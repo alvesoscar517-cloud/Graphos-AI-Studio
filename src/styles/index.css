@@ -1,0 +1,24 @@
+/* Theme variables - Design System */
+@import url('./theme-variables.css');
+
+/* Base styles */
+@import url('./common.css');
+
+/* Import tooltip styles */
+@import url('./tooltip.css');
+
+/* Modal styles are now imported in App.jsx */
+
+/* React-specific styles */
+#root {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}

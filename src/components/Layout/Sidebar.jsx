@@ -1,0 +1,199 @@
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { useAuth } from '../../contexts/AuthContext'
+import { useNotes } from '../../contexts/NotesContext'
+import './Sidebar.css'
+import NotificationPopup from '../Popups/NotificationPopup'
+import SettingsPopup from '../Popups/SettingsPopup'
+import UserProfilePopup from '../Popups/UserProfilePopup'
+import modal from '../../utils/modal'
+
+const Sidebar = ({ hidden, currentView, onViewChange }) => {
+  const { user } = useAuth()
+  const { getVisibleNotes, loadNote, deleteNote, currentNote } = useNotes()
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showUserProfile, setShowUserProfile] = useState(false)
+
+  const visibleNotes = getVisibleNotes()
+
+  const truncateTitle = (title, maxLength = 25) => {
+    if (title.length <= maxLength) return title
+    return title.substring(0, maxLength) + '...'
+  }
+
+  const handleNoteClick = (note) => {
+    loadNote(note.id)
+    onViewChange('playground-editor')
+  }
+
+  const handleDeleteNote = async (e, noteId) => {
+    e.stopPropagation()
+    const note = visibleNotes.find(n => n.id === noteId)
+    const confirmed = await modal.confirm(
+      `Bạn có chắc muốn xóa note "${note?.title}"?`,
+      'Xác nhận xóa',
+      { confirmText: 'Xóa', danger: true }
+    )
+    if (confirmed) {
+      deleteNote(noteId)
+      modal.toast('Đã xóa note', '', 'success')
+    }
+  }
+
+  return (
+    <motion.aside 
+      className="sidebar"
+      initial={false}
+      animate={{
+        x: hidden ? -238 : 0,
+        opacity: hidden ? 0 : 1
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        mass: 0.8
+      }}
+      drag="x"
+      dragConstraints={{ left: -238, right: 0 }}
+      dragElastic={0.2}
+      dragMomentum={false}
+      onDragEnd={(event, info) => {
+        // Nếu kéo quá 40% width thì toggle
+        const threshold = 238 * 0.4
+        if (info.offset.x < -threshold && !hidden) {
+          // Đóng sidebar nếu đang mở
+          // Note: Cần thêm callback từ parent để toggle
+        } else if (info.offset.x > threshold && hidden) {
+          // Mở sidebar nếu đang đóng
+        }
+      }}
+      style={{
+        pointerEvents: hidden ? 'none' : 'auto'
+      }}
+    >
+      <div className="sidebar-header">
+        <h1 className="logo-title">AI Content Auth</h1>
+      </div>
+
+      <nav className="nav">
+        <a 
+          href="#" 
+          className={`nav-item ${currentView === 'home' ? 'active' : ''}`}
+          onClick={(e) => { e.preventDefault(); onViewChange('home') }}
+        >
+          <img src="/icon/home.svg" alt="Home" />
+          <span>Home</span>
+        </a>
+
+        <a 
+          href="#" 
+          className={`nav-item ${currentView === 'playground' || currentView === 'playground-default' ? 'active' : ''}`}
+          onClick={(e) => { e.preventDefault(); onViewChange('playground') }}
+        >
+          <img src="/icon/play.svg" alt="Playground" />
+          <span>Playground</span>
+          <img 
+            src="/icon/clock.svg" 
+            alt="History" 
+            className="history-icon"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onViewChange('history') }}
+            data-tooltip="Xem lịch sử"
+            data-tooltip-position="right"
+          />
+        </a>
+
+        <div className="nav-section" id="notesList">
+          {visibleNotes.map(note => (
+            <div 
+              key={note.id}
+              className={`nav-subitem note-item ${currentNote?.id === note.id && currentView === 'playground-editor' ? 'active' : ''}`}
+              onClick={() => handleNoteClick(note)}
+            >
+              <span className="note-item-text" title={note.title}>
+                {truncateTitle(note.title)}
+              </span>
+              <button 
+                className="delete-note-btn"
+                onClick={(e) => handleDeleteNote(e, note.id)}
+              >
+                <img src="/icon/trash.svg" alt="Delete" />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <a 
+          href="#" 
+          className={`view-all ${currentView === 'history' ? 'active' : ''}`}
+          onClick={(e) => { e.preventDefault(); onViewChange('history') }}
+        >
+          View all history →
+        </a>
+      </nav>
+
+      <div className="sidebar-bottom">
+        <div className="footer-info">
+          <button 
+            className="footer-link"
+            onClick={(e) => { 
+              e.preventDefault()
+              e.stopPropagation()
+              // Close other popups
+              setShowSettings(false)
+              setShowUserProfile(false)
+              // Toggle this popup
+              setShowNotifications(!showNotifications)
+            }}
+          >
+            <img src="/icon/bell.svg" alt="Notifications" />
+            Thông báo
+          </button>
+
+          <button 
+            className="footer-link"
+            onClick={(e) => { 
+              e.preventDefault()
+              e.stopPropagation()
+              // Close other popups
+              setShowNotifications(false)
+              setShowUserProfile(false)
+              // Toggle this popup
+              setShowSettings(!showSettings)
+            }}
+          >
+            <img src="/icon/settings.svg" alt="Settings" />
+            Settings
+          </button>
+
+          <button 
+            className="footer-link"
+            onClick={(e) => { 
+              e.preventDefault()
+              e.stopPropagation()
+              // Close other popups
+              setShowNotifications(false)
+              setShowSettings(false)
+              // Toggle this popup
+              setShowUserProfile(!showUserProfile)
+            }}
+          >
+            <img 
+              src={user?.picture || "/icon/user-circle.svg"} 
+              alt="User"
+              style={user?.picture ? { borderRadius: '50%', width: '20px', height: '20px' } : {}}
+            />
+            <span>{user?.email || 'Chưa đăng nhập'}</span>
+          </button>
+        </div>
+      </div>
+
+      {showNotifications && <NotificationPopup onClose={() => setShowNotifications(false)} />}
+      {showSettings && <SettingsPopup onClose={() => setShowSettings(false)} />}
+      {showUserProfile && <UserProfilePopup onClose={() => setShowUserProfile(false)} />}
+    </motion.aside>
+  )
+}
+
+export default Sidebar

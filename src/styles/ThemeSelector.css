@@ -1,0 +1,122 @@
+/* Theme Selector - Standalone CSS */
+/* File này chứa style riêng cho theme selector để tránh xung đột */
+
+.theme-selector-wrapper {
+  margin-top: 20px;
+}
+
+.theme-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+/* Nút theme - hình vuông bo góc đơn giản */
+.theme-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 12px;
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover effect */
+.theme-btn:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Selected state */
+.theme-btn.theme-selected {
+  border-color: #4facfe;
+  background: rgba(79, 172, 254, 0.1);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.2);
+}
+
+.theme-btn.theme-selected:hover {
+  border-color: #4facfe;
+  background: rgba(79, 172, 254, 0.15);
+}
+
+/* Icon styling - màu đen xám */
+.theme-btn-icon {
+  width: 32px;
+  height: 32px;
+  transition: all 0.25s ease;
+  /* Chuyển icon thành màu đen xám */
+  filter: brightness(0) saturate(100%) invert(30%) sepia(0%) saturate(0%) hue-rotate(0deg);
+  opacity: 0.7;
+}
+
+.theme-btn:hover .theme-btn-icon {
+  /* Đậm hơn khi hover */
+  filter: brightness(0) saturate(100%) invert(20%) sepia(0%) saturate(0%) hue-rotate(0deg);
+  opacity: 0.85;
+  transform: scale(1.08);
+}
+
+.theme-btn.theme-selected .theme-btn-icon {
+  /* Màu xanh khi được chọn */
+  filter: invert(56%) sepia(89%) saturate(1500%) hue-rotate(175deg) brightness(102%) contrast(98%);
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+/* Text label */
+.theme-btn-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6c757d;
+  text-align: center;
+  transition: all 0.25s ease;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.theme-btn:hover .theme-btn-label {
+  color: #495057;
+}
+
+.theme-btn.theme-selected .theme-btn-label {
+  color: #4facfe;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .theme-selector-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .theme-btn {
+    padding: 18px 10px;
+    gap: 8px;
+  }
+
+  .theme-btn-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .theme-btn-label {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 992px) {
+  .theme-selector-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

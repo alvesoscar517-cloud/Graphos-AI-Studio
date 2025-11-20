@@ -1,0 +1,87 @@
+/* Playground Editor View Styles */
+.playground-editor-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  background: var(--bg-primary);
+}
+
+.playground-editor-view .text-input-area {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: var(--bg-primary) !important;
+}
+
+.playground-editor-view .main-textarea {
+  padding: 24px 32px !important;
+  margin: 0 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Header already styled in PlaygroundView.css */
+/* Text input area already styled in PlaygroundView.css */
+
+/* Additional editor-specific styles if needed */
+.playground-editor-view .main-header {
+  /* Inherits from PlaygroundView.css */
+}
+
+.playground-editor-view .text-input-area {
+  /* Inherits from PlaygroundView.css */
+}
+
+/* Shimmer Overlay */
+.text-input-area {
+  position: relative;
+}
+
+.shimmer-overlay {
+  position: absolute;
+  inset: 0;
+  padding: 24px 32px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-primary);
+  pointer-events: none;
+  z-index: 10;
+  /* Match textarea scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.shimmer-overlay::-webkit-scrollbar {
+  width: 8px;
+}
+
+.shimmer-overlay::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shimmer-overlay::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.shimmer-text {
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  /* Smooth rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Performance optimization for large text */
+  will-change: opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

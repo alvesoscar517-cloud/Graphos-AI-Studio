@@ -1,0 +1,108 @@
+import './ProfileCard.css'
+
+const ProfileCard = ({ profile, onSelect }) => {
+  // Debug: Log profile data
+  console.log('ProfileCard data:', profile)
+  
+  // Theme icon mapping
+  const getThemeIcon = (theme) => {
+    const themeIcons = {
+      'work': 'briefcase',
+      'personal': 'user',
+      'academic': 'graduation-cap',
+      'creative': 'palette',
+      'business': 'trending-up',
+      'social': 'message-circle',
+      'technical': 'code',
+      'other': 'more-horizontal'
+    }
+    return themeIcons[theme] || 'user-round'
+  }
+  
+  const formatNumber = (num) => {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'k'
+    }
+    return num.toString()
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Hôm nay'
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = Math.abs(now - date)
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    
+    if (diffDays === 0) return 'Hôm nay'
+    if (diffDays === 1) return 'Hôm qua'
+    if (diffDays < 7) return `${diffDays} ngày trước`
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} tuần trước`
+    
+    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  }
+
+  return (
+    <div 
+      className="profile-card" 
+      onClick={() => onSelect(profile)}
+    >
+      <div className="profile-card-header">
+        <div className="profile-card-icon">
+          <img src={`/icon/${getThemeIcon(profile.theme)}.svg`} alt={profile.profile_name} />
+        </div>
+      </div>
+      
+      <h4 className="profile-card-title">{profile.profile_name}</h4>
+      
+      <div className="profile-card-meta">
+        <div className="profile-card-meta-item">
+          <img src="/icon/file-text.svg" alt="Samples" />
+          <span>{profile.sample_count || 0} mẫu</span>
+        </div>
+        <div className="profile-card-meta-item">
+          <img src="/icon/type.svg" alt="Words" />
+          <span>{formatNumber(profile.total_words || 0)} từ</span>
+        </div>
+      </div>
+
+      <div className="profile-card-stats">
+        <div className="profile-stat">
+          <span className="profile-stat-label">FLESCH</span>
+          <span className="profile-stat-value">
+            {profile.statistics?.flesch_reading_ease?.toFixed(0) || 
+             profile.flesch_reading_ease?.toFixed(0) || '0'}
+          </span>
+        </div>
+        <div className="profile-stat">
+          <span className="profile-stat-label">CÂU TB</span>
+          <span className="profile-stat-value">
+            {profile.statistics?.avg_sentence_length?.toFixed(0) || 
+             profile.avg_sentence_length?.toFixed(0) || '0'}
+          </span>
+        </div>
+      </div>
+
+      <div className="profile-card-tags">
+        <span className="profile-tag">Văn phòng</span>
+        <span className="profile-tag">Cá nhân</span>
+      </div>
+
+      <div className="profile-card-footer">
+        <span className="profile-card-updated">
+          {formatDate(profile.created_at)}
+        </span>
+        <button 
+          className="profile-card-action"
+          onClick={(e) => {
+            e.stopPropagation()
+            onSelect(profile)
+          }}
+        >
+          Sử dụng
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default ProfileCard
