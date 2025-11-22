@@ -1,7 +1,18 @@
 import { CONFIG } from '../utils/config'
+import { isDevMode, getDefaultTestUser, devLog } from '../utils/devConfig'
 
 // Get user info helper
 export async function getUserInfo() {
+  // DEV MODE: Sử dụng test user
+  if (isDevMode()) {
+    const testUser = getDefaultTestUser()
+    if (testUser) {
+      devLog('Using test user:', testUser.email)
+      return testUser
+    }
+  }
+  
+  // PRODUCTION: Lấy user thật
   try {
     // Check if running in Chrome extension context
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { loadProfiles as loadProfilesAPI } from '../services/api'
+import { isDevMode, getOrCreateTestProfile, shouldUseTestProfile, devLog } from '../utils/devConfig'
 
 const ProfileContext = createContext()
 
@@ -51,6 +52,28 @@ export const ProfileProvider = ({ children }) => {
     setLoading(true)
     try {
       console.log('🔄 Loading profiles from API...')
+      
+      // DEV MODE: Sử dụng profile test nếu được bật
+      if (isDevMode() && shouldUseTestProfile()) {
+        devLog('🧪 Dev mode enabled - using test profile')
+        const testProfile = await getOrCreateTestProfile()
+        
+        if (testProfile) {
+          setProfiles([testProfile])
+          setLastLoaded(Date.now())
+          
+          // Auto-select test profile
+          devLog('Auto-selecting test profile:', testProfile.profile_name)
+          setCurrentProfile(testProfile)
+          localStorage.setItem('activeProfileId', testProfile.profile_id)
+          localStorage.setItem('activeProfileName', testProfile.profile_name)
+          
+          setLoading(false)
+          return
+        }
+      }
+      
+      // PRODUCTION: Load từ API như bình thường
       const data = await loadProfilesAPI()
       setProfiles(data)
       setLastLoaded(Date.now())

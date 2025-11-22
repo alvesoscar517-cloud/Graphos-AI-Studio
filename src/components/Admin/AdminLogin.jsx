@@ -18,7 +18,7 @@ export default function AdminLogin() {
 
     try {
       // Try to verify the key by making a test API call
-      const response = await fetch('https://ai-content-authenticator-472729326429.us-central1.run.app/api/admin/analytics/overview', {
+      const response = await fetch('https://ai-authenticator-472729326429.us-central1.run.app/api/admin/analytics/overview', {
         headers: {
           'X-Admin-Key': adminKey
         }

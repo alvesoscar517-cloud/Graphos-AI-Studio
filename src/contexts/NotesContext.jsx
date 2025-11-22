@@ -244,7 +244,7 @@ export const NotesProvider = ({ children }) => {
       // Extract first meaningful sentence or paragraph
       const firstPart = content.trim().substring(0, 100)
       
-      const response = await fetch('https://ai-content-authenticator-472729326429.us-central1.run.app/api/chat', {
+      const response = await fetch('https://ai-authenticator-472729326429.us-central1.run.app/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

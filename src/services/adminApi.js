@@ -3,7 +3,7 @@
  * Handles all admin panel API calls
  */
 
-const API_BASE_URL = 'https://ai-content-authenticator-472729326429.us-central1.run.app';
+const API_BASE_URL = 'https://ai-authenticator-472729326429.us-central1.run.app';
 
 // Get admin key from localStorage or environment
 const getAdminKey = () => {
@@ -156,7 +156,7 @@ export const translationApi = {
   translate: async (text, sourceLang = 'vi', targetLang = 'en') => {
     try {
       // Use Gemini for translation
-      const response = await fetch('https://ai-content-authenticator-472729326429.us-central1.run.app/api/translate', {
+      const response = await fetch('https://ai-authenticator-472729326429.us-central1.run.app/api/translate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

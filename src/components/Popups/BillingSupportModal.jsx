@@ -66,7 +66,7 @@ const BillingSupportModal = ({ onClose }) => {
     setError('')
 
     try {
-      const response = await fetch('https://ai-content-authenticator-472729326429.us-central1.run.app/send-feedback', {
+      const response = await fetch('https://ai-authenticator-472729326429.us-central1.run.app/send-feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

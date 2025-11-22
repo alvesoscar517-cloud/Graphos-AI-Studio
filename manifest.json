@@ -19,7 +19,7 @@
     "storage"
   ],
   "host_permissions": [
-    "https://ai-content-authenticator-472729326429.us-central1.run.app/*"
+    "https://ai-authenticator-472729326429.us-central1.run.app/*"
   ],
   "oauth2": {
     "client_id": "94136052128-r2rhnmicbq8q94agff7me9fipe8kh80q.apps.googleusercontent.com",

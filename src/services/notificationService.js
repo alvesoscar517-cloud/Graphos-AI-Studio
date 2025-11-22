@@ -3,7 +3,7 @@
  * Handles user notifications from backend
  */
 
-const API_BASE_URL = 'https://ai-content-authenticator-472729326429.us-central1.run.app';
+const API_BASE_URL = 'https://ai-authenticator-472729326429.us-central1.run.app';
 
 // Get user ID from auth
 const getUserId = () => {

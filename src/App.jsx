@@ -9,6 +9,7 @@ import { WorkspaceProvider } from './contexts/WorkspaceContext'
 import LoginOverlay from './components/Auth/LoginOverlay'
 import MainLayout from './components/Layout/MainLayout'
 import ProfileSetup from './components/ProfileSetup/ProfileSetup'
+import DevModeToggle from './components/Common/DevModeToggle'
 import modal from './utils/modal'
 import { initTooltips } from './utils/tooltips'
 import './utils/testNotifications' // Import test utilities
@@ -114,6 +115,7 @@ function App() {
               <ProfileProvider>
                 <WorkspaceProvider>
                   <AppContent />
+                  <DevModeToggle />
                 </WorkspaceProvider>
               </ProfileProvider>
             </AIProcessingProvider>

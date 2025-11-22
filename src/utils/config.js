@@ -1,5 +1,5 @@
 export const CONFIG = {
-  API_BASE_URL: 'https://ai-content-authenticator-472729326429.us-central1.run.app',
+  API_BASE_URL: 'https://ai-authenticator-472729326429.us-central1.run.app',
   MIN_WORDS_SHORT_SAMPLE: 10,
   MIN_WORDS_LONG_TEXT: 500,
   MIN_SAMPLES_REQUIRED: 3,

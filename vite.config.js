@@ -7,12 +7,12 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://ai-content-authenticator-472729326429.us-central1.run.app',
+        target: 'https://ai-authenticator-472729326429.us-central1.run.app',
         changeOrigin: true,
         secure: false,
       },
       '/send-feedback': {
-        target: 'https://ai-content-authenticator-472729326429.us-central1.run.app',
+        target: 'https://ai-authenticator-472729326429.us-central1.run.app',
         changeOrigin: true,
         secure: false,
       }
