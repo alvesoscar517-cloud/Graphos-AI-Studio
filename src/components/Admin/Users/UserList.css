@@ -16,6 +16,7 @@
 .header-title > img {
   width: 28px;
   height: 28px;
+  filter: brightness(0);
 }
 
 .list-header h1 {
@@ -54,6 +55,7 @@
   width: 18px;
   height: 18px;
   opacity: 0.5;
+  filter: brightness(0);
 }
 
 .search-box input {
@@ -210,7 +212,7 @@
 .btn-view img {
   width: 14px;
   height: 14px;
-  filter: invert(1);
+  filter: brightness(0) invert(1);
 }
 
 .btn-view:hover {
@@ -251,4 +253,30 @@
   .search-box {
     max-width: none;
   }
+}
+
+/* Export Button */
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-export:hover {
+  background: #222;
+}
+
+.btn-export img {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(1);
 }

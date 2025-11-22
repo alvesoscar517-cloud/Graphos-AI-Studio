@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { notificationsApi } from '../../../services/adminApi';
+import { useNotify } from '../../Common/NotificationProvider';
 import NotificationPreview from './NotificationPreview';
 import './NotificationEditor.css';
 

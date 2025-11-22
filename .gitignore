@@ -4,54 +4,30 @@ backend/node_modules/
 
 # Build outputs
 dist/
-build/
+backend/dist/
 
 # Environment variables
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+backend/.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Logs
-logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# OS files
-Thumbs.db
-.DS_Store
-
-# Extension files (if not needed in repo)
+# Extension
 *.crx
 *.pem
-
-# Temporary files
-*.tmp
-*.temp
-.cache/
-
-# Testing
-coverage/
-.nyc_output/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache

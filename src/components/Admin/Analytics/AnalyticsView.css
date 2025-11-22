@@ -20,6 +20,7 @@
 .header-title > img {
   width: 32px;
   height: 32px;
+  filter: brightness(0);
 }
 
 .analytics-header h1 {
@@ -100,7 +101,7 @@
 .stat-icon img {
   width: 28px;
   height: 28px;
-  filter: invert(1);
+  filter: brightness(0) invert(1);
 }
 
 .stat-content {
@@ -173,6 +174,7 @@
 .chart-header h3 img {
   width: 20px;
   height: 20px;
+  filter: brightness(0);
 }
 
 .chart-subtitle {
@@ -231,6 +233,7 @@
 .status-label img {
   width: 16px;
   height: 16px;
+  filter: brightness(0);
 }
 
 .status-value {
@@ -259,6 +262,7 @@
   width: 32px;
   height: 32px;
   flex-shrink: 0;
+  filter: brightness(0);
 }
 
 .insight-content {
@@ -292,9 +296,9 @@
 .btn-export,
 .btn-refresh {
   padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border: 1px solid #fff;
+  border-radius: 6px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
@@ -306,27 +310,33 @@
 .btn-refresh img {
   width: 16px;
   height: 16px;
-  filter: invert(1);
 }
 
 .btn-export {
   background: #000;
-  color: white;
+  color: #fff;
 }
 
 .btn-export:hover {
-  background: #333;
-  transform: translateY(-1px);
+  background: #222;
+}
+
+.btn-export img {
+  filter: brightness(0) invert(1);
 }
 
 .btn-refresh {
-  background: #000;
-  color: white;
+  background: #333;
+  color: #fff;
+  border: 1px solid #333;
 }
 
 .btn-refresh:hover {
-  background: #333;
-  transform: translateY(-1px);
+  background: #444;
+}
+
+.btn-refresh img {
+  filter: brightness(0) invert(1);
 }
 
 /* Loading */

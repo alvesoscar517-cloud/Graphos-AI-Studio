@@ -1,0 +1,157 @@
+#admin-root .admin-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  background: #000;
+  color: #fff;
+  transition: width 0.2s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #222;
+}
+
+#admin-root .admin-sidebar.open {
+  width: 240px;
+}
+
+#admin-root .admin-sidebar.closed {
+  width: 64px;
+}
+
+#admin-root .sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #222;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+}
+
+#admin-root .sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+#admin-root .logo-icon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+#admin-root .admin-sidebar.closed .logo-text {
+  display: none;
+}
+
+#admin-root .sidebar-nav {
+  flex: 1;
+  padding: 16px 0;
+  overflow-y: auto;
+}
+
+#admin-root .sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+#admin-root .sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#admin-root .sidebar-nav::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+#admin-root .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  color: #999;
+  text-decoration: none;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#admin-root .nav-item:hover {
+  background: #111;
+  color: #fff;
+}
+
+#admin-root .nav-item.active {
+  background: #111;
+  color: #fff;
+  border-left-color: #fff;
+}
+
+#admin-root .nav-icon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  filter: brightness(0) invert(0.6);
+  transition: filter 0.15s;
+}
+
+#admin-root .nav-item:hover .nav-icon,
+#admin-root .nav-item.active .nav-icon {
+  filter: brightness(0) invert(1);
+}
+
+#admin-root .admin-sidebar.closed .nav-item {
+  justify-content: center;
+  padding: 12px;
+}
+
+#admin-root .admin-sidebar.closed .nav-label {
+  display: none;
+}
+
+#admin-root .sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid #222;
+}
+
+#admin-root .toggle-btn {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#admin-root .toggle-btn img {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(0.6);
+  transition: filter 0.15s;
+}
+
+#admin-root .toggle-btn:hover {
+  background: #111;
+  border-color: #444;
+}
+
+#admin-root .toggle-btn:hover img {
+  filter: brightness(0) invert(1);
+}
+
+@media (max-width: 768px) {
+  #admin-root .admin-sidebar {
+    transform: translateX(-100%);
+  }
+
+  #admin-root .admin-sidebar.open {
+    transform: translateX(0);
+  }
+}

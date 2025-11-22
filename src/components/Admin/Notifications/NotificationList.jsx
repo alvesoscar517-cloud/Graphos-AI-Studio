@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { notificationsApi } from '../../../services/adminApi';
+import { useNotify } from '../../Common/NotificationProvider';
+import Spinner from '../../Common/Spinner';
 import './NotificationList.css';
 
 export default function NotificationList() {
@@ -8,6 +10,7 @@ export default function NotificationList() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const navigate = useNavigate();
+  const notify = useNotify();
 
   useEffect(() => {
     loadNotifications();
@@ -27,25 +30,38 @@ export default function NotificationList() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Bạn có chắc muốn xóa thông báo này?')) return;
+    const confirmed = await notify.confirm({
+      title: 'Xóa thông báo',
+      message: 'Bạn có chắc muốn xóa thông báo này?',
+      type: 'danger'
+    });
+    
+    if (!confirmed) return;
 
     try {
       await notificationsApi.delete(id);
       setNotifications(notifications.filter(n => n.id !== id));
+      notify.success('Đã xóa thông báo!');
     } catch (err) {
-      alert('Lỗi: ' + err.message);
+      notify.error('Lỗi: ' + err.message);
     }
   };
 
   const handleSend = async (id) => {
-    if (!confirm('Gửi thông báo này ngay bây giờ?')) return;
+    const confirmed = await notify.confirm({
+      title: 'Gửi thông báo',
+      message: 'Gửi thông báo này ngay bây giờ?',
+      type: 'info'
+    });
+    
+    if (!confirmed) return;
 
     try {
       await notificationsApi.send(id);
-      alert('Đã gửi thông báo thành công!');
+      notify.success('Đã gửi thông báo thành công!');
       loadNotifications();
     } catch (err) {
-      alert('Lỗi: ' + err.message);
+      notify.error('Lỗi: ' + err.message);
     }
   };
 

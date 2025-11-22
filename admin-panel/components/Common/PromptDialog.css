@@ -1,0 +1,84 @@
+#admin-root .prompt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+#admin-root .prompt-dialog {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  animation: slideUp 0.3s ease-out;
+}
+
+#admin-root .prompt-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+#admin-root .prompt-icon img {
+  width: 28px;
+  height: 28px;
+  filter: invert(47%) sepia(96%) saturate(1988%) hue-rotate(189deg) brightness(98%) contrast(98%);
+}
+
+#admin-root .prompt-title {
+  margin: 0 0 12px 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #000;
+}
+
+#admin-root .prompt-message {
+  margin: 0 0 20px 0;
+  font-size: 15px;
+  color: #666;
+  line-height: 1.6;
+}
+
+#admin-root .prompt-input {
+  margin-bottom: 24px;
+  /* Other styles from global input-custom.css */
+}
+
+#admin-root .prompt-actions {
+  display: flex;
+  gap: 12px;
+}
+
+#admin-root .btn-prompt-cancel {
+  flex: 1;
+}
+
+#admin-root .btn-prompt-ok {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  #admin-root .prompt-dialog {
+    padding: 24px;
+  }
+
+  #admin-root .prompt-actions {
+    flex-direction: column-reverse;
+  }
+}

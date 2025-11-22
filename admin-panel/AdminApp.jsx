@@ -1,6 +1,6 @@
 import { BrowserRouter as Router } from 'react-router-dom';
-import { AdminAuthProvider } from '../src/contexts/AdminAuthContext';
-import AdminRoutes from '../src/components/Admin/AdminRoutes';
+import { AdminAuthProvider } from './contexts/AdminAuthContext';
+import AdminRoutes from './components/AdminRoutes';
 
 export default function AdminApp() {
   return (

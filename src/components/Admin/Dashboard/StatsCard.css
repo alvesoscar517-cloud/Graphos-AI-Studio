@@ -26,10 +26,11 @@
   flex-shrink: 0;
 }
 
-.stats-icon img {
+.admin-layout .stats-icon img {
   width: 24px;
   height: 24px;
-  filter: invert(1);
+  filter: invert(1) brightness(2) !important;
+  -webkit-filter: invert(1) brightness(2) !important;
 }
 
 .stats-content {

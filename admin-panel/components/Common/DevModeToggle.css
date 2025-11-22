@@ -1,0 +1,246 @@
+#admin-root .dev-mode-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+#admin-root .dev-toggle-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+#admin-root .dev-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+}
+
+#admin-root .dev-indicator {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: #4ade80;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  #admin-root 0%, #admin-root 100% {
+    opacity: 1;
+  }
+  #admin-root 50% {
+    opacity: 0.5;
+  }
+}
+
+#admin-root .dev-panel {
+  position: absolute;
+  bottom: 60px;
+  right: 0;
+  width: 320px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  #admin-root from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  #admin-root to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#admin-root .dev-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+#admin-root .dev-panel-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#admin-root .dev-panel-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+#admin-root .dev-panel-header button:hover {
+  opacity: 1;
+}
+
+#admin-root .dev-panel-content {
+  padding: 16px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+#admin-root .dev-setting {
+  margin-bottom: 16px;
+}
+
+#admin-root .dev-setting label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+#admin-root .dev-setting input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+#admin-root .dev-setting input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#admin-root .dev-hint {
+  margin: 4px 0 0 24px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+#admin-root .dev-info {
+  margin-top: 20px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+#admin-root .dev-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+#admin-root .dev-info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+#admin-root .dev-info-item span {
+  color: #6b7280;
+  min-width: 50px;
+}
+
+#admin-root .dev-info-item code {
+  flex: 1;
+  padding: 4px 8px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #667eea;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#admin-root .dev-actions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+#admin-root .dev-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#admin-root .dev-btn-danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+#admin-root .dev-btn-danger:hover {
+  background: #fecaca;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  #admin-root .dev-panel {
+    background: #1f2937;
+  }
+
+  #admin-root .dev-setting label {
+    color: #f9fafb;
+  }
+
+  #admin-root .dev-hint {
+    color: #9ca3af;
+  }
+
+  #admin-root .dev-info {
+    background: #111827;
+  }
+
+  #admin-root .dev-info h4 {
+    color: #f9fafb;
+  }
+
+  #admin-root .dev-info-item span {
+    color: #9ca3af;
+  }
+
+  #admin-root .dev-info-item code {
+    background: #1f2937;
+    border-color: #374151;
+    color: #818cf8;
+  }
+
+  #admin-root .dev-actions {
+    border-top-color: #374151;
+  }
+}

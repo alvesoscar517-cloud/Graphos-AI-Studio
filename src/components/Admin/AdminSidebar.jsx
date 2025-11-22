@@ -6,7 +6,9 @@ export default function AdminSidebar({ isOpen, onToggle }) {
     { path: '/', icon: 'layout-dashboard.svg', label: 'Dashboard', exact: true },
     { path: '/notifications', icon: 'bell.svg', label: 'Thông báo' },
     { path: '/users', icon: 'users.svg', label: 'Người dùng' },
+    { path: '/support', icon: 'headphones.svg', label: 'Support' },
     { path: '/analytics', icon: 'chart-line.svg', label: 'Thống kê' },
+    { path: '/logs', icon: 'file-text.svg', label: 'Logs' },
     { path: '/settings', icon: 'settings.svg', label: 'Cài đặt' },
   ];
 

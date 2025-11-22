@@ -1,0 +1,62 @@
+/* ============================================================================
+   SETTINGS ICONS - CLEAN VERSION
+   ============================================================================ */
+
+/* Tab Icons */
+#admin-root .settings-view .tab-item > img {
+  width: 18px !important;
+  height: 18px !important;
+  filter: brightness(0) !important;
+  opacity: 0.5 !important;
+  transition: opacity 0.15s ease;
+}
+
+#admin-root .settings-view .tab-item:hover > img {
+  opacity: 1 !important;
+}
+
+#admin-root .settings-view .tab-item.active > img {
+  filter: brightness(0) invert(1) !important;
+  opacity: 1 !important;
+}
+
+/* Header Icon */
+#admin-root .settings-view .header-title > img {
+  filter: brightness(0) !important;
+  opacity: 1 !important;
+}
+
+/* Button Icons */
+#admin-root .settings-view .btn-save > img,
+#admin-root .settings-view .btn-test > img,
+#admin-root .settings-view .btn-primary > img {
+  filter: brightness(0) invert(1) !important;
+  opacity: 1 !important;
+}
+
+#admin-root .settings-view .btn-secondary > img {
+  filter: brightness(0) !important;
+  opacity: 0.8 !important;
+}
+
+/* Backup Card Icons */
+#admin-root .settings-view .backup-card > img {
+  filter: brightness(0) !important;
+  opacity: 0.6 !important;
+}
+
+/* History Icons */
+#admin-root .settings-view .history-item > img:first-child {
+  filter: brightness(0) !important;
+  opacity: 0.5 !important;
+}
+
+/* Icon Buttons */
+#admin-root .settings-view .btn-icon > img {
+  filter: brightness(0) !important;
+  opacity: 0.6 !important;
+}
+
+#admin-root .settings-view .btn-icon:hover > img {
+  opacity: 1 !important;
+}

@@ -12,7 +12,6 @@ import ProfileSetup from './components/ProfileSetup/ProfileSetup'
 import DevModeToggle from './components/Common/DevModeToggle'
 import modal from './utils/modal'
 import { initTooltips } from './utils/tooltips'
-import './utils/testNotifications' // Import test utilities
 import './styles/App.css'
 import './styles/modal.css'
 

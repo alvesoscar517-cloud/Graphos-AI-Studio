@@ -40,6 +40,7 @@ module.exports = {
   
   // Admin
   ADMIN_KEY: process.env.ADMIN_KEY || 'your-secure-admin-key-here',
+  ADMIN_PANEL_URL: process.env.ADMIN_PANEL_URL || 'https://your-domain.com/admin',
   
   // Email (if using)
   SMTP_HOST: process.env.SMTP_HOST,

@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usersApi } from '../../../services/adminApi';
+import { exportUsersToCSV } from '../../../utils/exportUtils';
+import { useNotify } from '../../Common/NotificationProvider';
+import Spinner from '../../Common/Spinner';
 import './UserList.css';
 
 export default function UserList() {
@@ -8,6 +11,7 @@ export default function UserList() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const notify = useNotify();
 
   useEffect(() => {
     loadUsers();
@@ -57,7 +61,12 @@ export default function UserList() {
   };
 
   if (loading) {
-    return <div className="loading">Đang tải...</div>;
+    return (
+      <div className="loading">
+        <Spinner size="large" />
+        <p>Đang tải...</p>
+      </div>
+    );
   }
 
   return (
@@ -70,6 +79,21 @@ export default function UserList() {
             <p>Xem và quản lý tất cả người dùng trong hệ thống</p>
           </div>
         </div>
+        
+        <button 
+          className="btn-export"
+          onClick={() => {
+            try {
+              exportUsersToCSV(users);
+              notify.success('Đã export danh sách người dùng!');
+            } catch (err) {
+              notify.error('Lỗi export: ' + err.message);
+            }
+          }}
+        >
+          <img src="/icon/download.svg" alt="Export" />
+          Export CSV
+        </button>
       </div>
 
       <div className="list-controls">

@@ -1,0 +1,267 @@
+#admin-root .notification-preview-container {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 24px;
+}
+
+#admin-root .preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+#admin-root .preview-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #000;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#admin-root .preview-header h3 img {
+  width: 18px;
+  height: 18px;
+}
+
+#admin-root .preview-language {
+  padding: 6px 12px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#admin-root .preview-info {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+#admin-root .info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#admin-root .info-label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 600;
+}
+
+#admin-root .info-value {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+#admin-root .info-value img {
+  width: 16px;
+  height: 16px;
+}
+
+#admin-root .preview-section {
+  margin-bottom: 24px;
+}
+
+#admin-root .preview-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#admin-root .preview-section h4 img {
+  width: 16px;
+  height: 16px;
+}
+
+/* Desktop Notification */
+#admin-root .preview-notification.desktop {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  border-left: 4px solid;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+#admin-root .notif-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#admin-root .notif-icon img {
+  width: 20px;
+  height: 20px;
+}
+
+#admin-root .notif-content {
+  flex: 1;
+}
+
+#admin-root .notif-content h5 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #000;
+}
+
+#admin-root .notif-content p {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+#admin-root .notif-cta {
+  padding: 8px 16px;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#admin-root .notif-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: #f0f0f0;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+#admin-root .notif-close:hover {
+  background: #e0e0e0;
+}
+
+/* Mobile Notification */
+#admin-root .mobile-frame {
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+#admin-root .preview-notification.mobile {
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border-top: 3px solid;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#admin-root .notif-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+#admin-root .notif-icon-mobile {
+  width: 20px;
+  height: 20px;
+}
+
+#admin-root .notif-time {
+  font-size: 12px;
+  color: #999;
+}
+
+#admin-root .preview-notification.mobile h5 {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  color: #000;
+  font-weight: 600;
+}
+
+#admin-root .preview-notification.mobile p {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+#admin-root .notif-cta-mobile {
+  background: none;
+  border: none;
+  padding: 0;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Target & Schedule Info */
+.target-info,
+#admin-root .schedule-info {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.target-info p,
+#admin-root .schedule-info p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.target-info p img,
+#admin-root .schedule-info p img {
+  width: 14px;
+  height: 14px;
+}
+
+.target-info p:last-child,
+#admin-root .schedule-info p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  #admin-root .notification-preview-container {
+    position: static;
+  }
+
+  #admin-root .preview-info {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

@@ -1,0 +1,68 @@
+/* Text Shimmer Effect - Improved */
+#admin-root .text-shimmer {
+  display: block;
+  position: relative;
+  color: var(--text-primary);
+  animation: shimmer-pulse var(--shimmer-duration, 2s) ease-in-out infinite;
+}
+
+/* Shimmer overlay effect */
+#admin-root .text-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.15) 50%,
+    transparent 100%
+  );
+  animation: shimmer-slide var(--shimmer-duration, 2s) ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Subtle pulse animation */
+@keyframes shimmer-pulse {
+  #admin-root 0%, #admin-root 100% {
+    opacity: 1;
+  }
+  #admin-root 50% {
+    opacity: 0.85;
+  }
+}
+
+/* Sliding shimmer effect */
+@keyframes shimmer-slide {
+  #admin-root 0% {
+    left: -100%;
+  }
+  #admin-root 100% {
+    left: 200%;
+  }
+}
+
+/* Dark theme - use lighter shimmer */
+#admin-root body.dark-theme .text-shimmer::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+}
+
+#admin-root body.dark-theme .text-shimmer {
+  animation: shimmer-pulse-dark var(--shimmer-duration, 2s) ease-in-out infinite;
+}
+
+@keyframes shimmer-pulse-dark {
+  #admin-root 0%, #admin-root 100% {
+    opacity: 1;
+  }
+  #admin-root 50% {
+    opacity: 0.9;
+  }
+}

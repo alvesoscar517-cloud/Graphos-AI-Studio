@@ -1,0 +1,290 @@
+#admin-root .notification-list {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+#admin-root .list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  gap: 20px;
+}
+
+#admin-root .header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#admin-root .header-title > img {
+  width: 28px;
+  height: 28px;
+  filter: brightness(0);
+}
+
+#admin-root .list-header h1 {
+  font-size: 24px;
+  margin: 0 0 4px 0;
+  color: #000;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+#admin-root .list-header p {
+  color: #666;
+  margin: 0;
+  font-size: 14px;
+}
+
+#admin-root .btn-primary {
+  padding: 12px 24px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#admin-root .btn-primary img {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(1);
+}
+
+#admin-root .btn-primary:hover {
+  background: #222;
+  transform: translateY(-2px);
+}
+
+#admin-root .list-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+#admin-root .list-filters button {
+  padding: 10px 18px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+#admin-root .list-filters button:hover {
+  border-color: #000;
+  color: #000;
+}
+
+#admin-root .list-filters button.active {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+#admin-root .notifications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+#admin-root .notification-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+#admin-root .notification-card:hover {
+  border-color: #000;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+#admin-root .card-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+#admin-root .status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#admin-root .type-badge {
+  padding: 4px 12px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#admin-root .type-badge img {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0);
+}
+
+#admin-root .card-body h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #000;
+}
+
+#admin-root .card-body p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#admin-root .card-footer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+#admin-root .card-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #666;
+}
+
+#admin-root .card-stats span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#admin-root .card-stats img {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0);
+}
+
+#admin-root .card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+#admin-root .card-actions button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+#admin-root .card-actions button img {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0) invert(1);
+}
+
+#admin-root .card-actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+#admin-root .btn-send {
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+}
+
+#admin-root .btn-edit {
+  background: #333;
+  color: #fff;
+  border: 1px solid #333;
+}
+
+#admin-root .btn-delete {
+  background: #555;
+  color: #fff;
+  border: 1px solid #555;
+  flex: 0 0 auto;
+  padding: 10px 14px;
+}
+
+#admin-root .empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+#admin-root .empty-state img {
+  width: 64px;
+  height: 64px;
+  opacity: 0.3;
+  filter: brightness(0);
+}
+
+#admin-root .empty-state p {
+  font-size: 18px;
+  color: #666;
+  margin: 0;
+}
+
+#admin-root .empty-state button {
+  padding: 12px 24px;
+  background: #000;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+#admin-root .empty-state button:hover {
+  background: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 768px) {
+  #admin-root .list-header {
+    flex-direction: column;
+  }
+
+  #admin-root .notifications-grid {
+    grid-template-columns: 1fr;
+  }
+}

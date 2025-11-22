@@ -1,0 +1,207 @@
+/* Custom Button Styles - Apple Style */
+
+button {
+  /* Reset */
+  border: none;
+  margin: 0;
+  padding: 0;
+  background: none;
+  font-family: inherit;
+  
+  /* Behavior */
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Primary Button */
+.btn-primary,
+button[type="submit"]:not(.btn-secondary):not(.btn-cancel) {
+  /* Layout */
+  padding: 11px 20px;
+  min-height: 44px;
+  
+  /* Style */
+  background: #007aff;
+  color: #ffffff;
+  border-radius: 10px;
+  
+  /* Typography */
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  
+  /* Behavior */
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 122, 255, 0.2);
+}
+
+.btn-primary:hover,
+button[type="submit"]:not(.btn-secondary):not(.btn-cancel):hover {
+  background: #0051d5;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.btn-primary:active,
+button[type="submit"]:not(.btn-secondary):not(.btn-cancel):active {
+  transform: scale(0.98);
+  background: #0040a8;
+}
+
+.btn-primary:disabled,
+button[type="submit"]:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Secondary Button */
+.btn-secondary {
+  padding: 11px 20px;
+  min-height: 44px;
+  background: #f0f0f0;
+  color: #000;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+  background: #d0d0d0;
+}
+
+/* Cancel/Tertiary Button */
+.btn-cancel,
+.btn-tertiary {
+  padding: 11px 20px;
+  min-height: 44px;
+  background: transparent;
+  color: #007aff;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-cancel:hover,
+.btn-tertiary:hover {
+  background: rgba(0, 122, 255, 0.08);
+}
+
+.btn-cancel:active,
+.btn-tertiary:active {
+  transform: scale(0.98);
+  background: rgba(0, 122, 255, 0.15);
+}
+
+/* Danger Button */
+.btn-danger {
+  padding: 11px 20px;
+  min-height: 44px;
+  background: #ff3b30;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(255, 59, 48, 0.2);
+}
+
+.btn-danger:hover {
+  background: #e6342a;
+  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
+}
+
+.btn-danger:active {
+  transform: scale(0.98);
+  background: #cc2e24;
+}
+
+/* Icon Buttons */
+.btn-icon {
+  padding: 10px;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  border-radius: 10px;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-icon:hover {
+  background: #e0e0e0;
+}
+
+.btn-icon:active {
+  transform: scale(0.95);
+  background: #d0d0d0;
+}
+
+/* Button with Icon */
+button img,
+.btn-primary img,
+.btn-secondary img {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .btn-primary,
+  button[type="submit"]:not(.btn-secondary):not(.btn-cancel) {
+    background: #0a84ff;
+  }
+
+  .btn-primary:hover,
+  button[type="submit"]:not(.btn-secondary):not(.btn-cancel):hover {
+    background: #0070e0;
+  }
+
+  .btn-secondary {
+    background: #2c2c2e;
+    color: #ffffff;
+  }
+
+  .btn-secondary:hover {
+    background: #3a3a3c;
+  }
+
+  .btn-cancel,
+  .btn-tertiary {
+    color: #0a84ff;
+  }
+
+  .btn-cancel:hover,
+  .btn-tertiary:hover {
+    background: rgba(10, 132, 255, 0.15);
+  }
+
+  .btn-icon {
+    background: #2c2c2e;
+  }
+
+  .btn-icon:hover {
+    background: #3a3a3c;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-cancel,
+  .btn-danger,
+  button[type="submit"] {
+    min-height: 48px;
+    font-size: 16px;
+  }
+}

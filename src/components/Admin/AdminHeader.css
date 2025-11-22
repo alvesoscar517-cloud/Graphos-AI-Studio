@@ -30,6 +30,7 @@
 .mobile-menu-btn img {
   width: 20px;
   height: 20px;
+  filter: brightness(0);
 }
 
 .mobile-menu-btn:hover {
@@ -62,6 +63,7 @@
 .user-icon {
   width: 18px;
   height: 18px;
+  filter: brightness(0);
 }
 
 .user-name {
@@ -88,7 +90,7 @@
 .logout-btn img {
   width: 16px;
   height: 16px;
-  filter: invert(1);
+  filter: brightness(0) invert(1);
 }
 
 .logout-btn:hover {

@@ -42,8 +42,8 @@
 .btn-preview {
   padding: 10px 20px;
   background: #000;
-  color: white;
-  border: none;
+  color: #fff;
+  border: 1px solid #000;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
@@ -60,7 +60,11 @@
 }
 
 .btn-preview:hover {
-  background: #333;
+  background: #222;
+}
+
+.btn-preview img {
+  filter: invert(1);
 }
 
 .btn-secondary {
@@ -131,8 +135,8 @@
 .btn-translate {
   padding: 8px 16px;
   background: #000;
-  color: white;
-  border: none;
+  color: #fff;
+  border: 1px solid #000;
   border-radius: 6px;
   font-weight: 600;
   font-size: 13px;
@@ -150,8 +154,11 @@
 }
 
 .btn-translate:hover:not(:disabled) {
-  background: #333;
-  transform: translateY(-1px);
+  background: #222;
+}
+
+.btn-translate img {
+  filter: invert(1);
 }
 
 .btn-translate:disabled {
@@ -376,23 +383,31 @@
 }
 
 .btn-save {
-  background: #666;
-  color: white;
+  background: #333;
+  color: #fff;
+  border: 1px solid #333;
 }
 
 .btn-save:hover:not(:disabled) {
-  background: #555;
-  transform: translateY(-1px);
+  background: #444;
+}
+
+.btn-save img {
+  filter: invert(1);
 }
 
 .btn-send {
   background: #000;
-  color: white;
+  color: #fff;
+  border: 1px solid #000;
 }
 
 .btn-send:hover:not(:disabled) {
-  background: #333;
-  transform: translateY(-1px);
+  background: #222;
+}
+
+.btn-send img {
+  filter: invert(1);
 }
 
 .btn-save:disabled,

@@ -1,23 +1,275 @@
-/* Admin Panel - Modern Minimal Design */
+/* Admin Panel Styles - Hoàn toàn tách biệt với main app */
 
-* {
+/* CSS Reset cho toàn bộ admin page */
+html:has(#admin-root),
+body:has(#admin-root) {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
 }
 
-body {
+/* Ẩn thanh cuộn cho html và body */
+html:has(#admin-root)::-webkit-scrollbar,
+body:has(#admin-root)::-webkit-scrollbar {
+  width: 0px !important;
+  height: 0px !important;
+  display: none !important;
+}
+
+html:has(#admin-root),
+body:has(#admin-root) {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Base styles cho admin root */
+#admin-root {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: #fafafa;
   color: #000;
+  line-height: 1.5;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
 }
 
-#admin-root {
-  width: 100%;
-  min-height: 100vh;
+/* Ẩn thanh cuộn trên toàn hệ thống admin - phải đặt sau all: initial */
+#admin-root::-webkit-scrollbar,
+#admin-root *::-webkit-scrollbar {
+  width: 0px !important;
+  height: 0px !important;
+  display: none !important;
 }
 
-/* Import admin global styles */
-@import '../src/styles/admin-global.css';
+#admin-root::-webkit-scrollbar-track,
+#admin-root *::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+#admin-root::-webkit-scrollbar-thumb,
+#admin-root *::-webkit-scrollbar-thumb {
+  background: transparent !important;
+}
+
+#admin-root,
+#admin-root * {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+/* Reset tất cả elements trong admin */
+#admin-root *,
+#admin-root *::before,
+#admin-root *::after {
+  box-sizing: border-box;
+}
+
+#admin-root img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: none;
+}
+
+#admin-root button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+#admin-root input,
+#admin-root textarea,
+#admin-root select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  border: none;
+  outline: none;
+}
+
+#admin-root a {
+  color: inherit;
+  text-decoration: none;
+}
+
+#admin-root ul,
+#admin-root ol {
+  list-style: none;
+}
+
+#admin-root h1,
+#admin-root h2,
+#admin-root h3,
+#admin-root h4,
+#admin-root h5,
+#admin-root h6 {
+  font-weight: inherit;
+}
+
+
+
+/* ===== ROUNDED CORNERS OVERRIDE ===== */
+/* Support & Analytics - Cards and Containers */
+#admin-root .stat-card,
+#admin-root .analytics-metric-card,
+#admin-root .analytics-chart-card,
+#admin-root .detail-card,
+#admin-root .tickets-table-container,
+#admin-root .list-controls {
+  border-radius: 16px !important;
+  -webkit-border-radius: 16px !important;
+  -moz-border-radius: 16px !important;
+}
+
+/* Badges - Pill Shape */
+#admin-root .type-badge,
+#admin-root .status-badge,
+#admin-root .priority-badge {
+  border-radius: 20px !important;
+  -webkit-border-radius: 20px !important;
+  -moz-border-radius: 20px !important;
+}
+
+/* Buttons and Inputs */
+#admin-root .action-btn {
+  border-radius: 12px !important;
+  -webkit-border-radius: 12px !important;
+  -moz-border-radius: 12px !important;
+}
+
+#admin-root .btn-view {
+  border-radius: 10px !important;
+  -webkit-border-radius: 10px !important;
+  -moz-border-radius: 10px !important;
+}
+
+#admin-root .filter-group select,
+#admin-root .status-selector select,
+#admin-root .analytics-select {
+  border-radius: 12px !important;
+  -webkit-border-radius: 12px !important;
+  -moz-border-radius: 12px !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Custom Select Dropdown Menu - Bo tròn góc */
+#admin-root select option {
+  border-radius: 0 !important;
+}
+
+/* Thử force border-radius cho dropdown (không hoạt động trên tất cả trình duyệt) */
+#admin-root select::-ms-expand {
+  display: none;
+}
+
+#admin-root select::after {
+  border-radius: 12px !important;
+}
+
+/* Content Areas */
+#admin-root .ticket-content,
+#admin-root .reply-item {
+  border-radius: 16px !important;
+  -webkit-border-radius: 16px !important;
+  -moz-border-radius: 16px !important;
+}
+
+/* Images Grid */
+#admin-root .images-grid a {
+  border-radius: 8px !important;
+  -webkit-border-radius: 8px !important;
+  -moz-border-radius: 8px !important;
+}
+
+/* Form Elements */
+#admin-root .reply-form textarea,
+#admin-root input[type="text"],
+#admin-root input[type="email"],
+#admin-root input[type="password"],
+#admin-root input[type="datetime-local"] {
+  border-radius: 8px !important;
+  -webkit-border-radius: 8px !important;
+  -moz-border-radius: 8px !important;
+}
+
+/* Admin-specific icon filters */
+#admin-root .stats-icon img,
+#admin-root .activity-icon img,
+#admin-root .login-icon img,
+#admin-root .admin-login-form button img,
+#admin-root .admin-error-message img,
+#admin-root .admin-login-footer img,
+#admin-root .dashboard-error button img {
+  filter: invert(1) brightness(2) !important;
+}
+
+#admin-root .section-header img,
+#admin-root .dashboard-error > img,
+#admin-root .label-icon {
+  filter: brightness(0) !important;
+}
+
+/* Admin header icons */
+#admin-root .admin-header .user-icon {
+  filter: brightness(0) !important;
+}
+
+#admin-root .admin-header .logout-btn img {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Loading states - unified style */
+#admin-root .loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px;
+  gap: 16px;
+  color: #666;
+}
+
+#admin-root .loading p {
+  font-size: 14px;
+  color: #666;
+}
+
+#admin-root .loading-small {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Sidebar icons - màu xám sáng trên nền đen */
+#admin-root .admin-sidebar .nav-icon {
+  filter: brightness(0) invert(0.6) !important;
+}
+
+#admin-root .admin-sidebar .nav-item:hover .nav-icon,
+#admin-root .admin-sidebar .nav-item.active .nav-icon {
+  filter: brightness(0) invert(1) !important;
+}
+
+#admin-root .admin-sidebar .logo-icon {
+  filter: brightness(0) invert(1) !important;
+}
+
+#admin-root .admin-sidebar .toggle-btn img {
+  filter: brightness(0) invert(0.6) !important;
+}
+
+#admin-root .admin-sidebar .toggle-btn:hover img {
+  filter: brightness(0) invert(1) !important;
+}

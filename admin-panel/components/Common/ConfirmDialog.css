@@ -1,0 +1,136 @@
+#admin-root .confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  #admin-root from {
+    opacity: 0;
+  }
+  #admin-root to {
+    opacity: 1;
+  }
+}
+
+#admin-root .confirm-dialog {
+  background: #000;
+  border-radius: 8px;
+  border: 1px solid #333;
+  padding: 32px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  #admin-root from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  #admin-root to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+#admin-root .confirm-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  background: #111;
+  border: 1px solid #333;
+}
+
+.confirm-icon-warning,
+.confirm-icon-danger,
+#admin-root .confirm-icon-info {
+  background: #111;
+  border: 1px solid #333;
+}
+
+#admin-root .confirm-icon img {
+  width: 24px;
+  height: 24px;
+  filter: invert(1);
+}
+
+#admin-root .confirm-title {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
+
+#admin-root .confirm-message {
+  margin: 0 0 28px 0;
+  font-size: 14px;
+  color: #999;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+#admin-root .confirm-actions {
+  display: flex;
+  gap: 12px;
+}
+
+#admin-root .btn-confirm-cancel {
+  flex: 1;
+  background: #111;
+  color: #fff;
+  border: 1px solid #333;
+}
+
+#admin-root .btn-confirm-cancel:hover {
+  background: #222;
+}
+
+#admin-root .btn-confirm-ok {
+  flex: 1;
+  background: #fff;
+  color: #000;
+  border: 1px solid #fff;
+}
+
+#admin-root .btn-confirm-ok:hover {
+  background: #e5e5e5;
+}
+
+.btn-confirm-warning,
+.btn-confirm-danger,
+#admin-root .btn-confirm-info {
+  background: #fff;
+  color: #000;
+  border: 1px solid #fff;
+}
+
+.btn-confirm-warning:hover,
+.btn-confirm-danger:hover,
+#admin-root .btn-confirm-info:hover {
+  background: #e5e5e5;
+}
+
+@media (max-width: 768px) {
+  #admin-root .confirm-dialog {
+    padding: 24px;
+  }
+
+  #admin-root .confirm-actions {
+    flex-direction: column-reverse;
+  }
+}

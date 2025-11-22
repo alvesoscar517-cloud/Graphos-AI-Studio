@@ -1,0 +1,462 @@
+#admin-root .notification-editor {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+#admin-root .editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  gap: 20px;
+}
+
+#admin-root .header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#admin-root .header-title > img {
+  width: 32px;
+  height: 32px;
+}
+
+#admin-root .editor-header h1 {
+  font-size: 28px;
+  margin: 0 0 8px 0;
+  color: #000;
+  font-weight: 600;
+}
+
+#admin-root .editor-header p {
+  color: #666;
+  margin: 0;
+}
+
+#admin-root .header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+#admin-root .btn-preview {
+  padding: 10px 20px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#admin-root .btn-preview img {
+  width: 16px;
+  height: 16px;
+  filter: invert(1);
+}
+
+#admin-root .btn-preview:hover {
+  background: #222;
+}
+
+#admin-root .btn-preview img {
+  filter: invert(1);
+}
+
+#admin-root .btn-secondary {
+  padding: 10px 20px;
+  background: white;
+  color: #000;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#admin-root .btn-secondary img {
+  width: 16px;
+  height: 16px;
+}
+
+#admin-root .btn-secondary:hover {
+  border-color: #000;
+}
+
+#admin-root .editor-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 24px;
+}
+
+#admin-root .editor-main {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+#admin-root .editor-section {
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+#admin-root .editor-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+#admin-root .editor-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  color: #000;
+}
+
+#admin-root .section-header-with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+#admin-root .section-header-with-action h3 {
+  margin: 0;
+}
+
+#admin-root .btn-translate {
+  padding: 8px 16px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#admin-root .btn-translate img {
+  width: 14px;
+  height: 14px;
+  filter: invert(1);
+}
+
+#admin-root .btn-translate:hover:not(:disabled) {
+  background: #222;
+}
+
+#admin-root .btn-translate img {
+  filter: invert(1);
+}
+
+#admin-root .btn-translate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Type Selector */
+#admin-root .type-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+#admin-root .type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border: 2px solid;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#admin-root .type-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#admin-root .type-icon {
+  width: 24px;
+  height: 24px;
+}
+
+#admin-root .type-label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Priority Selector */
+#admin-root .priority-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+#admin-root .priority-btn {
+  padding: 12px;
+  border: 2px solid;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+#admin-root .priority-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Language Tabs */
+#admin-root .language-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+#admin-root .language-tabs button {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.2s;
+}
+
+#admin-root .language-tabs button:hover {
+  color: #000;
+}
+
+#admin-root .language-tabs button.active {
+  color: #000;
+  border-bottom-color: #000;
+}
+
+/* Form */
+#admin-root .translation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#admin-root .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#admin-root .form-group label {
+  font-weight: 600;
+  color: #000;
+  font-size: 14px;
+}
+
+#admin-root .required {
+  color: #000;
+  margin-left: 4px;
+}
+
+.form-group input,
+#admin-root .form-group textarea {
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.form-group input:focus,
+#admin-root .form-group textarea:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+#admin-root .form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+#admin-root .form-group small {
+  color: #999;
+  font-size: 13px;
+}
+
+/* Target Selector */
+#admin-root .target-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#admin-root .radio-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#admin-root .radio-label img {
+  width: 18px;
+  height: 18px;
+}
+
+#admin-root .radio-label:hover {
+  background: #e9ecef;
+}
+
+#admin-root .radio-label input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+#admin-root .segment-options {
+  margin-left: 32px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#admin-root .segment-options label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* Actions */
+#admin-root .editor-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.btn-save,
+#admin-root .btn-send {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-save img,
+#admin-root .btn-send img {
+  width: 18px;
+  height: 18px;
+  filter: invert(1);
+}
+
+#admin-root .btn-save {
+  background: #333;
+  color: #fff;
+  border: 1px solid #333;
+}
+
+#admin-root .btn-save:hover:not(:disabled) {
+  background: #444;
+}
+
+#admin-root .btn-save img {
+  filter: invert(1);
+}
+
+#admin-root .btn-send {
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+}
+
+#admin-root .btn-send:hover:not(:disabled) {
+  background: #222;
+}
+
+#admin-root .btn-send img {
+  filter: invert(1);
+}
+
+.btn-save:disabled,
+#admin-root .btn-send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Preview Panel */
+#admin-root .editor-preview {
+  position: sticky;
+  top: 24px;
+  height: fit-content;
+}
+
+#admin-root .editor-loading {
+  text-align: center;
+  padding: 60px;
+  color: #666;
+}
+
+@media (max-width: 1200px) {
+  #admin-root .editor-layout {
+    grid-template-columns: 1fr;
+  }
+
+  #admin-root .editor-preview {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  #admin-root .editor-header {
+    flex-direction: column;
+  }
+
+  #admin-root .type-selector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #admin-root .priority-selector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #admin-root .language-tabs {
+    overflow-x: auto;
+  }
+
+  #admin-root .editor-actions {
+    flex-direction: column;
+  }
+}

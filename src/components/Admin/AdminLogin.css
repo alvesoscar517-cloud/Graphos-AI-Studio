@@ -53,7 +53,7 @@
 .login-icon img {
   width: 32px;
   height: 32px;
-  filter: invert(1);
+  filter: brightness(0) invert(1);
 }
 
 .admin-login-header h1 {
@@ -96,14 +96,16 @@
 .label-icon {
   width: 14px;
   height: 14px;
+  filter: brightness(0);
 }
 
 .admin-form-group input {
+  width: 100%;
   padding: 14px 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border: 2px solid #e5e5e5;
+  border-radius: 10px;
   font-size: 15px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   background: #fff;
   color: #000;
 }
@@ -111,7 +113,7 @@
 .admin-form-group input:focus {
   outline: none;
   border-color: #000;
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
 .admin-form-group input::placeholder {
@@ -132,42 +134,49 @@
 .admin-error-message img {
   width: 16px;
   height: 16px;
-  filter: invert(1);
+  filter: brightness(0) invert(1);
 }
 
-.admin-btn-login {
+.admin-login-form button[type="submit"] {
   width: 100%;
-  padding: 14px;
-  font-size: 14px;
-  background: #000;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  padding: 14px 24px;
+  min-height: 48px;
+  background: #000;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
 }
 
-.admin-btn-login img {
-  width: 16px;
-  height: 16px;
-  filter: invert(1);
-}
-
-.admin-btn-login:hover {
-  background: #333;
+.admin-login-form button[type="submit"]:hover:not(:disabled) {
+  background: #1a1a1a;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.admin-btn-login:active {
+.admin-login-form button[type="submit"]:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-login-form button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.admin-login-form button[type="submit"] img {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) invert(1);
+  margin: 0;
 }
 
 .admin-login-footer {
@@ -184,6 +193,7 @@
 .admin-login-footer img {
   width: 14px;
   height: 14px;
+  filter: brightness(0);
   opacity: 0.5;
 }
 

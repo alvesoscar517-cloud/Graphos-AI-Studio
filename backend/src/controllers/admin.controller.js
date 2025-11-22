@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const { db } = require('../config/firebase');
 const geminiService = require('../services/gemini.service');
 const logger = require('../utils/logger');
+const SystemLogger = require('../utils/systemLogger');
 
 // Get all users
 exports.getUsers = async (req, res) => {
@@ -46,7 +47,8 @@ exports.getUserDetails = async (req, res) => {
     const profiles = profilesSnapshot.docs.map(doc => ({
       id: doc.id,
       name: doc.data().name,
-      status: doc.data().status
+      status: doc.data().status,
+      samplesCount: doc.data().samples?.length || 0
     }));
     
     res.json({
@@ -64,19 +66,213 @@ exports.getUserDetails = async (req, res) => {
   }
 };
 
+// Get user logs
+exports.getUserLogs = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { limit = 50, type } = req.query;
+    
+    let query = db.collection('activity_logs')
+      .where('userId', '==', id)
+      .orderBy('timestamp', 'desc')
+      .limit(parseInt(limit));
+    
+    if (type && type !== 'all') {
+      query = query.where('type', '==', type);
+    }
+    
+    const snapshot = await query.get();
+    const logs = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      timestamp: doc.data().timestamp?.toDate().toISOString()
+    }));
+    
+    res.json({ success: true, logs, count: logs.length });
+  } catch (error) {
+    console.error('❌ Get user logs error:', error);
+    res.status(500).json({ error: String(error) });
+  }
+};
+
+// Lock/Unlock user
+exports.toggleUserLock = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { locked, reason } = req.body;
+    
+    const userDoc = await db.collection('users').doc(id).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    await db.collection('users').doc(id).update({
+      locked: locked || false,
+      lockReason: reason || null,
+      updatedAt: new Date()
+    });
+    
+    // Log activity
+    await db.collection('activity_logs').add({
+      userId: id,
+      type: 'account_status',
+      action: locked ? 'locked' : 'unlocked',
+      reason: reason || null,
+      timestamp: new Date()
+    });
+    
+    // System log
+    await SystemLogger.warning(
+      'user_lock_toggle',
+      `User ${locked ? 'locked' : 'unlocked'}: ${id}`,
+      { user: 'admin', data: { userId: id, locked, reason } }
+    );
+    
+    res.json({ 
+      success: true, 
+      message: locked ? 'User locked successfully' : 'User unlocked successfully' 
+    });
+  } catch (error) {
+    console.error('❌ Toggle user lock error:', error);
+    res.status(500).json({ error: String(error) });
+  }
+};
+
+// Delete user
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const userDoc = await db.collection('users').doc(id).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Delete user's profiles
+    const profilesSnapshot = await db.collection('voice_profiles')
+      .where('userId', '==', id)
+      .get();
+    
+    const batch = db.batch();
+    profilesSnapshot.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    
+    // Delete user's notifications
+    const notifsSnapshot = await db.collection('user_notifications')
+      .where('userId', '==', id)
+      .get();
+    
+    notifsSnapshot.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    
+    // Delete user
+    batch.delete(db.collection('users').doc(id));
+    
+    await batch.commit();
+    
+    // Log activity
+    await db.collection('activity_logs').add({
+      userId: id,
+      type: 'account_status',
+      action: 'deleted',
+      timestamp: new Date()
+    });
+    
+    // System log
+    await SystemLogger.error(
+      'user_deleted',
+      `User deleted: ${id}`,
+      { user: 'admin', data: { userId: id } }
+    );
+    
+    res.json({ success: true, message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('❌ Delete user error:', error);
+    res.status(500).json({ error: String(error) });
+  }
+};
+
+// Send notification to user
+exports.sendUserNotification = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { type, priority, translations } = req.body;
+    
+    const userDoc = await db.collection('users').doc(id).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const notificationId = uuidv4();
+    const now = new Date();
+    
+    await db.collection('user_notifications').doc(notificationId).set({
+      userId: id,
+      notificationId: null,
+      type: type || 'info',
+      priority: priority || 'medium',
+      translations: translations || {},
+      read: false,
+      clicked: false,
+      createdAt: now
+    });
+    
+    // Log activity
+    await db.collection('activity_logs').add({
+      userId: id,
+      type: 'notification',
+      action: 'sent',
+      notificationId,
+      timestamp: now
+    });
+    
+    res.json({ success: true, message: 'Notification sent successfully' });
+  } catch (error) {
+    console.error('❌ Send user notification error:', error);
+    res.status(500).json({ error: String(error) });
+  }
+};
+
 // Get overview analytics
 exports.getOverview = async (req, res) => {
   try {
-    const [usersSnapshot, profilesSnapshot] = await Promise.all([
+    const [usersSnapshot, profilesSnapshot, notificationsSnapshot] = await Promise.all([
       db.collection('users').count().get(),
-      db.collection('voice_profiles').count().get()
+      db.collection('voice_profiles').count().get(),
+      db.collection('notifications').count().get()
     ]);
+    
+    // Get recent activities
+    const activitiesSnapshot = await db.collection('activity_logs')
+      .orderBy('timestamp', 'desc')
+      .limit(10)
+      .get();
+    
+    const recentActivities = activitiesSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      timestamp: doc.data().timestamp?.toDate().toISOString()
+    }));
+    
+    // Calculate new users (last 7 days)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const newUsersSnapshot = await db.collection('users')
+      .where('createdAt', '>=', sevenDaysAgo)
+      .count()
+      .get();
     
     res.json({
       success: true,
       overview: {
         totalUsers: usersSnapshot.data().count,
         totalProfiles: profilesSnapshot.data().count,
+        totalNotifications: notificationsSnapshot.data().count,
+        newUsers: newUsersSnapshot.data().count,
+        recentActivities,
         timestamp: new Date().toISOString()
       }
     });
@@ -89,19 +285,37 @@ exports.getOverview = async (req, res) => {
 // Get user analytics
 exports.getUserAnalytics = async (req, res) => {
   try {
+    const { days = 30 } = req.query;
+    const daysAgo = new Date();
+    daysAgo.setDate(daysAgo.getDate() - parseInt(days));
+    
     const allUsersSnapshot = await db.collection('users').get();
     const tierDistribution = { free: 0, premium: 0, enterprise: 0 };
+    const userGrowth = [];
     
+    // Calculate tier distribution
     allUsersSnapshot.docs.forEach(doc => {
       const tier = doc.data().tier || 'free';
       tierDistribution[tier] = (tierDistribution[tier] || 0) + 1;
     });
     
+    // Calculate user growth (mock data for now - should be from actual data)
+    for (let i = parseInt(days) - 1; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      userGrowth.push({
+        date: date.toISOString().split('T')[0],
+        count: Math.floor(Math.random() * 10) + 1 // Replace with actual data
+      });
+    }
+    
     res.json({
       success: true,
       analytics: {
         tierDistribution,
-        totalUsers: allUsersSnapshot.size
+        totalUsers: allUsersSnapshot.size,
+        userGrowth,
+        newUsers: userGrowth.reduce((sum, day) => sum + day.count, 0)
       }
     });
   } catch (error) {
@@ -113,12 +327,18 @@ exports.getUserAnalytics = async (req, res) => {
 // Get usage analytics
 exports.getUsageAnalytics = async (req, res) => {
   try {
-    const usersSnapshot = await db.collection('users').get();
+    const [usersSnapshot, profilesSnapshot] = await Promise.all([
+      db.collection('users').get(),
+      db.collection('voice_profiles').get()
+    ]);
     
     let totalProfiles = 0;
     let totalAnalyses = 0;
     let totalRewrites = 0;
+    let readyProfiles = 0;
+    let pendingProfiles = 0;
     
+    // Count from users
     usersSnapshot.docs.forEach(doc => {
       const usage = doc.data().usage || {};
       totalProfiles += usage.profilesCount || 0;
@@ -126,12 +346,27 @@ exports.getUsageAnalytics = async (req, res) => {
       totalRewrites += usage.rewritesCount || 0;
     });
     
+    // Count profile status
+    profilesSnapshot.docs.forEach(doc => {
+      const status = doc.data().status;
+      if (status === 'ready') readyProfiles++;
+      else if (status === 'pending') pendingProfiles++;
+    });
+    
+    const totalUsers = usersSnapshot.size || 1;
+    
     res.json({
       success: true,
       analytics: {
         totalProfiles,
         totalAnalyses,
-        totalRewrites
+        totalRewrites,
+        avgProfilesPerUser: (totalProfiles / totalUsers).toFixed(2),
+        avgAnalysesPerUser: (totalAnalyses / totalUsers).toFixed(2),
+        profilesByStatus: {
+          ready: readyProfiles,
+          pending: pendingProfiles
+        }
       }
     });
   } catch (error) {
@@ -338,6 +573,13 @@ exports.sendNotification = async (req, res) => {
     
     await batch.commit();
     
+    // System log
+    await SystemLogger.success(
+      'notification_sent',
+      `Notification sent to ${targetUserIds.length} users`,
+      { user: 'admin', data: { notificationId: id, recipients: targetUserIds.length } }
+    );
+    
     res.json({
       success: true,
       message: `Notification sent to ${targetUserIds.length} users`,
@@ -377,6 +619,69 @@ exports.getNotificationStats = async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Get notification stats error:', error);
+    res.status(500).json({ error: String(error) });
+  }
+};
+
+// Get system logs
+exports.getSystemLogs = async (req, res) => {
+  try {
+    const { level, limit = 100 } = req.query;
+    
+    let query = db.collection('system_logs')
+      .orderBy('timestamp', 'desc')
+      .limit(parseInt(limit));
+    
+    if (level && level !== 'all') {
+      query = query.where('level', '==', level);
+    }
+    
+    const snapshot = await query.get();
+    const logs = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      timestamp: doc.data().timestamp?.toDate().toISOString()
+    }));
+    
+    res.json({ success: true, logs, count: logs.length });
+  } catch (error) {
+    console.error('❌ Get system logs error:', error);
+    res.status(500).json({ error: String(error) });
+  }
+};
+
+// Clear system logs
+exports.clearSystemLogs = async (req, res) => {
+  try {
+    const { olderThan } = req.query;
+    
+    let query = db.collection('system_logs');
+    
+    if (olderThan) {
+      const date = new Date(olderThan);
+      query = query.where('timestamp', '<', date);
+    }
+    
+    const snapshot = await query.get();
+    
+    if (snapshot.empty) {
+      return res.json({ success: true, message: 'No logs to clear', deleted: 0 });
+    }
+    
+    const batch = db.batch();
+    snapshot.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    
+    await batch.commit();
+    
+    res.json({ 
+      success: true, 
+      message: `Cleared ${snapshot.size} logs`,
+      deleted: snapshot.size
+    });
+  } catch (error) {
+    console.error('❌ Clear system logs error:', error);
     res.status(500).json({ error: String(error) });
   }
 };

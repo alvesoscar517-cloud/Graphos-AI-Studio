@@ -1,0 +1,551 @@
+/* ============================================================================
+   SETTINGS VIEW - CLEAN VERSION
+   ============================================================================ */
+
+/* Container */
+#admin-root .settings-view {
+  padding: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+/* Header */
+#admin-root .settings-view .settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+#admin-root .settings-view .header-title {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+#admin-root .settings-view .header-title > img {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+#admin-root .settings-view .header-title h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: #000000;
+  letter-spacing: -0.02em;
+}
+
+#admin-root .settings-view .header-title p {
+  font-size: 13px;
+  color: #666666;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Save Button */
+#admin-root .settings-view .btn-save {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#admin-root .settings-view .btn-save:hover {
+  background: #333333;
+  border-color: #333333;
+}
+
+#admin-root .settings-view .btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#admin-root .settings-view .btn-save > img {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+/* Layout */
+#admin-root .settings-view .settings-container {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 32px;
+  min-height: 600px;
+}
+
+/* Tabs Sidebar */
+#admin-root .settings-view .settings-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: transparent;
+  padding: 0;
+  height: fit-content;
+  position: sticky;
+  top: 24px;
+}
+
+#admin-root .settings-view .tab-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #666666 !important;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  border-left: 2px solid transparent;
+}
+
+#admin-root .settings-view .tab-item:hover {
+  background: #f5f5f5;
+  color: #000000 !important;
+  border-left-color: #cccccc;
+}
+
+#admin-root .settings-view .tab-item.active {
+  background: #000000;
+  color: #ffffff !important;
+  border-left-color: #000000;
+}
+
+/* Content Area */
+#admin-root .settings-view .settings-content {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 40px;
+}
+
+#admin-root .settings-view .settings-section h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 32px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  letter-spacing: -0.01em;
+}
+
+/* Form Groups */
+#admin-root .settings-view .setting-group {
+  margin-bottom: 28px;
+}
+
+#admin-root .settings-view .setting-group > label:not(.toggle-label) {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #000000;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+#admin-root .settings-view .setting-group input[type="text"],
+#admin-root .settings-view .setting-group input[type="email"],
+#admin-root .settings-view .setting-group input[type="password"],
+#admin-root .settings-view .setting-group input[type="number"],
+#admin-root .settings-view .setting-group select {
+  width: 100%;
+  padding: 11px 14px;
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  color: #000000;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+#admin-root .settings-view .setting-group input:focus,
+#admin-root .settings-view .setting-group select:focus {
+  outline: none;
+  border-color: #000000;
+  background: #fafafa;
+}
+
+#admin-root .settings-view .setting-group input::placeholder {
+  color: #999999;
+}
+
+#admin-root .settings-view .setting-group small {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666666;
+  line-height: 1.5;
+}
+
+/* Toggle Switches */
+#admin-root .settings-view .toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  padding: 18px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+#admin-root .settings-view .toggle-label:hover {
+  background: #f5f5f5;
+  border-color: #cccccc;
+}
+
+#admin-root .settings-view .toggle-label input[type="checkbox"] {
+  display: none;
+}
+
+#admin-root .settings-view .toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: #cccccc;
+  border-radius: 12px;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+#admin-root .settings-view .toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: all 0.25s ease;
+}
+
+#admin-root .settings-view .toggle-label input[type="checkbox"]:checked + .toggle-switch {
+  background: #000000;
+}
+
+#admin-root .settings-view .toggle-label input[type="checkbox"]:checked + .toggle-switch::after {
+  background: #ffffff;
+  left: 22px;
+}
+
+#admin-root .settings-view .toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  color: #000000;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+#admin-root .settings-view .toggle-text small {
+  font-size: 12px;
+  color: #666666;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Buttons */
+#admin-root .settings-view .btn-test,
+#admin-root .settings-view .btn-primary,
+#admin-root .settings-view .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#admin-root .settings-view .btn-test,
+#admin-root .settings-view .btn-primary {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+}
+
+#admin-root .settings-view .btn-test:hover,
+#admin-root .settings-view .btn-primary:hover {
+  background: #333333;
+  border-color: #333333;
+}
+
+#admin-root .settings-view .btn-test > img,
+#admin-root .settings-view .btn-primary > img {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+#admin-root .settings-view .btn-secondary {
+  background: #f5f5f5;
+  color: #000000;
+  border: 1px solid #cccccc;
+}
+
+#admin-root .settings-view .btn-secondary:hover {
+  background: #e0e0e0;
+  border-color: #999999;
+}
+
+#admin-root .settings-view .btn-secondary > img {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+/* Backup Section */
+#admin-root .settings-view .backup-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+#admin-root .settings-view .backup-card {
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+  transition: all 0.2s ease;
+  min-height: 240px;
+}
+
+#admin-root .settings-view .backup-card:hover {
+  border-color: #cccccc;
+  transform: translateY(-2px);
+}
+
+#admin-root .settings-view .backup-card > img {
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 auto 16px auto;
+  flex-shrink: 0;
+}
+
+#admin-root .settings-view .backup-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+#admin-root .settings-view .backup-card p {
+  font-size: 12px;
+  color: #666666;
+  margin: 0 0 20px 0;
+  line-height: 1.6;
+  flex: 1;
+}
+
+#admin-root .settings-view .backup-card button {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Card khôi phục backup - rộng bằng 3 card */
+#admin-root .settings-view .backup-card.restore-card {
+  grid-column: 1 / -1;
+  min-height: auto;
+}
+
+/* Backup History */
+#admin-root .settings-view .backup-history {
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 28px;
+}
+
+#admin-root .settings-view .backup-history h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.01em;
+}
+
+#admin-root .settings-view .history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#admin-root .settings-view .history-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+#admin-root .settings-view .history-item:hover {
+  background: #f5f5f5;
+  border-color: #cccccc;
+}
+
+#admin-root .settings-view .history-item > img:first-child {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+#admin-root .settings-view .history-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+#admin-root .settings-view .history-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #000000;
+}
+
+#admin-root .settings-view .history-date {
+  font-size: 11px;
+  color: #666666;
+}
+
+#admin-root .settings-view .history-size {
+  font-size: 12px;
+  color: #666666;
+  margin-right: 8px;
+}
+
+#admin-root .settings-view .btn-icon {
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#admin-root .settings-view .btn-icon:hover {
+  background: #f5f5f5;
+  border-color: #000000;
+}
+
+#admin-root .settings-view .btn-icon > img {
+  width: 14px !important;
+  height: 14px !important;
+  display: block;
+}
+
+/* Loading State */
+#admin-root .settings-view .settings-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+#admin-root .settings-view .settings-loading .spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #e0e0e0;
+  border-top-color: #000000;
+  border-radius: 50%;
+  animation: settings-spin 0.8s linear infinite;
+}
+
+#admin-root .settings-view .settings-loading p {
+  color: #666666;
+  font-size: 13px;
+}
+
+@keyframes settings-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  #admin-root .settings-view .settings-container {
+    grid-template-columns: 1fr;
+  }
+
+  #admin-root .settings-view .settings-tabs {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  #admin-root .settings-view .tab-item {
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+  }
+
+  #admin-root .settings-view .tab-item.active {
+    border-left: none;
+    border-bottom-color: #000000;
+  }
+
+  #admin-root .settings-view .backup-actions {
+    grid-template-columns: 1fr;
+  }
+
+  #admin-root .settings-view .backup-card.restore-card {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  #admin-root .settings-view {
+    padding: 20px;
+  }
+
+  #admin-root .settings-view .settings-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  #admin-root .settings-view .btn-save {
+    width: 100%;
+    justify-content: center;
+  }
+
+  #admin-root .settings-view .settings-content {
+    padding: 24px;
+  }
+
+  #admin-root .settings-view .tab-item span {
+    display: none;
+  }
+}

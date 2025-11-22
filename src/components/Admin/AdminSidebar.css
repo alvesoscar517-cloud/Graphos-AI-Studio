@@ -40,7 +40,7 @@
 .logo-icon {
   width: 24px;
   height: 24px;
-  filter: invert(1);
+  filter: brightness(0) invert(1);
 }
 
 .admin-sidebar.closed .logo-text {
@@ -94,13 +94,13 @@
   width: 20px;
   height: 20px;
   min-width: 20px;
-  filter: invert(0.6);
+  filter: brightness(0) invert(0.6);
   transition: filter 0.15s;
 }
 
 .nav-item:hover .nav-icon,
 .nav-item.active .nav-icon {
-  filter: invert(1);
+  filter: brightness(0) invert(1);
 }
 
 .admin-sidebar.closed .nav-item {
@@ -133,7 +133,7 @@
 .toggle-btn img {
   width: 16px;
   height: 16px;
-  filter: invert(0.6);
+  filter: brightness(0) invert(0.6);
   transition: filter 0.15s;
 }
 
@@ -143,7 +143,7 @@
 }
 
 .toggle-btn:hover img {
-  filter: invert(1);
+  filter: brightness(0) invert(1);
 }
 
 @media (max-width: 768px) {

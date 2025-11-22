@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { advancedAnalyticsApi, analyticsApi } from '../../../services/adminApi';
+import { exportAnalyticsToCSV, generateAnalyticsReport } from '../../../utils/exportUtils';
+import { useNotify } from '../../Common/NotificationProvider';
 import UserGrowthChart from './UserGrowthChart';
 import TierDistributionChart from './TierDistributionChart';
 import UsageStatsChart from './UsageStatsChart';
@@ -11,6 +13,7 @@ export default function AnalyticsView() {
   const [usageAnalytics, setUsageAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState(30);
+  const notify = useNotify();
 
   useEffect(() => {
     loadAnalytics();
@@ -241,11 +244,31 @@ export default function AnalyticsView() {
 
       {/* Export Button */}
       <div className="analytics-actions">
-        <button className="btn-export" onClick={() => alert('Export feature coming soon!')}>
+        <button 
+          className="btn-export" 
+          onClick={() => {
+            try {
+              exportAnalyticsToCSV(userAnalytics);
+              notify.success('Đã export CSV thành công!');
+            } catch (err) {
+              notify.error('Lỗi export: ' + err.message);
+            }
+          }}
+        >
           <img src="/icon/download.svg" alt="Export" />
           Export Report (CSV)
         </button>
-        <button className="btn-export" onClick={() => alert('Export feature coming soon!')}>
+        <button 
+          className="btn-export" 
+          onClick={() => {
+            try {
+              generateAnalyticsReport(overview, userAnalytics, usageAnalytics);
+              notify.success('Đã tạo báo cáo PDF!');
+            } catch (err) {
+              notify.error('Lỗi tạo PDF: ' + err.message);
+            }
+          }}
+        >
           <img src="/icon/file-text.svg" alt="PDF" />
           Export Report (PDF)
         </button>

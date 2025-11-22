@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
+import Spinner from '../Common/Spinner';
 import './AdminLogin.css';
 
 export default function AdminLogin() {
   const [adminKey, setAdminKey] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { loginAdmin } = useAdminAuth();
 
   const handleSubmit = async (e) => {
@@ -17,6 +19,8 @@ export default function AdminLogin() {
     }
 
     try {
+      setLoading(true);
+      
       // Try to verify the key by making a test API call
       const response = await fetch('https://ai-authenticator-472729326429.us-central1.run.app/api/admin/analytics/overview', {
         headers: {
@@ -31,6 +35,8 @@ export default function AdminLogin() {
       }
     } catch (err) {
       setError('Không thể kết nối đến server');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,9 +74,18 @@ export default function AdminLogin() {
             </div>
           )}
 
-          <button type="submit" className="admin-btn-login">
-            <img src="/icon/log-in.svg" alt="Login" />
-            Đăng nhập
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? (
+              <>
+                <Spinner size="small" color="white" />
+                Đang xác thực...
+              </>
+            ) : (
+              <>
+                <img src="/icon/log-in.svg" alt="Login" />
+                Đăng nhập
+              </>
+            )}
           </button>
         </form>
 

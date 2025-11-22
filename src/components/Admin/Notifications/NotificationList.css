@@ -20,6 +20,7 @@
 .header-title > img {
   width: 28px;
   height: 28px;
+  filter: brightness(0);
 }
 
 .list-header h1 {
@@ -39,8 +40,8 @@
 .btn-primary {
   padding: 12px 24px;
   background: #000;
-  color: white;
-  border: none;
+  color: #fff;
+  border: 1px solid #000;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
@@ -54,13 +55,12 @@
 .btn-primary img {
   width: 16px;
   height: 16px;
-  filter: invert(1);
+  filter: brightness(0) invert(1);
 }
 
 .btn-primary:hover {
-  background: #333;
+  background: #222;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .list-filters {
@@ -88,7 +88,7 @@
 
 .list-filters button.active {
   background: #000;
-  color: white;
+  color: #fff;
   border-color: #000;
 }
 
@@ -141,6 +141,7 @@
 .type-badge img {
   width: 14px;
   height: 14px;
+  filter: brightness(0);
 }
 
 .card-body h3 {
@@ -183,6 +184,7 @@
 .card-stats img {
   width: 14px;
   height: 14px;
+  filter: brightness(0);
 }
 
 .card-actions {
@@ -207,7 +209,7 @@
 .card-actions button img {
   width: 14px;
   height: 14px;
-  filter: invert(1);
+  filter: brightness(0) invert(1);
 }
 
 .card-actions button:hover {
@@ -217,17 +219,20 @@
 
 .btn-send {
   background: #000;
-  color: white;
+  color: #fff;
+  border: 1px solid #000;
 }
 
 .btn-edit {
-  background: #666;
-  color: white;
+  background: #333;
+  color: #fff;
+  border: 1px solid #333;
 }
 
 .btn-delete {
-  background: #000;
-  color: white;
+  background: #555;
+  color: #fff;
+  border: 1px solid #555;
   flex: 0 0 auto;
   padding: 10px 14px;
 }
@@ -248,6 +253,7 @@
   width: 64px;
   height: 64px;
   opacity: 0.3;
+  filter: brightness(0);
 }
 
 .empty-state p {
