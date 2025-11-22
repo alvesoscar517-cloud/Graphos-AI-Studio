@@ -42,7 +42,7 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
     <div className="feature-card rewrite-card">
       <div className="feature-card-header">
         <div className="feature-icon rewrite-icon">
-          <img src="/icon/wand-sparkles.svg" alt="Rewrite" />
+          <img src="/icon/pen.svg" alt="Rewrite" />
         </div>
         <div className="feature-info">
           <h4>Viết lại</h4>
@@ -54,7 +54,7 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
         onClick={rewriteText}
         disabled={disabled || isLoading}
       >
-        <span>{isLoading ? 'Đang viết lại...' : 'Viết lại'}</span>
+        <span className={isLoading ? 'shimmer-text-effect' : ''}>{isLoading ? 'Đang viết lại...' : 'Viết lại'}</span>
         <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
       </button>
     </div>

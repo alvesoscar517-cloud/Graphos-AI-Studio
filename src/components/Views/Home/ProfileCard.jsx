@@ -47,7 +47,7 @@ const ProfileCard = ({ profile, onSelect }) => {
       onClick={() => onSelect(profile)}
     >
       <div className="profile-card-header">
-        <div className="profile-card-icon">
+        <div className={`profile-card-icon theme-icon-${profile.theme || 'work'}`}>
           <img src={`/icon/${getThemeIcon(profile.theme)}.svg`} alt={profile.profile_name} />
         </div>
       </div>

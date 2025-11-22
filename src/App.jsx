@@ -5,11 +5,13 @@ import { ThemeProvider } from './contexts/ThemeContext'
 import { NotesProvider } from './contexts/NotesContext'
 import { AIProcessingProvider } from './contexts/AIProcessingContext'
 import { ProfileProvider } from './contexts/ProfileContext'
+import { WorkspaceProvider } from './contexts/WorkspaceContext'
 import LoginOverlay from './components/Auth/LoginOverlay'
 import MainLayout from './components/Layout/MainLayout'
 import ProfileSetup from './components/ProfileSetup/ProfileSetup'
 import modal from './utils/modal'
 import { initTooltips } from './utils/tooltips'
+import './utils/testNotifications' // Import test utilities
 import './styles/App.css'
 import './styles/modal.css'
 
@@ -110,7 +112,9 @@ function App() {
           <NotesProvider>
             <AIProcessingProvider>
               <ProfileProvider>
-                <AppContent />
+                <WorkspaceProvider>
+                  <AppContent />
+                </WorkspaceProvider>
               </ProfileProvider>
             </AIProcessingProvider>
           </NotesProvider>

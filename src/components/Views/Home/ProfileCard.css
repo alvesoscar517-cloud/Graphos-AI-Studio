@@ -49,14 +49,17 @@ body.dark-theme .profile-card:hover {
 .profile-card-icon img {
   width: 28px;
   height: 28px;
-  opacity: 0.6;
-  transition: opacity var(--transition-normal);
-  filter: grayscale(100%);
+  opacity: 0.8;
+  transition: all var(--transition-normal);
 }
 
 .profile-card:hover .profile-card-icon img {
-  opacity: 0.8;
+  opacity: 1;
+  transform: scale(1.05);
 }
+
+/* Theme icon colors are applied via theme-icon-* classes from theme-variables.css */
+/* Remove grayscale and invert filters to allow theme colors to show */
 
 body.dark-theme .profile-card-icon {
   background: rgba(255, 255, 255, 0.08) !important;
@@ -64,10 +67,6 @@ body.dark-theme .profile-card-icon {
 
 body.dark-theme .profile-card:hover .profile-card-icon {
   background: rgba(255, 255, 255, 0.12) !important;
-}
-
-body.dark-theme .profile-card-icon img {
-  filter: brightness(0) invert(1) !important;
 }
 
 .profile-card-menu {

@@ -1,0 +1,157 @@
+.admin-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  background: #000;
+  color: #fff;
+  transition: width 0.2s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #222;
+}
+
+.admin-sidebar.open {
+  width: 240px;
+}
+
+.admin-sidebar.closed {
+  width: 64px;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #222;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.logo-icon {
+  width: 24px;
+  height: 24px;
+  filter: invert(1);
+}
+
+.admin-sidebar.closed .logo-text {
+  display: none;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 0;
+  overflow-y: auto;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  color: #999;
+  text-decoration: none;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  background: #111;
+  color: #fff;
+}
+
+.nav-item.active {
+  background: #111;
+  color: #fff;
+  border-left-color: #fff;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  filter: invert(0.6);
+  transition: filter 0.15s;
+}
+
+.nav-item:hover .nav-icon,
+.nav-item.active .nav-icon {
+  filter: invert(1);
+}
+
+.admin-sidebar.closed .nav-item {
+  justify-content: center;
+  padding: 12px;
+}
+
+.admin-sidebar.closed .nav-label {
+  display: none;
+}
+
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid #222;
+}
+
+.toggle-btn {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-btn img {
+  width: 16px;
+  height: 16px;
+  filter: invert(0.6);
+  transition: filter 0.15s;
+}
+
+.toggle-btn:hover {
+  background: #111;
+  border-color: #444;
+}
+
+.toggle-btn:hover img {
+  filter: invert(1);
+}
+
+@media (max-width: 768px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+}

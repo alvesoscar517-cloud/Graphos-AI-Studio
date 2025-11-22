@@ -30,6 +30,16 @@
   --icon-opacity-hover: 0.8;
   --icon-opacity-active: 1;
   
+  /* Theme Icon Colors - Light Theme */
+  --theme-work-color: #1967d2;
+  --theme-personal-color: #ea4335;
+  --theme-academic-color: #34a853;
+  --theme-creative-color: #f538a0;
+  --theme-business-color: #fbbc04;
+  --theme-social-color: #8ab4f8;
+  --theme-technical-color: #5f6368;
+  --theme-other-color: #9aa0a6;
+  
   /* ===== BUTTON STYLES ===== */
   
   /* Primary Button */
@@ -106,6 +116,16 @@ body.dark-theme {
   --icon-opacity-hover: 0.8;
   --icon-opacity-active: 1;
   --icon-filter: brightness(0) invert(1);
+  
+  /* Theme Icon Colors - Dark Theme (brighter versions) */
+  --theme-work-color: #8ab4f8;
+  --theme-personal-color: #f28b82;
+  --theme-academic-color: #81c995;
+  --theme-creative-color: #ff80ab;
+  --theme-business-color: #fdd663;
+  --theme-social-color: #aecbfa;
+  --theme-technical-color: #9aa0a6;
+  --theme-other-color: #bdc1c6;
   
   /* Button Styles - Dark Theme */
   --btn-primary-bg: #8ab4f8;
@@ -346,6 +366,130 @@ body.dark-theme .card-icon img {
 .gap-xl { gap: var(--spacing-xl); }
 .gap-2xl { gap: var(--spacing-2xl); }
 
+/* ===== THEME ICON COLORS ===== */
+/* Apply colors to theme icons */
+.theme-icon-work {
+  filter: none !important;
+  color: var(--theme-work-color);
+}
+
+.theme-icon-personal {
+  filter: none !important;
+  color: var(--theme-personal-color);
+}
+
+.theme-icon-academic {
+  filter: none !important;
+  color: var(--theme-academic-color);
+}
+
+.theme-icon-creative {
+  filter: none !important;
+  color: var(--theme-creative-color);
+}
+
+.theme-icon-business {
+  filter: none !important;
+  color: var(--theme-business-color);
+}
+
+.theme-icon-social {
+  filter: none !important;
+  color: var(--theme-social-color);
+}
+
+.theme-icon-technical {
+  filter: none !important;
+  color: var(--theme-technical-color);
+}
+
+.theme-icon-other {
+  filter: none !important;
+  color: var(--theme-other-color);
+}
+
+/* SVG icon coloring using CSS filters */
+.theme-icon-work img,
+.theme-icon-work svg {
+  filter: invert(32%) sepia(89%) saturate(1583%) hue-rotate(201deg) brightness(91%) contrast(90%);
+}
+
+.theme-icon-personal img,
+.theme-icon-personal svg {
+  filter: invert(32%) sepia(89%) saturate(2583%) hue-rotate(347deg) brightness(91%) contrast(90%);
+}
+
+.theme-icon-academic img,
+.theme-icon-academic svg {
+  filter: invert(52%) sepia(89%) saturate(583%) hue-rotate(88deg) brightness(91%) contrast(90%);
+}
+
+.theme-icon-creative img,
+.theme-icon-creative svg {
+  filter: invert(42%) sepia(89%) saturate(2583%) hue-rotate(307deg) brightness(101%) contrast(95%);
+}
+
+.theme-icon-business img,
+.theme-icon-business svg {
+  filter: invert(72%) sepia(89%) saturate(583%) hue-rotate(8deg) brightness(101%) contrast(95%);
+}
+
+.theme-icon-social img,
+.theme-icon-social svg {
+  filter: invert(62%) sepia(49%) saturate(583%) hue-rotate(188deg) brightness(101%) contrast(95%);
+}
+
+.theme-icon-technical img,
+.theme-icon-technical svg {
+  filter: invert(42%) sepia(9%) saturate(283%) hue-rotate(180deg) brightness(91%) contrast(90%);
+}
+
+.theme-icon-other img,
+.theme-icon-other svg {
+  filter: invert(62%) sepia(9%) saturate(183%) hue-rotate(180deg) brightness(91%) contrast(90%);
+}
+
+/* Dark theme adjustments - brighter colors */
+body.dark-theme .theme-icon-work img,
+body.dark-theme .theme-icon-work svg {
+  filter: invert(62%) sepia(49%) saturate(583%) hue-rotate(188deg) brightness(101%) contrast(95%);
+}
+
+body.dark-theme .theme-icon-personal img,
+body.dark-theme .theme-icon-personal svg {
+  filter: invert(72%) sepia(49%) saturate(1583%) hue-rotate(327deg) brightness(101%) contrast(95%);
+}
+
+body.dark-theme .theme-icon-academic img,
+body.dark-theme .theme-icon-academic svg {
+  filter: invert(72%) sepia(49%) saturate(583%) hue-rotate(88deg) brightness(101%) contrast(95%);
+}
+
+body.dark-theme .theme-icon-creative img,
+body.dark-theme .theme-icon-creative svg {
+  filter: invert(72%) sepia(69%) saturate(2583%) hue-rotate(307deg) brightness(111%) contrast(100%);
+}
+
+body.dark-theme .theme-icon-business img,
+body.dark-theme .theme-icon-business svg {
+  filter: invert(82%) sepia(69%) saturate(583%) hue-rotate(8deg) brightness(111%) contrast(100%);
+}
+
+body.dark-theme .theme-icon-social img,
+body.dark-theme .theme-icon-social svg {
+  filter: invert(72%) sepia(49%) saturate(583%) hue-rotate(188deg) brightness(111%) contrast(100%);
+}
+
+body.dark-theme .theme-icon-technical img,
+body.dark-theme .theme-icon-technical svg {
+  filter: invert(62%) sepia(9%) saturate(283%) hue-rotate(180deg) brightness(101%) contrast(95%);
+}
+
+body.dark-theme .theme-icon-other img,
+body.dark-theme .theme-icon-other svg {
+  filter: invert(72%) sepia(9%) saturate(183%) hue-rotate(180deg) brightness(101%) contrast(95%);
+}
+
 /* ===== STANDARD HOVER EFFECTS ===== */
 /* Standard card hover effect - used across all cards */
 .card-hover-effect {
@@ -360,4 +504,38 @@ body.dark-theme .card-icon img {
 body.dark-theme .card-hover-effect:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   border-color: #5f6368;
+}
+
+/* ===== GLOBAL ICON FILTERS ===== */
+/* Standard icon opacity */
+.icon-standard {
+  opacity: var(--icon-opacity);
+  transition: opacity var(--transition-normal);
+}
+
+.icon-standard:hover {
+  opacity: var(--icon-opacity-hover);
+}
+
+/* Dark theme icon filter - applies to all icons that need inversion */
+body.dark-theme .icon-standard,
+body.dark-theme .tooltip-severity-badge img,
+body.dark-theme .suggestion-tooltip img,
+body.dark-theme .rewrite-label img {
+  filter: brightness(0) invert(1);
+}
+
+/* Icon in tooltips and modals */
+.tooltip-icon,
+.modal-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+body.dark-theme .tooltip-icon,
+body.dark-theme .modal-icon {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
 }

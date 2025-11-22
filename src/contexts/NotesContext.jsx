@@ -140,7 +140,9 @@ export const NotesProvider = ({ children }) => {
       content: '',
       visible: true,
       type: 'Chat prompt',
-      updated: new Date()
+      updated: new Date(),
+      titleGenerated: false, // Track if title was auto-generated
+      userEditedTitle: false // Track if user manually edited title
     }
     
     setNotes(prev => [...prev, newNote])
@@ -152,11 +154,13 @@ export const NotesProvider = ({ children }) => {
     return newNote
   }
 
-  const updateNote = (id, updates) => {
+  const updateNote = (id, updates, isUserTitleEdit = false) => {
     const updatedNote = notes.find(n => n.id === id)
     if (!updatedNote) return
 
-    const newNote = { ...updatedNote, ...updates, updated: new Date() }
+    // If user is editing title, mark it
+    const titleUpdates = isUserTitleEdit ? { userEditedTitle: true } : {}
+    const newNote = { ...updatedNote, ...updates, ...titleUpdates, updated: new Date() }
     
     setNotes(prev => prev.map(note => 
       note.id === id ? newNote : note
@@ -235,6 +239,39 @@ export const NotesProvider = ({ children }) => {
       .reverse()
   }
 
+  const generateTitle = async (content) => {
+    try {
+      // Extract first meaningful sentence or paragraph
+      const firstPart = content.trim().substring(0, 100)
+      
+      const response = await fetch('https://ai-content-authenticator-472729326429.us-central1.run.app/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [{
+            role: 'user',
+            content: `Tóm tắt nội dung sau thành tiêu đề ngắn gọn (tối đa 6-8 từ), chỉ trả về tiêu đề không giải thích: "${firstPart}"`
+          }],
+          systemPrompt: 'Bạn là trợ lý tóm tắt. Chỉ trả về tiêu đề ngắn gọn, không giải thích.',
+          model: 'gemini-2.0-flash-exp',
+          temperature: 0.3
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        return data.message.trim().replace(/^["']|["']$/g, '') // Remove quotes
+      }
+    } catch (err) {
+      console.error('Failed to generate title:', err)
+    }
+    
+    // Fallback to truncated content
+    return content.substring(0, 50) + (content.length > 50 ? '...' : '')
+  }
+
   const value = {
     notes,
     currentNote,
@@ -245,7 +282,8 @@ export const NotesProvider = ({ children }) => {
     deleteNote,
     loadNote,
     getVisibleNotes,
-    syncNotes
+    syncNotes,
+    generateTitle
   }
 
   return <NotesContext.Provider value={value}>{children}</NotesContext.Provider>

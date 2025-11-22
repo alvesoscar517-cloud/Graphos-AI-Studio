@@ -7,42 +7,72 @@ import CompatibilityCard from '../Analysis/CompatibilityCard'
 import AIDetectionCard from '../Analysis/AIDetectionCard'
 import DeviationCard from '../Analysis/DeviationCard'
 import StatisticsCard from '../Analysis/StatisticsCard'
-import RewriteCard from '../Analysis/RewriteCard'
-import SuggestionPopup from '../Analysis/SuggestionPopup'
+import RewriteModelSelector from '../Analysis/RewriteModelSelector'
+import { rewriteTextStream } from '../../services/api'
 import modal from '../../utils/modal'
 import './RightSidebar.css'
 
-const RightSidebar = ({ hidden, onClose, onHighlightSentence }) => {
-  const { currentNote } = useNotes()
+const RightSidebar = ({ hidden, onClose, onAnalysisComplete }) => {
+  const { currentNote, updateNote } = useNotes()
   const { currentProfile, selectProfile } = useProfiles()
-  const [selectedSentence, setSelectedSentence] = useState(null)
+  const [mode, setMode] = useState('analysis') // 'analysis' or 'rewrite'
+  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash')
+  const [isRewriting, setIsRewriting] = useState(false)
 
   const handleProfileSelect = (profile) => {
     selectProfile(profile)
   }
 
-  const handleSentenceClick = (sentence) => {
-    console.log('📝 Sentence clicked in RightSidebar:', sentence)
-    if (!currentProfile?.profile_id) {
-      console.error('❌ No profile selected!')
-      modal.toast('Lỗi', 'Vui lòng chọn profile trước', 'error')
-      return
-    }
-    
-    // Highlight sentence in editor
-    if (onHighlightSentence) {
-      onHighlightSentence(sentence)
-    }
-    
-    // Show suggestion popup
-    setSelectedSentence(sentence)
-  }
-
   const hasText = currentNote && currentNote.content && currentNote.content.trim().length > 0
   const hasProfile = currentProfile !== null
 
+  const handleRewrite = async () => {
+    if (!currentProfile || !hasText || isRewriting) return
+    
+    setIsRewriting(true)
+    
+    try {
+      // Add shimmer effect to editor
+      const editor = document.querySelector('.main-textarea')
+      if (editor) {
+        editor.classList.add('shimmer-effect')
+      }
+      
+      // Start streaming
+      let newText = ''
+      await rewriteTextStream(
+        currentProfile.profile_id,
+        currentNote.content,
+        selectedModel,
+        (chunk) => {
+          // Remove shimmer on first chunk
+          if (newText === '' && editor) {
+            editor.classList.remove('shimmer-effect')
+          }
+          
+          newText += chunk
+          // Update editor in real-time
+          updateNote(currentNote.id, { content: newText })
+        }
+      )
+      
+      modal.toast('Hoàn tất', 'Văn bản đã được viết lại', 'success')
+    } catch (error) {
+      console.error('Error rewriting:', error)
+      modal.error('Viết lại thất bại: ' + error.message)
+      
+      // Remove shimmer on error
+      const editor = document.querySelector('.main-textarea')
+      if (editor) {
+        editor.classList.remove('shimmer-effect')
+      }
+    } finally {
+      setIsRewriting(false)
+    }
+  }
+
   // Debug: Log when component renders
-  console.log('🔧 RightSidebar render:', { hidden, hasText, hasProfile, selectedSentence })
+  console.log('🔧 RightSidebar render:', { hidden, hasText, hasProfile, mode })
 
   return (
     <motion.aside 
@@ -74,7 +104,26 @@ const RightSidebar = ({ hidden, onClose, onHighlightSentence }) => {
       }}
     >
       <div className="right-header">
-        <h3 className="right-header-title">Công cụ phân tích</h3>
+        <div className="mode-toggle-container">
+          <button 
+            className={`mode-toggle-btn ${mode === 'analysis' ? 'active' : ''}`}
+            onClick={() => setMode('analysis')}
+            data-tooltip="Công cụ phân tích" 
+            data-tooltip-position="bottom"
+          >
+            <img src="/icon/bar-chart-4.svg" alt="Analysis" />
+            <span>Phân tích</span>
+          </button>
+          <button 
+            className={`mode-toggle-btn ${mode === 'rewrite' ? 'active' : ''}`}
+            onClick={() => setMode('rewrite')}
+            data-tooltip="Viết lại văn bản" 
+            data-tooltip-position="bottom"
+          >
+            <img src="/icon/pen.svg" alt="Rewrite" />
+            <span>Viết lại</span>
+          </button>
+        </div>
         <button 
           className="icon-btn close-sidebar-btn" 
           onClick={onClose}
@@ -91,56 +140,52 @@ const RightSidebar = ({ hidden, onClose, onHighlightSentence }) => {
           onProfileSelect={handleProfileSelect}
         />
 
-        <div className="feature-cards-grid">
-          <CompatibilityCard 
-            disabled={!hasText || !hasProfile}
-            currentProfile={currentProfile}
-            text={currentNote?.content || ''}
-            onSentenceClick={handleSentenceClick}
-          />
+        {mode === 'analysis' ? (
+          <div className="feature-cards-grid">
+            <CompatibilityCard 
+              disabled={!hasText || !hasProfile}
+              currentProfile={currentProfile}
+              text={currentNote?.content || ''}
+            />
 
-          <AIDetectionCard 
-            disabled={!hasText || !hasProfile}
-            text={currentNote?.content || ''}
-          />
+            <AIDetectionCard 
+              disabled={!hasText || !hasProfile}
+              text={currentNote?.content || ''}
+            />
 
-          <DeviationCard 
-            disabled={!hasText || !hasProfile}
-            currentProfile={currentProfile}
-            text={currentNote?.content || ''}
-            onSentenceClick={handleSentenceClick}
-          />
+            <DeviationCard 
+              disabled={!hasText || !hasProfile}
+              currentProfile={currentProfile}
+              text={currentNote?.content || ''}
+              onAnalysisComplete={onAnalysisComplete}
+            />
 
-          <StatisticsCard 
-            disabled={!hasText || !hasProfile}
-            currentProfile={currentProfile}
-            text={currentNote?.content || ''}
+            <StatisticsCard 
+              disabled={!hasText || !hasProfile}
+              currentProfile={currentProfile}
+              text={currentNote?.content || ''}
+            />
+          </div>
+        ) : (
+          <RewriteModelSelector 
+            selectedModel={selectedModel}
+            onModelSelect={setSelectedModel}
           />
-
-          <RewriteCard 
-            disabled={!hasText || !hasProfile}
-            currentProfile={currentProfile}
-            text={currentNote?.content || ''}
-          />
-        </div>
+        )}
       </div>
 
-      {/* Suggestion Popup - Shared across all cards */}
-      {selectedSentence && (
-        <SuggestionPopup
-          sentence={selectedSentence}
-          profileId={currentProfile?.profile_id}
-          onClose={() => {
-            console.log('❌ Closing suggestion popup')
-            setSelectedSentence(null)
-          }}
-          onApply={(rewrittenText) => {
-            console.log('✅ Applied suggestion:', rewrittenText)
-            modal.toast('Đã áp dụng gợi ý', 'Câu đã được cập nhật', 'success')
-            setSelectedSentence(null)
-            // TODO: Update text in editor
-          }}
-        />
+      {/* Rewrite Footer Button */}
+      {mode === 'rewrite' && (
+        <div className="right-sidebar-footer">
+          <button 
+            className={`rewrite-footer-btn ${isRewriting ? 'loading' : ''}`}
+            onClick={handleRewrite}
+            disabled={!hasText || !hasProfile || isRewriting}
+          >
+            <img src="/icon/pen.svg" alt="Rewrite" />
+            <span className={isRewriting ? 'shimmer-text-effect' : ''}>{isRewriting ? 'Đang viết lại...' : 'Viết lại văn bản'}</span>
+          </button>
+        </div>
       )}
     </motion.aside>
   )

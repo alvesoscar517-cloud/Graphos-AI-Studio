@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNotes } from '../../contexts/NotesContext'
@@ -7,6 +7,47 @@ import NotificationPopup from '../Popups/NotificationPopup'
 import SettingsPopup from '../Popups/SettingsPopup'
 import UserProfilePopup from '../Popups/UserProfilePopup'
 import modal from '../../utils/modal'
+
+// Notification Badge Component
+const NotificationBadge = () => {
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const loadUnreadCount = async () => {
+      try {
+        const { getUserNotifications } = await import('../../services/notificationService');
+        const { unreadCount } = await getUserNotifications(true);
+        setUnreadCount(unreadCount);
+      } catch (err) {
+        console.error('Load unread count error:', err);
+      }
+    };
+
+    loadUnreadCount();
+
+    // Listen for new notifications
+    const handleNewNotification = () => {
+      loadUnreadCount();
+    };
+    window.addEventListener('new-notification', handleNewNotification);
+
+    // Poll every 30 seconds
+    const interval = setInterval(loadUnreadCount, 30000);
+
+    return () => {
+      window.removeEventListener('new-notification', handleNewNotification);
+      clearInterval(interval);
+    };
+  }, []);
+
+  if (unreadCount === 0) return null;
+
+  return (
+    <span className="notification-badge">
+      {unreadCount > 99 ? '99+' : unreadCount}
+    </span>
+  );
+};
 
 const Sidebar = ({ hidden, currentView, onViewChange }) => {
   const { user } = useAuth()
@@ -104,6 +145,23 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
           />
         </a>
 
+        <a 
+          href="#" 
+          className={`nav-item ${currentView === 'workspace' ? 'active' : ''}`}
+          onClick={(e) => { e.preventDefault(); onViewChange('workspace') }}
+        >
+          <img src="/icon/message-square.svg" alt="Workspace" />
+          <span>Workspace</span>
+          <img 
+            src="/icon/clock.svg" 
+            alt="History" 
+            className="history-icon"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onViewChange('history') }}
+            data-tooltip="Xem lịch sử chat"
+            data-tooltip-position="right"
+          />
+        </a>
+
         <div className="nav-section" id="notesList">
           {visibleNotes.map(note => (
             <div 
@@ -136,18 +194,19 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
       <div className="sidebar-bottom">
         <div className="footer-info">
           <button 
-            className="footer-link"
+            className="footer-link notification-btn"
             onClick={(e) => { 
-              e.preventDefault()
-              e.stopPropagation()
-              // Close other popups
-              setShowSettings(false)
-              setShowUserProfile(false)
-              // Toggle this popup
-              setShowNotifications(!showNotifications)
+              e.preventDefault();
+              e.stopPropagation();
+              setShowSettings(false);
+              setShowUserProfile(false);
+              setShowNotifications(!showNotifications);
             }}
           >
-            <img src="/icon/bell.svg" alt="Notifications" />
+            <div className="notification-icon-wrapper">
+              <img src="/icon/bell.svg" alt="Notifications" />
+              <NotificationBadge />
+            </div>
             Thông báo
           </button>
 
@@ -156,10 +215,8 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
             onClick={(e) => { 
               e.preventDefault()
               e.stopPropagation()
-              // Close other popups
               setShowNotifications(false)
               setShowUserProfile(false)
-              // Toggle this popup
               setShowSettings(!showSettings)
             }}
           >
@@ -172,10 +229,8 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
             onClick={(e) => { 
               e.preventDefault()
               e.stopPropagation()
-              // Close other popups
               setShowNotifications(false)
               setShowSettings(false)
-              // Toggle this popup
               setShowUserProfile(!showUserProfile)
             }}
           >

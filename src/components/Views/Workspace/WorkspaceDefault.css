@@ -1,0 +1,94 @@
+/* Workspace Default (Intro Screen) */
+.workspace-default {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100vh;
+  width: 100%;
+  background: var(--bg-primary);
+  position: relative;
+}
+
+.workspace-default-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.workspace-default-header .icon-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.workspace-default-header .icon-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.workspace-default-header .icon-btn img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+}
+
+.workspace-default-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-left: 8px;
+}
+
+.workspace-default-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  padding-bottom: 180px;
+  position: relative;
+}
+
+/* Welcome Section */
+.workspace-welcome {
+  text-align: center;
+  margin-bottom: 80px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.workspace-welcome-text {
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .workspace-welcome-text {
+    font-size: 24px;
+  }
+}
+
+/* Dark Theme */
+body.dark-theme .workspace-default-header .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}

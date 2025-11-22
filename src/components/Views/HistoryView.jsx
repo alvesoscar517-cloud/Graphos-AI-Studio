@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNotes } from '../../contexts/NotesContext'
+import { useWorkspace } from '../../contexts/WorkspaceContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { openDriveFolder } from '../../services/drive'
 import modal from '../../utils/modal'
@@ -7,10 +8,12 @@ import './HistoryView.css'
 
 const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const { notes, loadNote, loading, syncNotes, needsReauth } = useNotes()
+  const { conversations, loadConversation } = useWorkspace()
   const { user, signOut } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
+  const [filterType, setFilterType] = useState('all') // 'all', 'text', 'chat'
   
-  console.log('HistoryView - notes:', notes.length, 'loading:', loading, 'needsReauth:', needsReauth)
+  console.log('HistoryView - notes:', notes.length, 'conversations:', conversations.length, 'loading:', loading)
 
   const formatTimeAgo = (date) => {
     const now = new Date()
@@ -24,15 +27,60 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     return date.toLocaleDateString()
   }
 
-  const filteredNotes = searchTerm
-    ? notes.filter(note => note.title.toLowerCase().includes(searchTerm.toLowerCase()))
-    : notes
+  // Combine notes and conversations into unified list
+  const allItems = useMemo(() => {
+    const items = []
+    
+    // Add notes from Drive
+    notes.forEach(note => {
+      items.push({
+        id: note.id,
+        title: note.title,
+        type: note.type === 'chat' ? 'chat' : 'text',
+        updated: note.updated,
+        source: 'drive',
+        data: note
+      })
+    })
+    
+    // Add conversations from workspace
+    conversations.forEach(conv => {
+      items.push({
+        id: conv.id,
+        title: conv.title,
+        type: 'chat',
+        updated: new Date(conv.updated),
+        source: 'workspace',
+        data: conv
+      })
+    })
+    
+    return items
+  }, [notes, conversations])
 
-  const sortedNotes = [...filteredNotes].sort((a, b) => b.updated - a.updated)
+  const filteredItems = allItems.filter(item => {
+    // Filter by search term
+    const matchesSearch = !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    // Filter by type
+    const matchesType = filterType === 'all' || 
+                       (filterType === 'text' && item.type === 'text') ||
+                       (filterType === 'chat' && item.type === 'chat')
+    
+    return matchesSearch && matchesType
+  })
 
-  const handleNoteClick = (noteId) => {
-    loadNote(noteId)
-    onViewChange('playground-editor')
+  const sortedItems = [...filteredItems].sort((a, b) => b.updated - a.updated)
+
+  const handleItemClick = (item) => {
+    if (item.source === 'drive') {
+      loadNote(item.id)
+      onViewChange('playground-editor')
+    } else {
+      // Load workspace conversation
+      loadConversation(item.id)
+      onViewChange('workspace')
+    }
   }
 
   const handleOpenInDrive = async () => {
@@ -81,14 +129,49 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         <div className="history-header">
           <div className="history-title-section">
             <h2 className="history-title">My history</h2>
-            <button className="dropdown-btn">
-              <img src="/icon/chevron-down.svg" alt="Dropdown" />
-            </button>
+            <div className="history-filter-tabs">
+              <button 
+                className={`filter-tab ${filterType === 'all' ? 'active' : ''}`}
+                onClick={() => setFilterType('all')}
+              >
+                Tất cả
+              </button>
+              <button 
+                className={`filter-tab ${filterType === 'text' ? 'active' : ''}`}
+                onClick={() => setFilterType('text')}
+              >
+                Văn bản
+              </button>
+              <button 
+                className={`filter-tab ${filterType === 'chat' ? 'active' : ''}`}
+                onClick={() => setFilterType('chat')}
+              >
+                Trò chuyện
+              </button>
+            </div>
           </div>
           <div className="history-actions">
             <button className="history-action-btn" onClick={handleOpenInDrive}>
               <img src="/icon/google-drive-svgrepo-com.svg" alt="Open in Drive" />
               <span>Open in Drive</span>
+            </button>
+            <button 
+              className="history-action-btn"
+              onClick={async () => {
+                try {
+                  await syncNotes()
+                  // TODO: Also sync conversations when implemented
+                  // await syncConversationsToDrive()
+                  modal.toast('Đã đồng bộ', 'Notes đã được đồng bộ với Drive', 'success')
+                } catch (error) {
+                  modal.error('Không thể đồng bộ: ' + error.message)
+                }
+              }}
+              data-tooltip="Đồng bộ với Drive"
+              data-tooltip-position="bottom"
+            >
+              <img src="/icon/refresh-cw.svg" alt="Sync" />
+              <span>Sync</span>
             </button>
             <div className="search-container">
               <img src="/icon/search.svg" alt="Search" className="search-icon" />
@@ -136,14 +219,14 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                 Đăng nhập lại
               </button>
             </div>
-          ) : sortedNotes.length === 0 ? (
+          ) : sortedItems.length === 0 ? (
             <div className="history-empty-state">
-              <img src="/icon/message-square.svg" alt="No notes" className="history-empty-icon" />
+              <img src="/icon/message-square.svg" alt="No items" className="history-empty-icon" />
               <h3 className="history-empty-title">
-                Chưa có notes nào
+                Chưa có nội dung nào
               </h3>
               <p className="history-empty-desc">
-                {user ? 'Tạo note đầu tiên hoặc đồng bộ từ Drive' : 'Vui lòng đăng nhập để xem notes'}
+                {user ? 'Tạo note hoặc chat đầu tiên, hoặc đồng bộ từ Drive' : 'Vui lòng đăng nhập để xem lịch sử'}
               </p>
               {user && (
                 <button 
@@ -167,27 +250,46 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                 <tr>
                   <th className="name-col">Name</th>
                   <th className="type-col">Type</th>
+                  <th className="source-col">Source</th>
                   <th className="updated-col">Updated</th>
                   <th className="actions-col"></th>
                 </tr>
               </thead>
               <tbody>
-                {sortedNotes.map(note => (
-                  <tr key={note.id} onClick={() => handleNoteClick(note.id)}>
+                {sortedItems.map(item => (
+                  <tr key={`${item.source}-${item.id}`} onClick={() => handleItemClick(item)}>
                     <td className="name-col">
                       <div className="history-name">
-                        <img src="/icon/message-square.svg" alt="Chat" />
-                        <span>{note.title}</span>
+                        <img 
+                          src={item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg"} 
+                          alt={item.type === 'chat' ? "Chat" : "Text"} 
+                        />
+                        <span>{item.title}</span>
                       </div>
                     </td>
                     <td className="type-col">
-                      <span className="history-type">{note.type}</span>
+                      <span className="history-type">{item.type === 'chat' ? 'Trò chuyện' : 'Văn bản'}</span>
+                    </td>
+                    <td className="source-col">
+                      <span className="history-source">
+                        {item.source === 'drive' ? (
+                          <>
+                            <img src="/icon/google-drive-svgrepo-com.svg" alt="Drive" />
+                            Drive
+                          </>
+                        ) : (
+                          <>
+                            <img src="/icon/monitor.svg" alt="Local" />
+                            Local
+                          </>
+                        )}
+                      </span>
                     </td>
                     <td className="updated-col">
-                      <span className="history-updated">{formatTimeAgo(note.updated)}</span>
+                      <span className="history-updated">{formatTimeAgo(item.updated)}</span>
                     </td>
                     <td className="actions-col">
-                      <button className="history-actions-btn">
+                      <button className="history-actions-btn" onClick={(e) => e.stopPropagation()}>
                         <img src="/icon/more-vertical.svg" alt="Actions" />
                       </button>
                     </td>

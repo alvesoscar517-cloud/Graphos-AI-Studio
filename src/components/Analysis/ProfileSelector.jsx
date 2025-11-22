@@ -78,7 +78,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
     <>
       <div className="model-selector clickable" onClick={handleClick}>
         <div className="profile-selector-header">
-          <div className="profile-selector-icon">
+          <div className={`profile-selector-icon theme-icon-${currentProfile?.theme || 'work'}`}>
             <img src={`/icon/${getThemeIcon(currentProfile?.theme)}.svg`} alt="Profile" />
           </div>
           <div className="profile-selector-info">
@@ -156,7 +156,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                     onClick={() => handleSelectProfile(profile)}
                   >
                     <div className="profile-modal-card-header">
-                      <div className="profile-modal-icon">
+                      <div className={`profile-modal-icon theme-icon-${profile.theme || 'work'}`}>
                         <img src={`/icon/${getThemeIcon(profile.theme)}.svg`} alt={profile.profile_name} />
                       </div>
                       <div className="profile-modal-info">

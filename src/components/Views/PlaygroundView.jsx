@@ -1,6 +1,6 @@
 import { useNotes } from '../../contexts/NotesContext'
 import PlaygroundDefault from './Playground/PlaygroundDefault'
-import PlaygroundEditor from './Playground/PlaygroundEditor'
+import PlaygroundEditorEnhanced from './Playground/PlaygroundEditorEnhanced'
 import './PlaygroundView.css'
 
 const PlaygroundView = ({ 
@@ -9,7 +9,8 @@ const PlaygroundView = ({
   onToggleRightSidebar,
   rightSidebarHidden,
   onViewChange,
-  highlightedSentence
+  highlightedSentence,
+  analysisData
 }) => {
   const { createNote } = useNotes()
 
@@ -26,12 +27,12 @@ const PlaygroundView = ({
           onCreateNote={handleCreateNote}
         />
       ) : (
-        <PlaygroundEditor 
+        <PlaygroundEditorEnhanced 
           onToggleLeftSidebar={onToggleLeftSidebar}
           onToggleRightSidebar={onToggleRightSidebar}
           rightSidebarHidden={rightSidebarHidden}
           onCreateNote={handleCreateNote}
-          highlightedSentence={highlightedSentence}
+          externalAnalysisData={analysisData}
         />
       )}
     </div>

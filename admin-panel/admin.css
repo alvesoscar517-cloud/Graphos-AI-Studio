@@ -1,0 +1,23 @@
+/* Admin Panel - Modern Minimal Design */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #fafafa;
+  color: #000;
+}
+
+#admin-root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Import admin global styles */
+@import '../src/styles/admin-global.css';

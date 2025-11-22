@@ -3,18 +3,16 @@ import { analyzeText } from '../../services/api'
 import { useAIProcessing } from '../../contexts/AIProcessingContext'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis, hasTextChanged } from '../../services/analysisCache'
-import TextHighlighter from './TextHighlighter'
 import './Analysis.css'
 import './CompatibilityCard.css'
 
-const CompatibilityCard = ({ disabled, currentProfile, text, onSentenceClick }) => {
+const CompatibilityCard = ({ disabled, currentProfile, text }) => {
   const [score, setScore] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [analysisDetails, setAnalysisDetails] = useState(null)
   const [showResult, setShowResult] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [textChanged, setTextChanged] = useState(true)
-  const [showHighlighter, setShowHighlighter] = useState(false)
   const { startProcessing, stopProcessing } = useAIProcessing()
   const { currentNote } = useNotes()
 
@@ -163,15 +161,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onSentenceClick }) 
     return 'Không tương thích'
   }
 
-  // Debug: Log when conditions change
-  useEffect(() => {
-    console.log('🔍 Highlighter conditions:', {
-      hasScore: score !== null,
-      hasSentenceAnalysis: !!analysisDetails?.sentence_analysis,
-      sentenceCount: analysisDetails?.sentence_analysis?.length || 0,
-      showHighlighter
-    })
-  }, [score, analysisDetails, showHighlighter])
+
 
   return (
     <>
@@ -204,7 +194,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onSentenceClick }) 
           disabled={disabled || isLoading || !textChanged}
           title={!textChanged ? 'Văn bản chưa thay đổi' : ''}
         >
-          <span>
+          <span className={isLoading ? 'shimmer-text-effect' : ''}>
             {isLoading ? 'Đang tính...' : !textChanged ? 'Đã tính' : 'Tính điểm'}
           </span>
           <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
@@ -289,36 +279,6 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onSentenceClick }) 
           </div>
         )}
 
-        {/* Text Highlighter Section */}
-        {score !== null && analysisDetails?.sentence_analysis && (
-          <div className="highlighter-section">
-            <button 
-              className={`toggle-highlighter-btn ${showHighlighter ? 'active' : ''}`}
-              onClick={() => {
-                console.log('🎨 Toggle highlighter:', !showHighlighter)
-                setShowHighlighter(!showHighlighter)
-              }}
-            >
-              <img src="/icon/highlighter.svg" alt="highlight" />
-              <span>{showHighlighter ? 'Ẩn đánh dấu' : 'Hiện đánh dấu câu'}</span>
-            </button>
-            
-            {showHighlighter && (
-              <div className="highlighter-container">
-                <TextHighlighter
-                  text={text}
-                  sentenceAnalysis={analysisDetails.sentence_analysis}
-                  onSentenceClick={(sentence) => {
-                    console.log('📝 Sentence clicked in CompatibilityCard:', sentence)
-                    if (onSentenceClick) {
-                      onSentenceClick(sentence)
-                    }
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
 

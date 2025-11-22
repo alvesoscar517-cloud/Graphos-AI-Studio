@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  overflow-x: visible;
   position: absolute;
   left: 0;
   top: 0;
@@ -189,6 +190,7 @@
 
 .sidebar-bottom {
   padding: 8px;
+  overflow: visible;
 }
 
 .sidebar-bottom .nav-item {
@@ -207,6 +209,13 @@
 
 .footer-info {
   padding: 0;
+  position: relative;
+  overflow: visible;
+}
+
+.footer-link.notification-btn {
+  position: relative;
+  overflow: visible;
 }
 
 .footer-info p {
@@ -243,28 +252,48 @@
   height: 20px;
 }
 
-/* Notification Badge */
-.notification-badge {
-  position: absolute;
-  top: 4px;
-  left: 24px;
-  background: #202124;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 600;
-  min-width: 16px;
-  height: 16px;
-  border-radius: 8px;
+/* Notification Icon Wrapper */
+.notification-icon-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Notification Badge */
+.notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  box-shadow: 0 0 0 2px #f8f9fa, 0 2px 4px rgba(0, 0, 0, 0.15);
+  animation: badgePulse 2s ease-in-out infinite;
   animation: badge-pulse 2s ease-in-out infinite;
 }
 
 .notification-badge.hidden {
   display: none;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
 }
 
 @keyframes badge-pulse {
@@ -365,9 +394,9 @@ body.dark-theme .footer-link {
 }
 
 body.dark-theme .notification-badge {
-  background: #f28b82;
-  color: #1e1e1e;
-  box-shadow: 0 1px 3px rgba(242, 139, 130, 0.5);
+  background: #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px #1e1e1e, 0 2px 4px rgba(59, 130, 246, 0.4);
 }
 
 body.dark-theme .footer-link:hover {

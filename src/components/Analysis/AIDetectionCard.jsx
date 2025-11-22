@@ -175,7 +175,7 @@ const AIDetectionCard = ({ disabled, text }) => {
           disabled={disabled || isLoading || !textChanged}
           title={!textChanged ? 'Văn bản chưa thay đổi' : ''}
         >
-          <span>
+          <span className={isLoading ? 'shimmer-text-effect' : ''}>
             {isLoading ? 'Đang phát hiện...' : !textChanged ? 'Đã phát hiện' : 'Phát hiện'}
           </span>
           <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />

@@ -376,6 +376,7 @@ const ProfileSetup = () => {
                       <button
                         key={theme.id}
                         className={`theme-btn ${selectedTheme === theme.id ? 'theme-selected' : ''}`}
+                        data-theme={theme.id}
                         onClick={() => setSelectedTheme(theme.id)}
                       >
                         <img 

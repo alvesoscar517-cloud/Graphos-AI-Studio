@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
+import FeedbackModal from './FeedbackModal'
+import BillingSupportModal from './BillingSupportModal'
 import './Popups.css'
 
 const SettingsPopup = ({ onClose }) => {
   const popupRef = useRef(null)
   const { theme, changeTheme } = useTheme()
   const [showThemeSubmenu, setShowThemeSubmenu] = useState(false)
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  const [showBillingModal, setShowBillingModal] = useState(false)
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -76,14 +80,21 @@ const SettingsPopup = ({ onClose }) => {
         <img src="/icon/shield.svg" className="settings-icon" alt="Privacy" />
         <span>Privacy policy</span>
       </div>
-      <div className="settings-item">
+      <div className="settings-item" onClick={() => setShowFeedbackModal(true)}>
         <img src="/icon/flag.svg" className="settings-icon" alt="Feedback" />
         <span>Send feedback</span>
       </div>
-      <div className="settings-item">
+      <div className="settings-item" onClick={() => setShowBillingModal(true)}>
         <img src="/icon/dollar-sign.svg" className="settings-icon" alt="Billing" />
         <span>Billing Support</span>
       </div>
+      
+      {showFeedbackModal && (
+        <FeedbackModal onClose={() => setShowFeedbackModal(false)} />
+      )}
+      {showBillingModal && (
+        <BillingSupportModal onClose={() => setShowBillingModal(false)} />
+      )}
     </div>
   )
 }

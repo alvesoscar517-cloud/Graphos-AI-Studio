@@ -43,7 +43,37 @@
 .history-title-section {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
+}
+
+.history-filter-tabs {
+  display: flex;
+  gap: 4px;
+  background: #f1f3f4;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.filter-tab {
+  background: none;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #5f6368;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-tab:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.filter-tab.active {
+  background: white;
+  color: #1967d2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .history-title {
@@ -546,4 +576,85 @@ body.dark-theme .history-action-btn img,
 body.dark-theme .search-icon,
 body.dark-theme .dropdown-btn img {
   filter: var(--icon-filter);
+}
+
+/* Table Column Widths */
+.name-col {
+  width: auto;
+  min-width: 200px;
+}
+
+.type-col {
+  width: 120px;
+  text-align: left;
+}
+
+.source-col {
+  width: 120px;
+  text-align: left;
+}
+
+.updated-col {
+  width: 150px;
+  text-align: left;
+}
+
+.actions-col {
+  width: 60px;
+  text-align: right;
+}
+
+/* Source Badge */
+.history-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.history-source img {
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
+}
+
+/* Dark Mode */
+body.dark-theme .history-filter-tabs {
+  background: rgba(60, 64, 67, 0.3);
+}
+
+body.dark-theme .filter-tab {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+body.dark-theme .filter-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-theme .filter-tab.active {
+  background: rgba(138, 180, 248, 0.2);
+  color: #8ab4f8;
+}
+
+body.dark-theme .history-table {
+  background: rgba(60, 64, 67, 0.2);
+}
+
+body.dark-theme .history-table thead {
+  background: rgba(60, 64, 67, 0.4);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .history-table tbody tr {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .history-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .title-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }

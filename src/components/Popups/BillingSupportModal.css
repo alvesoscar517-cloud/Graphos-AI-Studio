@@ -1,0 +1,445 @@
+.billing-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  animation: fadeIn 0.2s ease;
+}
+
+.billing-modal {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+.billing-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, transparent 100%);
+}
+
+.billing-header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.billing-icon {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  opacity: 0.6;
+}
+
+/* Dark theme - match info card background */
+body.dark-theme .billing-icon,
+[data-theme="dark"] .billing-icon {
+  filter: invert(1);
+  background: #3c4043;
+  border-color: #5f6368;
+}
+
+.billing-header-text h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.billing-header-text p {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.billing-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.billing-close-btn:hover {
+  background: var(--bg-hover);
+}
+
+.billing-close-btn img {
+  width: 20px;
+  height: 20px;
+  filter: var(--icon-filter);
+}
+
+.billing-content {
+  padding: 28px;
+  max-height: calc(90vh - 100px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.billing-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Info cards */
+.billing-info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.billing-info-card {
+  padding: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.billing-info-card:hover {
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.billing-info-card img {
+  width: 24px;
+  height: 24px;
+  filter: var(--icon-filter);
+  margin-bottom: 8px;
+}
+
+.billing-info-card h4 {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.billing-info-card p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Support categories */
+.support-categories {
+  margin-bottom: 24px;
+}
+
+.support-categories h3 {
+  margin: 0 0 12px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-chip {
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.category-chip:hover {
+  border-color: var(--accent-color);
+  background: var(--bg-hover);
+}
+
+.category-chip.selected {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+/* Form */
+.billing-form {
+  margin-top: 24px;
+}
+
+.billing-field {
+  margin-bottom: 20px;
+}
+
+.billing-field label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+}
+
+.billing-field input,
+.billing-field textarea,
+.billing-field select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  user-select: text;
+}
+
+
+
+.billing-field input:focus,
+.billing-field textarea:focus,
+.billing-field select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.billing-field textarea {
+  resize: none;
+  min-height: 140px;
+  line-height: 1.6;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.billing-field textarea::-webkit-scrollbar {
+  display: none;
+}
+
+.billing-field select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  user-select: none;
+}
+
+/* Custom dropdown styling for better appearance */
+.billing-field select option {
+  padding: 12px 16px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Dark theme select arrow */
+[data-theme="dark"] .billing-field select,
+body.dark-theme .billing-field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aaa' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+.char-count {
+  text-align: right;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+/* Attachment area */
+.attachment-area {
+  margin-top: 8px;
+}
+
+.attach-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--bg-secondary);
+  border: 2px dashed var(--border-color);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.attach-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--accent-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.attach-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.attach-btn img {
+  width: 18px;
+  height: 18px;
+  filter: var(--icon-filter);
+}
+
+.attachment-list {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.attachment-item {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.attachment-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-attachment-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.remove-attachment-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.remove-attachment-btn img {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0) invert(1);
+}
+
+/* Error message */
+.billing-error {
+  padding: 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 14px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.billing-error img {
+  width: 18px;
+  height: 18px;
+}
+
+/* Actions */
+.billing-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-cancel,
+.btn-submit {
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.btn-cancel:hover,
+.btn-submit:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--accent-color);
+  transform: translateY(-1px);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .billing-modal {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .remove-attachment-btn {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .remove-attachment-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] .billing-field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aaa' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+

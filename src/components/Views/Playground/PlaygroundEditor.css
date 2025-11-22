@@ -9,79 +9,260 @@
   background: var(--bg-primary);
 }
 
+/* Main Header */
+.playground-editor-view .main-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  height: 56px;
+}
+
+/* Title Container */
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.title-display {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 6px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+  max-width: 600px;
+  flex-shrink: 0;
+}
+
+.title-input {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-primary);
+  transition: all 0.2s;
+  width: auto;
+  min-width: 100px;
+  max-width: 600px;
+}
+
+.title-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+}
+
+.title-edit-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.title-container:hover .title-edit-btn {
+  opacity: 0.7;
+}
+
+.title-edit-btn:hover:not(:disabled) {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.05);
+  transform: scale(1.1);
+}
+
+.title-edit-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.title-edit-btn img {
+  width: 14px;
+  height: 14px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Dark Theme */
+body.dark-theme .title-edit-btn img {
+  filter: invert(1);
+}
+
+body.dark-theme .title-edit-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .title-input {
+  background: rgba(60, 64, 67, 0.5);
+}
+
+body.dark-theme .title-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(138, 180, 248, 0.15);
+}
+
+/* Dark theme for header icons */
+body.dark-theme .main-header .icon-btn img {
+  filter: invert(1);
+}
+
 .playground-editor-view .text-input-area {
+  flex: 1;
   padding: 0;
   margin: 0;
   border: none;
-  background: var(--bg-primary) !important;
-}
-
-.playground-editor-view .main-textarea {
-  padding: 24px 32px !important;
-  margin: 0 !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
-}
-
-/* Header already styled in PlaygroundView.css */
-/* Text input area already styled in PlaygroundView.css */
-
-/* Additional editor-specific styles if needed */
-.playground-editor-view .main-header {
-  /* Inherits from PlaygroundView.css */
-}
-
-.playground-editor-view .text-input-area {
-  /* Inherits from PlaygroundView.css */
-}
-
-/* Shimmer Overlay */
-.text-input-area {
-  position: relative;
-}
-
-.shimmer-overlay {
-  position: absolute;
-  inset: 0;
-  padding: 24px 32px;
-  overflow-y: auto;
-  overflow-x: hidden;
   background: var(--bg-primary);
+  overflow: hidden;
+}
+
+/* Removed old shimmer overlay styles - now using ContentEditableEditor */
+
+/* Analysis controls */
+.analysis-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.header-actions .divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-color);
+  margin: 0 8px;
+}
+
+.icon-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.icon-btn.active img {
+  filter: brightness(0) invert(1);
+}
+
+.icon-btn.loading {
   pointer-events: none;
-  z-index: 10;
-  /* Match textarea scrollbar */
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
+  opacity: 0.6;
 }
 
-.shimmer-overlay::-webkit-scrollbar {
-  width: 8px;
+.icon-btn.loading img {
+  animation: spin-icon 1s linear infinite;
 }
 
-.shimmer-overlay::-webkit-scrollbar-track {
+@keyframes spin-icon {
+  to { transform: rotate(360deg); }
+}
+
+/* Analysis status bar */
+.analysis-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 20px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  font-size: 13px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.status-item img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+.cache-indicator {
+  margin-left: auto;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.cache-indicator img {
+  opacity: 1;
+}
+
+/* Removed old highlight overlay styles - now using ContentEditableEditor */
+
+
+
+/* Done highlights button in top bar */
+.done-highlights-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
   background: transparent;
+  color: #333;
+  border: 1px solid #dadce0;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.shimmer-overlay::-webkit-scrollbar-thumb {
-  background: transparent;
+.done-highlights-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: #5f6368;
 }
 
-.shimmer-text {
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-primary);
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  word-break: break-word;
-  /* Smooth rendering */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* Performance optimization for large text */
-  will-change: opacity;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+.done-highlights-btn img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.done-highlights-btn:hover img {
+  opacity: 0.9;
+}
+
+body.dark-theme .done-highlights-btn,
+[data-theme="dark"] .done-highlights-btn {
+  background: rgba(60, 64, 67, 0.4);
+  color: #e3e3e3;
+  border-color: rgba(95, 99, 104, 0.5);
+}
+
+body.dark-theme .done-highlights-btn:hover,
+[data-theme="dark"] .done-highlights-btn:hover {
+  background: rgba(60, 64, 67, 0.6);
+  border-color: rgba(154, 160, 166, 0.6);
+}
+
+body.dark-theme .done-highlights-btn img,
+[data-theme="dark"] .done-highlights-btn img {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+
+body.dark-theme .done-highlights-btn:hover img,
+[data-theme="dark"] .done-highlights-btn:hover img {
+  opacity: 1;
 }

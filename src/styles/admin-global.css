@@ -1,0 +1,181 @@
+/**
+ * Admin Panel Global Styles - Modern Minimal Design
+ * Black & White Theme with System Icons
+ */
+
+/* Admin Root Container - CSS Variables */
+.admin-root {
+  --admin-black: #000000;
+  --admin-white: #ffffff;
+  --admin-gray-50: #fafafa;
+  --admin-gray-100: #f5f5f5;
+  --admin-gray-200: #e0e0e0;
+  --admin-gray-300: #d0d0d0;
+  --admin-gray-400: #b0b0b0;
+  --admin-gray-500: #999999;
+  --admin-gray-600: #666666;
+  --admin-gray-700: #444444;
+  --admin-gray-800: #222222;
+  --admin-gray-900: #111111;
+  
+  --admin-radius-sm: 6px;
+  --admin-radius: 8px;
+  --admin-radius-lg: 12px;
+  --admin-radius-full: 9999px;
+  --admin-transition: all 0.2s ease;
+  
+  /* Reset admin panel styles */
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Reset for admin panel only */
+.admin-root *,
+.admin-root *::before,
+.admin-root *::after {
+  box-sizing: border-box;
+}
+
+.admin-root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  color: var(--admin-black);
+}
+
+/* Common Admin Utilities */
+.admin-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--admin-radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--admin-transition);
+  font-family: inherit;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-btn-primary {
+  background: var(--admin-black);
+  color: var(--admin-white);
+}
+
+.admin-btn-primary:hover:not(:disabled) {
+  background: var(--admin-gray-800);
+}
+
+.admin-btn-secondary {
+  background: var(--admin-white);
+  color: var(--admin-black);
+  border: 1px solid var(--admin-gray-200);
+}
+
+.admin-btn-secondary:hover:not(:disabled) {
+  border-color: var(--admin-black);
+}
+
+.admin-btn-success {
+  background: var(--admin-black);
+  color: var(--admin-white);
+}
+
+.admin-btn-danger {
+  background: var(--admin-black);
+  color: var(--admin-white);
+}
+
+/* Admin Card */
+.admin-card {
+  background: var(--admin-white);
+  border: 1px solid var(--admin-gray-200);
+  border-radius: var(--admin-radius);
+  padding: 24px;
+}
+
+/* Admin Input */
+.admin-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--admin-gray-200);
+  border-radius: var(--admin-radius);
+  font-size: 14px;
+  font-family: inherit;
+  transition: var(--admin-transition);
+  background: var(--admin-white);
+  color: var(--admin-black);
+}
+
+.admin-input:focus {
+  outline: none;
+  border-color: var(--admin-black);
+  box-shadow: 0 0 0 1px var(--admin-black);
+}
+
+/* Admin Loading */
+.admin-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.admin-spinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--admin-gray-100);
+  border-top: 2px solid var(--admin-black);
+  border-radius: 50%;
+  animation: admin-spin 0.8s linear infinite;
+}
+
+@keyframes admin-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Admin Empty State */
+.admin-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--admin-gray-500);
+}
+
+/* Admin Badge */
+.admin-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--admin-radius);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Scrollbar for admin */
+.admin-root ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-root ::-webkit-scrollbar-track {
+  background: var(--admin-gray-50);
+}
+
+.admin-root ::-webkit-scrollbar-thumb {
+  background: var(--admin-gray-300);
+  border-radius: var(--admin-radius);
+}
+
+.admin-root ::-webkit-scrollbar-thumb:hover {
+  background: var(--admin-gray-400);
+}

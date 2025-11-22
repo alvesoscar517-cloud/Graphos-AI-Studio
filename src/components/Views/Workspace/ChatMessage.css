@@ -1,0 +1,239 @@
+/* Chat Message Styles */
+.chat-message {
+  display: flex;
+  width: 100%;
+  animation: messageSlideIn 0.3s ease-out;
+  margin-bottom: 24px;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-message-user {
+  justify-content: flex-end;
+}
+
+.chat-message-ai {
+  justify-content: flex-start;
+}
+
+.chat-message-content-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-message-user .chat-message-content-wrapper {
+  align-items: flex-end;
+  max-width: 70%;
+}
+
+.chat-message-ai .chat-message-content-wrapper {
+  align-items: flex-start;
+  width: 100%;
+}
+
+.chat-message-bubble {
+  padding: 12px 16px;
+  border-radius: 18px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+.chat-message-ai-content {
+  width: 100%;
+  position: relative;
+}
+
+.chat-message-error .chat-message-ai-content {
+  color: #f44336;
+}
+
+.chat-message-text {
+  margin: 0;
+  line-height: 1.5;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+/* Markdown Styling */
+.chat-message-markdown {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #000;
+}
+
+.chat-message-markdown p {
+  margin: 0 0 8px 0;
+  color: inherit;
+}
+
+.chat-message-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.chat-message-markdown code {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: inherit;
+}
+
+.chat-message-markdown pre {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.chat-message-markdown pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+.chat-message-markdown ul,
+.chat-message-markdown ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.chat-message-markdown li {
+  margin: 4px 0;
+  color: inherit;
+}
+
+.chat-message-markdown strong {
+  font-weight: 600;
+  color: inherit;
+}
+
+.chat-message-markdown em {
+  font-style: italic;
+  color: inherit;
+}
+
+.chat-message-markdown a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.chat-message-markdown blockquote {
+  border-left: 3px solid var(--border-primary);
+  padding-left: 12px;
+  margin: 8px 0;
+  color: inherit;
+}
+
+/* Attachments */
+.chat-message-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chat-attachment {
+  max-width: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chat-attachment img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.chat-attachment-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.chat-attachment-file img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+}
+
+/* Copy Button */
+.chat-message-copy {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.2s;
+  border-radius: 6px;
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-message-copy:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.chat-message-copy img {
+  width: 16px;
+  height: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chat-message {
+    max-width: 95%;
+  }
+
+  .chat-message-bubble {
+    padding: 10px 14px;
+  }
+}
+
+/* Dark Theme */
+body.dark-theme .chat-message-bubble {
+  background: rgba(60, 64, 67, 0.3);
+}
+
+body.dark-theme .chat-message-markdown {
+  color: #fff;
+}
+
+body.dark-theme .chat-message-markdown code {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .chat-message-markdown pre {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .chat-attachment-file {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .chat-message-copy:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .workspace-loading-dots {
+  background: rgba(60, 64, 67, 0.3);
+}

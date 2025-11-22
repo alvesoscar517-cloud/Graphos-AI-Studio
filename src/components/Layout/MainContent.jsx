@@ -1,5 +1,6 @@
 import HomeView from '../Views/HomeView'
 import PlaygroundView from '../Views/PlaygroundView'
+import WorkspaceView from '../Views/WorkspaceView'
 import HistoryView from '../Views/HistoryView'
 
 const MainContent = ({ 
@@ -9,14 +10,19 @@ const MainContent = ({
   onToggleRightSidebar,
   rightSidebarHidden,
   leftSidebarHidden,
-  highlightedSentence
+  highlightedSentence,
+  analysisData
 }) => {
+  // Only add margin-right for playground-editor (RightSidebar)
+  // Workspace handles its own sidebar internally
+  const shouldAddRightMargin = currentView === 'playground-editor' && !rightSidebarHidden
+  
   return (
     <main 
       className="main-content"
       style={{
         marginLeft: leftSidebarHidden ? 0 : '238px',
-        marginRight: rightSidebarHidden ? 0 : '300px',
+        marginRight: shouldAddRightMargin ? '300px' : 0,
         transition: 'margin 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
@@ -35,6 +41,16 @@ const MainContent = ({
           rightSidebarHidden={rightSidebarHidden}
           onViewChange={onViewChange}
           highlightedSentence={highlightedSentence}
+          analysisData={analysisData}
+        />
+      )}
+
+      {currentView === 'workspace' && (
+        <WorkspaceView 
+          onToggleLeftSidebar={onToggleLeftSidebar}
+          onToggleRightSidebar={onToggleRightSidebar}
+          rightSidebarHidden={rightSidebarHidden}
+          leftSidebarHidden={leftSidebarHidden}
         />
       )}
       

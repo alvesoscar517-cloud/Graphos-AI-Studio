@@ -213,26 +213,54 @@ body.dark-theme .empty-text {
 }
 
 .profile-modal-card:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--card-shadow-hover);
-  background: var(--bg-hover);
-  transform: translateY(-1px);
+  border-color: #dadce0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .profile-modal-card.selected {
-  border-color: var(--color-primary);
-  border-width: 1.5px;
+  border-color: var(--border-primary);
+  border-width: 1px;
+}
+
+body.dark-theme .profile-modal-card {
+  background: #2d2d2d;
+  border-color: #3c4043;
+}
+
+body.dark-theme .profile-modal-card:hover {
+  border-color: #5f6368;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-theme .profile-modal-card.selected {
-  border-color: var(--color-primary);
-  border-width: 1.5px;
+  border-color: #3c4043;
+  border-width: 1px;
+}
+
+/* Selected indicator - blue dot */
+.profile-modal-card.selected::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: #4285f4;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+  z-index: 10;
+}
+
+body.dark-theme .profile-modal-card.selected::before {
+  background: #8ab4f8;
+  box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.25);
 }
 
 .profile-modal-card-header {
   display: flex;
   align-items: flex-start;
   gap: 10px;
+  position: relative;
 }
 
 .profile-modal-icon {
@@ -248,8 +276,7 @@ body.dark-theme .profile-modal-card.selected {
 }
 
 .profile-modal-card:hover .profile-modal-icon {
-  background: var(--bg-active);
-  transform: scale(1.05);
+  /* No change on hover - keep consistent */
 }
 
 .profile-modal-icon img {
@@ -260,7 +287,7 @@ body.dark-theme .profile-modal-card.selected {
 }
 
 .profile-modal-card:hover .profile-modal-icon img {
-  opacity: 0.9;
+  /* No change on hover - keep consistent */
 }
 
 body.dark-theme .profile-modal-icon {
@@ -268,7 +295,7 @@ body.dark-theme .profile-modal-icon {
 }
 
 body.dark-theme .profile-modal-card:hover .profile-modal-icon {
-  background: rgba(255, 255, 255, 0.12);
+  /* No change on hover - keep consistent */
 }
 
 body.dark-theme .profile-modal-icon img {
@@ -281,6 +308,7 @@ body.dark-theme .profile-modal-icon img {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding-right: 36px;
 }
 
 .profile-modal-name-row {
@@ -372,6 +400,10 @@ body.dark-theme .profile-modal-meta-item img {
   justify-content: center;
   transition: all 0.2s ease;
   flex-shrink: 0;
+  position: absolute;
+  top: 18px;
+  right: 0;
+  z-index: 5;
 }
 
 .profile-modal-delete-btn:hover {
@@ -426,8 +458,7 @@ body.dark-theme .profile-modal-delete-btn:hover img {
 }
 
 .profile-modal-card:hover .profile-modal-tag {
-  background: var(--bg-tertiary);
-  border-color: var(--border-hover);
+  /* No change on hover - keep consistent */
 }
 
 /* Legacy model card styles - keep for backward compatibility */

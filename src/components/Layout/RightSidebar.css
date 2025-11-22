@@ -32,6 +32,64 @@
   flex: 1;
 }
 
+/* Mode Toggle Container */
+.mode-toggle-container {
+  display: flex;
+  gap: 4px;
+  background: #f1f3f4;
+  padding: 4px;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.mode-toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #5f6368;
+  transition: all 0.2s ease;
+}
+
+.mode-toggle-btn img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.mode-toggle-btn span {
+  font-size: 13px;
+}
+
+.mode-toggle-btn:hover {
+  color: #202124;
+}
+
+.mode-toggle-btn:hover img {
+  opacity: 0.8;
+}
+
+.mode-toggle-btn.active {
+  background: #fff;
+  color: #1a73e8;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mode-toggle-btn.active img {
+  opacity: 1;
+  /* Light theme blue color filter */
+  filter: brightness(0) saturate(100%) invert(38%) sepia(98%) saturate(2618%) hue-rotate(203deg) brightness(95%) contrast(89%);
+}
+
 .close-sidebar-btn {
   margin-left: auto;
   margin-right: 0;
@@ -65,6 +123,7 @@
   flex-direction: column;
   gap: 20px;
   padding: 16px;
+  padding-bottom: 80px; /* Space for fixed footer */
   flex: 1;
 }
 
@@ -329,6 +388,87 @@
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* Right Sidebar Footer - Overlay Style */
+.right-sidebar-footer {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 300px;
+  padding: 16px;
+  margin: 8px;
+  width: calc(300px - 16px);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(232, 234, 237, 0.8);
+  border-radius: 12px;
+  z-index: 10;
+}
+
+.rewrite-footer-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #5f6368;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.rewrite-footer-btn:hover:not(:disabled) {
+  background: #3c4043;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.rewrite-footer-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.rewrite-footer-btn:disabled {
+  background: #e8eaed;
+  color: #9aa0a6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.rewrite-footer-btn img {
+  width: 18px;
+  height: 18px;
+  opacity: 0.9;
+}
+
+.rewrite-footer-btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.rewrite-footer-btn.loading img {
+  opacity: 0;
+}
+
+.rewrite-footer-btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Dark Theme for Right Sidebar */
 body.dark-theme .right-sidebar {
   background: #1e1e1e;
@@ -340,6 +480,27 @@ body.dark-theme .right-sidebar {
 body.dark-theme .right-header-title {
   color: #e3e3e3;
 }
+
+/* Dark Theme - Mode Toggle */
+body.dark-theme .mode-toggle-container {
+  background: #2d2d2d;
+}
+
+body.dark-theme .mode-toggle-btn {
+  color: #9aa0a6;
+}
+
+body.dark-theme .mode-toggle-btn:hover {
+  color: #e3e3e3;
+}
+
+body.dark-theme .mode-toggle-btn.active {
+  background: #3c4043;
+  color: #8ab4f8;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark theme active icon filter moved to common.css for global consistency */
 
 body.dark-theme .code-btn {
   color: #e3e3e3;
@@ -456,4 +617,32 @@ body.dark-theme .right-sidebar::-webkit-scrollbar-thumb {
 
 body.dark-theme .right-sidebar::-webkit-scrollbar-thumb:hover {
   background: #80868b;
+}
+
+/* Dark Theme - Footer */
+body.dark-theme .right-sidebar-footer {
+  background: rgba(30, 30, 30, 0.8);
+  border: 1px solid rgba(60, 64, 67, 0.8);
+}
+
+body.dark-theme .rewrite-footer-btn {
+  background: #5f6368;
+  color: #e3e3e3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .rewrite-footer-btn:hover:not(:disabled) {
+  background: #80868b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-theme .rewrite-footer-btn:disabled {
+  background: #3c4043;
+  color: #5f6368;
+  box-shadow: none;
+}
+
+body.dark-theme .rewrite-footer-btn.loading::after {
+  border-color: rgba(227, 227, 227, 0.3);
+  border-top-color: #e3e3e3;
 }

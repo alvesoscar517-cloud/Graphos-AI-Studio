@@ -173,6 +173,61 @@ export async function rewriteText(profileId, text) {
   }
 }
 
+// Streaming rewrite with model selection
+export async function rewriteTextStream(profileId, text, model, onChunk) {
+  try {
+    const userInfo = await getUserInfo()
+    const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite_stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        profile_id: profileId,
+        text: text,
+        model: model,
+        user_id: userInfo.userId
+      })
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    
+    while (true) {
+      const { done, value } = await reader.read()
+      
+      if (done) break
+      
+      const chunk = decoder.decode(value, { stream: true })
+      const lines = chunk.split('\n')
+      
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6)
+          if (data === '[DONE]') {
+            return
+          }
+          try {
+            const json = JSON.parse(data)
+            if (json.chunk) {
+              onChunk(json.chunk)
+            }
+          } catch (e) {
+            // Skip invalid JSON
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error streaming rewrite:', error)
+    throw error
+  }
+}
+
 // Profile Setup API calls
 export async function createProfile(profileName, theme = 'work') {
   try {
@@ -326,6 +381,162 @@ export async function getSuggestions(profileId, sentence, sentenceScore, context
     throw new Error(data.error || 'Failed to get suggestions')
   } catch (error) {
     console.error('❌ Error getting suggestions:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+// ============================================================================
+// OPTIMIZED APIs - Cost-efficient versions
+// ============================================================================
+
+// In-memory cache for embeddings (client-side)
+const embeddingCache = new Map()
+const CACHE_TTL = 30 * 60 * 1000 // 30 minutes
+
+function getCacheKey(text) {
+  // Simple hash function for cache key
+  let hash = 0
+  for (let i = 0; i < text.length; i++) {
+    const char = text.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash // Convert to 32bit integer
+  }
+  return hash.toString()
+}
+
+function getCachedData(key) {
+  const cached = embeddingCache.get(key)
+  if (!cached) return null
+  
+  const now = Date.now()
+  if (now - cached.timestamp > CACHE_TTL) {
+    embeddingCache.delete(key)
+    return null
+  }
+  
+  return cached.data
+}
+
+function setCachedData(key, data) {
+  embeddingCache.set(key, {
+    data,
+    timestamp: Date.now()
+  })
+}
+
+// Optimized analyze - with client-side caching
+export async function analyzeTextOptimized(profileId, text) {
+  try {
+    // Check cache first
+    const cacheKey = `analyze_${profileId}_${getCacheKey(text)}`
+    const cached = getCachedData(cacheKey)
+    
+    if (cached) {
+      console.log('⚡ Using cached analysis result')
+      return { success: true, data: cached }
+    }
+    
+    const userInfo = await getUserInfo()
+    const response = await fetch(`${CONFIG.API_BASE_URL}/analyze`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        profile_id: profileId,
+        text: text,
+        user_id: userInfo.userId,
+        use_cache: true // Tell backend to use cache
+      })
+    })
+    
+    const data = await response.json()
+    
+    if (response.ok && data.success) {
+      // Cache the result
+      setCachedData(cacheKey, data)
+      return { success: true, data }
+    }
+    
+    return { success: false, error: data.error }
+  } catch (error) {
+    console.error('Error analyzing text:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+// Optimized suggestions - only for deviant sentences
+export async function getSuggestionsOptimized(profileId, sentence, sentenceScore) {
+  try {
+    // Only fetch suggestions if sentence is deviant (score < 0.6)
+    if (sentenceScore >= 0.6) {
+      return {
+        success: true,
+        data: {
+          suggestions: [],
+          rewritten: sentence,
+          confidence: 100
+        }
+      }
+    }
+    
+    // Check cache
+    const cacheKey = `suggest_${profileId}_${getCacheKey(sentence)}`
+    const cached = getCachedData(cacheKey)
+    
+    if (cached) {
+      console.log('⚡ Using cached suggestions')
+      return { success: true, data: cached }
+    }
+    
+    const response = await fetch(`${CONFIG.API_BASE_URL}/suggest_improvements`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        profile_id: profileId,
+        sentence: sentence,
+        sentence_score: sentenceScore,
+        lightweight: true // Request lightweight response
+      })
+    })
+    
+    const data = await response.json()
+    
+    if (response.ok && data.success) {
+      // Cache the result
+      setCachedData(cacheKey, data)
+      return { success: true, data }
+    }
+    
+    throw new Error(data.error || 'Failed to get suggestions')
+  } catch (error) {
+    console.error('❌ Error getting suggestions:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+// Batch analyze - for multiple texts efficiently
+export async function analyzeTextBatch(profileId, texts) {
+  try {
+    const userInfo = await getUserInfo()
+    const response = await fetch(`${CONFIG.API_BASE_URL}/analyze_batch`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        profile_id: profileId,
+        texts: texts,
+        user_id: userInfo.userId
+      })
+    })
+    
+    const data = await response.json()
+    return { success: response.ok && data.success, data, error: data.error }
+  } catch (error) {
+    console.error('Error batch analyzing:', error)
     return { success: false, error: error.message }
   }
 }
