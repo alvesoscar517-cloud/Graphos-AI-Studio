@@ -4,7 +4,7 @@ export default function StatsCard({ icon, title, value, subtitle, change }) {
   return (
     <div className="stats-card">
       <div className="stats-icon">
-        <img src={`/admin/icon/${icon}`} alt={title} />
+        <img src={`/icon/${icon}`} alt={title} />
       </div>
       
       <div className="stats-content">

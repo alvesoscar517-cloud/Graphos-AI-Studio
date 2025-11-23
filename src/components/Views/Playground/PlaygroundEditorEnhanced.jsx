@@ -4,7 +4,7 @@ import { useAuth } from '../../../contexts/AuthContext'
 import { useAIProcessing } from '../../../contexts/AIProcessingContext'
 import { useProfiles } from '../../../contexts/ProfileContext'
 import { openDriveFolder } from '../../../services/drive'
-import InlineHighlightEditor from '../../Analysis/InlineHighlightEditor'
+import TextHighlightEditor from '../../Analysis/TextHighlightEditor'
 import modal from '../../../utils/modal'
 import './PlaygroundEditor.css'
 
@@ -22,7 +22,8 @@ const PlaygroundEditorEnhanced = ({
   onToggleRightSidebar, 
   rightSidebarHidden,
   onCreateNote,
-  externalAnalysisData
+  externalAnalysisData,
+  rewriteMode
 }) => {
   const { currentNote, updateNote, notes, generateTitle } = useNotes()
   const { user, signOut } = useAuth()
@@ -269,7 +270,7 @@ const PlaygroundEditorEnhanced = ({
       </header>
 
       <div className="text-input-area">
-        <InlineHighlightEditor
+        <TextHighlightEditor
           value={currentNote?.content || ''}
           onChange={handleContentChange}
           analysis={analysis}
@@ -277,6 +278,8 @@ const PlaygroundEditorEnhanced = ({
           placeholder="Nhập nội dung..."
           showHighlights={showHighlights}
           onHighlightsChange={setHasHighlights}
+          showRewriteToolbar={true}
+          currentProfile={currentProfile}
         />
       </div>
 

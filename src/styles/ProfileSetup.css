@@ -202,7 +202,7 @@
 .input-group input:focus,
 .input-group textarea:focus {
   outline: none;
-  border-color: #4facfe;
+  border-color: rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.1);
 }
 
@@ -337,7 +337,7 @@
 .option-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: rgba(79, 172, 254, 0.15);
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -348,7 +348,8 @@
 }
 
 .option-icon svg {
-  color: white;
+  color: #4facfe;
+  stroke-width: 2;
 }
 
 .option-content {
@@ -386,6 +387,8 @@
 
 .option-badge svg {
   color: white;
+  stroke: white;
+  stroke-width: 3;
 }
 
 @keyframes scaleIn {
@@ -429,7 +432,7 @@
 
 .modern-textarea-container textarea:focus {
   outline: none;
-  border-color: #dee2e6;
+  border-color: rgba(0, 0, 0, 0.15);
   box-shadow: none;
   background: white;
 }
@@ -491,10 +494,12 @@
   transform: scale(0);
   transition: all 0.3s ease;
   color: white;
+  stroke: white;
+  stroke-width: 3;
 }
 
 .checkmark-btn.completed {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: #4facfe;
   border-color: #4facfe;
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
@@ -562,8 +567,9 @@
 }
 
 .checklist-item svg {
-  color: #28a745;
+  color: #4facfe;
   flex-shrink: 0;
+  stroke-width: 2.5;
 }
 
 .checklist-item span {

@@ -9,6 +9,7 @@ const MainLayout = () => {
   const [currentView, setCurrentView] = useState('playground') // 'home', 'playground', 'history', 'workspace'
   const [highlightedSentence, setHighlightedSentence] = useState(null) // NEW: For highlighting sentence in editor
   const [analysisData, setAnalysisData] = useState(null) // NEW: For inline highlighting
+  const [rewriteMode, setRewriteMode] = useState(false) // NEW: For showing rewrite toolbar
 
   // Reset right sidebar state when switching to workspace
   const handleViewChange = (view) => {
@@ -43,6 +44,7 @@ const MainLayout = () => {
         leftSidebarHidden={leftSidebarHidden}
         highlightedSentence={highlightedSentence}
         analysisData={analysisData}
+        rewriteMode={rewriteMode}
       />
       {/* Only show RightSidebar for playground-editor, not for workspace */}
       {currentView !== 'workspace' && (
@@ -51,6 +53,7 @@ const MainLayout = () => {
           onClose={() => setRightSidebarHidden(true)}
           onHighlightSentence={setHighlightedSentence}
           onAnalysisComplete={setAnalysisData}
+          onModeChange={(mode) => setRewriteMode(mode === 'rewrite')}
         />
       )}
     </div>

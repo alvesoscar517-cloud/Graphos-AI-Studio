@@ -1,30 +1,8 @@
-/* Admin Panel Styles - Hoàn toàn tách biệt với main app */
+/* Admin Panel Styles - Standalone Extension */
 
-/* CSS Reset cho toàn bộ admin page */
-html:has(#admin-root),
-body:has(#admin-root) {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-}
+/* CSS Reset - CHỈ áp dụng trong #admin-root */
 
-/* Ẩn thanh cuộn cho html và body */
-html:has(#admin-root)::-webkit-scrollbar,
-body:has(#admin-root)::-webkit-scrollbar {
-  width: 0px !important;
-  height: 0px !important;
-  display: none !important;
-}
-
-html:has(#admin-root),
-body:has(#admin-root) {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
-}
-
-/* Base styles cho admin root */
+/* Base styles */
 #admin-root {
   display: block;
   width: 100%;
@@ -36,8 +14,6 @@ body:has(#admin-root) {
   color: #000;
   line-height: 1.5;
   font-size: 14px;
-  margin: 0;
-  padding: 0;
 }
 
 /* Ẩn thanh cuộn trên toàn hệ thống admin - phải đặt sau all: initial */
@@ -78,22 +54,17 @@ body:has(#admin-root) {
   border: none;
 }
 
+/* Không reset button/input quá mức - để components tự style */
 #admin-root button {
   font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-  outline: none;
+  box-sizing: border-box;
 }
 
 #admin-root input,
 #admin-root textarea,
 #admin-root select {
   font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  border: none;
-  outline: none;
+  box-sizing: border-box;
 }
 
 #admin-root a {
@@ -203,7 +174,7 @@ body:has(#admin-root) {
   -moz-border-radius: 8px !important;
 }
 
-/* Admin-specific icon filters */
+/* Admin-specific icon filters - FIX: Hiển thị màu trắng trên nền tối */
 #admin-root .stats-icon img,
 #admin-root .activity-icon img,
 #admin-root .login-icon img,
@@ -211,18 +182,19 @@ body:has(#admin-root) {
 #admin-root .admin-error-message img,
 #admin-root .admin-login-footer img,
 #admin-root .dashboard-error button img {
-  filter: invert(1) brightness(2) !important;
+  filter: brightness(0) invert(1) !important;
 }
 
 #admin-root .section-header img,
 #admin-root .dashboard-error > img,
 #admin-root .label-icon {
-  filter: brightness(0) !important;
+  filter: brightness(0) invert(1) !important;
 }
 
 /* Admin header icons */
 #admin-root .admin-header .user-icon {
-  filter: brightness(0) !important;
+  filter: none !important;
+  color: #333 !important;
 }
 
 #admin-root .admin-header .logout-btn img {

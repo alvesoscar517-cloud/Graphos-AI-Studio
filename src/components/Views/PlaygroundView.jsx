@@ -10,7 +10,8 @@ const PlaygroundView = ({
   rightSidebarHidden,
   onViewChange,
   highlightedSentence,
-  analysisData
+  analysisData,
+  rewriteMode
 }) => {
   const { createNote } = useNotes()
 
@@ -33,6 +34,7 @@ const PlaygroundView = ({
           rightSidebarHidden={rightSidebarHidden}
           onCreateNote={handleCreateNote}
           externalAnalysisData={analysisData}
+          rewriteMode={rewriteMode}
         />
       )}
     </div>

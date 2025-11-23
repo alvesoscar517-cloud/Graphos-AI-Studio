@@ -111,11 +111,11 @@ export default function SupportDetail() {
     <div className="support-detail">
       <div className="detail-header">
         <button className="btn-back" onClick={() => navigate('/support')}>
-          <img src="/admin/icon/arrow-left.svg" alt="Back" />
+          <img src="/icon/arrow-left.svg" alt="Back" />
           Back
         </button>
         <div className="header-title">
-          <img src="/admin/icon/headphones.svg" alt="Support" />
+          <img src="/icon/headphones.svg" alt="Support" />
           <h1>Ticket Details #{ticket.id.substring(0, 8)}</h1>
         </div>
       </div>
@@ -125,7 +125,7 @@ export default function SupportDetail() {
           <div className="card-header">
             <div className="ticket-meta">
               <span className={`type-badge ${ticket.type}`}>
-                <img src={`/admin/icon/${ticket.type === 'billing_support' ? 'dollar-sign' : 'message-square'}.svg`} alt={ticket.type} />
+                <img src={`/icon/${ticket.type === 'billing_support' ? 'dollar-sign' : 'message-square'}.svg`} alt={ticket.type} />
                 {ticket.type === 'billing_support' ? 'Billing Support' : 'Feedback'}
               </span>
               <span className="priority-badge" style={{ background: ticket.priority === 'high' ? '#f44336' : '#ff9800' }}>
@@ -151,7 +151,7 @@ export default function SupportDetail() {
 
           <div className="ticket-info">
             <div className="info-row">
-              <img src="/admin/icon/user.svg" alt="User" />
+              <img src="/icon/user.svg" alt="User" />
               <div>
                 <div className="info-label">Sender</div>
                 <div className="info-value">{ticket.userName}</div>
@@ -159,7 +159,7 @@ export default function SupportDetail() {
               </div>
             </div>
             <div className="info-row">
-              <img src="/admin/icon/calendar.svg" alt="Date" />
+              <img src="/icon/calendar.svg" alt="Date" />
               <div>
                 <div className="info-label">Created</div>
                 <div className="info-value">{new Date(ticket.createdAt).toLocaleString('en-US')}</div>
@@ -167,7 +167,7 @@ export default function SupportDetail() {
             </div>
             {ticket.category && (
               <div className="info-row">
-                <img src="/admin/icon/tag.svg" alt="Category" />
+                <img src="/icon/tag.svg" alt="Category" />
                 <div>
                   <div className="info-label">Category</div>
                   <div className="info-value">{ticket.category}</div>
@@ -203,7 +203,7 @@ export default function SupportDetail() {
               onClick={() => handleStatusChange('in_progress')}
               disabled={ticket.status === 'in_progress'}
             >
-              <img src="/admin/icon/clock.svg" alt="In Progress" />
+              <img src="/icon/clock.svg" alt="In Progress" />
               In Progress
             </button>
             <button 
@@ -211,7 +211,7 @@ export default function SupportDetail() {
               onClick={() => handleStatusChange('resolved')}
               disabled={ticket.status === 'resolved'}
             >
-              <img src="/admin/icon/check-circle.svg" alt="Resolved" />
+              <img src="/icon/check-circle.svg" alt="Resolved" />
               Resolved
             </button>
             <button 
@@ -219,14 +219,14 @@ export default function SupportDetail() {
               onClick={() => handleStatusChange('closed')}
               disabled={ticket.status === 'closed'}
             >
-              <img src="/admin/icon/x-circle.svg" alt="Closed" />
+              <img src="/icon/x-circle.svg" alt="Closed" />
               Close ticket
             </button>
             <button 
               className="action-btn danger"
               onClick={handleDelete}
             >
-              <img src="/admin/icon/trash-2.svg" alt="Delete" />
+              <img src="/icon/trash-2.svg" alt="Delete" />
               Delete ticket
             </button>
           </div>
@@ -234,7 +234,7 @@ export default function SupportDetail() {
 
         <div className="detail-card full-width">
           <h3>
-            <img src="/admin/icon/message-circle.svg" alt="Replies" />
+            <img src="/icon/message-circle.svg" alt="Replies" />
             Replies ({ticket.replies?.length || 0})
           </h3>
 
@@ -244,7 +244,7 @@ export default function SupportDetail() {
                 <div key={reply.id} className={`reply-item ${reply.from}`}>
                   <div className="reply-header">
                     <div className="reply-author">
-                      <img src={`/admin/icon/${reply.from === 'admin' ? 'shield' : 'user'}.svg`} alt={reply.from} />
+                      <img src={`/icon/${reply.from === 'admin' ? 'shield' : 'user'}.svg`} alt={reply.from} />
                       <span>{reply.from === 'admin' ? 'Admin' : ticket.userName}</span>
                     </div>
                     <div className="reply-time">
@@ -290,7 +290,7 @@ export default function SupportDetail() {
             </div>
 
             <button type="submit" className="btn-send" disabled={sending}>
-              <img src="/admin/icon/send.svg" alt="Send" />
+              <img src="/icon/send.svg" alt="Send" />
               {sending ? 'Sending...' : 'Send reply'}
             </button>
           </form>

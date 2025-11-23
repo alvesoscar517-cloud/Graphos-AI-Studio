@@ -16,11 +16,11 @@
 }
 
 @keyframes slideIn {
-  #admin-root from {
+  from {
     transform: translateX(400px);
     opacity: 0;
   }
-  #admin-root to {
+  to {
     transform: translateX(0);
     opacity: 1;
   }

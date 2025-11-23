@@ -73,7 +73,7 @@ export default function SystemLogs() {
         subtitle="Monitor system activities and events"
         actions={
           <button className="btn-clear" onClick={handleClearLogs}>
-            <img src="/admin/icon/trash-2.svg" alt="Clear" />
+            <img src="/icon/trash-2.svg" alt="Clear" />
             Clear all logs
           </button>
         }
@@ -90,28 +90,28 @@ export default function SystemLogs() {
           className={filter === 'info' ? 'active' : ''}
           onClick={() => setFilter('info')}
         >
-          <img src="/admin/icon/info.svg" alt="Info" />
+          <img src="/icon/info.svg" alt="Info" />
           Info
         </button>
         <button 
           className={filter === 'success' ? 'active' : ''}
           onClick={() => setFilter('success')}
         >
-          <img src="/admin/icon/check-circle.svg" alt="Success" />
+          <img src="/icon/check-circle.svg" alt="Success" />
           Success
         </button>
         <button 
           className={filter === 'warning' ? 'active' : ''}
           onClick={() => setFilter('warning')}
         >
-          <img src="/admin/icon/alert-triangle.svg" alt="Warning" />
+          <img src="/icon/alert-triangle.svg" alt="Warning" />
           Warning
         </button>
         <button 
           className={filter === 'error' ? 'active' : ''}
           onClick={() => setFilter('error')}
         >
-          <img src="/admin/icon/x-circle.svg" alt="Error" />
+          <img src="/icon/x-circle.svg" alt="Error" />
           Error
         </button>
       </div>
@@ -119,7 +119,7 @@ export default function SystemLogs() {
       <div className="logs-container">
         {filteredLogs.length === 0 ? (
           <div className="empty-state">
-            <img src="/admin/icon/inbox.svg" alt="Empty" />
+            <img src="/icon/inbox.svg" alt="Empty" />
             <p>No logs</p>
           </div>
         ) : (
@@ -127,7 +127,7 @@ export default function SystemLogs() {
             {filteredLogs.map(log => (
               <div key={log.id} className="log-item">
                 <div className="log-icon" style={{ background: getLevelColor(log.level) }}>
-                  <img src={`/admin/icon/${getLevelIcon(log.level)}`} alt={log.level} />
+                  <img src={`/icon/${getLevelIcon(log.level)}`} alt={log.level} />
                 </div>
                 
                 <div className="log-content">
@@ -138,11 +138,11 @@ export default function SystemLogs() {
                   <div className="log-message">{log.message}</div>
                   <div className="log-meta">
                     <span>
-                      <img src="/admin/icon/user.svg" alt="User" />
+                      <img src="/icon/user.svg" alt="User" />
                       {log.user}
                     </span>
                     <span>
-                      <img src="/admin/icon/globe.svg" alt="IP" />
+                      <img src="/icon/globe.svg" alt="IP" />
                       {log.ip}
                     </span>
                   </div>

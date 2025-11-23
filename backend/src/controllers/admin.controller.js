@@ -299,13 +299,41 @@ exports.getUserAnalytics = async (req, res) => {
       tierDistribution[tier] = (tierDistribution[tier] || 0) + 1;
     });
     
-    // Calculate user growth (mock data for now - should be from actual data)
+    // Calculate user growth from actual user creation dates
+    const usersByDate = {};
+    
+    allUsersSnapshot.docs.forEach(doc => {
+      const userData = doc.data();
+      const createdAt = userData.created_at || userData.createdAt;
+      
+      if (createdAt) {
+        let dateStr;
+        if (createdAt.toDate) {
+          // Firestore Timestamp
+          dateStr = createdAt.toDate().toISOString().split('T')[0];
+        } else if (typeof createdAt === 'string') {
+          dateStr = new Date(createdAt).toISOString().split('T')[0];
+        } else {
+          dateStr = new Date(createdAt).toISOString().split('T')[0];
+        }
+        
+        // Only count users within the date range
+        const userDate = new Date(dateStr);
+        if (userDate >= daysAgo) {
+          usersByDate[dateStr] = (usersByDate[dateStr] || 0) + 1;
+        }
+      }
+    });
+    
+    // Fill in all dates in range (including dates with 0 users)
     for (let i = parseInt(days) - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      
       userGrowth.push({
-        date: date.toISOString().split('T')[0],
-        count: Math.floor(Math.random() * 10) + 1 // Replace with actual data
+        date: dateStr,
+        count: usersByDate[dateStr] || 0
       });
     }
     

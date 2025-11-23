@@ -32,7 +32,7 @@ class ErrorBoundary extends React.Component {
         <div className="error-boundary">
           <div className="error-container">
             <div className="error-icon">
-              <img src="/admin/icon/alert-circle.svg" alt="Error" />
+              <img src="/icon/alert-circle.svg" alt="Error" />
             </div>
             
             <h1 className="error-title">Something went wrong</h1>
@@ -42,7 +42,7 @@ class ErrorBoundary extends React.Component {
 
             <div className="error-dashboard">
               <button className="btn-dashboard" onClick={this.handleGoHome}>
-                <img src="/admin/icon/home.svg" alt="Home" />
+                <img src="/icon/home.svg" alt="Home" />
                 Dashboard
               </button>
             </div>

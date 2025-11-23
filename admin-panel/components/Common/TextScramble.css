@@ -12,10 +12,10 @@
 }
 
 @keyframes scramble-flicker {
-  #admin-root 0%, #admin-root 100% {
+  0%, 100% {
     opacity: 0.7;
   }
-  #admin-root 50% {
+  50% {
     opacity: 0.4;
   }
 }

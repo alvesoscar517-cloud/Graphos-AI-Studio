@@ -11,9 +11,9 @@ export default function ConfirmDialog({
   onCancel 
 }) {
   const icons = {
-    warning: '/admin/icon/alert-triangle.svg',
-    danger: '/admin/icon/alert-octagon.svg',
-    info: '/admin/icon/info.svg'
+    warning: '/icon/alert-triangle.svg',
+    danger: '/icon/alert-octagon.svg',
+    info: '/icon/info.svg'
   };
 
   return createPortal(

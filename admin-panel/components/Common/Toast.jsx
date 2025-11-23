@@ -13,10 +13,10 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
   }, [duration, onClose]);
 
   const icons = {
-    success: '/admin/icon/check-circle.svg',
-    error: '/admin/icon/x-circle.svg',
-    warning: '/admin/icon/alert-triangle.svg',
-    info: '/admin/icon/info.svg'
+    success: '/icon/check-circle.svg',
+    error: '/icon/x-circle.svg',
+    warning: '/icon/alert-triangle.svg',
+    info: '/icon/info.svg'
   };
 
   return createPortal(
@@ -24,7 +24,7 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
       <img src={icons[type]} alt={type} className="toast-icon" />
       <span className="toast-message">{message}</span>
       <button className="toast-close" onClick={onClose}>
-        <img src="/admin/icon/x.svg" alt="Close" />
+        <img src="/icon/x.svg" alt="Close" />
       </button>
     </div>,
     document.body

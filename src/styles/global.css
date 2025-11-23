@@ -1,0 +1,368 @@
+/* Global Styles - Ẩn thanh cuộn và thiết lập font cho toàn bộ hệ thống */
+
+/* CSS Variables */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #f1f3f4;
+  --text-primary: #202124;
+  --text-secondary: #5f6368;
+  --border-primary: #e8eaed;
+  
+  /* Standardized header dimensions */
+  --header-height: 40px;
+  --header-padding-vertical: 8px;
+  --header-padding-horizontal: 12px;
+  --menu-btn-margin-left: 4px;
+  --menu-btn-size: 32px;
+  --menu-icon-size: 18px;
+}
+
+body.dark-theme {
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #3c4043;
+  --text-primary: #e3e3e3;
+  --text-secondary: #9aa0a6;
+  --border-primary: #3c4043;
+}
+
+/* Thiết lập font mặc định cho toàn bộ hệ thống */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Ẩn thanh cuộn cho body và html */
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #202124;
+  background: #ffffff;
+  height: 100%;
+  width: 100%;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dark theme colors */
+body.dark-theme {
+  color: #e3e3e3;
+  background: #1e1e1e;
+}
+
+/* Ẩn thanh cuộn cho root element */
+#root {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  height: 100%;
+  width: 100%;
+}
+
+#root::-webkit-scrollbar {
+  display: none;
+}
+
+/* App container */
+.app {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container layout */
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* Standardized header across all views */
+.main-header,
+.playground-topbar,
+.workspace-header,
+.workspace-default-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--header-padding-vertical) var(--header-padding-horizontal);
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  height: var(--header-height);
+  flex-shrink: 0;
+}
+
+/* History topbar without border */
+.history-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--header-padding-vertical) var(--header-padding-horizontal);
+  background: var(--bg-primary);
+  height: var(--header-height);
+  flex-shrink: 0;
+}
+
+/* Standardized menu button across all views */
+.menu-btn,
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--menu-btn-size);
+  height: var(--menu-btn-size);
+  flex-shrink: 0;
+  transition: background-color 0.2s ease;
+}
+
+.menu-btn {
+  margin-left: var(--menu-btn-margin-left);
+}
+
+.menu-btn img,
+.icon-btn img {
+  width: var(--menu-icon-size);
+  height: var(--menu-icon-size);
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.menu-btn:hover,
+.icon-btn:hover {
+  background: rgba(241, 243, 244, 0.5);
+}
+
+.menu-btn:hover img,
+.icon-btn:hover img {
+  opacity: 1;
+}
+
+/* Dark theme for menu buttons */
+body.dark-theme .menu-btn:hover,
+body.dark-theme .icon-btn:hover {
+  background: rgba(60, 64, 67, 0.4);
+}
+
+body.dark-theme .menu-btn img,
+body.dark-theme .icon-btn img {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+body.dark-theme .menu-btn:hover img,
+body.dark-theme .icon-btn:hover img {
+  opacity: 1;
+}
+
+/* Ẩn thanh cuộn cho các container có overflow */
+.app,
+.main-layout,
+.content-area,
+.sidebar,
+.right-sidebar,
+.workspace-sidebar,
+.history-view,
+.history-table-container,
+.settings-panel,
+.chat-container,
+.messages-container,
+.notes-list,
+.profile-list {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.app::-webkit-scrollbar,
+.main-layout::-webkit-scrollbar,
+.content-area::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar,
+.right-sidebar::-webkit-scrollbar,
+.workspace-sidebar::-webkit-scrollbar,
+.history-view::-webkit-scrollbar,
+.history-table-container::-webkit-scrollbar,
+.settings-panel::-webkit-scrollbar,
+.chat-container::-webkit-scrollbar,
+.messages-container::-webkit-scrollbar,
+.notes-list::-webkit-scrollbar,
+.profile-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* Đảm bảo vẫn có thể scroll nhưng không hiển thị thanh cuộn */
+.scrollable {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollable::-webkit-scrollbar {
+  display: none;
+}
+
+/* Typography - Thiết lập kiểu chữ cho các phần tử */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0;
+  color: inherit;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 400;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 400;
+}
+
+h3 {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+h4 {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+h5 {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+h6 {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Font weights */
+.font-light {
+  font-weight: 300;
+}
+
+.font-normal {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+/* Font sizes */
+.text-xs {
+  font-size: 12px;
+}
+
+.text-sm {
+  font-size: 13px;
+}
+
+.text-base {
+  font-size: 14px;
+}
+
+.text-lg {
+  font-size: 16px;
+}
+
+.text-xl {
+  font-size: 18px;
+}
+
+.text-2xl {
+  font-size: 20px;
+}
+
+.text-3xl {
+  font-size: 24px;
+}
+
+/* Code font */
+code,
+pre,
+.code-font {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+}
+
+/* Button và input font */
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Link styles */
+a {
+  color: #1967d2;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #1557b0;
+  text-decoration: underline;
+}
+
+body.dark-theme a {
+  color: #8ab4f8;
+}
+
+body.dark-theme a:hover {
+  color: #aecbfa;
+}

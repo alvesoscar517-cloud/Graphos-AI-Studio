@@ -208,54 +208,22 @@ body.dark-theme .profile-selector-arrow {
   transform: scale(1.1);
 }
 
-/* Compatibility Icon - Blue */
-.compatibility-icon {
-  background: rgba(66, 133, 244, 0.1);
-  color: #4285f4;
-}
+/* All icons use default gray background with blue icon color */
 
-.compatibility-icon img {
-  filter: invert(47%) sepia(96%) saturate(1733%) hue-rotate(198deg) brightness(98%) contrast(101%);
-}
-
-/* AI Detection Icon - Purple */
-.ai-icon {
-  background: rgba(139, 92, 246, 0.1);
-  color: #8b5cf6;
-}
-
-.ai-icon img {
-  filter: invert(42%) sepia(93%) saturate(2466%) hue-rotate(248deg) brightness(95%) contrast(101%);
-}
-
-/* Deviation Icon - Orange/Yellow */
-.deviation-icon {
-  background: rgba(251, 188, 4, 0.1);
-  color: #fbbc04;
-}
-
-.deviation-icon img {
-  filter: invert(70%) sepia(89%) saturate(1842%) hue-rotate(359deg) brightness(101%) contrast(101%);
-}
-
-/* Statistics Icon - Green */
-.stats-icon {
-  background: rgba(52, 168, 83, 0.1);
-  color: #34a853;
-}
-
-.stats-icon img {
-  filter: invert(59%) sepia(89%) saturate(450%) hue-rotate(92deg) brightness(95%) contrast(91%);
-}
-
-/* Rewrite Icon - Red/Pink */
+.compatibility-icon,
+.ai-icon,
+.deviation-icon,
+.stats-icon,
 .rewrite-icon {
-  background: rgba(234, 67, 53, 0.1);
-  color: #ea4335;
+  /* Use default background from .feature-icon (no custom background) */
 }
 
+.compatibility-icon img,
+.ai-icon img,
+.deviation-icon img,
+.stats-icon img,
 .rewrite-icon img {
-  filter: invert(44%) sepia(89%) saturate(2913%) hue-rotate(329deg) brightness(98%) contrast(94%);
+  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%) !important;
 }
 
 .feature-info {
@@ -602,14 +570,23 @@ body.dark-theme .profile-selector-arrow {
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 10px 12px;
   background: #f8f9fa;
   border: 1px solid #e8eaed;
   border-radius: 10px;
   margin-top: 0;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: #202124;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.ai-verdict-full span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
 }
 
 .verdict-icon {
@@ -647,16 +624,25 @@ body.dark-theme .profile-selector-arrow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
+  padding: 10px 12px;
   background: #f8f9fa;
   border: 1px solid #e8eaed;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: #202124;
   cursor: pointer;
   transition: all 0.2s ease;
   margin-top: 4px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.detail-btn-full span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
 }
 
 .detail-btn-full:hover {
@@ -668,6 +654,7 @@ body.dark-theme .profile-selector-arrow {
   width: 16px;
   height: 16px;
   opacity: 0.6;
+  flex-shrink: 0;
 }
 
 /* Deviation List */
@@ -1150,11 +1137,16 @@ body.dark-theme .profile-selector-icon:hover {
 
 body.dark-theme .profile-selector-icon img {
   filter: brightness(0) invert(1);
+  opacity: 0.7;
 }
 
-/* Dark theme - Feature icons keep their colors */
+body.dark-theme .profile-selector-icon:hover img {
+  opacity: 0.9;
+}
+
+/* Dark theme - Feature icons use blue color */
 body.dark-theme .feature-icon img {
-  /* No filter - keep original colors */
+  /* Icons already have blue filter from light theme */
 }
 
 body.dark-theme .feature-info h4 {

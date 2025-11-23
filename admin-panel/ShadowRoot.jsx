@@ -9,39 +9,57 @@ export default function ShadowRoot({ children, styles }) {
   const shadowHostRef = useRef(null);
   const shadowRootRef = useRef(null);
   const reactRootRef = useRef(null);
+  const isInitialized = useRef(false);
 
   useEffect(() => {
-    if (!shadowHostRef.current) return;
+    if (!shadowHostRef.current || isInitialized.current) return;
 
-    // Tạo Shadow DOM
-    if (!shadowRootRef.current) {
+    try {
+      // Tạo Shadow DOM
       shadowRootRef.current = shadowHostRef.current.attachShadow({ mode: 'open' });
       
-      // Tạo container cho React
-      const container = document.createElement('div');
-      container.id = 'shadow-container';
-      shadowRootRef.current.appendChild(container);
-
       // Inject CSS vào Shadow DOM
       if (styles) {
         const styleElement = document.createElement('style');
         styleElement.textContent = styles;
         shadowRootRef.current.appendChild(styleElement);
       }
+      
+      // Tạo container cho React
+      const container = document.createElement('div');
+      container.id = 'shadow-container';
+      container.style.width = '100%';
+      container.style.height = '100%';
+      container.style.minHeight = '100vh';
+      shadowRootRef.current.appendChild(container);
 
       // Render React app vào Shadow DOM
       reactRootRef.current = createRoot(container);
+      reactRootRef.current.render(children);
+      
+      isInitialized.current = true;
+      console.log('✅ Shadow DOM created successfully for Admin Panel');
+    } catch (error) {
+      console.error('❌ Failed to create Shadow DOM:', error);
     }
+  }, []);
 
-    // Render children
-    reactRootRef.current.render(children);
+  // Update children khi thay đổi
+  useEffect(() => {
+    if (reactRootRef.current && isInitialized.current) {
+      reactRootRef.current.render(children);
+    }
+  }, [children]);
 
-    return () => {
-      if (reactRootRef.current) {
-        reactRootRef.current.unmount();
-      }
-    };
-  }, [children, styles]);
-
-  return <div ref={shadowHostRef} style={{ width: '100%', height: '100%' }} />;
+  return (
+    <div 
+      ref={shadowHostRef} 
+      style={{ 
+        width: '100%', 
+        height: '100%',
+        minHeight: '100vh',
+        display: 'block'
+      }} 
+    />
+  );
 }

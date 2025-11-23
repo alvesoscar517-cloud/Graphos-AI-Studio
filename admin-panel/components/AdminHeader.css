@@ -63,7 +63,8 @@
 #admin-root .user-icon {
   width: 18px;
   height: 18px;
-  filter: brightness(0);
+  color: #333;
+  flex-shrink: 0;
 }
 
 #admin-root .user-name {

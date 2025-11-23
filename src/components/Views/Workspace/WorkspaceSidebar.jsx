@@ -44,7 +44,10 @@ const WorkspaceSidebar = ({ hidden, onClose, onNewChat }) => {
       }}
     >
       <div className="right-header workspace-header-simple">
-        <h3 className="workspace-header-title">Cài đặt AI</h3>
+        <div className="workspace-header-title-wrapper">
+          <img src="/icon/message-circle.svg" alt="AI" className="workspace-header-icon" />
+          <h3 className="workspace-header-title">Cài đặt AI</h3>
+        </div>
         <button 
           className="icon-btn close-sidebar-btn" 
           onClick={onClose}

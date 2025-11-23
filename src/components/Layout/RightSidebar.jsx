@@ -8,16 +8,21 @@ import AIDetectionCard from '../Analysis/AIDetectionCard'
 import DeviationCard from '../Analysis/DeviationCard'
 import StatisticsCard from '../Analysis/StatisticsCard'
 import RewriteModelSelector from '../Analysis/RewriteModelSelector'
-import { rewriteTextStream } from '../../services/api'
-import modal from '../../utils/modal'
 import './RightSidebar.css'
 
-const RightSidebar = ({ hidden, onClose, onAnalysisComplete }) => {
-  const { currentNote, updateNote } = useNotes()
+const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => {
+  const { currentNote } = useNotes()
   const { currentProfile, selectProfile } = useProfiles()
   const [mode, setMode] = useState('analysis') // 'analysis' or 'rewrite'
   const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash')
-  const [isRewriting, setIsRewriting] = useState(false)
+
+  // Notify parent when mode changes
+  const handleModeChange = (newMode) => {
+    setMode(newMode)
+    if (onModeChange) {
+      onModeChange(newMode)
+    }
+  }
 
   const handleProfileSelect = (profile) => {
     selectProfile(profile)
@@ -25,54 +30,6 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete }) => {
 
   const hasText = currentNote && currentNote.content && currentNote.content.trim().length > 0
   const hasProfile = currentProfile !== null
-
-  const handleRewrite = async () => {
-    if (!currentProfile || !hasText || isRewriting) return
-    
-    setIsRewriting(true)
-    
-    try {
-      // Add shimmer effect to editor
-      const editor = document.querySelector('.main-textarea')
-      if (editor) {
-        editor.classList.add('shimmer-effect')
-      }
-      
-      // Start streaming
-      let newText = ''
-      await rewriteTextStream(
-        currentProfile.profile_id,
-        currentNote.content,
-        selectedModel,
-        (chunk) => {
-          // Remove shimmer on first chunk
-          if (newText === '' && editor) {
-            editor.classList.remove('shimmer-effect')
-          }
-          
-          newText += chunk
-          // Update editor in real-time
-          updateNote(currentNote.id, { content: newText })
-        }
-      )
-      
-      modal.toast('Hoàn tất', 'Văn bản đã được viết lại', 'success')
-    } catch (error) {
-      console.error('Error rewriting:', error)
-      modal.error('Viết lại thất bại: ' + error.message)
-      
-      // Remove shimmer on error
-      const editor = document.querySelector('.main-textarea')
-      if (editor) {
-        editor.classList.remove('shimmer-effect')
-      }
-    } finally {
-      setIsRewriting(false)
-    }
-  }
-
-  // Debug: Log when component renders
-  console.log('🔧 RightSidebar render:', { hidden, hasText, hasProfile, mode })
 
   return (
     <motion.aside 
@@ -107,7 +64,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete }) => {
         <div className="mode-toggle-container">
           <button 
             className={`mode-toggle-btn ${mode === 'analysis' ? 'active' : ''}`}
-            onClick={() => setMode('analysis')}
+            onClick={() => handleModeChange('analysis')}
             data-tooltip="Công cụ phân tích" 
             data-tooltip-position="bottom"
           >
@@ -116,7 +73,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete }) => {
           </button>
           <button 
             className={`mode-toggle-btn ${mode === 'rewrite' ? 'active' : ''}`}
-            onClick={() => setMode('rewrite')}
+            onClick={() => handleModeChange('rewrite')}
             data-tooltip="Viết lại văn bản" 
             data-tooltip-position="bottom"
           >
@@ -174,19 +131,6 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete }) => {
         )}
       </div>
 
-      {/* Rewrite Footer Button */}
-      {mode === 'rewrite' && (
-        <div className="right-sidebar-footer">
-          <button 
-            className={`rewrite-footer-btn ${isRewriting ? 'loading' : ''}`}
-            onClick={handleRewrite}
-            disabled={!hasText || !hasProfile || isRewriting}
-          >
-            <img src="/icon/pen.svg" alt="Rewrite" />
-            <span className={isRewriting ? 'shimmer-text-effect' : ''}>{isRewriting ? 'Đang viết lại...' : 'Viết lại văn bản'}</span>
-          </button>
-        </div>
-      )}
     </motion.aside>
   )
 }

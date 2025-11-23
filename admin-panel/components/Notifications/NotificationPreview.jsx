@@ -39,7 +39,7 @@ export default function NotificationPreview({ notification, language = 'vi' }) {
     <div className="notification-preview-container">
       <div className="preview-header">
         <h3>
-          <img src="/admin/icon/eye.svg" alt="Preview" />
+          <img src="/icon/eye.svg" alt="Preview" />
           Preview
         </h3>
         <div className="preview-language">
@@ -53,7 +53,7 @@ export default function NotificationPreview({ notification, language = 'vi' }) {
         <div className="info-item">
           <span className="info-label">Type:</span>
           <span className="info-value">
-            <img src={`/admin/icon/${getTypeIcon(notification.type)}`} alt="Type" />
+            <img src={`/icon/${getTypeIcon(notification.type)}`} alt="Type" />
           </span>
         </div>
         <div className="info-item">
@@ -65,7 +65,7 @@ export default function NotificationPreview({ notification, language = 'vi' }) {
       {/* Desktop Preview */}
       <div className="preview-section">
         <h4>
-          <img src="/admin/icon/monitor.svg" alt="Desktop" />
+          <img src="/icon/monitor.svg" alt="Desktop" />
           Desktop
         </h4>
         <div 
@@ -73,7 +73,7 @@ export default function NotificationPreview({ notification, language = 'vi' }) {
           style={{ borderLeftColor: getTypeColor(notification.type) }}
         >
           <div className="notif-icon" style={{ background: `${getTypeColor(notification.type)}20` }}>
-            <img src={`/admin/icon/${getTypeIcon(notification.type)}`} alt="Icon" style={{ filter: 'none' }} />
+            <img src={`/icon/${getTypeIcon(notification.type)}`} alt="Icon" style={{ filter: 'none' }} />
           </div>
           <div className="notif-content">
             <h5>{translation.title || 'Notification Title'}</h5>
@@ -91,7 +91,7 @@ export default function NotificationPreview({ notification, language = 'vi' }) {
       {/* Mobile Preview */}
       <div className="preview-section">
         <h4>
-          <img src="/admin/icon/smartphone.svg" alt="Mobile" />
+          <img src="/icon/smartphone.svg" alt="Mobile" />
           Mobile
         </h4>
         <div className="mobile-frame">
@@ -100,7 +100,7 @@ export default function NotificationPreview({ notification, language = 'vi' }) {
             style={{ borderTopColor: getTypeColor(notification.type) }}
           >
             <div className="notif-header">
-              <img src={`/admin/icon/${getTypeIcon(notification.type)}`} alt="Icon" className="notif-icon-mobile" />
+              <img src={`/icon/${getTypeIcon(notification.type)}`} alt="Icon" className="notif-icon-mobile" />
               <span className="notif-time">Just now</span>
             </div>
             <h5>{translation.title || 'Notification Title'}</h5>
@@ -117,19 +117,19 @@ export default function NotificationPreview({ notification, language = 'vi' }) {
       {/* Target Info */}
       <div className="preview-section">
         <h4>
-          <img src="/admin/icon/target.svg" alt="Target" />
+          <img src="/icon/target.svg" alt="Target" />
           Target
         </h4>
         <div className="target-info">
           {notification.target.type === 'all' && (
             <p>
-              <img src="/admin/icon/users.svg" alt="All" />
+              <img src="/icon/users.svg" alt="All" />
               All Users
             </p>
           )}
           {notification.target.type === 'segment' && (
             <p>
-              <img src="/admin/icon/target.svg" alt="Segment" />
+              <img src="/icon/target.svg" alt="Segment" />
               Specific User Group
             </p>
           )}
@@ -140,19 +140,19 @@ export default function NotificationPreview({ notification, language = 'vi' }) {
       {(notification.scheduledAt || notification.expiresAt) && (
         <div className="preview-section">
           <h4>
-            <img src="/admin/icon/clock.svg" alt="Schedule" />
+            <img src="/icon/clock.svg" alt="Schedule" />
             Schedule
           </h4>
           <div className="schedule-info">
             {notification.scheduledAt && (
               <p>
-                <img src="/admin/icon/calendar.svg" alt="Send" />
+                <img src="/icon/calendar.svg" alt="Send" />
                 Send: {new Date(notification.scheduledAt).toLocaleString('en-US')}
               </p>
             )}
             {notification.expiresAt && (
               <p>
-                <img src="/admin/icon/clock.svg" alt="Expire" />
+                <img src="/icon/clock.svg" alt="Expire" />
                 Expires: {new Date(notification.expiresAt).toLocaleString('en-US')}
               </p>
             )}

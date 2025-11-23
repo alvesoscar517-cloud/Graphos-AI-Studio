@@ -101,7 +101,7 @@ export default function NotificationList() {
     
     return (
       <span className="type-badge">
-        <img src={`/admin/icon/${typeInfo.icon}`} alt={typeInfo.label} />
+        <img src={`/icon/${typeInfo.icon}`} alt={typeInfo.label} />
         {typeInfo.label}
       </span>
     );
@@ -115,7 +115,7 @@ export default function NotificationList() {
     <div className="notification-list">
       <div className="list-header">
         <div className="header-title">
-          <img src="/admin/icon/bell.svg" alt="Notifications" />
+          <img src="/icon/bell.svg" alt="Notifications" />
           <div>
             <h1>Notification Management</h1>
             <p>Create and manage notifications sent to users</p>
@@ -126,7 +126,7 @@ export default function NotificationList() {
           className="btn-primary"
           onClick={() => navigate('/notifications/new')}
         >
-          <img src="/admin/icon/plus.svg" alt="Add" />
+          <img src="/icon/plus.svg" alt="Add" />
           Create New Notification
         </button>
       </div>
@@ -161,7 +161,7 @@ export default function NotificationList() {
       <div className="notifications-grid">
         {notifications.length === 0 ? (
           <div className="empty-state">
-            <img src="/admin/icon/inbox.svg" alt="Empty" />
+            <img src="/icon/inbox.svg" alt="Empty" />
             <p>No notifications yet</p>
             <button onClick={() => navigate('/notifications/new')}>
               Create First Notification
@@ -183,11 +183,11 @@ export default function NotificationList() {
               <div className="card-footer">
                 <div className="card-stats">
                   <span>
-                    <img src="/admin/icon/send.svg" alt="Sent" />
+                    <img src="/icon/send.svg" alt="Sent" />
                     {notif.stats?.sent || 0} sent
                   </span>
                   <span>
-                    <img src="/admin/icon/eye.svg" alt="Read" />
+                    <img src="/icon/eye.svg" alt="Read" />
                     {notif.stats?.read || 0} read
                   </span>
                 </div>
@@ -198,7 +198,7 @@ export default function NotificationList() {
                       className="btn-send"
                       onClick={() => handleSend(notif.id)}
                     >
-                      <img src="/admin/icon/send.svg" alt="Send" />
+                      <img src="/icon/send.svg" alt="Send" />
                       Send
                     </button>
                   )}
@@ -207,7 +207,7 @@ export default function NotificationList() {
                     className="btn-edit"
                     onClick={() => navigate(`/notifications/${notif.id}`)}
                   >
-                    <img src="/admin/icon/edit.svg" alt="Edit" />
+                    <img src="/icon/edit.svg" alt="Edit" />
                     Edit
                   </button>
                   
@@ -215,7 +215,7 @@ export default function NotificationList() {
                     className="btn-delete"
                     onClick={() => handleDelete(notif.id)}
                   >
-                    <img src="/admin/icon/trash-2.svg" alt="Delete" />
+                    <img src="/icon/trash-2.svg" alt="Delete" />
                   </button>
                 </div>
               </div>

@@ -26,8 +26,7 @@ const SettingsPopup = ({ onClose }) => {
     <div className="settings-popup show" ref={popupRef} style={{ display: 'block' }}>
       <div 
         className="settings-item" 
-        onMouseEnter={() => setShowThemeSubmenu(true)}
-        onMouseLeave={() => setShowThemeSubmenu(false)}
+        onClick={() => setShowThemeSubmenu(!showThemeSubmenu)}
       >
         <img src="/icon/palette.svg" className="settings-icon" alt="Theme" />
         <span>Theme</span>
@@ -35,21 +34,21 @@ const SettingsPopup = ({ onClose }) => {
         
         {showThemeSubmenu && (
           <div className="theme-submenu show">
-            <div className="theme-option" onClick={() => changeTheme('light')}>
+            <div className="theme-option" onClick={(e) => { e.stopPropagation(); changeTheme('light'); }}>
               <input type="radio" name="theme" checked={theme === 'light'} readOnly />
               <label>
                 <img src="/icon/sun.svg" className="theme-icon" alt="Light" />
                 <span>Light</span>
               </label>
             </div>
-            <div className="theme-option" onClick={() => changeTheme('dark')}>
+            <div className="theme-option" onClick={(e) => { e.stopPropagation(); changeTheme('dark'); }}>
               <input type="radio" name="theme" checked={theme === 'dark'} readOnly />
               <label>
                 <img src="/icon/moon.svg" className="theme-icon" alt="Dark" />
                 <span>Dark</span>
               </label>
             </div>
-            <div className="theme-option" onClick={() => changeTheme('system')}>
+            <div className="theme-option" onClick={(e) => { e.stopPropagation(); changeTheme('system'); }}>
               <input type="radio" name="theme" checked={theme === 'system'} readOnly />
               <label>
                 <img src="/icon/monitor.svg" className="theme-icon" alt="System" />

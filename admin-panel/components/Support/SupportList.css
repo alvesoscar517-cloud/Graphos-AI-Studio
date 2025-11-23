@@ -58,25 +58,19 @@
   border-color: #e0e0e0 !important;
 }
 
-#admin-root .stat-card.highlight {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
+/* Remove special styling for open card - make it same as others */
 
-.stat-card.highlight .stat-value,
-#admin-root .stat-card.highlight .stat-label {
-  color: white;
-}
-
-#admin-root .stat-card.highlight img {
-  filter: brightness(0) invert(1);
-}
-
-#admin-root .stat-card > img {
-  width: 48px;
-  height: 48px;
+#admin-root .stat-card > img,
+#admin-root .stat-card > svg {
+  width: 64px;
+  height: 64px;
   flex-shrink: 0;
-  filter: brightness(0);
+  color: #333 !important;
+  opacity: 0.9;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 16px;
+  box-sizing: border-box;
 }
 
 #admin-root .stat-content {
@@ -228,7 +222,8 @@
 #admin-root .type-badge img {
   width: 14px;
   height: 14px;
-  filter: brightness(0);
+  filter: none !important;
+  opacity: 1;
 }
 
 #admin-root .ticket-title {
@@ -255,7 +250,8 @@
 #admin-root .reply-count img {
   width: 14px;
   height: 14px;
-  filter: brightness(0);
+  filter: brightness(0) !important;
+  opacity: 0.6;
 }
 
 #admin-root .user-info-mini {
@@ -333,7 +329,8 @@
 #admin-root .btn-view img {
   width: 14px;
   height: 14px;
-  filter: brightness(0);
+  filter: brightness(0) !important;
+  opacity: 0.8;
 }
 
 #admin-root .empty-row {

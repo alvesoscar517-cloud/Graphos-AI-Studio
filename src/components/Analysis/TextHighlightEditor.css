@@ -1,0 +1,256 @@
+/* TextHighlightEditor - Brand New Component */
+
+.text-highlight-editor {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary, #ffffff);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.highlight-editor-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  box-sizing: border-box;
+}
+
+.highlight-editor-wrapper.with-toolbar {
+  padding-bottom: 60px;
+}
+
+.highlight-editor-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* Textarea */
+.highlight-editor-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 24px 32px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary, #202124);
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  z-index: 1;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.highlight-editor-input::placeholder {
+  color: var(--text-tertiary, #9e9e9e);
+}
+
+/* Overlay layer */
+.highlight-editor-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 24px 32px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: transparent;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  pointer-events: none;
+  z-index: 2;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.highlight-editor-overlay span {
+  pointer-events: auto;
+}
+
+/* Text segments */
+.highlight-text-normal {
+  pointer-events: none;
+}
+
+.highlight-text-marked {
+  cursor: pointer;
+  border-radius: 2px;
+  padding: 2px 0;
+  pointer-events: auto;
+  user-select: none;
+}
+
+/* FORCE: Disable ALL hover/active/focus effects with maximum specificity */
+.text-highlight-editor .highlight-editor-overlay .highlight-text-marked,
+.text-highlight-editor .highlight-editor-overlay .highlight-text-marked:hover,
+.text-highlight-editor .highlight-editor-overlay .highlight-text-marked:active,
+.text-highlight-editor .highlight-editor-overlay .highlight-text-marked:focus,
+.text-highlight-editor .highlight-editor-overlay .highlight-text-marked:visited {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+  will-change: auto !important;
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  -ms-transition: none !important;
+}
+
+/* Colors - Light theme */
+.highlight-text-marked.level-high {
+  background-color: rgba(220, 38, 38, 0.15);
+}
+
+.highlight-text-marked.level-medium {
+  background-color: rgba(234, 88, 12, 0.15);
+}
+
+.highlight-text-marked.level-low {
+  background-color: rgba(202, 138, 4, 0.15);
+}
+
+/* Dark theme */
+body.dark-theme .text-highlight-editor,
+[data-theme="dark"] .text-highlight-editor {
+  background: var(--bg-primary, #1e1e1e);
+}
+
+body.dark-theme .highlight-editor-input,
+[data-theme="dark"] .highlight-editor-input {
+  color: var(--text-primary, #e3e3e3);
+}
+
+body.dark-theme .highlight-editor-input::placeholder,
+[data-theme="dark"] .highlight-editor-input::placeholder {
+  color: var(--text-tertiary, #5f6368);
+}
+
+body.dark-theme .highlight-text-marked.level-high,
+[data-theme="dark"] .highlight-text-marked.level-high {
+  background-color: rgba(242, 139, 130, 0.25);
+}
+
+body.dark-theme .highlight-text-marked.level-medium,
+[data-theme="dark"] .highlight-text-marked.level-medium {
+  background-color: rgba(253, 214, 99, 0.2);
+}
+
+body.dark-theme .highlight-text-marked.level-low,
+[data-theme="dark"] .highlight-text-marked.level-low {
+  background-color: rgba(253, 214, 99, 0.15);
+}
+
+/* AI Processing shimmer */
+.highlight-editor-input.processing-shimmer {
+  background: linear-gradient(
+    90deg,
+    #202124 0%,
+    #202124 25%,
+    #4285f4 40%,
+    #8ab4f8 50%,
+    #4285f4 60%,
+    #202124 75%,
+    #202124 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: processing-shimmer 3s linear infinite;
+}
+
+body.dark-theme .highlight-editor-input.processing-shimmer,
+[data-theme="dark"] .highlight-editor-input.processing-shimmer {
+  background: linear-gradient(
+    90deg,
+    #e3e3e3 0%,
+    #e3e3e3 25%,
+    #8ab4f8 40%,
+    #ffffff 50%,
+    #8ab4f8 60%,
+    #e3e3e3 75%,
+    #e3e3e3 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: processing-shimmer 3s linear infinite;
+}
+
+@keyframes processing-shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+/* Processing glow border */
+.highlight-editor-wrapper.processing-active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  animation: processing-glow 2s ease-in-out infinite;
+  z-index: 5;
+}
+
+@keyframes processing-glow {
+  0%, 100% {
+    border-color: rgba(66, 133, 244, 0);
+    box-shadow: 0 0 0 rgba(66, 133, 244, 0);
+  }
+  50% {
+    border-color: rgba(66, 133, 244, 0.3);
+    box-shadow: 0 0 20px rgba(66, 133, 244, 0.2);
+  }
+}
+
+body.dark-theme .highlight-editor-wrapper.processing-active::after,
+[data-theme="dark"] .highlight-editor-wrapper.processing-active::after {
+  animation: processing-glow-dark 2s ease-in-out infinite;
+}
+
+@keyframes processing-glow-dark {
+  0%, 100% {
+    border-color: rgba(138, 180, 248, 0);
+    box-shadow: 0 0 0 rgba(138, 180, 248, 0);
+  }
+  50% {
+    border-color: rgba(138, 180, 248, 0.3);
+    box-shadow: 0 0 20px rgba(138, 180, 248, 0.2);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .highlight-editor-input,
+  .highlight-editor-overlay {
+    padding: 16px 20px;
+    font-size: 13px;
+  }
+}

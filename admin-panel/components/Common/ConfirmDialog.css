@@ -14,10 +14,10 @@
 }
 
 @keyframes fadeIn {
-  #admin-root from {
+  from {
     opacity: 0;
   }
-  #admin-root to {
+  to {
     opacity: 1;
   }
 }
@@ -34,11 +34,11 @@
 }
 
 @keyframes slideUp {
-  #admin-root from {
+  from {
     transform: translateY(40px);
     opacity: 0;
   }
-  #admin-root to {
+  to {
     transform: translateY(0);
     opacity: 1;
   }

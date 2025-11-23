@@ -30,7 +30,7 @@
 
 #admin-root .dashboard-sections {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
@@ -40,6 +40,9 @@
   border-radius: 12px;
   padding: 24px;
   transition: border-color 0.2s, box-shadow 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 #admin-root .section:hover {
@@ -74,6 +77,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
 }
 
 #admin-root .activity-item {
@@ -109,6 +113,13 @@
   -webkit-filter: invert(1) brightness(2) !important;
 }
 
+#admin-root .activity-icon svg {
+  width: 20px;
+  height: 20px;
+  color: #fff !important;
+  stroke: #fff !important;
+}
+
 #admin-root .activity-content {
   flex: 1;
 }
@@ -126,37 +137,7 @@
   color: #999;
 }
 
-#admin-root .quick-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-#admin-root .quick-stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px;
-  background: #fafafa;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-
-#admin-root .quick-stat-item:hover {
-  background: #f0f0f0;
-}
-
-#admin-root .stat-label {
-  color: #666;
-  font-size: 13px;
-}
-
-#admin-root .stat-value {
-  font-size: 20px;
-  font-weight: 600;
-  color: #000;
-  letter-spacing: -0.5px;
-}
+/* Quick stats now use same styling as activity list */
 
 .dashboard-loading,
 #admin-root .dashboard-error {
@@ -219,8 +200,8 @@
 }
 
 @keyframes spin {
-  #admin-root 0% { transform: rotate(0deg); }
-  #admin-root 100% { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {

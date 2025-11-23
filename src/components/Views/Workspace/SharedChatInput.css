@@ -40,35 +40,40 @@
   align-items: center;
   gap: 8px;
   background: var(--bg-secondary);
-  border: 2px solid var(--border-primary);
+  border: 1.5px solid var(--border-primary);
   border-radius: 24px;
-  padding: 4px 12px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 6px 12px;
+  min-height: 40px;
+  transition: none !important;
 }
 
 .shared-chat-input-container.bottom .shared-chat-input-box {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  border: 1.5px solid rgba(0, 0, 0, 0.15) !important;
 }
 
+.shared-chat-input-box:hover,
 .shared-chat-input-box:focus-within {
-  border-color: var(--border-primary);
+  border: 1.5px solid var(--border-primary) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
 }
 
-.shared-chat-input-box:hover {
-  border-color: rgba(0, 0, 0, 0.2);
-}
-
-body.dark-theme .shared-chat-input-box:hover {
-  border-color: rgba(255, 255, 255, 0.15);
+body.dark-theme .shared-chat-input-box:hover,
+body.dark-theme .shared-chat-input-box:focus-within {
+  border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
 }
 
 /* Attach Button */
 .shared-attach-btn {
   background: none;
   border: none;
-  padding: 8px;
+  padding: 6px;
   cursor: pointer;
   border-radius: 50%;
   display: flex;
@@ -76,8 +81,6 @@ body.dark-theme .shared-chat-input-box:hover {
   justify-content: center;
   flex-shrink: 0;
   opacity: 0.7;
-  width: 36px;
-  height: 36px;
   transition: opacity 0.2s ease;
 }
 
@@ -93,32 +96,47 @@ body.dark-theme .shared-chat-input-box:hover {
 .shared-attach-btn img {
   width: 20px;
   height: 20px;
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
 body.dark-theme .shared-attach-btn img {
-  filter: invert(1);
-  opacity: 0.7;
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
 }
 
 /* Textarea */
 .shared-textarea {
   flex: 1;
-  border: none;
-  background: transparent;
-  font-size: 16px;
+  border: none !important;
+  background: transparent !important;
+  font-size: 15px;
   color: var(--text-primary);
-  padding: 12px 8px;
-  outline: none;
+  padding: 0 4px;
+  outline: none !important;
   resize: none;
   min-height: 24px;
-  max-height: 90px;
-  line-height: 1.5;
+  max-height: 72px; /* 3 lines: 24px * 3 = 72px */
+  line-height: 24px;
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
   font-family: 'Google Sans', 'Roboto', sans-serif;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: none !important;
+  box-shadow: none !important;
+  align-self: center;
+}
+
+body.dark-theme .shared-textarea {
+  color: #e3e3e3;
+}
+
+.shared-textarea:hover,
+.shared-textarea:focus,
+.shared-textarea:active {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
 .shared-textarea::-webkit-scrollbar {
@@ -128,11 +146,11 @@ body.dark-theme .shared-attach-btn img {
 .shared-textarea::placeholder {
   color: var(--text-secondary);
   opacity: 0.6;
-  transition: opacity 0.2s ease;
 }
 
-.shared-textarea:focus::placeholder {
-  opacity: 0.4;
+body.dark-theme .shared-textarea::placeholder {
+  color: #9aa0a6;
+  opacity: 0.7;
 }
 
 .shared-chat-input-container.bottom .shared-textarea {
@@ -141,8 +159,8 @@ body.dark-theme .shared-attach-btn img {
 
 /* Send Button */
 .shared-send-btn {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: none;
   background: #5f6368;
@@ -154,10 +172,12 @@ body.dark-theme .shared-attach-btn img {
   flex-shrink: 0;
   animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transition: background 0.2s ease;
+  padding: 0;
+  position: relative;
 }
 
 .shared-send-btn:hover:not(:disabled) {
-  background: #4a4d52;
+  background: #4a5157;
 }
 
 @keyframes scaleIn {
@@ -178,9 +198,13 @@ body.dark-theme .shared-attach-btn img {
 }
 
 .shared-send-btn img {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   filter: brightness(0) invert(1);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 /* Dark Theme */
@@ -189,29 +213,31 @@ body.dark-theme .shared-chat-input-container.bottom {
 }
 
 body.dark-theme .shared-chat-input-box {
-  background: rgba(60, 64, 67, 0.95);
+  background: rgba(45, 45, 45, 0.95);
   backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 body.dark-theme .shared-chat-input-container.bottom .shared-chat-input-box {
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
-}
-
-body.dark-theme .shared-chat-input-box:focus-within {
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(45, 45, 45, 0.98);
+  border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 body.dark-theme .shared-send-btn {
-  background: #5f6368;
+  background: #8ab4f8;
 }
 
 body.dark-theme .shared-send-btn:hover:not(:disabled) {
-  background: #6f7378;
+  background: #aecbfa;
 }
 
 body.dark-theme .shared-send-btn:disabled {
   background: #3c4043;
   opacity: 0.5;
+}
+
+body.dark-theme .shared-send-btn img {
+  filter: brightness(0) invert(0);
 }
 
 /* Responsive */

@@ -28,7 +28,7 @@ export default function PromptDialog({
     <div className="prompt-overlay" onClick={onCancel}>
       <div className="prompt-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="prompt-icon">
-          <img src="/admin/icon/edit.svg" alt="Prompt" />
+          <img src="/icon/edit.svg" alt="Prompt" />
         </div>
         <h2 className="prompt-title">{title}</h2>
         {message && <p className="prompt-message">{message}</p>}

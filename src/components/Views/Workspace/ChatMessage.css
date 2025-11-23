@@ -180,7 +180,6 @@
   padding: 6px;
   cursor: pointer;
   opacity: 0.5;
-  transition: all 0.2s;
   border-radius: 6px;
   margin-top: 8px;
   display: inline-flex;
@@ -230,8 +229,17 @@ body.dark-theme .chat-attachment-file {
   background: rgba(255, 255, 255, 0.1);
 }
 
+body.dark-theme .chat-message-copy {
+  opacity: 0.6;
+}
+
 body.dark-theme .chat-message-copy:hover {
   background: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+
+body.dark-theme .chat-message-copy img {
+  filter: brightness(0) invert(1);
 }
 
 body.dark-theme .workspace-loading-dots {

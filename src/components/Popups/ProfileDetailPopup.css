@@ -149,12 +149,13 @@ body.dark-theme .profile-detail-close img {
 .profile-detail-section h3 img {
   width: 20px;
   height: 20px;
-  opacity: var(--icon-opacity);
-  transition: opacity var(--transition-normal);
+  opacity: 1;
+  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
+  transition: all var(--transition-normal);
 }
 
 body.dark-theme .profile-detail-section h3 img {
-  filter: var(--icon-filter);
+  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
 }
 
 .profile-detail-grid {
@@ -222,13 +223,14 @@ body.dark-theme .profile-detail-section h3 img {
 .profile-characteristics-list li img {
   width: 18px;
   height: 18px;
-  opacity: var(--icon-opacity);
+  opacity: 1;
+  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 body.dark-theme .profile-characteristics-list li img {
-  filter: var(--icon-filter);
+  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
 }
 
 .profile-vocab-group {

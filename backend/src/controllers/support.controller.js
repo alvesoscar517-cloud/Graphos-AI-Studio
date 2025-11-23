@@ -139,20 +139,111 @@ exports.replyToTicket = async (req, res) => {
         });
         
         const htmlContent = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2>📬 Response to your ${ticket.type === 'billing_support' ? 'Support Request' : 'Feedback'}</h2>
-            <p>Hi ${ticket.userName},</p>
-            <p>We have responded to your ticket:</p>
-            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0;">
-              <p><strong>Original Request:</strong> ${ticket.title}</p>
-            </div>
-            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0;">
-              <p><strong>Our Response:</strong></p>
-              <p>${message.replace(/\n/g, '<br>')}</p>
-            </div>
-            <p>If you have any further questions, please reply to this email.</p>
-            <p>Best regards,<br>LocalizeAI Support Team</p>
-          </div>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          </head>
+          <body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
+              <tr>
+                <td align="center">
+                  <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    
+                    <!-- Header -->
+                    <tr>
+                      <td style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 40px 40px 30px; text-align: center;">
+                        <div style="background-color: #ffffff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 20px; display: inline-flex; align-items: center; justify-content: center;">
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="9" y1="10" x2="15" y2="10" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="9" y1="14" x2="13" y2="14" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+                          </svg>
+                        </div>
+                        <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">
+                          We've Responded to Your ${ticket.type === 'billing_support' ? 'Support Request' : 'Feedback'}
+                        </h1>
+                        <p style="margin: 10px 0 0; color: #cccccc; font-size: 14px;">
+                          Ticket #${id.substring(0, 8).toUpperCase()}
+                        </p>
+                      </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                      <td style="padding: 40px;">
+                        
+                        <!-- Greeting -->
+                        <p style="margin: 0 0 24px; color: #1a1a1a; font-size: 16px;">
+                          Hi <strong>${ticket.userName}</strong>,
+                        </p>
+                        
+                        <p style="margin: 0 0 30px; color: #666666; font-size: 15px; line-height: 1.6;">
+                          Thank you for reaching out. Our team has reviewed your request and provided a response below.
+                        </p>
+
+                        <!-- Original Request -->
+                        <div style="margin-bottom: 24px;">
+                          <p style="margin: 0 0 8px; color: #999999; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                            Your Original Request
+                          </p>
+                          <div style="padding: 16px 20px; background-color: #fafafa; border-left: 4px solid #e5e5e5; border-radius: 4px;">
+                            <p style="margin: 0; color: #333333; font-size: 15px; font-weight: 500;">
+                              ${ticket.title}
+                            </p>
+                          </div>
+                        </div>
+
+                        <!-- Response -->
+                        <div style="margin-bottom: 30px;">
+                          <p style="margin: 0 0 8px; color: #999999; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                            Our Response
+                          </p>
+                          <div style="padding: 20px; background-color: #1a1a1a; border-radius: 6px;">
+                            <p style="margin: 0; color: #ffffff; font-size: 15px; line-height: 1.7; white-space: pre-wrap;">${message}</p>
+                          </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div style="height: 1px; background-color: #e5e5e5; margin: 30px 0;"></div>
+
+                        <!-- Additional Info -->
+                        <p style="margin: 0 0 20px; color: #666666; font-size: 14px; line-height: 1.6;">
+                          If you have any further questions or need additional assistance, please don't hesitate to reply to this email. We're here to help!
+                        </p>
+
+                        <!-- Signature -->
+                        <div style="margin-top: 30px;">
+                          <p style="margin: 0 0 4px; color: #1a1a1a; font-size: 15px; font-weight: 600;">
+                            Best regards,
+                          </p>
+                          <p style="margin: 0; color: #666666; font-size: 15px;">
+                            LocalizeAI Support Team
+                          </p>
+                        </div>
+
+                      </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                      <td style="padding: 30px 40px; background-color: #fafafa; border-top: 1px solid #e5e5e5; text-align: center;">
+                        <p style="margin: 0 0 8px; color: #999999; font-size: 13px; line-height: 1.6;">
+                          This email was sent in response to your support ticket
+                        </p>
+                        <p style="margin: 0; color: #cccccc; font-size: 12px;">
+                          © ${new Date().getFullYear()} LocalizeAI. All rights reserved.
+                        </p>
+                      </td>
+                    </tr>
+
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+          </html>
         `;
         
         await transporter.sendMail({

@@ -4,6 +4,7 @@
   background: #fff;
   border-left: 1px solid #e8eaed;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   position: absolute;
@@ -12,6 +13,7 @@
   bottom: 0;
   z-index: 100;
   touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 
 /* Không cần .right-sidebar.hidden vì Framer Motion xử lý animation */
@@ -20,9 +22,10 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 16px;
-  height: 56px;
+  padding: 8px 16px;
+  height: 40px;
   justify-content: flex-start;
+  flex-shrink: 0;
 }
 
 .right-header-title {
@@ -47,27 +50,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 12px;
+  gap: 5px;
+  padding: 6px 8px;
   border: none;
   background: transparent;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 400;
   color: #5f6368;
   transition: all 0.2s ease;
 }
 
 .mode-toggle-btn img {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   opacity: 0.6;
   transition: opacity 0.2s ease;
 }
 
 .mode-toggle-btn span {
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .mode-toggle-btn:hover {
@@ -93,6 +97,8 @@
 .close-sidebar-btn {
   margin-left: auto;
   margin-right: 0;
+  flex-shrink: 0;
+  padding: 6px;
 }
 
 .code-btn {
@@ -123,8 +129,9 @@
   flex-direction: column;
   gap: 20px;
   padding: 16px;
-  padding-bottom: 80px; /* Space for fixed footer */
   flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .model-selector h3 {
@@ -500,7 +507,29 @@ body.dark-theme .mode-toggle-btn.active {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Dark theme active icon filter moved to common.css for global consistency */
+body.dark-theme .mode-toggle-btn.active img {
+  /* Dark theme blue color filter */
+  filter: brightness(0) saturate(100%) invert(64%) sepia(35%) saturate(1028%) hue-rotate(186deg) brightness(103%) contrast(96%);
+}
+
+/* Dark theme - Invert all icons */
+body.dark-theme .mode-toggle-btn img {
+  filter: brightness(0) invert(1);
+  opacity: 0.6;
+}
+
+body.dark-theme .mode-toggle-btn:hover img {
+  opacity: 0.8;
+}
+
+body.dark-theme .close-sidebar-btn img,
+body.dark-theme .code-btn img {
+  filter: brightness(0) invert(1);
+}
+
+body.dark-theme .rewrite-footer-btn img {
+  filter: brightness(0) invert(1);
+}
 
 body.dark-theme .code-btn {
   color: #e3e3e3;

@@ -1,4 +1,5 @@
 // Modal notification system for React
+import '../components/Popups/NotificationModal.css'
 
 class ModalSystem {
   constructor() {
@@ -84,12 +85,12 @@ class ModalSystem {
 
   loading(message = 'Đang xử lý...') {
     const overlay = document.createElement('div')
-    overlay.className = 'modal-overlay show'
+    overlay.className = 'notification-modal-overlay show'
     overlay.innerHTML = `
-      <div class="modal-container">
-        <div class="modal-loading">
-          <div class="modal-spinner"></div>
-          <p class="modal-loading-text">${this.escapeHtml(message)}</p>
+      <div class="notification-modal-container">
+        <div class="notification-modal-loading">
+          <div class="notification-modal-spinner"></div>
+          <p class="notification-modal-loading-text">${this.escapeHtml(message)}</p>
         </div>
       </div>
     `
@@ -104,12 +105,7 @@ class ModalSystem {
 
   showModal(config) {
     // Force close any existing modal first
-    if (this.currentModal) {
-      if (this.currentModal.parentNode) {
-        this.currentModal.parentNode.removeChild(this.currentModal)
-      }
-      this.currentModal = null
-    }
+    this.closeModal()
 
     const { type = 'info', title, message, buttons = [] } = config
 
@@ -124,33 +120,30 @@ class ModalSystem {
     const icon = iconMap[type] || 'info'
 
     const overlay = document.createElement('div')
-    overlay.className = 'modal-overlay'
+    overlay.className = 'notification-modal-overlay'
 
     const buttonsHtml = buttons.map(btn => 
-      `<button class="modal-button ${btn.style || 'secondary'}" data-action="${btn.text}">
+      `<button class="notification-modal-button ${btn.style || 'secondary'}" data-action="${btn.text}">
         ${this.escapeHtml(btn.text)}
       </button>`
     ).join('')
 
     overlay.innerHTML = `
-      <div class="modal-container">
-        <div class="modal-header">
-          <div class="modal-icon ${type}">
+      <div class="notification-modal-container">
+        <div class="notification-modal-header">
+          <div class="notification-modal-icon ${type}">
             <img src="/icon/${icon}.svg" alt="${type}">
           </div>
-          <div class="modal-header-text">
-            <h3 class="modal-title">${this.escapeHtml(title)}</h3>
-            <p class="modal-message">${this.escapeHtml(message)}</p>
+          <div class="notification-modal-header-text">
+            <h3 class="notification-modal-title">${this.escapeHtml(title)}</h3>
+            <p class="notification-modal-message">${this.escapeHtml(message)}</p>
           </div>
         </div>
-        <div class="modal-footer">
+        <div class="notification-modal-footer">
           ${buttonsHtml}
         </div>
       </div>
     `
-
-    document.body.appendChild(overlay)
-    this.currentModal = overlay
 
     // Store event handlers for cleanup
     const handlers = {
@@ -159,10 +152,19 @@ class ModalSystem {
       keyboard: null
     }
 
-    setTimeout(() => overlay.classList.add('show'), 10)
+    // Append to body first
+    document.body.appendChild(overlay)
+    this.currentModal = overlay
+
+    // Use requestAnimationFrame for smoother animation
+    requestAnimationFrame(() => {
+      if (overlay.parentNode) {
+        overlay.classList.add('show')
+      }
+    })
 
     buttons.forEach((btn, index) => {
-      const btnElement = overlay.querySelectorAll('.modal-button')[index]
+      const btnElement = overlay.querySelectorAll('.notification-modal-button')[index]
       if (btnElement && btn.onClick) {
         const handler = () => {
           this.cleanupHandlers(handlers)
@@ -216,17 +218,20 @@ class ModalSystem {
   }
 
   closeModal() {
-    if (this.currentModal) {
-      // Remove all event listeners by cloning and replacing
+    if (this.currentModal && this.currentModal.parentNode) {
       const oldModal = this.currentModal
+      this.currentModal = null
+      
       oldModal.classList.remove('show')
       
       setTimeout(() => {
-        if (oldModal && oldModal.parentNode) {
-          oldModal.parentNode.removeChild(oldModal)
-        }
-        if (this.currentModal === oldModal) {
-          this.currentModal = null
+        try {
+          if (oldModal.parentNode) {
+            oldModal.parentNode.removeChild(oldModal)
+          }
+        } catch (error) {
+          // Ignore errors if node was already removed
+          console.debug('Modal already removed:', error)
         }
       }, 200)
     }

@@ -19,11 +19,13 @@ const SharedChatInput = ({
     setShowSendBtn(message.trim().length > 0)
   }, [message])
 
-  // Auto-resize textarea
+  // Auto-resize textarea (1 line default, max 3 lines)
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 90) + 'px'
+      textareaRef.current.style.height = '24px' // Reset to 1 line
+      const scrollHeight = textareaRef.current.scrollHeight
+      const maxHeight = 72 // 3 lines: 24px * 3
+      textareaRef.current.style.height = Math.min(scrollHeight, maxHeight) + 'px'
     }
   }, [message])
 
@@ -32,7 +34,7 @@ const SharedChatInput = ({
       onSendMessage(message.trim())
       setMessage('')
       if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto'
+        textareaRef.current.style.height = '24px' // Reset to 1 line
       }
     }
   }

@@ -179,6 +179,16 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
           </div>
 
           <div className="workspace-header-actions">
+            {rightSidebarHidden && (
+              <button 
+                className="icon-btn"
+                onClick={onToggleRightSidebar}
+                data-tooltip="Mở sidebar" 
+                data-tooltip-position="left"
+              >
+                <img src="/icon/panel-right.svg" alt="Toggle Right Sidebar" />
+              </button>
+            )}
             <button 
               className="icon-btn"
               onClick={() => {
@@ -190,16 +200,6 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
             >
               <img src="/icon/plus.svg" alt="New Chat" />
             </button>
-            {rightSidebarHidden && (
-              <button 
-                className="icon-btn"
-                onClick={onToggleRightSidebar}
-                data-tooltip="Mở sidebar" 
-                data-tooltip-position="left"
-              >
-                <img src="/icon/panel-right.svg" alt="Toggle Right Sidebar" />
-              </button>
-            )}
           </div>
         </div>
 

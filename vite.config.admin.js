@@ -5,11 +5,11 @@ import { fileURLToPath } from 'url'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 
-// Vite config riêng cho Admin Panel
+// Vite config cho Admin Panel - Standalone Extension
 export default defineConfig({
   plugins: [react()],
   root: resolve(__dirname, 'admin-panel'),
-  base: '/admin/',
+  base: './', // Relative paths cho extension
   server: {
     port: 5174,
     proxy: {
@@ -29,8 +29,13 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: resolve(__dirname, 'dist/admin'),
-    emptyOutDir: true
+    outDir: resolve(__dirname, 'dist-admin'), // Build vào thư mục riêng
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'admin-panel/index.html')
+      }
+    }
   },
   publicDir: resolve(__dirname, 'admin-panel/public')
 })

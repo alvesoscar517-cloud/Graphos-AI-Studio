@@ -4,7 +4,7 @@ import { createProfile, addSamplesBatch, finalizeProfile } from '../../services/
 import { splitTextIntoChunks, validateSampleText } from '../../utils/textSplitter'
 import { clearCachedProfileDetail, clearAllProfileDetailCaches } from '../../utils/profileDetailCache'
 import modal from '../../utils/modal'
-import Lottie from 'lottie-react'
+import LottieWrapper from './LottieWrapper'
 import PasteTextModal from './PasteTextModal'
 import UploadFileModal from './UploadFileModal'
 import '../../styles/ProfileSetup.css'
@@ -20,8 +20,10 @@ import faceIdAnimation from '../../animation/face-id.json'
 const ProfileSetup = () => {
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1)
-  const [mountKey, setMountKey] = useState(Date.now())
-  
+  const [animationKey, setAnimationKey] = useState(0)
+  const mountedRef = useRef(true)
+  const cancellingRef = useRef(false)
+  const timeoutsRef = useRef([])
 
   const [profileData, setProfileData] = useState({
     name: '',
@@ -52,16 +54,20 @@ const ProfileSetup = () => {
 
   // Cleanup on unmount
   useEffect(() => {
-    // Force fresh mount
-    setMountKey(Date.now())
+    mountedRef.current = true
     
     return () => {
-      // Clear any pending timeouts/intervals
-      setProcessing(false)
-      setShowPasteModal(false)
-      setShowUploadModal(false)
+      mountedRef.current = false
+      // Clear all pending timeouts
+      timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
+      timeoutsRef.current = []
     }
   }, [])
+
+  // Force remount animations when step changes
+  useEffect(() => {
+    setAnimationKey(prev => prev + 1)
+  }, [currentStep])
 
 
 
@@ -198,11 +204,11 @@ const ProfileSetup = () => {
 
   // Step 4: Finalize profile (batch upload + finalize)
   useEffect(() => {
-    if (currentStep !== 4 || processing) return
+    if (currentStep !== 4 || processing || !mountedRef.current) return
 
-    let timeouts = []
-    
     const handleFinalizeProfile = async () => {
+      if (!mountedRef.current) return
+      
       setProcessing(true)
       setProcessingStep(1)
 
@@ -216,47 +222,69 @@ const ProfileSetup = () => {
         console.log(`📦 Submitting ${allSamples.length} samples (${profileData.longTextChunks.length} long + ${profileData.shortSamples.length} short)`)
 
         if (allSamples.length < 3) {
-          modal.alert('Cần ít nhất 3 mẫu văn bản', 'Lỗi')
-          setProcessing(false)
-          setCurrentStep(3)
+          if (mountedRef.current) {
+            modal.alert('Cần ít nhất 3 mẫu văn bản', 'Lỗi')
+            setProcessing(false)
+            setCurrentStep(3)
+          }
           return
         }
 
         // Step 1: Upload samples in batch
+        if (!mountedRef.current) return
         setProcessingStep(1)
         await addSamplesBatch(profileData.profileId, allSamples)
         
-        timeouts.push(setTimeout(() => setProcessingStep(2), 500))
+        if (!mountedRef.current) return
+        
+        const timeout1 = setTimeout(() => {
+          if (mountedRef.current) setProcessingStep(2)
+        }, 500)
+        timeoutsRef.current.push(timeout1)
 
         // Step 2: Finalize profile (create embeddings + summary)
-        timeouts.push(setTimeout(async () => {
-          setProcessingStep(2)
-          await finalizeProfile(profileData.profileId)
+        const timeout2 = setTimeout(async () => {
+          if (!mountedRef.current) return
           
-          // Clear caches after profile creation
-          clearAllProfileDetailCaches() // Clear all profile caches
-          clearCachedProfileDetail(profileData.profileId) // Clear detail cache if exists
-          
-          setTimeout(() => {
-            setProcessingStep(3)
-            setShowCompletion(true)
-          }, 1000)
-        }, 1500))
+          try {
+            setProcessingStep(2)
+            await finalizeProfile(profileData.profileId)
+            
+            if (!mountedRef.current) return
+            
+            // Clear caches after profile creation
+            clearAllProfileDetailCaches()
+            clearCachedProfileDetail(profileData.profileId)
+            
+            const timeout3 = setTimeout(() => {
+              if (mountedRef.current) {
+                setProcessingStep(3)
+                setShowCompletion(true)
+              }
+            }, 1000)
+            timeoutsRef.current.push(timeout3)
+          } catch (error) {
+            console.error('Finalize error:', error)
+            if (mountedRef.current) {
+              modal.alert('Không thể hoàn thiện hồ sơ. Vui lòng thử lại.', 'Lỗi')
+              setProcessing(false)
+              setCurrentStep(3)
+            }
+          }
+        }, 1500)
+        timeoutsRef.current.push(timeout2)
 
       } catch (error) {
         console.error('Finalize error:', error)
-        modal.alert('Không thể hoàn thiện hồ sơ. Vui lòng thử lại.', 'Lỗi')
-        setProcessing(false)
-        setCurrentStep(3)
+        if (mountedRef.current) {
+          modal.alert('Không thể hoàn thiện hồ sơ. Vui lòng thử lại.', 'Lỗi')
+          setProcessing(false)
+          setCurrentStep(3)
+        }
       }
     }
 
     handleFinalizeProfile()
-
-    // Cleanup timeouts on unmount
-    return () => {
-      timeouts.forEach(timeout => clearTimeout(timeout))
-    }
   }, [currentStep, profileData])
 
   // Complete setup
@@ -267,68 +295,58 @@ const ProfileSetup = () => {
     navigate('/')
   }
 
-  const cancellingRef = useRef(false)
-  const mountedRef = useRef(true)
-  
-  useEffect(() => {
-    mountedRef.current = true
-    return () => {
-      mountedRef.current = false
-    }
-  }, [])
-  
   const handleCancel = useCallback(async () => {
     // Prevent if component is unmounting
     if (!mountedRef.current || isCancelling) {
-      console.log('[ProfileSetup] Component unmounted or already cancelling, ignoring...')
       return
     }
     
     // Prevent multiple simultaneous calls
     if (cancellingRef.current) {
-      console.log('[ProfileSetup] Already cancelling, ignoring...')
       return
     }
     
-
-    
     try {
-      setIsCancelling(true)
       cancellingRef.current = true
+      setIsCancelling(true)
+      
       const hasData = profileName || hasLongText || samples.length > 0
       if (hasData) {
-        console.log('[ProfileSetup] Showing cancel confirmation...')
         const confirmed = await modal.confirm(
           'Tất cả dữ liệu đã nhập sẽ bị mất.',
           'Hủy bỏ tạo hồ sơ?',
           { confirmText: 'Hủy bỏ', danger: true }
         )
-        console.log('[ProfileSetup] Confirmation result:', confirmed)
+        
         if (!confirmed) {
+          if (mountedRef.current) {
+            setIsCancelling(false)
+          }
           cancellingRef.current = false
           return
         }
       }
-      mountedRef.current = false
+      
+      // Clear all timeouts before navigating
+      timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
+      timeoutsRef.current = []
+      
       navigate('/', { replace: true })
     } catch (error) {
       console.error('[ProfileSetup] Error in handleCancel:', error)
-      // Force navigate even if there's an error
       navigate('/', { replace: true })
     } finally {
-      // Reset after a delay
-      setTimeout(() => {
-        cancellingRef.current = false
-      }, 1000)
+      cancellingRef.current = false
     }
-  }, [])
+  }, [profileName, hasLongText, samples.length, isCancelling, navigate])
 
   const progressPercentage = (currentStep / 4) * 100
   
   // Calculate total samples for display
   const totalSamples = profileData.longTextChunks.length + profileData.shortSamples.length
 
-  if (isCancelling) {
+  // Don't render if cancelling or unmounted
+  if (isCancelling || !mountedRef.current) {
     return null
   }
 
@@ -344,10 +362,11 @@ const ProfileSetup = () => {
         </div>
 
         {/* Step 1: Profile Name */}
-        <div className={`step-content ${currentStep === 1 ? 'active' : ''}`} style={{ display: currentStep === 1 ? 'block' : 'none' }}>
+        {currentStep === 1 && (
+        <div className="step-content active">
           <div className="content-wrapper">
             <div className="animation-container">
-              <Lottie key={`lottie-1-${mountKey}`} animationData={loaderCatAnimation} loop={true} />
+              <LottieWrapper key={`step1-${animationKey}`} animationData={loaderCatAnimation} loop={true} />
             </div>
             <div className="form-container">
               <h1 className="step-title">Bắt đầu Hiệu chỉnh Văn phong của bạn</h1>
@@ -412,12 +431,14 @@ const ProfileSetup = () => {
             </div>
           </div>
         </div>
+        )}
 
         {/* Step 2: Long Text */}
-        <div className={`step-content ${currentStep === 2 ? 'active' : ''}`} style={{ display: currentStep === 2 ? 'block' : 'none' }}>
+        {currentStep === 2 && (
+        <div className="step-content active">
           <div className="content-wrapper">
             <div className="animation-container">
-              <Lottie animationData={biometricAnimation} loop={true} />
+              <LottieWrapper key={`step2-${animationKey}`} animationData={biometricAnimation} loop={true} />
             </div>
             <div className="form-container">
               <h1 className="step-title">Cung cấp Văn bản Dài</h1>
@@ -491,12 +512,14 @@ const ProfileSetup = () => {
             </div>
           </div>
         </div>
+        )}
 
         {/* Step 3: Short Samples */}
-        <div className={`step-content ${currentStep === 3 ? 'active' : ''}`} style={{ display: currentStep === 3 ? 'block' : 'none' }}>
+        {currentStep === 3 && (
+        <div className="step-content active">
           <div className="content-wrapper">
             <div className="animation-container">
-              <Lottie animationData={contactMailAnimation} loop={true} />
+              <LottieWrapper key={`step3-${animationKey}`} animationData={contactMailAnimation} loop={true} />
             </div>
             <div className="form-container">
               <h1 className="step-title">Cung cấp Văn bản Ngắn</h1>
@@ -560,12 +583,14 @@ const ProfileSetup = () => {
             </div>
           </div>
         </div>
+        )}
 
         {/* Step 4: Processing */}
-        <div className={`step-content ${currentStep === 4 ? 'active' : ''}`} style={{ display: currentStep === 4 && !showCompletion ? 'block' : 'none' }}>
+        {currentStep === 4 && !showCompletion && (
+        <div className="step-content active">
           <div className="content-wrapper-processing">
             <div className="animation-container-large">
-              <Lottie animationData={loadingBlueAnimation} loop={true} />
+              <LottieWrapper key={`step4-${animationKey}`} animationData={loadingBlueAnimation} loop={true} />
             </div>
             <div className="form-container-processing">
               <h1 className="step-title">Đang Hiệu chỉnh Hồ sơ</h1>
@@ -608,13 +633,14 @@ const ProfileSetup = () => {
             </div>
           </div>
         </div>
+        )}
 
         {/* Completion Modal */}
         {showCompletion && (
           <div className="completion-modal active">
             <div className="completion-modal-content">
               <div className="completion-animation">
-                <Lottie animationData={faceIdAnimation} loop={false} />
+                <LottieWrapper key={`completion-${animationKey}`} animationData={faceIdAnimation} loop={false} />
               </div>
               <h1 className="completion-title">Hoàn tất!</h1>
               <p className="completion-subtitle">Hồ sơ văn phong của bạn đã sẵn sàng</p>

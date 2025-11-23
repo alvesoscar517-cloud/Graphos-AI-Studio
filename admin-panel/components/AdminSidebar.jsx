@@ -16,7 +16,7 @@ export default function AdminSidebar({ isOpen, onToggle }) {
     <div className={`admin-sidebar ${isOpen ? 'open' : 'closed'}`}>
       <div className="sidebar-header">
         <div className="sidebar-logo">
-          <img src="/admin/icon/shield-check.svg" alt="Logo" className="logo-icon" />
+          <img src="/icon/shield-check.svg" alt="Logo" className="logo-icon" />
           {isOpen && <span className="logo-text">Admin</span>}
         </div>
       </div>
@@ -30,7 +30,7 @@ export default function AdminSidebar({ isOpen, onToggle }) {
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             title={!isOpen ? item.label : ''}
           >
-            <img src={`/admin/icon/${item.icon}`} alt={item.label} className="nav-icon" />
+            <img src={`/icon/${item.icon}`} alt={item.label} className="nav-icon" />
             {isOpen && <span className="nav-label">{item.label}</span>}
           </NavLink>
         ))}
@@ -39,7 +39,7 @@ export default function AdminSidebar({ isOpen, onToggle }) {
       <div className="sidebar-footer">
         <button className="toggle-btn" onClick={onToggle} title={isOpen ? 'Collapse' : 'Expand'}>
           <img 
-            src={isOpen ? '/admin/icon/chevron-left.svg' : '/admin/icon/chevron-right.svg'} 
+            src={isOpen ? '/icon/chevron-left.svg' : '/icon/chevron-right.svg'} 
             alt="Toggle" 
           />
         </button>

@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useNotification } from '../../hooks/useNotification'
 import './BillingSupportModal.css'
 
 const BillingSupportModal = ({ onClose }) => {
+  const { success, error: showError } = useNotification()
   const [category, setCategory] = useState('')
   const [subject, setSubject] = useState('')
   const [description, setDescription] = useState('')
@@ -86,7 +88,7 @@ const BillingSupportModal = ({ onClose }) => {
       const data = await response.json()
 
       if (response.ok) {
-        alert('Yêu cầu hỗ trợ đã được gửi! Chúng tôi sẽ phản hồi trong vòng 24h.')
+        success('Yêu cầu hỗ trợ đã được gửi! Chúng tôi sẽ phản hồi trong vòng 24h.')
         onClose()
       } else {
         setError(data.error || 'Có lỗi xảy ra, vui lòng thử lại')

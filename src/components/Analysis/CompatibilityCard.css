@@ -4,15 +4,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 8px 0;
+  gap: 12px;
+  padding: 12px 0;
 }
 
-/* Score Circle - Isolated styles */
+/* Modern Circle Design */
 .compatibility-card .compatibility-score-circle {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -30,15 +30,20 @@
 .compatibility-card .compatibility-score-bg {
   fill: none;
   stroke: #f1f3f4;
-  stroke-width: 8;
+  stroke-width: 10;
+}
+
+.compatibility-card .compatibility-score-inner {
+  fill: white;
 }
 
 .compatibility-card .compatibility-score-progress {
   fill: none;
-  stroke-width: 8;
+  stroke: #4facfe;
+  stroke-width: 10;
   stroke-linecap: round;
-  stroke-dasharray: 326.56;
-  transition: stroke-dashoffset 0.6s ease;
+  stroke-dasharray: 314.16;
+  transition: none;
 }
 
 .compatibility-card .compatibility-score-text {
@@ -49,25 +54,24 @@
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 3px;
-  z-index: 100;
-  pointer-events: none;
+  gap: 2px;
+  z-index: 10;
 }
 
 .compatibility-card .compatibility-score-number {
   font-size: 36px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: -1px;
+  letter-spacing: -1.5px;
   color: var(--text-primary);
 }
 
 .compatibility-card .compatibility-score-symbol {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
   color: var(--text-secondary);
-  margin-top: 4px;
+  opacity: 0.5;
 }
 
 /* Verdict */
@@ -168,6 +172,10 @@ body.dark-theme .compatibility-card .compatibility-score-bg {
   stroke: #3c4043;
 }
 
+body.dark-theme .compatibility-card .compatibility-score-inner {
+  fill: #2d2d2d;
+}
+
 body.dark-theme .compatibility-card .compatibility-score-number {
   color: #e3e3e3;
 }
@@ -175,6 +183,8 @@ body.dark-theme .compatibility-card .compatibility-score-number {
 body.dark-theme .compatibility-card .compatibility-score-symbol {
   color: #9aa0a6;
 }
+
+
 
 body.dark-theme .compatibility-card .compatibility-verdict img,
 body.dark-theme .compatibility-card .detail-btn-full img {

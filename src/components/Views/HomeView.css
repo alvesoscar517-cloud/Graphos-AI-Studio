@@ -5,33 +5,18 @@
   flex: 1;
   overflow-y: auto;
   position: relative;
+  height: 100vh;
+  background: var(--bg-primary);
 }
 
 .home-menu-btn {
   position: absolute !important;
-  top: 12px !important;
-  left: 8px !important;
-  z-index: 100;
-  background: #fff;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 !important;
+  top: 8px !important;
+  left: 16px !important;
+  z-index: 100 !important;
 }
 
-.home-menu-btn:hover {
-  background: #f1f3f4;
-}
-
-.home-menu-btn img {
-  width: 20px;
-  height: 20px;
-  opacity: 0.6;
-}
+/* Dark theme inherited from global.css */
 
 .home-content {
   flex: 1;
@@ -86,6 +71,7 @@
   margin-left: auto;
   flex-shrink: 0;
   height: fit-content;
+  transition: all 0.2s ease;
 }
 
 .new-app-btn:hover {
@@ -96,6 +82,12 @@
 .new-app-btn img {
   width: 18px;
   height: 18px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.new-app-btn:hover img {
+  opacity: 1;
 }
 
 .quick-actions {
@@ -146,13 +138,14 @@
 .action-icon {
   width: 28px;
   height: 28px;
-  opacity: 0.6;
-  filter: grayscale(100%);
-  transition: opacity 0.2s ease;
+  opacity: 0.7;
+  filter: brightness(0) saturate(100%);
+  transition: all 0.2s ease;
 }
 
 .action-card:hover .action-icon {
-  opacity: 0.8;
+  opacity: 1;
+  filter: brightness(0) saturate(100%);
 }
 
 .action-card h3 {
@@ -220,13 +213,14 @@
 .news-icon {
   width: 28px;
   height: 28px;
-  opacity: 0.6;
-  filter: grayscale(100%);
-  transition: opacity 0.2s ease;
+  opacity: 0.7;
+  filter: brightness(0) saturate(100%);
+  transition: all 0.2s ease;
 }
 
 .news-card:hover .news-icon {
-  opacity: 0.8;
+  opacity: 1;
+  filter: brightness(0) saturate(100%);
 }
 
 .news-content {
@@ -399,13 +393,7 @@ body.dark-theme .loading-profiles p {
   color: #9aa0a6;
 }
 
-body.dark-theme .home-menu-btn {
-  background: #1e1e1e;
-}
-
-body.dark-theme .home-menu-btn:hover {
-  background: #3c4043;
-}
+/* Dark theme inherited from global.css */
 
 body.dark-theme .hero-title {
   color: #e3e3e3;
@@ -423,6 +411,17 @@ body.dark-theme .new-app-btn {
 
 body.dark-theme .new-app-btn:hover {
   background: #3c4043;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .new-app-btn img {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+
+body.dark-theme .new-app-btn:hover img {
+  filter: brightness(0) invert(1);
+  opacity: 1;
 }
 
 body.dark-theme .action-card {
@@ -447,12 +446,32 @@ body.dark-theme .action-card:hover .action-icon-wrapper {
   background: rgba(255, 255, 255, 0.12);
 }
 
+body.dark-theme .action-icon {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+body.dark-theme .action-card:hover .action-icon {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+
 body.dark-theme .news-icon-wrapper {
   background: rgba(255, 255, 255, 0.08);
 }
 
 body.dark-theme .news-card:hover .news-icon-wrapper {
   background: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-theme .news-icon {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+body.dark-theme .news-card:hover .news-icon {
+  filter: brightness(0) invert(1);
+  opacity: 1;
 }
 
 body.dark-theme .section-title {

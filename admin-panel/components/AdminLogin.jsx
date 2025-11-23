@@ -45,7 +45,7 @@ export default function AdminLogin() {
       <div className="admin-login-container">
         <div className="admin-login-header">
           <div className="login-icon">
-            <img src="/admin/icon/shield-check.svg" alt="Shield" />
+            <img src="/icon/shield-check.svg" alt="Shield" />
           </div>
           <h1>Admin Panel</h1>
           <p>Login to manage the system</p>
@@ -54,7 +54,7 @@ export default function AdminLogin() {
         <form onSubmit={handleSubmit} className="admin-login-form">
           <div className="admin-form-group">
             <label htmlFor="adminKey">
-              <img src="/admin/icon/key.svg" alt="Key" className="label-icon" />
+              <img src="/icon/key.svg" alt="Key" className="label-icon" />
               Admin Key
             </label>
             <input
@@ -69,7 +69,7 @@ export default function AdminLogin() {
 
           {error && (
             <div className="admin-error-message">
-              <img src="/admin/icon/alert-circle.svg" alt="Error" />
+              <img src="/icon/alert-circle.svg" alt="Error" />
               {error}
             </div>
           )}
@@ -82,7 +82,7 @@ export default function AdminLogin() {
               </>
             ) : (
               <>
-                <img src="/admin/icon/log-in.svg" alt="Login" />
+                <img src="/icon/log-in.svg" alt="Login" />
                 Login
               </>
             )}
@@ -90,7 +90,7 @@ export default function AdminLogin() {
         </form>
 
         <div className="admin-login-footer">
-          <img src="/admin/icon/info.svg" alt="Info" />
+          <img src="/icon/info.svg" alt="Info" />
           <p>Contact administrator if you need help</p>
         </div>
       </div>

@@ -83,7 +83,7 @@ export default function UserList() {
               }
             }}
           >
-            <img src="/admin/icon/download.svg" alt="Export" />
+            <img src="/icon/download.svg" alt="Export" />
             Export CSV
           </button>
         }
@@ -91,7 +91,7 @@ export default function UserList() {
 
       <div className="list-controls">
         <div className="search-box">
-          <img src="/admin/icon/search.svg" alt="Search" className="search-icon" />
+          <img src="/icon/search.svg" alt="Search" className="search-icon" />
           <input
             type="text"
             placeholder="Search by email, name, or ID..."
@@ -155,7 +155,7 @@ export default function UserList() {
                       className="btn-view"
                       onClick={() => navigate(`/users/${user.id}`)}
                     >
-                      <img src="/admin/icon/eye.svg" alt="View" />
+                      <img src="/icon/eye.svg" alt="View" />
                       View
                     </button>
                   </td>

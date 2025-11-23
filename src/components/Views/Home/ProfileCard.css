@@ -49,12 +49,14 @@ body.dark-theme .profile-card:hover {
 .profile-card-icon img {
   width: 28px;
   height: 28px;
-  opacity: 0.8;
+  opacity: 1;
+  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
   transition: all var(--transition-normal);
 }
 
 .profile-card:hover .profile-card-icon img {
   opacity: 1;
+  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(110%) contrast(98%);
   transform: scale(1.05);
 }
 
@@ -134,14 +136,14 @@ body.dark-theme .profile-card-menu:hover img {
 .profile-card-meta-item img {
   width: 14px;
   height: 14px;
-  opacity: var(--icon-opacity);
-  filter: brightness(0) saturate(100%) invert(30%) sepia(0%) saturate(0%) hue-rotate(0deg);
+  opacity: 1;
+  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
   transition: all var(--transition-normal);
 }
 
 body.dark-theme .profile-card-meta-item img {
-  filter: brightness(0) invert(1);
-  opacity: 0.6;
+  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
+  opacity: 1;
 }
 
 .profile-card-stats {

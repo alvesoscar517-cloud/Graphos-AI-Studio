@@ -135,14 +135,6 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
         >
           <img src="/icon/play.svg" alt="Playground" />
           <span>Playground</span>
-          <img 
-            src="/icon/clock.svg" 
-            alt="History" 
-            className="history-icon"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onViewChange('history') }}
-            data-tooltip="Xem lịch sử"
-            data-tooltip-position="right"
-          />
         </a>
 
         <a 
@@ -152,15 +144,12 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
         >
           <img src="/icon/message-square.svg" alt="Workspace" />
           <span>Workspace</span>
-          <img 
-            src="/icon/clock.svg" 
-            alt="History" 
-            className="history-icon"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onViewChange('history') }}
-            data-tooltip="Xem lịch sử chat"
-            data-tooltip-position="right"
-          />
         </a>
+
+        <div className="nav-label">
+          <img src="/icon/clock.svg" alt="History" />
+          <span>History</span>
+        </div>
 
         <div className="nav-section" id="notesList">
           {visibleNotes.map(note => (

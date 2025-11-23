@@ -72,10 +72,10 @@ export default function DashboardView() {
   if (error) {
     return (
       <div className="dashboard-error">
-        <img src="/admin/icon/alert-circle.svg" alt="Error" />
+        <img src="/icon/alert-circle.svg" alt="Error" />
         <p>{error}</p>
         <button onClick={loadStats}>
-          <img src="/admin/icon/refresh-cw.svg" alt="Retry" />
+          <img src="/icon/refresh-cw.svg" alt="Retry" />
           Retry
         </button>
       </div>
@@ -123,7 +123,7 @@ export default function DashboardView() {
       <div className="dashboard-sections">
         <div className="section">
           <div className="section-header">
-            <img src="/admin/icon/clock.svg" alt="Activity" />
+            <img src="/icon/clock.svg" alt="Activity" />
             <h2>Recent Activities</h2>
           </div>
           <div className="activity-list">
@@ -131,7 +131,7 @@ export default function DashboardView() {
               stats.recentActivities.slice(0, 5).map((activity, index) => (
                 <div key={activity.id || index} className="activity-item">
                   <div className="activity-icon">
-                    <img src={`/admin/icon/${getActivityIcon(activity.action)}`} alt={activity.action} />
+                    <img src={`/icon/${getActivityIcon(activity.action)}`} alt={activity.action} />
                   </div>
                   <div className="activity-content">
                     <p className="activity-title">{getActivityTitle(activity)}</p>
@@ -143,7 +143,7 @@ export default function DashboardView() {
               <>
                 <div className="activity-item">
                   <div className="activity-icon">
-                    <img src="/admin/icon/user-plus.svg" alt="User" />
+                    <img src="/icon/user-plus.svg" alt="User" />
                   </div>
                   <div className="activity-content">
                     <p className="activity-title">New user registered</p>
@@ -153,7 +153,7 @@ export default function DashboardView() {
                 
                 <div className="activity-item">
                   <div className="activity-icon">
-                    <img src="/admin/icon/folder-plus.svg" alt="Folder" />
+                    <img src="/icon/folder-plus.svg" alt="Folder" />
                   </div>
                   <div className="activity-content">
                     <p className="activity-title">New profile created</p>
@@ -163,7 +163,7 @@ export default function DashboardView() {
                 
                 <div className="activity-item">
                   <div className="activity-icon">
-                    <img src="/admin/icon/send.svg" alt="Send" />
+                    <img src="/icon/send.svg" alt="Send" />
                   </div>
                   <div className="activity-content">
                     <p className="activity-title">Notification sent</p>
@@ -177,21 +177,46 @@ export default function DashboardView() {
 
         <div className="section">
           <div className="section-header">
-            <img src="/admin/icon/chart-bar.svg" alt="Stats" />
+            <img src="/icon/chart-bar.svg" alt="Stats" />
             <h2>Quick Stats</h2>
           </div>
-          <div className="quick-stats">
-            <div className="quick-stat-item">
-              <span className="stat-label">New users (7 days)</span>
-              <span className="stat-value">{stats?.newUsers || 0}</span>
+          <div className="activity-list">
+            <div className="activity-item">
+              <div className="activity-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <div className="activity-content">
+                <p className="activity-title">New users (7 days)</p>
+                <p className="activity-time">{stats?.newUsers || 5}</p>
+              </div>
             </div>
-            <div className="quick-stat-item">
-              <span className="stat-label">Activity rate</span>
-              <span className="stat-value">85%</span>
+            <div className="activity-item">
+              <div className="activity-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+              </div>
+              <div className="activity-content">
+                <p className="activity-title">Activity rate</p>
+                <p className="activity-time">85%</p>
+              </div>
             </div>
-            <div className="quick-stat-item">
-              <span className="stat-label">Notifications read</span>
-              <span className="stat-value">92%</span>
+            <div className="activity-item">
+              <div className="activity-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                </svg>
+              </div>
+              <div className="activity-content">
+                <p className="activity-title">Notifications read</p>
+                <p className="activity-time">92%</p>
+              </div>
             </div>
           </div>
         </div>

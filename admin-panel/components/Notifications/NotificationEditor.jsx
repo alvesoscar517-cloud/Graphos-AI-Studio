@@ -168,7 +168,7 @@ export default function NotificationEditor() {
     <div className="notification-editor">
       <div className="editor-header">
         <div className="header-title">
-          <img src={`/admin/icon/${isEditMode ? 'edit' : 'plus'}.svg`} alt={isEditMode ? 'Edit' : 'Create'} />
+          <img src={`/icon/${isEditMode ? 'edit' : 'plus'}.svg`} alt={isEditMode ? 'Edit' : 'Create'} />
           <div>
             <h1>{isEditMode ? 'Edit Notification' : 'Create New Notification'}</h1>
             <p>Create multilingual notifications to send to users</p>
@@ -180,14 +180,14 @@ export default function NotificationEditor() {
             className="btn-preview"
             onClick={() => setShowPreview(!showPreview)}
           >
-            <img src="/admin/icon/eye.svg" alt="Preview" />
+            <img src="/icon/eye.svg" alt="Preview" />
             {showPreview ? 'Hide' : 'Show'} Preview
           </button>
           <button 
             className="btn-secondary"
             onClick={() => navigate('/notifications')}
           >
-            <img src="/admin/icon/arrow-left.svg" alt="Back" />
+            <img src="/icon/arrow-left.svg" alt="Back" />
             Back
           </button>
         </div>
@@ -215,7 +215,7 @@ export default function NotificationEditor() {
                   }}
                   onClick={() => setNotification({ ...notification, type: type.value })}
                 >
-                  <img src={`/admin/icon/${type.icon}`} alt={type.label} className="type-icon" />
+                  <img src={`/icon/${type.icon}`} alt={type.label} className="type-icon" />
                   <span className="type-label">{type.label}</span>
                 </button>
               ))}
@@ -258,7 +258,7 @@ export default function NotificationEditor() {
                   disabled={!notification.translations.vi.title || !notification.translations.vi.message}
                   title="Auto-translate from Vietnamese"
                 >
-                  <img src="/admin/icon/languages.svg" alt="Translate" />
+                  <img src="/icon/languages.svg" alt="Translate" />
                   Auto Translate
                 </button>
               )}
@@ -330,7 +330,7 @@ export default function NotificationEditor() {
                     target: { ...notification.target, type: 'all' }
                   })}
                 />
-                <img src="/admin/icon/users.svg" alt="All users" />
+                <img src="/icon/users.svg" alt="All users" />
                 <span>All Users</span>
               </label>
 
@@ -343,7 +343,7 @@ export default function NotificationEditor() {
                     target: { ...notification.target, type: 'segment' }
                   })}
                 />
-                <img src="/admin/icon/target.svg" alt="Segment" />
+                <img src="/icon/target.svg" alt="Segment" />
                 <span>User Groups</span>
               </label>
 
@@ -394,7 +394,7 @@ export default function NotificationEditor() {
               onClick={() => handleSave(false)}
               disabled={saving}
             >
-              <img src="/admin/icon/save.svg" alt="Save" />
+              <img src="/icon/save.svg" alt="Save" />
               {saving ? 'Saving...' : 'Save Draft'}
             </button>
 
@@ -403,7 +403,7 @@ export default function NotificationEditor() {
               onClick={() => handleSave(true)}
               disabled={saving}
             >
-              <img src="/admin/icon/send.svg" alt="Send" />
+              <img src="/icon/send.svg" alt="Send" />
               {saving ? 'Sending...' : 'Send Now'}
             </button>
           </div>

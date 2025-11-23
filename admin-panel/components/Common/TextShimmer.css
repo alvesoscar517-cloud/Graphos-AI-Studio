@@ -26,20 +26,20 @@
 
 /* Subtle pulse animation */
 @keyframes shimmer-pulse {
-  #admin-root 0%, #admin-root 100% {
+  0%, 100% {
     opacity: 1;
   }
-  #admin-root 50% {
+  50% {
     opacity: 0.85;
   }
 }
 
 /* Sliding shimmer effect */
 @keyframes shimmer-slide {
-  #admin-root 0% {
+  0% {
     left: -100%;
   }
-  #admin-root 100% {
+  100% {
     left: 200%;
   }
 }
@@ -59,10 +59,10 @@
 }
 
 @keyframes shimmer-pulse-dark {
-  #admin-root 0%, #admin-root 100% {
+  0%, 100% {
     opacity: 1;
   }
-  #admin-root 50% {
+  50% {
     opacity: 0.9;
   }
 }

@@ -170,11 +170,11 @@ export default function UserDetail() {
     <div className="user-detail">
       <div className="detail-header">
         <button className="btn-back" onClick={() => navigate('/users')}>
-          <img src="/admin/icon/arrow-left.svg" alt="Back" />
+          <img src="/icon/arrow-left.svg" alt="Back" />
           Back
         </button>
         <div className="header-title">
-          <img src="/admin/icon/user.svg" alt="User" />
+          <img src="/icon/user.svg" alt="User" />
           <h1>User Details</h1>
         </div>
       </div>
@@ -202,7 +202,7 @@ export default function UserDetail() {
             <div className="info-item">
               <span className="info-label">Tier:</span>
               <span className={`tier-badge ${user.tier}`}>
-                <img src={`/admin/icon/${user.tier === 'premium' ? 'star' : 'circle'}.svg`} alt={user.tier} />
+                <img src={`/icon/${user.tier === 'premium' ? 'star' : 'circle'}.svg`} alt={user.tier} />
                 {user.tier === 'premium' ? 'Premium' : 'Free'}
               </span>
             </div>
@@ -218,26 +218,26 @@ export default function UserDetail() {
         {/* Usage Stats Card */}
         <div className="detail-card">
           <h2>
-            <img src="/admin/icon/chart-bar.svg" alt="Stats" />
+            <img src="/icon/chart-bar.svg" alt="Stats" />
             Usage Statistics
           </h2>
           <div className="stats-grid">
             <div className="stat-box">
-              <img src="/admin/icon/folder.svg" alt="Profiles" className="stat-icon" />
+              <img src="/icon/folder.svg" alt="Profiles" className="stat-icon" />
               <div className="stat-content">
                 <div className="stat-value">{user.usage?.profilesCount || 0}</div>
                 <div className="stat-label">Profiles</div>
               </div>
             </div>
             <div className="stat-box">
-              <img src="/admin/icon/search.svg" alt="Analyses" className="stat-icon" />
+              <img src="/icon/search.svg" alt="Analyses" className="stat-icon" />
               <div className="stat-content">
                 <div className="stat-value">{user.usage?.analysesCount || 0}</div>
                 <div className="stat-label">Analyses</div>
               </div>
             </div>
             <div className="stat-box">
-              <img src="/admin/icon/edit.svg" alt="Rewrites" className="stat-icon" />
+              <img src="/icon/edit.svg" alt="Rewrites" className="stat-icon" />
               <div className="stat-content">
                 <div className="stat-value">{user.usage?.rewritesCount || 0}</div>
                 <div className="stat-label">Rewrites</div>
@@ -249,19 +249,19 @@ export default function UserDetail() {
         {/* Profiles Card */}
         <div className="detail-card full-width">
           <h2>
-            <img src="/admin/icon/folder.svg" alt="Profiles" />
+            <img src="/icon/folder.svg" alt="Profiles" />
             Writing Profiles ({user.profiles?.length || 0})
           </h2>
           {user.profiles && user.profiles.length > 0 ? (
             <div className="profiles-list">
               {user.profiles.map(profile => (
                 <div key={profile.id} className="profile-item">
-                  <img src="/admin/icon/file-text.svg" alt="Profile" className="profile-icon" />
+                  <img src="/icon/file-text.svg" alt="Profile" className="profile-icon" />
                   <div className="profile-info">
                     <div className="profile-name">{profile.name}</div>
                     <div className="profile-meta">
                       <span className={`status-badge ${profile.status}`}>
-                        <img src={`/admin/icon/${profile.status === 'ready' ? 'check-circle' : 'clock'}.svg`} alt="Status" />
+                        <img src={`/icon/${profile.status === 'ready' ? 'check-circle' : 'clock'}.svg`} alt="Status" />
                         {profile.status === 'ready' ? 'Ready' : 'Processing'}
                       </span>
                       <span className="profile-samples">
@@ -274,7 +274,7 @@ export default function UserDetail() {
             </div>
           ) : (
             <div className="empty-state">
-              <img src="/admin/icon/inbox.svg" alt="Empty" />
+              <img src="/icon/inbox.svg" alt="Empty" />
               <p>User has not created any profiles yet</p>
             </div>
           )}
@@ -283,24 +283,24 @@ export default function UserDetail() {
         {/* Actions Card */}
         <div className="detail-card full-width">
           <h2>
-            <img src="/admin/icon/zap.svg" alt="Actions" />
+            <img src="/icon/zap.svg" alt="Actions" />
             Actions
           </h2>
           <div className="actions-grid">
             <button className="action-btn" onClick={() => setShowNotificationModal(true)}>
-              <img src="/admin/icon/bell.svg" alt="Notification" className="action-icon" />
+              <img src="/icon/bell.svg" alt="Notification" className="action-icon" />
               <span className="action-label">Send notification</span>
             </button>
             <button className="action-btn" onClick={loadLogs}>
-              <img src="/admin/icon/activity.svg" alt="Logs" className="action-icon" />
+              <img src="/icon/activity.svg" alt="Logs" className="action-icon" />
               <span className="action-label">View logs</span>
             </button>
             <button className="action-btn" onClick={handleLockUser}>
-              <img src={`/admin/icon/${user.locked ? 'unlock' : 'lock'}.svg`} alt="Lock" className="action-icon" />
+              <img src={`/icon/${user.locked ? 'unlock' : 'lock'}.svg`} alt="Lock" className="action-icon" />
               <span className="action-label">{user.locked ? 'Unlock' : 'Lock'} account</span>
             </button>
             <button className="action-btn danger" onClick={handleDeleteUser}>
-              <img src="/admin/icon/trash-2.svg" alt="Delete" className="action-icon" />
+              <img src="/icon/trash-2.svg" alt="Delete" className="action-icon" />
               <span className="action-label">Delete user</span>
             </button>
           </div>
@@ -311,11 +311,11 @@ export default function UserDetail() {
           <div className="detail-card full-width">
             <div className="card-header-with-action">
               <h2>
-                <img src="/admin/icon/activity.svg" alt="Logs" />
+                <img src="/icon/activity.svg" alt="Logs" />
                 Activity Logs ({logs.length})
               </h2>
               <button className="btn-close" onClick={() => setShowLogs(false)}>
-                <img src="/admin/icon/x.svg" alt="Close" />
+                <img src="/icon/x.svg" alt="Close" />
               </button>
             </div>
             {logsLoading ? (
@@ -325,7 +325,7 @@ export default function UserDetail() {
                 {logs.map(log => (
                   <div key={log.id} className="log-item">
                     <div className="log-icon" style={{ background: getLogColor(log.type) }}>
-                      <img src={`/admin/icon/${getLogIcon(log.type)}`} alt={log.type} />
+                      <img src={`/icon/${getLogIcon(log.type)}`} alt={log.type} />
                     </div>
                     <div className="log-content">
                       <div className="log-header">
@@ -342,7 +342,7 @@ export default function UserDetail() {
               </div>
             ) : (
               <div className="empty-state">
-                <img src="/admin/icon/inbox.svg" alt="Empty" />
+                <img src="/icon/inbox.svg" alt="Empty" />
                 <p>No activities yet</p>
               </div>
             )}
@@ -357,7 +357,7 @@ export default function UserDetail() {
             <div className="modal-header">
               <h2>Send notification to user</h2>
               <button className="btn-close" onClick={() => setShowNotificationModal(false)}>
-                <img src="/admin/icon/x.svg" alt="Close" />
+                <img src="/icon/x.svg" alt="Close" />
               </button>
             </div>
             <div className="modal-body">
@@ -414,7 +414,7 @@ export default function UserDetail() {
                 Cancel
               </button>
               <button className="btn-primary" onClick={handleSendNotification}>
-                <img src="/admin/icon/send.svg" alt="Send" />
+                <img src="/icon/send.svg" alt="Send" />
                 Send notification
               </button>
             </div>

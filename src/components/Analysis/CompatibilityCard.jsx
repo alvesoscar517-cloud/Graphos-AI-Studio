@@ -203,24 +203,27 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
           <div className="feature-result" style={{ display: 'block' }}>
             <div className="compatibility-score-display">
               <div className="compatibility-score-circle">
-                <svg className="compatibility-score-svg" viewBox="0 0 120 120">
+                <svg className="compatibility-score-svg" viewBox="0 0 110 110">
                   <defs>
                     <linearGradient id="compatibilityGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style={{ stopColor: getScoreColor(score), stopOpacity: 1 }} />
-                      <stop offset="100%" style={{ stopColor: getScoreColor(score), stopOpacity: 0.7 }} />
+                      <stop offset="0%" stopColor="#4facfe" />
+                      <stop offset="100%" stopColor="#00d4ff" />
                     </linearGradient>
                   </defs>
-                  <circle className="compatibility-score-bg" cx="60" cy="60" r="52"></circle>
+                  {/* Progress track */}
+                  <circle className="compatibility-score-bg" cx="55" cy="55" r="50"></circle>
+                  {/* Progress bar */}
                   <circle 
                     className="compatibility-score-progress" 
-                    cx="60" 
-                    cy="60" 
-                    r="52"
+                    cx="55" 
+                    cy="55" 
+                    r="50"
                     style={{
-                      strokeDashoffset: 326.56 - (score / 100) * 326.56,
-                      stroke: 'url(#compatibilityGradient)'
+                      strokeDashoffset: 314.16 - (score / 100) * 314.16
                     }}
                   ></circle>
+                  {/* White inner circle to create donut effect */}
+                  <circle className="compatibility-score-inner" cx="55" cy="55" r="45"></circle>
                 </svg>
                 <div className="compatibility-score-text">
                   <div className="compatibility-score-number">{score}</div>

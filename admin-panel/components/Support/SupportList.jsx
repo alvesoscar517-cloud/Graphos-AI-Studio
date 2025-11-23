@@ -49,7 +49,7 @@ export default function SupportList() {
     
     return (
       <span className="status-badge" style={{ background: badge.color }}>
-        <img src={`/admin/icon/${badge.icon}`} alt={status} />
+        <img src={`/icon/${badge.icon}`} alt={status} />
         {badge.label}
       </span>
     );
@@ -65,7 +65,7 @@ export default function SupportList() {
     
     return (
       <span className="type-badge" style={{ borderColor: badge.color, color: badge.color }}>
-        <img src={`/admin/icon/${badge.icon}`} alt={type} style={{ filter: 'none' }} />
+        <img src={`/icon/${badge.icon}`} alt={type} style={{ filter: 'none' }} />
         {badge.label}
       </span>
     );
@@ -109,7 +109,7 @@ export default function SupportList() {
               }
             }}
           >
-            <img src="/admin/icon/download.svg" alt="Export" />
+            <img src="/icon/download.svg" alt="Export" />
             Export CSV
           </button>
         }
@@ -118,28 +118,39 @@ export default function SupportList() {
       {statistics && (
         <div className="stats-cards">
           <div className="stat-card">
-            <img src="/admin/icon/inbox.svg" alt="Total" />
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect width="20" height="16" x="2" y="4" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
             <div className="stat-content">
               <div className="stat-value">{statistics.total}</div>
               <div className="stat-label">Total tickets</div>
             </div>
           </div>
-          <div className="stat-card highlight">
-            <img src="/admin/icon/circle-dot.svg" alt="Open" />
+          <div className="stat-card">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="1"/>
+            </svg>
             <div className="stat-content">
               <div className="stat-value">{statistics.open}</div>
               <div className="stat-label">Open</div>
             </div>
           </div>
           <div className="stat-card">
-            <img src="/admin/icon/message-square.svg" alt="Feedback" />
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
             <div className="stat-content">
               <div className="stat-value">{statistics.feedback}</div>
               <div className="stat-label">Feedback</div>
             </div>
           </div>
           <div className="stat-card">
-            <img src="/admin/icon/dollar-sign.svg" alt="Billing" />
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" x2="12" y1="2" y2="22"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
             <div className="stat-content">
               <div className="stat-value">{statistics.billing}</div>
               <div className="stat-label">Billing</div>
@@ -210,7 +221,7 @@ export default function SupportList() {
                     <div className="title-content">{ticket.title}</div>
                     {ticket.replies && ticket.replies.length > 0 && (
                       <span className="reply-count">
-                        <img src="/admin/icon/message-circle.svg" alt="Replies" />
+                        <img src="/icon/message-circle.svg" alt="Replies" />
                         {ticket.replies.length}
                       </span>
                     )}
@@ -231,7 +242,7 @@ export default function SupportList() {
                       className="btn-view"
                       onClick={() => navigate(`/support/${ticket.id}`)}
                     >
-                      <img src="/admin/icon/eye.svg" alt="View" />
+                      <img src="/icon/eye.svg" alt="View" />
                       View
                     </button>
                   </td>

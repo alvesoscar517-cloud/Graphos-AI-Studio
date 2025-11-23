@@ -57,7 +57,7 @@ export default function UsageStatsChart({ profiles, analyses, rewrites }) {
               className="usage-stat-icon"
               style={{ background: stat.iconBg }}
             >
-              <img src={`/admin/icon/${stat.icon}.svg`} alt={stat.label} />
+              <img src={`/icon/${stat.icon}.svg`} alt={stat.label} />
             </div>
             <div className="usage-stat-content">
               <div className="usage-stat-label">{stat.label}</div>
@@ -72,7 +72,7 @@ export default function UsageStatsChart({ profiles, analyses, rewrites }) {
       <div className="usage-stats-summary">
         <div className="summary-main">
           <div className="summary-icon">
-            <img src="/admin/icon/activity.svg" alt="Total" />
+            <img src="/icon/activity.svg" alt="Total" />
           </div>
           <div className="summary-content">
             <div className="summary-label">Total Operations</div>

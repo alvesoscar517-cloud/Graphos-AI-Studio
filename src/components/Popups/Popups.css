@@ -19,6 +19,7 @@
 .profile-header {
   padding: 27px 20px;
   text-align: center;
+  border-bottom: none;
 }
 
 .profile-avatar {
@@ -67,6 +68,8 @@
   width: 100%;
   background: none;
   border: none;
+  border-top: none;
+  border-bottom: none;
   padding: 14px 20px;
   text-align: center;
   font-size: 12px;
@@ -277,14 +280,16 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 12px;
+  padding: 8px 12px;
+  margin: 2px 6px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.15s ease;
   position: relative;
+  border-radius: 20px;
 }
 
 .settings-item:hover {
-  background: #f8f9fa;
+  background: #e8eaed;
 }
 
 .settings-icon {
@@ -318,13 +323,13 @@
 .theme-submenu {
   position: absolute;
   left: 100%;
-  top: 0;
+  top: -6px;
   width: 150px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   padding: 4px 0;
-  margin-left: 8px;
+  margin-left: 12px;
   display: none;
   z-index: 1002;
 }
@@ -337,21 +342,48 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 12px;
+  padding: 8px 12px;
+  margin: 2px 6px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: none;
+  border-radius: 20px;
 }
 
 .theme-option:hover {
-  background: #f8f9fa;
+  background: #e8eaed !important;
 }
 
 .theme-option input[type="radio"] {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   margin: 0;
   cursor: pointer;
   flex-shrink: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 2px solid #5f6368;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-option input[type="radio"]:checked {
+  border-color: #1967d2;
+}
+
+.theme-option input[type="radio"]:checked::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #1967d2;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .theme-option label {
@@ -457,8 +489,16 @@ body.dark-theme .notification-icon {
   background: #3c4043;
 }
 
+body.dark-theme .notification-icon img {
+  filter: invert(1) brightness(0.9);
+}
+
 body.dark-theme .notification-item.unread .notification-icon {
   background: #8ab4f8;
+}
+
+body.dark-theme .notification-item.unread .notification-icon img {
+  filter: brightness(0) invert(1);
 }
 
 body.dark-theme .notification-title {
@@ -486,6 +526,14 @@ body.dark-theme .settings-popup {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
+body.dark-theme .settings-icon {
+  filter: invert(1) brightness(0.9);
+}
+
+body.dark-theme .settings-arrow {
+  filter: invert(1) brightness(0.9);
+}
+
 body.dark-theme .settings-item:hover {
   background: #3c4043;
 }
@@ -503,10 +551,26 @@ body.dark-theme .theme-submenu {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
+body.dark-theme .theme-icon {
+  filter: invert(1) brightness(0.9);
+}
+
 body.dark-theme .theme-option:hover {
-  background: #3c4043;
+  background: #3c4043 !important;
 }
 
 body.dark-theme .theme-option label span {
   color: #e3e3e3;
+}
+
+body.dark-theme .theme-option input[type="radio"] {
+  border-color: #9aa0a6;
+}
+
+body.dark-theme .theme-option input[type="radio"]:checked {
+  border-color: #8ab4f8;
+}
+
+body.dark-theme .theme-option input[type="radio"]:checked::after {
+  background: #8ab4f8;
 }

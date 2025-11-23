@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <style>
+    /* Prevent any external CSS from affecting admin */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+    /* Ensure only admin CSS is loaded */
+    body > *:not(#admin-root):not(script) {
+      display: none !important;
+    }
+  </style>
+  <script type="module" crossorigin src="./assets/main-JZg2MjHR.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/main-INBguumL.css">
+</head>
+<body>
+  <div id="admin-root"></div>
+</body>
+</html>

@@ -124,7 +124,7 @@ export default function SettingsView() {
             onClick={handleSave}
             disabled={saving}
           >
-            <img src="/admin/icon/save.svg" alt="Save" />
+            <img src="/icon/save.svg" alt="Save" />
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
         }
@@ -138,7 +138,7 @@ export default function SettingsView() {
               className={`tab-item ${activeTab === tab.id ? 'active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <img src={`/admin/icon/${tab.icon}`} alt={tab.label} />
+              <img src={`/icon/${tab.icon}`} alt={tab.label} />
               <span>{tab.label}</span>
             </button>
           ))}
@@ -395,7 +395,7 @@ export default function SettingsView() {
               </div>
 
               <button className="btn-test">
-                <img src="/admin/icon/send.svg" alt="Test" />
+                <img src="/icon/send.svg" alt="Test" />
                 Send Test Email
               </button>
             </div>
@@ -469,41 +469,41 @@ export default function SettingsView() {
               
               <div className="backup-actions">
                 <div className="backup-card">
-                  <img src="/admin/icon/database.svg" alt="Backup" />
+                  <img src="/icon/database.svg" alt="Backup" />
                   <h3>Full Data Backup</h3>
                   <p>Backup all user data, profiles and settings</p>
                   <button className="btn-primary">
-                    <img src="/admin/icon/download.svg" alt="Backup" />
+                    <img src="/icon/download.svg" alt="Backup" />
                     Create Backup Now
                   </button>
                 </div>
 
                 <div className="backup-card">
-                  <img src="/admin/icon/users.svg" alt="Users" />
+                  <img src="/icon/users.svg" alt="Users" />
                   <h3>Export User List</h3>
                   <p>Export user list to CSV file</p>
                   <button className="btn-primary">
-                    <img src="/admin/icon/download.svg" alt="Export" />
+                    <img src="/icon/download.svg" alt="Export" />
                     Export Users (CSV)
                   </button>
                 </div>
 
                 <div className="backup-card">
-                  <img src="/admin/icon/chart-line.svg" alt="Analytics" />
+                  <img src="/icon/chart-line.svg" alt="Analytics" />
                   <h3>Export Analytics Report</h3>
                   <p>Export detailed statistics report</p>
                   <button className="btn-primary">
-                    <img src="/admin/icon/file-text.svg" alt="Report" />
+                    <img src="/icon/file-text.svg" alt="Report" />
                     Export Report (PDF)
                   </button>
                 </div>
 
                 <div className="backup-card restore-card">
-                  <img src="/admin/icon/upload.svg" alt="Restore" />
+                  <img src="/icon/upload.svg" alt="Restore" />
                   <h3>Restore from Backup</h3>
                   <p>Restore data from backup file</p>
                   <button className="btn-secondary">
-                    <img src="/admin/icon/upload.svg" alt="Restore" />
+                    <img src="/icon/upload.svg" alt="Restore" />
                     Select Backup File
                   </button>
                 </div>
@@ -513,14 +513,14 @@ export default function SettingsView() {
                 <h3>Backup History</h3>
                 <div className="history-list">
                   <div className="history-item">
-                    <img src="/admin/icon/check-circle.svg" alt="Success" />
+                    <img src="/icon/check-circle.svg" alt="Success" />
                     <div className="history-info">
                       <span className="history-name">backup_2024_01_15.zip</span>
                       <span className="history-date">15/01/2024 - 10:30 AM</span>
                     </div>
                     <span className="history-size">2.5 MB</span>
                     <button className="btn-icon">
-                      <img src="/admin/icon/download.svg" alt="Download" />
+                      <img src="/icon/download.svg" alt="Download" />
                     </button>
                   </div>
                 </div>

@@ -7,11 +7,14 @@ import modal from '../../utils/modal'
 import './HistoryView.css'
 
 const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
-  const { notes, loadNote, loading, syncNotes, needsReauth } = useNotes()
-  const { conversations, loadConversation } = useWorkspace()
+  const { notes, loadNote, loading, syncNotes, needsReauth, deleteNote } = useNotes()
+  const { conversations, loadConversation, deleteConversation } = useWorkspace()
   const { user, signOut } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('all') // 'all', 'text', 'chat'
+  const [isSyncing, setIsSyncing] = useState(false)
+  const [activeMenu, setActiveMenu] = useState(null)
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   
   console.log('HistoryView - notes:', notes.length, 'conversations:', conversations.length, 'loading:', loading)
 
@@ -81,6 +84,45 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       loadConversation(item.id)
       onViewChange('workspace')
     }
+  }
+
+  const handleMenuClick = (e, item) => {
+    e.stopPropagation()
+    const rect = e.currentTarget.getBoundingClientRect()
+    setMenuPosition({ x: rect.right - 160, y: rect.bottom + 4 })
+    setActiveMenu(activeMenu === item.id ? null : item.id)
+  }
+
+  const handleCloseMenu = (e) => {
+    e.stopPropagation()
+    setActiveMenu(null)
+  }
+
+  const handleDeleteItem = async (item) => {
+    setActiveMenu(null)
+    const confirmed = await modal.confirm(
+      `Bạn có chắc chắn muốn xóa "${item.title}"?`,
+      'Xác nhận xóa',
+      { confirmText: 'Xóa', danger: true }
+    )
+    
+    if (confirmed) {
+      try {
+        if (item.source === 'drive') {
+          await deleteNote(item.id)
+        } else {
+          await deleteConversation(item.id)
+        }
+        modal.toast('Đã xóa', '', 'success')
+      } catch (error) {
+        modal.error('Không thể xóa: ' + error.message)
+      }
+    }
+  }
+
+  const handleShareItem = (item) => {
+    setActiveMenu(null)
+    modal.info('Tính năng chia sẻ sẽ được cập nhật trong phiên bản tiếp theo')
   }
 
   const handleOpenInDrive = async () => {
@@ -156,19 +198,23 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
               <span>Open in Drive</span>
             </button>
             <button 
-              className="history-action-btn"
+              className={`history-action-btn ${isSyncing ? 'syncing' : ''}`}
               onClick={async () => {
                 try {
+                  setIsSyncing(true)
                   await syncNotes()
                   // TODO: Also sync conversations when implemented
                   // await syncConversationsToDrive()
                   modal.toast('Đã đồng bộ', 'Notes đã được đồng bộ với Drive', 'success')
                 } catch (error) {
                   modal.error('Không thể đồng bộ: ' + error.message)
+                } finally {
+                  setIsSyncing(false)
                 }
               }}
               data-tooltip="Đồng bộ với Drive"
               data-tooltip-position="bottom"
+              disabled={isSyncing}
             >
               <img src="/icon/refresh-cw.svg" alt="Sync" />
               <span>Sync</span>
@@ -289,9 +335,50 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                       <span className="history-updated">{formatTimeAgo(item.updated)}</span>
                     </td>
                     <td className="actions-col">
-                      <button className="history-actions-btn" onClick={(e) => e.stopPropagation()}>
+                      <button 
+                        className="history-actions-btn" 
+                        onClick={(e) => handleMenuClick(e, item)}
+                      >
                         <img src="/icon/more-vertical.svg" alt="Actions" />
                       </button>
+                      {activeMenu === item.id && (
+                        <>
+                          <div 
+                            className="history-menu-overlay" 
+                            onClick={handleCloseMenu}
+                          />
+                          <div 
+                            className="history-actions-menu"
+                            style={{ 
+                              position: 'fixed',
+                              left: `${menuPosition.x}px`,
+                              top: `${menuPosition.y}px`
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button 
+                              className="history-menu-item"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleShareItem(item)
+                              }}
+                            >
+                              <img src="/icon/share-2.svg" alt="Share" />
+                              Chia sẻ
+                            </button>
+                            <button 
+                              className="history-menu-item danger"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteItem(item)
+                              }}
+                            >
+                              <img src="/icon/trash-2.svg" alt="Delete" />
+                              Xóa
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))}

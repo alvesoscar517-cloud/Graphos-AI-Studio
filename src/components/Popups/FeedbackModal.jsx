@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useNotification } from '../../hooks/useNotification'
 import './FeedbackModal.css'
 
 const FeedbackModal = ({ onClose }) => {
+  const { success, error: showError } = useNotification()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [images, setImages] = useState([])
@@ -73,7 +75,7 @@ const FeedbackModal = ({ onClose }) => {
       const data = await response.json()
 
       if (response.ok) {
-        alert('Cảm ơn bạn đã gửi feedback! Chúng tôi sẽ phản hồi sớm.')
+        success('Cảm ơn bạn đã gửi feedback! Chúng tôi sẽ phản hồi sớm.')
         onClose()
       } else {
         setError(data.error || 'Có lỗi xảy ra, vui lòng thử lại')

@@ -11,7 +11,8 @@ const MainContent = ({
   rightSidebarHidden,
   leftSidebarHidden,
   highlightedSentence,
-  analysisData
+  analysisData,
+  rewriteMode
 }) => {
   // Only add margin-right for playground-editor (RightSidebar)
   // Workspace handles its own sidebar internally
@@ -42,6 +43,7 @@ const MainContent = ({
           onViewChange={onViewChange}
           highlightedSentence={highlightedSentence}
           analysisData={analysisData}
+          rewriteMode={rewriteMode}
         />
       )}
 

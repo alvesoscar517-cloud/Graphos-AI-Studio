@@ -19,14 +19,6 @@ const WorkspaceDefault = ({ onToggleLeftSidebar, onStartChat, onToggleRightSideb
         <span className="workspace-default-title">AI Workspace</span>
         
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-          <button 
-            className="icon-btn"
-            onClick={onStartChat}
-            data-tooltip="New chat" 
-            data-tooltip-position="left"
-          >
-            <img src="/icon/plus.svg" alt="New Chat" />
-          </button>
           {rightSidebarHidden && (
             <button 
               className="icon-btn"
@@ -37,6 +29,14 @@ const WorkspaceDefault = ({ onToggleLeftSidebar, onStartChat, onToggleRightSideb
               <img src="/icon/panel-right.svg" alt="Toggle Right Sidebar" />
             </button>
           )}
+          <button 
+            className="icon-btn"
+            onClick={onStartChat}
+            data-tooltip="New chat" 
+            data-tooltip-position="left"
+          >
+            <img src="/icon/plus.svg" alt="New Chat" />
+          </button>
         </div>
       </div>
 

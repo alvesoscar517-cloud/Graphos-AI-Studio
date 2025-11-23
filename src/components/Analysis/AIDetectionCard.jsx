@@ -184,24 +184,27 @@ const AIDetectionCard = ({ disabled, text }) => {
           <div className="feature-result" style={{ display: 'block' }}>
             <div className="ai-score-display">
               <div className="ai-score-circle">
-                <svg className="ai-score-svg" viewBox="0 0 120 120">
+                <svg className="ai-score-svg" viewBox="0 0 110 110">
                   <defs>
                     <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style={{ stopColor: getAIScoreColor(result), stopOpacity: 1 }} />
-                      <stop offset="100%" style={{ stopColor: getAIScoreColor(result), stopOpacity: 0.7 }} />
+                      <stop offset="0%" stopColor="#4facfe" />
+                      <stop offset="100%" stopColor="#00d4ff" />
                     </linearGradient>
                   </defs>
-                  <circle className="ai-score-bg" cx="60" cy="60" r="52"></circle>
+                  {/* Progress track */}
+                  <circle className="ai-score-bg" cx="55" cy="55" r="50"></circle>
+                  {/* Progress bar */}
                   <circle 
                     className="ai-score-progress" 
-                    cx="60" 
-                    cy="60" 
-                    r="52"
+                    cx="55" 
+                    cy="55" 
+                    r="50"
                     style={{
-                      strokeDashoffset: 326.56 - (result / 100) * 326.56,
-                      stroke: 'url(#aiGradient)'
+                      strokeDashoffset: 314.16 - (result / 100) * 314.16
                     }}
                   ></circle>
+                  {/* White inner circle to create donut effect */}
+                  <circle className="ai-score-inner" cx="55" cy="55" r="45"></circle>
                 </svg>
                 <div className="ai-score-text">
                   <div className="ai-score-number">{result}</div>

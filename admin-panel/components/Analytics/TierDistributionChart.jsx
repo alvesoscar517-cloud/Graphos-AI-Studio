@@ -6,7 +6,7 @@ export default function TierDistributionChart({ data }) {
   if (total === 0) {
     return (
       <div className="chart-empty">
-        <img src="/admin/icon/inbox.svg" alt="Empty" className="chart-empty-icon" />
+        <img src="/icon/inbox.svg" alt="Empty" className="chart-empty-icon" />
         <p className="chart-empty-text">No tier data available</p>
       </div>
     );
@@ -42,7 +42,7 @@ export default function TierDistributionChart({ data }) {
             <div key={index} className="tier-row">
               <div className="tier-info">
                 <img 
-                  src={`/admin/icon/${tier.icon}.svg`} 
+                  src={`/icon/${tier.icon}.svg`} 
                   alt={tier.name}
                   className="tier-icon"
                 />
