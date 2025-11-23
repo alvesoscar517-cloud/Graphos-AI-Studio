@@ -5,7 +5,7 @@
 
 import { cache } from '../utils/cache';
 
-const API_BASE_URL = 'https://ai-authenticator-472729326429.us-central1.run.app';
+const API_BASE_URL = 'https://ai-backend-admin-472729326429.us-central1.run.app';
 
 // Get admin key from localStorage or environment
 const getAdminKey = () => {
@@ -199,7 +199,7 @@ export const translationApi = {
   translate: async (text, sourceLang = 'vi', targetLang = 'en') => {
     try {
       // Use Gemini for translation
-      const response = await fetch('https://ai-authenticator-472729326429.us-central1.run.app/api/translate', {
+      const response = await fetch('https://ai-backend-admin-472729326429.us-central1.run.app/api/translate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -338,5 +338,59 @@ export const supportApi = {
     cache.clear();
     
     return result;
+  },
+};
+
+// ============================================================================
+// BACKUP API
+// ============================================================================
+
+export const backupApi = {
+  // Create backup now
+  create: async () => {
+    return apiCall('/api/backup/create', {
+      method: 'POST',
+    });
+  },
+
+  // List all backups
+  list: async () => {
+    return apiCall('/api/backup/list');
+  },
+
+  // Get download URL for a backup
+  getDownloadUrl: async (filename) => {
+    return apiCall(`/api/backup/download-url/${filename}`);
+  },
+
+  // Download backup directly
+  download: async (filename) => {
+    const adminKey = getAdminKey();
+    const response = await fetch(`${API_BASE_URL}/api/backup/download/${filename}`, {
+      headers: {
+        'X-Admin-Key': adminKey,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Download failed');
+    }
+
+    return response.blob();
+  },
+
+  // Import backup
+  import: async (backupData) => {
+    return apiCall('/api/backup/import', {
+      method: 'POST',
+      body: JSON.stringify({ backupData }),
+    });
+  },
+
+  // Cleanup old backups
+  cleanup: async (keepCount = 10) => {
+    return apiCall(`/api/backup/cleanup?keep=${keepCount}`, {
+      method: 'DELETE',
+    });
   },
 };

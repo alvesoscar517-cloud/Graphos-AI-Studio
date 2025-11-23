@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { settingsApi } from '../../services/adminApi';
+import { settingsApi, backupApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
 import LoadingScreen from '../Common/LoadingScreen';
+import BackupSuccessModal from './BackupSuccessModal';
 import './SettingsView.css';
 import './SettingsIcons.css';
 
@@ -49,11 +50,18 @@ export default function SettingsView() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('system');
+  const [backingUp, setBackingUp] = useState(false);
+  const [backupList, setBackupList] = useState([]);
+  const [showBackupModal, setShowBackupModal] = useState(false);
+  const [backupResult, setBackupResult] = useState(null);
   const notify = useNotify();
 
   useEffect(() => {
     loadSettings();
-  }, []);
+    if (activeTab === 'backup') {
+      loadBackupList();
+    }
+  }, [activeTab]);
 
   const loadSettings = async () => {
     try {
@@ -97,6 +105,59 @@ export default function SettingsView() {
         [key]: value,
       },
     }));
+  };
+
+  const loadBackupList = async () => {
+    try {
+      const response = await backupApi.list();
+      if (response && response.data) {
+        setBackupList(response.data);
+      }
+    } catch (err) {
+      console.error('Load backup list error:', err);
+    }
+  };
+
+  const handleBackupNow = async () => {
+    try {
+      setBackingUp(true);
+      notify.info('Đang tạo backup...');
+      
+      const response = await backupApi.create();
+      
+      if (response && response.success && response.data) {
+        // Hiển thị modal với thông tin backup
+        setBackupResult(response.data);
+        setShowBackupModal(true);
+        notify.success('✅ Backup hoàn tất!');
+        loadBackupList(); // Refresh list
+      } else {
+        notify.error('Backup failed: ' + (response.message || 'Unknown error'));
+      }
+    } catch (err) {
+      notify.error('Backup error: ' + err.message);
+    } finally {
+      setBackingUp(false);
+    }
+  };
+
+  const handleDownloadBackup = async (filename) => {
+    try {
+      notify.info('Preparing download...');
+      
+      // Get download URL from backend
+      const response = await backupApi.getDownloadUrl(filename);
+      
+      if (response && response.success && response.data.downloadUrl) {
+        // Open download URL in new tab
+        window.open(response.data.downloadUrl, '_blank');
+        notify.success('Download started! Save the file to your Drive.');
+      } else {
+        notify.error('Failed to get download URL');
+      }
+    } catch (err) {
+      notify.error('Download error: ' + err.message);
+    }
   };
 
   const tabs = [
@@ -465,70 +526,79 @@ export default function SettingsView() {
           {/* Backup Settings */}
           {activeTab === 'backup' && (
             <div className="settings-section">
-              <h2>Backup & Export</h2>
+              <h2>Backup & Restore</h2>
               
               <div className="backup-actions">
                 <div className="backup-card">
                   <img src="/icon/database.svg" alt="Backup" />
-                  <h3>Full Data Backup</h3>
-                  <p>Backup all user data, profiles and settings</p>
-                  <button className="btn-primary">
+                  <h3>Firestore Backup to Cloud Storage</h3>
+                  <p>Backup all Firestore data to Google Cloud Storage</p>
+                  <button 
+                    className="btn-primary"
+                    onClick={handleBackupNow}
+                    disabled={backingUp}
+                  >
                     <img src="/icon/download.svg" alt="Backup" />
-                    Create Backup Now
-                  </button>
-                </div>
-
-                <div className="backup-card">
-                  <img src="/icon/users.svg" alt="Users" />
-                  <h3>Export User List</h3>
-                  <p>Export user list to CSV file</p>
-                  <button className="btn-primary">
-                    <img src="/icon/download.svg" alt="Export" />
-                    Export Users (CSV)
-                  </button>
-                </div>
-
-                <div className="backup-card">
-                  <img src="/icon/chart-line.svg" alt="Analytics" />
-                  <h3>Export Analytics Report</h3>
-                  <p>Export detailed statistics report</p>
-                  <button className="btn-primary">
-                    <img src="/icon/file-text.svg" alt="Report" />
-                    Export Report (PDF)
-                  </button>
-                </div>
-
-                <div className="backup-card restore-card">
-                  <img src="/icon/upload.svg" alt="Restore" />
-                  <h3>Restore from Backup</h3>
-                  <p>Restore data from backup file</p>
-                  <button className="btn-secondary">
-                    <img src="/icon/upload.svg" alt="Restore" />
-                    Select Backup File
+                    {backingUp ? 'Creating Backup...' : 'Create Backup Now'}
                   </button>
                 </div>
               </div>
 
               <div className="backup-history">
-                <h3>Backup History</h3>
-                <div className="history-list">
-                  <div className="history-item">
-                    <img src="/icon/check-circle.svg" alt="Success" />
-                    <div className="history-info">
-                      <span className="history-name">backup_2024_01_15.zip</span>
-                      <span className="history-date">15/01/2024 - 10:30 AM</span>
-                    </div>
-                    <span className="history-size">2.5 MB</span>
-                    <button className="btn-icon">
-                      <img src="/icon/download.svg" alt="Download" />
-                    </button>
+                <h3>Recent Backups (Cloud Storage)</h3>
+                {backupList.length === 0 ? (
+                  <p className="no-data">No backups found. Click "Create Backup Now" to start.</p>
+                ) : (
+                  <div className="history-list">
+                    {backupList.slice(0, 10).map((backup, index) => (
+                      <div key={index} className="history-item">
+                        <img src="/icon/check-circle.svg" alt="Success" />
+                        <div className="history-info">
+                          <span className="history-name">{backup.name}</span>
+                          <span className="history-date">
+                            {new Date(backup.created).toLocaleString()}
+                          </span>
+                        </div>
+                        <span className="history-size">
+                          {(parseInt(backup.size) / 1024 / 1024).toFixed(2)} MB
+                        </span>
+                        <button 
+                          className="btn-icon"
+                          title="Download backup directly"
+                          onClick={() => handleDownloadBackup(backup.name)}
+                        >
+                          <img src="/icon/download.svg" alt="Download" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                </div>
+                )}
+              </div>
+
+              <div className="backup-info">
+                <h3>ℹ️ Backup Information</h3>
+                <ul>
+                  <li>✅ Backups are stored in Google Cloud Storage bucket</li>
+                  <li>🔄 Automatic backup runs every 24 hours</li>
+                  <li>📧 Download link sent to your email after each backup</li>
+                  <li>🗑️ Old backups are automatically cleaned up (keeps 30 most recent)</li>
+                  <li>📦 Backup includes: users, notifications, support tickets, voice profiles</li>
+                  <li>💰 Storage cost: ~$0.02/GB/month (very cheap!)</li>
+                  <li>💡 <strong>Tip:</strong> Click download button to get a signed URL, then save to your personal Google Drive</li>
+                </ul>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Backup Success Modal */}
+      {showBackupModal && backupResult && (
+        <BackupSuccessModal 
+          backupInfo={backupResult}
+          onClose={() => setShowBackupModal(false)}
+        />
+      )}
     </div>
   );
 }
