@@ -24,7 +24,13 @@ export const WorkspaceProvider = ({ children }) => {
   const [modelSettings, setModelSettings] = useState({
     model: 'gemini-2.0-flash-exp',
     temperature: 0.7,
-    maxTokens: 2048
+    maxTokens: 2048,
+    writingPreferences: {
+      useVocabularyPreferences: true,
+      useKeyCharacteristics: true,
+      useSentencePatterns: true,
+      useRewriteInstructions: true
+    }
   })
 
   // Load conversations from localStorage
@@ -195,7 +201,8 @@ export const WorkspaceProvider = ({ children }) => {
           systemPrompt: currentConversation?.systemPrompt || generateSystemPrompt(),
           model: actualModel,
           temperature: modelSettings.temperature || 0.7,
-          profileId: currentProfile?.profile_id || null
+          profileId: currentProfile?.profile_id || null,
+          writingPreferences: modelSettings.writingPreferences || null
         })
       })
 

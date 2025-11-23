@@ -161,7 +161,7 @@ export async function detectAI(text) {
   }
 }
 
-export async function rewriteText(profileId, text) {
+export async function rewriteText(profileId, text, model = 'gemini-2.5-flash', writingPreferences = null) {
   try {
     const userInfo = await getUserInfo()
     const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite`, {
@@ -172,7 +172,9 @@ export async function rewriteText(profileId, text) {
       body: JSON.stringify({
         profile_id: profileId,
         text: text,
-        user_id: userInfo.userId
+        user_id: userInfo.userId,
+        model: model,
+        writing_preferences: writingPreferences
       })
     })
     
@@ -185,7 +187,7 @@ export async function rewriteText(profileId, text) {
 }
 
 // Streaming rewrite with model selection
-export async function rewriteTextStream(profileId, text, model, onChunk) {
+export async function rewriteTextStream(profileId, text, model, writingPreferences, onChunk) {
   try {
     const userInfo = await getUserInfo()
     const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite_stream`, {
@@ -197,6 +199,7 @@ export async function rewriteTextStream(profileId, text, model, onChunk) {
         profile_id: profileId,
         text: text,
         model: model,
+        writing_preferences: writingPreferences,
         user_id: userInfo.userId
       })
     })

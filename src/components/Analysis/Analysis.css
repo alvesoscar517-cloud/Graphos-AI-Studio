@@ -56,7 +56,7 @@
 
 .profile-selector-icon:hover {
   background: #e8eaed;
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .profile-selector-icon img {
@@ -195,7 +195,7 @@ body.dark-theme .profile-selector-arrow {
 
 .feature-icon:hover {
   background: #e8eaed;
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .feature-icon img {
@@ -205,7 +205,7 @@ body.dark-theme .profile-selector-arrow {
 }
 
 .feature-icon:hover img {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 /* All icons use default gray background with blue icon color */
@@ -399,7 +399,7 @@ body.dark-theme .profile-selector-arrow {
 
 .stat-item-modern:hover .stat-icon-wrapper {
   background: #e8eaed;
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .stat-icon-wrapper.readability,
@@ -414,6 +414,7 @@ body.dark-theme .profile-selector-arrow {
   height: 24px;
   opacity: 0.8;
   transition: opacity 0.2s ease;
+  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
 }
 
 .stat-item-modern:hover .stat-icon-wrapper img {
@@ -432,6 +433,10 @@ body.dark-theme .profile-selector-arrow {
   font-size: 20px;
   font-weight: 600;
   color: #202124;
+}
+
+.stat-value-modern.highlight-red {
+  color: #ea4335;
 }
 
 /* Deviation Styles */
@@ -568,7 +573,7 @@ body.dark-theme .profile-selector-arrow {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 8px;
   padding: 10px 12px;
   background: #f8f9fa;
@@ -583,16 +588,17 @@ body.dark-theme .profile-selector-arrow {
 }
 
 .ai-verdict-full span {
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .verdict-icon {
-  width: 20px;
-  height: 20px;
-  opacity: 0.6;
+  width: 16px;
+  height: 16px;
+  opacity: 0.8;
+  flex-shrink: 0;
+  margin-top: -1px;
 }
 
 .detail-btn {
@@ -683,7 +689,7 @@ body.dark-theme .profile-selector-arrow {
 
 .deviation-item-modern.clickable:hover {
   background: #e8eaed;
-  transform: translateX(4px);
+  transform: translateX(2px);
 }
 
 .deviation-item-modern.clickable .view-icon {
@@ -816,8 +822,7 @@ body.dark-theme .empty-text {
 .action-btn:hover {
   background: #e8eaed;
   border-color: #5f6368;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .action-btn:active {
@@ -1213,7 +1218,8 @@ body.dark-theme .stat-icon-wrapper.words {
 }
 
 body.dark-theme .stat-icon-wrapper img {
-  /* Keep original icon colors in dark theme */
+  /* Keep blue icon color in dark theme */
+  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
   opacity: 0.8;
 }
 
@@ -1223,6 +1229,10 @@ body.dark-theme .stat-label-modern {
 
 body.dark-theme .stat-value-modern {
   color: #e3e3e3;
+}
+
+body.dark-theme .stat-value-modern.highlight-red {
+  color: #f28b82;
 }
 
 body.dark-theme .deviation-header {
@@ -1386,7 +1396,7 @@ body.dark-theme .profile-selector-icon {
 }
 
 .feature-btn:hover .btn-arrow {
-  transform: translateX(2px);
+  transform: translateX(1px);
   opacity: 1;
 }
 
@@ -2219,7 +2229,7 @@ body.dark-theme .info-row img {
 
 .deviation-item-modern:hover {
   background: var(--bg-hover);
-  transform: translateX(2px);
+  transform: translateX(1px);
 }
 
 .deviation-number {
@@ -2274,7 +2284,7 @@ body.dark-theme .info-row img {
 
 .deviation-item-modern:hover {
   background: rgba(0, 0, 0, 0.04);
-  transform: translateX(4px);
+  transform: translateX(2px);
 }
 
 .deviation-item-modern.severity-high {
@@ -2437,18 +2447,18 @@ body.dark-theme .deviation-score {
 }
 
 .summary-badge.summary-good {
-  background: rgba(52, 168, 83, 0.1);
-  color: #34a853;
+  background: rgba(66, 133, 244, 0.1);
+  color: #4285f4;
 }
 
 .summary-badge.summary-minor {
-  background: rgba(251, 188, 5, 0.1);
-  color: #f9ab00;
+  background: rgba(66, 133, 244, 0.15);
+  color: #4285f4;
 }
 
 .summary-badge.summary-critical {
-  background: rgba(234, 67, 53, 0.1);
-  color: #ea4335;
+  background: rgba(66, 133, 244, 0.2);
+  color: #4285f4;
 }
 
 
@@ -2464,15 +2474,18 @@ body.dark-theme .icon-filter {
 
 /* Dark theme adjustments */
 body.dark-theme .summary-badge.summary-good {
-  background: rgba(52, 168, 83, 0.15);
+  background: rgba(138, 180, 248, 0.15);
+  color: #8ab4f8;
 }
 
 body.dark-theme .summary-badge.summary-minor {
-  background: rgba(251, 188, 5, 0.15);
+  background: rgba(138, 180, 248, 0.2);
+  color: #8ab4f8;
 }
 
 body.dark-theme .summary-badge.summary-critical {
-  background: rgba(234, 67, 53, 0.15);
+  background: rgba(138, 180, 248, 0.25);
+  color: #8ab4f8;
 }
 
 /* Responsive */
@@ -2503,40 +2516,40 @@ body.dark-theme .summary-badge.summary-critical {
 }
 
 .summary-badge.summary-good {
-  background: rgba(52, 168, 83, 0.1);
-  color: #34a853;
-  border-color: rgba(52, 168, 83, 0.2);
+  background: rgba(66, 133, 244, 0.1);
+  color: #4285f4;
+  border-color: rgba(66, 133, 244, 0.2);
 }
 
 .summary-badge.summary-minor {
-  background: rgba(251, 188, 5, 0.1);
-  color: #fb8c00;
-  border-color: rgba(251, 188, 5, 0.2);
+  background: rgba(66, 133, 244, 0.15);
+  color: #4285f4;
+  border-color: rgba(66, 133, 244, 0.25);
 }
 
 .summary-badge.summary-critical {
-  background: rgba(234, 67, 53, 0.1);
-  color: #ea4335;
-  border-color: rgba(234, 67, 53, 0.2);
+  background: rgba(66, 133, 244, 0.2);
+  color: #4285f4;
+  border-color: rgba(66, 133, 244, 0.3);
 }
 
 /* Dark theme for summary badges */
 body.dark-theme .summary-badge.summary-good {
-  background: rgba(129, 201, 149, 0.2);
-  color: #81c995;
-  border-color: rgba(129, 201, 149, 0.3);
+  background: rgba(138, 180, 248, 0.15);
+  color: #8ab4f8;
+  border-color: rgba(138, 180, 248, 0.25);
 }
 
 body.dark-theme .summary-badge.summary-minor {
-  background: rgba(253, 214, 99, 0.2);
-  color: #fdd663;
-  border-color: rgba(253, 214, 99, 0.3);
+  background: rgba(138, 180, 248, 0.2);
+  color: #8ab4f8;
+  border-color: rgba(138, 180, 248, 0.3);
 }
 
 body.dark-theme .summary-badge.summary-critical {
-  background: rgba(242, 139, 130, 0.2);
-  color: #f28b82;
-  border-color: rgba(242, 139, 130, 0.3);
+  background: rgba(138, 180, 248, 0.25);
+  color: #8ab4f8;
+  border-color: rgba(138, 180, 248, 0.35);
 }
 
 /* Deviation Hint */

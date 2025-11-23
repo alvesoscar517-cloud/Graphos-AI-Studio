@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { rewriteText as rewriteTextAPI } from '../../services/api'
+import { useRewrite } from '../../contexts/RewriteContext'
 import modal from '../../utils/modal'
 import './Analysis.css'
 
 const RewriteCard = ({ disabled, currentProfile, text }) => {
+  const { selectedModel, writingPreferences } = useRewrite()
   const [isLoading, setIsLoading] = useState(false)
 
   const rewriteText = async () => {
@@ -13,7 +15,12 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
     const loadingModal = modal.loading('Đang viết lại văn bản...')
     
     try {
-      const result = await rewriteTextAPI(currentProfile.profile_id, text)
+      const result = await rewriteTextAPI(
+        currentProfile.profile_id, 
+        text,
+        selectedModel,
+        writingPreferences
+      )
       
       loadingModal.close()
       

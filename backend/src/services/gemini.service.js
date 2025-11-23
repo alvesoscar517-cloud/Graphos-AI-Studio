@@ -362,10 +362,10 @@ Trả về JSON theo format:
   }
 }
 
-async function rewriteWithVoice(originalText, voiceProfile, context = {}) {
+async function rewriteWithVoice(originalText, voiceProfile, context = {}, modelName = 'gemini-2.0-flash-exp') {
   try {
     const model = vertexAI.getGenerativeModel({ 
-      model: 'gemini-2.0-flash-exp'
+      model: modelName
     });
 
     let voiceDescription;
@@ -380,10 +380,63 @@ CỤM TỪ ƯA THÍCH: ${voiceProfile.vocabulary_preferences.common_phrases.join
       voiceDescription = String(voiceProfile);
     }
 
-    const prompt = `Viết lại văn bản sau sao cho phù hợp với văn phong mục tiêu, giữ nguyên ý nghĩa.
+    let prompt = `Viết lại văn bản sau sao cho phù hợp với văn phong mục tiêu, giữ nguyên ý nghĩa.
 
 VĂN PHONG MỤC TIÊU:
-${voiceDescription}
+${voiceDescription}`;
+
+    // Add writing preferences if provided (based on profile data)
+    if (context.writingPreferences && typeof voiceProfile === 'object') {
+      const prefs = context.writingPreferences;
+      let preferencesText = '';
+      
+      // Vocabulary Preferences
+      if (prefs.useVocabularyPreferences && voiceProfile.vocabulary_preferences) {
+        const vocabPrefs = voiceProfile.vocabulary_preferences;
+        if (vocabPrefs.common_phrases?.length > 0 || vocabPrefs.preferred_connectors?.length > 0 || vocabPrefs.avoid_words?.length > 0) {
+          preferencesText += '\n\nTỪ VỰNG ƯA THÍCH:';
+          if (vocabPrefs.common_phrases?.length > 0) {
+            preferencesText += '\nCỤM TỪ THƯỜNG DÙNG: ' + vocabPrefs.common_phrases.join(', ');
+          }
+          if (vocabPrefs.preferred_connectors?.length > 0) {
+            preferencesText += '\nTỪ NỐI ƯA THÍCH: ' + vocabPrefs.preferred_connectors.join(', ');
+          }
+          if (vocabPrefs.avoid_words?.length > 0) {
+            preferencesText += '\nTỪ NÊN TRÁNH: ' + vocabPrefs.avoid_words.join(', ');
+          }
+        }
+      }
+      
+      // Key characteristics
+      if (prefs.useKeyCharacteristics && voiceProfile.key_characteristics?.length > 0) {
+        preferencesText += '\n\nĐẶC ĐIỂM CHÍNH: ' + voiceProfile.key_characteristics.join(', ');
+      }
+      
+      // Sentence Patterns
+      if (prefs.useSentencePatterns && voiceProfile.sentence_patterns) {
+        const sentencePatterns = voiceProfile.sentence_patterns;
+        if (sentencePatterns.opening_style || sentencePatterns.structure_preference) {
+          preferencesText += '\n\nCẤU TRÚC CÂU:';
+          if (sentencePatterns.opening_style) {
+            preferencesText += '\nPHONG CÁCH MỞ ĐẦU: ' + sentencePatterns.opening_style;
+          }
+          if (sentencePatterns.structure_preference) {
+            preferencesText += '\nCẤU TRÚC: ' + sentencePatterns.structure_preference;
+          }
+        }
+      }
+      
+      // Rewrite instructions
+      if (prefs.useRewriteInstructions && voiceProfile.rewrite_instructions) {
+        preferencesText += '\n\nHƯỚNG DẪN VIẾT LẠI: ' + voiceProfile.rewrite_instructions;
+      }
+      
+      if (preferencesText) {
+        prompt += preferencesText;
+      }
+    }
+
+    prompt += `
 
 VĂN BẢN GỐC:
 ${originalText}

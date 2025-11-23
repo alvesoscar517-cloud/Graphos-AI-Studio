@@ -45,11 +45,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 24px 12px 24px !important;
-  border-bottom: 1px solid #e8eaed;
+  padding: 18px 24px 8px 24px !important;
+  border-bottom: none;
   flex-shrink: 0;
   gap: 12px;
-  min-height: 60px;
+  min-height: 50px;
   margin-bottom: 0 !important;
 }
 
@@ -101,7 +101,7 @@
   align-items: center;
   gap: 10px;
   padding: 6px 14px;
-  margin: 6px 24px 12px 24px;
+  margin: 0 24px 12px 24px;
   background: #f8f9fa;
   border-radius: 18px;
   border: 1px solid transparent;
@@ -257,24 +257,7 @@ body.dark-theme .profile-modal-card.selected {
   border-width: 1px;
 }
 
-/* Selected indicator - blue dot */
-.profile-modal-card.selected::before {
-  content: '';
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 8px;
-  height: 8px;
-  background: #4285f4;
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
-  z-index: 10;
-}
-
-body.dark-theme .profile-modal-card.selected::before {
-  background: #8ab4f8;
-  box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.25);
-}
+/* Selected indicator - removed blue dot, using badge instead */
 
 .profile-modal-card-header {
   display: flex;
@@ -369,6 +352,42 @@ body.dark-theme .profile-modal-icon img {
   border: 1px solid rgba(251, 191, 36, 0.2);
 }
 
+.profile-modal-badge.selected {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.profile-modal-badge.quality {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.profile-modal-badge.quality.quality-excellent {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.profile-modal-badge.quality.quality-good {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.profile-modal-badge.quality.quality-ok {
+  background: rgba(251, 191, 36, 0.12);
+  color: #f9ab00;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.profile-modal-badge.quality.quality-poor {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
 body.dark-theme .profile-modal-badge.ready {
   background: rgba(34, 197, 94, 0.15);
   color: #4ade80;
@@ -377,6 +396,36 @@ body.dark-theme .profile-modal-badge.ready {
 body.dark-theme .profile-modal-badge.pending {
   background: rgba(251, 191, 36, 0.15);
   color: #fcd34d;
+}
+
+body.dark-theme .profile-modal-badge.selected {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+body.dark-theme .profile-modal-badge.quality {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+body.dark-theme .profile-modal-badge.quality.quality-excellent {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+body.dark-theme .profile-modal-badge.quality.quality-good {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+body.dark-theme .profile-modal-badge.quality.quality-ok {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fcd34d;
+}
+
+body.dark-theme .profile-modal-badge.quality.quality-poor {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
 }
 
 .profile-modal-meta {
@@ -478,6 +527,20 @@ body.dark-theme .profile-modal-delete-btn:hover img {
   color: var(--text-secondary);
   font-weight: 500;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.profile-modal-tag img {
+  width: 11px;
+  height: 11px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+body.dark-theme .profile-modal-tag img {
+  filter: brightness(0) invert(1);
 }
 
 .profile-modal-card:hover .profile-modal-tag {
@@ -748,8 +811,8 @@ body.dark-theme .modal-content {
 }
 
 body.dark-theme .modal-content .modal-header {
-  border-bottom: 1px solid #3c4043;
-  min-height: 60px;
+  border-bottom: none;
+  min-height: 50px;
 }
 
 body.dark-theme .modal-content .modal-header h2 {

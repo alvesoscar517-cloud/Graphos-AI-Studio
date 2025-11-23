@@ -33,8 +33,10 @@ const AIDetectionCard = ({ disabled, text }) => {
     if (text) {
       const cached = getCachedAnalysis(currentNote.id, text, 'detect')
       if (cached) {
+        // In hoa chữ cái đầu của verdict khi load từ cache
+        const verdictText = cached.verdict ? cached.verdict.charAt(0).toUpperCase() + cached.verdict.slice(1) : cached.verdict
         setResult(cached.aiScore)
-        setVerdict(cached.verdict)
+        setVerdict(verdictText)
         setEvidence(cached.evidence || [])
         setTextChanged(false)
         console.log('📦 Loaded cached AI detection result for current text')
@@ -60,8 +62,10 @@ const AIDetectionCard = ({ disabled, text }) => {
       })
       
       if (latestResult) {
+        // In hoa chữ cái đầu của verdict khi load từ cache
+        const verdictText = latestResult.verdict ? latestResult.verdict.charAt(0).toUpperCase() + latestResult.verdict.slice(1) : latestResult.verdict
         setResult(latestResult.aiScore)
-        setVerdict(latestResult.verdict)
+        setVerdict(verdictText)
         setEvidence(latestResult.evidence || [])
         console.log('📦 Loaded most recent cached result (text has changed)')
       }
@@ -100,9 +104,11 @@ const AIDetectionCard = ({ disabled, text }) => {
       
       if (apiResult.success && apiResult.data) {
         const aiScore = Math.round(apiResult.data.ai_probability || 0)
-        // Rút ngắn verdict
+        // Rút ngắn verdict và in hoa chữ cái đầu
         let verdictText = apiResult.data.verdict || (aiScore < 50 ? 'Có vẻ do con người viết' : 'Có thể do AI tạo ra')
         verdictText = verdictText.replace('Nội dung ', '').replace('nội dung ', '')
+        // In hoa chữ cái đầu
+        verdictText = verdictText.charAt(0).toUpperCase() + verdictText.slice(1)
         
         const resultData = {
           aiScore,

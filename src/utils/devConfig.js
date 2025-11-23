@@ -5,7 +5,7 @@
 
 export const DEV_CONFIG = {
   // Bật chế độ development (sử dụng profile test mặc định)
-  ENABLE_DEV_MODE: true,
+  ENABLE_DEV_MODE: false,
   
   // Profile test mặc định (sẽ được tạo một lần và tái sử dụng)
   DEFAULT_TEST_PROFILE: {

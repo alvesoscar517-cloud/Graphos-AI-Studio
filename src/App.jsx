@@ -6,6 +6,7 @@ import { NotesProvider } from './contexts/NotesContext'
 import { AIProcessingProvider } from './contexts/AIProcessingContext'
 import { ProfileProvider } from './contexts/ProfileContext'
 import { WorkspaceProvider } from './contexts/WorkspaceContext'
+import { RewriteProvider } from './contexts/RewriteContext'
 import LoginOverlay from './components/Auth/LoginOverlay'
 import MainLayout from './components/Layout/MainLayout'
 import ProfileSetupWrapper from './components/ProfileSetup/ProfileSetupWrapper'
@@ -47,7 +48,9 @@ function App() {
               <AIProcessingProvider>
                 <ProfileProvider>
                   <WorkspaceProvider>
-                    <AppContent />
+                    <RewriteProvider>
+                      <AppContent />
+                    </RewriteProvider>
                   </WorkspaceProvider>
                 </ProfileProvider>
               </AIProcessingProvider>

@@ -2,19 +2,21 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNotes } from '../../contexts/NotesContext'
 import { useProfiles } from '../../contexts/ProfileContext'
+import { useRewrite } from '../../contexts/RewriteContext'
 import ProfileSelector from '../Analysis/ProfileSelector'
 import CompatibilityCard from '../Analysis/CompatibilityCard'
 import AIDetectionCard from '../Analysis/AIDetectionCard'
 import DeviationCard from '../Analysis/DeviationCard'
 import StatisticsCard from '../Analysis/StatisticsCard'
-import RewriteModelSelector from '../Analysis/RewriteModelSelector'
+import ModelSelector from '../Analysis/ModelSelector'
+import WritingPreferences from '../Analysis/WritingPreferences'
 import './RightSidebar.css'
 
 const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => {
   const { currentNote } = useNotes()
   const { currentProfile, selectProfile } = useProfiles()
+  const { selectedModel, setSelectedModel, writingPreferences, setWritingPreferences } = useRewrite()
   const [mode, setMode] = useState('analysis') // 'analysis' or 'rewrite'
-  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash')
 
   // Notify parent when mode changes
   const handleModeChange = (newMode) => {
@@ -124,10 +126,17 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
             />
           </div>
         ) : (
-          <RewriteModelSelector 
-            selectedModel={selectedModel}
-            onModelSelect={setSelectedModel}
-          />
+          <>
+            <ModelSelector 
+              selectedModel={selectedModel}
+              onModelSelect={setSelectedModel}
+            />
+            <WritingPreferences
+              currentProfile={currentProfile}
+              preferences={writingPreferences}
+              onPreferencesChange={setWritingPreferences}
+            />
+          </>
         )}
       </div>
 

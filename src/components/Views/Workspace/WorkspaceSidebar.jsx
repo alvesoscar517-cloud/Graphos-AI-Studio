@@ -3,7 +3,8 @@ import { motion } from 'framer-motion'
 import { useProfiles } from '../../../contexts/ProfileContext'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import ProfileSelector from '../../Analysis/ProfileSelector'
-import RewriteModelSelector from '../../Analysis/RewriteModelSelector'
+import ModelSelector from '../../Analysis/ModelSelector'
+import WritingPreferences from '../../Analysis/WritingPreferences'
 import './WorkspaceSidebar.css'
 
 const WorkspaceSidebar = ({ hidden, onClose, onNewChat }) => {
@@ -16,6 +17,10 @@ const WorkspaceSidebar = ({ hidden, onClose, onNewChat }) => {
 
   const handleModelSelect = (modelId) => {
     updateModelSettings({ model: modelId })
+  }
+
+  const handlePreferencesChange = (preferences) => {
+    updateModelSettings({ writingPreferences: preferences })
   }
 
   // Sync initial model if not set
@@ -64,9 +69,15 @@ const WorkspaceSidebar = ({ hidden, onClose, onNewChat }) => {
           onProfileSelect={handleProfileSelect}
         />
 
-        <RewriteModelSelector 
+        <ModelSelector 
           selectedModel={modelSettings.model || 'gemini-2.0-flash-exp'}
           onModelSelect={handleModelSelect}
+        />
+
+        <WritingPreferences
+          currentProfile={currentProfile}
+          preferences={modelSettings.writingPreferences}
+          onPreferencesChange={handlePreferencesChange}
         />
       </div>
     </motion.aside>

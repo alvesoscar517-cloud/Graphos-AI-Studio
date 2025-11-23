@@ -170,14 +170,20 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
       {analysisData && showResult && (
         <div className="feature-result" style={{ display: 'block' }}>
           {/* Analysis stats */}
-          <div className="deviation-stats">
-            <div className="stat-item-compact">
-              <span className="stat-label">Độ tương thích</span>
-              <span className="stat-value">{analysisData.voice_compatibility_score}%</span>
+          <div className="stats-grid-modern">
+            <div className="stat-item-modern">
+              <div className="stat-icon-wrapper">
+                <img src="/icon/target.svg" alt="Compatibility" />
+              </div>
+              <span className="stat-label-modern">TƯƠNG THÍCH</span>
+              <span className="stat-value-modern">{analysisData.voice_compatibility_score}%</span>
             </div>
-            <div className="stat-item-compact">
-              <span className="stat-label">Câu có gợi ý</span>
-              <span className="stat-value highlight-red">
+            <div className="stat-item-modern">
+              <div className="stat-icon-wrapper">
+                <img src="/icon/alert-circle.svg" alt="Suggestions" />
+              </div>
+              <span className="stat-label-modern">CÂU CÓ GỢI Ý</span>
+              <span className="stat-value-modern">
                 {analysisData.sentence_suggestions ? Object.keys(analysisData.sentence_suggestions).filter(
                   key => analysisData.sentence_suggestions[key].issues_found > 0
                 ).length : 0}

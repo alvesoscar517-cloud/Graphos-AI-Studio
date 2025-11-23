@@ -10,7 +10,7 @@ const logger = require('../utils/logger');
 
 exports.sendMessage = async (req, res) => {
   try {
-    const { messages, systemPrompt, model = 'gemini-2.0-flash-exp', temperature = 0.7, profileId = null } = req.body;
+    const { messages, systemPrompt, model = 'gemini-2.0-flash-exp', temperature = 0.7, profileId = null, writingPreferences = null } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages array is required' });
@@ -41,6 +41,68 @@ Hãy trả lời theo CHÍNH XÁC phong cách trên.`;
         }
       } catch (profileError) {
         console.error(`❌ Error loading profile ${profileId}:`, profileError);
+      }
+    }
+
+    // Add writing preferences to system prompt (based on profile data)
+    if (writingPreferences && profileId) {
+      try {
+        const profileDoc = await db.collection('profiles').doc(profileId).get();
+        if (profileDoc.exists) {
+          const profile = profileDoc.data();
+          const voiceProfile = profile.voice_profile;
+          
+          if (voiceProfile) {
+            let preferencesText = '';
+            
+            // Vocabulary Preferences (common phrases, connectors, avoid words)
+            if (writingPreferences.useVocabularyPreferences && voiceProfile.vocabulary_preferences) {
+              const vocabPrefs = voiceProfile.vocabulary_preferences;
+              if (vocabPrefs.common_phrases?.length > 0 || vocabPrefs.preferred_connectors?.length > 0 || vocabPrefs.avoid_words?.length > 0) {
+                preferencesText += '\n\nTỪ VỰNG ƯA THÍCH:';
+                if (vocabPrefs.common_phrases?.length > 0) {
+                  preferencesText += '\nCỤM TỪ THƯỜNG DÙNG: ' + vocabPrefs.common_phrases.join(', ');
+                }
+                if (vocabPrefs.preferred_connectors?.length > 0) {
+                  preferencesText += '\nTỪ NỐI ƯA THÍCH: ' + vocabPrefs.preferred_connectors.join(', ');
+                }
+                if (vocabPrefs.avoid_words?.length > 0) {
+                  preferencesText += '\nTỪ NÊN TRÁNH: ' + vocabPrefs.avoid_words.join(', ');
+                }
+              }
+            }
+            
+            // Key characteristics
+            if (writingPreferences.useKeyCharacteristics && voiceProfile.key_characteristics?.length > 0) {
+              preferencesText += '\n\nĐẶC ĐIỂM CHÍNH: ' + voiceProfile.key_characteristics.join(', ');
+            }
+            
+            // Sentence Patterns (opening style, structure)
+            if (writingPreferences.useSentencePatterns && voiceProfile.sentence_patterns) {
+              const sentencePatterns = voiceProfile.sentence_patterns;
+              if (sentencePatterns.opening_style || sentencePatterns.structure_preference) {
+                preferencesText += '\n\nCẤU TRÚC CÂU:';
+                if (sentencePatterns.opening_style) {
+                  preferencesText += '\nPHONG CÁCH MỞ ĐẦU: ' + sentencePatterns.opening_style;
+                }
+                if (sentencePatterns.structure_preference) {
+                  preferencesText += '\nCẤU TRÚC: ' + sentencePatterns.structure_preference;
+                }
+              }
+            }
+            
+            // Rewrite instructions
+            if (writingPreferences.useRewriteInstructions && voiceProfile.rewrite_instructions) {
+              preferencesText += '\n\nHƯỚNG DẪN VIẾT LẠI: ' + voiceProfile.rewrite_instructions;
+            }
+            
+            if (preferencesText) {
+              enhancedSystemPrompt += preferencesText;
+            }
+          }
+        }
+      } catch (prefError) {
+        console.error(`❌ Error loading preferences:`, prefError);
       }
     }
 

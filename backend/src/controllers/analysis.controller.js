@@ -271,7 +271,7 @@ exports.suggestImprovements = async (req, res) => {
 
 exports.rewriteText = async (req, res) => {
   try {
-    const { profile_id, text, user_id, context } = req.body;
+    const { profile_id, text, user_id, context, model = 'gemini-2.5-flash', writing_preferences } = req.body;
 
     if (!profile_id || !text) {
       return res.status(400).json({ error: 'profile_id and text are required' });
@@ -296,7 +296,18 @@ exports.rewriteText = async (req, res) => {
       });
     }
 
-    const rewrittenText = await geminiService.rewriteWithVoice(text, voiceProfile, context || {});
+    // Enhance context with writing preferences (based on profile data)
+    let enhancedContext = { ...context };
+    if (writing_preferences) {
+      enhancedContext.writingPreferences = {
+        useVocabularyPreferences: writing_preferences.useVocabularyPreferences,
+        useKeyCharacteristics: writing_preferences.useKeyCharacteristics,
+        useSentencePatterns: writing_preferences.useSentencePatterns,
+        useRewriteInstructions: writing_preferences.useRewriteInstructions
+      };
+    }
+
+    const rewrittenText = await geminiService.rewriteWithVoice(text, voiceProfile, enhancedContext, model);
 
     if (user_id) {
       await db.collection('users').doc(user_id).update({
@@ -323,7 +334,7 @@ exports.rewriteText = async (req, res) => {
 
 exports.rewriteTextStream = async (req, res) => {
   try {
-    const { profile_id, text, model, user_id } = req.body;
+    const { profile_id, text, model, user_id, writing_preferences } = req.body;
 
     if (!profile_id || !text) {
       return res.status(400).json({ error: 'profile_id and text are required' });
@@ -348,7 +359,59 @@ exports.rewriteTextStream = async (req, res) => {
       voiceDescription = String(voiceProfile);
     }
 
-    const prompt = `Viết lại văn bản theo văn phong: ${voiceDescription}\n\nVăn bản gốc: ${text}\n\nVăn bản đã viết lại:`;
+    let prompt = `Viết lại văn bản theo văn phong: ${voiceDescription}\n\nVăn bản gốc: ${text}`;
+
+    // Add writing preferences to prompt (based on profile data)
+    if (writing_preferences && voiceProfile) {
+      let preferencesText = '';
+      
+      // Vocabulary Preferences
+      if (writing_preferences.useVocabularyPreferences && voiceProfile.vocabulary_preferences) {
+        const vocabPrefs = voiceProfile.vocabulary_preferences;
+        if (vocabPrefs.common_phrases?.length > 0 || vocabPrefs.preferred_connectors?.length > 0 || vocabPrefs.avoid_words?.length > 0) {
+          preferencesText += '\n\nTỪ VỰNG ƯA THÍCH:';
+          if (vocabPrefs.common_phrases?.length > 0) {
+            preferencesText += '\nCỤM TỪ THƯỜNG DÙNG: ' + vocabPrefs.common_phrases.join(', ');
+          }
+          if (vocabPrefs.preferred_connectors?.length > 0) {
+            preferencesText += '\nTỪ NỐI ƯA THÍCH: ' + vocabPrefs.preferred_connectors.join(', ');
+          }
+          if (vocabPrefs.avoid_words?.length > 0) {
+            preferencesText += '\nTỪ NÊN TRÁNH: ' + vocabPrefs.avoid_words.join(', ');
+          }
+        }
+      }
+      
+      // Key characteristics
+      if (writing_preferences.useKeyCharacteristics && voiceProfile.key_characteristics?.length > 0) {
+        preferencesText += '\n\nĐẶC ĐIỂM CHÍNH: ' + voiceProfile.key_characteristics.join(', ');
+      }
+      
+      // Sentence Patterns
+      if (writing_preferences.useSentencePatterns && voiceProfile.sentence_patterns) {
+        const sentencePatterns = voiceProfile.sentence_patterns;
+        if (sentencePatterns.opening_style || sentencePatterns.structure_preference) {
+          preferencesText += '\n\nCẤU TRÚC CÂU:';
+          if (sentencePatterns.opening_style) {
+            preferencesText += '\nPHONG CÁCH MỞ ĐẦU: ' + sentencePatterns.opening_style;
+          }
+          if (sentencePatterns.structure_preference) {
+            preferencesText += '\nCẤU TRÚC: ' + sentencePatterns.structure_preference;
+          }
+        }
+      }
+      
+      // Rewrite instructions
+      if (writing_preferences.useRewriteInstructions && voiceProfile.rewrite_instructions) {
+        preferencesText += '\n\nHƯỚNG DẪN VIẾT LẠI: ' + voiceProfile.rewrite_instructions;
+      }
+      
+      if (preferencesText) {
+        prompt += preferencesText;
+      }
+    }
+
+    prompt += '\n\nVăn bản đã viết lại:';
 
     const modelName = model || 'gemini-2.5-flash';
     const generativeModel = geminiService.vertexAI.getGenerativeModel({ model: modelName });

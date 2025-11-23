@@ -162,10 +162,17 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                       <div className="profile-modal-info">
                         <div className="profile-modal-name-row">
                           <h3 className="profile-modal-name">{profile.profile_name}</h3>
-                          {profile.status === 'ready' ? (
+                          {currentProfile?.profile_id === profile.profile_id ? (
+                            <span className="profile-modal-badge selected">Đang chọn</span>
+                          ) : profile.status === 'ready' ? (
                             <span className="profile-modal-badge ready">Sẵn sàng</span>
                           ) : (
                             <span className="profile-modal-badge pending">Đang xử lý</span>
+                          )}
+                          {(profile.quality_score || profile.qualityScore) && (
+                            <span className={`profile-modal-badge quality quality-${profile.quality_rating || profile.qualityRating || 'ok'}`}>
+                              {profile.quality_score || profile.qualityScore}/100
+                            </span>
                           )}
                         </div>
                         <div className="profile-modal-meta">
@@ -173,12 +180,30 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                             <img src="/icon/file-text.svg" alt="Samples" />
                             {profile.sample_count || 0} mẫu
                           </span>
-                          {profile.statistics && (
+                          {profile.statistics?.totalWords && (
                             <>
                               <span className="profile-modal-meta-divider">•</span>
                               <span className="profile-modal-meta-item">
                                 <img src="/icon/type.svg" alt="Words" />
-                                {profile.statistics.totalWords?.toLocaleString() || 0} từ
+                                {profile.statistics.totalWords.toLocaleString()} từ
+                              </span>
+                            </>
+                          )}
+                          {profile.statistics?.totalSentences && (
+                            <>
+                              <span className="profile-modal-meta-divider">•</span>
+                              <span className="profile-modal-meta-item">
+                                <img src="/icon/align-left.svg" alt="Sentences" />
+                                {profile.statistics.totalSentences.toLocaleString()} câu
+                              </span>
+                            </>
+                          )}
+                          {profile.created_at && (
+                            <>
+                              <span className="profile-modal-meta-divider">•</span>
+                              <span className="profile-modal-meta-item">
+                                <img src="/icon/calendar.svg" alt="Created" />
+                                {new Date(profile.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                               </span>
                             </>
                           )}
@@ -193,32 +218,38 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                       </button>
                     </div>
                     
-                    {profile.voice_profile && (
-                      <div className="profile-modal-card-body">
-                        <div className="profile-modal-tags">
-                          {profile.voice_profile.tone && (
-                            <span className="profile-modal-tag">
-                              {profile.voice_profile.tone === 'professional' ? 'Chuyên nghiệp' :
-                               profile.voice_profile.tone === 'casual' ? 'Thân mật' :
-                               profile.voice_profile.tone === 'academic' ? 'Học thuật' :
-                               profile.voice_profile.tone === 'creative' ? 'Sáng tạo' :
-                               profile.voice_profile.tone === 'friendly' ? 'Thân thiện' :
-                               profile.voice_profile.tone}
-                            </span>
-                          )}
-                          {profile.voice_profile.formality_level && (
-                            <span className="profile-modal-tag">
-                              Trang trọng: {profile.voice_profile.formality_level}/10
-                            </span>
-                          )}
-                          {profile.statistics?.readabilityScore && (
-                            <span className="profile-modal-tag">
-                              Flesch: {profile.statistics.readabilityScore.toFixed(0)}
-                            </span>
-                          )}
-                        </div>
+                    <div className="profile-modal-card-body">
+                      <div className="profile-modal-tags">
+                        <span className="profile-modal-tag">
+                          <img src="/icon/mic.svg" alt="Tone" />
+                          {profile.voice_profile?.tone ? (
+                            profile.voice_profile.tone === 'professional' ? 'Chuyên nghiệp' :
+                            profile.voice_profile.tone === 'casual' ? 'Thân mật' :
+                            profile.voice_profile.tone === 'academic' ? 'Học thuật' :
+                            profile.voice_profile.tone === 'creative' ? 'Sáng tạo' :
+                            profile.voice_profile.tone === 'friendly' ? 'Thân thiện' :
+                            profile.voice_profile.tone
+                          ) : 'N/A'}
+                        </span>
+                        <span className="profile-modal-tag">
+                          <img src="/icon/award.svg" alt="Formality" />
+                          Trang trọng: {profile.voice_profile?.formality_level || 'N/A'}/10
+                        </span>
+                        <span className="profile-modal-tag">
+                          <img src="/icon/bar-chart.svg" alt="Length" />
+                          Câu {profile.voice_profile?.sentence_patterns?.typical_length ? (
+                            profile.voice_profile.sentence_patterns.typical_length === 'short' ? 'ngắn' :
+                            profile.voice_profile.sentence_patterns.typical_length === 'medium' ? 'TB' :
+                            profile.voice_profile.sentence_patterns.typical_length === 'long' ? 'dài' :
+                            profile.voice_profile.sentence_patterns.typical_length
+                          ) : 'N/A'}
+                        </span>
+                        <span className="profile-modal-tag">
+                          <img src="/icon/hash.svg" alt="Avg" />
+                          TB: {profile.statistics?.avgSentenceLength ? profile.statistics.avgSentenceLength.toFixed(1) : 'N/A'} từ/câu
+                        </span>
                       </div>
-                    )}
+                    </div>
                   </div>
                 ))
               )}

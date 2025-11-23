@@ -49,19 +49,15 @@ body.dark-theme .profile-card:hover {
 .profile-card-icon img {
   width: 28px;
   height: 28px;
-  opacity: 1;
-  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
+  opacity: 0.7;
+  filter: brightness(0) saturate(100%);
   transition: all var(--transition-normal);
 }
 
 .profile-card:hover .profile-card-icon img {
-  opacity: 1;
-  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(110%) contrast(98%);
+  opacity: 0.9;
   transform: scale(1.05);
 }
-
-/* Theme icon colors are applied via theme-icon-* classes from theme-variables.css */
-/* Remove grayscale and invert filters to allow theme colors to show */
 
 body.dark-theme .profile-card-icon {
   background: rgba(255, 255, 255, 0.08) !important;
@@ -69,6 +65,15 @@ body.dark-theme .profile-card-icon {
 
 body.dark-theme .profile-card:hover .profile-card-icon {
   background: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.dark-theme .profile-card-icon img {
+  filter: brightness(0) saturate(100%) invert(1);
+  opacity: 0.8;
+}
+
+body.dark-theme .profile-card:hover .profile-card-icon img {
+  opacity: 1;
 }
 
 .profile-card-menu {
@@ -136,14 +141,14 @@ body.dark-theme .profile-card-menu:hover img {
 .profile-card-meta-item img {
   width: 14px;
   height: 14px;
-  opacity: 1;
-  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
+  opacity: 0.6;
+  filter: brightness(0) saturate(100%);
   transition: all var(--transition-normal);
 }
 
 body.dark-theme .profile-card-meta-item img {
-  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
-  opacity: 1;
+  filter: brightness(0) saturate(100%) invert(1);
+  opacity: 0.7;
 }
 
 .profile-card-stats {
@@ -173,38 +178,7 @@ body.dark-theme .profile-card-meta-item img {
   color: var(--text-primary);
 }
 
-/* Quality Score Colors */
-.profile-stat-value.quality-score-excellent {
-  color: #28a745;
-}
-
-.profile-stat-value.quality-score-good {
-  color: #17a2b8;
-}
-
-.profile-stat-value.quality-score-ok {
-  color: #ffc107;
-}
-
-.profile-stat-value.quality-score-poor {
-  color: #dc3545;
-}
-
-body.dark-theme .profile-stat-value.quality-score-excellent {
-  color: #4ade80;
-}
-
-body.dark-theme .profile-stat-value.quality-score-good {
-  color: #22d3ee;
-}
-
-body.dark-theme .profile-stat-value.quality-score-ok {
-  color: #fcd34d;
-}
-
-body.dark-theme .profile-stat-value.quality-score-poor {
-  color: #f87171;
-}
+/* Quality Score - No colors, use default text color */
 
 .profile-card-tags {
   display: flex;

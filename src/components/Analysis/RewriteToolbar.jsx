@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, MotionConfig } from 'framer-motion'
 import { rewriteText as rewriteTextAPI } from '../../services/api'
+import { useRewrite } from '../../contexts/RewriteContext'
 import modal from '../../utils/modal'
 import './RewriteToolbar.css'
 
@@ -34,6 +35,7 @@ const RewriteToolbar = ({
   onTextChange,
   disabled 
 }) => {
+  const { selectedModel, writingPreferences } = useRewrite()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const containerRef = useRef(null)
@@ -67,7 +69,12 @@ const RewriteToolbar = ({
     const loadingModal = modal.loading('Đang viết lại văn bản...')
     
     try {
-      const result = await rewriteTextAPI(currentProfile.profile_id, text)
+      const result = await rewriteTextAPI(
+        currentProfile.profile_id, 
+        text, 
+        selectedModel,
+        writingPreferences
+      )
       
       loadingModal.close()
       
