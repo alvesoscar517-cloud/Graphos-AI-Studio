@@ -19,16 +19,9 @@ export default function BackupSuccessModal({ backupInfo, onClose }) {
   };
 
   const handleSaveToDrive = () => {
-    // Mở Google Drive với link upload
     const driveUrl = `https://drive.google.com/drive/u/0/my-drive`;
     window.open(driveUrl, '_blank');
-    
-    // Đồng thời download file để user có thể upload
     handleDownload();
-  };
-
-  const formatSize = (bytes) => {
-    return (bytes / 1024 / 1024).toFixed(2) + ' MB';
   };
 
   return (
@@ -38,28 +31,34 @@ export default function BackupSuccessModal({ backupInfo, onClose }) {
           <div className="success-icon">
             <img src="/icon/check-circle.svg" alt="Success" />
           </div>
-          <h2>🎉 Backup thành công!</h2>
+          <h2>Backup Completed Successfully</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
         <div className="modal-body">
           <div className="backup-details">
             <div className="detail-row">
-              <span className="label">📁 File:</span>
+              <img src="/icon/file.svg" alt="File" className="row-icon" />
+              <span className="label">File:</span>
               <span className="value">{backupInfo.fileName}</span>
             </div>
             <div className="detail-row">
-              <span className="label">🕐 Thời gian:</span>
+              <img src="/icon/clock.svg" alt="Time" className="row-icon" />
+              <span className="label">Time:</span>
               <span className="value">{new Date(backupInfo.timestamp).toLocaleString('vi-VN')}</span>
             </div>
             <div className="detail-row">
-              <span className="label">📦 Bucket:</span>
+              <img src="/icon/database.svg" alt="Bucket" className="row-icon" />
+              <span className="label">Bucket:</span>
               <span className="value">{backupInfo.bucket}</span>
             </div>
           </div>
 
           <div className="backup-stats">
-            <h3>📊 Thống kê:</h3>
+            <h3>
+              <img src="/icon/bar-chart.svg" alt="Stats" className="section-icon" />
+              Statistics
+            </h3>
             <div className="stats-grid">
               {Object.entries(backupInfo.stats).map(([collection, count]) => (
                 <div key={collection} className="stat-item">
@@ -71,20 +70,23 @@ export default function BackupSuccessModal({ backupInfo, onClose }) {
           </div>
 
           <div className="download-section">
-            <h3>📥 Tải xuống Backup:</h3>
+            <h3>
+              <img src="/icon/download.svg" alt="Download" className="section-icon" />
+              Download Backup
+            </h3>
             <p className="download-hint">
-              Link download có hiệu lực trong 7 ngày. Bạn có thể lưu vào Google Drive cá nhân.
+              Public URL - No expiration. Save to your personal Google Drive for safekeeping.
             </p>
 
             <div className="action-buttons">
               <button className="btn-primary" onClick={handleDownload}>
                 <img src="/icon/download.svg" alt="Download" />
-                Tải xuống ngay
+                Download Now
               </button>
 
               <button className="btn-secondary" onClick={handleSaveToDrive}>
                 <img src="/icon/upload.svg" alt="Drive" />
-                Lưu vào Drive
+                Open Drive
               </button>
 
               <button 
@@ -92,7 +94,7 @@ export default function BackupSuccessModal({ backupInfo, onClose }) {
                 onClick={handleCopyLink}
               >
                 <img src="/icon/copy.svg" alt="Copy" />
-                {copying ? 'Đã copy!' : 'Copy link'}
+                {copying ? 'Copied!' : 'Copy Link'}
               </button>
             </div>
 
@@ -108,15 +110,13 @@ export default function BackupSuccessModal({ backupInfo, onClose }) {
 
           <div className="email-notice">
             <img src="/icon/mail.svg" alt="Email" />
-            <p>
-              Link download cũng đã được gửi đến email <strong>{backupInfo.emailSent ? '✅' : '⏳'}</strong>
-            </p>
+            <p>Download link has been sent to your email</p>
           </div>
         </div>
 
         <div className="modal-footer">
           <button className="btn-close" onClick={onClose}>
-            Đóng
+            Close
           </button>
         </div>
       </div>

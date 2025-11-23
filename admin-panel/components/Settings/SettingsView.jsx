@@ -576,15 +576,39 @@ export default function SettingsView() {
               </div>
 
               <div className="backup-info">
-                <h3>ℹ️ Backup Information</h3>
+                <h3>
+                  <img src="/icon/info.svg" alt="Info" />
+                  Backup Information
+                </h3>
                 <ul>
-                  <li>✅ Backups are stored in Google Cloud Storage bucket</li>
-                  <li>🔄 Automatic backup runs every 24 hours</li>
-                  <li>📧 Download link sent to your email after each backup</li>
-                  <li>🗑️ Old backups are automatically cleaned up (keeps 30 most recent)</li>
-                  <li>📦 Backup includes: users, notifications, support tickets, voice profiles</li>
-                  <li>💰 Storage cost: ~$0.02/GB/month (very cheap!)</li>
-                  <li>💡 <strong>Tip:</strong> Click download button to get a signed URL, then save to your personal Google Drive</li>
+                  <li>
+                    <img src="/icon/check-circle.svg" alt="" />
+                    Backups stored in Google Cloud Storage bucket
+                  </li>
+                  <li>
+                    <img src="/icon/refresh-cw.svg" alt="" />
+                    Automatic backup runs every 24 hours
+                  </li>
+                  <li>
+                    <img src="/icon/mail.svg" alt="" />
+                    Download link sent to your email after each backup
+                  </li>
+                  <li>
+                    <img src="/icon/trash-2.svg" alt="" />
+                    Old backups automatically cleaned up (keeps 30 most recent)
+                  </li>
+                  <li>
+                    <img src="/icon/database.svg" alt="" />
+                    Backup includes: users, notifications, support tickets, voice profiles
+                  </li>
+                  <li>
+                    <img src="/icon/dollar-sign.svg" alt="" />
+                    Storage cost: ~$0.02/GB/month (very cheap!)
+                  </li>
+                  <li>
+                    <img src="/icon/lightbulb.svg" alt="" />
+                    <strong>Tip:</strong> Public URL never expires - Save to your personal Google Drive
+                  </li>
                 </ul>
               </div>
             </div>

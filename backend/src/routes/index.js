@@ -57,6 +57,7 @@ const profileController = require('../controllers/profile.controller');
 const analysisController = require('../controllers/analysis.controller');
 
 router.post('/create_profile', profileController.createProfile);
+router.post('/create_profile_complete', profileController.createProfileComplete);
 router.post('/add_sample', profileController.addSample);
 router.post('/add_samples_batch', profileController.addSamplesBatch);
 router.post('/finalize_profile', profileController.finalizeProfile);

@@ -234,6 +234,184 @@ Mức độ trang trọng: ${voiceProfile.formality_level}/10
 };
 
 // ============================================================================
+// CREATE PROFILE COMPLETE (Optimized - One API Call with Progress)
+// ============================================================================
+
+exports.createProfileComplete = async (req, res) => {
+  try {
+    const { user_id, profile_name = 'Hồ sơ mặc định', email, name = 'User', theme = 'work', samples } = req.body;
+
+    // Validate inputs
+    if (!samples || !Array.isArray(samples) || samples.length < 3) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Cần ít nhất 3 mẫu văn bản để tạo hồ sơ',
+        error_code: 'INSUFFICIENT_SAMPLES'
+      });
+    }
+
+    if (samples.length > 20) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Tối đa 20 mẫu văn bản',
+        error_code: 'TOO_MANY_SAMPLES'
+      });
+    }
+
+    // Validate each sample content
+    for (let i = 0; i < samples.length; i++) {
+      try {
+        validateText(samples[i].text, 20, 20000);
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          error: `Mẫu #${i + 1}: ${error.message}`,
+          error_code: 'INVALID_SAMPLE_CONTENT'
+        });
+      }
+    }
+
+    const userId = validateUserId(user_id);
+
+    // Calculate profile quality score
+    const { calculateProfileScore } = require('../utils/validation');
+    const qualityScore = calculateProfileScore(samples);
+    
+    logger.info('Profile quality score', { 
+      score: qualityScore.score, 
+      rating: qualityScore.rating,
+      sampleCount: samples.length 
+    });
+
+    // Step 1: Create or get user
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      await db.collection('users').doc(userId).set({
+        email: email || userId,
+        name,
+        tier: 'free',
+        usage: { profilesCount: 0, analysesCount: 0, rewritesCount: 0 },
+        createdAt: new Date()
+      });
+      logger.info('Auto-created user', { userId });
+    }
+
+    const profileId = uuidv4();
+
+    // Step 2: Create embeddings for all samples
+    logger.info('Creating embeddings', { count: samples.length });
+    const texts = samples.map(s => s.text);
+    const embeddings = await geminiService.createBatchEmbeddings(texts, 'RETRIEVAL_DOCUMENT');
+    logger.info('Embeddings created', { count: embeddings.length });
+
+    // Step 3: Calculate statistics
+    logger.info('Calculating statistics');
+    const allText = texts.join(' ');
+    const statisticalFeatures = analysisService.calculateStatistics(allText);
+
+    // Step 4: Generate voice summary
+    logger.info('Generating voice profile');
+    const voiceProfile = await geminiService.generateVoiceSummary(texts, statisticalFeatures);
+
+    const promptableSummary = `
+Tone: ${voiceProfile.tone}
+Mức độ trang trọng: ${voiceProfile.formality_level}/10
+Đặc điểm: ${voiceProfile.key_characteristics.join(', ')}
+`.trim();
+
+    // Step 5: Write everything in a batch
+    logger.info('Writing to database');
+    const batch = db.batch();
+
+    // Create profile document with quality score
+    const profileRef = db.collection('voice_profiles').doc(profileId);
+    batch.set(profileRef, {
+      userId,
+      name: profile_name,
+      theme,
+      status: 'ready',
+      samplesCount: samples.length,
+      statisticalFeatures,
+      voiceProfile,
+      promptableSummary,
+      embeddingModel: 'text-embedding-004',
+      qualityScore: qualityScore.score,
+      qualityRating: qualityScore.rating,
+      qualityFeedback: qualityScore.feedback,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    // Add all samples
+    samples.forEach((sample, idx) => {
+      const sampleId = uuidv4();
+      const sampleRef = db.collection('voice_profiles')
+        .doc(profileId)
+        .collection('samples')
+        .doc(sampleId);
+
+      batch.set(sampleRef, {
+        text: sample.text,
+        type: sample.type || 'unknown',
+        vector: embeddings[idx],
+        vectorModel: 'text-embedding-004',
+        taskType: 'RETRIEVAL_DOCUMENT',
+        createdAt: new Date()
+      });
+    });
+
+    // Update user profile count
+    const userRef = db.collection('users').doc(userId);
+    batch.update(userRef, {
+      'usage.profilesCount': FieldValue.increment(1)
+    });
+
+    await batch.commit();
+
+    logger.info('Profile created complete', { 
+      profileId, 
+      userId, 
+      samplesCount: samples.length,
+      qualityScore: qualityScore.score
+    });
+
+    res.status(201).json({
+      success: true,
+      profile_id: profileId,
+      status: 'ready',
+      samples_count: samples.length,
+      statistical_features: statisticalFeatures,
+      voice_profile: voiceProfile,
+      quality_score: qualityScore
+    });
+  } catch (error) {
+    logger.error('Create profile complete error', { error: error.message });
+    
+    // Return user-friendly error messages
+    let errorMessage = 'Không thể tạo hồ sơ. Vui lòng thử lại.';
+    let errorCode = 'UNKNOWN_ERROR';
+    
+    if (error.message.includes('INVALID_CONTENT')) {
+      errorMessage = error.message.replace('INVALID_CONTENT: ', '');
+      errorCode = 'INVALID_CONTENT';
+    } else if (error.message.includes('QUOTA_EXCEEDED')) {
+      errorMessage = 'Hệ thống đang quá tải. Vui lòng thử lại sau vài phút.';
+      errorCode = 'QUOTA_EXCEEDED';
+    } else if (error.message.includes('EMBEDDING_FAILED')) {
+      errorMessage = 'Lỗi xử lý văn bản. Vui lòng kiểm tra nội dung và thử lại.';
+      errorCode = 'EMBEDDING_FAILED';
+    }
+    
+    res.status(500).json({ 
+      success: false,
+      error: errorMessage,
+      error_code: errorCode,
+      error_detail: error.message
+    });
+  }
+};
+
+// ============================================================================
 // GET PROFILE
 // ============================================================================
 

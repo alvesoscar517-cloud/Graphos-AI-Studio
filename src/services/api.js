@@ -341,6 +341,39 @@ export async function finalizeProfile(profileId) {
   }
 }
 
+// Create profile with all data in one call (optimized flow)
+export async function createProfileComplete(profileName, theme, samples) {
+  try {
+    const userInfo = await getUserInfo()
+    console.log(`📦 Creating complete profile with ${samples.length} samples...`)
+    
+    const response = await fetch(`${CONFIG.API_BASE_URL}/create_profile_complete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: userInfo.userId,
+        profile_name: profileName,
+        email: userInfo.email,
+        name: userInfo.name,
+        theme: theme,
+        samples: samples
+      })
+    })
+    
+    const data = await response.json()
+    if (response.ok && data.success) {
+      console.log(`✅ Profile created successfully: ${data.profile_id}`)
+      return data
+    }
+    throw new Error(data.error || 'Failed to create profile')
+  } catch (error) {
+    console.error('Error creating complete profile:', error)
+    throw error
+  }
+}
+
 export async function getProfileDetails(profileId) {
   try {
     console.log('📋 Loading profile details for:', profileId)

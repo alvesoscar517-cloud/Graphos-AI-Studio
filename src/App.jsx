@@ -79,13 +79,16 @@ function AppContent() {
           </ErrorBoundary>
         } 
       />
+
       <Route path="*" element={
-        <div className="app">
-          {/* Show login overlay when loading or not authenticated */}
-          {(isLoading || !isAuthenticated) && <LoginOverlay />}
-          {/* Only render MainLayout when authenticated and not loading */}
-          {!isLoading && isAuthenticated && <MainLayout />}
-        </div>
+        <ErrorBoundary>
+          <div className="app">
+            {/* Show login overlay when loading or not authenticated */}
+            {(isLoading || !isAuthenticated) && <LoginOverlay />}
+            {/* Only render MainLayout when authenticated and not loading */}
+            {!isLoading && isAuthenticated && <MainLayout />}
+          </div>
+        </ErrorBoundary>
       } />
     </Routes>
   )

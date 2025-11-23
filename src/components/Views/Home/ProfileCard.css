@@ -173,6 +173,39 @@ body.dark-theme .profile-card-meta-item img {
   color: var(--text-primary);
 }
 
+/* Quality Score Colors */
+.profile-stat-value.quality-score-excellent {
+  color: #28a745;
+}
+
+.profile-stat-value.quality-score-good {
+  color: #17a2b8;
+}
+
+.profile-stat-value.quality-score-ok {
+  color: #ffc107;
+}
+
+.profile-stat-value.quality-score-poor {
+  color: #dc3545;
+}
+
+body.dark-theme .profile-stat-value.quality-score-excellent {
+  color: #4ade80;
+}
+
+body.dark-theme .profile-stat-value.quality-score-good {
+  color: #22d3ee;
+}
+
+body.dark-theme .profile-stat-value.quality-score-ok {
+  color: #fcd34d;
+}
+
+body.dark-theme .profile-stat-value.quality-score-poor {
+  color: #f87171;
+}
+
 .profile-card-tags {
   display: flex;
   flex-wrap: wrap;

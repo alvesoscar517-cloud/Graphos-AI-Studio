@@ -6,12 +6,13 @@ class ModalSystem {
     this.currentModal = null
   }
 
-  alert(message, title = 'Thông báo', type = 'info') {
+  alert(message, title = 'Thông báo', type = 'info', forceLight = false) {
     return new Promise((resolve) => {
       this.showModal({
         type,
         title,
         message,
+        forceLight,
         buttons: [
           {
             text: 'OK',
@@ -32,7 +33,8 @@ class ModalSystem {
       confirmText = 'OK',
       cancelText = 'Hủy',
       confirmStyle = 'primary',
-      danger = false
+      danger = false,
+      forceLight = false
     } = options
 
     return new Promise((resolve) => {
@@ -40,6 +42,7 @@ class ModalSystem {
         type,
         title,
         message,
+        forceLight,
         buttons: [
           {
             text: cancelText,
@@ -107,7 +110,7 @@ class ModalSystem {
     // Force close any existing modal first
     this.closeModal()
 
-    const { type = 'info', title, message, buttons = [] } = config
+    const { type = 'info', title, message, buttons = [], forceLight = false } = config
 
     const iconMap = {
       success: 'check-circle',
@@ -120,7 +123,7 @@ class ModalSystem {
     const icon = iconMap[type] || 'info'
 
     const overlay = document.createElement('div')
-    overlay.className = 'notification-modal-overlay'
+    overlay.className = `notification-modal-overlay${forceLight ? ' force-light-theme' : ''}`
 
     const buttonsHtml = buttons.map(btn => 
       `<button class="notification-modal-button ${btn.style || 'secondary'}" data-action="${btn.text}">

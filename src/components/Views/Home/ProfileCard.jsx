@@ -67,10 +67,9 @@ const ProfileCard = ({ profile, onSelect }) => {
 
       <div className="profile-card-stats">
         <div className="profile-stat">
-          <span className="profile-stat-label">FLESCH</span>
-          <span className="profile-stat-value">
-            {profile.statistics?.flesch_reading_ease?.toFixed(0) || 
-             profile.flesch_reading_ease?.toFixed(0) || '0'}
+          <span className="profile-stat-label">ĐIỂM SỐ</span>
+          <span className={`profile-stat-value quality-score-${profile.quality_rating || 'ok'}`}>
+            {profile.quality_score || profile.qualityScore || 'N/A'}
           </span>
         </div>
         <div className="profile-stat">

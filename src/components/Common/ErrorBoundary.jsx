@@ -1,9 +1,16 @@
 import { Component } from 'react'
+import './ErrorBoundary.css'
+import ghostIcon from '../../../icon for background/ghost-with-raised-arms.svg'
 
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props)
-    this.state = { hasError: false, error: null, errorInfo: null }
+    this.state = { 
+      hasError: false, 
+      error: null, 
+      errorInfo: null,
+      showDetails: false
+    }
   }
 
   static getDerivedStateFromError(error) {
@@ -18,37 +25,56 @@ class ErrorBoundary extends Component {
     })
   }
 
+  toggleDetails = () => {
+    this.setState(prev => ({ showDetails: !prev.showDetails }))
+  }
+
+  goHome = () => {
+    window.location.href = '/'
+  }
+
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{
-          padding: '20px',
-          margin: '20px',
-          border: '1px solid #f44336',
-          borderRadius: '4px',
-          backgroundColor: '#ffebee'
-        }}>
-          <h2 style={{ color: '#d32f2f' }}>Đã xảy ra lỗi</h2>
-          <details style={{ whiteSpace: 'pre-wrap', marginTop: '10px' }}>
-            <summary>Chi tiết lỗi</summary>
-            {this.state.error && this.state.error.toString()}
-            <br />
-            {this.state.errorInfo && this.state.errorInfo.componentStack}
-          </details>
-          <button
-            onClick={() => window.location.href = '/'}
-            style={{
-              marginTop: '10px',
-              padding: '8px 16px',
-              backgroundColor: '#2196f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Quay về trang chủ
-          </button>
+        <div className="error-screen">
+          <div className="error-content">
+            <img 
+              src={ghostIcon} 
+              alt="Error" 
+              className="error-icon"
+            />
+            <h1 className="error-title">Đã xảy ra lỗi</h1>
+            <p className="error-message">
+              Rất tiếc, đã có lỗi xảy ra. Vui lòng thử lại sau.
+            </p>
+            
+            {this.state.showDetails && (
+              <div className="error-details">
+                <div className="error-details-content">
+                  <strong>Chi tiết lỗi:</strong>
+                  <pre>{this.state.error && this.state.error.toString()}</pre>
+                  {this.state.errorInfo && (
+                    <pre>{this.state.errorInfo.componentStack}</pre>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="error-actions">
+              <button 
+                className="btn-details"
+                onClick={this.toggleDetails}
+              >
+                {this.state.showDetails ? 'Ẩn chi tiết' : 'Xem chi tiết'}
+              </button>
+              <button 
+                className="btn-home"
+                onClick={this.goHome}
+              >
+                Quay về trang chủ
+              </button>
+            </div>
+          </div>
         </div>
       )
     }

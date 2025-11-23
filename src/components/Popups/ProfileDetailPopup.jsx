@@ -83,6 +83,58 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
         </div>
 
         <div className="profile-detail-content">
+          {/* Quality Score Section */}
+          {(profile.quality_score || profile.qualityScore) && (
+            <section className="profile-detail-section">
+              <h3>
+                <img src="/icon/award.svg" alt="Quality" />
+                Chất lượng hồ sơ
+              </h3>
+              <div className="profile-quality-score">
+                <div className={`quality-score-display quality-rating-${profile.quality_rating || profile.qualityRating || 'ok'}`}>
+                  <div className="quality-score-number">
+                    {profile.quality_score || profile.qualityScore}
+                  </div>
+                  <div className="quality-score-label">/100</div>
+                </div>
+                <div className="quality-score-info">
+                  <div className="quality-rating-badge">
+                    {(profile.quality_rating || profile.qualityRating) === 'excellent' && (
+                      <>
+                        <img src="/icon/star.svg" alt="Excellent" />
+                        <span>Xuất sắc</span>
+                      </>
+                    )}
+                    {(profile.quality_rating || profile.qualityRating) === 'good' && (
+                      <>
+                        <img src="/icon/thumbs-up.svg" alt="Good" />
+                        <span>Tốt</span>
+                      </>
+                    )}
+                    {(profile.quality_rating || profile.qualityRating) === 'ok' && (
+                      <>
+                        <img src="/icon/check.svg" alt="OK" />
+                        <span>Đạt yêu cầu</span>
+                      </>
+                    )}
+                    {(profile.quality_rating || profile.qualityRating) === 'poor' && (
+                      <>
+                        <img src="/icon/alert-circle.svg" alt="Poor" />
+                        <span>Cần cải thiện</span>
+                      </>
+                    )}
+                  </div>
+                  <p className="quality-description">
+                    {(profile.quality_rating || profile.qualityRating) === 'excellent' && 'Hồ sơ xuất sắc! AI sẽ học rất tốt văn phong của bạn.'}
+                    {(profile.quality_rating || profile.qualityRating) === 'good' && 'Hồ sơ tốt! AI có thể học được văn phong của bạn.'}
+                    {(profile.quality_rating || profile.qualityRating) === 'ok' && 'Hồ sơ đủ dùng, nhưng nên cải thiện để AI học tốt hơn.'}
+                    {(profile.quality_rating || profile.qualityRating) === 'poor' && 'Hồ sơ cần cải thiện. Hãy thêm mẫu và nội dung đa dạng hơn.'}
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* Overview Section */}
           <section className="profile-detail-section">
             <h3>
