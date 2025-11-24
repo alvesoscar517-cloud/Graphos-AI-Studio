@@ -44,14 +44,17 @@ const ChatMessage = ({ message }) => {
               <ReactMarkdown>{message.content}</ReactMarkdown>
             </div>
             
-            <button 
-              className="chat-message-copy"
-              onClick={handleCopy}
-              data-tooltip={copied ? 'Đã sao chép!' : 'Sao chép'}
-              data-tooltip-position="top"
-            >
-              <img src={copied ? "/icon/check.svg" : "/icon/copy.svg"} alt="Copy" />
-            </button>
+            {/* Chỉ hiển thị nút copy khi không đang streaming và có nội dung */}
+            {!message.streaming && message.content && (
+              <button 
+                className="chat-message-copy"
+                onClick={handleCopy}
+                data-tooltip={copied ? 'Đã sao chép!' : 'Sao chép'}
+                data-tooltip-position="top"
+              >
+                <img src={copied ? "/icon/check.svg" : "/icon/copy.svg"} alt="Copy" />
+              </button>
+            )}
           </div>
         )}
       </div>

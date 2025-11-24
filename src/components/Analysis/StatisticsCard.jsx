@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { analyzeText } from '../../services/api'
-import { useAIProcessing } from '../../contexts/AIProcessingContext'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis, hasTextChanged } from '../../services/analysisCache'
+import Lottie from 'lottie-react'
+import threeDotsAnimation from '../../animation/Three dots loading.json'
 import modal from '../../utils/modal'
 import './Analysis.css'
 
@@ -12,7 +13,6 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
   const [showModal, setShowModal] = useState(false)
   const [showResult, setShowResult] = useState(true)
   const [textChanged, setTextChanged] = useState(true)
-  const { startProcessing, stopProcessing } = useAIProcessing()
   const { currentNote } = useNotes()
 
   // Load cached result when note or profile changes
@@ -83,7 +83,6 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
     }
     
     setIsLoading(true)
-    startProcessing('statistics')
     try {
       console.log('📊 Analyzing statistics for text:', text.substring(0, 50) + '...')
       const result = await analyzeText(currentProfile.profile_id, text)
@@ -119,7 +118,6 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
       setStats(null)
     } finally {
       setIsLoading(false)
-      stopProcessing()
     }
   }
 
@@ -170,10 +168,18 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
           disabled={disabled || isLoading || !textChanged}
           title={!textChanged ? 'Văn bản chưa thay đổi' : ''}
         >
-          <span className={isLoading ? 'shimmer-text-effect' : ''}>
-            {isLoading ? 'Đang phân tích...' : !textChanged ? 'Đã phân tích' : 'Phân tích'}
-          </span>
-          <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
+          {isLoading ? (
+            <Lottie 
+              animationData={threeDotsAnimation} 
+              loop={true}
+              style={{ width: 50, height: 16 }}
+            />
+          ) : (
+            <>
+              <span>{!textChanged ? 'Đã phân tích' : 'Phân tích'}</span>
+              <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
+            </>
+          )}
         </button>
         {stats && showResult && (
           <div className="feature-result" style={{ display: 'block' }}>

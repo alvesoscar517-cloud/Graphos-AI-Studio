@@ -3,9 +3,11 @@ import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import ChatMessage from './ChatMessage'
 import WorkspaceSidebar from './WorkspaceSidebar'
 import SharePopup from '../../Popups/SharePopup'
+import Lottie from 'lottie-react'
+import threeDotsAnimation from '../../../animation/Three dots loading.json'
 
 const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden }) => {
-  const { currentConversation, isLoading, updateConversationTitle } = useWorkspace()
+  const { currentConversation, isLoading, updateConversationTitle, clearConversation } = useWorkspace()
   const messagesEndRef = useRef(null)
   const messagesContainerRef = useRef(null)
   const [title, setTitle] = useState('')
@@ -201,6 +203,14 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
           <div className="workspace-header-actions">
             <button 
               className="icon-btn"
+              onClick={clearConversation}
+              data-tooltip="New chat" 
+              data-tooltip-position="left"
+            >
+              <img src="/icon/plus.svg" alt="New Chat" />
+            </button>
+            <button 
+              className="icon-btn"
               onClick={handleShareClick}
               data-tooltip="Chia sẻ cuộc trò chuyện" 
               data-tooltip-position="left"
@@ -218,17 +228,6 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
                 <img src="/icon/panel-right.svg" alt="Toggle Right Sidebar" />
               </button>
             )}
-            <button 
-              className="icon-btn"
-              onClick={() => {
-                // Create new chat
-                window.location.reload()
-              }}
-              data-tooltip="New chat" 
-              data-tooltip-position="left"
-            >
-              <img src="/icon/plus.svg" alt="New Chat" />
-            </button>
           </div>
         </div>
 
@@ -253,11 +252,11 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
             ))}
             {isLoading && (
               <div className="workspace-loading">
-                <div className="workspace-loading-dots">
-                  <div className="workspace-loading-dot"></div>
-                  <div className="workspace-loading-dot"></div>
-                  <div className="workspace-loading-dot"></div>
-                </div>
+                <Lottie 
+                  animationData={threeDotsAnimation} 
+                  loop={true}
+                  style={{ width: 60, height: 40 }}
+                />
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -282,10 +281,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
       <WorkspaceSidebar 
         hidden={rightSidebarHidden} 
         onClose={onToggleRightSidebar}
-        onNewChat={() => {
-          // Create new chat and clear current
-          window.location.reload() // Simple way, or use context
-        }}
+        onNewChat={clearConversation}
       />
     </>
   )

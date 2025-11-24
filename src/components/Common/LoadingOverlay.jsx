@@ -1,13 +1,21 @@
-import { createPortal } from 'react-dom';
-import Spinner from './Spinner';
-import './Spinner.css';
+import Lottie from 'lottie-react'
+import threeDotsAnimation from '../../animation/Three dots loading.json'
+import './LoadingOverlay.css'
 
-export default function LoadingOverlay({ message = 'Đang tải...' }) {
-  return createPortal(
+const LoadingOverlay = ({ show }) => {
+  if (!show) return null
+
+  return (
     <div className="loading-overlay">
-      <Spinner size="large" color="primary" />
-      <div className="loading-text">{message}</div>
-    </div>,
-    document.body
-  );
+      <div className="loading-overlay-content">
+        <Lottie 
+          animationData={threeDotsAnimation} 
+          loop={true}
+          style={{ width: 80, height: 60 }}
+        />
+      </div>
+    </div>
+  )
 }
+
+export default LoadingOverlay

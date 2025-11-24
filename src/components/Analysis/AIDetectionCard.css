@@ -97,7 +97,7 @@
   width: 16px;
   height: 16px;
   opacity: 0.8;
-  filter: var(--icon-filter);
+  filter: var(--icon-blue-filter);
   flex-shrink: 0;
   margin-top: -1px;
 }
@@ -143,7 +143,7 @@
   width: 16px;
   height: 16px;
   opacity: 0.6;
-  filter: var(--icon-filter);
+  filter: var(--icon-blue-filter);
   flex-shrink: 0;
 }
 
@@ -166,7 +166,11 @@ body.dark-theme .ai-card .ai-score-symbol {
 
 
 
-body.dark-theme .ai-card .ai-verdict-full img,
+body.dark-theme .ai-card .ai-verdict-full img {
+  filter: var(--icon-blue-filter);
+  opacity: 0.8;
+}
+
 body.dark-theme .ai-card .detail-btn-full img {
   filter: brightness(0) invert(1);
 }

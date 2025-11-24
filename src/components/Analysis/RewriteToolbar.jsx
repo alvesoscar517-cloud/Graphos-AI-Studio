@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, MotionConfig } from 'framer-motion'
+import Lottie from 'lottie-react'
 import { rewriteTextStream } from '../../services/api'
 import { useRewrite } from '../../contexts/RewriteContext'
-import { useAIProcessing } from '../../contexts/AIProcessingContext'
 import modal from '../../utils/modal'
+import threeDotsAnimation from '../../animation/Three dots loading.json'
 import './RewriteToolbar.css'
 
 const transition = {
@@ -36,7 +37,6 @@ const RewriteToolbar = ({
   disabled 
 }) => {
   const { selectedModel, writingPreferences } = useRewrite()
-  const { startProcessing, stopProcessing } = useAIProcessing()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const containerRef = useRef(null)
@@ -76,12 +76,31 @@ const RewriteToolbar = ({
     
     console.log('🚀 Starting rewrite process...')
     setIsLoading(true)
-    startProcessing('rewrite')
     
     try {
-      let streamedText = ''
+      let fullText = '' // Complete text buffer
+      let displayedText = '' // Currently displayed text
       let hasStartedStreaming = false
       let chunkCount = 0
+      let animationFrameId = null
+      let isAnimating = false
+      
+      // Smooth animation function
+      const animateText = () => {
+        if (displayedText.length < fullText.length) {
+          // Calculate how many characters to add (adaptive speed)
+          const remaining = fullText.length - displayedText.length
+          const charsToAdd = Math.max(1, Math.min(3, Math.ceil(remaining / 20)))
+          
+          displayedText = fullText.substring(0, displayedText.length + charsToAdd)
+          onTextChange(displayedText)
+          
+          animationFrameId = requestAnimationFrame(animateText)
+        } else {
+          isAnimating = false
+          animationFrameId = null
+        }
+      }
       
       await rewriteTextStream(
         currentProfile.profile_id,
@@ -92,33 +111,53 @@ const RewriteToolbar = ({
           chunkCount++
           console.log(`📦 Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
           
-          // First chunk - stop shimmer and clear editor
+          // First chunk - clear editor
           if (!hasStartedStreaming) {
             hasStartedStreaming = true
-            console.log('🔄 First chunk - stopping shimmer and clearing editor')
-            stopProcessing() // Stop shimmer effect immediately
+            console.log('🔄 First chunk - clearing editor')
             onTextChange('') // Clear old text immediately
+            displayedText = ''
           }
           
-          // Append chunk to streamed text
-          streamedText += chunk
-          onTextChange(streamedText)
-          console.log(`✍️ Updated editor with ${streamedText.length} characters`)
+          // Add chunk to full text buffer
+          fullText += chunk
+          
+          // Start smooth animation if not already running
+          if (!isAnimating) {
+            isAnimating = true
+            animateText()
+          }
+          
+          console.log(`✍️ Buffer: ${fullText.length} chars, Displayed: ${displayedText.length} chars`)
         }
       )
+      
+      // Wait for animation to complete naturally
+      const waitForAnimation = () => {
+        return new Promise((resolve) => {
+          const checkAnimation = () => {
+            if (!isAnimating && displayedText.length >= fullText.length) {
+              resolve()
+            } else {
+              requestAnimationFrame(checkAnimation)
+            }
+          }
+          checkAnimation()
+        })
+      }
+      
+      await waitForAnimation()
       
       // Success - text is already in editor
       console.log(`✅ Rewrite completed successfully - ${chunkCount} chunks received`)
       
     } catch (error) {
       console.error('❌ Error rewriting:', error)
-      stopProcessing()
       modal.error('Viết lại thất bại: ' + error.message)
       // Restore original text on error
       onTextChange(originalText)
     } finally {
       setIsLoading(false)
-      stopProcessing()
       console.log('🏁 Rewrite process finished')
     }
   }
@@ -245,11 +284,20 @@ const RewriteToolbar = ({
                   ariaLabel="Viết lại văn bản"
                   active={isLoading}
                 >
-                  {!isLoading && <img src="/icon/pen.svg" alt="Rewrite" className="toolbar-icon" />}
+                  {isLoading ? (
+                    <Lottie 
+                      animationData={threeDotsAnimation} 
+                      loop={true}
+                      style={{ width: 32, height: 14 }}
+                    />
+                  ) : (
+                    <img src="/icon/pen.svg" alt="Rewrite" className="toolbar-icon" />
+                  )}
                 </Button>
                 <Button
                   onClick={() => setIsExpanded(true)}
                   ariaLabel="Mở thêm tùy chọn"
+                  disabled={isLoading}
                 >
                   <img src="/icon/chevron-right.svg" alt="Expand" className="toolbar-icon" />
                 </Button>
@@ -259,6 +307,7 @@ const RewriteToolbar = ({
                 <Button
                   onClick={() => setIsExpanded(false)}
                   ariaLabel="Thu gọn"
+                  disabled={isLoading}
                 >
                   <img src="/icon/chevron-left.svg" alt="Collapse" className="toolbar-icon" />
                 </Button>
@@ -271,7 +320,13 @@ const RewriteToolbar = ({
                   ariaLabel="Viết lại văn bản"
                   active={isLoading}
                 >
-                  {!isLoading && (
+                  {isLoading ? (
+                    <Lottie 
+                      animationData={threeDotsAnimation} 
+                      loop={true}
+                      style={{ width: 42, height: 17 }}
+                    />
+                  ) : (
                     <>
                       <img src="/icon/pen.svg" alt="Rewrite" className="toolbar-icon" />
                       <span className="toolbar-label">Viết lại</span>
@@ -281,7 +336,7 @@ const RewriteToolbar = ({
                 
                 <Button
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={disabled}
+                  disabled={disabled || isLoading}
                   ariaLabel="Tải file lên"
                 >
                   <img src="/icon/upload.svg" alt="Upload" className="toolbar-icon" />

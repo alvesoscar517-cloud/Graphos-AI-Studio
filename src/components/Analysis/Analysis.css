@@ -62,13 +62,14 @@
 .profile-selector-icon img {
   width: 32px;
   height: 32px;
-  opacity: 0.6;
-  filter: grayscale(100%);
+  opacity: 0.7;
+  /* Unified blue color for all profile icons */
+  filter: var(--icon-blue-filter);
   transition: opacity 0.2s ease;
 }
 
 .profile-selector-icon:hover img {
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .profile-selector-arrow {
@@ -223,7 +224,7 @@ body.dark-theme .profile-selector-arrow {
 .deviation-icon img,
 .stats-icon img,
 .rewrite-icon img {
-  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%) !important;
+  filter: var(--icon-blue-filter) !important;
 }
 
 .feature-info {
@@ -414,7 +415,7 @@ body.dark-theme .profile-selector-arrow {
   height: 24px;
   opacity: 0.8;
   transition: opacity 0.2s ease;
-  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
+  filter: var(--icon-blue-filter);
 }
 
 .stat-item-modern:hover .stat-icon-wrapper img {
@@ -1141,7 +1142,8 @@ body.dark-theme .profile-selector-icon:hover {
 }
 
 body.dark-theme .profile-selector-icon img {
-  filter: brightness(0) invert(1);
+  /* Unified blue color in dark theme */
+  filter: var(--icon-blue-filter);
   opacity: 0.7;
 }
 
@@ -1218,8 +1220,8 @@ body.dark-theme .stat-icon-wrapper.words {
 }
 
 body.dark-theme .stat-icon-wrapper img {
-  /* Keep blue icon color in dark theme */
-  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
+  /* Unified blue icon color in dark theme */
+  filter: var(--icon-blue-filter);
   opacity: 0.8;
 }
 
@@ -2661,4 +2663,48 @@ body.dark-theme .stat-value {
 
 body.dark-theme .stat-value.highlight-red {
   color: #f28b82;
+}
+
+/* Shimmer Text Effect - Gradient on text only */
+.shimmer-text-effect {
+  display: inline-block;
+  background: linear-gradient(
+    110deg,
+    #000000 0%,
+    #000000 30%,
+    #ffffff 50%,
+    #000000 70%,
+    #000000 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-animation 2.5s ease-in-out infinite;
+  will-change: background-position;
+}
+
+body.dark-theme .shimmer-text-effect {
+  background: linear-gradient(
+    110deg,
+    #e3e3e3 0%,
+    #e3e3e3 30%,
+    #5eb9ff 50%,
+    #e3e3e3 70%,
+    #e3e3e3 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-animation 2.5s ease-in-out infinite;
+}
+
+@keyframes shimmer-animation {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
 }

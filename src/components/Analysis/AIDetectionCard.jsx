@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { detectAI as detectAIAPI } from '../../services/api'
-import { useAIProcessing } from '../../contexts/AIProcessingContext'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis, hasTextChanged } from '../../services/analysisCache'
+import Lottie from 'lottie-react'
+import threeDotsAnimation from '../../animation/Three dots loading.json'
 import modal from '../../utils/modal'
 import './Analysis.css'
 import './AIDetectionCard.css'
@@ -15,7 +16,6 @@ const AIDetectionCard = ({ disabled, text }) => {
   const [showModal, setShowModal] = useState(false)
   const [showResult, setShowResult] = useState(true)
   const [textChanged, setTextChanged] = useState(true)
-  const { startProcessing, stopProcessing } = useAIProcessing()
   const { currentNote } = useNotes()
 
   // Load cached result when note changes
@@ -95,7 +95,6 @@ const AIDetectionCard = ({ disabled, text }) => {
     }
     
     setIsLoading(true)
-    startProcessing('detect')
     try {
       console.log('🔍 Detecting AI for text:', text.substring(0, 50) + '...')
       const apiResult = await detectAIAPI(text)
@@ -136,7 +135,6 @@ const AIDetectionCard = ({ disabled, text }) => {
       setVerdict('')
     } finally {
       setIsLoading(false)
-      stopProcessing()
     }
   }
 
@@ -181,10 +179,18 @@ const AIDetectionCard = ({ disabled, text }) => {
           disabled={disabled || isLoading || !textChanged}
           title={!textChanged ? 'Văn bản chưa thay đổi' : ''}
         >
-          <span className={isLoading ? 'shimmer-text-effect' : ''}>
-            {isLoading ? 'Đang phát hiện...' : !textChanged ? 'Đã phát hiện' : 'Phát hiện'}
-          </span>
-          <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
+          {isLoading ? (
+            <Lottie 
+              animationData={threeDotsAnimation} 
+              loop={true}
+              style={{ width: 50, height: 16 }}
+            />
+          ) : (
+            <>
+              <span>{!textChanged ? 'Đã phát hiện' : 'Phát hiện'}</span>
+              <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
+            </>
+          )}
         </button>
         {result !== null && showResult && (
           <div className="feature-result" style={{ display: 'block' }}>
@@ -220,7 +226,12 @@ const AIDetectionCard = ({ disabled, text }) => {
               
               <div className="ai-verdict-full">
                 <img 
-                  src={isHumanWritten ? "/icon/user-check.svg" : "/icon/bot.svg"} 
+                  src={
+                    result < 30 ? "/icon/shield-check.svg" : 
+                    result < 50 ? "/icon/check-circle.svg" : 
+                    result < 70 ? "/icon/alert-circle.svg" : 
+                    "/icon/alert-triangle.svg"
+                  } 
                   alt="verdict" 
                   className="verdict-icon"
                 />

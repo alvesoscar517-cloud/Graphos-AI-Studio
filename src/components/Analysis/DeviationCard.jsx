@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { analyzeText } from '../../services/api'
-import { useAIProcessing } from '../../contexts/AIProcessingContext'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis, hasTextChanged } from '../../services/analysisCache'
+import Lottie from 'lottie-react'
+import threeDotsAnimation from '../../animation/Three dots loading.json'
 import modal from '../../utils/modal'
 import './Analysis.css'
 
@@ -12,7 +13,6 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
   const [isLoading, setIsLoading] = useState(false)
   const [showResult, setShowResult] = useState(true)
   const [textChanged, setTextChanged] = useState(true)
-  const { startProcessing, stopProcessing } = useAIProcessing()
   const { currentNote } = useNotes()
 
   // Load cached result when note changes
@@ -88,7 +88,6 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
     }
     
     setIsLoading(true)
-    startProcessing('deviation')
     try {
       const result = await analyzeText(currentProfile.profile_id, text)
       
@@ -128,7 +127,6 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
       modal.error('Phân tích thất bại: ' + error.message)
     } finally {
       setIsLoading(false)
-      stopProcessing()
     }
   }
 
@@ -162,10 +160,18 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
         disabled={disabled || isLoading || !textChanged}
         title={!textChanged ? 'Văn bản chưa thay đổi' : ''}
       >
-        <span className={isLoading ? 'shimmer-text-effect' : ''}>
-          {isLoading ? 'Đang tìm...' : !textChanged ? 'Đã tìm kiếm' : 'Tìm kiếm'}
-        </span>
-        <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
+        {isLoading ? (
+          <Lottie 
+            animationData={threeDotsAnimation} 
+            loop={true}
+            style={{ width: 50, height: 16 }}
+          />
+        ) : (
+          <>
+            <span>{!textChanged ? 'Đã tìm kiếm' : 'Tìm kiếm'}</span>
+            <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
+          </>
+        )}
       </button>
       {analysisData && showResult && (
         <div className="feature-result" style={{ display: 'block' }}>

@@ -99,14 +99,16 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
 
   return (
     <div className="home-view">
-      <button 
-        className="home-menu-btn icon-btn" 
-        onClick={onToggleLeftSidebar}
-        data-tooltip="Ẩn/hiện sidebar" 
-        data-tooltip-position="right"
-      >
-        <img src="/icon/panel-left.svg" alt="Toggle Left Sidebar" />
-      </button>
+      <header className="home-header">
+        <button 
+          className="menu-btn icon-btn" 
+          onClick={onToggleLeftSidebar}
+          data-tooltip="Ẩn/hiện sidebar" 
+          data-tooltip-position="right"
+        >
+          <img src="/icon/panel-left.svg" alt="Toggle Left Sidebar" />
+        </button>
+      </header>
 
       <div className="home-content">
         <div className="home-hero">
@@ -184,18 +186,12 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
         </div>
 
         <div className="profile-section">
-          {loading ? (
-            <div className="loading-profiles">
-              <div className="spinner"></div>
-              <p>Đang tải hồ sơ...</p>
-            </div>
-          ) : (
-            <ProfileCarousel 
-              profiles={profiles}
-              onSelectProfile={handleSelectProfile}
-              onUseProfile={handleUseProfileFromCard}
-            />
-          )}
+          <ProfileCarousel 
+            profiles={profiles}
+            onSelectProfile={handleSelectProfile}
+            onUseProfile={handleUseProfileFromCard}
+            loading={loading}
+          />
         </div>
       </div>
 

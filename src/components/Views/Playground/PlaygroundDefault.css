@@ -5,35 +5,131 @@
   flex: 1;
   background: #fff;
   overflow: hidden;
-  align-items: center;
   height: 100%;
-}
-
-.playground-topbar {
   width: 100%;
-  position: relative;
-  z-index: 1;
 }
 
-.playground-topbar-title {
+/* Override header for playground - tách riêng để tránh xung đột */
+.playground-default-view .main-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  min-height: 56px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+/* Header actions alignment */
+.playground-default-view .main-header .header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.playground-default-view .playground-topbar-title {
   font-size: 13px;
   font-weight: 500;
   color: #202124;
   margin-left: 4px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  flex: 1;
+}
+
+body.dark-theme .playground-default-view .playground-topbar-title {
+  color: #e3e3e3;
+}
+
+/* New Button with Border */
+.new-btn-bordered {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid #dadce0;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #202124;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  line-height: normal;
+  height: 32px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+.new-btn-bordered:hover {
+  background: #f8f9fa;
+  border-color: #bdc1c6;
+}
+
+.new-btn-bordered img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+.new-btn-bordered:hover img {
+  opacity: 1;
+}
+
+/* Dark theme for new button */
+body.dark-theme .new-btn-bordered {
+  border-color: #5f6368;
+  color: #e3e3e3;
+}
+
+body.dark-theme .new-btn-bordered:hover {
+  background: #3c4043;
+  border-color: #80868b;
+}
+
+body.dark-theme .new-btn-bordered img {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+body.dark-theme .new-btn-bordered:hover img {
+  opacity: 1;
 }
 
 .playground-welcome-content {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 900px;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  justify-content: center;
-  padding: 0 40px;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  padding: 0 24px;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Center content with max-width */
+.playground-studio-header,
+.studio-tabs,
+.studio-models-list {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 900px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .playground-welcome-content::-webkit-scrollbar {
@@ -42,7 +138,7 @@
 
 .playground-studio-header {
   text-align: center;
-  padding: 40px 24px 20px;
+  padding: 0 0 32px;
   flex-shrink: 0;
 }
 
@@ -58,9 +154,10 @@
 .studio-tabs {
   display: flex;
   gap: 8px;
-  padding: 0 24px 24px;
+  padding: 0 0 24px;
   justify-content: center;
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .studio-tab {
@@ -112,9 +209,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: 100%;
-  max-width: 100%;
-  padding: 0 24px 24px;
+  padding: 0 0 24px;
   flex-shrink: 0;
 }
 
@@ -322,8 +417,12 @@ body.dark-theme .playground-topbar .icon-btn:hover img {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .playground-default-view .main-header {
+    padding: 8px 12px;
+  }
+
   .playground-welcome-content {
-    padding: 40px 16px;
+    padding: 0 16px;
   }
 
   .studio-title {
@@ -349,5 +448,10 @@ body.dark-theme .playground-topbar .icon-btn:hover img {
     overflow-x: auto;
     justify-content: flex-start;
     margin-bottom: 32px;
+  }
+  
+  .new-btn-bordered {
+    padding: 6px 10px;
+    font-size: 12px;
   }
 }

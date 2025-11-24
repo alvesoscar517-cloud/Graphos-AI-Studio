@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react'
 import { useNotes } from '../../../contexts/NotesContext'
 import { useAuth } from '../../../contexts/AuthContext'
 import { useAIProcessing } from '../../../contexts/AIProcessingContext'
-import { openDriveFolder } from '../../../services/drive'
+import { createShare } from '../../../services/share'
 import modal from '../../../utils/modal'
 import TextShimmer from '../../Common/TextShimmer'
 import './PlaygroundEditor.css'
@@ -14,8 +14,8 @@ const PlaygroundEditor = ({
   onCreateNote,
   highlightedSentence // NEW: Sentence to highlight from deviation card
 }) => {
-  const { currentNote, updateNote, notes } = useNotes()
-  const { user, signOut } = useAuth()
+  const { currentNote, updateNote } = useNotes()
+  const { user } = useAuth()
   const { isProcessing, processingType } = useAIProcessing()
   const textareaRef = useRef(null)
 
@@ -62,32 +62,32 @@ const PlaygroundEditor = ({
     }
   }, [highlightedSentence, currentNote?.content])
 
-  const handleOpenInDrive = async () => {
+  const handleShare = async () => {
     try {
-      if (!user) {
-        modal.alert('Vui lòng đăng nhập để sử dụng tính năng này', 'Chưa đăng nhập')
+      if (!currentNote || !currentNote.content.trim()) {
+        modal.alert('Không có nội dung để chia sẻ', 'Lỗi')
         return
       }
 
-      await openDriveFolder(notes)
-      modal.toast('Đã mở thư mục Drive', '', 'success')
-    } catch (error) {
-      if (error.message === 'Not authenticated') {
-        modal.alert('Vui lòng đăng nhập để sử dụng tính năng này', 'Chưa đăng nhập')
-      } else if (error.message === 'NEED_REAUTH') {
-        const confirmed = await modal.confirm(
-          'Ứng dụng cần quyền truy cập Google Drive để đồng bộ notes. Vui lòng đăng nhập lại để cấp quyền.',
-          'Cần cấp quyền Drive',
-          { confirmText: 'Đăng nhập lại', danger: false }
-        )
-        
-        if (confirmed) {
-          await signOut()
-          modal.info('Vui lòng đăng nhập lại để cấp quyền truy cập Google Drive.')
+      // Create share link
+      const shareData = await createShare(
+        'note',
+        currentNote.title || 'Untitled',
+        currentNote.content,
+        null,
+        {
+          createdAt: new Date().toISOString()
         }
-      } else {
-        modal.error('Không thể mở thư mục Drive: ' + error.message)
-      }
+      )
+
+      // Copy link to clipboard
+      const shareUrl = `${window.location.origin}/shared/${shareData.share_id}`
+      await navigator.clipboard.writeText(shareUrl)
+      
+      modal.toast('Đã sao chép link chia sẻ', '', 'success')
+    } catch (error) {
+      console.error('Share error:', error)
+      modal.error('Không thể tạo link chia sẻ: ' + error.message)
     }
   }
 
@@ -121,10 +121,10 @@ const PlaygroundEditor = ({
           </button>
           <button 
             className="icon-btn" 
-            onClick={handleOpenInDrive}
-            data-tooltip="Mở trong Google Drive"
+            onClick={handleShare}
+            data-tooltip="Chia sẻ note"
           >
-            <img src="/icon/share-2.svg" alt="Drive" />
+            <img src="/icon/share-2.svg" alt="Share" />
           </button>
           {rightSidebarHidden && (
             <button 

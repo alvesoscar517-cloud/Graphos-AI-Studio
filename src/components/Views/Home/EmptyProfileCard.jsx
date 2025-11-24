@@ -31,8 +31,6 @@ const EmptyProfileCard = () => {
 
   return (
     <div className="empty-profile-section">
-      <h3 className="section-title">Hồ sơ văn phong của bạn</h3>
-      
       <div className="empty-profile-card">
         <div className="empty-card-content">
           <div className="empty-card-left">

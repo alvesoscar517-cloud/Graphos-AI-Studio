@@ -1,16 +1,6 @@
 /* Empty Profile Section */
 .empty-profile-section {
-  padding: 0 80px;
-  max-width: 1200px;
-  margin: 0 auto 48px;
   width: 100%;
-}
-
-.empty-profile-section .section-title {
-  font-size: 20px;
-  font-weight: 400;
-  color: #202124;
-  margin-bottom: 24px;
 }
 
 /* Empty Profile Card */
@@ -221,10 +211,6 @@
 }
 
 /* Dark Theme */
-body.dark-theme .empty-profile-section .section-title {
-  color: #e3e3e3;
-}
-
 body.dark-theme .empty-profile-card {
   background: #2d2d2d;
   border-color: #3c4043;

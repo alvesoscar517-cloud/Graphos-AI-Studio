@@ -50,6 +50,12 @@
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: auto;
+  /* Smooth rendering optimizations */
+  will-change: contents;
+  contain: layout style;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
 }
 
 .highlight-editor-input::placeholder {
@@ -157,38 +163,39 @@ body.dark-theme .highlight-text-marked.level-low,
   background-color: rgba(253, 214, 99, 0.15);
 }
 
-/* AI Processing shimmer - Only on text, white/black colors */
+/* AI Processing shimmer - Gradient on text only */
 .highlight-editor-input.processing-shimmer {
   background: linear-gradient(
-    90deg,
-    #828282 0%,
-    #828282 30%,
+    110deg,
+    #000000 0%,
+    #000000 30%,
     #ffffff 50%,
-    #828282 70%,
-    #828282 100%
+    #000000 70%,
+    #000000 100%
   );
   background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: processing-shimmer 5s linear infinite;
+  animation: processing-shimmer 2.5s ease-in-out infinite;
+  will-change: background-position;
 }
 
 body.dark-theme .highlight-editor-input.processing-shimmer,
 [data-theme="dark"] .highlight-editor-input.processing-shimmer {
   background: linear-gradient(
-    90deg,
-    #828282 0%,
-    #828282 30%,
-    #ffffff 50%,
-    #828282 70%,
-    #828282 100%
+    110deg,
+    #e3e3e3 0%,
+    #e3e3e3 30%,
+    #5eb9ff 50%,
+    #e3e3e3 70%,
+    #e3e3e3 100%
   );
   background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: processing-shimmer 5s linear infinite;
+  animation: processing-shimmer 2.5s ease-in-out infinite;
 }
 
 @keyframes processing-shimmer {

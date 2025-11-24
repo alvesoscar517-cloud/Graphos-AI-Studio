@@ -9,6 +9,15 @@
   --text-secondary: #5f6368;
   --border-primary: #e8eaed;
   
+  /* Unified Blue Color System */
+  --color-blue: #4facfe;
+  --color-blue-hover: #3b9aed;
+  --color-blue-light: rgba(79, 172, 254, 0.1);
+  --color-blue-border: rgba(79, 172, 254, 0.3);
+  
+  /* Blue icon filter for light theme */
+  --icon-blue-filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
+  
   /* Standardized header dimensions */
   --header-height: 40px;
   --header-padding-vertical: 8px;
@@ -25,6 +34,15 @@ body.dark-theme {
   --text-primary: #e3e3e3;
   --text-secondary: #9aa0a6;
   --border-primary: #3c4043;
+  
+  /* Unified Blue Color System for Dark Theme */
+  --color-blue: #5eb9ff;
+  --color-blue-hover: #7ac7ff;
+  --color-blue-light: rgba(94, 185, 255, 0.15);
+  --color-blue-border: rgba(94, 185, 255, 0.3);
+  
+  /* Blue icon filter for dark theme */
+  --icon-blue-filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(110%) contrast(98%);
 }
 
 /* Thiết lập font mặc định cho toàn bộ hệ thống */
@@ -349,20 +367,20 @@ select {
 
 /* Link styles */
 a {
-  color: #1967d2;
+  color: var(--color-blue);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: #1557b0;
+  color: var(--color-blue-hover);
   text-decoration: underline;
 }
 
 body.dark-theme a {
-  color: #8ab4f8;
+  color: var(--color-blue);
 }
 
 body.dark-theme a:hover {
-  color: #aecbfa;
+  color: var(--color-blue-hover);
 }

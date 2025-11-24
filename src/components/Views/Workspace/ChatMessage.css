@@ -70,6 +70,12 @@
   font-size: 14px;
   line-height: 1.6;
   color: #000;
+  /* Smooth rendering optimizations */
+  will-change: contents;
+  contain: layout style;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
 }
 
 .chat-message-markdown p {

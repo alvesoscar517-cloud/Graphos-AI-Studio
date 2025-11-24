@@ -133,8 +133,8 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
           className={`nav-item ${currentView === 'playground' || currentView === 'playground-default' ? 'active' : ''}`}
           onClick={(e) => { e.preventDefault(); onViewChange('playground') }}
         >
-          <img src="/icon/play.svg" alt="Playground" />
-          <span>Playground</span>
+          <img src="/icon/play.svg" alt="AI Studio" />
+          <span>AI Studio</span>
         </a>
 
         <a 
@@ -142,8 +142,8 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
           className={`nav-item ${currentView === 'workspace' ? 'active' : ''}`}
           onClick={(e) => { e.preventDefault(); onViewChange('workspace') }}
         >
-          <img src="/icon/message-square.svg" alt="Workspace" />
-          <span>Workspace</span>
+          <img src="/icon/message-square.svg" alt="AI Workspace" />
+          <span>AI Workspace</span>
         </a>
 
         <div className="nav-label">

@@ -71,7 +71,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+  background: var(--color-blue);
   border-radius: 10px;
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -263,16 +263,16 @@
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: var(--color-blue);
   color: white;
-  border-color: #3b82f6;
+  border-color: var(--color-blue);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2563eb;
-  border-color: #2563eb;
+  background: var(--color-blue-hover);
+  border-color: var(--color-blue-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 12px var(--color-blue-border);
 }
 
 .btn-primary:disabled {
@@ -306,12 +306,12 @@
 
 .btn-outline {
   background: white;
-  color: #4facfe;
-  border: 2px solid #4facfe;
+  color: var(--color-blue);
+  border: 2px solid var(--color-blue);
 }
 
 .btn-outline:hover {
-  background: #4facfe;
+  background: var(--color-blue);
   color: white;
 }
 
@@ -352,13 +352,13 @@
 }
 
 .option-card.has-data {
-  border-color: #93c5fd;
+  border-color: var(--color-blue);
   background: rgba(255, 255, 255, 0.75);
 }
 
 .option-card.has-data:hover {
-  border-color: #93c5fd;
-  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-blue);
+  box-shadow: 0 2px 6px var(--color-blue-border);
 }
 
 .option-icon {
@@ -375,7 +375,7 @@
 }
 
 .option-icon svg {
-  color: #4facfe;
+  color: var(--color-blue);
   stroke-width: 2;
 }
 
@@ -403,14 +403,14 @@
   right: 16px;
   width: 32px;
   height: 32px;
-  background: #3b82f6;
+  background: var(--color-blue);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
   animation: scaleIn 0.3s ease-out;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 8px var(--color-blue-border);
 }
 
 .option-badge svg {
@@ -735,7 +735,7 @@
 }
 
 .sample-progress-text span {
-  color: #3b82f6;
+  color: var(--color-blue);
   font-size: 15px;
 }
 
@@ -773,10 +773,10 @@
 }
 
 .checkmark-btn.completed {
-  background: #3b82f6;
-  border-color: #3b82f6;
+  background: var(--color-blue);
+  border-color: var(--color-blue);
   transform: scale(1);
-  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 2px 6px var(--color-blue-border);
 }
 
 .checkmark-btn.completed svg {
@@ -785,9 +785,9 @@
 }
 
 .checkmark-btn.active {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  background: var(--color-blue);
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px var(--color-blue-border);
 }
 
 .checkmark-btn.active svg {
@@ -796,8 +796,8 @@
 }
 
 .checkmark-btn:not(:disabled):not(.completed):not(.active):hover {
-  border-color: #3b82f6;
-  background: rgba(59, 130, 246, 0.05);
+  border-color: var(--color-blue);
+  background: var(--color-blue-light);
   cursor: pointer;
 }
 
@@ -860,7 +860,7 @@
 }
 
 .checklist-item svg {
-  color: #4facfe;
+  color: var(--color-blue);
   flex-shrink: 0;
   stroke-width: 2.5;
 }
@@ -884,7 +884,7 @@
   width: 24px;
   height: 24px;
   border: 3px solid #e9ecef;
-  border-top-color: #4facfe;
+  border-top-color: var(--color-blue);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   flex-shrink: 0;
@@ -952,7 +952,7 @@
 .completion-title {
   font-size: 42px;
   font-weight: 600;
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: var(--color-blue);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

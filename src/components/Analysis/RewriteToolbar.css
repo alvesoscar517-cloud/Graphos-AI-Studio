@@ -103,16 +103,15 @@
   display: none;
 }
 
-/* Loading spinner replaces icon when active */
-.toolbar-btn.active::before {
-  content: '';
-  display: block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(66, 133, 244, 0.2);
-  border-top-color: #4285f4;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+/* Loading animation container - no background, no padding interference */
+.toolbar-btn.active {
+  padding: 0;
+  background: transparent !important;
+  pointer-events: none;
+}
+
+.toolbar-btn.active:hover {
+  background: transparent !important;
 }
 
 .toolbar-label {
@@ -164,10 +163,10 @@
   filter: brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(1352%) hue-rotate(200deg) brightness(95%) contrast(90%);
 }
 
-.dark-theme .toolbar-btn.active::before,
-[data-theme="dark"] .toolbar-btn.active::before {
-  border-color: rgba(138, 180, 248, 0.2);
-  border-top-color: #8ab4f8;
+/* Dark theme - animation stays the same (no filter needed for Lottie) */
+.dark-theme .toolbar-btn.active,
+[data-theme="dark"] .toolbar-btn.active {
+  background: transparent !important;
 }
 
 .dark-theme .toolbar-divider,

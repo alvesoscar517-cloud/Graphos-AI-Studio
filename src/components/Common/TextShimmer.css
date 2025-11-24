@@ -1,24 +1,25 @@
-/* Text Shimmer Effect - White/Gray shimmer like in image */
+/* Text Shimmer Effect - Gradient on text only */
 .text-shimmer {
-  display: block;
+  display: inline-block;
   position: relative;
   background: linear-gradient(
-    90deg,
-    #828282 0%,
-    #828282 30%,
+    110deg,
+    #000000 0%,
+    #000000 30%,
     #ffffff 50%,
-    #828282 70%,
-    #828282 100%
+    #000000 70%,
+    #000000 100%
   );
   background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: text-shimmer-slide var(--shimmer-duration, 5s) linear infinite;
+  animation: shimmer-slide var(--shimmer-duration, 2.5s) ease-in-out infinite;
+  will-change: background-position;
 }
 
-/* Sliding shimmer animation */
-@keyframes text-shimmer-slide {
+/* Sliding shimmer animation with smooth easing */
+@keyframes shimmer-slide {
   0% {
     background-position: 200% center;
   }
@@ -27,20 +28,20 @@
   }
 }
 
-/* Dark theme - same effect (white shimmer on gray) */
+/* Dark theme - blue shimmer on light gray */
 body.dark-theme .text-shimmer,
 [data-theme="dark"] .text-shimmer {
   background: linear-gradient(
-    90deg,
-    #828282 0%,
-    #828282 30%,
-    #ffffff 50%,
-    #828282 70%,
-    #828282 100%
+    110deg,
+    #e3e3e3 0%,
+    #e3e3e3 30%,
+    #5eb9ff 50%,
+    #e3e3e3 70%,
+    #e3e3e3 100%
   );
   background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: text-shimmer-slide var(--shimmer-duration, 5s) linear infinite;
+  animation: shimmer-slide var(--shimmer-duration, 2.5s) ease-in-out infinite;
 }

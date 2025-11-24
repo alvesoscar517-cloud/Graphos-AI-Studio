@@ -30,14 +30,20 @@ export const AuthProvider = ({ children }) => {
           if (response) {
             const userInfo = await chrome.runtime.sendMessage({ action: 'getUserInfo' })
             if (userInfo && userInfo.email) {
-              setUser(userInfo)
+              // Generate userId from email if not exists
+              const userId = userInfo.id || `user_${userInfo.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+              localStorage.setItem('userId', userId);
+              setUser({ ...userInfo, id: userId })
             }
           }
         } catch (chromeError) {
           console.warn('Chrome extension context not available:', chromeError)
           // Fallback to dev mode
+          const devUserId = 'dev_user_123';
+          localStorage.setItem('userId', devUserId);
           setIsAuthenticated(true)
           setUser({
+            id: devUserId,
             email: 'dev@example.com',
             name: 'Development User',
             picture: null
@@ -46,8 +52,11 @@ export const AuthProvider = ({ children }) => {
       } else {
         // Running in regular browser - skip auth for development
         console.log('⚠️ Running in browser mode - Auth disabled for development')
+        const devUserId = 'dev_user_123';
+        localStorage.setItem('userId', devUserId);
         setIsAuthenticated(true)
         setUser({
+          id: devUserId,
           email: 'dev@example.com',
           name: 'Development User',
           picture: null
@@ -56,8 +65,11 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('❌ Auth check error:', error)
       // Fallback to authenticated for development
+      const devUserId = 'dev_user_123';
+      localStorage.setItem('userId', devUserId);
       setIsAuthenticated(true)
       setUser({
+        id: devUserId,
         email: 'dev@example.com',
         name: 'Development User',
         picture: null
@@ -74,16 +86,21 @@ export const AuthProvider = ({ children }) => {
           const response = await chrome.runtime.sendMessage({ action: 'signIn' })
           
           if (response && response.success) {
+            const userId = response.userInfo.id || `user_${response.userInfo.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+            localStorage.setItem('userId', userId);
             setIsAuthenticated(true)
-            setUser(response.userInfo)
+            setUser({ ...response.userInfo, id: userId })
             return true
           }
           return false
         } catch (chromeError) {
           console.warn('Chrome extension context not available:', chromeError)
           // Fallback to dev mode
+          const devUserId = 'dev_user_123';
+          localStorage.setItem('userId', devUserId);
           setIsAuthenticated(true)
           setUser({
+            id: devUserId,
             email: 'dev@example.com',
             name: 'Development User',
             picture: null
@@ -92,8 +109,11 @@ export const AuthProvider = ({ children }) => {
         }
       } else {
         // Browser mode - simulate sign in
+        const devUserId = 'dev_user_123';
+        localStorage.setItem('userId', devUserId);
         setIsAuthenticated(true)
         setUser({
+          id: devUserId,
           email: 'dev@example.com',
           name: 'Development User',
           picture: null
@@ -103,8 +123,11 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('❌ Sign in error:', error)
       // Fallback to authenticated for development
+      const devUserId = 'dev_user_123';
+      localStorage.setItem('userId', devUserId);
       setIsAuthenticated(true)
       setUser({
+        id: devUserId,
         email: 'dev@example.com',
         name: 'Development User',
         picture: null
@@ -120,6 +143,7 @@ export const AuthProvider = ({ children }) => {
           const response = await chrome.runtime.sendMessage({ action: 'signOut' })
           
           if (response.success) {
+            localStorage.removeItem('userId');
             setIsAuthenticated(false)
             setUser(null)
             return true
@@ -127,12 +151,14 @@ export const AuthProvider = ({ children }) => {
           return false
         } catch (chromeError) {
           console.warn('Chrome extension context not available:', chromeError)
+          localStorage.removeItem('userId');
           setIsAuthenticated(false)
           setUser(null)
           return true
         }
       } else {
         // Browser mode
+        localStorage.removeItem('userId');
         setIsAuthenticated(false)
         setUser(null)
         return true
@@ -143,43 +169,12 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const switchAccount = async () => {
-    try {
-      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
-        try {
-          const response = await chrome.runtime.sendMessage({ action: 'switchAccount' })
-          
-          if (response.success) {
-            setIsAuthenticated(false)
-            setUser(null)
-            return true
-          }
-          return false
-        } catch (chromeError) {
-          console.warn('Chrome extension context not available:', chromeError)
-          setIsAuthenticated(false)
-          setUser(null)
-          return true
-        }
-      } else {
-        // Browser mode
-        setIsAuthenticated(false)
-        setUser(null)
-        return true
-      }
-    } catch (error) {
-      console.error('❌ Switch account error:', error)
-      return false
-    }
-  }
-
   const value = {
     user,
     isAuthenticated,
     isLoading,
     signIn,
-    signOut,
-    switchAccount
+    signOut
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

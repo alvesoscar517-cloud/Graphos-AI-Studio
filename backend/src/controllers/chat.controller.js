@@ -157,6 +157,146 @@ Hãy trả lời theo CHÍNH XÁC phong cách trên.`;
   }
 };
 
+exports.sendMessageStream = async (req, res) => {
+  try {
+    const { messages, systemPrompt, model = 'gemini-2.0-flash-exp', temperature = 0.7, profileId = null, writingPreferences = null } = req.body;
+
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Messages array is required' });
+    }
+
+    console.log(`💬 Chat stream request: ${messages.length} messages, model: ${model}`);
+
+    let enhancedSystemPrompt = systemPrompt || 'Bạn là một trợ lý AI thông minh và hữu ích.';
+    
+    if (profileId) {
+      try {
+        const profileDoc = await db.collection('profiles').doc(profileId).get();
+        
+        if (profileDoc.exists) {
+          const profile = profileDoc.data();
+          const voiceProfile = profile.voice_profile;
+          
+          if (voiceProfile) {
+            enhancedSystemPrompt = `${systemPrompt || 'Bạn là một trợ lý AI thông minh và hữu ích.'}
+
+QUAN TRỌNG - PHONG CÁCH TRẢ LỜI:
+TONE: ${voiceProfile.tone}
+MỨC ĐỘ TRANG TRỌNG: ${voiceProfile.formality_level}/10
+ĐẶC ĐIỂM: ${voiceProfile.key_characteristics?.slice(0, 3).join(', ') || ''}
+
+Hãy trả lời theo CHÍNH XÁC phong cách trên.`;
+          }
+        }
+      } catch (profileError) {
+        console.error(`❌ Error loading profile ${profileId}:`, profileError);
+      }
+    }
+
+    // Add writing preferences to system prompt
+    if (writingPreferences && profileId) {
+      try {
+        const profileDoc = await db.collection('profiles').doc(profileId).get();
+        if (profileDoc.exists) {
+          const profile = profileDoc.data();
+          const voiceProfile = profile.voice_profile;
+          
+          if (voiceProfile) {
+            let preferencesText = '';
+            
+            if (writingPreferences.useVocabularyPreferences && voiceProfile.vocabulary_preferences) {
+              const vocabPrefs = voiceProfile.vocabulary_preferences;
+              if (vocabPrefs.common_phrases?.length > 0 || vocabPrefs.preferred_connectors?.length > 0 || vocabPrefs.avoid_words?.length > 0) {
+                preferencesText += '\n\nTỪ VỰNG ƯA THÍCH:';
+                if (vocabPrefs.common_phrases?.length > 0) {
+                  preferencesText += '\nCỤM TỪ THƯỜNG DÙNG: ' + vocabPrefs.common_phrases.join(', ');
+                }
+                if (vocabPrefs.preferred_connectors?.length > 0) {
+                  preferencesText += '\nTỪ NỐI ƯA THÍCH: ' + vocabPrefs.preferred_connectors.join(', ');
+                }
+                if (vocabPrefs.avoid_words?.length > 0) {
+                  preferencesText += '\nTỪ NÊN TRÁNH: ' + vocabPrefs.avoid_words.join(', ');
+                }
+              }
+            }
+            
+            if (writingPreferences.useKeyCharacteristics && voiceProfile.key_characteristics?.length > 0) {
+              preferencesText += '\n\nĐẶC ĐIỂM CHÍNH: ' + voiceProfile.key_characteristics.join(', ');
+            }
+            
+            if (writingPreferences.useSentencePatterns && voiceProfile.sentence_patterns) {
+              const sentencePatterns = voiceProfile.sentence_patterns;
+              if (sentencePatterns.opening_style || sentencePatterns.structure_preference) {
+                preferencesText += '\n\nCẤU TRÚC CÂU:';
+                if (sentencePatterns.opening_style) {
+                  preferencesText += '\nPHONG CÁCH MỞ ĐẦU: ' + sentencePatterns.opening_style;
+                }
+                if (sentencePatterns.structure_preference) {
+                  preferencesText += '\nCẤU TRÚC: ' + sentencePatterns.structure_preference;
+                }
+              }
+            }
+            
+            if (writingPreferences.useRewriteInstructions && voiceProfile.rewrite_instructions) {
+              preferencesText += '\n\nHƯỚNG DẪN VIẾT LẠI: ' + voiceProfile.rewrite_instructions;
+            }
+            
+            if (preferencesText) {
+              enhancedSystemPrompt += preferencesText;
+            }
+          }
+        }
+      } catch (prefError) {
+        console.error(`❌ Error loading preferences:`, prefError);
+      }
+    }
+
+    // Set up SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const generativeModel = geminiService.vertexAI.getGenerativeModel({
+      model: model,
+      generationConfig: {
+        temperature: temperature,
+        maxOutputTokens: 2048,
+      },
+    });
+
+    const chatHistory = messages.slice(0, -1).map(msg => ({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }]
+    }));
+
+    const chat = generativeModel.startChat({
+      history: chatHistory,
+      systemInstruction: enhancedSystemPrompt
+    });
+
+    const lastMessage = messages[messages.length - 1];
+    
+    const result = await chat.sendMessageStream(lastMessage.content);
+
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      if (chunkText) {
+        res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+      }
+    }
+
+    res.write('data: [DONE]\n\n');
+    res.end();
+
+    console.log(`✅ Chat stream completed`);
+
+  } catch (error) {
+    console.error('❌ Chat stream error:', error);
+    res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+    res.end();
+  }
+};
+
 exports.uploadFile = async (req, res) => {
   try {
     // TODO: Implement file upload

@@ -148,7 +148,7 @@ export const WorkspaceProvider = ({ children }) => {
     return firstMessage.substring(0, 50) + (firstMessage.length > 50 ? '...' : '')
   }, [modelSettings.model])
 
-  // Send message
+  // Send message with smooth streaming
   const sendMessage = useCallback(async (content, attachments = []) => {
     let conversation = currentConversation
     
@@ -176,6 +176,23 @@ export const WorkspaceProvider = ({ children }) => {
     setIsLoading(true)
     setError(null)
 
+    // Create AI message placeholder
+    const aiMessageId = (Date.now() + 1).toString()
+    const aiMessage = {
+      id: aiMessageId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      streaming: true
+    }
+
+    // Add empty AI message
+    setCurrentConversation(prev => ({
+      ...(prev || conversation),
+      messages: [...updatedMessages, aiMessage],
+      updated: new Date()
+    }))
+
     try {
       // Map model ID to actual model name
       const modelMap = {
@@ -187,39 +204,88 @@ export const WorkspaceProvider = ({ children }) => {
       
       const actualModel = modelMap[modelSettings.model] || 'gemini-2.0-flash-exp'
 
-      // Call AI API
-      const response = await fetch(`${CONFIG.API_BASE_URL}/api/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages: updatedMessages.map(m => ({
-            role: m.role,
-            content: m.content
-          })),
-          systemPrompt: currentConversation?.systemPrompt || generateSystemPrompt(),
-          model: actualModel,
-          temperature: modelSettings.temperature || 0.7,
-          profileId: currentProfile?.profile_id || null,
-          writingPreferences: modelSettings.writingPreferences || null
+      // Import streaming function
+      const { sendChatMessageStream } = await import('../services/api')
+
+      let fullText = '' // Complete text buffer
+      let displayedText = '' // Currently displayed text
+      let animationFrameId = null
+      let isAnimating = false
+
+      // Smooth animation function
+      const animateText = () => {
+        if (displayedText.length < fullText.length) {
+          // Calculate how many characters to add (adaptive speed)
+          const remaining = fullText.length - displayedText.length
+          const charsToAdd = Math.max(1, Math.min(3, Math.ceil(remaining / 20)))
+          
+          displayedText = fullText.substring(0, displayedText.length + charsToAdd)
+          
+          // Update message content
+          setCurrentConversation(prev => ({
+            ...prev,
+            messages: prev.messages.map(m => 
+              m.id === aiMessageId 
+                ? { ...m, content: displayedText }
+                : m
+            )
+          }))
+          
+          animationFrameId = requestAnimationFrame(animateText)
+        } else {
+          isAnimating = false
+          animationFrameId = null
+        }
+      }
+
+      // Stream response
+      await sendChatMessageStream(
+        updatedMessages.map(m => ({
+          role: m.role,
+          content: m.content
+        })),
+        currentConversation?.systemPrompt || generateSystemPrompt(),
+        actualModel,
+        modelSettings.temperature || 0.7,
+        currentProfile?.profile_id || null,
+        modelSettings.writingPreferences || null,
+        (chunk) => {
+          // Add chunk to full text buffer
+          fullText += chunk
+          
+          // Start smooth animation if not already running
+          if (!isAnimating) {
+            isAnimating = true
+            animateText()
+          }
+        }
+      )
+
+      // Wait for animation to complete naturally
+      const waitForAnimation = () => {
+        return new Promise((resolve) => {
+          const checkAnimation = () => {
+            if (!isAnimating && displayedText.length >= fullText.length) {
+              resolve()
+            } else {
+              requestAnimationFrame(checkAnimation)
+            }
+          }
+          checkAnimation()
         })
-      })
+      }
+      
+      await waitForAnimation()
+      displayedText = fullText
 
-      if (!response.ok) {
-        throw new Error('Failed to get AI response')
+      // Final update with complete message
+      const finalAiMessage = {
+        ...aiMessage,
+        content: fullText,
+        streaming: false
       }
 
-      const data = await response.json()
-
-      const aiMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: data.message,
-        timestamp: new Date()
-      }
-
-      const finalMessages = [...updatedMessages, aiMessage]
+      const finalMessages = [...updatedMessages, finalAiMessage]
 
       // Auto-generate title for first message (only if user hasn't edited it)
       let newTitle = currentConversation?.title || conversation?.title

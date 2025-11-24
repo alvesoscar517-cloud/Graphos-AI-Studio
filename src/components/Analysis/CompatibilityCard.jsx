@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { analyzeText } from '../../services/api'
-import { useAIProcessing } from '../../contexts/AIProcessingContext'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis, hasTextChanged } from '../../services/analysisCache'
+import Lottie from 'lottie-react'
+import threeDotsAnimation from '../../animation/Three dots loading.json'
 import './Analysis.css'
 import './CompatibilityCard.css'
 
@@ -13,7 +14,6 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
   const [showResult, setShowResult] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [textChanged, setTextChanged] = useState(true)
-  const { startProcessing, stopProcessing } = useAIProcessing()
   const { currentNote } = useNotes()
 
   // Load cached result when note or profile changes
@@ -89,7 +89,6 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
     }
     
     setIsLoading(true)
-    startProcessing('compatibility')
     try {
       console.log('🔍 Analyzing with profile:', currentProfile.profile_id)
       console.log('📝 Text length:', text.length)
@@ -141,7 +140,6 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
       setAnalysisDetails(null)
     } finally {
       setIsLoading(false)
-      stopProcessing()
     }
   }
 
@@ -194,10 +192,18 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
           disabled={disabled || isLoading || !textChanged}
           title={!textChanged ? 'Văn bản chưa thay đổi' : ''}
         >
-          <span className={isLoading ? 'shimmer-text-effect' : ''}>
-            {isLoading ? 'Đang tính...' : !textChanged ? 'Đã tính' : 'Tính điểm'}
-          </span>
-          <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
+          {isLoading ? (
+            <Lottie 
+              animationData={threeDotsAnimation} 
+              loop={true}
+              style={{ width: 50, height: 16 }}
+            />
+          ) : (
+            <>
+              <span>{!textChanged ? 'Đã tính' : 'Tính điểm'}</span>
+              <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
+            </>
+          )}
         </button>
         {score !== null && showResult && (
           <div className="feature-result" style={{ display: 'block' }}>

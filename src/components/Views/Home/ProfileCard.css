@@ -50,7 +50,8 @@ body.dark-theme .profile-card:hover {
   width: 28px;
   height: 28px;
   opacity: 0.7;
-  filter: brightness(0) saturate(100%);
+  /* Unified blue color for all profile icons */
+  filter: var(--icon-blue-filter);
   transition: all var(--transition-normal);
 }
 
@@ -68,7 +69,8 @@ body.dark-theme .profile-card:hover .profile-card-icon {
 }
 
 body.dark-theme .profile-card-icon img {
-  filter: brightness(0) saturate(100%) invert(1);
+  /* Unified blue color in dark theme */
+  filter: var(--icon-blue-filter);
   opacity: 0.8;
 }
 

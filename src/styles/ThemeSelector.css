@@ -41,14 +41,14 @@
 
 /* Selected state */
 .theme-btn.theme-selected {
-  border-color: #4facfe;
-  background: rgba(79, 172, 254, 0.1);
-  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.2);
+  border-color: var(--color-blue);
+  background: var(--color-blue-light);
+  box-shadow: 0 4px 12px var(--color-blue-border);
 }
 
 .theme-btn.theme-selected:hover {
-  border-color: #4facfe;
-  background: rgba(79, 172, 254, 0.15);
+  border-color: var(--color-blue);
+  background: var(--color-blue-light);
 }
 
 /* Icon styling - màu theo theme */
@@ -69,19 +69,19 @@
   transform: scale(1.08);
 }
 
-/* All theme icons use blue color */
+/* All theme icons use unified blue color */
 .theme-btn .theme-btn-icon {
-  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(101%) contrast(98%);
+  filter: var(--icon-blue-filter);
 }
 
-/* Hover - brighter blue */
+/* Hover - same blue */
 .theme-btn:hover .theme-btn-icon {
-  filter: invert(47%) sepia(89%) saturate(2476%) hue-rotate(182deg) brightness(110%) contrast(98%);
+  filter: var(--icon-blue-filter);
 }
 
-/* Selected - most vibrant blue */
+/* Selected - same blue */
 .theme-btn.theme-selected .theme-btn-icon {
-  filter: invert(47%) sepia(89%) saturate(2676%) hue-rotate(182deg) brightness(115%) contrast(100%);
+  filter: var(--icon-blue-filter);
 }
 
 /* Text label */
@@ -100,7 +100,7 @@
 }
 
 .theme-btn.theme-selected .theme-btn-label {
-  color: #4facfe;
+  color: var(--color-blue);
   font-weight: 600;
 }
 

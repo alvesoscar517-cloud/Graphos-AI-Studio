@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
-import Lottie from 'lottie-react'
 import { useProfiles } from '../../contexts/ProfileContext'
 import { deleteProfile as deleteProfileAPI } from '../../services/api'
 import { invalidateProfileDetailCache } from '../../utils/profileDetailCache'
 import modal from '../../utils/modal'
-import catAnimation from '../../animation/cat-playing-animation.json'
 import './Analysis.css'
 import '../Popups/ProfileModal.css'
 
@@ -130,12 +128,11 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                 </div>
               ) : filteredProfiles.length === 0 ? (
                 <div className="empty-state">
-                  <div className="empty-animation-wrapper">
-                    <Lottie
-                      animationData={catAnimation}
-                      loop={true}
-                      autoplay={true}
-                      style={{ width: '100%', height: '100%' }}
+                  <div className="empty-monster-wrapper">
+                    <img 
+                      src="/icon for background/monster-chibi.svg" 
+                      alt="Monster Chibi" 
+                      className="empty-monster-icon"
                     />
                   </div>
                   <p className="empty-text">

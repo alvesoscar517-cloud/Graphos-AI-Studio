@@ -40,21 +40,6 @@ const SharePopup = ({ item, onClose }) => {
   const createShare = async () => {
     setIsLoading(true)
     try {
-      // Generate mock share ID for UI testing
-      const mockShareId = 'demo-' + Math.random().toString(36).substr(2, 9)
-      setShareId(mockShareId)
-      
-      // Generate mock extension URL
-      const extensionId = chrome?.runtime?.id || 'your-extension-id'
-      const extensionUrl = `https://chromewebstore.google.com/detail/ai-content-authenticator/${extensionId}?share=${mockShareId}`
-      
-      // Simulate API delay for realistic feel
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      setShareUrl(extensionUrl)
-      
-      // Uncomment below to use real API when backend is ready
-      /*
       const shareData = {
         type: item.type === 'chat' ? 'conversation' : 'note',
         title: item.title,
@@ -80,19 +65,16 @@ const SharePopup = ({ item, onClose }) => {
 
       const data = await response.json()
       setShareId(data.shareId)
-      
-      const extensionUrl = `https://chromewebstore.google.com/detail/ai-content-authenticator/${chrome.runtime.id}?share=${data.shareId}`
-      setShareUrl(extensionUrl)
-      */
+      setShareUrl(data.shareUrl)
     } catch (error) {
       console.error('Failed to create share:', error)
-      // Don't show error in demo mode
-      // modal.error('Không thể tạo liên kết chia sẻ')
+      modal.error('Không thể tạo liên kết chia sẻ. Vui lòng thử lại.')
       
-      // Fallback to demo URL
+      // Fallback to demo URL for development
       const mockShareId = 'demo-' + Math.random().toString(36).substr(2, 9)
       setShareId(mockShareId)
-      setShareUrl(`https://chromewebstore.google.com/detail/ai-content-authenticator/demo?share=${mockShareId}`)
+      const extensionId = chrome?.runtime?.id || 'your-extension-id'
+      setShareUrl(`https://chromewebstore.google.com/detail/ai-content-authenticator/${extensionId}?share=${mockShareId}`)
     } finally {
       setIsLoading(false)
     }

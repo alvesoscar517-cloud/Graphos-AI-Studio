@@ -195,15 +195,24 @@
   transform: translateY(-30px);
 }
 
-.empty-animation-wrapper {
-  width: 260px;
-  height: 260px;
+.empty-monster-wrapper {
+  width: 200px;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: -40px auto -60px auto;
-  padding: 0;
-  transform: scale(1.15);
+  margin: -20px auto -20px auto;
+}
+
+.empty-monster-icon {
+  width: 180px;
+  height: 180px;
+  opacity: 0.4;
+}
+
+body.dark-theme .empty-monster-icon {
+  opacity: 0.3;
+  filter: invert(1) brightness(1.2);
 }
 
 .empty-text {
@@ -286,6 +295,8 @@ body.dark-theme .profile-modal-card.selected {
   width: 20px;
   height: 20px;
   opacity: 0.7;
+  /* Unified blue color for all profile icons */
+  filter: var(--icon-blue-filter);
   transition: opacity 0.2s ease;
 }
 
@@ -302,7 +313,8 @@ body.dark-theme .profile-modal-card:hover .profile-modal-icon {
 }
 
 body.dark-theme .profile-modal-icon img {
-  filter: brightness(0) invert(1);
+  /* Unified blue color in dark theme */
+  filter: var(--icon-blue-filter);
 }
 
 .profile-modal-info {

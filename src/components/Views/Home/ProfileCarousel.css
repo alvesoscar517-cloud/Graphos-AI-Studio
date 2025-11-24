@@ -98,3 +98,12 @@ body.dark-theme .profile-nav-btn:hover:not(:disabled) img {
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 }
+
+/* Loading State */
+.profile-carousel-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 40px 0;
+}

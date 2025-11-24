@@ -25,10 +25,8 @@
   flex-direction: column;
   align-items: center;
   padding: 0;
-  max-width: 1200px;
   width: 100%;
-  margin: 0 auto;
-  border-top: none;
+  overflow: hidden;
 }
 
 .history-header {
@@ -74,7 +72,7 @@
 
 .filter-tab.active {
   background: white;
-  color: #1967d2;
+  color: #202124;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -253,16 +251,31 @@ body.dark-theme .search-container:hover .search-icon {
 .history-table-container {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
   padding-right: 40px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  min-height: 0;
 }
 
 .history-table-container::-webkit-scrollbar {
-  display: none;
+  width: 8px;
+}
+
+.history-table-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.history-table-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.history-table-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .history-table {
@@ -270,6 +283,7 @@ body.dark-theme .search-container:hover .search-icon {
   border-collapse: collapse;
   font-size: 14px;
   table-layout: auto;
+  background: transparent;
 }
 
 .history-table thead {
@@ -328,13 +342,12 @@ body.dark-theme .search-container:hover .search-icon {
 }
 
 .history-table tbody tr:hover td {
-  background: #f8f9fa;
-  border-bottom: 1px solid #f8f9fa;
+  background: rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.02);
 }
 
 .history-table tbody tr:hover td:first-child {
   border-radius: 8px 0 0 8px;
-  padding-left: 20px;
 }
 
 .history-table tbody tr:hover td:last-child {
@@ -471,17 +484,9 @@ body.dark-theme .history-actions-btn img {
   background: #f8f9fa;
 }
 
-.history-menu-item.danger {
-  color: #202124;
-}
-
 .history-menu-item img {
   width: 16px;
   height: 16px;
-  opacity: 0.6;
-}
-
-.history-menu-item.danger img {
   opacity: 0.6;
 }
 
@@ -489,16 +494,7 @@ body.dark-theme .history-menu-item {
   color: #e3e3e3;
 }
 
-body.dark-theme .history-menu-item.danger {
-  color: #e3e3e3;
-}
-
 body.dark-theme .history-menu-item img {
-  filter: brightness(0) invert(1);
-  opacity: 0.7;
-}
-
-body.dark-theme .history-menu-item.danger img {
   filter: brightness(0) invert(1);
   opacity: 0.7;
 }
@@ -681,7 +677,7 @@ body.dark-theme .history-empty-desc {
 }
 
 body.dark-theme .history-table {
-  background: #1e1e1e;
+  background: transparent;
 }
 
 body.dark-theme .history-table thead {
@@ -703,13 +699,12 @@ body.dark-theme .history-table tbody tr:hover {
 }
 
 body.dark-theme .history-table tbody tr:hover td {
-  background: #2d2d2d;
-  border-bottom: 1px solid #2d2d2d;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 body.dark-theme .history-table tbody tr:hover td:first-child {
   border-radius: 8px 0 0 8px;
-  padding-left: 20px;
 }
 
 body.dark-theme .history-table tbody tr:hover td:last-child {
@@ -744,10 +739,6 @@ body.dark-theme .history-menu-item {
 
 body.dark-theme .history-menu-item:hover {
   background: #3c4043;
-}
-
-body.dark-theme .history-menu-item.danger {
-  color: #f28b82;
 }
 
 /* Dark theme - Icons auto-invert */
@@ -818,30 +809,21 @@ body.dark-theme .filter-tab {
 }
 
 body.dark-theme .filter-tab:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.9);
 }
 
 body.dark-theme .filter-tab.active {
-  background: rgba(138, 180, 248, 0.2);
-  color: #8ab4f8;
+  background: #3c4043;
+  color: #e3e3e3;
 }
 
-body.dark-theme .history-table {
-  background: rgba(60, 64, 67, 0.2);
+body.dark-theme .history-table-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-body.dark-theme .history-table thead {
-  background: rgba(60, 64, 67, 0.4);
-  border-bottom-color: rgba(255, 255, 255, 0.1);
-}
-
-body.dark-theme .history-table tbody tr {
-  border-bottom-color: rgba(255, 255, 255, 0.05);
-}
-
-body.dark-theme .history-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.05);
+body.dark-theme .history-table-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 body.dark-theme .title-edit-btn:hover {

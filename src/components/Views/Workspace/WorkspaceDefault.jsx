@@ -1,7 +1,7 @@
 import { useAuth } from '../../../contexts/AuthContext'
 import './WorkspaceDefault.css'
 
-const WorkspaceDefault = ({ onToggleLeftSidebar, onStartChat, onToggleRightSidebar, rightSidebarHidden }) => {
+const WorkspaceDefault = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden }) => {
   const { user } = useAuth()
 
   return (
@@ -18,8 +18,8 @@ const WorkspaceDefault = ({ onToggleLeftSidebar, onStartChat, onToggleRightSideb
         
         <span className="workspace-default-title">AI Workspace</span>
         
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-          {rightSidebarHidden && (
+        {rightSidebarHidden && (
+          <div style={{ marginLeft: 'auto' }}>
             <button 
               className="icon-btn"
               onClick={onToggleRightSidebar}
@@ -28,16 +28,8 @@ const WorkspaceDefault = ({ onToggleLeftSidebar, onStartChat, onToggleRightSideb
             >
               <img src="/icon/panel-right.svg" alt="Toggle Right Sidebar" />
             </button>
-          )}
-          <button 
-            className="icon-btn"
-            onClick={onStartChat}
-            data-tooltip="New chat" 
-            data-tooltip-position="left"
-          >
-            <img src="/icon/plus.svg" alt="New Chat" />
-          </button>
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="workspace-default-content">

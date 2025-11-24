@@ -607,3 +607,78 @@ export async function analyzeTextBatch(profileId, texts) {
     return { success: false, error: error.message }
   }
 }
+
+// Chat streaming - for smooth chat responses
+export async function sendChatMessageStream(messages, systemPrompt, model, temperature, profileId, writingPreferences, onChunk) {
+  try {
+    console.log('📡 Sending chat stream request...')
+    
+    const response = await fetch(`${CONFIG.API_BASE_URL}/api/chat/stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        messages,
+        systemPrompt,
+        model,
+        temperature,
+        profileId,
+        writingPreferences
+      })
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    console.log('📡 Response received, starting to read stream...')
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+    
+    while (true) {
+      const { done, value } = await reader.read()
+      
+      if (done) {
+        console.log('📡 Stream ended')
+        break
+      }
+      
+      // Decode chunk and add to buffer
+      buffer += decoder.decode(value, { stream: true })
+      
+      // Process complete lines
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || '' // Keep incomplete line in buffer
+      
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6).trim()
+          
+          if (data === '[DONE]') {
+            console.log('📡 Received [DONE] signal')
+            return
+          }
+          
+          if (data) {
+            try {
+              const json = JSON.parse(data)
+              if (json.chunk) {
+                onChunk(json.chunk)
+              } else if (json.error) {
+                console.error('❌ Server error:', json.error)
+                throw new Error(json.error)
+              }
+            } catch (e) {
+              console.warn('⚠️ Failed to parse JSON:', data, e)
+            }
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error streaming chat:', error)
+    throw error
+  }
+}

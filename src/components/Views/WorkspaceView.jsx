@@ -12,11 +12,12 @@ const WorkspaceView = ({
   rightSidebarHidden,
   leftSidebarHidden
 }) => {
-  const { currentConversation, createConversation, sendMessage, isLoading } = useWorkspace()
+  const { currentConversation, sendMessage, isLoading, clearConversation } = useWorkspace()
   const [isTransitioning, setIsTransitioning] = useState(false)
 
   const handleStartChat = () => {
-    createConversation('New Chat')
+    // Clear conversation hiện tại để quay về giao diện default
+    clearConversation()
   }
 
   const handleSendMessage = async (message) => {
@@ -34,11 +35,12 @@ const WorkspaceView = ({
     }
   }
 
-  const isCentered = !currentConversation && !isTransitioning
+  // Hiển thị giao diện default khi chưa có conversation HOẶC conversation chưa có tin nhắn
+  const showDefaultView = !currentConversation || currentConversation.messages.length === 0
 
   return (
     <div className="workspace-view">
-      {!currentConversation ? (
+      {showDefaultView ? (
         <>
           <div 
             className="workspace-default-wrapper"
@@ -49,7 +51,6 @@ const WorkspaceView = ({
           >
             <WorkspaceDefault 
               onToggleLeftSidebar={onToggleLeftSidebar}
-              onStartChat={handleStartChat}
               onToggleRightSidebar={onToggleRightSidebar}
               rightSidebarHidden={rightSidebarHidden}
             />
