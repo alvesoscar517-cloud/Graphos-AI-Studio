@@ -318,7 +318,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           </button>
           {onUse && profile.status === 'ready' && (
             <button className="btn-primary" onClick={onUse}>
-              <img src="/icon/check.svg" alt="Use" />
+              <img src="/icon/play.svg" alt="Use" />
               Sử dụng hồ sơ này
             </button>
           )}

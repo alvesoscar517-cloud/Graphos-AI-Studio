@@ -355,28 +355,39 @@ body.dark-theme .search-container:hover .search-icon {
 }
 
 .name-col {
-  width: 50%;
+  width: 35%;
   min-width: 200px;
+  max-width: 400px;
 }
 
 .type-col {
   width: 140px;
   white-space: nowrap;
   text-align: left;
+  padding-left: 40px !important;
+  padding-right: 16px !important;
+}
+
+.source-col {
+  width: 140px;
+  white-space: nowrap;
+  text-align: left;
+  padding-left: 40px !important;
   padding-right: 16px !important;
 }
 
 .updated-col {
-  width: 120px;
+  width: 160px;
   white-space: nowrap;
   text-align: left;
+  padding-left: 40px !important;
   padding-right: 16px !important;
 }
 
 .actions-col {
-  width: 40px;
+  width: 60px;
   text-align: right;
-  padding-right: 0 !important;
+  padding-right: 16px !important;
 }
 
 .history-actions-btn {
@@ -385,8 +396,8 @@ body.dark-theme .search-container:hover .search-icon {
   border: none;
   cursor: pointer;
   border-radius: 4px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  opacity: 0.6;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -396,11 +407,16 @@ body.dark-theme .search-container:hover .search-icon {
 }
 
 .history-table tbody tr:hover .history-actions-btn {
-  opacity: 0.6;
+  opacity: 1;
 }
 
 .history-actions-btn:hover {
   opacity: 1 !important;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+body.dark-theme .history-actions-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .history-actions-btn img {
@@ -456,7 +472,7 @@ body.dark-theme .history-actions-btn img {
 }
 
 .history-menu-item.danger {
-  color: #d93025;
+  color: #202124;
 }
 
 .history-menu-item img {
@@ -466,7 +482,15 @@ body.dark-theme .history-actions-btn img {
 }
 
 .history-menu-item.danger img {
-  opacity: 0.8;
+  opacity: 0.6;
+}
+
+body.dark-theme .history-menu-item {
+  color: #e3e3e3;
+}
+
+body.dark-theme .history-menu-item.danger {
+  color: #e3e3e3;
 }
 
 body.dark-theme .history-menu-item img {
@@ -476,7 +500,7 @@ body.dark-theme .history-menu-item img {
 
 body.dark-theme .history-menu-item.danger img {
   filter: brightness(0) invert(1);
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
 .history-name {
@@ -485,6 +509,13 @@ body.dark-theme .history-menu-item.danger img {
   gap: 12px;
   font-weight: 400;
   color: #202124;
+  overflow: hidden;
+}
+
+.history-name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .history-name img {

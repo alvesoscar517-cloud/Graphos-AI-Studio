@@ -5,6 +5,28 @@ chrome.action.onClicked.addListener((tab) => {
   });
 });
 
+// Xử lý khi extension được cài đặt hoặc cập nhật
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    console.log('✅ Extension installed');
+  } else if (details.reason === 'update') {
+    console.log('✅ Extension updated');
+  }
+});
+
+// Xử lý URL với share parameter
+chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+  const url = new URL(details.url);
+  const shareId = url.searchParams.get('share');
+  
+  if (shareId && details.frameId === 0) {
+    // Redirect to extension with share parameter
+    chrome.tabs.update(details.tabId, {
+      url: chrome.runtime.getURL(`index.html?share=${shareId}`)
+    });
+  }
+});
+
 // Kiểm tra trạng thái đăng nhập
 async function checkAuthStatus() {
   const result = await chrome.storage.local.get(['userInfo', 'accessToken']);

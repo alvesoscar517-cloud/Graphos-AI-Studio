@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { loadProfiles, getProfileDetails } from '../../services/api'
 import { getCachedProfiles, setCachedProfiles, checkCacheInvalidation } from '../../utils/profileCache'
 import { getCachedProfileDetail, setCachedProfileDetail } from '../../utils/profileDetailCache'
+import { useNotes } from '../../contexts/NotesContext'
 import ProfileCarousel from './Home/ProfileCarousel'
 import ProfileDetailPopup from '../Popups/ProfileDetailPopup'
 import modal from '../../utils/modal'
 import './HomeView.css'
 
 const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
+  const { createNote } = useNotes()
   const navigate = useNavigate()
   const [profiles, setProfiles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -74,6 +76,20 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
     localStorage.setItem('activeProfileName', profile.profile_name)
     modal.toast('Đã chọn hồ sơ', profile.profile_name, 'success')
     setShowDetailPopup(false)
+    
+    // Create new note and switch to editor
+    createNote()
+    onViewChange('playground-editor')
+  }
+
+  const handleUseProfileFromCard = (profile) => {
+    // Set active profile
+    localStorage.setItem('activeProfileId', profile.profile_id)
+    localStorage.setItem('activeProfileName', profile.profile_name)
+    modal.toast('Đã chọn hồ sơ', profile.profile_name, 'success')
+    
+    // Create new note and switch to editor
+    createNote()
     onViewChange('playground-editor')
   }
   
@@ -177,6 +193,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
             <ProfileCarousel 
               profiles={profiles}
               onSelectProfile={handleSelectProfile}
+              onUseProfile={handleUseProfileFromCard}
             />
           )}
         </div>

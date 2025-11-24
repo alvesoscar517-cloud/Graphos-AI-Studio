@@ -419,9 +419,26 @@ exports.rewriteTextStream = async (req, res) => {
     const result = await generativeModel.generateContentStream(prompt);
 
     for await (const chunk of result.stream) {
-      const chunkText = chunk.text();
-      if (chunkText) {
-        res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+      try {
+        // Try different ways to extract text from chunk
+        let chunkText = null;
+        
+        if (typeof chunk.text === 'function') {
+          chunkText = chunk.text();
+        } else if (chunk.candidates && chunk.candidates[0]) {
+          const candidate = chunk.candidates[0];
+          if (candidate.content && candidate.content.parts && candidate.content.parts[0]) {
+            chunkText = candidate.content.parts[0].text;
+          }
+        } else if (chunk.text) {
+          chunkText = chunk.text;
+        }
+        
+        if (chunkText) {
+          res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+        }
+      } catch (chunkError) {
+        console.error('Error processing chunk:', chunkError);
       }
     }
 

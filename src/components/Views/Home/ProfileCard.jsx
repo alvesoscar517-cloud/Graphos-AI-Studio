@@ -1,6 +1,6 @@
 import './ProfileCard.css'
 
-const ProfileCard = ({ profile, onSelect }) => {
+const ProfileCard = ({ profile, onSelect, onUse }) => {
   // Debug: Log profile data
   console.log('ProfileCard data:', profile)
   
@@ -82,21 +82,33 @@ const ProfileCard = ({ profile, onSelect }) => {
       </div>
 
       <div className="profile-card-tags">
-        <span className="profile-tag">Văn phòng</span>
-        <span className="profile-tag">Cá nhân</span>
+        <span className="profile-tag">
+          <img src="/icon/briefcase.svg" alt="Văn phòng" />
+          Văn phòng
+        </span>
+        <span className="profile-tag">
+          <img src="/icon/user.svg" alt="Cá nhân" />
+          Cá nhân
+        </span>
       </div>
 
       <div className="profile-card-footer">
         <span className="profile-card-updated">
+          <img src="/icon/clock.svg" alt="Thời gian" />
           {formatDate(profile.created_at)}
         </span>
         <button 
           className="profile-card-action"
           onClick={(e) => {
             e.stopPropagation()
-            onSelect(profile)
+            if (onUse) {
+              onUse(profile)
+            } else {
+              onSelect(profile)
+            }
           }}
         >
+          <img src="/icon/play.svg" alt="Sử dụng" />
           Sử dụng
         </button>
       </div>

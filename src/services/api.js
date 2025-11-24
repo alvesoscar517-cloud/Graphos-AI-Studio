@@ -190,6 +190,8 @@ export async function rewriteText(profileId, text, model = 'gemini-2.5-flash', w
 export async function rewriteTextStream(profileId, text, model, writingPreferences, onChunk) {
   try {
     const userInfo = await getUserInfo()
+    console.log('📡 Sending rewrite_stream request...')
+    
     const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite_stream`, {
       method: 'POST',
       headers: {
@@ -208,36 +210,54 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     
+    console.log('📡 Response received, starting to read stream...')
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
+    let buffer = ''
     
     while (true) {
       const { done, value } = await reader.read()
       
-      if (done) break
+      if (done) {
+        console.log('📡 Stream ended')
+        break
+      }
       
-      const chunk = decoder.decode(value, { stream: true })
-      const lines = chunk.split('\n')
+      // Decode chunk and add to buffer
+      buffer += decoder.decode(value, { stream: true })
+      
+      // Process complete lines
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || '' // Keep incomplete line in buffer
       
       for (const line of lines) {
         if (line.startsWith('data: ')) {
-          const data = line.slice(6)
+          const data = line.slice(6).trim()
+          
           if (data === '[DONE]') {
+            console.log('📡 Received [DONE] signal')
             return
           }
-          try {
-            const json = JSON.parse(data)
-            if (json.chunk) {
-              onChunk(json.chunk)
+          
+          if (data) {
+            try {
+              const json = JSON.parse(data)
+              if (json.chunk) {
+                console.log('📦 Chunk received:', json.chunk.substring(0, 30) + '...')
+                onChunk(json.chunk)
+              } else if (json.error) {
+                console.error('❌ Server error:', json.error)
+                throw new Error(json.error)
+              }
+            } catch (e) {
+              console.warn('⚠️ Failed to parse JSON:', data, e)
             }
-          } catch (e) {
-            // Skip invalid JSON
           }
         }
       }
     }
   } catch (error) {
-    console.error('Error streaming rewrite:', error)
+    console.error('❌ Error streaming rewrite:', error)
     throw error
   }
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import ChatMessage from './ChatMessage'
 import WorkspaceSidebar from './WorkspaceSidebar'
+import SharePopup from '../../Popups/SharePopup'
 
 const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden }) => {
   const { currentConversation, isLoading, updateConversationTitle } = useWorkspace()
@@ -12,6 +13,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [isTypingTitle, setIsTypingTitle] = useState(false)
+  const [showSharePopup, setShowSharePopup] = useState(false)
   const titleInputRef = useRef(null)
   const typingTimeoutRef = useRef(null)
 
@@ -126,8 +128,26 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
     setIsEditingTitle(true)
   }
 
+  const handleShareClick = () => {
+    if (currentConversation && currentConversation.messages.length > 0) {
+      setShowSharePopup(true)
+    }
+  }
+
   return (
     <>
+      {showSharePopup && currentConversation && (
+        <SharePopup 
+          item={{
+            id: currentConversation.id,
+            title: currentConversation.title,
+            type: 'chat',
+            updated: new Date(currentConversation.updated),
+            data: currentConversation
+          }}
+          onClose={() => setShowSharePopup(false)}
+        />
+      )}
       <div 
         className="workspace-chat-container"
         style={{
@@ -179,6 +199,15 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
           </div>
 
           <div className="workspace-header-actions">
+            <button 
+              className="icon-btn"
+              onClick={handleShareClick}
+              data-tooltip="Chia sẻ cuộc trò chuyện" 
+              data-tooltip-position="left"
+              disabled={!currentConversation || currentConversation.messages.length === 0}
+            >
+              <img src="/icon/share-2.svg" alt="Share" />
+            </button>
             {rightSidebarHidden && (
               <button 
                 className="icon-btn"

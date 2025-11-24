@@ -4,6 +4,7 @@ import { useWorkspace } from '../../contexts/WorkspaceContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { openDriveFolder } from '../../services/drive'
 import modal from '../../utils/modal'
+import SharePopup from '../Popups/SharePopup'
 import './HistoryView.css'
 
 const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
@@ -15,6 +16,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const [isSyncing, setIsSyncing] = useState(false)
   const [activeMenu, setActiveMenu] = useState(null)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
+  const [shareItem, setShareItem] = useState(null)
   
   console.log('HistoryView - notes:', notes.length, 'conversations:', conversations.length, 'loading:', loading)
 
@@ -89,7 +91,19 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const handleMenuClick = (e, item) => {
     e.stopPropagation()
     const rect = e.currentTarget.getBoundingClientRect()
-    setMenuPosition({ x: rect.right - 160, y: rect.bottom + 4 })
+    const menuWidth = 160
+    const menuHeight = 100 // Approximate height of menu
+    
+    // Calculate horizontal position (center under button)
+    const x = rect.left + (rect.width / 2) - (menuWidth / 2)
+    
+    // Calculate vertical position (below or above based on space)
+    const spaceBelow = window.innerHeight - rect.bottom
+    const y = spaceBelow > menuHeight + 20 
+      ? rect.bottom + 8  // Show below
+      : rect.top - menuHeight - 8  // Show above
+    
+    setMenuPosition({ x, y })
     setActiveMenu(activeMenu === item.id ? null : item.id)
   }
 
@@ -122,7 +136,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
 
   const handleShareItem = (item) => {
     setActiveMenu(null)
-    modal.info('Tính năng chia sẻ sẽ được cập nhật trong phiên bản tiếp theo')
+    setShareItem(item)
   }
 
   const handleOpenInDrive = async () => {
@@ -155,7 +169,14 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   }
 
   return (
-    <div className="history-view">
+    <>
+      {shareItem && (
+        <SharePopup 
+          item={shareItem}
+          onClose={() => setShareItem(null)}
+        />
+      )}
+      <div className="history-view">
       <div className="history-topbar">
         <button 
           className="menu-btn icon-btn" 
@@ -388,6 +409,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         </div>
       </div>
     </div>
+    </>
   )
 }
 

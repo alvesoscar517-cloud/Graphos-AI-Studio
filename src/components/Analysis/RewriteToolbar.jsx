@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, MotionConfig } from 'framer-motion'
-import { rewriteText as rewriteTextAPI } from '../../services/api'
+import { rewriteTextStream } from '../../services/api'
 import { useRewrite } from '../../contexts/RewriteContext'
+import { useAIProcessing } from '../../contexts/AIProcessingContext'
 import modal from '../../utils/modal'
 import './RewriteToolbar.css'
 
@@ -13,7 +14,7 @@ const transition = {
   damping: 25,
 }
 
-const Button = ({ children, onClick, disabled, ariaLabel, active, tooltip }) => {
+const Button = ({ children, onClick, disabled, ariaLabel, active }) => {
   return (
     <button
       className={`toolbar-btn ${active ? 'active' : ''}`}
@@ -21,7 +22,6 @@ const Button = ({ children, onClick, disabled, ariaLabel, active, tooltip }) => 
       onClick={onClick}
       disabled={disabled}
       aria-label={ariaLabel}
-      data-tooltip={tooltip}
     >
       {children}
     </button>
@@ -36,6 +36,7 @@ const RewriteToolbar = ({
   disabled 
 }) => {
   const { selectedModel, writingPreferences } = useRewrite()
+  const { startProcessing, stopProcessing } = useAIProcessing()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const containerRef = useRef(null)
@@ -63,44 +64,62 @@ const RewriteToolbar = ({
   }, [visible])
 
   const handleRewrite = async () => {
-    if (!currentProfile || !text || isLoading) return
+    // Check if text exists
+    if (!text || text.trim().length === 0) {
+      modal.alert('Vui lòng nhập văn bản trước khi viết lại', 'Không có văn bản')
+      return
+    }
+
+    if (!currentProfile || isLoading) return
     
+    const originalText = text // Save original text for error recovery
+    
+    console.log('🚀 Starting rewrite process...')
     setIsLoading(true)
-    const loadingModal = modal.loading('Đang viết lại văn bản...')
+    startProcessing('rewrite')
     
     try {
-      const result = await rewriteTextAPI(
-        currentProfile.profile_id, 
-        text, 
+      let streamedText = ''
+      let hasStartedStreaming = false
+      let chunkCount = 0
+      
+      await rewriteTextStream(
+        currentProfile.profile_id,
+        originalText,
         selectedModel,
-        writingPreferences
+        writingPreferences,
+        (chunk) => {
+          chunkCount++
+          console.log(`📦 Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
+          
+          // First chunk - stop shimmer and clear editor
+          if (!hasStartedStreaming) {
+            hasStartedStreaming = true
+            console.log('🔄 First chunk - stopping shimmer and clearing editor')
+            stopProcessing() // Stop shimmer effect immediately
+            onTextChange('') // Clear old text immediately
+          }
+          
+          // Append chunk to streamed text
+          streamedText += chunk
+          onTextChange(streamedText)
+          console.log(`✍️ Updated editor with ${streamedText.length} characters`)
+        }
       )
       
-      loadingModal.close()
+      // Success - text is already in editor
+      console.log(`✅ Rewrite completed successfully - ${chunkCount} chunks received`)
       
-      if (result.success && result.data) {
-        const rewrittenText = result.data.rewritten_text || ''
-        
-        // Show result in modal with option to replace
-        const confirmed = await modal.confirm(
-          rewrittenText,
-          'Văn bản đã được viết lại',
-          'Thay thế văn bản',
-          'Đóng'
-        )
-        
-        if (confirmed && onTextChange) {
-          onTextChange(rewrittenText)
-        }
-      } else {
-        throw new Error(result.error || 'Rewrite failed')
-      }
     } catch (error) {
-      loadingModal.close()
-      console.error('Error rewriting:', error)
+      console.error('❌ Error rewriting:', error)
+      stopProcessing()
       modal.error('Viết lại thất bại: ' + error.message)
+      // Restore original text on error
+      onTextChange(originalText)
     } finally {
       setIsLoading(false)
+      stopProcessing()
+      console.log('🏁 Rewrite process finished')
     }
   }
 
@@ -225,14 +244,12 @@ const RewriteToolbar = ({
                   disabled={disabled || isLoading || !text || !currentProfile}
                   ariaLabel="Viết lại văn bản"
                   active={isLoading}
-                  tooltip="Viết lại văn bản"
                 >
-                  <img src="/icon/pen.svg" alt="Rewrite" className="toolbar-icon" />
+                  {!isLoading && <img src="/icon/pen.svg" alt="Rewrite" className="toolbar-icon" />}
                 </Button>
                 <Button
                   onClick={() => setIsExpanded(true)}
                   ariaLabel="Mở thêm tùy chọn"
-                  tooltip="Mở thêm tùy chọn"
                 >
                   <img src="/icon/chevron-right.svg" alt="Expand" className="toolbar-icon" />
                 </Button>
@@ -242,7 +259,6 @@ const RewriteToolbar = ({
                 <Button
                   onClick={() => setIsExpanded(false)}
                   ariaLabel="Thu gọn"
-                  tooltip="Thu gọn"
                 >
                   <img src="/icon/chevron-left.svg" alt="Collapse" className="toolbar-icon" />
                 </Button>
@@ -254,19 +270,19 @@ const RewriteToolbar = ({
                   disabled={disabled || isLoading || !text || !currentProfile}
                   ariaLabel="Viết lại văn bản"
                   active={isLoading}
-                  tooltip={isLoading ? 'Đang xử lý...' : 'Viết lại văn bản'}
                 >
-                  <img src="/icon/pen.svg" alt="Rewrite" className="toolbar-icon" />
-                  <span className="toolbar-label">
-                    {isLoading ? 'Đang xử lý...' : 'Viết lại'}
-                  </span>
+                  {!isLoading && (
+                    <>
+                      <img src="/icon/pen.svg" alt="Rewrite" className="toolbar-icon" />
+                      <span className="toolbar-label">Viết lại</span>
+                    </>
+                  )}
                 </Button>
                 
                 <Button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={disabled}
                   ariaLabel="Tải file lên"
-                  tooltip="Tải file TXT, PDF, DOCX"
                 >
                   <img src="/icon/upload.svg" alt="Upload" className="toolbar-icon" />
                   <span className="toolbar-label">Tải file</span>

@@ -16,7 +16,9 @@
   },
   "permissions": [
     "identity",
-    "storage"
+    "storage",
+    "webNavigation",
+    "tabs"
   ],
   "host_permissions": [
     "https://ai-authenticator-472729326429.us-central1.run.app/*"

@@ -157,42 +157,38 @@ body.dark-theme .highlight-text-marked.level-low,
   background-color: rgba(253, 214, 99, 0.15);
 }
 
-/* AI Processing shimmer */
+/* AI Processing shimmer - Only on text, white/black colors */
 .highlight-editor-input.processing-shimmer {
   background: linear-gradient(
     90deg,
-    #202124 0%,
-    #202124 25%,
-    #4285f4 40%,
-    #8ab4f8 50%,
-    #4285f4 60%,
-    #202124 75%,
-    #202124 100%
+    #828282 0%,
+    #828282 30%,
+    #ffffff 50%,
+    #828282 70%,
+    #828282 100%
   );
   background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: processing-shimmer 3s linear infinite;
+  animation: processing-shimmer 5s linear infinite;
 }
 
 body.dark-theme .highlight-editor-input.processing-shimmer,
 [data-theme="dark"] .highlight-editor-input.processing-shimmer {
   background: linear-gradient(
     90deg,
-    #e3e3e3 0%,
-    #e3e3e3 25%,
-    #8ab4f8 40%,
+    #828282 0%,
+    #828282 30%,
     #ffffff 50%,
-    #8ab4f8 60%,
-    #e3e3e3 75%,
-    #e3e3e3 100%
+    #828282 70%,
+    #828282 100%
   );
   background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: processing-shimmer 3s linear infinite;
+  animation: processing-shimmer 5s linear infinite;
 }
 
 @keyframes processing-shimmer {
@@ -204,47 +200,7 @@ body.dark-theme .highlight-editor-input.processing-shimmer,
   }
 }
 
-/* Processing glow border */
-.highlight-editor-wrapper.processing-active::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  animation: processing-glow 2s ease-in-out infinite;
-  z-index: 5;
-}
-
-@keyframes processing-glow {
-  0%, 100% {
-    border-color: rgba(66, 133, 244, 0);
-    box-shadow: 0 0 0 rgba(66, 133, 244, 0);
-  }
-  50% {
-    border-color: rgba(66, 133, 244, 0.3);
-    box-shadow: 0 0 20px rgba(66, 133, 244, 0.2);
-  }
-}
-
-body.dark-theme .highlight-editor-wrapper.processing-active::after,
-[data-theme="dark"] .highlight-editor-wrapper.processing-active::after {
-  animation: processing-glow-dark 2s ease-in-out infinite;
-}
-
-@keyframes processing-glow-dark {
-  0%, 100% {
-    border-color: rgba(138, 180, 248, 0);
-    box-shadow: 0 0 0 rgba(138, 180, 248, 0);
-  }
-  50% {
-    border-color: rgba(138, 180, 248, 0.3);
-    box-shadow: 0 0 20px rgba(138, 180, 248, 0.2);
-  }
-}
+/* Removed processing glow border - shimmer only on text */
 
 /* Responsive */
 @media (max-width: 768px) {

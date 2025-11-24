@@ -3,7 +3,7 @@ import ProfileCard from './ProfileCard'
 import EmptyProfileCard from './EmptyProfileCard'
 import './ProfileCarousel.css'
 
-const ProfileCarousel = ({ profiles, onSelectProfile }) => {
+const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const handlePrev = () => {
@@ -55,6 +55,7 @@ const ProfileCarousel = ({ profiles, onSelectProfile }) => {
               key={profile.profile_id}
               profile={profile}
               onSelect={onSelectProfile}
+              onUse={onUseProfile}
             />
           ))}
         </div>

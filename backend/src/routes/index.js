@@ -10,6 +10,7 @@ const analysisRoutes = require('./analysis.routes');
 const adminRoutes = require('./admin.routes');
 const chatRoutes = require('./chat.routes');
 const notificationRoutes = require('./notification.routes');
+const shareRoutes = require('./share.routes');
 
 const router = express.Router();
 
@@ -51,6 +52,7 @@ router.use('/analysis', analysisRoutes);
 router.use('/api/admin', adminRoutes);
 router.use('/api/chat', chatRoutes);
 router.use('/api/notifications', notificationRoutes);
+router.use('/api/share', shareRoutes);
 
 // Backward compatibility routes (legacy endpoints)
 const profileController = require('../controllers/profile.controller');
