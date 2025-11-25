@@ -9,6 +9,7 @@ const lemonSqueezy = require('../services/lemonsqueezy.service');
 const creditService = require('../services/credit.service');
 const { CREDIT_PACKAGES, getPackageByVariantId, getPackageByPrice } = require('../config/pricing');
 const logger = require('../utils/logger');
+const realtimeController = require('./realtime.controller');
 
 // Webhook event types
 const WEBHOOK_EVENTS = {
@@ -193,7 +194,7 @@ async function handleOrderCreated(data, customData) {
   }
 
   // Save order record
-  await db.collection('orders').doc(String(data.id)).set({
+  const orderData = {
     orderId: data.id,
     userId,
     customerEmail: attrs.user_email,
@@ -209,7 +210,11 @@ async function handleOrderCreated(data, customData) {
     refunded: false,
     createdAt: new Date(attrs.created_at),
     updatedAt: new Date()
-  });
+  };
+  
+  await db.collection('orders').doc(String(data.id)).set(orderData);
+
+  let newCredits = null;
 
   // Add credits if package exists
   if (userId && foundPkg) {
@@ -221,6 +226,10 @@ async function handleOrderCreated(data, customData) {
       price: foundPkg.price
     });
 
+    // Get updated credit balance
+    const userDoc = await db.collection('users').doc(userId).get();
+    newCredits = userDoc.exists ? userDoc.data().credits : null;
+
     logger.info('Credits added from order', { userId, credits: totalCredits, orderId: data.id, packageId });
   } else {
     logger.warn('Could not add credits - package not found', { 
@@ -229,6 +238,22 @@ async function handleOrderCreated(data, customData) {
       variantId, 
       orderTotal,
       customData 
+    });
+  }
+
+  // Broadcast to SSE connections (real-time update to client)
+  if (userId) {
+    realtimeController.broadcastPayment(userId, {
+      type: 'order_created',
+      order: {
+        orderId: orderData.orderId,
+        packageId: orderData.packageId,
+        productName: orderData.productName,
+        variantName: orderData.variantName,
+        total: orderData.total,
+        totalFormatted: orderData.totalFormatted
+      },
+      credits: newCredits
     });
   }
 }
@@ -811,16 +836,13 @@ exports.checkPaymentStatus = async (req, res) => {
     }
 
     // Parse since timestamp (default: 5 minutes ago)
-    const sinceDate = since 
-      ? new Date(parseInt(since)) 
-      : new Date(Date.now() - 5 * 60 * 1000);
+    const sinceTimestamp = since 
+      ? parseInt(since) 
+      : Date.now() - 5 * 60 * 1000;
 
-    // Query for orders created after the timestamp
+    // Simple query - only filter by userId (no orderBy to avoid composite index)
     const ordersSnapshot = await db.collection('orders')
       .where('userId', '==', user_id)
-      .where('createdAt', '>=', sinceDate)
-      .orderBy('createdAt', 'desc')
-      .limit(1)
       .get();
 
     if (ordersSnapshot.empty) {
@@ -831,7 +853,30 @@ exports.checkPaymentStatus = async (req, res) => {
       });
     }
 
-    const order = ordersSnapshot.docs[0].data();
+    // Helper to get timestamp from various date formats
+    const getTimestamp = (dateValue) => {
+      if (!dateValue) return 0;
+      if (dateValue.toMillis) return dateValue.toMillis(); // Firestore Timestamp
+      if (dateValue instanceof Date) return dateValue.getTime();
+      if (typeof dateValue === 'number') return dateValue;
+      return new Date(dateValue).getTime();
+    };
+
+    // Filter orders created after the timestamp and sort by date desc
+    const recentOrders = ordersSnapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(order => getTimestamp(order.createdAt) >= sinceTimestamp)
+      .sort((a, b) => getTimestamp(b.createdAt) - getTimestamp(a.createdAt));
+
+    if (recentOrders.length === 0) {
+      return res.json({ 
+        success: true, 
+        hasPurchase: false,
+        message: 'No recent purchase found'
+      });
+    }
+
+    const order = recentOrders[0];
     
     // Get updated credit balance
     const userDoc = await db.collection('users').doc(user_id).get();

@@ -31,7 +31,9 @@ router.post('/license/deactivate', paymentController.deactivateLicense);
 // Order history
 router.get('/orders', paymentController.getOrderHistory);
 
-// Payment status check (for polling after checkout)
+// Payment status check (for polling after checkout - legacy fallback)
 router.get('/check-status', paymentController.checkPaymentStatus);
+
+// Note: SSE endpoint moved to /api/realtime/events/:userId for unified real-time updates
 
 module.exports = router;

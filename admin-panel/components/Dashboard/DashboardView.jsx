@@ -1,28 +1,25 @@
 import { useState, useEffect } from 'react';
-import { analyticsApi } from '../../services/adminApi';
+import { useRealtime } from '../../contexts/RealtimeContext';
 import PageHeader from '../Common/PageHeader';
 import StatsCard from './StatsCard';
 import LoadingScreen from '../Common/LoadingScreen';
 import './DashboardView.css';
 
 export default function DashboardView() {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { overview: stats, loading: realtimeLoading, loadOverview, setActiveTab } = useRealtime();
   const [error, setError] = useState('');
+  const loading = realtimeLoading.overview;
 
   useEffect(() => {
+    setActiveTab('dashboard');
     loadStats();
   }, []);
 
   const loadStats = async () => {
     try {
-      setLoading(true);
-      const response = await analyticsApi.getOverview();
-      setStats(response.overview);
+      await loadOverview();
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -69,12 +66,12 @@ export default function DashboardView() {
     return <LoadingScreen />;
   }
 
-  if (error) {
+  if (error && !stats) {
     return (
       <div className="dashboard-error">
         <img src="/icon/alert-circle.svg" alt="Error" />
         <p>{error}</p>
-        <button onClick={loadStats}>
+        <button onClick={() => loadOverview(true)}>
           <img src="/icon/refresh-cw.svg" alt="Retry" />
           Retry
         </button>

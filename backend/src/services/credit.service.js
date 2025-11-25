@@ -11,6 +11,15 @@ const {
 } = require('../config/pricing');
 const logger = require('../utils/logger');
 
+// Lazy load realtime controller to avoid circular dependency
+let realtimeController = null;
+const getRealtimeController = () => {
+  if (!realtimeController) {
+    realtimeController = require('../controllers/realtime.controller');
+  }
+  return realtimeController;
+};
+
 // ============================================================================
 // CREDIT BALANCE OPERATIONS
 // ============================================================================
@@ -116,6 +125,10 @@ async function deductCredits(userId, amount, featureName, metadata = {}) {
       });
     });
     
+    // Get updated balance and broadcast via SSE
+    const updatedCredits = await getUserCredits(userId);
+    getRealtimeController().broadcastCredits(userId, updatedCredits);
+    
     logger.info('Credits deducted', { userId, amount, featureName });
     
     return true;
@@ -177,6 +190,10 @@ async function addCredits(userId, amount, source, metadata = {}) {
         balanceAfter: currentBalance + amount
       });
     });
+    
+    // Get updated balance and broadcast via SSE
+    const updatedCredits = await getUserCredits(userId);
+    getRealtimeController().broadcastCredits(userId, updatedCredits);
     
     logger.info('Credits added', { userId, amount, source });
     

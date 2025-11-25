@@ -1,31 +1,35 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useRealtime } from '../../contexts/RealtimeContext';
 import { notificationsApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
 import LoadingScreen from '../Common/LoadingScreen';
 import './NotificationList.css';
 
 export default function NotificationList() {
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { 
+    notifications, 
+    loading: realtimeLoading, 
+    loadNotifications,
+    invalidateCache,
+    setActiveTab 
+  } = useRealtime();
   const [filter, setFilter] = useState('all');
   const navigate = useNavigate();
   const notify = useNotify();
+  const loading = realtimeLoading.notifications;
 
   useEffect(() => {
-    loadNotifications();
+    setActiveTab('notifications');
+    handleLoadNotifications();
   }, [filter]);
 
-  const loadNotifications = async () => {
+  const handleLoadNotifications = async () => {
     try {
-      setLoading(true);
       const params = filter !== 'all' ? { status: filter } : {};
-      const response = await notificationsApi.getAll(params);
-      setNotifications(response.notifications);
+      await loadNotifications(params);
     } catch (err) {
       console.error('Load notifications error:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -40,7 +44,8 @@ export default function NotificationList() {
 
     try {
       await notificationsApi.delete(id);
-      setNotifications(notifications.filter(n => n.id !== id));
+      invalidateCache('notifications');
+      await handleLoadNotifications();
       notify.success('Notification deleted!');
     } catch (err) {
       notify.error('Error: ' + err.message);
@@ -59,7 +64,8 @@ export default function NotificationList() {
     try {
       await notificationsApi.send(id);
       notify.success('Notification sent successfully!');
-      loadNotifications();
+      invalidateCache('notifications');
+      await handleLoadNotifications();
     } catch (err) {
       notify.error('Error: ' + err.message);
     }
@@ -107,9 +113,15 @@ export default function NotificationList() {
     );
   };
 
-  if (loading) {
+  if (loading && (!notifications || notifications.length === 0)) {
     return <LoadingScreen />;
   }
+
+  // Filter notifications locally
+  const filteredNotifications = (notifications || []).filter(n => {
+    if (filter === 'all') return true;
+    return n.status === filter;
+  });
 
   return (
     <div className="notification-list">
@@ -159,7 +171,7 @@ export default function NotificationList() {
       </div>
 
       <div className="notifications-grid">
-        {notifications.length === 0 ? (
+        {filteredNotifications.length === 0 ? (
           <div className="empty-state">
             <img src="/icon/inbox.svg" alt="Empty" />
             <p>No notifications yet</p>
@@ -168,7 +180,7 @@ export default function NotificationList() {
             </button>
           </div>
         ) : (
-          notifications.map(notif => (
+          filteredNotifications.map(notif => (
             <div key={notif.id} className="notification-card">
               <div className="card-header">
                 {getTypeBadge(notif.type)}

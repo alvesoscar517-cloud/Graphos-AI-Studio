@@ -11,6 +11,7 @@ const cacheService = require('../services/cache.service');
 const logger = require('../utils/logger');
 const { validateText, validateProfileId, validateUserId } = require('../utils/validation');
 const { FREE_CREDITS } = require('../config/pricing');
+const realtimeController = require('./realtime.controller');
 
 // ============================================================================
 // CREATE PROFILE
@@ -56,6 +57,12 @@ exports.createProfile = async (req, res) => {
     });
 
     logger.info('Profile created', { profileId, userId });
+
+    // Broadcast profile update via SSE
+    realtimeController.broadcastProfileUpdate(userId, {
+      type: 'created',
+      profile: { profile_id: profileId, profile_name, theme, status: 'pending' }
+    });
 
     res.status(201).json({
       success: true,
@@ -388,6 +395,12 @@ Mức độ trang trọng: ${voiceProfile.formality_level}/10
       qualityScore: qualityScore.score
     });
 
+    // Broadcast profile update via SSE
+    realtimeController.broadcastProfileUpdate(userId, {
+      type: 'created',
+      profile: { profile_id: profileId, profile_name, theme, status: 'ready', samples_count: samples.length }
+    });
+
     res.status(201).json({
       success: true,
       profile_id: profileId,
@@ -546,9 +559,18 @@ exports.deleteProfile = async (req, res) => {
     });
     await batch.commit();
 
+    const profileData = profileDoc.data();
     await db.collection('voice_profiles').doc(profile_id).delete();
 
     cacheService.invalidateProfileCache(profile_id);
+
+    // Broadcast profile deletion via SSE
+    if (profileData.userId) {
+      realtimeController.broadcastProfileUpdate(profileData.userId, {
+        type: 'deleted',
+        profile: { profile_id }
+      });
+    }
 
     res.json({
       success: true,

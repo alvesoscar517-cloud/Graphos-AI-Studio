@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-import { loadProfiles as loadProfilesAPI } from '../services/api'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { loadProfiles as loadProfilesAPI, getUserInfo } from '../services/api'
 import { isDevMode, getOrCreateTestProfile, shouldUseTestProfile, devLog } from '../utils/devConfig'
+import realtimeService from '../services/realtimeService'
 
 const ProfileContext = createContext()
 
@@ -23,23 +24,43 @@ export const ProfileProvider = ({ children }) => {
     loadProfiles()
   }, [])
 
-  // Check if cache invalidated (after profile creation)
+  // Subscribe to real-time profile updates via SSE
   useEffect(() => {
+    let unsubscribe = null;
+    
+    const setupRealtimeUpdates = async () => {
+      try {
+        const userInfo = await getUserInfo();
+        realtimeService.connect(userInfo.userId);
+        
+        // Subscribe to profile updates
+        unsubscribe = realtimeService.subscribe('profile', (data) => {
+          console.log('👤 Profile update via SSE:', data);
+          if (data.type === 'created' || data.type === 'updated' || data.type === 'deleted') {
+            loadProfiles(true); // Force reload
+          }
+        });
+      } catch (e) {
+        console.warn('Could not setup realtime profile updates:', e);
+      }
+    };
+    
+    setupRealtimeUpdates();
+    
+    // Fallback: Check localStorage invalidation (for legacy support)
     const checkInvalidation = () => {
       const invalidated = localStorage.getItem('profileCacheInvalidated')
       if (invalidated === 'true') {
         console.log('🔄 Profile cache invalidated, reloading...')
-        loadProfiles()
+        loadProfiles(true)
         localStorage.removeItem('profileCacheInvalidated')
       }
     }
-
-    // Check immediately
     checkInvalidation()
-
-    // Check every 2 seconds (in case of race condition)
-    const interval = setInterval(checkInvalidation, 2000)
-    return () => clearInterval(interval)
+    
+    return () => {
+      if (unsubscribe) unsubscribe();
+    }
   }, [])
 
   const loadProfiles = async (force = false) => {

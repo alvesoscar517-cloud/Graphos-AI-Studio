@@ -7,6 +7,7 @@ import { AIProcessingProvider } from './contexts/AIProcessingContext'
 import { ProfileProvider } from './contexts/ProfileContext'
 import { WorkspaceProvider } from './contexts/WorkspaceContext'
 import { RewriteProvider } from './contexts/RewriteContext'
+import { PaymentProvider } from './contexts/PaymentContext'
 import LoginOverlay from './components/Auth/LoginOverlay'
 import MainLayout from './components/Layout/MainLayout'
 import ProfileSetupWrapper from './components/ProfileSetup/ProfileSetupWrapper'
@@ -45,17 +46,19 @@ function App() {
       <Router>
         <ThemeProvider>
           <AuthProvider>
-            <NotesProvider>
-              <AIProcessingProvider>
-                <ProfileProvider>
-                  <WorkspaceProvider>
-                    <RewriteProvider>
-                      <AppContent />
-                    </RewriteProvider>
-                  </WorkspaceProvider>
-                </ProfileProvider>
-              </AIProcessingProvider>
-            </NotesProvider>
+            <PaymentProvider>
+              <NotesProvider>
+                <AIProcessingProvider>
+                  <ProfileProvider>
+                    <WorkspaceProvider>
+                      <RewriteProvider>
+                        <AppContent />
+                      </RewriteProvider>
+                    </WorkspaceProvider>
+                  </ProfileProvider>
+                </AIProcessingProvider>
+              </NotesProvider>
+            </PaymentProvider>
           </AuthProvider>
         </ThemeProvider>
       </Router>

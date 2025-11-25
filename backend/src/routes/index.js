@@ -13,6 +13,7 @@ const notificationRoutes = require('./notification.routes');
 const shareRoutes = require('./share.routes');
 const creditRoutes = require('./credit.routes');
 const paymentRoutes = require('./payment.routes');
+const realtimeRoutes = require('./realtime.routes');
 const paymentController = require('../controllers/payment.controller');
 
 const router = express.Router();
@@ -62,6 +63,7 @@ router.use('/api/notifications', notificationRoutes);
 router.use('/api/share', shareRoutes);
 router.use('/api/credits', creditRoutes);
 router.use('/api/payment', paymentRoutes);
+router.use('/api/realtime', realtimeRoutes);
 
 // Backward compatibility routes (legacy endpoints)
 const profileController = require('../controllers/profile.controller');

@@ -1,6 +1,10 @@
+import { useRealtime } from '../contexts/RealtimeContext';
+import RealtimeIndicator from './Common/RealtimeIndicator';
 import './AdminHeader.css';
 
 export default function AdminHeader({ onLogout, onToggleSidebar }) {
+  const { overview } = useRealtime();
+  
   return (
     <header className="admin-header">
       <div className="header-left">
@@ -11,6 +15,11 @@ export default function AdminHeader({ onLogout, onToggleSidebar }) {
       </div>
 
       <div className="header-right">
+        <RealtimeIndicator 
+          isConnected={true} 
+          lastUpdate={overview?.timestamp}
+        />
+        
         <div className="admin-user">
           <svg className="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10" />

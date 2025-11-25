@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supportApi } from '../../services/adminApi';
+import { useRealtime } from '../../contexts/RealtimeContext';
 import { exportSupportToCSV } from '../../utils/exportUtils';
 import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
@@ -9,31 +9,29 @@ import CustomSelect from '../Common/CustomSelect';
 import './SupportList.css';
 
 export default function SupportList() {
-  const [tickets, setTickets] = useState([]);
-  const [statistics, setStatistics] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { 
+    supportTickets: tickets, 
+    supportStats: statistics, 
+    loading: realtimeLoading, 
+    loadSupport,
+    setActiveTab 
+  } = useRealtime();
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterType, setFilterType] = useState('all');
   const navigate = useNavigate();
   const notify = useNotify();
+  const loading = realtimeLoading.support;
 
   useEffect(() => {
+    setActiveTab('support');
     loadData();
   }, [filterStatus, filterType]);
 
   const loadData = async () => {
     try {
-      setLoading(true);
-      const [ticketsRes, statsRes] = await Promise.all([
-        supportApi.getAll({ status: filterStatus, type: filterType, limit: 100 }),
-        supportApi.getStatistics()
-      ]);
-      setTickets(ticketsRes.tickets);
-      setStatistics(statsRes.statistics);
+      await loadSupport({ status: filterStatus, type: filterType, limit: 100 });
     } catch (err) {
       // Error handled silently
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -87,9 +85,16 @@ export default function SupportList() {
     );
   };
 
-  if (loading) {
+  if (loading && (!tickets || tickets.length === 0)) {
     return <LoadingScreen />;
   }
+
+  // Filter tickets locally based on current filters
+  const filteredTickets = (tickets || []).filter(ticket => {
+    if (filterStatus !== 'all' && ticket.status !== filterStatus) return false;
+    if (filterType !== 'all' && ticket.type !== filterType) return false;
+    return true;
+  });
 
   return (
     <div className="support-list">
@@ -102,7 +107,7 @@ export default function SupportList() {
             className="btn-export"
             onClick={() => {
               try {
-                exportSupportToCSV(tickets);
+                exportSupportToCSV(filteredTickets);
                 notify.success('Ticket list exported successfully!');
               } catch (err) {
                 notify.error('Export error: ' + err.message);
@@ -186,7 +191,7 @@ export default function SupportList() {
 
         <div className="list-stats">
           <span className="stat-item">
-            <strong>{tickets.length}</strong> tickets
+            <strong>{filteredTickets.length}</strong> tickets
           </span>
         </div>
       </div>
@@ -206,14 +211,14 @@ export default function SupportList() {
             </tr>
           </thead>
           <tbody>
-            {tickets.length === 0 ? (
+            {filteredTickets.length === 0 ? (
               <tr>
                 <td colSpan="8" className="empty-row">
                   No tickets
                 </td>
               </tr>
             ) : (
-              tickets.map(ticket => (
+              filteredTickets.map(ticket => (
                 <tr key={ticket.id} className={ticket.status === 'open' ? 'unread' : ''}>
                   <td className="ticket-id">#{ticket.id.substring(0, 8)}</td>
                   <td>{getTypeBadge(ticket.type)}</td>

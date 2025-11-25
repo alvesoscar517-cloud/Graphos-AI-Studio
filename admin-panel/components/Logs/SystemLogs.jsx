@@ -1,26 +1,26 @@
 import { useState, useEffect } from 'react';
+import { useRealtime } from '../../contexts/RealtimeContext';
 import { logsApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
 import './SystemLogs.css';
 
 export default function SystemLogs() {
-  const [logs, setLogs] = useState([]);
+  const { systemLogs: logs, loading: realtimeLoading, loadLogs, setActiveTab } = useRealtime();
   const [filter, setFilter] = useState('all');
   const notify = useNotify();
 
   useEffect(() => {
-    loadLogs();
+    setActiveTab('logs');
+    handleLoadLogs();
   }, [filter]);
 
-  const loadLogs = async () => {
+  const handleLoadLogs = async () => {
     try {
       const params = filter !== 'all' ? { level: filter } : {};
-      const response = await logsApi.getAll(params);
-      setLogs(response.logs || []);
+      await loadLogs(params);
     } catch (err) {
       notify.error('Unable to load logs');
-      setLogs([]);
     }
   };
 
@@ -35,7 +35,7 @@ export default function SystemLogs() {
 
     try {
       await logsApi.clear();
-      setLogs([]);
+      await loadLogs({}, true); // Force refresh
       notify.success('All logs cleared!');
     } catch (err) {
       notify.error('Error: ' + err.message);

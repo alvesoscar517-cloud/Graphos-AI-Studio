@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usersApi } from '../../services/adminApi';
+import { useRealtime } from '../../contexts/RealtimeContext';
 import { exportUsersToCSV } from '../../utils/exportUtils';
 import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
@@ -8,25 +8,22 @@ import LoadingScreen from '../Common/LoadingScreen';
 import './UserList.css';
 
 export default function UserList() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { users, loading: realtimeLoading, loadUsers, setActiveTab } = useRealtime();
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const notify = useNotify();
+  const loading = realtimeLoading.users;
 
   useEffect(() => {
-    loadUsers();
+    setActiveTab('users');
+    handleLoadUsers();
   }, []);
 
-  const loadUsers = async () => {
+  const handleLoadUsers = async () => {
     try {
-      setLoading(true);
-      const response = await usersApi.getAll({ limit: 100 });
-      setUsers(response.users);
+      await loadUsers({ limit: 100 });
     } catch (err) {
       // Error handled silently
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -61,7 +58,7 @@ export default function UserList() {
     );
   };
 
-  if (loading) {
+  if (loading && users.length === 0) {
     return <LoadingScreen />;
   }
 

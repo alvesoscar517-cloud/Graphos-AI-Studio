@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { advancedAnalyticsApi, analyticsApi } from '../../services/adminApi';
+import { useRealtime } from '../../contexts/RealtimeContext';
 import { exportAnalyticsToCSV, generateAnalyticsReport } from '../../utils/exportUtils';
 import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
@@ -11,44 +11,33 @@ import CustomSelect from '../Common/CustomSelect';
 import './AnalyticsView.css';
 
 export default function AnalyticsView() {
-  const [overview, setOverview] = useState(null);
-  const [userAnalytics, setUserAnalytics] = useState(null);
-  const [usageAnalytics, setUsageAnalytics] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { 
+    overview, 
+    userAnalytics, 
+    usageAnalytics, 
+    loading: realtimeLoading, 
+    loadAnalytics,
+    setActiveTab 
+  } = useRealtime();
   const [timeRange, setTimeRange] = useState(30);
   const notify = useNotify();
+  const loading = realtimeLoading.analytics;
 
   useEffect(() => {
-    loadAnalytics();
+    setActiveTab('analytics');
+    handleLoadAnalytics();
   }, [timeRange]);
 
-  const loadAnalytics = async () => {
+  const handleLoadAnalytics = async () => {
     try {
-      setLoading(true);
-      const [overviewRes, userRes, usageRes] = await Promise.all([
-        analyticsApi.getOverview(),
-        advancedAnalyticsApi.getUserAnalytics(timeRange),
-        advancedAnalyticsApi.getUsageAnalytics()
-      ]);
-
-      console.log('Analytics data loaded:', { overviewRes, userRes, usageRes });
-
-      setOverview(overviewRes.overview || {});
-      setUserAnalytics(userRes.analytics || {});
-      setUsageAnalytics(usageRes.analytics || {});
+      await loadAnalytics(timeRange);
     } catch (err) {
       console.error('Load analytics error:', err);
       notify.error('Failed to load analytics data: ' + (err.message || 'Unknown error'));
-      // Set empty data to prevent errors
-      setOverview({});
-      setUserAnalytics({});
-      setUsageAnalytics({});
-    } finally {
-      setLoading(false);
     }
   };
 
-  if (loading) {
+  if (loading && !overview) {
     return <LoadingScreen />;
   }
 
@@ -198,7 +187,7 @@ export default function AnalyticsView() {
             Generate PDF
           </button>
         </div>
-        <button className="analytics-btn analytics-btn-secondary" onClick={loadAnalytics}>
+        <button className="analytics-btn analytics-btn-secondary" onClick={() => loadAnalytics(timeRange, true)}>
           <img src="/icon/refresh-cw.svg" alt="Refresh" />
           Refresh Data
         </button>
