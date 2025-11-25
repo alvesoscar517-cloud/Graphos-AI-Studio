@@ -18,7 +18,7 @@ const BillingSupportModal = ({ onClose }) => {
     'Billing Issue',
     'Payment Failed',
     'Refund Request',
-    'Subscription',
+    'Credit Purchase',
     'Invoice',
     'Other'
   ]

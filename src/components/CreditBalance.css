@@ -19,6 +19,16 @@
   letter-spacing: 0.2px;
 }
 
+.credit-text.low-credit {
+  color: #f9ab00;
+  font-weight: 500;
+}
+
+.credit-text.out-of-credit {
+  color: #d93025;
+  font-weight: 600;
+}
+
 .credit-loading {
   font-size: 14px;
   color: #5f6368;
@@ -49,6 +59,14 @@ body.dark-theme .credit-display {
 body.dark-theme .credit-text,
 body.dark-theme .credit-loading {
   color: #9aa0a6;
+}
+
+body.dark-theme .credit-text.low-credit {
+  color: #fdd663;
+}
+
+body.dark-theme .credit-text.out-of-credit {
+  color: #f28b82;
 }
 
 body.dark-theme .upgrade-button-simple {

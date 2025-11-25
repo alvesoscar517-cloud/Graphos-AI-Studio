@@ -1,369 +1,149 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { CONFIG } from '../utils/config';
+import { getUserInfo } from '../services/api';
 import './UpgradePlanModal.css';
 
-// Default plans - hiển thị ngay lập tức
-const DEFAULT_PLANS = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: 0,
-    monthlyCredits: 100,
-    features: {
-      ai_detection: true,
-      text_analysis: true,
-      text_rewrite: true,
-      chat_message: true,
-      voice_profiles: 2,
-      priority_support: false,
-      api_access: false
-    }
-  },
-  {
-    id: 'starter',
-    name: 'Starter',
-    price: 9.99,
-    monthlyCredits: 500,
-    features: {
-      ai_detection: true,
-      text_analysis: true,
-      text_rewrite: true,
-      chat_message: true,
-      improvement_suggestions: true,
-      voice_profiles: 5,
-      priority_support: false,
-      api_access: false
-    },
-    bonus: {
-      signup_credits: 100
-    }
-  },
-  {
-    id: 'professional',
-    name: 'Professional',
-    price: 29.99,
-    monthlyCredits: 2000,
-    features: {
-      ai_detection: true,
-      text_analysis: true,
-      text_rewrite: true,
-      chat_message: true,
-      improvement_suggestions: true,
-      translation: true,
-      voice_profiles: 20,
-      priority_support: true,
-      api_access: false
-    },
-    bonus: {
-      signup_credits: 500
-    },
-    discount: {
-      rewrite_cost: 0.8,
-      analysis_cost: 0.8
-    }
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 99.99,
-    monthlyCredits: 10000,
-    features: {
-      ai_detection: true,
-      text_analysis: true,
-      text_rewrite: true,
-      chat_message: true,
-      improvement_suggestions: true,
-      translation: true,
-      voice_profiles: -1,
-      priority_support: true,
-      api_access: true
-    },
-    bonus: {
-      signup_credits: 2000
-    },
-    discount: {
-      rewrite_cost: 0.6,
-      analysis_cost: 0.6
-    }
-  }
-];
-
-// Default packages - hiển thị ngay lập tức
+// Default packages với variant IDs
 const DEFAULT_PACKAGES = [
   {
-    id: 'small',
+    id: 'basic',
     credits: 100,
     price: 4.99,
     bonus: 0,
     totalCredits: 100,
-    description: 'Gói nhỏ'
+    description: 'Basic'
   },
   {
-    id: 'medium',
+    id: 'pro',
     credits: 500,
     price: 19.99,
     bonus: 50,
     totalCredits: 550,
-    description: 'Gói trung'
+    description: 'Pro'
   },
   {
-    id: 'large',
+    id: 'pro_plus',
     credits: 1500,
     price: 49.99,
     bonus: 300,
     totalCredits: 1800,
-    description: 'Gói lớn'
+    description: 'Pro+'
   },
   {
-    id: 'mega',
+    id: 'power',
     credits: 5000,
     price: 149.99,
     bonus: 1500,
     totalCredits: 6500,
-    description: 'Gói khổng lồ'
+    description: 'Power'
   }
 ];
 
-const UpgradePlanModal = ({ isOpen, onClose, currentPlan = 'free', onUpgrade }) => {
-  const [plans, setPlans] = useState(DEFAULT_PLANS);
+const UpgradePlanModal = ({ isOpen, onClose, onUpgrade }) => {
   const [packages, setPackages] = useState(DEFAULT_PACKAGES);
-  const [activeTab, setActiveTab] = useState('subscription');
   const [loading, setLoading] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [loadingPackageId, setLoadingPackageId] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
-      // Vẫn fetch từ server để cập nhật nếu có thay đổi
-      fetchPlansAndPackages();
+      fetchPackages();
     }
   }, [isOpen]);
 
-  const fetchPlansAndPackages = async () => {
+  const fetchPackages = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const [plansRes, packagesRes] = await Promise.all([
-        fetch(`${apiUrl}/api/subscription/plans`),
-        fetch(`${apiUrl}/api/subscription/packages`)
-      ]);
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/credits/packages`);
+      const data = await response.json();
 
-      const plansData = await plansRes.json();
-      const packagesData = await packagesRes.json();
-
-      // Chỉ cập nhật nếu có data từ server
-      if (plansData.plans && plansData.plans.length > 0) {
-        setPlans(plansData.plans);
-      }
-      if (packagesData.packages && packagesData.packages.length > 0) {
-        setPackages(packagesData.packages);
+      if (data.packages && data.packages.length > 0) {
+        setPackages(data.packages);
       }
     } catch (error) {
-      console.error('Error fetching plans:', error);
-      // Giữ nguyên default plans nếu có lỗi
+      console.error('Error fetching packages:', error);
     }
   };
 
-  const handleUpgradePlan = async (planId) => {
+  const handlePurchasePackage = async (pkg) => {
     setLoading(true);
+    setLoadingPackageId(pkg.id);
+    
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${apiUrl}/api/subscription/upgrade`, {
+      const userInfo = await getUserInfo();
+      
+      // Gọi API tạo checkout URL từ Lemon Squeezy
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/payment/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: localStorage.getItem('userId'),
-          plan_id: planId,
-          payment_method: 'card'
+          packageId: pkg.id,
+          variantId: pkg.variantId,
+          userId: userInfo.userId,
+          email: userInfo.email
         })
       });
 
       const data = await response.json();
 
-      if (data.success) {
-        onUpgrade?.(data);
+      if (data.success && data.checkoutUrl) {
+        // Mở Lemon Squeezy checkout trong tab mới
+        window.open(data.checkoutUrl, '_blank');
         onClose();
       } else {
-        alert('Upgrade failed: ' + data.error);
+        alert('Không thể tạo thanh toán: ' + (data.error || 'Unknown error'));
       }
     } catch (error) {
-      console.error('Error upgrading plan:', error);
-      alert('Failed to upgrade plan');
+      console.error('Error creating checkout:', error);
+      alert('Lỗi khi tạo thanh toán. Vui lòng thử lại.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handlePurchasePackage = async (packageId) => {
-    setLoading(true);
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${apiUrl}/api/subscription/credits/purchase`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: localStorage.getItem('userId'),
-          package_id: packageId,
-          payment_method: 'card'
-        })
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        onUpgrade?.(data);
-        onClose();
-      } else {
-        alert('Purchase failed: ' + data.error);
-      }
-    } catch (error) {
-      console.error('Error purchasing package:', error);
-      alert('Failed to purchase package');
-    } finally {
-      setLoading(false);
+      setLoadingPackageId(null);
     }
   };
 
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <div className="upgrade-modal-overlay" onClick={onClose}>
       <div className="upgrade-modal" onClick={(e) => e.stopPropagation()}>
         <div className="upgrade-modal-header">
-          <h2>Nâng cấp tài khoản</h2>
+          <h2>Mua Credits</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
-        <div className="upgrade-tabs">
-          <button
-            className={`tab ${activeTab === 'subscription' ? 'active' : ''}`}
-            onClick={() => setActiveTab('subscription')}
-          >
-            Gói đăng ký
-          </button>
-          <button
-            className={`tab ${activeTab === 'credits' ? 'active' : ''}`}
-            onClick={() => setActiveTab('credits')}
-          >
-            Mua credits
-          </button>
-        </div>
-
         <div className="upgrade-modal-content">
-          {activeTab === 'subscription' && (
-            <div className="plans-grid">
-              {plans.map((plan) => (
-                <div
-                  key={plan.id}
-                  className={`plan-card ${plan.id === currentPlan ? 'current' : ''} ${selectedPlan === plan.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedPlan(plan.id)}
-                >
-                  <div className="plan-header">
-                    <h3>{plan.name}</h3>
-                    {plan.id === currentPlan && <span className="current-badge">Hiện tại</span>}
-                  </div>
+          <div className="packages-grid">
+            {packages.map((pkg) => (
+              <div
+                key={pkg.id}
+                className="package-card"
+              >
+                <h3>{pkg.description}</h3>
 
-                  <div className="plan-price">
-                    <span className="price">${plan.price}</span>
-                    <span className="period">/tháng</span>
-                  </div>
+                <div className="package-price">
+                  <span className="price">${pkg.price}</span>
+                </div>
 
-                  <div className="plan-credits">
-                    <strong>{plan.monthlyCredits}</strong> credits/tháng
-                    {plan.bonus?.signup_credits && (
-                      <span className="inline-bonus"> + {plan.bonus.signup_credits} credits bonus khi đăng ký</span>
-                    )}
-                  </div>
-
-                  <div className="plan-features">
-                    <ul>
-                      {plan.features.ai_detection && (
-                        <li><img src="/icon/search.svg" alt="" className="feature-icon" />Phát hiện AI</li>
-                      )}
-                      {plan.features.text_analysis && (
-                        <li><img src="/icon/chart-bar.svg" alt="" className="feature-icon" />Phân tích văn bản</li>
-                      )}
-                      {plan.features.text_rewrite && (
-                        <li><img src="/icon/pen.svg" alt="" className="feature-icon" />Viết lại văn bản</li>
-                      )}
-                      {plan.features.improvement_suggestions && (
-                        <li><img src="/icon/lightbulb.svg" alt="" className="feature-icon" />Gợi ý cải thiện</li>
-                      )}
-                      {plan.features.chat_message && (
-                        <li><img src="/icon/message-circle.svg" alt="" className="feature-icon" />Chat AI</li>
-                      )}
-                      {plan.features.translation && (
-                        <li><img src="/icon/languages.svg" alt="" className="feature-icon" />Dịch thuật</li>
-                      )}
-                      <li>
-                        <img src="/icon/mic.svg" alt="" className="feature-icon" />
-                        {plan.features.voice_profiles === -1 ? 'Không giới hạn' : plan.features.voice_profiles} voice profiles
-                      </li>
-                      {plan.features.priority_support && (
-                        <li><img src="/icon/bolt.svg" alt="" className="feature-icon" />Hỗ trợ ưu tiên</li>
-                      )}
-                      {plan.features.api_access && (
-                        <li><img src="/icon/plug.svg" alt="" className="feature-icon" />API access</li>
-                      )}
-                      {plan.discount?.rewrite_cost && (
-                        <li><img src="/icon/badge-percent.svg" alt="" className="feature-icon" />{Math.round((1 - plan.discount.rewrite_cost) * 100)}% giảm viết lại</li>
-                      )}
-                      {plan.discount?.analysis_cost && (
-                        <li><img src="/icon/badge-percent.svg" alt="" className="feature-icon" />{Math.round((1 - plan.discount.analysis_cost) * 100)}% giảm phân tích</li>
-                      )}
-                    </ul>
-                  </div>
-
-                  {plan.id !== currentPlan && (
-                    <button
-                      className="upgrade-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleUpgradePlan(plan.id);
-                      }}
-                      disabled={loading}
-                    >
-                      {loading ? 'Đang xử lý...' : 'Nâng cấp'}
-                    </button>
+                <div className="package-credits">
+                  <strong>{pkg.totalCredits}</strong> credits
+                  {pkg.bonus > 0 && (
+                    <span className="bonus-percent">+{Math.round((pkg.bonus / pkg.credits) * 100)}% bonus</span>
                   )}
                 </div>
-              ))}
-            </div>
-          )}
 
-          {activeTab === 'credits' && (
-            <div className="packages-grid">
-              {packages.map((pkg) => (
-                <div
-                  key={pkg.id}
-                  className={`package-card ${selectedPackage === pkg.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedPackage(pkg.id)}
+                <button
+                  className="purchase-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePurchasePackage(pkg);
+                  }}
+                  disabled={loading}
                 >
-                  <h3>{pkg.description}</h3>
-
-                  <div className="package-price">
-                    <span className="price">${pkg.price}</span>
-                  </div>
-
-                  <div className="package-credits">
-                    <strong>{pkg.totalCredits}</strong> credits
-                    {pkg.bonus > 0 && (
-                      <span className="bonus-percent">+{Math.round((pkg.bonus / pkg.credits) * 10) / 10}% lợi ích</span>
-                    )}
-                  </div>
-
-                  <button
-                    className="purchase-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePurchasePackage(pkg.id);
-                    }}
-                    disabled={loading}
-                  >
-                    {loading ? 'Đang xử lý...' : 'Mua ngay'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+                  {loadingPackageId === pkg.id ? 'Đang xử lý...' : 'Mua ngay'}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="upgrade-modal-footer">
@@ -374,6 +154,8 @@ const UpgradePlanModal = ({ isOpen, onClose, currentPlan = 'free', onUpgrade }) 
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default UpgradePlanModal;

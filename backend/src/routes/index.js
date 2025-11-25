@@ -11,7 +11,9 @@ const adminRoutes = require('./admin.routes');
 const chatRoutes = require('./chat.routes');
 const notificationRoutes = require('./notification.routes');
 const shareRoutes = require('./share.routes');
-const subscriptionRoutes = require('./subscription.routes');
+const creditRoutes = require('./credit.routes');
+const paymentRoutes = require('./payment.routes');
+const paymentController = require('../controllers/payment.controller');
 
 const router = express.Router();
 
@@ -46,6 +48,20 @@ router.get('/health', (_req, res) => {
   });
 });
 
+// Webhook endpoint (NO AUTH - verified by signature)
+// Must be before body parser for raw body access
+router.post('/webhooks/lemonsqueezy', express.raw({ type: 'application/json' }), (req, res, next) => {
+  req.rawBody = req.body;
+  if (Buffer.isBuffer(req.body)) {
+    try {
+      req.body = JSON.parse(req.body.toString());
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid JSON' });
+    }
+  }
+  next();
+}, paymentController.handleWebhook);
+
 // Mount routes
 router.use('/', authRoutes);
 router.use('/profiles', profileRoutes);
@@ -54,11 +70,13 @@ router.use('/api/admin', adminRoutes);
 router.use('/api/chat', chatRoutes);
 router.use('/api/notifications', notificationRoutes);
 router.use('/api/share', shareRoutes);
-router.use('/api/subscription', subscriptionRoutes);
+router.use('/api/credits', creditRoutes);
+router.use('/api/payment', paymentRoutes);
 
 // Backward compatibility routes (legacy endpoints)
 const profileController = require('../controllers/profile.controller');
 const analysisController = require('../controllers/analysis.controller');
+const creditMiddleware = require('../middleware/credit.middleware');
 
 router.post('/create_profile', profileController.createProfile);
 router.post('/create_profile_complete', profileController.createProfileComplete);
@@ -68,11 +86,13 @@ router.post('/finalize_profile', profileController.finalizeProfile);
 router.get('/get_profile', profileController.getProfile);
 router.get('/get_profiles', profileController.getProfiles);
 router.post('/delete_profile', profileController.deleteProfile);
-router.post('/authenticate', analysisController.authenticateContent);
-router.post('/analyze', analysisController.analyzeText);
-router.post('/suggest_improvements', analysisController.suggestImprovements);
-router.post('/rewrite', analysisController.rewriteText);
-router.post('/rewrite_stream', analysisController.rewriteTextStream);
+
+// Legacy endpoints with credit middleware
+router.post('/authenticate', creditMiddleware.aiDetection, analysisController.authenticateContent);
+router.post('/analyze', creditMiddleware.textAnalysis, analysisController.analyzeText);
+router.post('/suggest_improvements', creditMiddleware.improvementSuggestions, analysisController.suggestImprovements);
+router.post('/rewrite', creditMiddleware.textRewrite, analysisController.rewriteText);
+router.post('/rewrite_stream', creditMiddleware.textRewrite, analysisController.rewriteTextStream);
 router.post('/api/translate', analysisController.translateText);
 
 module.exports = router;

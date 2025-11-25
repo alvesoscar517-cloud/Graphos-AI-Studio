@@ -23,15 +23,8 @@ async function initUserCredits() {
         name: 'Development User',
         credits: {
           balance: 100,
-          monthly: 100,
-          purchased: 0,
+          purchased: 100,
           used: 0
-        },
-        subscription: {
-          plan: 'free',
-          status: 'active',
-          startDate: new Date().toISOString(),
-          lastReset: new Date().toISOString()
         },
         usage: {
           analysesCount: 0,
@@ -46,13 +39,8 @@ async function initUserCredits() {
       console.log('Updating dev user credits...');
       await devUserRef.update({
         'credits.balance': 100,
-        'credits.monthly': 100,
-        'credits.purchased': 0,
-        'credits.used': 0,
-        'subscription.plan': 'free',
-        'subscription.status': 'active',
-        'subscription.startDate': new Date().toISOString(),
-        'subscription.lastReset': new Date().toISOString()
+        'credits.purchased': 100,
+        'credits.used': 0
       });
       console.log('✅ Dev user credits updated\n');
     }
@@ -74,13 +62,8 @@ async function initUserCredits() {
         const userRef = db.collection('users').doc(doc.id);
         batch.update(userRef, {
           'credits.balance': 100,
-          'credits.monthly': 100,
-          'credits.purchased': 0,
-          'credits.used': 0,
-          'subscription.plan': 'free',
-          'subscription.status': 'active',
-          'subscription.startDate': new Date().toISOString(),
-          'subscription.lastReset': new Date().toISOString()
+          'credits.purchased': 100,
+          'credits.used': 0
         });
         updatedCount++;
       }

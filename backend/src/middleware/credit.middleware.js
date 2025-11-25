@@ -21,9 +21,6 @@ function requireCredits(featureName, costCalculator) {
         });
       }
       
-      // Check if monthly credits need reset
-      await creditService.checkAndResetMonthlyCredits(userId);
-      
       // Calculate cost based on request
       const cost = costCalculator(req);
       
@@ -82,34 +79,29 @@ function requireCredits(featureName, costCalculator) {
 const costCalculators = {
   aiDetection: (req) => {
     const { text } = req.body;
-    const userPlan = req.user?.subscription?.plan || 'free';
-    return creditService.calculateAIDetectionCost(text, userPlan);
+    return creditService.calculateAIDetectionCost(text);
   },
   
   textAnalysis: (req) => {
     const { text } = req.body;
-    const userPlan = req.user?.subscription?.plan || 'free';
-    return creditService.calculateAnalysisCost(text, userPlan);
+    return creditService.calculateAnalysisCost(text);
   },
   
   textRewrite: (req) => {
     const { text, model } = req.body;
-    const userPlan = req.user?.subscription?.plan || 'free';
-    return creditService.calculateRewriteCost(text, model, userPlan);
+    return creditService.calculateRewriteCost(text, model);
   },
   
   improvementSuggestions: (req) => {
     const { sentence } = req.body;
-    const userPlan = req.user?.subscription?.plan || 'free';
     // Estimate 1 sentence
-    return creditService.calculateSuggestionsCost(1, userPlan);
+    return creditService.calculateSuggestionsCost(1);
   },
   
   chatMessage: (req) => {
     const { messages, model } = req.body;
     const lastMessage = messages[messages.length - 1];
-    const userPlan = req.user?.subscription?.plan || 'free';
-    return creditService.calculateChatCost(lastMessage.content, model, userPlan);
+    return creditService.calculateChatCost(lastMessage.content, model);
   }
 };
 

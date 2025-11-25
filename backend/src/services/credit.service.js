@@ -7,8 +7,7 @@ const { db, FieldValue } = require('../config/firebase');
 const { 
   calculateFeatureCost, 
   countWords, 
-  countSentences,
-  SUBSCRIPTION_PLANS 
+  countSentences
 } = require('../config/pricing');
 const logger = require('../utils/logger');
 
@@ -30,7 +29,6 @@ async function getUserCredits(userId) {
     const userData = userDoc.data();
     const credits = userData.credits || {
       balance: 0,
-      monthly: 0,
       purchased: 0,
       used: 0
     };
@@ -118,16 +116,11 @@ async function addCredits(userId, amount, source, metadata = {}) {
       const userData = userDoc.data();
       const currentBalance = userData.credits?.balance || 0;
       
-      // Determine which credit pool to increment
+      // Update credit balance
       const updateData = {
-        'credits.balance': FieldValue.increment(amount)
+        'credits.balance': FieldValue.increment(amount),
+        'credits.purchased': FieldValue.increment(amount)
       };
-      
-      if (source === 'subscription') {
-        updateData['credits.monthly'] = FieldValue.increment(amount);
-      } else if (source === 'purchase') {
-        updateData['credits.purchased'] = FieldValue.increment(amount);
-      }
       
       transaction.update(userRef, updateData);
       
@@ -160,80 +153,66 @@ async function addCredits(userId, amount, source, metadata = {}) {
 /**
  * Calculate cost for AI detection
  */
-function calculateAIDetectionCost(text, userPlan = 'free') {
+function calculateAIDetectionCost(text) {
   const wordCount = countWords(text);
-  const plan = SUBSCRIPTION_PLANS[userPlan];
   
   return calculateFeatureCost('ai_detection', {
-    wordCount,
-    discount: plan?.discount
+    wordCount
   });
 }
 
 /**
  * Calculate cost for text analysis
  */
-function calculateAnalysisCost(text, userPlan = 'free') {
+function calculateAnalysisCost(text) {
   const wordCount = countWords(text);
   const sentenceCount = countSentences(text);
-  const plan = SUBSCRIPTION_PLANS[userPlan];
   
   return calculateFeatureCost('text_analysis', {
     wordCount,
-    sentenceCount,
-    discount: plan?.discount
+    sentenceCount
   });
 }
 
 /**
  * Calculate cost for text rewriting
  */
-function calculateRewriteCost(text, model = 'gemini-2.0-flash-exp', userPlan = 'free') {
+function calculateRewriteCost(text, model = 'gemini-2.0-flash-exp') {
   const wordCount = countWords(text);
-  const plan = SUBSCRIPTION_PLANS[userPlan];
   
   return calculateFeatureCost('text_rewrite', {
     wordCount,
-    model,
-    discount: plan?.discount
+    model
   });
 }
 
 /**
  * Calculate cost for improvement suggestions
  */
-function calculateSuggestionsCost(sentenceCount, userPlan = 'free') {
-  const plan = SUBSCRIPTION_PLANS[userPlan];
-  
+function calculateSuggestionsCost(sentenceCount) {
   return calculateFeatureCost('improvement_suggestions', {
-    sentenceCount,
-    discount: plan?.discount
+    sentenceCount
   });
 }
 
 /**
  * Calculate cost for chat message
  */
-function calculateChatCost(text, model = 'gemini-2.0-flash-exp', userPlan = 'free') {
+function calculateChatCost(text, model = 'gemini-2.0-flash-exp') {
   const wordCount = countWords(text);
-  const plan = SUBSCRIPTION_PLANS[userPlan];
   
   return calculateFeatureCost('chat_message', {
     wordCount,
-    model,
-    discount: plan?.discount
+    model
   });
 }
 
 /**
  * Calculate cost for voice profile generation
  */
-function calculateVoiceProfileCost(sampleCount, userPlan = 'free') {
-  const plan = SUBSCRIPTION_PLANS[userPlan];
-  
+function calculateVoiceProfileCost(sampleCount) {
   return calculateFeatureCost('voice_profile_generation', {
-    sampleCount,
-    discount: plan?.discount
+    sampleCount
   });
 }
 
@@ -319,88 +298,6 @@ async function getUserUsageStats(userId, days = 30) {
   }
 }
 
-// ============================================================================
-// SUBSCRIPTION MANAGEMENT
-// ============================================================================
-
-/**
- * Reset monthly credits for subscription users
- */
-async function resetMonthlyCredits(userId) {
-  try {
-    const userDoc = await db.collection('users').doc(userId).get();
-    
-    if (!userDoc.exists) {
-      throw new Error('User not found');
-    }
-    
-    const userData = userDoc.data();
-    const planName = userData.subscription?.plan || 'free';
-    const plan = SUBSCRIPTION_PLANS[planName];
-    
-    if (!plan) {
-      throw new Error('Invalid subscription plan');
-    }
-    
-    // Add monthly credits
-    await addCredits(userId, plan.monthlyCredits, 'subscription', {
-      plan: planName,
-      resetDate: new Date().toISOString()
-    });
-    
-    // Update last reset date
-    await db.collection('users').doc(userId).update({
-      'subscription.lastReset': new Date().toISOString()
-    });
-    
-    logger.info('Monthly credits reset', { userId, plan: planName, credits: plan.monthlyCredits });
-    
-    return true;
-  } catch (error) {
-    logger.error('Error resetting monthly credits', { userId, error: error.message });
-    throw error;
-  }
-}
-
-/**
- * Check if user needs monthly credit reset
- */
-async function checkAndResetMonthlyCredits(userId) {
-  try {
-    const userDoc = await db.collection('users').doc(userId).get();
-    
-    if (!userDoc.exists) {
-      return false;
-    }
-    
-    const userData = userDoc.data();
-    const lastReset = userData.subscription?.lastReset;
-    
-    if (!lastReset) {
-      // First time - reset now
-      await resetMonthlyCredits(userId);
-      return true;
-    }
-    
-    const lastResetDate = new Date(lastReset);
-    const now = new Date();
-    
-    // Check if a month has passed
-    const monthsPassed = (now.getFullYear() - lastResetDate.getFullYear()) * 12 
-                       + (now.getMonth() - lastResetDate.getMonth());
-    
-    if (monthsPassed >= 1) {
-      await resetMonthlyCredits(userId);
-      return true;
-    }
-    
-    return false;
-  } catch (error) {
-    logger.error('Error checking monthly reset', { userId, error: error.message });
-    return false;
-  }
-}
-
 module.exports = {
   getUserCredits,
   hasEnoughCredits,
@@ -413,7 +310,5 @@ module.exports = {
   calculateChatCost,
   calculateVoiceProfileCost,
   trackFeatureUsage,
-  getUserUsageStats,
-  resetMonthlyCredits,
-  checkAndResetMonthlyCredits
+  getUserUsageStats
 };

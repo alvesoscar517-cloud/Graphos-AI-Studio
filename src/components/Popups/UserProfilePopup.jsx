@@ -83,7 +83,6 @@ const UserProfilePopup = ({ onClose }) => {
       <UpgradePlanModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
-        currentPlan={user?.subscription?.plan || 'free'}
         onUpgrade={handleUpgradeSuccess}
       />
     </>

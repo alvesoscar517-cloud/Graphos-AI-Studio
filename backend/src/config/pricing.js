@@ -4,6 +4,12 @@
  */
 
 // ============================================================================
+// FREE CREDITS FOR NEW USERS
+// ============================================================================
+
+const FREE_CREDITS = 50; // Credits miễn phí cho user mới
+
+// ============================================================================
 // MODEL PRICING (based on Gemini API costs)
 // ============================================================================
 
@@ -116,140 +122,51 @@ const FEATURE_COSTS = {
 };
 
 // ============================================================================
-// SUBSCRIPTION PLANS
-// ============================================================================
-
-const SUBSCRIPTION_PLANS = {
-  'free': {
-    name: 'Free',
-    monthlyCredits: 100,
-    price: 0,
-    features: {
-      ai_detection: true,
-      text_analysis: true,
-      text_rewrite: true,
-      chat_message: true,
-      voice_profiles: 2,           // Max 2 profiles
-      max_samples_per_profile: 10
-    },
-    limits: {
-      daily_credits: 10,
-      max_text_length: 5000
-    }
-  },
-  
-  'starter': {
-    name: 'Starter',
-    monthlyCredits: 500,
-    price: 9.99,                   // $9.99/month
-    features: {
-      ai_detection: true,
-      text_analysis: true,
-      text_rewrite: true,
-      chat_message: true,
-      improvement_suggestions: true,
-      voice_profiles: 5,
-      max_samples_per_profile: 30
-    },
-    limits: {
-      daily_credits: 50,
-      max_text_length: 10000
-    },
-    bonus: {
-      signup_credits: 100          // Bonus 100 credits on signup
-    }
-  },
-  
-  'professional': {
-    name: 'Professional',
-    monthlyCredits: 2000,
-    price: 29.99,                  // $29.99/month
-    features: {
-      ai_detection: true,
-      text_analysis: true,
-      text_rewrite: true,
-      chat_message: true,
-      improvement_suggestions: true,
-      translation: true,
-      voice_profiles: 20,
-      max_samples_per_profile: 100,
-      priority_support: true
-    },
-    limits: {
-      daily_credits: 200,
-      max_text_length: 20000
-    },
-    bonus: {
-      signup_credits: 500
-    },
-    discount: {
-      rewrite_cost: 0.8,           // 20% discount on rewrites
-      analysis_cost: 0.8
-    }
-  },
-  
-  'enterprise': {
-    name: 'Enterprise',
-    monthlyCredits: 10000,
-    price: 99.99,                  // $99.99/month
-    features: {
-      ai_detection: true,
-      text_analysis: true,
-      text_rewrite: true,
-      chat_message: true,
-      improvement_suggestions: true,
-      translation: true,
-      voice_profiles: -1,          // Unlimited
-      max_samples_per_profile: -1, // Unlimited
-      priority_support: true,
-      api_access: true,
-      custom_models: true
-    },
-    limits: {
-      daily_credits: -1,           // Unlimited
-      max_text_length: 50000
-    },
-    bonus: {
-      signup_credits: 2000
-    },
-    discount: {
-      rewrite_cost: 0.6,           // 40% discount
-      analysis_cost: 0.6,
-      chat_cost: 0.7
-    }
-  }
-};
-
-// ============================================================================
 // CREDIT PACKAGES (One-time purchase)
 // ============================================================================
 
 const CREDIT_PACKAGES = {
-  'small': {
+  'basic': {
     credits: 100,
     price: 4.99,
     bonus: 0,
-    description: 'Gói nhỏ - 100 credits'
+    description: 'Basic',
+    variantId: process.env.LS_VARIANT_BASIC || null  // Lemon Squeezy variant ID
   },
-  'medium': {
+  'pro': {
     credits: 500,
     price: 19.99,
     bonus: 50,                     // +10% bonus
-    description: 'Gói trung - 500 credits + 50 bonus'
+    description: 'Pro',
+    variantId: process.env.LS_VARIANT_PRO || null
   },
-  'large': {
+  'pro_plus': {
     credits: 1500,
     price: 49.99,
     bonus: 300,                    // +20% bonus
-    description: 'Gói lớn - 1500 credits + 300 bonus'
+    description: 'Pro+',
+    variantId: process.env.LS_VARIANT_PRO_PLUS || null
   },
-  'mega': {
+  'power': {
     credits: 5000,
     price: 149.99,
     bonus: 1500,                   // +30% bonus
-    description: 'Gói khổng lồ - 5000 credits + 1500 bonus'
+    description: 'Power',
+    variantId: process.env.LS_VARIANT_POWER || null
   }
 };
+
+/**
+ * Get package by Lemon Squeezy variant ID
+ */
+function getPackageByVariantId(variantId) {
+  for (const [packageId, pkg] of Object.entries(CREDIT_PACKAGES)) {
+    if (pkg.variantId === variantId || pkg.variantId === String(variantId)) {
+      return { packageId, ...pkg };
+    }
+  }
+  return null;
+}
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -289,14 +206,6 @@ function calculateFeatureCost(featureName, params = {}) {
     }
   }
   
-  // Apply subscription discount
-  if (params.discount) {
-    const discountKey = `${featureName.split('_')[0]}_cost`;
-    if (params.discount[discountKey]) {
-      cost *= params.discount[discountKey];
-    }
-  }
-  
   // Cap at max cost
   if (feature.maxCost) {
     cost = Math.min(cost, feature.maxCost);
@@ -329,12 +238,13 @@ function countSentences(text) {
 }
 
 module.exports = {
+  FREE_CREDITS,
   MODEL_COSTS,
   FEATURE_COSTS,
-  SUBSCRIPTION_PLANS,
   CREDIT_PACKAGES,
   calculateFeatureCost,
   estimateTokens,
   countWords,
-  countSentences
+  countSentences,
+  getPackageByVariantId
 };

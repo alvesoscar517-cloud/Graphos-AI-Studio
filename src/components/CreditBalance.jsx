@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { CONFIG } from '../utils/config';
 import './CreditBalance.css';
 
 const CreditBalance = ({ userId, onUpgradeClick }) => {
@@ -16,9 +17,8 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
 
   const fetchCredits = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const response = await fetch(
-        `${apiUrl}/api/subscription/credits/balance?user_id=${userId}`
+        `${CONFIG.API_BASE_URL}/api/credits/balance?user_id=${userId}`
       );
       const data = await response.json();
       
@@ -32,9 +32,11 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
     }
   };
 
-  // Calculate used credits
+  // Display credit balance
+  const balance = credits?.balance?.toFixed(2) || '0';
   const used = credits?.used?.toFixed(2) || '0';
-  const total = credits?.monthly || '0';
+  const isLowCredit = parseFloat(balance) < 10;
+  const isOutOfCredit = parseFloat(balance) <= 0;
 
   return (
     <div className="credit-balance-simple">
@@ -42,7 +44,9 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
         {loading ? (
           <div className="credit-loading">...</div>
         ) : (
-          <span className="credit-text">{used} used / {total} total</span>
+          <span className={`credit-text ${isLowCredit ? 'low-credit' : ''} ${isOutOfCredit ? 'out-of-credit' : ''}`}>
+            {balance} credits / {used} used
+          </span>
         )}
       </div>
       <button className="upgrade-button-simple" onClick={onUpgradeClick}>

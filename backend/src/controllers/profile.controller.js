@@ -10,6 +10,7 @@ const analysisService = require('../services/analysis.service');
 const cacheService = require('../services/cache.service');
 const logger = require('../utils/logger');
 const { validateText, validateProfileId, validateUserId } = require('../utils/validation');
+const { FREE_CREDITS } = require('../config/pricing');
 
 // ============================================================================
 // CREATE PROFILE
@@ -27,10 +28,16 @@ exports.createProfile = async (req, res) => {
         email: email || userId,
         name,
         tier: 'free',
+        credits: {
+          balance: FREE_CREDITS,
+          purchased: 0,
+          used: 0,
+          free: FREE_CREDITS
+        },
         usage: { profilesCount: 0, analysesCount: 0, rewritesCount: 0 },
         createdAt: new Date()
       });
-      logger.info('Auto-created user', { userId });
+      logger.info('Auto-created user with free credits', { userId, freeCredits: FREE_CREDITS });
     }
 
     const profileId = uuidv4();
@@ -290,10 +297,16 @@ exports.createProfileComplete = async (req, res) => {
         email: email || userId,
         name,
         tier: 'free',
+        credits: {
+          balance: FREE_CREDITS,
+          purchased: 0,
+          used: 0,
+          free: FREE_CREDITS
+        },
         usage: { profilesCount: 0, analysesCount: 0, rewritesCount: 0 },
         createdAt: new Date()
       });
-      logger.info('Auto-created user', { userId });
+      logger.info('Auto-created user with free credits', { userId, freeCredits: FREE_CREDITS });
     }
 
     const profileId = uuidv4();
