@@ -158,10 +158,33 @@ const CREDIT_PACKAGES = {
 
 /**
  * Get package by Lemon Squeezy variant ID
+ * Supports both string and number comparison
  */
 function getPackageByVariantId(variantId) {
+  const variantIdStr = String(variantId);
+  const variantIdNum = parseInt(variantId, 10);
+  
   for (const [packageId, pkg] of Object.entries(CREDIT_PACKAGES)) {
-    if (pkg.variantId === variantId || pkg.variantId === String(variantId)) {
+    if (!pkg.variantId) continue;
+    
+    const pkgVariantStr = String(pkg.variantId);
+    const pkgVariantNum = parseInt(pkg.variantId, 10);
+    
+    if (pkgVariantStr === variantIdStr || pkgVariantNum === variantIdNum) {
+      return { packageId, ...pkg };
+    }
+  }
+  return null;
+}
+
+/**
+ * Get package by price (fallback when variant ID not configured)
+ * Matches based on total price in cents
+ */
+function getPackageByPrice(priceInCents) {
+  for (const [packageId, pkg] of Object.entries(CREDIT_PACKAGES)) {
+    const pkgPriceInCents = Math.round(pkg.price * 100);
+    if (pkgPriceInCents === priceInCents) {
       return { packageId, ...pkg };
     }
   }
@@ -246,5 +269,6 @@ module.exports = {
   estimateTokens,
   countWords,
   countSentences,
-  getPackageByVariantId
+  getPackageByVariantId,
+  getPackageByPrice
 };

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { detectAI as detectAIAPI } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
-import { getCachedAnalysis, setCachedAnalysis, hasTextChanged } from '../../services/analysisCache'
+import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import modal from '../../utils/modal'
@@ -18,18 +18,19 @@ const AIDetectionCard = ({ disabled, text }) => {
   const [textChanged, setTextChanged] = useState(true)
   const { currentNote } = useNotes()
 
-  // Load cached result when note changes
+  // Reset state and load cached result when note changes
   useEffect(() => {
+    // Always reset state first when note changes
+    setResult(null)
+    setEvidence([])
+    setVerdict('')
+    setTextChanged(true)
+
     if (!currentNote) {
-      setResult(null)
-      setEvidence([])
-      setVerdict('')
-      setTextChanged(true)
       return
     }
 
-    // Try to load any cached result for this note (any text version)
-    // We'll check the current text first, then fall back to any cached version
+    // Only load cache if we have text and exact match exists
     if (text) {
       const cached = getCachedAnalysis(currentNote.id, text, 'detect')
       if (cached) {
@@ -39,49 +40,35 @@ const AIDetectionCard = ({ disabled, text }) => {
         setVerdict(verdictText)
         setEvidence(cached.evidence || [])
         setTextChanged(false)
-        console.log('📦 Loaded cached AI detection result for current text')
-        return
+        console.log('📦 Loaded cached AI detection result for note:', currentNote.id)
       }
     }
+  }, [currentNote?.id])
 
-    // If no exact match, try to load the most recent cached result for this note
-    // This keeps the old result visible even when text changes
-    const cache = JSON.parse(localStorage.getItem('ai_analysis_cache') || '{}')
-    const noteCache = cache[currentNote.id]
-    
-    if (noteCache) {
-      // Get the most recent cached result
-      let latestResult = null
-      let latestTimestamp = 0
-      
-      Object.values(noteCache).forEach(textCache => {
-        if (textCache.detect && textCache.detect.timestamp > latestTimestamp) {
-          latestTimestamp = textCache.detect.timestamp
-          latestResult = textCache.detect.data
-        }
-      })
-      
-      if (latestResult) {
-        // In hoa chữ cái đầu của verdict khi load từ cache
-        const verdictText = latestResult.verdict ? latestResult.verdict.charAt(0).toUpperCase() + latestResult.verdict.slice(1) : latestResult.verdict
-        setResult(latestResult.aiScore)
-        setVerdict(verdictText)
-        setEvidence(latestResult.evidence || [])
-        console.log('📦 Loaded most recent cached result (text has changed)')
-      }
-    }
-  }, [currentNote])
-
-  // Check if text has changed (to enable/disable button)
+  // Check if text has changed and load cache if available
   useEffect(() => {
     if (!currentNote || !text) {
       setTextChanged(true)
       return
     }
 
-    const changed = hasTextChanged(currentNote.id, text, 'detect')
-    setTextChanged(changed)
-  }, [currentNote, text])
+    // Check if we have cached result for this exact text
+    const cached = getCachedAnalysis(currentNote.id, text, 'detect')
+    if (cached) {
+      const verdictText = cached.verdict ? cached.verdict.charAt(0).toUpperCase() + cached.verdict.slice(1) : cached.verdict
+      setResult(cached.aiScore)
+      setVerdict(verdictText)
+      setEvidence(cached.evidence || [])
+      setTextChanged(false)
+      console.log('📦 Loaded cached AI detection result for text change')
+    } else {
+      // Text changed but no cache - reset result and enable button
+      setResult(null)
+      setEvidence([])
+      setVerdict('')
+      setTextChanged(true)
+    }
+  }, [currentNote?.id, text])
 
   const detectAI = async () => {
     if (!text) {

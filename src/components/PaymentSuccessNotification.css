@@ -1,0 +1,264 @@
+/* ============================================================================
+   PAYMENT SUCCESS NOTIFICATION
+   Compact, minimal design with confetti animation
+   ============================================================================ */
+
+/* Light Mode */
+body.light-theme .payment-success-wrapper {
+  --notif-bg: #ffffff;
+  --notif-border: transparent;
+  --text-primary: #0d0d0d;
+  --text-secondary: #666666;
+  --success-bg: #0d0d0d;
+  --success-color: #ffffff;
+  --btn-bg: #0d0d0d;
+  --btn-color: #ffffff;
+  --credits-bg: #f5f5f5;
+  --icon-filter: invert(0);
+  --icon-filter-btn: invert(1);
+}
+
+/* Dark Mode */
+body.dark-theme .payment-success-wrapper,
+.payment-success-wrapper {
+  --notif-bg: #1e1e1e;
+  --notif-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --success-bg: #ffffff;
+  --success-color: #0d0d0d;
+  --btn-bg: #ffffff;
+  --btn-color: #0d0d0d;
+  --credits-bg: #282828;
+  --icon-filter: invert(1);
+  --icon-filter-btn: invert(0);
+}
+
+/* Wrapper */
+.payment-success-wrapper {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999999;
+  animation: wrapperFadeIn 0.3s ease-out;
+  pointer-events: none;
+}
+
+.payment-success-wrapper.closing {
+  animation: wrapperFadeOut 0.3s ease-out forwards;
+}
+
+@keyframes wrapperFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes wrapperFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Confetti Container - Full screen */
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.confetti-container > div {
+  transform: scale(2.5);
+  transform-origin: center center;
+}
+
+/* Notification Card */
+.payment-success-notification {
+  position: relative;
+  z-index: 2;
+  background: var(--notif-bg);
+  border: 1px solid var(--notif-border);
+  border-radius: 16px;
+  padding: 32px 28px;
+  max-width: 340px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.4);
+  animation: notifSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: auto;
+}
+
+.payment-success-wrapper.closing .payment-success-notification {
+  animation: notifSlideDown 0.3s ease-out forwards;
+}
+
+@keyframes notifSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes notifSlideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+}
+
+/* Close Button */
+.close-notification {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.15s ease;
+}
+
+.close-notification:hover {
+  opacity: 0.8;
+}
+
+.close-notification img {
+  width: 16px;
+  height: 16px;
+  filter: var(--icon-filter);
+}
+
+/* Success Icon */
+.success-icon-wrapper {
+  margin-bottom: 20px;
+}
+
+.success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--success-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  animation: iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+
+@keyframes iconPop {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.success-icon img {
+  width: 28px;
+  height: 28px;
+  filter: var(--icon-filter-btn);
+}
+
+/* Title */
+.success-title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* Message */
+.success-message {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* Credits Info */
+.credits-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--credits-bg);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.credits-info img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+  filter: var(--icon-filter);
+}
+
+.credits-info strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Continue Button */
+.continue-btn {
+  width: 100%;
+  padding: 12px 20px;
+  background: var(--btn-bg);
+  color: var(--btn-color);
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.continue-btn:hover {
+  opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+  .payment-success-notification {
+    padding: 24px 20px;
+    max-width: 300px;
+  }
+
+  .success-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .success-icon img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .success-title {
+    font-size: 18px;
+  }
+
+  .success-message {
+    font-size: 13px;
+  }
+}

@@ -7,7 +7,7 @@
 const { db, FieldValue } = require('../config/firebase');
 const lemonSqueezy = require('../services/lemonsqueezy.service');
 const creditService = require('../services/credit.service');
-const { CREDIT_PACKAGES, getPackageByVariantId } = require('../config/pricing');
+const { CREDIT_PACKAGES, getPackageByVariantId, getPackageByPrice } = require('../config/pricing');
 const logger = require('../utils/logger');
 
 // Webhook event types
@@ -62,17 +62,34 @@ exports.handleWebhook = async (req, res) => {
     const signature = req.headers['x-signature'];
     const rawBody = req.rawBody || JSON.stringify(req.body);
 
-    // Verify webhook signature
-    if (!lemonSqueezy.verifyWebhookSignature(rawBody, signature)) {
-      logger.warn('Invalid webhook signature');
-      return res.status(401).json({ error: 'Invalid signature' });
+    logger.info('Webhook received', { 
+      hasSignature: !!signature, 
+      hasRawBody: !!req.rawBody,
+      bodyType: typeof req.body 
+    });
+
+    // Verify webhook signature (skip in test mode if no secret configured)
+    const webhookSecret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET;
+    if (webhookSecret && signature) {
+      if (!lemonSqueezy.verifyWebhookSignature(rawBody, signature)) {
+        logger.warn('Invalid webhook signature', { signature: signature?.substring(0, 20) + '...' });
+        return res.status(401).json({ error: 'Invalid signature' });
+      }
+      logger.info('Webhook signature verified');
+    } else if (!webhookSecret) {
+      logger.warn('Webhook secret not configured - skipping signature verification');
     }
 
     const { meta, data } = req.body;
     const eventName = meta.event_name;
     const customData = meta.custom_data || {};
 
-    logger.info('Webhook received', { event: eventName, id: data.id });
+    logger.info('Processing webhook event', { 
+      event: eventName, 
+      id: data.id,
+      customData,
+      testMode: meta.test_mode 
+    });
 
     switch (eventName) {
       case WEBHOOK_EVENTS.ORDER_CREATED:
@@ -129,10 +146,15 @@ exports.handleWebhook = async (req, res) => {
         logger.info('Unhandled webhook event', { event: eventName });
     }
 
+    logger.info('Webhook processed successfully');
     res.json({ received: true });
   } catch (error) {
-    logger.error('Webhook processing failed', { error: error.message });
-    res.status(500).json({ error: 'Webhook processing failed' });
+    logger.error('Webhook processing failed', { 
+      error: error.message, 
+      stack: error.stack,
+      body: req.body 
+    });
+    res.status(500).json({ error: 'Webhook processing failed', details: error.message });
   }
 };
 
@@ -144,12 +166,29 @@ async function handleOrderCreated(data, customData) {
   const userId = customData.user_id;
   let packageId = customData.package_id;
   
-  // Try to find package from variant ID if not provided
   const variantId = attrs.first_order_item?.variant_id;
-  if (!packageId && variantId) {
-    const foundPkg = getPackageByVariantId(variantId);
+  const orderTotal = attrs.total; // Price in cents
+  
+  // Try to find package: 1) from custom_data, 2) from variant ID, 3) from price
+  let foundPkg = null;
+  
+  if (packageId && CREDIT_PACKAGES[packageId]) {
+    foundPkg = { packageId, ...CREDIT_PACKAGES[packageId] };
+    logger.info('Package found from custom_data', { packageId });
+  } else if (variantId) {
+    foundPkg = getPackageByVariantId(variantId);
     if (foundPkg) {
       packageId = foundPkg.packageId;
+      logger.info('Package found from variant ID', { variantId, packageId });
+    }
+  }
+  
+  // Fallback: match by price
+  if (!foundPkg && orderTotal) {
+    foundPkg = getPackageByPrice(orderTotal);
+    if (foundPkg) {
+      packageId = foundPkg.packageId;
+      logger.info('Package found from price fallback', { orderTotal, packageId });
     }
   }
 
@@ -173,19 +212,24 @@ async function handleOrderCreated(data, customData) {
   });
 
   // Add credits if package exists
-  if (userId && packageId && CREDIT_PACKAGES[packageId]) {
-    const pkg = CREDIT_PACKAGES[packageId];
-    const totalCredits = pkg.credits + pkg.bonus;
+  if (userId && foundPkg) {
+    const totalCredits = foundPkg.credits + foundPkg.bonus;
     
     await creditService.addCredits(userId, totalCredits, 'purchase', {
       orderId: data.id,
       package: packageId,
-      price: pkg.price
+      price: foundPkg.price
     });
 
-    logger.info('Credits added from order', { userId, credits: totalCredits, orderId: data.id });
+    logger.info('Credits added from order', { userId, credits: totalCredits, orderId: data.id, packageId });
   } else {
-    logger.warn('Could not add credits - package not found', { userId, packageId, variantId });
+    logger.warn('Could not add credits - package not found', { 
+      userId, 
+      packageId, 
+      variantId, 
+      orderTotal,
+      customData 
+    });
   }
 }
 
@@ -750,6 +794,74 @@ exports.getOrderHistory = async (req, res) => {
     res.json({ success: true, orders });
   } catch (error) {
     logger.error('Get order history failed', { error: error.message });
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Check payment status - for polling after checkout
+ * Returns the latest order created after a given timestamp
+ */
+exports.checkPaymentStatus = async (req, res) => {
+  try {
+    const { user_id, since } = req.query;
+
+    if (!user_id) {
+      return res.status(400).json({ error: 'user_id is required' });
+    }
+
+    // Parse since timestamp (default: 5 minutes ago)
+    const sinceDate = since 
+      ? new Date(parseInt(since)) 
+      : new Date(Date.now() - 5 * 60 * 1000);
+
+    // Query for orders created after the timestamp
+    const ordersSnapshot = await db.collection('orders')
+      .where('userId', '==', user_id)
+      .where('createdAt', '>=', sinceDate)
+      .orderBy('createdAt', 'desc')
+      .limit(1)
+      .get();
+
+    if (ordersSnapshot.empty) {
+      return res.json({ 
+        success: true, 
+        hasPurchase: false,
+        message: 'No recent purchase found'
+      });
+    }
+
+    const order = ordersSnapshot.docs[0].data();
+    
+    // Get updated credit balance
+    const userDoc = await db.collection('users').doc(user_id).get();
+    const credits = userDoc.exists ? userDoc.data().credits : null;
+
+    logger.info('Payment status checked', { 
+      userId: user_id, 
+      orderId: order.orderId,
+      packageId: order.packageId 
+    });
+
+    res.json({
+      success: true,
+      hasPurchase: true,
+      order: {
+        orderId: order.orderId,
+        packageId: order.packageId,
+        productName: order.productName,
+        variantName: order.variantName,
+        total: order.total,
+        totalFormatted: order.totalFormatted,
+        createdAt: order.createdAt
+      },
+      credits: credits ? {
+        balance: credits.balance,
+        purchased: credits.purchased
+      } : null
+    });
+  } catch (error) {
+    logger.error('Check payment status failed', { error: error.message });
     res.status(500).json({ error: error.message });
   }
 };

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
-import { getCachedAnalysis, setCachedAnalysis, hasTextChanged } from '../../services/analysisCache'
+import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import './Analysis.css'
@@ -16,16 +16,18 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
   const [textChanged, setTextChanged] = useState(true)
   const { currentNote } = useNotes()
 
-  // Load cached result when note or profile changes
+  // Reset state and load cached result when note or profile changes
   useEffect(() => {
+    // Always reset state first when note/profile changes
+    setScore(null)
+    setAnalysisDetails(null)
+    setTextChanged(true)
+
     if (!currentNote || !currentProfile) {
-      setScore(null)
-      setAnalysisDetails(null)
-      setTextChanged(true)
       return
     }
 
-    // Try to load cached result for this note + profile + text
+    // Only load cache if we have text and exact match exists
     if (text) {
       const cacheKey = `${currentProfile.profile_id}_${text}`
       const cached = getCachedAnalysis(currentNote.id, cacheKey, 'compatibility')
@@ -33,49 +35,33 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
         setScore(cached.score)
         setAnalysisDetails(cached.details)
         setTextChanged(false)
-        console.log('📦 Loaded cached compatibility result')
-        return
+        console.log('📦 Loaded cached compatibility result for note:', currentNote.id)
       }
     }
+  }, [currentNote?.id, currentProfile?.profile_id])
 
-    // If no exact match, try to load most recent result for this profile
-    const cache = JSON.parse(localStorage.getItem('ai_analysis_cache') || '{}')
-    const noteCache = cache[currentNote.id]
-    
-    if (noteCache) {
-      let latestResult = null
-      let latestTimestamp = 0
-      
-      Object.values(noteCache).forEach(textCache => {
-        if (textCache.compatibility && textCache.compatibility.timestamp > latestTimestamp) {
-          const cachedData = textCache.compatibility.data
-          // Check if it's for the same profile
-          if (cachedData.details?.profile_name === currentProfile.profile_name) {
-            latestTimestamp = textCache.compatibility.timestamp
-            latestResult = cachedData
-          }
-        }
-      })
-      
-      if (latestResult) {
-        setScore(latestResult.score)
-        setAnalysisDetails(latestResult.details)
-        console.log('📦 Loaded most recent cached result (text/profile changed)')
-      }
-    }
-  }, [currentNote, currentProfile])
-
-  // Check if text or profile has changed
+  // Check if text or profile has changed and load cache if available
   useEffect(() => {
     if (!currentNote || !text || !currentProfile) {
       setTextChanged(true)
       return
     }
 
+    // Check if we have cached result for this exact text + profile
     const cacheKey = `${currentProfile.profile_id}_${text}`
-    const changed = hasTextChanged(currentNote.id, cacheKey, 'compatibility')
-    setTextChanged(changed)
-  }, [currentNote, text, currentProfile])
+    const cached = getCachedAnalysis(currentNote.id, cacheKey, 'compatibility')
+    if (cached) {
+      setScore(cached.score)
+      setAnalysisDetails(cached.details)
+      setTextChanged(false)
+      console.log('📦 Loaded cached compatibility result for text change')
+    } else {
+      // Text/profile changed but no cache - reset result and enable button
+      setScore(null)
+      setAnalysisDetails(null)
+      setTextChanged(true)
+    }
+  }, [currentNote?.id, text, currentProfile?.profile_id])
 
   const calculateScore = async () => {
     if (!currentProfile || !text) {

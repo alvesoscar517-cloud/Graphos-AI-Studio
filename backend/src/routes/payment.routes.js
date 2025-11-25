@@ -31,4 +31,7 @@ router.post('/license/deactivate', paymentController.deactivateLicense);
 // Order history
 router.get('/orders', paymentController.getOrderHistory);
 
+// Payment status check (for polling after checkout)
+router.get('/check-status', paymentController.checkPaymentStatus);
+
 module.exports = router;

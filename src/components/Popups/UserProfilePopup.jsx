@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
-import modal from '../../utils/modal'
 import CreditBalance from '../CreditBalance'
 import UpgradePlanModal from '../UpgradePlanModal'
+import modal from '../../utils/modal'
 import './Popups.css'
 
 const UserProfilePopup = ({ onClose }) => {
   const popupRef = useRef(null)
   const { user, signOut } = useAuth()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [creditRefreshKey, setCreditRefreshKey] = useState(0)
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -39,9 +40,10 @@ const UserProfilePopup = ({ onClose }) => {
     setShowUpgradeModal(true)
   }
 
-  const handleUpgradeSuccess = (data) => {
-    modal.toast('Nâng cấp thành công!', `Đã thêm ${data.creditsAdded} credits`, 'success')
-    // Refresh credit balance will happen automatically via CreditBalance component
+  const handlePurchaseSuccess = () => {
+    // Force refresh credit balance by changing key
+    setCreditRefreshKey(prev => prev + 1);
+    setShowUpgradeModal(false);
   }
 
   return (
@@ -61,6 +63,7 @@ const UserProfilePopup = ({ onClose }) => {
         {/* Credit Balance Section */}
         <div className="profile-credits-section">
           <CreditBalance 
+            key={creditRefreshKey}
             userId={user?.id || localStorage.getItem('userId')}
             onUpgradeClick={handleUpgradeClick}
           />
@@ -83,7 +86,7 @@ const UserProfilePopup = ({ onClose }) => {
       <UpgradePlanModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
-        onUpgrade={handleUpgradeSuccess}
+        onPurchaseSuccess={handlePurchaseSuccess}
       />
     </>
   )

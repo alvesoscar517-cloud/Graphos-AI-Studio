@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { CONFIG } from '../utils/config';
 import { getUserInfo } from '../services/api';
+import { usePaymentPolling } from '../hooks/usePaymentPolling';
+import PaymentSuccessNotification from './PaymentSuccessNotification';
 
 import './UpgradePlanModal.css';
 
@@ -46,18 +48,35 @@ const DEFAULT_PACKAGES = [
   }
 ];
 
-const UpgradePlanModal = ({ isOpen, onClose }) => {
+const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
   const [packages, setPackages] = useState(DEFAULT_PACKAGES);
   const [loading, setLoading] = useState(false);
   const [loadingPackageId, setLoadingPackageId] = useState(null);
   const [error, setError] = useState(null);
+  
+  // Payment polling hook
+  const { 
+    purchaseResult, 
+    startPolling, 
+    stopPolling, 
+    clearPurchaseResult 
+  } = usePaymentPolling();
 
   useEffect(() => {
     if (isOpen) {
       fetchPackages();
       setError(null);
+    } else {
+      // Stop polling when modal closes (but keep checking in background)
     }
   }, [isOpen]);
+
+  // Stop polling when component unmounts
+  useEffect(() => {
+    return () => {
+      stopPolling();
+    };
+  }, [stopPolling]);
 
   const fetchPackages = async () => {
     try {
@@ -99,6 +118,8 @@ const UpgradePlanModal = ({ isOpen, onClose }) => {
       const data = await response.json();
 
       if (data.success && data.checkoutUrl) {
+        // Start polling for payment status
+        startPolling();
         window.open(data.checkoutUrl, '_blank');
         onClose();
       } else {
@@ -126,6 +147,25 @@ const UpgradePlanModal = ({ isOpen, onClose }) => {
     if (pkg.bonus <= 0) return null;
     return Math.round((pkg.bonus / pkg.credits) * 100);
   };
+
+  // Handle purchase success notification close
+  const handlePurchaseNotificationClose = () => {
+    clearPurchaseResult();
+    // Callback to parent to refresh credit balance
+    onPurchaseSuccess?.();
+  };
+
+  // Show success notification even when modal is closed
+  if (purchaseResult) {
+    return (
+      <PaymentSuccessNotification
+        isVisible={true}
+        order={purchaseResult.order}
+        credits={purchaseResult.credits}
+        onClose={handlePurchaseNotificationClose}
+      />
+    );
+  }
 
   if (!isOpen) return null;
 
@@ -166,7 +206,7 @@ const UpgradePlanModal = ({ isOpen, onClose }) => {
                 >
                   {pkg.popular && (
                     <div className="popular-badge">
-                      <img src="/icon/trending-up.svg" alt="" />
+                      <img src="/icon/tags.svg" alt="" />
                       <span>Phổ biến</span>
                     </div>
                   )}

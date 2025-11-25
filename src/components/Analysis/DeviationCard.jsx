@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
-import { getCachedAnalysis, setCachedAnalysis, hasTextChanged } from '../../services/analysisCache'
+import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import modal from '../../utils/modal'
@@ -15,16 +15,18 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
   const [textChanged, setTextChanged] = useState(true)
   const { currentNote } = useNotes()
 
-  // Load cached result when note changes
+  // Reset state and load cached result when note or profile changes
   useEffect(() => {
+    // Always reset state first when note/profile changes
+    setDeviations([])
+    setAnalysisData(null)
+    setTextChanged(true)
+
     if (!currentNote || !currentProfile) {
-      setDeviations([])
-      setAnalysisData(null)
-      setTextChanged(true)
       return
     }
 
-    // Try to load cached result for current text
+    // Only load cache if we have text and exact match exists
     if (text) {
       const cacheKey = `deviation_${currentProfile.profile_id}`
       const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
@@ -38,36 +40,12 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
           onAnalysisComplete(cached)
         }
         
-        console.log('📦 Loaded cached deviation analysis')
-        return
+        console.log('📦 Loaded cached deviation analysis for note:', currentNote.id)
       }
     }
+  }, [currentNote?.id, currentProfile?.profile_id])
 
-    // Try to load most recent cached result
-    const cache = JSON.parse(localStorage.getItem('ai_analysis_cache') || '{}')
-    const noteCache = cache[currentNote.id]
-    
-    if (noteCache && currentProfile) {
-      const cacheKey = `deviation_${currentProfile.profile_id}`
-      let latestResult = null
-      let latestTimestamp = 0
-      
-      Object.values(noteCache).forEach(textCache => {
-        if (textCache[cacheKey] && textCache[cacheKey].timestamp > latestTimestamp) {
-          latestTimestamp = textCache[cacheKey].timestamp
-          latestResult = textCache[cacheKey].data
-        }
-      })
-      
-      if (latestResult) {
-        setDeviations(latestResult.deviant_sentences || [])
-        setAnalysisData(latestResult)
-        console.log('📦 Loaded most recent cached result (text has changed)')
-      }
-    }
-  }, [currentNote, currentProfile])
-
-  // Check if text has changed
+  // Check if text has changed and load cache if available
   useEffect(() => {
     if (!currentNote || !text || !currentProfile) {
       setTextChanged(true)
@@ -75,9 +53,23 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
     }
 
     const cacheKey = `deviation_${currentProfile.profile_id}`
-    const changed = hasTextChanged(currentNote.id, text, cacheKey)
-    setTextChanged(changed)
-  }, [currentNote, text, currentProfile])
+    const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
+    if (cached) {
+      setDeviations(cached.deviant_sentences || [])
+      setAnalysisData(cached)
+      setTextChanged(false)
+      
+      if (onAnalysisComplete) {
+        onAnalysisComplete(cached)
+      }
+      console.log('📦 Loaded cached deviation analysis for text change')
+    } else {
+      // Text changed but no cache - reset result and enable button
+      setDeviations([])
+      setAnalysisData(null)
+      setTextChanged(true)
+    }
+  }, [currentNote?.id, text, currentProfile?.profile_id])
 
   const findDeviations = async () => {
     if (!currentProfile || !text) return

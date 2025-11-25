@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
-import { getCachedAnalysis, setCachedAnalysis, hasTextChanged } from '../../services/analysisCache'
+import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import modal from '../../utils/modal'
@@ -15,51 +15,29 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
   const [textChanged, setTextChanged] = useState(true)
   const { currentNote } = useNotes()
 
-  // Load cached result when note or profile changes
+  // Reset state and load cached result when note or profile changes
   useEffect(() => {
+    // Always reset state first when note/profile changes
+    setStats(null)
+    setTextChanged(true)
+
     if (!currentNote || !currentProfile) {
-      setStats(null)
-      setTextChanged(true)
       return
     }
 
-    // Try to load cached result for current text first
+    // Only load cache if we have text and exact match exists
     if (text) {
       const cacheKey = `stats_${currentProfile.profile_id}`
       const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
       if (cached) {
         setStats(cached)
         setTextChanged(false)
-        console.log('📦 Loaded cached statistics for current text')
-        return
+        console.log('📦 Loaded cached statistics for note:', currentNote.id)
       }
     }
+  }, [currentNote?.id, currentProfile?.profile_id])
 
-    // If no exact match, try to load the most recent cached result for this note
-    // This keeps the old result visible even when text changes
-    const cache = JSON.parse(localStorage.getItem('ai_analysis_cache') || '{}')
-    const noteCache = cache[currentNote.id]
-    
-    if (noteCache && currentProfile) {
-      const cacheKey = `stats_${currentProfile.profile_id}`
-      let latestResult = null
-      let latestTimestamp = 0
-      
-      Object.values(noteCache).forEach(textCache => {
-        if (textCache[cacheKey] && textCache[cacheKey].timestamp > latestTimestamp) {
-          latestTimestamp = textCache[cacheKey].timestamp
-          latestResult = textCache[cacheKey].data
-        }
-      })
-      
-      if (latestResult) {
-        setStats(latestResult)
-        console.log('📦 Loaded most recent cached statistics (text has changed)')
-      }
-    }
-  }, [currentNote, currentProfile])
-
-  // Check if text has changed (to enable/disable button)
+  // Check if text has changed and load cache if available
   useEffect(() => {
     if (!currentNote || !text || !currentProfile) {
       setTextChanged(true)
@@ -67,9 +45,17 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
     }
 
     const cacheKey = `stats_${currentProfile.profile_id}`
-    const changed = hasTextChanged(currentNote.id, text, cacheKey)
-    setTextChanged(changed)
-  }, [currentNote, text, currentProfile])
+    const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
+    if (cached) {
+      setStats(cached)
+      setTextChanged(false)
+      console.log('📦 Loaded cached statistics for text change')
+    } else {
+      // Text changed but no cache - reset result and enable button
+      setStats(null)
+      setTextChanged(true)
+    }
+  }, [currentNote?.id, text, currentProfile?.profile_id])
 
   const analyzeStats = async () => {
     if (!currentProfile || !text) {

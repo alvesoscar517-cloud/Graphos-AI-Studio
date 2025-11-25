@@ -7,17 +7,6 @@ export const DEV_CONFIG = {
   // Bật chế độ development (sử dụng profile test mặc định)
   ENABLE_DEV_MODE: true,
   
-  // Profile test mặc định (sẽ được tạo một lần và tái sử dụng)
-  DEFAULT_TEST_PROFILE: {
-    profile_id: 'dev_test_profile_001',
-    profile_name: 'Test Profile (Dev)',
-    theme: 'work',
-    user_id: 'dev_test_user',
-    status: 'active',
-    sample_count: 5,
-    created_at: new Date().toISOString()
-  },
-  
   // User test mặc định
   DEFAULT_TEST_USER: {
     userId: 'dev_test_user',
@@ -52,7 +41,7 @@ export function devLog(...args) {
 }
 
 /**
- * Lấy profile test mặc định
+ * Lấy profile test từ localStorage
  */
 export function getDefaultTestProfile() {
   if (!isDevMode()) return null
@@ -67,7 +56,7 @@ export function getDefaultTestProfile() {
     }
   }
   
-  return DEV_CONFIG.DEFAULT_TEST_PROFILE
+  return null
 }
 
 /**
@@ -104,24 +93,19 @@ export function shouldUseTestProfile() {
 }
 
 /**
- * Tạo hoặc lấy profile test
+ * Lấy profile test từ localStorage
  */
 export async function getOrCreateTestProfile() {
   if (!isDevMode()) return null
   
-  // Kiểm tra localStorage trước
+  // Kiểm tra localStorage
   const existing = getDefaultTestProfile()
   if (existing) {
     devLog('Using existing test profile:', existing.profile_name)
     return existing
   }
   
-  // Nếu chưa có, tạo mới
-  devLog('Creating new test profile...')
-  const profile = DEV_CONFIG.DEFAULT_TEST_PROFILE
-  saveTestProfile(profile)
-  
-  return profile
+  return null
 }
 
 /**

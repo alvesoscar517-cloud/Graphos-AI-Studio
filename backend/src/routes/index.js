@@ -49,18 +49,8 @@ router.get('/health', (_req, res) => {
 });
 
 // Webhook endpoint (NO AUTH - verified by signature)
-// Must be before body parser for raw body access
-router.post('/webhooks/lemonsqueezy', express.raw({ type: 'application/json' }), (req, res, next) => {
-  req.rawBody = req.body;
-  if (Buffer.isBuffer(req.body)) {
-    try {
-      req.body = JSON.parse(req.body.toString());
-    } catch (e) {
-      return res.status(400).json({ error: 'Invalid JSON' });
-    }
-  }
-  next();
-}, paymentController.handleWebhook);
+// Note: rawBody is captured in main index.js before express.json() parses it
+router.post('/webhooks/lemonsqueezy', paymentController.handleWebhook);
 
 // Mount routes
 router.use('/', authRoutes);

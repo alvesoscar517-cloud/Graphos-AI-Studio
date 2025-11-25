@@ -25,7 +25,20 @@ const app = express();
 // CORS
 app.use(corsMiddleware);
 
-// Body parser
+// Capture raw body for webhook signature verification (MUST be before express.json)
+app.use('/webhooks/lemonsqueezy', express.raw({ type: 'application/json' }), (req, res, next) => {
+  // Store raw body for signature verification
+  req.rawBody = req.body.toString();
+  // Parse JSON for handler
+  try {
+    req.body = JSON.parse(req.rawBody);
+  } catch (e) {
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+  next();
+});
+
+// Body parser for all other routes
 app.use(express.json({ limit: config.MAX_REQUEST_SIZE }));
 app.use(express.urlencoded({ extended: true, limit: config.MAX_REQUEST_SIZE }));
 
