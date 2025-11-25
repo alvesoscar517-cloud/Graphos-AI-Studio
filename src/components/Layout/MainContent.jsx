@@ -1,5 +1,5 @@
 import HomeView from '../Views/HomeView'
-import PlaygroundView from '../Views/PlaygroundView'
+import AIStudioView from '../Views/AIStudioView'
 import WorkspaceView from '../Views/WorkspaceView'
 import HistoryView from '../Views/HistoryView'
 
@@ -14,9 +14,9 @@ const MainContent = ({
   analysisData,
   rewriteMode
 }) => {
-  // Only add margin-right for playground-editor (RightSidebar)
+  // Only add margin-right for aistudio-editor (RightSidebar)
   // Workspace handles its own sidebar internally
-  const shouldAddRightMargin = currentView === 'playground-editor' && !rightSidebarHidden
+  const shouldAddRightMargin = currentView === 'aistudio-editor' && !rightSidebarHidden
   
   return (
     <main 
@@ -34,9 +34,9 @@ const MainContent = ({
         />
       )}
       
-      {(currentView === 'playground' || currentView === 'playground-editor') && (
-        <PlaygroundView 
-          showEditor={currentView === 'playground-editor'}
+      {(currentView === 'aistudio' || currentView === 'aistudio-editor') && (
+        <AIStudioView 
+          showEditor={currentView === 'aistudio-editor'}
           onToggleLeftSidebar={onToggleLeftSidebar}
           onToggleRightSidebar={onToggleRightSidebar}
           rightSidebarHidden={rightSidebarHidden}

@@ -5,23 +5,23 @@
 
 export const DEV_CONFIG = {
   // Bật chế độ development (sử dụng profile test mặc định)
-  ENABLE_DEV_MODE: false,
+  ENABLE_DEV_MODE: true,
   
   // Profile test mặc định (sẽ được tạo một lần và tái sử dụng)
   DEFAULT_TEST_PROFILE: {
     profile_id: 'dev_test_profile_001',
     profile_name: 'Test Profile (Dev)',
     theme: 'work',
-    user_id: 'dev_test_user',
+    user_id: 'dev_user_123',
     status: 'active',
     sample_count: 5,
     created_at: new Date().toISOString()
   },
   
-  // User test mặc định
+  // User test mặc định - email phải hợp lệ cho Lemon Squeezy
   DEFAULT_TEST_USER: {
-    userId: 'dev_test_user',
-    email: 'dev@test.local',
+    userId: 'dev_user_123',
+    email: 'dev.test@example.com',
     name: 'Dev Test User'
   },
   

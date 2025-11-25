@@ -40,9 +40,11 @@ export async function getUserInfo() {
       userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9)
       localStorage.setItem('userId', userId)
     }
+    // Sử dụng email hợp lệ cho dev/local mode
+    const isDevUser = userId.startsWith('dev_user')
     return {
       userId: userId,
-      email: userId + '@local',
+      email: isDevUser ? 'dev.test@example.com' : `${userId}@localhost.dev`,
       name: 'Local User'
     }
   } catch (storageError) {
@@ -51,7 +53,7 @@ export async function getUserInfo() {
     const tempId = 'temp_' + Date.now()
     return {
       userId: tempId,
-      email: tempId + '@temp',
+      email: 'temp.user@localhost.dev',
       name: 'Temporary User'
     }
   }

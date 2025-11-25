@@ -5,9 +5,9 @@ import { useAIProcessing } from '../../../contexts/AIProcessingContext'
 import { createShare } from '../../../services/share'
 import modal from '../../../utils/modal'
 import TextShimmer from '../../Common/TextShimmer'
-import './PlaygroundEditor.css'
+import './AIStudioEditor.css'
 
-const PlaygroundEditor = ({ 
+const AIStudioEditor = ({ 
   onToggleLeftSidebar, 
   onToggleRightSidebar, 
   rightSidebarHidden,
@@ -92,7 +92,7 @@ const PlaygroundEditor = ({
   }
 
   return (
-    <div className="playground-editor-view">
+    <div className="aistudio-editor-view">
       <header className="main-header">
         <button 
           className="menu-btn icon-btn" 
@@ -163,4 +163,4 @@ const PlaygroundEditor = ({
   )
 }
 
-export default PlaygroundEditor
+export default AIStudioEditor

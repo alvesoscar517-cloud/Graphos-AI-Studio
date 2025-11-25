@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import './PlaygroundDefault.css'
+import './AIStudioDefault.css'
 
-const PlaygroundDefault = ({ onToggleLeftSidebar, onCreateNote }) => {
+const AIStudioDefault = ({ onToggleLeftSidebar, onCreateNote }) => {
   const [activeTab, setActiveTab] = useState('content')
 
   const tabs = [
@@ -153,7 +153,7 @@ const PlaygroundDefault = ({ onToggleLeftSidebar, onCreateNote }) => {
   }
 
   return (
-    <div className="playground-default-view">
+    <div className="aistudio-default-view">
       <header className="main-header">
         <button 
           className="menu-btn icon-btn" 
@@ -163,7 +163,7 @@ const PlaygroundDefault = ({ onToggleLeftSidebar, onCreateNote }) => {
         >
           <img src="/icon/panel-left.svg" alt="Toggle Left Sidebar" />
         </button>
-        <span className="playground-topbar-title">AI Studio</span>
+        <span className="aistudio-topbar-title">AI Studio</span>
         <div className="header-actions">
           <button 
             className="new-btn-bordered" 
@@ -176,8 +176,8 @@ const PlaygroundDefault = ({ onToggleLeftSidebar, onCreateNote }) => {
         </div>
       </header>
 
-      <div className="playground-welcome-content">
-        <div className="playground-studio-header">
+      <div className="aistudio-welcome-content">
+        <div className="aistudio-studio-header">
           <h1 className="studio-title">AI Content Authenticator</h1>
         </div>
 
@@ -223,4 +223,4 @@ const PlaygroundDefault = ({ onToggleLeftSidebar, onCreateNote }) => {
   )
 }
 
-export default PlaygroundDefault
+export default AIStudioDefault

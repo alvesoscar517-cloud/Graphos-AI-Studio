@@ -1,9 +1,9 @@
 import { useNotes } from '../../contexts/NotesContext'
-import PlaygroundDefault from './Playground/PlaygroundDefault'
-import PlaygroundEditorEnhanced from './Playground/PlaygroundEditorEnhanced'
-import './PlaygroundView.css'
+import AIStudioDefault from './AIStudio/AIStudioDefault'
+import AIStudioEditorEnhanced from './AIStudio/AIStudioEditorEnhanced'
+import './AIStudioView.css'
 
-const PlaygroundView = ({ 
+const AIStudioView = ({ 
   showEditor, 
   onToggleLeftSidebar, 
   onToggleRightSidebar,
@@ -17,18 +17,18 @@ const PlaygroundView = ({
 
   const handleCreateNote = () => {
     createNote()
-    onViewChange('playground-editor')
+    onViewChange('aistudio-editor')
   }
 
   return (
-    <div className="playground-view">
+    <div className="aistudio-view">
       {!showEditor ? (
-        <PlaygroundDefault 
+        <AIStudioDefault 
           onToggleLeftSidebar={onToggleLeftSidebar}
           onCreateNote={handleCreateNote}
         />
       ) : (
-        <PlaygroundEditorEnhanced 
+        <AIStudioEditorEnhanced 
           onToggleLeftSidebar={onToggleLeftSidebar}
           onToggleRightSidebar={onToggleRightSidebar}
           rightSidebarHidden={rightSidebarHidden}
@@ -41,4 +41,4 @@ const PlaygroundView = ({
   )
 }
 
-export default PlaygroundView
+export default AIStudioView

@@ -65,7 +65,7 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
 
   const handleNoteClick = (note) => {
     loadNote(note.id)
-    onViewChange('playground-editor')
+    onViewChange('aistudio-editor')
   }
 
   const handleDeleteNote = async (e, noteId) => {
@@ -130,8 +130,8 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
 
         <a 
           href="#" 
-          className={`nav-item ${currentView === 'playground' || currentView === 'playground-default' ? 'active' : ''}`}
-          onClick={(e) => { e.preventDefault(); onViewChange('playground') }}
+          className={`nav-item ${currentView === 'aistudio' || currentView === 'aistudio-default' ? 'active' : ''}`}
+          onClick={(e) => { e.preventDefault(); onViewChange('aistudio') }}
         >
           <img src="/icon/play.svg" alt="AI Studio" />
           <span>AI Studio</span>
@@ -155,7 +155,7 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
           {visibleNotes.map(note => (
             <div 
               key={note.id}
-              className={`nav-subitem note-item ${currentNote?.id === note.id && currentView === 'playground-editor' ? 'active' : ''}`}
+              className={`nav-subitem note-item ${currentNote?.id === note.id && currentView === 'aistudio-editor' ? 'active' : ''}`}
               onClick={() => handleNoteClick(note)}
             >
               <span className="note-item-text" title={note.title}>

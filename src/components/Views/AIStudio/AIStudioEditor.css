@@ -1,5 +1,5 @@
-/* Playground Editor View Styles */
-.playground-editor-view {
+/* AI Studio Editor View Styles */
+.aistudio-editor-view {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -12,12 +12,12 @@
   box-sizing: border-box;
 }
 
-body.dark-theme .playground-editor-view {
+body.dark-theme .aistudio-editor-view {
   background: #1e1e1e;
 }
 
 /* Main Header */
-.playground-editor-view .main-header {
+.aistudio-editor-view .main-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -133,7 +133,7 @@ body.dark-theme .title-input:focus {
 
 /* Dark theme inherited from global.css */
 
-.playground-editor-view .text-input-area {
+.aistudio-editor-view .text-input-area {
   flex: 1;
   padding: 0;
   margin: 0;
@@ -146,7 +146,7 @@ body.dark-theme .title-input:focus {
   box-sizing: border-box !important;
 }
 
-body.dark-theme .playground-editor-view .text-input-area {
+body.dark-theme .aistudio-editor-view .text-input-area {
   background: #1e1e1e !important;
 }
 

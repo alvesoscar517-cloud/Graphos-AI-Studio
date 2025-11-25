@@ -128,7 +128,7 @@ body.dark-theme {
 
 /* Standardized header across all views */
 .main-header,
-.playground-topbar,
+.aistudio-topbar,
 .workspace-header,
 .workspace-default-header {
   display: flex;

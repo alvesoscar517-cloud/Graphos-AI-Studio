@@ -67,6 +67,7 @@ class LemonSqueezyService {
 
   /**
    * Create checkout URL for purchasing credits
+   * Only shows the selected variant - no variant picker
    */
   async createCheckout(variantId, userData = {}) {
     const { email, userId, customData = {} } = userData;
@@ -81,6 +82,10 @@ class LemonSqueezyService {
               user_id: userId,
               ...customData
             }
+          },
+          product_options: {
+            // Disable variant picker - only show selected variant
+            enabled_variants: [parseInt(variantId)]
           },
           checkout_options: {
             embed: false,

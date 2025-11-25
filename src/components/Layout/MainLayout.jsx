@@ -6,7 +6,7 @@ import RightSidebar from './RightSidebar'
 const MainLayout = () => {
   const [leftSidebarHidden, setLeftSidebarHidden] = useState(false)
   const [rightSidebarHidden, setRightSidebarHidden] = useState(false)
-  const [currentView, setCurrentView] = useState('playground') // 'home', 'playground', 'history', 'workspace'
+  const [currentView, setCurrentView] = useState('aistudio') // 'home', 'aistudio', 'history', 'workspace'
   const [highlightedSentence, setHighlightedSentence] = useState(null) // NEW: For highlighting sentence in editor
   const [analysisData, setAnalysisData] = useState(null) // NEW: For inline highlighting
   const [rewriteMode, setRewriteMode] = useState(false) // NEW: For showing rewrite toolbar
@@ -21,7 +21,7 @@ const MainLayout = () => {
 
   // Auto hide/show right sidebar based on view
   // Workspace has its own sidebar, so don't show RightSidebar for it
-  const shouldShowRightSidebar = currentView === 'playground-editor'
+  const shouldShowRightSidebar = currentView === 'aistudio-editor'
   
   // For workspace, pass rightSidebarHidden directly (not affected by shouldShowRightSidebar)
   const effectiveRightSidebarHidden = currentView === 'workspace' 
@@ -46,7 +46,7 @@ const MainLayout = () => {
         analysisData={analysisData}
         rewriteMode={rewriteMode}
       />
-      {/* Only show RightSidebar for playground-editor, not for workspace */}
+      {/* Only show RightSidebar for aistudio-editor, not for workspace */}
       {currentView !== 'workspace' && (
         <RightSidebar 
           hidden={rightSidebarHidden || !shouldShowRightSidebar}

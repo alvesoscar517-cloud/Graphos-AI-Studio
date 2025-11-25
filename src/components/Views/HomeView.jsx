@@ -79,7 +79,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
     
     // Create new note and switch to editor
     createNote()
-    onViewChange('playground-editor')
+    onViewChange('aistudio-editor')
   }
 
   const handleUseProfileFromCard = (profile) => {
@@ -90,7 +90,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
     
     // Create new note and switch to editor
     createNote()
-    onViewChange('playground-editor')
+    onViewChange('aistudio-editor')
   }
   
   const handleCreateProfile = () => {
@@ -129,7 +129,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
             </div>
             <h3>Tạo Hồ sơ Văn phong</h3>
           </div>
-          <div className="action-card" onClick={() => onViewChange('playground-editor')} style={{ cursor: 'pointer' }}>
+          <div className="action-card" onClick={() => onViewChange('aistudio-editor')} style={{ cursor: 'pointer' }}>
             <div className="action-icon-wrapper">
               <img src="/icon/file-search.svg" alt="Analyze" className="action-icon" />
             </div>

@@ -6,10 +6,10 @@ import { useProfiles } from '../../../contexts/ProfileContext'
 import { createShare } from '../../../services/share'
 import TextHighlightEditor from '../../Analysis/TextHighlightEditor'
 import modal from '../../../utils/modal'
-import './PlaygroundEditor.css'
+import './AIStudioEditor.css'
 
 /**
- * PlaygroundEditorEnhanced - Editor với ContentEditable và inline highlighting
+ * AIStudioEditorEnhanced - Editor với ContentEditable và inline highlighting
  * 
  * FEATURES:
  * - ContentEditable editor với HTML/CSS đầy đủ
@@ -17,7 +17,7 @@ import './PlaygroundEditor.css'
  * - Tooltip gợi ý khi click vào câu lệch chuẩn
  * - Hiển thị tốt hơn, tương tác dễ dàng hơn
  */
-const PlaygroundEditorEnhanced = ({ 
+const AIStudioEditorEnhanced = ({ 
   onToggleLeftSidebar, 
   onToggleRightSidebar, 
   rightSidebarHidden,
@@ -189,7 +189,7 @@ const PlaygroundEditorEnhanced = ({
   }, [currentNote?.content, analysis])
 
   return (
-    <div className="playground-editor-view">
+    <div className="aistudio-editor-view">
       <header className="main-header">
         <button 
           className="menu-btn icon-btn" 
@@ -287,4 +287,4 @@ const PlaygroundEditorEnhanced = ({
   )
 }
 
-export default PlaygroundEditorEnhanced
+export default AIStudioEditorEnhanced

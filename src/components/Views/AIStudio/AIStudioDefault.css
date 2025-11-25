@@ -1,5 +1,5 @@
-/* Playground Default View Styles */
-.playground-default-view {
+/* AI Studio Default View Styles */
+.aistudio-default-view {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -9,8 +9,8 @@
   width: 100%;
 }
 
-/* Override header for playground - tách riêng để tránh xung đột */
-.playground-default-view .main-header {
+/* Override header for aistudio - tách riêng để tránh xung đột */
+.aistudio-default-view .main-header {
   width: 100%;
   display: flex;
   align-items: center;
@@ -25,7 +25,7 @@
 }
 
 /* Header actions alignment */
-.playground-default-view .main-header .header-actions {
+.aistudio-default-view .main-header .header-actions {
   margin-left: auto;
   display: flex;
   align-items: center;
@@ -34,7 +34,7 @@
   margin-right: 12px;
 }
 
-.playground-default-view .playground-topbar-title {
+.aistudio-default-view .aistudio-topbar-title {
   font-size: 13px;
   font-weight: 500;
   color: #202124;
@@ -44,7 +44,7 @@
   flex: 1;
 }
 
-body.dark-theme .playground-default-view .playground-topbar-title {
+body.dark-theme .aistudio-default-view .aistudio-topbar-title {
   color: #e3e3e3;
 }
 
@@ -106,7 +106,7 @@ body.dark-theme .new-btn-bordered:hover img {
   opacity: 1;
 }
 
-.playground-welcome-content {
+.aistudio-welcome-content {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -122,7 +122,7 @@ body.dark-theme .new-btn-bordered:hover img {
 }
 
 /* Center content with max-width */
-.playground-studio-header,
+.aistudio-studio-header,
 .studio-tabs,
 .studio-models-list {
   margin-left: auto;
@@ -132,11 +132,11 @@ body.dark-theme .new-btn-bordered:hover img {
   box-sizing: border-box;
 }
 
-.playground-welcome-content::-webkit-scrollbar {
+.aistudio-welcome-content::-webkit-scrollbar {
   display: none;
 }
 
-.playground-studio-header {
+.aistudio-studio-header {
   text-align: center;
   padding: 0 0 32px;
   flex-shrink: 0;
@@ -334,11 +334,11 @@ body.dark-theme .new-btn-bordered:hover img {
 }
 
 /* Dark Theme */
-body.dark-theme .playground-default-view {
+body.dark-theme .aistudio-default-view {
   background: #1e1e1e;
 }
 
-body.dark-theme .playground-topbar-title {
+body.dark-theme .aistudio-topbar-title {
   color: #e3e3e3;
 }
 
@@ -405,23 +405,23 @@ body.dark-theme .model-action-btn:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Override global.css for playground topbar icon in dark theme */
-body.dark-theme .playground-topbar .icon-btn img {
+/* Override global.css for aistudio topbar icon in dark theme */
+body.dark-theme .aistudio-topbar .icon-btn img {
   filter: brightness(0) invert(1) !important;
   opacity: 0.7 !important;
 }
 
-body.dark-theme .playground-topbar .icon-btn:hover img {
+body.dark-theme .aistudio-topbar .icon-btn:hover img {
   opacity: 1 !important;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .playground-default-view .main-header {
+  .aistudio-default-view .main-header {
     padding: 8px 12px;
   }
 
-  .playground-welcome-content {
+  .aistudio-welcome-content {
     padding: 0 16px;
   }
 

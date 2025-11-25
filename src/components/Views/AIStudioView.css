@@ -1,5 +1,5 @@
-/* Playground View Styles */
-.playground-view {
+/* AI Studio View Styles */
+.aistudio-view {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -10,7 +10,7 @@
   box-sizing: border-box;
 }
 
-body.dark-theme .playground-view {
+body.dark-theme .aistudio-view {
   background: #1e1e1e;
 }
 
@@ -189,7 +189,7 @@ body.dark-theme .text-input-area {
   color: transparent;
 }
 
-/* Dark Theme for Playground View - handled by CSS variables */
+/* Dark Theme for AI Studio View - handled by CSS variables */
 
 /* Dark theme styles inherited from global.css */
 

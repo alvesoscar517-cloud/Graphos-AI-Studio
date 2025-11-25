@@ -16,14 +16,40 @@ const logger = require('../utils/logger');
 // ============================================================================
 
 /**
+ * Default credits for new users
+ */
+const DEFAULT_NEW_USER_CREDITS = 10;
+
+/**
  * Get user's current credit balance
+ * Auto-creates user with default credits if not exists
  */
 async function getUserCredits(userId) {
   try {
-    const userDoc = await db.collection('users').doc(userId).get();
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
     
+    // Auto-create user with default credits if not exists
     if (!userDoc.exists) {
-      throw new Error('User not found');
+      const defaultCredits = {
+        balance: DEFAULT_NEW_USER_CREDITS,
+        purchased: 0,
+        used: 0,
+        bonus: DEFAULT_NEW_USER_CREDITS
+      };
+      
+      await userRef.set({
+        userId,
+        credits: defaultCredits,
+        createdAt: new Date().toISOString(),
+        usage: {
+          lastActivity: new Date().toISOString()
+        }
+      });
+      
+      logger.info('New user created with default credits', { userId, credits: DEFAULT_NEW_USER_CREDITS });
+      
+      return defaultCredits;
     }
     
     const userData = userDoc.data();
@@ -101,6 +127,7 @@ async function deductCredits(userId, amount, featureName, metadata = {}) {
 
 /**
  * Add credits to user balance
+ * Auto-creates user if not exists
  */
 async function addCredits(userId, amount, source, metadata = {}) {
   try {
@@ -109,20 +136,34 @@ async function addCredits(userId, amount, source, metadata = {}) {
     await db.runTransaction(async (transaction) => {
       const userDoc = await transaction.get(userRef);
       
+      let currentBalance = 0;
+      
       if (!userDoc.exists) {
-        throw new Error('User not found');
+        // Create new user with the credits being added
+        transaction.set(userRef, {
+          userId,
+          credits: {
+            balance: amount,
+            purchased: amount,
+            used: 0
+          },
+          createdAt: new Date().toISOString(),
+          usage: {
+            lastActivity: new Date().toISOString()
+          }
+        });
+      } else {
+        const userData = userDoc.data();
+        currentBalance = userData.credits?.balance || 0;
+        
+        // Update credit balance
+        const updateData = {
+          'credits.balance': FieldValue.increment(amount),
+          'credits.purchased': FieldValue.increment(amount)
+        };
+        
+        transaction.update(userRef, updateData);
       }
-      
-      const userData = userDoc.data();
-      const currentBalance = userData.credits?.balance || 0;
-      
-      // Update credit balance
-      const updateData = {
-        'credits.balance': FieldValue.increment(amount),
-        'credits.purchased': FieldValue.increment(amount)
-      };
-      
-      transaction.update(userRef, updateData);
       
       // Log transaction
       const transactionRef = db.collection('credit_transactions').doc();

@@ -80,7 +80,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const handleItemClick = (item) => {
     if (item.source === 'drive') {
       loadNote(item.id)
-      onViewChange('playground-editor')
+      onViewChange('aistudio-editor')
     } else {
       // Load workspace conversation
       loadConversation(item.id)
