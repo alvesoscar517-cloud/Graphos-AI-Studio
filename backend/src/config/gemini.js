@@ -16,7 +16,7 @@ function getVertexAI() {
       project: config.PROJECT_ID,
       location: config.LOCATION
     });
-    console.log('✅ Vertex AI initialized');
+    console.log('[INIT] Vertex AI initialized');
   }
   return vertexAI;
 }
@@ -26,7 +26,7 @@ function getAIPlatformClient() {
     aiplatformClient = new PredictionServiceClient({
       apiEndpoint: `${config.LOCATION}-aiplatform.googleapis.com`
     });
-    console.log('✅ AI Platform Client initialized');
+    console.log('[INIT] AI Platform Client initialized');
   }
   return aiplatformClient;
 }

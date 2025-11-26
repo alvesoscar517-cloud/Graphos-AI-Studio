@@ -19,10 +19,10 @@ const MAX_ANALYSIS_CACHE_SIZE = 100;
 function getCachedProfile(profileId) {
   const cached = profileCache.get(profileId);
   if (cached && Date.now() - cached.timestamp < PROFILE_CACHE_TTL) {
-    console.log(`✅ Cache HIT for profile ${profileId}`);
+    console.log(`[CACHE] Cache HIT for profile ${profileId}`);
     return cached.data;
   }
-  console.log(`❌ Cache MISS for profile ${profileId}`);
+  console.log(`[CACHE] Cache MISS for profile ${profileId}`);
   return null;
 }
 
@@ -31,13 +31,13 @@ function setCachedProfile(profileId, data) {
     data,
     timestamp: Date.now()
   });
-  console.log(`💾 Cached profile ${profileId}`);
+  console.log(`[CACHE] Cached profile ${profileId}`);
 }
 
 function invalidateProfileCache(profileId) {
   profileCache.delete(profileId);
   centroidCache.delete(profileId);
-  console.log(`🗑️  Invalidated cache for profile ${profileId}`);
+  console.log(`[CACHE] Invalidated cache for profile ${profileId}`);
 }
 
 // ============================================================================
@@ -65,7 +65,7 @@ function getCachedAnalysis(profileId, text) {
     return null;
   }
   
-  console.log(`⚡ Analysis cache HIT`);
+  console.log(`[CACHE] Analysis cache HIT`);
   return cached.result;
 }
 

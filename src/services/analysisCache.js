@@ -1,9 +1,9 @@
 /**
  * Analysis Cache Service
- * Lưu trữ kết quả phân tích AI để tránh gọi API lặp lại
+ * Store AI analysis results to avoid repeated API calls
  */
 
-// Tạo hash đơn giản từ text
+// Create simple hash from text
 function simpleHash(str) {
   let hash = 0
   for (let i = 0; i < str.length; i++) {

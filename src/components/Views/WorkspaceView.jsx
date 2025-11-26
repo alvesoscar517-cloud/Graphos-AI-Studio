@@ -16,7 +16,7 @@ const WorkspaceView = ({
   const [isTransitioning, setIsTransitioning] = useState(false)
 
   const handleStartChat = () => {
-    // Clear conversation hiện tại để quay về giao diện default
+    // Clear current conversation to return to default interface
     clearConversation()
   }
 
@@ -35,7 +35,7 @@ const WorkspaceView = ({
     }
   }
 
-  // Hiển thị giao diện default khi chưa có conversation HOẶC conversation chưa có tin nhắn
+  // Show default view when no conversation OR conversation has no messages
   const showDefaultView = !currentConversation || currentConversation.messages.length === 0
 
   return (

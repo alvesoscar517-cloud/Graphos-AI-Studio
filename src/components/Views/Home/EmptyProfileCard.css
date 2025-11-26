@@ -72,10 +72,10 @@
 }
 
 .typing-icon {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   background: #e8f0fe;
-  border-radius: 8px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -83,14 +83,14 @@
 }
 
 .typing-icon img {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   opacity: 0.7;
   transition: opacity 0.2s ease;
 }
 
 .typing-text {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   margin: 0;
   color: #5f6368;
@@ -290,10 +290,6 @@ body.dark-theme .empty-card-right .animation-container > div {
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .empty-profile-section {
-    padding: 0 40px;
-  }
-
   .empty-card-content {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -312,10 +308,6 @@ body.dark-theme .empty-card-right .animation-container > div {
 }
 
 @media (max-width: 768px) {
-  .empty-profile-section {
-    padding: 0 20px;
-  }
-
   .empty-card-content {
     padding: 24px;
   }
@@ -356,10 +348,6 @@ body.dark-theme .empty-card-right .animation-container > div {
 }
 
 @media (max-width: 480px) {
-  .empty-profile-section {
-    padding: 0 16px;
-  }
-
   .empty-card-content {
     padding: 20px;
   }

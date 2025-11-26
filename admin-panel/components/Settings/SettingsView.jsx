@@ -121,15 +121,15 @@ export default function SettingsView() {
   const handleBackupNow = async () => {
     try {
       setBackingUp(true);
-      notify.info('Đang tạo backup...');
+      notify.info('Creating backup...');
       
       const response = await backupApi.create();
       
       if (response && response.success && response.data) {
-        // Hiển thị modal với thông tin backup
+        // Show modal with backup information
         setBackupResult(response.data);
         setShowBackupModal(true);
-        notify.success('✅ Backup hoàn tất!');
+        notify.success('✅ Backup completed!');
         loadBackupList(); // Refresh list
       } else {
         notify.error('Backup failed: ' + (response.message || 'Unknown error'));

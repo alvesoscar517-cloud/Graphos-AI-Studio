@@ -1,11 +1,31 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useNotes } from '../../contexts/NotesContext'
 import { useWorkspace } from '../../contexts/WorkspaceContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { openDriveFolder } from '../../services/drive'
+import { truncateTitleByWords } from '../../utils/titleUtils'
 import modal from '../../utils/modal'
 import SharePopup from '../Popups/SharePopup'
 import './HistoryView.css'
+
+// Helper function to highlight search text
+const HighlightText = ({ text, searchTerm, regex }) => {
+  if (!searchTerm || !text || !regex) return <>{text}</>
+  
+  const parts = text.split(regex)
+  
+  return (
+    <>
+      {parts.map((part, index) => 
+        regex.test(part) ? (
+          <mark key={index} className="search-highlight">{part}</mark>
+        ) : (
+          <span key={index}>{part}</span>
+        )
+      )}
+    </>
+  )
+}
 
 const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const { notes, loadNote, loading, syncNotes, needsReauth, deleteNote } = useNotes()
@@ -13,14 +33,77 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const { user, signOut } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('all') // 'all', 'text', 'chat'
+  const [filterSource, setFilterSource] = useState('all') // 'all', 'drive', 'local'
+  const [sortBy, setSortBy] = useState('updated') // 'updated', 'name', 'type'
+  const [sortOrder, setSortOrder] = useState('asc') // 'asc', 'desc'
   const [isSyncing, setIsSyncing] = useState(false)
   const [activeMenu, setActiveMenu] = useState(null)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   const [shareItem, setShareItem] = useState(null)
+  const [selectedItems, setSelectedItems] = useState(new Set())
+  const [isSelectionMode, setIsSelectionMode] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isMobile, setIsMobile] = useState(false)
+  const [isSourceDropdownOpen, setIsSourceDropdownOpen] = useState(false)
+  const itemsPerPage = 50
+  const searchInputRef = useRef(null)
+  const sourceDropdownRef = useRef(null)
   
   console.log('HistoryView - notes:', notes.length, 'conversations:', conversations.length, 'loading:', loading)
 
-  const formatTimeAgo = (date) => {
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (sourceDropdownRef.current && !sourceDropdownRef.current.contains(e.target)) {
+        setIsSourceDropdownOpen(false)
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Focus search with '/'
+      if (e.key === '/' && !e.ctrlKey && !e.metaKey && document.activeElement !== searchInputRef.current) {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+      
+      // Escape to clear search or exit selection mode
+      if (e.key === 'Escape') {
+        if (isSourceDropdownOpen) {
+          setIsSourceDropdownOpen(false)
+        } else if (searchTerm) {
+          setSearchTerm('')
+        } else if (isSelectionMode) {
+          setIsSelectionMode(false)
+          setSelectedItems(new Set())
+        }
+      }
+      
+      // Ctrl/Cmd + A to select all
+      if ((e.ctrlKey || e.metaKey) && e.key === 'a' && isSelectionMode) {
+        e.preventDefault()
+        handleSelectAll()
+      }
+    }
+    
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [searchTerm, isSelectionMode, isSourceDropdownOpen])
+
+  const formatTimeAgo = useCallback((date) => {
     const now = new Date()
     const diffMs = now - date
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
@@ -30,7 +113,17 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
     if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
     return date.toLocaleDateString()
-  }
+  }, [])
+
+  // Memoized search regex
+  const searchRegex = useMemo(() => {
+    if (!searchTerm) return null
+    try {
+      return new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+    } catch {
+      return null
+    }
+  }, [searchTerm])
 
   // Combine notes and conversations into unified list
   const allItems = useMemo(() => {
@@ -63,21 +156,64 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     return items
   }, [notes, conversations])
 
-  const filteredItems = allItems.filter(item => {
-    // Filter by search term
-    const matchesSearch = !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase())
-    
-    // Filter by type
-    const matchesType = filterType === 'all' || 
-                       (filterType === 'text' && item.type === 'text') ||
-                       (filterType === 'chat' && item.type === 'chat')
-    
-    return matchesSearch && matchesType
-  })
+  const filteredItems = useMemo(() => {
+    return allItems.filter(item => {
+      // Filter by search term
+      const matchesSearch = !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      // Filter by type
+      const matchesType = filterType === 'all' || 
+                         (filterType === 'text' && item.type === 'text') ||
+                         (filterType === 'chat' && item.type === 'chat')
+      
+      // Filter by source
+      const matchesSource = filterSource === 'all' ||
+                           (filterSource === 'drive' && item.source === 'drive') ||
+                           (filterSource === 'local' && item.source === 'workspace')
+      
+      return matchesSearch && matchesType && matchesSource
+    })
+  }, [allItems, searchTerm, filterType, filterSource])
 
-  const sortedItems = [...filteredItems].sort((a, b) => b.updated - a.updated)
+  const sortedItems = useMemo(() => {
+    const sorted = [...filteredItems].sort((a, b) => {
+      let comparison = 0
+      
+      switch (sortBy) {
+        case 'name':
+          comparison = a.title.localeCompare(b.title)
+          break
+        case 'type':
+          comparison = a.type.localeCompare(b.type)
+          break
+        case 'updated':
+        default:
+          comparison = b.updated - a.updated
+          break
+      }
+      
+      return sortOrder === 'asc' ? comparison : -comparison
+    })
+    
+    return sorted
+  }, [filteredItems, sortBy, sortOrder])
 
-  const handleItemClick = (item) => {
+  // Paginated items
+  const paginatedItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return sortedItems.slice(startIndex, startIndex + itemsPerPage)
+  }, [sortedItems, currentPage, itemsPerPage])
+
+  const totalPages = Math.ceil(sortedItems.length / itemsPerPage)
+
+  const handleItemClick = (item, e) => {
+    // If in selection mode, toggle selection
+    if (isSelectionMode) {
+      e?.stopPropagation()
+      toggleItemSelection(item)
+      return
+    }
+    
     if (item.source === 'drive') {
       loadNote(item.id)
       onViewChange('aistudio-editor')
@@ -88,20 +224,80 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     }
   }
 
+  const toggleItemSelection = (item) => {
+    const itemKey = `${item.source}-${item.id}`
+    setSelectedItems(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(itemKey)) {
+        newSet.delete(itemKey)
+      } else {
+        newSet.add(itemKey)
+      }
+      return newSet
+    })
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedItems.size === 0) return
+    
+    const confirmed = await modal.confirm(
+      `Are you sure you want to delete ${selectedItems.size} item${selectedItems.size > 1 ? 's' : ''}?`,
+      'Confirm Bulk Delete',
+      { confirmText: 'Delete All', danger: true }
+    )
+    
+    if (confirmed) {
+      try {
+        const itemsToDelete = sortedItems.filter(item => 
+          selectedItems.has(`${item.source}-${item.id}`)
+        )
+        
+        for (const item of itemsToDelete) {
+          if (item.source === 'drive') {
+            await deleteNote(item.id)
+          } else {
+            await deleteConversation(item.id)
+          }
+        }
+        
+        setSelectedItems(new Set())
+        setIsSelectionMode(false)
+        modal.toast('Deleted', `${itemsToDelete.length} items deleted`, 'success')
+      } catch (error) {
+        modal.error('Unable to delete some items: ' + error.message)
+      }
+    }
+  }
+
+  const handleSelectAll = () => {
+    if (selectedItems.size === paginatedItems.length) {
+      setSelectedItems(new Set())
+    } else {
+      const allIds = new Set(paginatedItems.map(item => `${item.source}-${item.id}`))
+      setSelectedItems(allIds)
+    }
+  }
+
+  const toggleSortOrder = (newSortBy) => {
+    if (sortBy === newSortBy) {
+      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(newSortBy)
+      setSortOrder('asc')
+    }
+  }
+
   const handleMenuClick = (e, item) => {
     e.stopPropagation()
     const rect = e.currentTarget.getBoundingClientRect()
     const menuWidth = 160
-    const menuHeight = 100 // Approximate height of menu
+    const menuHeight = 100
     
-    // Calculate horizontal position (center under button)
     const x = rect.left + (rect.width / 2) - (menuWidth / 2)
-    
-    // Calculate vertical position (below or above based on space)
     const spaceBelow = window.innerHeight - rect.bottom
     const y = spaceBelow > menuHeight + 20 
-      ? rect.bottom + 8  // Show below
-      : rect.top - menuHeight - 8  // Show above
+      ? rect.bottom + 8
+      : rect.top - menuHeight - 8
     
     setMenuPosition({ x, y })
     setActiveMenu(activeMenu === item.id ? null : item.id)
@@ -115,9 +311,9 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const handleDeleteItem = async (item) => {
     setActiveMenu(null)
     const confirmed = await modal.confirm(
-      `Bạn có chắc chắn muốn xóa "${item.title}"?`,
-      'Xác nhận xóa',
-      { confirmText: 'Xóa', danger: true }
+      `Are you sure you want to delete "${item.title}"?`,
+      'Confirm Delete',
+      { confirmText: 'Delete', danger: true }
     )
     
     if (confirmed) {
@@ -127,9 +323,9 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         } else {
           await deleteConversation(item.id)
         }
-        modal.toast('Đã xóa', '', 'success')
+        modal.toast('Deleted', '', 'success')
       } catch (error) {
-        modal.error('Không thể xóa: ' + error.message)
+        modal.error('Unable to delete: ' + error.message)
       }
     }
   }
@@ -142,30 +338,233 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const handleOpenInDrive = async () => {
     try {
       if (!user) {
-        modal.alert('Vui lòng đăng nhập để sử dụng tính năng này', 'Chưa đăng nhập')
+        modal.alert('Please sign in to use this feature', 'Not Signed In')
         return
       }
 
       await openDriveFolder(notes)
-      modal.toast('Đã mở thư mục Drive', '', 'success')
+      modal.toast('Drive folder opened', '', 'success')
     } catch (error) {
       if (error.message === 'Not authenticated') {
-        modal.alert('Vui lòng đăng nhập để sử dụng tính năng này', 'Chưa đăng nhập')
+        modal.alert('Please sign in to use this feature', 'Not Signed In')
       } else if (error.message === 'NEED_REAUTH') {
         const confirmed = await modal.confirm(
-          'Ứng dụng cần quyền truy cập Google Drive để đồng bộ notes. Vui lòng đăng nhập lại để cấp quyền.',
-          'Cần cấp quyền Drive',
-          { confirmText: 'Đăng nhập lại', danger: false }
+          'The app needs Google Drive access to sync notes. Please sign in again to grant permission.',
+          'Drive Permission Required',
+          { confirmText: 'Sign In Again', danger: false }
         )
         
         if (confirmed) {
           await signOut()
-          modal.info('Vui lòng đăng nhập lại để cấp quyền truy cập Google Drive.')
+          modal.info('Please sign in again to grant Google Drive access.')
         }
       } else {
-        modal.error('Không thể mở thư mục Drive: ' + error.message)
+        modal.error('Unable to open Drive folder: ' + error.message)
       }
     }
+  }
+
+  // Render table row
+  const renderTableRow = (item) => {
+    const itemKey = `${item.source}-${item.id}`
+    const isSelected = selectedItems.has(itemKey)
+    
+    return (
+      <tr 
+        key={itemKey} 
+        onClick={(e) => handleItemClick(item, e)}
+        className={`${isSelected ? 'selected' : ''} ${isSelectionMode ? 'selection-mode' : ''}`}
+      >
+        {isSelectionMode && (
+          <td className="checkbox-col">
+            <input 
+              type="checkbox" 
+              checked={isSelected}
+              onChange={() => toggleItemSelection(item)}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </td>
+        )}
+        <td className="name-col">
+          <div className="history-name">
+            <img 
+              src={item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg"} 
+              alt={item.type === 'chat' ? "Chat" : "Text"} 
+            />
+            <span title={item.title}>
+              <HighlightText 
+                text={truncateTitleByWords(item.title, 7)} 
+                searchTerm={searchTerm}
+                regex={searchRegex}
+              />
+            </span>
+          </div>
+        </td>
+        {!isMobile && (
+          <>
+            <td className="type-col">
+              <span className="history-type">{item.type === 'chat' ? 'Chat' : 'Text'}</span>
+            </td>
+            <td className="source-col">
+              <span className="history-source">
+                {item.source === 'drive' ? (
+                  <>
+                    <img src="/icon/google-drive-svgrepo-com.svg" alt="Drive" />
+                    Drive
+                  </>
+                ) : (
+                  <>
+                    <img src="/icon/monitor.svg" alt="Local" />
+                    Local
+                  </>
+                )}
+              </span>
+            </td>
+          </>
+        )}
+        <td className="updated-col">
+          <span className="history-updated">{formatTimeAgo(item.updated)}</span>
+        </td>
+        <td className="actions-col">
+          <button 
+            className="history-actions-btn" 
+            onClick={(e) => handleMenuClick(e, item)}
+          >
+            <img src="/icon/more-vertical.svg" alt="Actions" />
+          </button>
+          {activeMenu === item.id && (
+            <>
+              <div 
+                className="history-menu-overlay" 
+                onClick={handleCloseMenu}
+              />
+              <div 
+                className="history-actions-menu"
+                style={{ 
+                  position: 'fixed',
+                  left: `${menuPosition.x}px`,
+                  top: `${menuPosition.y}px`
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button 
+                  className="history-menu-item"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleShareItem(item)
+                  }}
+                >
+                  <img src="/icon/share-2.svg" alt="Share" />
+                  Share
+                </button>
+                <button 
+                  className="history-menu-item danger"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleDeleteItem(item)
+                  }}
+                >
+                  <img src="/icon/trash-2.svg" alt="Delete" />
+                  Delete
+                </button>
+              </div>
+            </>
+          )}
+        </td>
+      </tr>
+    )
+  }
+
+  // Render mobile card
+  const renderMobileCard = (item) => {
+    const itemKey = `${item.source}-${item.id}`
+    const isSelected = selectedItems.has(itemKey)
+    
+    return (
+      <div 
+        key={itemKey}
+        className={`history-card ${isSelected ? 'selected' : ''}`}
+        onClick={(e) => handleItemClick(item, e)}
+      >
+        {isSelectionMode && (
+          <input 
+            type="checkbox" 
+            checked={isSelected}
+            onChange={() => toggleItemSelection(item)}
+            onClick={(e) => e.stopPropagation()}
+            className="card-checkbox"
+          />
+        )}
+        <div className="card-header">
+          <div className="card-title">
+            <img 
+              src={item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg"} 
+              alt={item.type === 'chat' ? "Chat" : "Text"} 
+            />
+            <span>
+              <HighlightText 
+                text={truncateTitleByWords(item.title, 7)} 
+                searchTerm={searchTerm}
+                regex={searchRegex}
+              />
+            </span>
+          </div>
+          <button 
+            className="history-actions-btn" 
+            onClick={(e) => handleMenuClick(e, item)}
+          >
+            <img src="/icon/more-vertical.svg" alt="Actions" />
+          </button>
+        </div>
+        <div className="card-meta">
+          <span className="card-type">{item.type === 'chat' ? 'Chat' : 'Text'}</span>
+          <span className="card-separator">•</span>
+          <span className="card-source">
+            {item.source === 'drive' ? 'Drive' : 'Local'}
+          </span>
+          <span className="card-separator">•</span>
+          <span className="card-time">{formatTimeAgo(item.updated)}</span>
+        </div>
+        {activeMenu === item.id && (
+          <>
+            <div 
+              className="history-menu-overlay" 
+              onClick={handleCloseMenu}
+            />
+            <div 
+              className="history-actions-menu"
+              style={{ 
+                position: 'fixed',
+                left: `${menuPosition.x}px`,
+                top: `${menuPosition.y}px`
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button 
+                className="history-menu-item"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleShareItem(item)
+                }}
+              >
+                <img src="/icon/share-2.svg" alt="Share" />
+                Share
+              </button>
+              <button 
+                className="history-menu-item danger"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDeleteItem(item)
+                }}
+              >
+                <img src="/icon/trash-2.svg" alt="Delete" />
+                Delete
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -177,238 +576,316 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         />
       )}
       <div className="history-view">
-      <div className="history-topbar">
-        <button 
-          className="menu-btn icon-btn" 
-          onClick={onToggleLeftSidebar}
-          data-tooltip="Ẩn/hiện sidebar" 
-          data-tooltip-position="right"
-        >
-          <img src="/icon/panel-left.svg" alt="Toggle Left Sidebar" />
-        </button>
-      </div>
-
-      <div className="history-content">
-        <div className="history-header">
-          <div className="history-title-section">
-            <h2 className="history-title">My history</h2>
-            <div className="history-filter-tabs">
-              <button 
-                className={`filter-tab ${filterType === 'all' ? 'active' : ''}`}
-                onClick={() => setFilterType('all')}
-              >
-                Tất cả
-              </button>
-              <button 
-                className={`filter-tab ${filterType === 'text' ? 'active' : ''}`}
-                onClick={() => setFilterType('text')}
-              >
-                Văn bản
-              </button>
-              <button 
-                className={`filter-tab ${filterType === 'chat' ? 'active' : ''}`}
-                onClick={() => setFilterType('chat')}
-              >
-                Trò chuyện
-              </button>
-            </div>
-          </div>
-          <div className="history-actions">
-            <button className="history-action-btn" onClick={handleOpenInDrive}>
-              <img src="/icon/google-drive-svgrepo-com.svg" alt="Open in Drive" />
-              <span>Open in Drive</span>
-            </button>
-            <button 
-              className={`history-action-btn ${isSyncing ? 'syncing' : ''}`}
-              onClick={async () => {
-                try {
-                  setIsSyncing(true)
-                  await syncNotes()
-                  // TODO: Also sync conversations when implemented
-                  // await syncConversationsToDrive()
-                  modal.toast('Đã đồng bộ', 'Notes đã được đồng bộ với Drive', 'success')
-                } catch (error) {
-                  modal.error('Không thể đồng bộ: ' + error.message)
-                } finally {
-                  setIsSyncing(false)
-                }
-              }}
-              data-tooltip="Đồng bộ với Drive"
-              data-tooltip-position="bottom"
-              disabled={isSyncing}
-            >
-              <img src="/icon/refresh-cw.svg" alt="Sync" />
-              <span>Sync</span>
-            </button>
-            <div className="search-container">
-              <img src="/icon/search.svg" alt="Search" className="search-icon" />
-              <input 
-                type="text" 
-                className="search-input" 
-                placeholder="Search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
+        <div className="history-topbar">
+          <button 
+            className="menu-btn icon-btn" 
+            onClick={onToggleLeftSidebar}
+            data-tooltip="Toggle sidebar" 
+            data-tooltip-position="right"
+          >
+            <img src="/icon/panel-left.svg" alt="Toggle Left Sidebar" />
+          </button>
         </div>
 
-        <div className="history-table-container">
-          {loading ? (
-            <div className="history-empty-state">
-              <p className="history-empty-desc">Đang tải notes từ Drive...</p>
+        <div className="history-content">
+          <div className="history-header">
+            <div className="history-title-section">
+              <h2 className="history-title">My History</h2>
+              <div className="history-filter-tabs">
+                <button 
+                  className={`filter-tab ${filterType === 'all' ? 'active' : ''}`}
+                  onClick={() => setFilterType('all')}
+                >
+                  Tất cả
+                </button>
+                <button 
+                  className={`filter-tab ${filterType === 'text' ? 'active' : ''}`}
+                  onClick={() => setFilterType('text')}
+                >
+                  Text
+                </button>
+                <button 
+                  className={`filter-tab ${filterType === 'chat' ? 'active' : ''}`}
+                  onClick={() => setFilterType('chat')}
+                >
+                  Trò chuyện
+                </button>
+              </div>
             </div>
-          ) : needsReauth ? (
-            <div className="history-empty-state">
-              <img src="/icon/shield-check.svg" alt="Need Auth" className="history-empty-icon" />
-              <h3 className="history-empty-title">
-                Cần cấp quyền Drive
-              </h3>
-              <p className="history-empty-desc">
-                Ứng dụng cần quyền truy cập Google Drive để đồng bộ notes.<br/>
-                Vui lòng đăng nhập lại để cấp quyền.
-              </p>
-              <button 
-                className="sync-drive-btn"
-                onClick={async () => {
-                  const confirmed = await modal.confirm(
-                    'Bạn sẽ cần đăng nhập lại để cấp quyền truy cập Google Drive.',
-                    'Đăng nhập lại',
-                    { confirmText: 'Đăng nhập lại', danger: false }
-                  )
-                  
-                  if (confirmed) {
-                    await signOut()
-                    modal.info('Vui lòng đăng nhập lại để cấp quyền truy cập Google Drive.')
-                  }
-                }}
-              >
-                Đăng nhập lại
-              </button>
+            <div className="history-actions">
+              {!isMobile && (
+                <>
+                  <button className="history-action-btn" onClick={handleOpenInDrive}>
+                    <img src="/icon/google-drive-svgrepo-com.svg" alt="Open in Drive" />
+                    <span>Open in Drive</span>
+                  </button>
+                  <button 
+                    className={`history-action-btn ${isSyncing ? 'syncing' : ''}`}
+                    onClick={async () => {
+                      try {
+                        setIsSyncing(true)
+                        await syncNotes()
+                        modal.toast('Synced', 'Notes have been synced with Drive', 'success')
+                      } catch (error) {
+                        modal.error('Unable to sync: ' + error.message)
+                      } finally {
+                        setIsSyncing(false)
+                      }
+                    }}
+                    data-tooltip="Sync with Drive"
+                    data-tooltip-position="bottom"
+                    disabled={isSyncing}
+                  >
+                    <img src="/icon/refresh-cw.svg" alt="Sync" />
+                    <span>Sync</span>
+                  </button>
+                </>
+              )}
+              <div className="search-container">
+                <img src="/icon/search.svg" alt="Search" className="search-icon" />
+                <input 
+                  ref={searchInputRef}
+                  type="text" 
+                  className="search-input" 
+                  placeholder="Search (Press / to focus)"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </div>
-          ) : sortedItems.length === 0 ? (
-            <div className="history-empty-state">
-              <img src="/icon/message-square.svg" alt="No items" className="history-empty-icon" />
-              <h3 className="history-empty-title">
-                Chưa có nội dung nào
-              </h3>
-              <p className="history-empty-desc">
-                {user ? 'Tạo note hoặc chat đầu tiên, hoặc đồng bộ từ Drive' : 'Vui lòng đăng nhập để xem lịch sử'}
-              </p>
-              {user && (
+          </div>
+
+          {/* Toolbar */}
+          {sortedItems.length > 0 && (
+            <div className="history-toolbar">
+              <div className="toolbar-left">
+                {isSelectionMode ? (
+                  <>
+                    <button 
+                      className="toolbar-btn"
+                      onClick={() => {
+                        setIsSelectionMode(false)
+                        setSelectedItems(new Set())
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      className="toolbar-btn"
+                      onClick={handleSelectAll}
+                    >
+                      {selectedItems.size === paginatedItems.length ? 'Deselect All' : 'Select All'}
+                    </button>
+                    {selectedItems.size > 0 && (
+                      <button 
+                        className="toolbar-btn danger"
+                        onClick={handleBulkDelete}
+                      >
+                        Delete ({selectedItems.size})
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <button 
+                      className="toolbar-btn select-btn"
+                      onClick={() => setIsSelectionMode(true)}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="9 11 12 14 22 4"></polyline>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                      </svg>
+                      Select
+                    </button>
+                    <div className="toolbar-divider" />
+                    <button 
+                      className={`toolbar-btn sort-btn ${sortBy === 'updated' ? 'active' : ''}`}
+                      onClick={() => toggleSortOrder('updated')}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                      Date {sortBy === 'updated' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    </button>
+                    <button 
+                      className={`toolbar-btn sort-btn ${sortBy === 'name' ? 'active' : ''}`}
+                      onClick={() => toggleSortOrder('name')}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M4 7h16M4 12h16M4 17h10"></path>
+                      </svg>
+                      Name {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    </button>
+                    <button 
+                      className={`toolbar-btn sort-btn ${sortBy === 'type' ? 'active' : ''}`}
+                      onClick={() => toggleSortOrder('type')}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                      </svg>
+                      Type {sortBy === 'type' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    </button>
+                    <div className="toolbar-divider" />
+                    <div className="custom-dropdown" ref={sourceDropdownRef}>
+                      <button 
+                        className="custom-dropdown-trigger"
+                        onClick={() => setIsSourceDropdownOpen(!isSourceDropdownOpen)}
+                      >
+                        <span>
+                          {filterSource === 'all' && 'All Sources'}
+                          {filterSource === 'drive' && 'Drive Only'}
+                          {filterSource === 'local' && 'Local Only'}
+                        </span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </button>
+                      {isSourceDropdownOpen && (
+                        <div className="custom-dropdown-menu">
+                          <button 
+                            className={`custom-dropdown-item ${filterSource === 'all' ? 'active' : ''}`}
+                            onClick={() => {
+                              setFilterSource('all')
+                              setIsSourceDropdownOpen(false)
+                            }}
+                          >
+                            All Sources
+                          </button>
+                          <button 
+                            className={`custom-dropdown-item ${filterSource === 'drive' ? 'active' : ''}`}
+                            onClick={() => {
+                              setFilterSource('drive')
+                              setIsSourceDropdownOpen(false)
+                            }}
+                          >
+                            Drive Only
+                          </button>
+                          <button 
+                            className={`custom-dropdown-item ${filterSource === 'local' ? 'active' : ''}`}
+                            onClick={() => {
+                              setFilterSource('local')
+                              setIsSourceDropdownOpen(false)
+                            }}
+                          >
+                            Local Only
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="toolbar-right">
+                <span className="item-count">{sortedItems.length} items</span>
+              </div>
+            </div>
+          )}
+
+          <div className="history-table-container">
+            {loading ? (
+              <div className="history-empty-state">
+                <p className="history-empty-desc">Loading notes from Drive...</p>
+              </div>
+            ) : needsReauth ? (
+              <div className="history-empty-state">
+                <img src="/icon/shield-check.svg" alt="Need Auth" className="history-empty-icon" />
+                <h3 className="history-empty-title">Drive Permission Required</h3>
+                <p className="history-empty-desc">
+                  The app needs Google Drive access to sync notes.<br/>
+                  Please sign in again to grant permission.
+                </p>
                 <button 
                   className="sync-drive-btn"
                   onClick={async () => {
-                    try {
-                      await syncNotes()
-                      modal.toast('Đã đồng bộ', '', 'success')
-                    } catch (error) {
-                      modal.error('Không thể đồng bộ: ' + error.message)
+                    const confirmed = await modal.confirm(
+                      'You need to sign in again to grant Google Drive access.',
+                      'Sign In Again',
+                      { confirmText: 'Sign In Again', danger: false }
+                    )
+                    
+                    if (confirmed) {
+                      await signOut()
+                      modal.info('Please sign in again to grant Google Drive access.')
                     }
                   }}
                 >
-                  Đồng bộ từ Drive
+                  Sign In Again
                 </button>
-              )}
-            </div>
-          ) : (
-            <table className="history-table">
-              <thead>
-                <tr>
-                  <th className="name-col">Name</th>
-                  <th className="type-col">Type</th>
-                  <th className="source-col">Source</th>
-                  <th className="updated-col">Updated</th>
-                  <th className="actions-col"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedItems.map(item => (
-                  <tr key={`${item.source}-${item.id}`} onClick={() => handleItemClick(item)}>
-                    <td className="name-col">
-                      <div className="history-name">
-                        <img 
-                          src={item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg"} 
-                          alt={item.type === 'chat' ? "Chat" : "Text"} 
-                        />
-                        <span>{item.title}</span>
-                      </div>
-                    </td>
-                    <td className="type-col">
-                      <span className="history-type">{item.type === 'chat' ? 'Trò chuyện' : 'Văn bản'}</span>
-                    </td>
-                    <td className="source-col">
-                      <span className="history-source">
-                        {item.source === 'drive' ? (
-                          <>
-                            <img src="/icon/google-drive-svgrepo-com.svg" alt="Drive" />
-                            Drive
-                          </>
-                        ) : (
-                          <>
-                            <img src="/icon/monitor.svg" alt="Local" />
-                            Local
-                          </>
-                        )}
-                      </span>
-                    </td>
-                    <td className="updated-col">
-                      <span className="history-updated">{formatTimeAgo(item.updated)}</span>
-                    </td>
-                    <td className="actions-col">
-                      <button 
-                        className="history-actions-btn" 
-                        onClick={(e) => handleMenuClick(e, item)}
-                      >
-                        <img src="/icon/more-vertical.svg" alt="Actions" />
-                      </button>
-                      {activeMenu === item.id && (
-                        <>
-                          <div 
-                            className="history-menu-overlay" 
-                            onClick={handleCloseMenu}
-                          />
-                          <div 
-                            className="history-actions-menu"
-                            style={{ 
-                              position: 'fixed',
-                              left: `${menuPosition.x}px`,
-                              top: `${menuPosition.y}px`
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <button 
-                              className="history-menu-item"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleShareItem(item)
-                              }}
-                            >
-                              <img src="/icon/share-2.svg" alt="Share" />
-                              Chia sẻ
-                            </button>
-                            <button 
-                              className="history-menu-item danger"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleDeleteItem(item)
-                              }}
-                            >
-                              <img src="/icon/trash-2.svg" alt="Delete" />
-                              Xóa
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </td>
+              </div>
+            ) : sortedItems.length === 0 ? (
+              <div className="history-empty-state">
+                <img src="/icon/message-square.svg" alt="No items" className="history-empty-icon" />
+                <h3 className="history-empty-title">No items yet</h3>
+                <p className="history-empty-desc">
+                  {user ? 'Create your first note or chat, or sync from Drive' : 'Please sign in to view history'}
+                </p>
+                {user && (
+                  <button 
+                    className="sync-drive-btn"
+                    onClick={async () => {
+                      try {
+                        await syncNotes()
+                        modal.toast('Synced', '', 'success')
+                      } catch (error) {
+                        modal.error('Unable to sync: ' + error.message)
+                      }
+                    }}
+                  >
+                    Sync from Drive
+                  </button>
+                )}
+              </div>
+            ) : isMobile ? (
+              <div className="history-cards">
+                {paginatedItems.map(renderMobileCard)}
+              </div>
+            ) : (
+              <table className="history-table">
+                <thead>
+                  <tr>
+                    {isSelectionMode && <th className="checkbox-col"></th>}
+                    <th className="name-col">Name</th>
+                    <th className="type-col">Type</th>
+                    <th className="source-col">Source</th>
+                    <th className="updated-col">Updated</th>
+                    <th className="actions-col"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {paginatedItems.map(renderTableRow)}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="history-pagination">
+              <button 
+                className="pagination-btn"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <span className="pagination-info">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button 
+                className="pagination-btn"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
           )}
         </div>
       </div>
-    </div>
     </>
   )
 }

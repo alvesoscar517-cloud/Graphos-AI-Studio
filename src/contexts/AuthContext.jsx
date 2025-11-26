@@ -1,181 +1,24 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+/**
+ * Auth Context - Environment-aware
+ * Automatically uses dev or prod version based on NODE_ENV
+ */
 
-const AuthContext = createContext()
+// Import both versions
+import * as DevAuth from './AuthContext.dev.jsx'
+import * as ProdAuth from './AuthContext.prod.jsx'
 
-export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-  return context
+// Use dev version in development, prod version in production
+const isDev = import.meta.env.DEV || import.meta.env.MODE === 'development'
+
+// Select the appropriate version
+const AuthModule = isDev ? DevAuth : ProdAuth
+
+// Log which version is being used
+if (isDev) {
+  console.log('🔧 Using Development Auth Provider')
+} else {
+  console.log('🚀 Using Production Auth Provider')
 }
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    checkAuthentication()
-  }, [])
-
-  const checkAuthentication = async () => {
-    try {
-      // Check if running in Chrome extension context
-      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
-        try {
-          const response = await chrome.runtime.sendMessage({ action: 'checkAuth' })
-          setIsAuthenticated(response)
-          
-          if (response) {
-            const userInfo = await chrome.runtime.sendMessage({ action: 'getUserInfo' })
-            if (userInfo && userInfo.email) {
-              // Generate userId from email if not exists
-              const userId = userInfo.id || `user_${userInfo.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
-              localStorage.setItem('userId', userId);
-              setUser({ ...userInfo, id: userId })
-            }
-          }
-        } catch (chromeError) {
-          console.warn('Chrome extension context not available:', chromeError)
-          // Fallback to dev mode
-          const devUserId = 'dev_user_123';
-          localStorage.setItem('userId', devUserId);
-          setIsAuthenticated(true)
-          setUser({
-            id: devUserId,
-            email: 'dev@example.com',
-            name: 'Development User',
-            picture: null
-          })
-        }
-      } else {
-        // Running in regular browser - skip auth for development
-        console.log('⚠️ Running in browser mode - Auth disabled for development')
-        const devUserId = 'dev_user_123';
-        localStorage.setItem('userId', devUserId);
-        setIsAuthenticated(true)
-        setUser({
-          id: devUserId,
-          email: 'dev@example.com',
-          name: 'Development User',
-          picture: null
-        })
-      }
-    } catch (error) {
-      console.error('❌ Auth check error:', error)
-      // Fallback to authenticated for development
-      const devUserId = 'dev_user_123';
-      localStorage.setItem('userId', devUserId);
-      setIsAuthenticated(true)
-      setUser({
-        id: devUserId,
-        email: 'dev@example.com',
-        name: 'Development User',
-        picture: null
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const signIn = async () => {
-    try {
-      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
-        try {
-          const response = await chrome.runtime.sendMessage({ action: 'signIn' })
-          
-          if (response && response.success) {
-            const userId = response.userInfo.id || `user_${response.userInfo.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
-            localStorage.setItem('userId', userId);
-            setIsAuthenticated(true)
-            setUser({ ...response.userInfo, id: userId })
-            return true
-          }
-          return false
-        } catch (chromeError) {
-          console.warn('Chrome extension context not available:', chromeError)
-          // Fallback to dev mode
-          const devUserId = 'dev_user_123';
-          localStorage.setItem('userId', devUserId);
-          setIsAuthenticated(true)
-          setUser({
-            id: devUserId,
-            email: 'dev@example.com',
-            name: 'Development User',
-            picture: null
-          })
-          return true
-        }
-      } else {
-        // Browser mode - simulate sign in
-        const devUserId = 'dev_user_123';
-        localStorage.setItem('userId', devUserId);
-        setIsAuthenticated(true)
-        setUser({
-          id: devUserId,
-          email: 'dev@example.com',
-          name: 'Development User',
-          picture: null
-        })
-        return true
-      }
-    } catch (error) {
-      console.error('❌ Sign in error:', error)
-      // Fallback to authenticated for development
-      const devUserId = 'dev_user_123';
-      localStorage.setItem('userId', devUserId);
-      setIsAuthenticated(true)
-      setUser({
-        id: devUserId,
-        email: 'dev@example.com',
-        name: 'Development User',
-        picture: null
-      })
-      return true
-    }
-  }
-
-  const signOut = async () => {
-    try {
-      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
-        try {
-          const response = await chrome.runtime.sendMessage({ action: 'signOut' })
-          
-          if (response.success) {
-            localStorage.removeItem('userId');
-            setIsAuthenticated(false)
-            setUser(null)
-            return true
-          }
-          return false
-        } catch (chromeError) {
-          console.warn('Chrome extension context not available:', chromeError)
-          localStorage.removeItem('userId');
-          setIsAuthenticated(false)
-          setUser(null)
-          return true
-        }
-      } else {
-        // Browser mode
-        localStorage.removeItem('userId');
-        setIsAuthenticated(false)
-        setUser(null)
-        return true
-      }
-    } catch (error) {
-      console.error('❌ Sign out error:', error)
-      return false
-    }
-  }
-
-  const value = {
-    user,
-    isAuthenticated,
-    isLoading,
-    signIn,
-    signOut
-  }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
+// Export from selected module
+export const { useAuth, AuthProvider } = AuthModule

@@ -4,7 +4,6 @@
   left: 0;
   right: 0;
   z-index: 100;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
 }
 
@@ -14,21 +13,34 @@
   padding: 0 24px;
   left: 0;
   right: 0;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Animation khi chuyển từ centered sang bottom */
 .shared-chat-input-container.bottom {
   position: fixed;
   bottom: 0;
   transform: translateY(0);
   padding: 16px;
   background: transparent;
+  animation: slideToBottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideToBottom {
+  from {
+    opacity: 0.8;
+    transform: translateY(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .shared-chat-input-wrapper {
   max-width: 700px;
   margin: 0 auto;
   pointer-events: auto;
-  transition: max-width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .shared-chat-input-container.bottom .shared-chat-input-wrapper {
@@ -170,7 +182,6 @@ body.dark-theme .shared-textarea::placeholder {
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transition: background 0.2s ease;
   padding: 0;
   position: relative;
@@ -180,27 +191,16 @@ body.dark-theme .shared-textarea::placeholder {
   background: #4a5157;
 }
 
-@keyframes scaleIn {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
 .shared-send-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   background: #e8eaed;
 }
 
-.shared-send-btn img {
+.shared-send-btn svg {
   width: 18px;
   height: 18px;
-  filter: brightness(0) invert(1);
+  color: white;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -236,8 +236,8 @@ body.dark-theme .shared-send-btn:disabled {
   opacity: 0.5;
 }
 
-body.dark-theme .shared-send-btn img {
-  filter: brightness(0) invert(0);
+body.dark-theme .shared-send-btn svg {
+  color: #202124;
 }
 
 /* Responsive */

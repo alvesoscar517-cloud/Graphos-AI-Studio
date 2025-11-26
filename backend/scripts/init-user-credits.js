@@ -7,7 +7,7 @@ const { db } = require('../src/config/firebase');
 
 async function initUserCredits() {
   try {
-    console.log('🚀 Initializing user credits...\n');
+    console.log('[INFO] Initializing user credits...\n');
 
     // Create or update dev user
     const devUserId = 'dev_user_123';
@@ -34,15 +34,15 @@ async function initUserCredits() {
         },
         createdAt: new Date().toISOString()
       });
-      console.log('✅ Dev user created with 100 free credits\n');
+      console.log('[SUCCESS] Dev user created with 100 free credits\n');
     } else {
-      console.log('Updating dev user credits...');
+      console.log('[INFO] Updating dev user credits...');
       await devUserRef.update({
         'credits.balance': 100,
         'credits.purchased': 100,
         'credits.used': 0
       });
-      console.log('✅ Dev user credits updated\n');
+      console.log('[SUCCESS] Dev user credits updated\n');
     }
 
     // Update all existing users
@@ -71,12 +71,12 @@ async function initUserCredits() {
     
     if (updatedCount > 0) {
       await batch.commit();
-      console.log(`✅ Updated ${updatedCount} existing users with credits\n`);
+      console.log(`[SUCCESS] Updated ${updatedCount} existing users with credits\n`);
     } else {
-      console.log('No other users need updating\n');
+      console.log('[INFO] No other users need updating\n');
     }
 
-    console.log('✨ Initialization complete!\n');
+    console.log('[SUCCESS] Initialization complete!\n');
     console.log('Summary:');
     console.log(`- Dev user: dev_user_123 (100 credits)`);
     console.log(`- Other users updated: ${updatedCount}`);
@@ -84,7 +84,7 @@ async function initUserCredits() {
     
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error initializing credits:', error);
+    console.error('[ERROR] Error initializing credits:', error);
     process.exit(1);
   }
 }

@@ -22,7 +22,7 @@ const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile, loading }) =
   return (
     <div className="profile-showcase">
       <div className="profile-showcase-header">
-        <h3 className="section-title">Hồ sơ văn phong của bạn</h3>
+        <h3 className="section-title">Your Writing Style Profiles</h3>
         {!loading && (
           <div className="profile-showcase-actions">
             <button 

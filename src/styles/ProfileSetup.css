@@ -114,21 +114,26 @@
   overflow: hidden;
 }
 
-/* Animation Container - Step 1, 2, 3 */
-.profile-setup-page .animation-container {
+/* Animation Container - Unified for Step 1, 2, 3, 4 */
+.profile-setup-page .animation-container,
+.profile-setup-page .animation-container-large {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
-  padding: 60px;
+  padding: 40px;
   box-sizing: border-box;
   background: transparent;
 }
 
-.profile-setup-page .animation-container > div {
-  width: 400px !important;
-  height: 400px !important;
+/* Unified animation size for all steps (excluding completion/error modals) */
+.profile-setup-page .animation-container > div,
+.profile-setup-page .animation-container-large > div {
+  width: 380px !important;
+  height: 380px !important;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 /* Step 2 Animation - Deep Blue Filter */
@@ -815,22 +820,7 @@
   overflow: hidden;
 }
 
-/* Animation Container - Step 4 Processing */
-.profile-setup-page .animation-container-large {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  padding: 60px;
-  box-sizing: border-box;
-  background: transparent;
-}
-
-.profile-setup-page .animation-container-large > div {
-  width: 400px !important;
-  height: 400px !important;
-}
+/* Animation Container - Step 4 Processing (inherits from unified styles above) */
 
 
 
@@ -992,8 +982,8 @@
 
   .profile-setup-page .animation-container > div,
   .profile-setup-page .animation-container-large > div {
-    width: 450px;
-    height: 450px;
+    width: 350px !important;
+    height: 350px !important;
   }
 }
 
@@ -1011,13 +1001,13 @@
 
   .profile-setup-page .animation-container,
   .profile-setup-page .animation-container-large {
-    min-height: 400px;
+    min-height: 320px;
   }
 
   .profile-setup-page .animation-container > div,
   .profile-setup-page .animation-container-large > div {
-    width: 400px;
-    height: 400px;
+    width: 300px !important;
+    height: 300px !important;
   }
 
   .form-container,
@@ -1048,14 +1038,14 @@
 
   .profile-setup-page .animation-container,
   .profile-setup-page .animation-container-large {
-    min-height: 350px;
+    min-height: 280px;
     padding: 20px;
   }
 
   .profile-setup-page .animation-container > div,
   .profile-setup-page .animation-container-large > div {
-    width: 350px;
-    height: 350px;
+    width: 260px !important;
+    height: 260px !important;
   }
 
   .form-container,
@@ -1116,13 +1106,13 @@
   .profile-setup-page .animation-container-large {
     height: 200px;
     min-height: 180px;
-    padding: 5px;
+    padding: 10px;
   }
 
   .profile-setup-page .animation-container > div,
   .profile-setup-page .animation-container-large > div {
-    max-width: min(220px, 70%);
-    max-height: min(220px, 70%);
+    width: 180px !important;
+    height: 180px !important;
   }
 
   .form-container,
@@ -1323,5 +1313,237 @@
   .score-message {
     font-size: 14px;
     padding: 0 10px;
+  }
+}
+
+
+/* Draft Restore Toast - Clean horizontal layout */
+.draft-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  z-index: 10000;
+  animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.draft-toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 10px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.draft-toast-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.draft-toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.draft-toast-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.draft-toast-subtitle {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.draft-toast-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.draft-toast-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.draft-toast-btn-secondary {
+  background: white;
+  color: #4b5563;
+  border-color: #e5e7eb;
+}
+
+.draft-toast-btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.draft-toast-btn-primary {
+  background: var(--color-blue);
+  color: white;
+}
+
+.draft-toast-btn-primary:hover {
+  background: var(--color-blue-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px var(--color-blue-border);
+}
+
+.draft-toast-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.draft-toast-close:hover {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Auto-save Badge - subtle floating indicator */
+.auto-save-badge {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 12px;
+  color: #6b7280;
+  z-index: 100;
+  animation: badgeFadeIn 0.3s ease-out;
+}
+
+@keyframes badgeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auto-save-badge svg {
+  color: #10b981;
+}
+
+/* Responsive for toast and badge */
+@media (max-width: 768px) {
+  .draft-toast {
+    bottom: 20px;
+    right: 20px;
+    left: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .draft-toast-subtitle {
+    max-width: none;
+  }
+  
+  .draft-toast-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+  
+  .draft-toast-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .draft-toast {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    padding: 12px 14px;
+  }
+  
+  .draft-toast-icon {
+    width: 38px;
+    height: 38px;
+  }
+  
+  .draft-toast-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .draft-toast-title {
+    font-size: 13px;
+  }
+  
+  .draft-toast-subtitle {
+    font-size: 11px;
+  }
+  
+  .draft-toast-btn {
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+  
+  .auto-save-badge {
+    bottom: 16px;
+    left: 16px;
+    padding: 6px 10px;
+    font-size: 11px;
   }
 }

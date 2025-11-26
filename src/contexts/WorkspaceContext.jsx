@@ -13,9 +13,25 @@ export const useWorkspace = () => {
   return context
 }
 
+// Error messages mapping
+const ERROR_MESSAGES = {
+  QUOTA_EXCEEDED: 'API quota exceeded. Please try again in a few minutes.',
+  RATE_LIMITED: 'Too many requests. Please slow down.',
+  INVALID_INPUT: 'Invalid input. Please check your message.',
+  CONTENT_BLOCKED: 'Content was blocked by safety filters. Please rephrase your message.',
+  MODEL_ERROR: 'AI model error. Try selecting a different model.',
+  NETWORK_ERROR: 'Network error. Please check your connection.',
+  DEFAULT: 'Something went wrong. Please try again.'
+}
+
 export const WorkspaceProvider = ({ children }) => {
   const { user } = useAuth()
   const { currentProfile } = useProfiles()
+  
+  // Configuration
+  const MAX_CONVERSATIONS = 100
+  const MAX_MESSAGES_PER_CONVERSATION = 50
+  const SUMMARIZE_THRESHOLD = 20 // Trigger summarization after this many messages
   
   const [conversations, setConversations] = useState([])
   const [currentConversation, setCurrentConversation] = useState(null)
@@ -40,7 +56,12 @@ export const WorkspaceProvider = ({ children }) => {
       if (saved) {
         try {
           const parsed = JSON.parse(saved)
-          setConversations(parsed)
+          const limited = parsed.slice(0, MAX_CONVERSATIONS)
+          setConversations(limited)
+          
+          if (parsed.length > MAX_CONVERSATIONS) {
+            console.log(`⚠️ Loaded ${MAX_CONVERSATIONS} of ${parsed.length} conversations`)
+          }
         } catch (err) {
           console.error('Failed to load conversations:', err)
         }
@@ -50,17 +71,40 @@ export const WorkspaceProvider = ({ children }) => {
 
   // Save conversations to localStorage
   useEffect(() => {
-    if (user && conversations.length > 0) {
-      localStorage.setItem(
-        `workspace_conversations_${user.email}`,
-        JSON.stringify(conversations)
+    if (user) {
+      const conversationsWithContent = conversations.filter(c => 
+        (c.messages && c.messages.length > 0) || 
+        (c.title && c.title.trim() !== '' && c.title !== 'New Chat')
       )
       
-      // TODO: Sync to Drive in background
-      // This would require Drive API integration similar to notes
-      // For now, conversations are stored locally only
+      const limited = conversationsWithContent.slice(0, MAX_CONVERSATIONS)
+      
+      if (limited.length > 0) {
+        localStorage.setItem(
+          `workspace_conversations_${user.email}`,
+          JSON.stringify(limited)
+        )
+      }
     }
   }, [conversations, user])
+  
+  // Periodic cleanup
+  useEffect(() => {
+    const cleanupInterval = setInterval(() => {
+      setConversations(prev => {
+        if (prev.length <= MAX_CONVERSATIONS) return prev
+        
+        const sorted = [...prev].sort((a, b) => 
+          new Date(b.updated || b.created) - new Date(a.updated || a.created)
+        )
+        
+        console.log(`🧹 Auto-cleanup: Keeping ${MAX_CONVERSATIONS} of ${prev.length} conversations`)
+        return sorted.slice(0, MAX_CONVERSATIONS)
+      })
+    }, 5 * 60 * 1000)
+    
+    return () => clearInterval(cleanupInterval)
+  }, [])
 
   // Generate system prompt based on user profile
   const generateSystemPrompt = useCallback(() => {
@@ -70,27 +114,49 @@ export const WorkspaceProvider = ({ children }) => {
 
     const { writing_style, tone, expertise } = currentProfile
     
-    let prompt = 'Bạn là một trợ lý AI thông minh. '
+    let prompt = 'You are an intelligent AI assistant. '
     
     if (writing_style) {
-      prompt += `Hãy viết theo phong cách: ${writing_style}. `
+      prompt += `Write in this style: ${writing_style}. `
     }
     
     if (tone) {
-      prompt += `Sử dụng giọng điệu: ${tone}. `
+      prompt += `Use this tone: ${tone}. `
     }
     
     if (expertise && expertise.length > 0) {
-      prompt += `Bạn có chuyên môn về: ${expertise.join(', ')}. `
+      prompt += `You have expertise in: ${expertise.join(', ')}. `
     }
     
-    prompt += 'Hãy trả lời một cách tự nhiên, chính xác và phù hợp với văn phong của người dùng.'
+    prompt += 'Please respond naturally, accurately, and in a way that matches the user\'s writing style.'
     
     return prompt
   }, [currentProfile])
 
+  // Check if conversation has content
+  const hasContent = useCallback((conversation) => {
+    if (!conversation) return false
+    const messages = conversation.messages || []
+    const title = conversation.title?.trim() || ''
+    return messages.length > 0 || (title.length > 0 && title !== 'New Chat')
+  }, [])
+
+  // Clean up empty conversations
+  const cleanupEmptyConversations = useCallback(() => {
+    setConversations(prev => {
+      const emptyConvs = prev.filter(c => !hasContent(c) && c.id !== currentConversation?.id)
+      if (emptyConvs.length > 0) {
+        console.log(`🧹 Cleaning up ${emptyConvs.length} empty conversations`)
+        return prev.filter(c => hasContent(c) || c.id === currentConversation?.id)
+      }
+      return prev
+    })
+  }, [hasContent, currentConversation])
+
   // Create new conversation
   const createConversation = useCallback((title = 'New Chat') => {
+    cleanupEmptyConversations()
+    
     const newConversation = {
       id: Date.now().toString(),
       title,
@@ -99,15 +165,16 @@ export const WorkspaceProvider = ({ children }) => {
       created: new Date(),
       updated: new Date(),
       type: 'chat',
-      titleGenerated: false, // Track if title was auto-generated
-      userEditedTitle: false // Track if user manually edited title
+      titleGenerated: false,
+      userEditedTitle: false,
+      summary: null // Store conversation summary
     }
     
     setConversations(prev => [newConversation, ...prev])
     setCurrentConversation(newConversation)
     
     return newConversation
-  }, [generateSystemPrompt])
+  }, [generateSystemPrompt, cleanupEmptyConversations])
 
   // Load conversation
   const loadConversation = useCallback((id) => {
@@ -117,9 +184,19 @@ export const WorkspaceProvider = ({ children }) => {
     }
   }, [conversations])
 
+  // Truncate title to max words
+  const truncateTitleToWords = useCallback((title, maxWords = 7) => {
+    if (!title) return title
+    const words = title.trim().split(/\s+/)
+    if (words.length <= maxWords) return title
+    return words.slice(0, maxWords).join(' ') + '...'
+  }, [])
+
   // Generate title from AI
   const generateTitle = useCallback(async (firstMessage) => {
     try {
+      const truncatedMessage = firstMessage.substring(0, 150)
+      
       const response = await fetch(`${CONFIG.API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: {
@@ -128,27 +205,53 @@ export const WorkspaceProvider = ({ children }) => {
         body: JSON.stringify({
           messages: [{
             role: 'user',
-            content: `Tóm tắt nội dung sau thành tiêu đề ngắn gọn (tối đa 6-8 từ), chỉ trả về tiêu đề không giải thích: "${firstMessage}"`
+            content: `Create a short title (maximum 7 words) for the following content. ONLY return the title, no explanation: "${truncatedMessage}"`
           }],
-          systemPrompt: 'Bạn là trợ lý tóm tắt. Chỉ trả về tiêu đề ngắn gọn, không giải thích.',
-          model: modelSettings.model || 'gemini-2.0-flash-exp',
-          temperature: 0.3
+          systemPrompt: 'You are a title generation assistant. Only return a short title of maximum 7 words, no explanation, no quotes.',
+          model: 'gemini-2.0-flash-lite',
+          temperature: 0.2,
+          maxTokens: 30
         })
       })
 
       if (response.ok) {
         const data = await response.json()
-        return data.message.trim().replace(/^["']|["']$/g, '') // Remove quotes
+        let title = data.message.trim().replace(/^["']|["']$/g, '')
+        return truncateTitleToWords(title, 7)
       }
     } catch (err) {
       console.error('Failed to generate title:', err)
     }
     
-    // Fallback to truncated message
-    return firstMessage.substring(0, 50) + (firstMessage.length > 50 ? '...' : '')
-  }, [modelSettings.model])
+    const firstSentence = firstMessage.split(/[.!?。]/)[0]?.trim() || firstMessage
+    return truncateTitleToWords(firstSentence, 7)
+  }, [truncateTitleToWords])
 
-  // Send message with smooth streaming
+  // Format error message for display
+  const formatErrorMessage = useCallback((error) => {
+    if (error.code && ERROR_MESSAGES[error.code]) {
+      return ERROR_MESSAGES[error.code]
+    }
+    if (error.message) {
+      // Check for known error patterns
+      if (error.message.includes('quota') || error.message.includes('QUOTA')) {
+        return ERROR_MESSAGES.QUOTA_EXCEEDED
+      }
+      if (error.message.includes('rate') || error.message.includes('429')) {
+        return ERROR_MESSAGES.RATE_LIMITED
+      }
+      if (error.message.includes('network') || error.message.includes('fetch')) {
+        return ERROR_MESSAGES.NETWORK_ERROR
+      }
+      if (error.message.includes('blocked') || error.message.includes('safety')) {
+        return ERROR_MESSAGES.CONTENT_BLOCKED
+      }
+      return error.message
+    }
+    return ERROR_MESSAGES.DEFAULT
+  }, [])
+
+  // Send message with streaming
   const sendMessage = useCallback(async (content, attachments = []) => {
     let conversation = currentConversation
     
@@ -156,15 +259,35 @@ export const WorkspaceProvider = ({ children }) => {
       conversation = createConversation()
     }
 
+    // Process attachments to base64 if needed
+    const processedAttachments = await Promise.all(
+      attachments.map(async (att) => {
+        if (att.base64) return att
+        if (att.file) {
+          return new Promise((resolve) => {
+            const reader = new FileReader()
+            reader.onload = () => {
+              resolve({
+                ...att,
+                base64: reader.result.split(',')[1],
+                mimeType: att.type || att.file.type
+              })
+            }
+            reader.readAsDataURL(att.file)
+          })
+        }
+        return att
+      })
+    )
+
     const userMessage = {
       id: Date.now().toString(),
       role: 'user',
       content,
-      attachments,
+      attachments: processedAttachments,
       timestamp: new Date()
     }
 
-    // Add user message immediately
     const updatedMessages = [...(conversation?.messages || []), userMessage]
     
     setCurrentConversation(prev => ({
@@ -176,7 +299,6 @@ export const WorkspaceProvider = ({ children }) => {
     setIsLoading(true)
     setError(null)
 
-    // Create AI message placeholder
     const aiMessageId = (Date.now() + 1).toString()
     const aiMessage = {
       id: aiMessageId,
@@ -186,7 +308,6 @@ export const WorkspaceProvider = ({ children }) => {
       streaming: true
     }
 
-    // Add empty AI message
     setCurrentConversation(prev => ({
       ...(prev || conversation),
       messages: [...updatedMessages, aiMessage],
@@ -194,7 +315,6 @@ export const WorkspaceProvider = ({ children }) => {
     }))
 
     try {
-      // Map model ID to actual model name
       const modelMap = {
         'gemini-2.0-flash-exp': 'gemini-2.0-flash-exp',
         'gemini-2.5-flash-lite': 'gemini-2.5-flash-lite',
@@ -204,24 +324,28 @@ export const WorkspaceProvider = ({ children }) => {
       
       const actualModel = modelMap[modelSettings.model] || 'gemini-2.0-flash-exp'
 
-      // Import streaming function
-      const { sendChatMessageStream } = await import('../services/api')
+      // Check if humanization is enabled
+      const chatSettings = modelSettings.chatSettings || {}
+      const useHumanizedChat = chatSettings.humanizeResponse || chatSettings.useAntiAIDetection
 
-      let fullText = '' // Complete text buffer
-      let displayedText = '' // Currently displayed text
+      // Import appropriate streaming function
+      const { sendChatMessageStream, sendHumanizedChatStream } = await import('../services/api')
+      const streamFunction = useHumanizedChat && currentProfile ? sendHumanizedChatStream : sendChatMessageStream
+
+      let fullText = ''
+      let displayedText = ''
       let animationFrameId = null
       let isAnimating = false
+      let newSummary = conversation?.summary || null
+      let humanizationResult = null
 
-      // Smooth animation function
       const animateText = () => {
         if (displayedText.length < fullText.length) {
-          // Calculate how many characters to add (adaptive speed)
           const remaining = fullText.length - displayedText.length
           const charsToAdd = Math.max(1, Math.min(3, Math.ceil(remaining / 20)))
           
           displayedText = fullText.substring(0, displayedText.length + charsToAdd)
           
-          // Update message content
           setCurrentConversation(prev => ({
             ...prev,
             messages: prev.messages.map(m => 
@@ -238,30 +362,98 @@ export const WorkspaceProvider = ({ children }) => {
         }
       }
 
-      // Stream response
-      await sendChatMessageStream(
-        updatedMessages.map(m => ({
-          role: m.role,
-          content: m.content
-        })),
-        currentConversation?.systemPrompt || generateSystemPrompt(),
-        actualModel,
-        modelSettings.temperature || 0.7,
-        currentProfile?.profile_id || null,
-        modelSettings.writingPreferences || null,
-        (chunk) => {
-          // Add chunk to full text buffer
-          fullText += chunk
-          
-          // Start smooth animation if not already running
-          if (!isAnimating) {
-            isAnimating = true
-            animateText()
-          }
-        }
-      )
+      // Prepare messages for API (include attachments)
+      const apiMessages = updatedMessages.map(m => ({
+        role: m.role,
+        content: m.content,
+        attachments: m.attachments?.map(a => ({
+          base64: a.base64,
+          mimeType: a.mimeType || a.type,
+          name: a.name
+        }))
+      }))
 
-      // Wait for animation to complete naturally
+      // Use humanized or standard chat based on settings
+      if (useHumanizedChat && currentProfile) {
+        console.log('🎭 Using humanized chat with voice profile')
+        await streamFunction(
+          apiMessages,
+          currentConversation?.systemPrompt || generateSystemPrompt(),
+          actualModel,
+          modelSettings.temperature || 0.7,
+          currentProfile.profile_id,
+          modelSettings.writingPreferences || null,
+          chatSettings,
+          (chunk) => {
+            fullText += chunk
+            if (!isAnimating) {
+              isAnimating = true
+              animateText()
+            }
+          },
+          {
+            conversationSummary: conversation?.summary,
+            onContext: (contextInfo) => {
+              if (contextInfo.wasSummarized) {
+                console.log(`📝 Conversation summarized (${contextInfo.summarizedCount} messages)`)
+              }
+            },
+            onHumanized: (humanizedText) => {
+              // Replace with fully humanized text
+              console.log('✨ Received humanized text')
+              fullText = humanizedText
+              displayedText = humanizedText
+              setCurrentConversation(prev => ({
+                ...prev,
+                messages: prev.messages.map(m => 
+                  m.id === aiMessageId 
+                    ? { ...m, content: humanizedText }
+                    : m
+                )
+              }))
+            },
+            onComplete: (completeInfo) => {
+              if (completeInfo.summary) {
+                newSummary = completeInfo.summary
+              }
+              if (completeInfo.humanization) {
+                humanizationResult = completeInfo.humanization
+              }
+            }
+          }
+        )
+      } else {
+        await sendChatMessageStream(
+          apiMessages,
+          currentConversation?.systemPrompt || generateSystemPrompt(),
+          actualModel,
+          modelSettings.temperature || 0.7,
+          currentProfile?.profile_id || null,
+          modelSettings.writingPreferences || null,
+          (chunk) => {
+            fullText += chunk
+            if (!isAnimating) {
+              isAnimating = true
+              animateText()
+            }
+          },
+          {
+            conversationSummary: conversation?.summary,
+            onContext: (contextInfo) => {
+              if (contextInfo.wasSummarized) {
+                console.log(`📝 Conversation summarized (${contextInfo.summarizedCount} messages)`)
+              }
+            },
+            onComplete: (completeInfo) => {
+              if (completeInfo.summary) {
+                newSummary = completeInfo.summary
+              }
+            }
+          }
+        )
+      }
+
+      // Wait for animation to complete
       const waitForAnimation = () => {
         return new Promise((resolve) => {
           const checkAnimation = () => {
@@ -278,7 +470,6 @@ export const WorkspaceProvider = ({ children }) => {
       await waitForAnimation()
       displayedText = fullText
 
-      // Final update with complete message
       const finalAiMessage = {
         ...aiMessage,
         content: fullText,
@@ -287,13 +478,12 @@ export const WorkspaceProvider = ({ children }) => {
 
       const finalMessages = [...updatedMessages, finalAiMessage]
 
-      // Auto-generate title for first message (only if user hasn't edited it)
+      // Auto-generate title for first message
       let newTitle = currentConversation?.title || conversation?.title
       const isFirstMessage = (currentConversation?.messages || conversation?.messages || []).length === 0
       const userEditedTitle = currentConversation?.userEditedTitle || conversation?.userEditedTitle
       
       if (isFirstMessage && !userEditedTitle) {
-        // Generate title in background
         generateTitle(content).then(title => {
           setConversations(prev => 
             prev.map(c => c.id === (currentConversation?.id || conversation?.id) 
@@ -304,21 +494,19 @@ export const WorkspaceProvider = ({ children }) => {
           setCurrentConversation(prev => prev ? { ...prev, title, titleGenerated: true } : prev)
         })
         
-        // Use temporary title for now
-        newTitle = content.substring(0, 50) + (content.length > 50 ? '...' : '')
+        newTitle = truncateTitleToWords(content, 7)
       }
 
-      // Update conversation with AI response
       const updatedConversation = {
         ...(currentConversation || conversation),
         messages: finalMessages,
         updated: new Date(),
-        title: newTitle
+        title: newTitle,
+        summary: newSummary
       }
       
       setCurrentConversation(updatedConversation)
 
-      // Update in conversations list
       setConversations(prev => {
         const exists = prev.find(c => c.id === updatedConversation.id)
         if (exists) {
@@ -330,25 +518,26 @@ export const WorkspaceProvider = ({ children }) => {
 
     } catch (err) {
       console.error('Error sending message:', err)
-      setError(err.message)
+      const errorMessage = formatErrorMessage(err)
+      setError(errorMessage)
       
-      // Add error message
-      const errorMessage = {
+      const errorMessageObj = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại.',
+        content: errorMessage,
         error: true,
+        errorCode: err.code,
         timestamp: new Date()
       }
 
       setCurrentConversation(prev => ({
         ...(prev || conversation),
-        messages: [...updatedMessages, errorMessage]
+        messages: [...updatedMessages, errorMessageObj]
       }))
     } finally {
       setIsLoading(false)
     }
-  }, [currentConversation, generateSystemPrompt, createConversation, modelSettings, currentProfile, generateTitle])
+  }, [currentConversation, generateSystemPrompt, createConversation, modelSettings, currentProfile, generateTitle, formatErrorMessage, truncateTitleToWords])
 
   // Delete conversation
   const deleteConversation = useCallback((id) => {
@@ -399,23 +588,36 @@ export const WorkspaceProvider = ({ children }) => {
     }
   }, [currentConversation])
 
-  // Sync conversations to Drive (placeholder for future implementation)
+  // Retry last message
+  const retryLastMessage = useCallback(async () => {
+    if (!currentConversation || currentConversation.messages.length < 2) return
+    
+    const messages = currentConversation.messages
+    const lastUserMessageIndex = messages.length - 2
+    const lastUserMessage = messages[lastUserMessageIndex]
+    
+    if (lastUserMessage?.role !== 'user') return
+    
+    // Remove the error message
+    const messagesWithoutError = messages.slice(0, -1)
+    setCurrentConversation(prev => ({
+      ...prev,
+      messages: messagesWithoutError
+    }))
+    
+    // Resend
+    await sendMessage(lastUserMessage.content, lastUserMessage.attachments || [])
+  }, [currentConversation, sendMessage])
+
+  // Sync to Drive (placeholder)
   const syncConversationsToDrive = useCallback(async () => {
     if (!user) {
       throw new Error('User not authenticated')
     }
 
     try {
-      // TODO: Implement Drive sync
-      // 1. Get or create "AI Conversations" folder in Drive
-      // 2. For each conversation, create/update a JSON file
-      // 3. Store conversation data including messages, title, timestamps
-      // 4. Handle conflicts (local vs remote changes)
-      
       console.log('📤 Drive sync for conversations not yet implemented')
       console.log(`   Would sync ${conversations.length} conversations`)
-      
-      // For now, just return success
       return { synced: 0, message: 'Drive sync coming soon' }
     } catch (error) {
       console.error('Failed to sync conversations to Drive:', error)
@@ -438,7 +640,8 @@ export const WorkspaceProvider = ({ children }) => {
     generateSystemPrompt,
     updateModelSettings,
     updateConversationTitle,
-    syncConversationsToDrive
+    syncConversationsToDrive,
+    retryLastMessage
   }
 
   return (

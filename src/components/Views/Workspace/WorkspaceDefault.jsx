@@ -10,7 +10,7 @@ const WorkspaceDefault = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSide
         <button 
           className="menu-btn icon-btn" 
           onClick={onToggleLeftSidebar}
-          data-tooltip="Ẩn/hiện sidebar" 
+          data-tooltip="Toggle sidebar" 
           data-tooltip-position="right"
         >
           <img src="/icon/panel-left.svg" alt="Toggle Sidebar" />
@@ -23,7 +23,7 @@ const WorkspaceDefault = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSide
             <button 
               className="icon-btn"
               onClick={onToggleRightSidebar}
-              data-tooltip="Mở sidebar" 
+              data-tooltip="Open sidebar" 
               data-tooltip-position="left"
             >
               <img src="/icon/panel-right.svg" alt="Toggle Right Sidebar" />
@@ -35,7 +35,7 @@ const WorkspaceDefault = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSide
       <div className="workspace-default-content">
         <div className="workspace-welcome">
           <h1 className="workspace-welcome-text">
-            Xin chào, {user?.name || user?.email?.split('@')[0] || 'bạn'}
+            Hello, {user?.name || user?.email?.split('@')[0] || 'friend'}
           </h1>
         </div>
       </div>

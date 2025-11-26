@@ -21,18 +21,26 @@ const embeddingCache = new Map();
 const EMBEDDING_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 const MAX_EMBEDDING_CACHE_SIZE = 1000;
 
+const crypto = require('crypto');
+const redisService = require('./redis.service');
+
 function hashText(text) {
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) {
-    const char = text.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return hash.toString();
+  // Use SHA256 for better collision resistance
+  return crypto.createHash('sha256').update(text).digest('hex').substring(0, 16);
 }
 
-function getCachedEmbedding(text, taskType) {
-  const key = `${hashText(text)}_${taskType}`;
+async function getCachedEmbedding(text, taskType) {
+  const textHash = hashText(text);
+  
+  // Try Redis/distributed cache first
+  const redisCached = await redisService.embeddingCache.get(textHash, taskType);
+  if (redisCached) {
+    console.log(`[CACHE] Embedding cache HIT (distributed)`);
+    return redisCached;
+  }
+  
+  // Fallback to local memory cache
+  const key = `${textHash}_${taskType}`;
   const cached = embeddingCache.get(key);
   
   if (!cached) return null;
@@ -42,17 +50,23 @@ function getCachedEmbedding(text, taskType) {
     return null;
   }
   
-  console.log(`⚡ Embedding cache HIT`);
+  console.log(`[CACHE] Embedding cache HIT (memory)`);
   return cached.embedding;
 }
 
-function setCachedEmbedding(text, taskType, embedding) {
+async function setCachedEmbedding(text, taskType, embedding) {
+  const textHash = hashText(text);
+  
+  // Save to Redis/distributed cache
+  await redisService.embeddingCache.set(textHash, taskType, embedding);
+  
+  // Also save to local memory cache for faster access
   if (embeddingCache.size >= MAX_EMBEDDING_CACHE_SIZE) {
     const firstKey = embeddingCache.keys().next().value;
     embeddingCache.delete(firstKey);
   }
   
-  const key = `${hashText(text)}_${taskType}`;
+  const key = `${textHash}_${taskType}`;
   embeddingCache.set(key, {
     embedding,
     timestamp: Date.now()
@@ -65,11 +79,11 @@ function setCachedEmbedding(text, taskType, embedding) {
 
 async function createEmbedding(text, taskType = 'SEMANTIC_SIMILARITY') {
   try {
-    const cached = getCachedEmbedding(text, taskType);
+    const cached = await getCachedEmbedding(text, taskType);
     if (cached) return cached;
     
     if (text.length > 20000) {
-      console.warn(`⚠️  Text too long (${text.length} chars), truncating to 20000`);
+      console.warn(`[WARN] Text too long (${text.length} chars), truncating to 20000`);
       text = text.substring(0, 20000);
     }
 
@@ -86,7 +100,7 @@ async function createEmbedding(text, taskType = 'SEMANTIC_SIMILARITY') {
       instances: [instanceValue]
     };
 
-    console.log(`🔄 Generating Gemini embedding (${taskType}) for ${text.length} chars...`);
+    console.log(`[PROCESS] Generating Gemini embedding (${taskType}) for ${text.length} chars...`);
     const [response] = await aiplatformClient.predict(request);
     
     if (!response.predictions || response.predictions.length === 0) {
@@ -100,13 +114,13 @@ async function createEmbedding(text, taskType = 'SEMANTIC_SIMILARITY') {
     }
     
     const embedding = prediction.embeddings.values;
-    console.log(`✅ Generated embedding with ${embedding.length} dimensions`);
+    console.log(`[SUCCESS] Generated embedding with ${embedding.length} dimensions`);
     
-    setCachedEmbedding(text, taskType, embedding);
+    await setCachedEmbedding(text, taskType, embedding);
     
     return embedding;
   } catch (error) {
-    console.error('❌ Embedding generation failed:', error.message);
+    console.error('[ERROR] Embedding generation failed:', error.message);
     
     if (error.message.includes('quota') || error.message.includes('RESOURCE_EXHAUSTED')) {
       throw new Error('QUOTA_EXCEEDED: Gemini API quota exhausted. Please try again later.');
@@ -124,10 +138,14 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
     const textsToFetch = [];
     const fetchIndices = [];
     
+    // Check cache for each text (in parallel for better performance)
+    const cacheChecks = await Promise.all(
+      texts.map(text => getCachedEmbedding(text, taskType))
+    );
+    
     texts.forEach((text, idx) => {
-      const cached = getCachedEmbedding(text, taskType);
-      if (cached) {
-        embeddings[idx] = cached;
+      if (cacheChecks[idx]) {
+        embeddings[idx] = cacheChecks[idx];
       } else {
         textsToFetch.push(text);
         fetchIndices.push(idx);
@@ -135,15 +153,15 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
     });
     
     if (textsToFetch.length === 0) {
-      console.log(`⚡ All ${texts.length} embeddings from cache`);
+      console.log(`[CACHE] All ${texts.length} embeddings from cache`);
       return embeddings;
     }
     
-    console.log(`📊 Cache: ${texts.length - textsToFetch.length} hits, ${textsToFetch.length} misses`);
+    console.log(`[CACHE] Hits: ${texts.length - textsToFetch.length}, Misses: ${textsToFetch.length}`);
 
     const validTexts = textsToFetch.map(text => {
       if (text.length > 20000) {
-        console.warn(`⚠️  Text too long (${text.length} chars), truncating`);
+        console.warn(`[WARN] Text too long (${text.length} chars), truncating`);
         return text.substring(0, 20000);
       }
       return text;
@@ -165,7 +183,7 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
       instances
     };
 
-    console.log(`🔄 Generating ${textsToFetch.length} Gemini embeddings in batch (${taskType})...`);
+    console.log(`[PROCESS] Generating ${textsToFetch.length} Gemini embeddings in batch (${taskType})...`);
     const [response] = await aiplatformClient.predict(request);
     
     const predictions = response.predictions.map(p => helpers.fromValue(p));
@@ -174,21 +192,24 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
       if (!prediction || !prediction.embeddings || !prediction.embeddings.values) {
         throw new Error(`Invalid embedding structure for prediction ${idx + 1}`);
       }
-      const embedding = prediction.embeddings.values;
-      
-      setCachedEmbedding(textsToFetch[idx], taskType, embedding);
-      
-      return embedding;
+      return prediction.embeddings.values;
     });
+    
+    // Cache all new embeddings in parallel
+    await Promise.all(
+      newEmbeddings.map((embedding, idx) => 
+        setCachedEmbedding(textsToFetch[idx], taskType, embedding)
+      )
+    );
     
     fetchIndices.forEach((originalIdx, newIdx) => {
       embeddings[originalIdx] = newEmbeddings[newIdx];
     });
     
-    console.log(`✅ Generated ${newEmbeddings.length} new embeddings (${texts.length - newEmbeddings.length} from cache)`);
+    console.log(`[SUCCESS] Generated ${newEmbeddings.length} new embeddings (${texts.length - newEmbeddings.length} from cache)`);
     return embeddings;
   } catch (error) {
-    console.error('❌ Batch embedding generation failed:', error.message);
+    console.error('[ERROR] Batch embedding generation failed:', error.message);
     
     if (error.message.includes('quota') || error.message.includes('RESOURCE_EXHAUSTED')) {
       throw new Error('QUOTA_EXCEEDED: Gemini API quota exhausted. Please try again later.');
@@ -199,35 +220,228 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
 }
 
 // ============================================================================
-// AI CONTENT DETECTION
+// AI CONTENT DETECTION - ENHANCED VERSION
 // ============================================================================
 
+/**
+ * Preprocess text for AI detection
+ * @param {string} text - Raw text input
+ * @returns {Array<string>} - Array of text chunks for analysis
+ */
+function preprocessTextForDetection(text) {
+  // Normalize formatting
+  let cleaned = text
+    .replace(/\n{3,}/g, '\n\n')  // Normalize line breaks
+    .replace(/\s{2,}/g, ' ')     // Normalize spaces
+    .replace(/\t/g, ' ')         // Replace tabs
+    .trim();
+  
+  // For long texts, analyze multiple sections
+  const MAX_CHUNK_SIZE = 3000;
+  if (cleaned.length > MAX_CHUNK_SIZE * 1.5) {
+    const chunks = [];
+    // Beginning
+    chunks.push(cleaned.substring(0, MAX_CHUNK_SIZE));
+    // Middle
+    const midStart = Math.floor(cleaned.length / 2) - MAX_CHUNK_SIZE / 2;
+    chunks.push(cleaned.substring(midStart, midStart + MAX_CHUNK_SIZE));
+    // End
+    chunks.push(cleaned.substring(cleaned.length - MAX_CHUNK_SIZE));
+    return chunks;
+  }
+  
+  return [cleaned];
+}
+
+/**
+ * Enhanced AI detection with improved prompt
+ * @param {string} text - Text to analyze
+ * @returns {Promise<Object>} - Detection result
+ */
 async function detectAIContent(text) {
+  try {
+    const chunks = preprocessTextForDetection(text);
+    
+    // If multiple chunks, analyze each and combine results
+    if (chunks.length > 1) {
+      console.log(`[PROCESS] Analyzing ${chunks.length} text chunks for AI detection...`);
+      const results = await Promise.all(chunks.map(chunk => detectAIContentSingle(chunk)));
+      return combineDetectionResults(results);
+    }
+    
+    return await detectAIContentSingle(chunks[0]);
+  } catch (error) {
+    console.error('[ERROR] AI detection failed:', error);
+    return detectAIContentHeuristic(text);
+  }
+}
+
+/**
+ * Analyze a single text chunk for AI content
+ */
+async function detectAIContentSingle(text) {
   try {
     const model = vertexAI.getGenerativeModel({ 
       model: 'gemini-2.0-flash-exp',
       generationConfig: {
-        responseMimeType: 'application/json'
+        responseMimeType: 'application/json',
+        temperature: 0.1 // Low temperature for consistent results
       }
     });
 
-    const prompt = `Bạn là chuyên gia phân tích văn bản, chuyên phát hiện nội dung được tạo bởi AI.
+    const prompt = `You are an expert linguist specializing in detecting AI-generated content. Analyze the text with extreme precision.
 
-NHIỆM VỤ: Đánh giá khả năng văn bản dưới đây được tạo ra bởi AI (Large Language Model).
-
-VĂN BẢN CẦN PHÂN TÍCH:
+TEXT TO ANALYZE:
 """
 ${text}
 """
 
-YÊU CẦU PHÂN TÍCH:
-1. Đánh giá tổng thể: Đưa ra phần trăm khả năng văn bản được tạo bởi AI (0-100%)
-2. Bằng chứng cụ thể: Liệt kê 3-5 bằng chứng ngôn ngữ rõ ràng
+ANALYZE THESE SPECIFIC INDICATORS:
 
-Trả về JSON:
+1. LEXICAL PATTERNS (Weight: 25%):
+   - Repetitive sentence structures or openings
+   - Overuse of transitional phrases (however, moreover, furthermore, additionally)
+   - Generic/vague language vs specific details
+   - Unusual or overly formal word combinations
+   - Hedging language ("It's important to note", "One might argue")
+
+2. SEMANTIC PATTERNS (Weight: 25%):
+   - Lack of personal anecdotes, opinions, or unique perspectives
+   - Overly balanced/neutral tone without strong stance
+   - Missing emotional depth or authentic voice
+   - Generic examples without cultural/temporal specificity
+   - Absence of humor, sarcasm, idioms, or colloquialisms
+
+3. STRUCTURAL PATTERNS (Weight: 25%):
+   - Predictable paragraph structure (intro-body-conclusion in every section)
+   - Uniform sentence length throughout
+   - Excessive use of lists or bullet-point style writing
+   - Perfect grammar without natural errors or variations
+   - Mechanical transitions between ideas
+
+4. CONTENT PATTERNS (Weight: 25%):
+   - Lack of controversial or strong personal opinions
+   - Missing specific names, dates, places, or verifiable details
+   - Overly comprehensive coverage (trying to cover all angles)
+   - Repetitive reinforcement of main points
+   - Generic conclusions that could apply to any topic
+
+SCORING GUIDE:
+- 0-15%: Clearly human (unique voice, personal details, natural imperfections, specific references)
+- 15-35%: Likely human (mostly authentic with minor AI-like patterns)
+- 35-55%: Uncertain (mixed signals, could be either)
+- 55-75%: Likely AI (multiple AI patterns, lacks authenticity markers)
+- 75-100%: Clearly AI (formulaic, generic, multiple red flags across categories)
+
+Return JSON:
 {
-  "ai_probability": <số từ 0-100>,
-  "evidence": ["Bằng chứng 1", "Bằng chứng 2", "Bằng chứng 3"]
+  "ai_probability": <number 0-100>,
+  "confidence": <number 0-100>,
+  "evidence": [
+    {
+      "category": "lexical|semantic|structural|content",
+      "finding": "specific observation about the text",
+      "impact": "high|medium|low"
+    }
+  ],
+  "human_indicators": ["list of human-like traits found, if any"],
+  "ai_indicators": ["list of AI-like traits found, if any"],
+  "analysis_summary": "2-3 sentence summary of the analysis"
+}`;
+
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.candidates[0].content.parts[0].text.trim();
+    const parsed = JSON.parse(responseText);
+    
+    // Format evidence for display
+    const formattedEvidence = [];
+    if (parsed.evidence && Array.isArray(parsed.evidence)) {
+      parsed.evidence.forEach(e => {
+        if (typeof e === 'object' && e.finding) {
+          formattedEvidence.push(`[${e.category?.toUpperCase() || 'GENERAL'}] ${e.finding}`);
+        } else if (typeof e === 'string') {
+          formattedEvidence.push(e);
+        }
+      });
+    }
+    
+    // Add human/AI indicators to evidence
+    if (parsed.human_indicators?.length > 0) {
+      formattedEvidence.push(`✓ Human indicators: ${parsed.human_indicators.slice(0, 2).join(', ')}`);
+    }
+    if (parsed.ai_indicators?.length > 0) {
+      formattedEvidence.push(`⚠ AI indicators: ${parsed.ai_indicators.slice(0, 2).join(', ')}`);
+    }
+    
+    return {
+      aiProbability: parseFloat(parsed.ai_probability || 50),
+      confidence: parseFloat(parsed.confidence || 70),
+      evidence: formattedEvidence.length > 0 ? formattedEvidence : ['Analysis completed'],
+      humanIndicators: parsed.human_indicators || [],
+      aiIndicators: parsed.ai_indicators || [],
+      summary: parsed.analysis_summary || ''
+    };
+  } catch (error) {
+    console.error('[ERROR] Single chunk AI detection failed:', error);
+    throw error;
+  }
+}
+
+/**
+ * Deep analysis for uncertain results (40-60% range)
+ */
+async function detectAIContentDeep(text) {
+  try {
+    const model = vertexAI.getGenerativeModel({ 
+      model: 'gemini-2.0-flash-exp',
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.2
+      }
+    });
+
+    const prompt = `You are performing a DEEP ANALYSIS to determine if this text is AI-generated. The initial analysis was inconclusive.
+
+TEXT:
+"""
+${text}
+"""
+
+FOCUS ON SUBTLE INDICATORS:
+
+1. MICRO-PATTERNS:
+   - Word choice consistency (does vocabulary level stay uniform?)
+   - Sentence rhythm and flow (natural variation vs mechanical)
+   - Use of filler words, contractions, informal language
+   - Typos, minor grammatical variations (humans make these)
+
+2. AUTHENTICITY MARKERS:
+   - Specific personal experiences or anecdotes
+   - Cultural references, slang, or regional expressions
+   - Emotional language that feels genuine
+   - Incomplete thoughts or tangents (human tendency)
+   - Strong opinions or biases
+
+3. AI FINGERPRINTS:
+   - "As a [role]" or "I cannot" patterns
+   - Excessive qualifiers ("It's worth noting", "It's important to")
+   - Perfect parallel structure in lists
+   - Overly diplomatic or balanced viewpoints
+   - Generic examples (e.g., "For example, consider...")
+
+4. WRITING QUIRKS:
+   - Unique metaphors or analogies
+   - Humor attempts (successful or not)
+   - Self-references or meta-commentary
+   - Inconsistent formatting (human tendency)
+
+Return JSON:
+{
+  "ai_probability": <number 0-100>,
+  "confidence": <number 0-100>,
+  "deep_evidence": ["detailed finding 1", "detailed finding 2", "detailed finding 3"],
+  "authenticity_score": <number 0-100>,
+  "key_determination_factor": "the single most important factor in this analysis"
 }`;
 
     const result = await model.generateContent(prompt);
@@ -236,47 +450,285 @@ Trả về JSON:
     
     return {
       aiProbability: parseFloat(parsed.ai_probability || 50),
-      evidence: parsed.evidence || []
+      confidence: parseFloat(parsed.confidence || 60),
+      evidence: parsed.deep_evidence || [],
+      authenticityScore: parsed.authenticity_score,
+      keyFactor: parsed.key_determination_factor
     };
   } catch (error) {
-    console.error('❌ AI detection failed:', error);
+    console.error('[ERROR] Deep AI detection failed:', error);
+    throw error;
+  }
+}
+
+/**
+ * Combine results from multiple chunk analyses
+ */
+function combineDetectionResults(results) {
+  if (!results || results.length === 0) {
+    return { aiProbability: 50, confidence: 0, evidence: ['No results to combine'] };
+  }
+  
+  // Weighted average - give more weight to higher confidence results
+  let totalWeight = 0;
+  let weightedProbability = 0;
+  let allEvidence = [];
+  let allHumanIndicators = [];
+  let allAiIndicators = [];
+  
+  results.forEach(result => {
+    const weight = result.confidence || 50;
+    totalWeight += weight;
+    weightedProbability += result.aiProbability * weight;
+    
+    if (result.evidence) allEvidence.push(...result.evidence);
+    if (result.humanIndicators) allHumanIndicators.push(...result.humanIndicators);
+    if (result.aiIndicators) allAiIndicators.push(...result.aiIndicators);
+  });
+  
+  const avgProbability = totalWeight > 0 ? weightedProbability / totalWeight : 50;
+  const avgConfidence = results.reduce((sum, r) => sum + (r.confidence || 50), 0) / results.length;
+  
+  // Deduplicate evidence
+  const uniqueEvidence = [...new Set(allEvidence)].slice(0, 6);
+  
+  return {
+    aiProbability: parseFloat(avgProbability.toFixed(2)),
+    confidence: parseFloat(avgConfidence.toFixed(2)),
+    evidence: uniqueEvidence,
+    humanIndicators: [...new Set(allHumanIndicators)].slice(0, 3),
+    aiIndicators: [...new Set(allAiIndicators)].slice(0, 3),
+    chunksAnalyzed: results.length
+  };
+}
+
+/**
+ * Enhanced AI detection with multi-pass for uncertain results
+ */
+async function detectAIContentEnhanced(text) {
+  try {
+    // Pass 1: Standard detection
+    const quickResult = await detectAIContent(text);
+    
+    console.log(`[AI-DETECT] Pass 1 result: ${quickResult.aiProbability}% (confidence: ${quickResult.confidence}%)`);
+    
+    // If result is uncertain (35-65%) AND confidence is low, run deep analysis
+    if (quickResult.aiProbability >= 35 && quickResult.aiProbability <= 65 && quickResult.confidence < 75) {
+      console.log('[AI-DETECT] Result uncertain, running deep analysis...');
+      
+      try {
+        const deepResult = await detectAIContentDeep(text);
+        
+        // Combine results with weighted average
+        const combinedProbability = (quickResult.aiProbability * 0.4 + deepResult.aiProbability * 0.6);
+        const combinedConfidence = Math.max(quickResult.confidence, deepResult.confidence);
+        
+        console.log(`[AI-DETECT] Deep analysis: ${deepResult.aiProbability}% → Combined: ${combinedProbability.toFixed(1)}%`);
+        
+        return {
+          aiProbability: parseFloat(combinedProbability.toFixed(2)),
+          confidence: parseFloat(combinedConfidence.toFixed(2)),
+          evidence: [...quickResult.evidence, ...deepResult.evidence].slice(0, 6),
+          humanIndicators: quickResult.humanIndicators || [],
+          aiIndicators: quickResult.aiIndicators || [],
+          multiPass: true,
+          keyFactor: deepResult.keyFactor
+        };
+      } catch (deepError) {
+        console.error('[WARN] Deep analysis failed, using quick result:', deepError.message);
+        return quickResult;
+      }
+    }
+    
+    return quickResult;
+  } catch (error) {
+    console.error('[ERROR] Enhanced AI detection failed:', error);
     return detectAIContentHeuristic(text);
   }
 }
 
+/**
+ * Enhanced heuristic fallback with comprehensive checks
+ */
 function detectAIContentHeuristic(text) {
   let score = 0;
   const evidence = [];
-  const words = text.toLowerCase().split(/\s+/);
+  const humanIndicators = [];
+  const aiIndicators = [];
+  
+  const textLower = text.toLowerCase();
+  const words = textLower.split(/\s+/).filter(w => w.length > 0);
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  
+  if (words.length < 10) {
+    return {
+      aiProbability: 50,
+      confidence: 20,
+      evidence: ['Text too short for reliable analysis'],
+      humanIndicators: [],
+      aiIndicators: []
+    };
+  }
 
+  // 1. AI Phrases Detection (expanded list)
+  const aiPhrases = [
+    // Classic AI phrases
+    'it is important to note', 'it should be noted', 'in conclusion',
+    'to summarize', 'in summary', 'as an ai', 'i cannot', 'i apologize',
+    // Hedging phrases
+    'it is worth mentioning', 'one might argue', 'it is essential',
+    'it is crucial', 'it is vital', 'it is imperative',
+    // Filler phrases
+    'in today\'s world', 'in this day and age', 'at the end of the day',
+    'it goes without saying', 'needless to say', 'first and foremost',
+    'last but not least', 'in light of', 'with that being said',
+    'having said that', 'that being said',
+    // AI-specific verbs
+    'delve into', 'dive into', 'explore the', 'unpack the',
+    'leverage', 'utilize', 'facilitate', 'implement',
+    // Transition overuse
+    'furthermore', 'moreover', 'additionally', 'consequently',
+    'subsequently', 'nevertheless', 'nonetheless', 'hence', 'thus'
+  ];
+  
+  const foundPhrases = aiPhrases.filter(phrase => textLower.includes(phrase));
+  if (foundPhrases.length > 0) {
+    const phraseScore = Math.min(foundPhrases.length * 7, 35);
+    score += phraseScore;
+    aiIndicators.push(`Contains ${foundPhrases.length} typical AI phrases`);
+    evidence.push(`AI phrases found: "${foundPhrases.slice(0, 3).join('", "')}"`);
+  }
+
+  // 2. Sentence Length Uniformity
+  if (sentences.length >= 4) {
+    const sentenceLengths = sentences.map(s => s.split(/\s+/).length);
+    const avgLength = sentenceLengths.reduce((a, b) => a + b, 0) / sentenceLengths.length;
+    const variance = sentenceLengths.reduce((sum, len) => sum + Math.pow(len - avgLength, 2), 0) / sentenceLengths.length;
+    const stdDev = Math.sqrt(variance);
+    
+    if (stdDev < 4 && sentences.length > 5) {
+      score += 12;
+      aiIndicators.push('Very uniform sentence length');
+      evidence.push(`Uniform sentence length (std dev: ${stdDev.toFixed(1)}) - typical of AI`);
+    } else if (stdDev > 10) {
+      humanIndicators.push('Natural sentence length variation');
+    }
+  }
+
+  // 3. Contraction Analysis
+  const contractions = [
+    "don't", "won't", "can't", "isn't", "aren't", "wasn't", "weren't",
+    "i'm", "you're", "they're", "we're", "it's", "that's", "there's",
+    "here's", "what's", "who's", "let's", "i've", "you've", "we've",
+    "they've", "i'll", "you'll", "he'll", "she'll", "we'll", "they'll",
+    "i'd", "you'd", "he'd", "she'd", "we'd", "they'd", "couldn't",
+    "wouldn't", "shouldn't", "hasn't", "haven't", "hadn't"
+  ];
+  
+  const contractionCount = contractions.filter(c => textLower.includes(c)).length;
+  const contractionDensity = contractionCount / (words.length / 100);
+  
+  if (contractionCount === 0 && words.length > 100) {
+    score += 10;
+    aiIndicators.push('No contractions used');
+    evidence.push('No contractions found - formal AI style');
+  } else if (contractionDensity > 2) {
+    humanIndicators.push('Natural use of contractions');
+    score -= 5;
+  }
+
+  // 4. Transition Word Overuse
+  const transitions = ['however', 'moreover', 'furthermore', 'additionally', 
+    'consequently', 'therefore', 'nevertheless', 'nonetheless', 
+    'subsequently', 'accordingly', 'hence', 'thus'];
+  const transitionCount = transitions.filter(t => textLower.includes(t)).length;
+  
+  if (transitionCount > 4) {
+    score += Math.min(transitionCount * 4, 20);
+    aiIndicators.push('Excessive transition words');
+    evidence.push(`Excessive transition words (${transitionCount} found)`);
+  }
+
+  // 5. Perfect Structure Detection
+  const hasIntro = sentences[0]?.length > 50;
+  const lastSentence = sentences[sentences.length - 1]?.toLowerCase() || '';
+  const hasConclusion = lastSentence.includes('in conclusion') || 
+                        lastSentence.includes('to summarize') ||
+                        lastSentence.includes('in summary') ||
+                        lastSentence.includes('overall');
+  
+  if (hasIntro && hasConclusion && sentences.length > 5) {
+    score += 8;
+    aiIndicators.push('Perfect intro-conclusion structure');
+    evidence.push('Formulaic structure detected');
+  }
+
+  // 6. Word Repetition Analysis
   const wordFreq = new Map();
-  words.forEach(word => {
+  const contentWords = words.filter(w => w.length > 4 && !['which', 'there', 'their', 'would', 'could', 'should', 'about', 'these', 'those'].includes(w));
+  contentWords.forEach(word => {
     wordFreq.set(word, (wordFreq.get(word) || 0) + 1);
   });
   
-  const mostCommon = Array.from(wordFreq.entries()).sort((a, b) => b[1] - a[1])[0];
+  const sortedWords = Array.from(wordFreq.entries()).sort((a, b) => b[1] - a[1]);
+  const topWord = sortedWords[0];
   
-  if (mostCommon && mostCommon[1] > words.length * 0.1) {
-    score += 15;
-    evidence.push(`Từ "${mostCommon[0]}" lặp lại quá nhiều (${mostCommon[1]} lần)`);
+  if (topWord && topWord[1] > words.length * 0.05 && topWord[1] > 5) {
+    score += 8;
+    aiIndicators.push('Repetitive vocabulary');
+    evidence.push(`Word "${topWord[0]}" repeats ${topWord[1]} times`);
   }
 
-  const aiPhrases = [
-    'it is important to note', 'it should be noted', 'in conclusion',
-    'to summarize', 'in summary', 'as an ai', 'i cannot', 'i apologize'
-  ];
+  // 7. Personal Pronouns & Authenticity
+  const personalPronouns = ['i ', 'my ', 'me ', 'myself'];
+  const hasPersonal = personalPronouns.some(p => textLower.includes(p));
+  const opinionPhrases = ['i think', 'i believe', 'in my opinion', 'i feel', 'personally'];
+  const hasOpinion = opinionPhrases.some(p => textLower.includes(p));
   
-  const textLower = text.toLowerCase();
-  const foundPhrases = aiPhrases.filter(phrase => textLower.includes(phrase));
-  
-  if (foundPhrases.length > 0) {
-    score += Math.min(foundPhrases.length * 10, 30);
-    evidence.push(`Chứa cụm từ điển hình của AI: "${foundPhrases[0]}"`);
+  if (hasPersonal && hasOpinion) {
+    humanIndicators.push('Personal voice and opinions');
+    score -= 10;
+  } else if (!hasPersonal && words.length > 150) {
+    score += 5;
+    aiIndicators.push('Lacks personal voice');
   }
+
+  // 8. Informal Language / Slang
+  const informalMarkers = ['gonna', 'wanna', 'gotta', 'kinda', 'sorta', 'yeah', 'nope', 'yep', 'ok ', 'okay', 'lol', 'btw', 'tbh', 'imo', 'imho'];
+  const hasInformal = informalMarkers.some(m => textLower.includes(m));
+  
+  if (hasInformal) {
+    humanIndicators.push('Uses informal language');
+    score -= 8;
+  }
+
+  // 9. Question Usage
+  const questionCount = (text.match(/\?/g) || []).length;
+  if (questionCount > 0 && questionCount < sentences.length * 0.3) {
+    humanIndicators.push('Natural question usage');
+    score -= 3;
+  }
+
+  // 10. Exclamation & Emotion
+  const exclamationCount = (text.match(/!/g) || []).length;
+  if (exclamationCount > 0 && exclamationCount < 5) {
+    humanIndicators.push('Emotional expression');
+    score -= 3;
+  }
+
+  // Calculate final score
+  const finalScore = Math.max(0, Math.min(95, score));
+  
+  // Calculate confidence based on evidence strength
+  const evidenceCount = evidence.length + humanIndicators.length + aiIndicators.length;
+  const confidence = Math.min(70, 30 + evidenceCount * 8);
 
   return {
-    aiProbability: Math.min(score, 100),
-    evidence: evidence.length > 0 ? evidence : ['Phân tích heuristic cơ bản']
+    aiProbability: finalScore,
+    confidence: confidence,
+    evidence: evidence.length > 0 ? evidence : ['Heuristic analysis completed'],
+    humanIndicators: humanIndicators,
+    aiIndicators: aiIndicators
   };
 }
 
@@ -299,70 +751,138 @@ async function generateVoiceSummary(sampleTexts, statisticalFeatures) {
 
     const combinedText = selectedSamples.join('\n\n---\n\n');
 
-    const prompt = `Phân tích phong cách viết của tác giả dựa trên các mẫu văn bản.
+    const prompt = `Analyze the author's writing style based on text samples.
 
-THỐNG KÊ VĂN PHONG:
-- Độ dài trung bình câu: ${statisticalFeatures.avgSentenceLength} từ
-- Độ dài trung bình từ: ${statisticalFeatures.avgWordLength} ký tự
-- Độ phong phú từ vựng: ${statisticalFeatures.vocabularyRichness.toFixed(2)}
+WRITING STYLE STATISTICS:
+- Average sentence length: ${statisticalFeatures.avgSentenceLength} words
+- Average word length: ${statisticalFeatures.avgWordLength} characters
+- Vocabulary richness: ${statisticalFeatures.vocabularyRichness.toFixed(2)}
+- Top sentence starters: ${statisticalFeatures.topSentenceStarters?.join(', ') || 'N/A'}
+- Transition word usage: ${Object.keys(statisticalFeatures.transitionWordUsage || {}).slice(0, 5).join(', ') || 'N/A'}
 
-CÁC MẪU VĂN BẢN:
+TEXT SAMPLES:
 ${combinedText}
 
-Trả về JSON theo format:
+ANALYZE DEEPLY:
+1. How does the author typically START sentences? (Subject-first, Adverb-first, Question, etc.)
+2. What TRANSITION WORDS does the author prefer? (however, therefore, but, and, etc.)
+3. What PUNCTUATION PATTERNS are distinctive? (em-dashes, semicolons, exclamation marks, commas)
+4. What EMOTIONAL MARKERS appear? (I think, I feel, In my opinion, etc.)
+5. What is the typical PARAGRAPH STRUCTURE? (Topic sentence first, examples, conclusion)
+6. What SENTENCE OPENING patterns are common? (Time markers, Conjunctions, Adverbs, etc.)
+
+Return JSON in this format:
 {
   "tone": "professional/casual/academic/creative/friendly",
   "formality_level": 1-10,
-  "key_characteristics": ["Đặc điểm 1", "Đặc điểm 2", "Đặc điểm 3", "Đặc điểm 4", "Đặc điểm 5"],
+  "key_characteristics": ["Characteristic 1", "Characteristic 2", "Characteristic 3", "Characteristic 4", "Characteristic 5"],
+  "sentence_starters": ["Common starter 1", "Common starter 2", "Common starter 3"],
+  "transition_preferences": ["transition 1", "transition 2", "transition 3"],
+  "punctuation_style": "Description of punctuation usage (e.g., 'Uses commas frequently, avoids semicolons')",
   "vocabulary_preferences": {
-    "common_phrases": ["cụm từ 1", "cụm từ 2"],
-    "avoid_words": ["từ 1", "từ 2"],
-    "preferred_connectors": ["từ nối 1", "từ nối 2"]
+    "common_phrases": ["phrase 1", "phrase 2", "phrase 3"],
+    "avoid_words": ["word 1", "word 2"],
+    "preferred_connectors": ["connector 1", "connector 2", "connector 3"]
   },
   "sentence_patterns": {
     "typical_length": "short/medium/long",
     "structure_preference": "simple/complex/varied",
-    "opening_style": "Mô tả cách mở đầu"
+    "opening_style": "Description of opening style (e.g., 'Often starts with subject, occasionally uses time markers')"
   },
-  "rewrite_instructions": "Hướng dẫn chi tiết"
+  "rewrite_instructions": "Detailed instructions on how to rewrite text to match this style, including specific examples"
 }`;
 
     const result = await model.generateContent(prompt);
     const responseText = result.response.candidates[0].content.parts[0].text.trim();
     const voiceProfile = JSON.parse(responseText);
     
-    console.log(`✅ Generated voice profile: ${voiceProfile.tone}, formality: ${voiceProfile.formality_level}`);
+    console.log(`[SUCCESS] Generated voice profile: ${voiceProfile.tone}, formality: ${voiceProfile.formality_level}`);
     
     return voiceProfile;
   } catch (error) {
-    console.error('❌ Voice summary generation failed:', error);
+    console.error('[ERROR] Voice summary generation failed:', error);
     
     return {
       tone: 'neutral',
       formality_level: 5,
       key_characteristics: [
-        'Phong cách viết tự nhiên',
-        'Sử dụng ngôn ngữ đơn giản',
-        'Cấu trúc câu rõ ràng',
-        'Truyền đạt ý tưởng trực tiếp',
-        'Phù hợp với ngữ cảnh giao tiếp'
+        'Natural writing style',
+        'Uses simple language',
+        'Clear sentence structure',
+        'Direct idea expression',
+        'Suitable for communication context'
       ],
+      sentence_starters: ['The', 'I', 'It'],
+      transition_preferences: ['and', 'but', 'however'],
+      punctuation_style: 'Uses standard punctuation, prefers commas and periods',
       vocabulary_preferences: {
         common_phrases: [],
         avoid_words: [],
-        preferred_connectors: ['và', 'nhưng', 'vì']
+        preferred_connectors: ['and', 'but', 'because']
       },
       sentence_patterns: {
         typical_length: 'medium',
         structure_preference: 'simple',
-        opening_style: 'Bắt đầu với chủ ngữ rõ ràng'
+        opening_style: 'Start with clear subject'
       },
-      rewrite_instructions: 'Viết lại văn bản giữ nguyên ý nghĩa, sử dụng ngôn ngữ tự nhiên và dễ hiểu.'
+      rewrite_instructions: 'Rewrite text while preserving meaning, using natural and easy-to-understand language.'
     };
   }
 }
 
+/**
+ * Enhanced rewrite with anti-AI detection
+ * Uses humanize.service for advanced humanization
+ */
 async function rewriteWithVoice(originalText, voiceProfile, context = {}, modelName = 'gemini-2.0-flash-exp') {
+  try {
+    // Import humanize service
+    const humanizeService = require('./humanize.service');
+    
+    // Check if iterative refinement is requested
+    if (context.useIterativeRefinement) {
+      console.log('[REWRITE] Using iterative refinement mode...');
+      const result = await humanizeService.rewriteWithIterativeRefinement(
+        originalText,
+        voiceProfile,
+        context,
+        {
+          maxIterations: context.maxIterations || 2,
+          targetProbability: context.targetProbability || 40,
+          model: modelName
+        }
+      );
+      return result.text;
+    }
+    
+    // Use enhanced anti-AI detection rewrite
+    console.log('[REWRITE] Using enhanced anti-AI detection mode...');
+    const rewrittenText = await humanizeService.rewriteWithAntiDetection(
+      originalText,
+      voiceProfile,
+      {
+        ...context,
+        sampleText: context.sampleText || null,
+        applyImperfections: context.applyImperfections !== false
+      },
+      modelName
+    );
+
+    console.log(`[SUCCESS] Rewritten text (${originalText.length} → ${rewrittenText.length} chars)`);
+    return rewrittenText;
+  } catch (error) {
+    console.error('[ERROR] Text rewriting failed:', error);
+    
+    // Fallback to basic rewrite if humanize service fails
+    console.log('[REWRITE] Falling back to basic rewrite...');
+    return await rewriteWithVoiceBasic(originalText, voiceProfile, context, modelName);
+  }
+}
+
+/**
+ * Basic rewrite (fallback) - original implementation
+ */
+async function rewriteWithVoiceBasic(originalText, voiceProfile, context = {}, modelName = 'gemini-2.0-flash-exp') {
   try {
     const model = vertexAI.getGenerativeModel({ 
       model: modelName
@@ -373,16 +893,16 @@ async function rewriteWithVoice(originalText, voiceProfile, context = {}, modelN
     if (typeof voiceProfile === 'object' && voiceProfile.tone) {
       voiceDescription = `
 TONE: ${voiceProfile.tone}
-MỨC ĐỘ TRANG TRỌNG: ${voiceProfile.formality_level}/10
-ĐẶC ĐIỂM: ${voiceProfile.key_characteristics.slice(0, 3).join(', ')}
-CỤM TỪ ƯA THÍCH: ${voiceProfile.vocabulary_preferences.common_phrases.join(', ')}`;
+FORMALITY LEVEL: ${voiceProfile.formality_level}/10
+CHARACTERISTICS: ${(voiceProfile.key_characteristics || []).slice(0, 3).join(', ')}
+PREFERRED PHRASES: ${(voiceProfile.vocabulary_preferences?.common_phrases || []).join(', ')}`;
     } else {
       voiceDescription = String(voiceProfile);
     }
 
-    let prompt = `Viết lại văn bản sau sao cho phù hợp với văn phong mục tiêu, giữ nguyên ý nghĩa.
+    let prompt = `Rewrite the following text to match the target writing style while preserving meaning.
 
-VĂN PHONG MỤC TIÊU:
+TARGET WRITING STYLE:
 ${voiceDescription}`;
 
     // Add writing preferences if provided (based on profile data)
@@ -394,41 +914,41 @@ ${voiceDescription}`;
       if (prefs.useVocabularyPreferences && voiceProfile.vocabulary_preferences) {
         const vocabPrefs = voiceProfile.vocabulary_preferences;
         if (vocabPrefs.common_phrases?.length > 0 || vocabPrefs.preferred_connectors?.length > 0 || vocabPrefs.avoid_words?.length > 0) {
-          preferencesText += '\n\nTỪ VỰNG ƯA THÍCH:';
+          preferencesText += '\n\nVOCABULARY PREFERENCES:';
           if (vocabPrefs.common_phrases?.length > 0) {
-            preferencesText += '\nCỤM TỪ THƯỜNG DÙNG: ' + vocabPrefs.common_phrases.join(', ');
+            preferencesText += '\nCOMMON PHRASES: ' + vocabPrefs.common_phrases.join(', ');
           }
           if (vocabPrefs.preferred_connectors?.length > 0) {
-            preferencesText += '\nTỪ NỐI ƯA THÍCH: ' + vocabPrefs.preferred_connectors.join(', ');
+            preferencesText += '\nPREFERRED CONNECTORS: ' + vocabPrefs.preferred_connectors.join(', ');
           }
           if (vocabPrefs.avoid_words?.length > 0) {
-            preferencesText += '\nTỪ NÊN TRÁNH: ' + vocabPrefs.avoid_words.join(', ');
+            preferencesText += '\nWORDS TO AVOID: ' + vocabPrefs.avoid_words.join(', ');
           }
         }
       }
       
       // Key characteristics
       if (prefs.useKeyCharacteristics && voiceProfile.key_characteristics?.length > 0) {
-        preferencesText += '\n\nĐẶC ĐIỂM CHÍNH: ' + voiceProfile.key_characteristics.join(', ');
+        preferencesText += '\n\nKEY CHARACTERISTICS: ' + voiceProfile.key_characteristics.join(', ');
       }
       
       // Sentence Patterns
       if (prefs.useSentencePatterns && voiceProfile.sentence_patterns) {
         const sentencePatterns = voiceProfile.sentence_patterns;
         if (sentencePatterns.opening_style || sentencePatterns.structure_preference) {
-          preferencesText += '\n\nCẤU TRÚC CÂU:';
+          preferencesText += '\n\nSENTENCE STRUCTURE:';
           if (sentencePatterns.opening_style) {
-            preferencesText += '\nPHONG CÁCH MỞ ĐẦU: ' + sentencePatterns.opening_style;
+            preferencesText += '\nOPENING STYLE: ' + sentencePatterns.opening_style;
           }
           if (sentencePatterns.structure_preference) {
-            preferencesText += '\nCẤU TRÚC: ' + sentencePatterns.structure_preference;
+            preferencesText += '\nSTRUCTURE: ' + sentencePatterns.structure_preference;
           }
         }
       }
       
       // Rewrite instructions
       if (prefs.useRewriteInstructions && voiceProfile.rewrite_instructions) {
-        preferencesText += '\n\nHƯỚNG DẪN VIẾT LẠI: ' + voiceProfile.rewrite_instructions;
+        preferencesText += '\n\nREWRITE INSTRUCTIONS: ' + voiceProfile.rewrite_instructions;
       }
       
       if (preferencesText) {
@@ -438,33 +958,53 @@ ${voiceDescription}`;
 
     prompt += `
 
-VĂN BẢN GỐC:
+ORIGINAL TEXT:
 ${originalText}
 
-VĂN BẢN ĐÃ VIẾT LẠI:`;
+REWRITTEN TEXT:`;
 
     const result = await model.generateContent(prompt);
     const rewrittenText = result.response.candidates[0].content.parts[0].text.trim();
 
-    console.log(`✅ Rewritten text (${originalText.length} → ${rewrittenText.length} chars)`);
     return rewrittenText;
   } catch (error) {
-    console.error('❌ Text rewriting failed:', error);
+    console.error('[ERROR] Basic text rewriting failed:', error);
     throw error;
   }
 }
 
 // ============================================================================
-// IMPROVEMENT SUGGESTIONS
+// IMPROVEMENT SUGGESTIONS (with caching)
 // ============================================================================
 
-async function generateImprovementSuggestions(sentence, issues, voiceProfile, context) {
+const suggestionAICache = new Map();
+const SUGGESTION_AI_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+
+function getSuggestionAICacheKey(sentence, profileId) {
+  const hash = crypto.createHash('md5')
+    .update(`${sentence}_${profileId}`)
+    .digest('hex')
+    .substring(0, 12);
+  return `ai_sug_${hash}`;
+}
+
+async function generateImprovementSuggestions(sentence, issues, voiceProfile, context, profileId = null) {
+  // Check cache first
+  if (profileId) {
+    const cacheKey = getSuggestionAICacheKey(sentence, profileId);
+    const cached = suggestionAICache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < SUGGESTION_AI_CACHE_TTL) {
+      console.log(`[CACHE] AI suggestion cache HIT`);
+      return cached.data;
+    }
+  }
+
   try {
     const model = vertexAI.getGenerativeModel({ 
       model: 'gemini-2.0-flash-exp',
       generationConfig: {
         responseMimeType: 'application/json',
-        temperature: 0.7
+        temperature: 0.5 // Lower temperature for more consistent results
       }
     });
 
@@ -473,73 +1013,86 @@ async function generateImprovementSuggestions(sentence, issues, voiceProfile, co
     if (typeof voiceProfile === 'object' && voiceProfile.tone) {
       voiceDescription = `
 TONE: ${voiceProfile.tone}
-MỨC ĐỘ TRANG TRỌNG: ${voiceProfile.formality_level}/10
-ĐẶC ĐIỂM: ${voiceProfile.key_characteristics?.slice(0, 3).join(', ')}
-CỤM TỪ ƯA THÍCH: ${voiceProfile.vocabulary_preferences?.common_phrases?.slice(0, 3).join(', ')}
-CẤU TRÚC CÂU: ${voiceProfile.sentence_patterns?.structure_preference}`;
+FORMALITY LEVEL: ${voiceProfile.formality_level}/10
+CHARACTERISTICS: ${voiceProfile.key_characteristics?.slice(0, 3).join(', ')}
+PREFERRED PHRASES: ${voiceProfile.vocabulary_preferences?.common_phrases?.slice(0, 3).join(', ')}
+SENTENCE STRUCTURE: ${voiceProfile.sentence_patterns?.structure_preference}`;
     } else {
       voiceDescription = String(voiceProfile);
     }
 
-    const prompt = `Bạn là chuyên gia phân tích văn bản, chuyên đưa ra gợi ý cải thiện cụ thể.
+    const prompt = `You are a text analysis expert specializing in providing specific improvement suggestions.
 
-VĂN PHONG MỤC TIÊU:
+TARGET WRITING STYLE:
 ${voiceDescription}
 
-CÂU CẦN PHÂN TÍCH:
+SENTENCE TO ANALYZE:
 "${sentence}"
 
-VẤN ĐỀ PHÁT HIỆN:
+DETECTED ISSUES:
 ${issues.map(i => `- ${i.type} (${i.severity}): ${i.detail}`).join('\n')}
 
-${context?.previous_sentence ? `CÂU TRƯỚC: "${context.previous_sentence}"` : ''}
-${context?.next_sentence ? `CÂU SAU: "${context.next_sentence}"` : ''}
+${context?.previous_sentence ? `PREVIOUS SENTENCE: "${context.previous_sentence}"` : ''}
+${context?.next_sentence ? `NEXT SENTENCE: "${context.next_sentence}"` : ''}
 
-NHIỆM VỤ:
-Đưa ra 2-4 gợi ý cụ thể để cải thiện câu cho phù hợp với văn phong mục tiêu.
+TASK:
+Provide 2-4 specific suggestions to improve the sentence to match the target writing style.
 
-YÊU CẦU:
-1. Mỗi gợi ý phải cụ thể, có thể áp dụng ngay
-2. Giải thích ngắn gọn tại sao cần thay đổi
-3. Đưa ra ví dụ minh họa nếu có thể
-4. Ưu tiên các vấn đề severity cao
+REQUIREMENTS:
+1. Each suggestion must be specific and immediately applicable
+2. Briefly explain why the change is needed
+3. Provide concrete examples if possible
+4. Prioritize high severity issues
 
-Trả về JSON theo format:
+Return JSON in this format:
 {
   "suggestions": [
     {
       "type": "vocabulary|structure|length|formality|punctuation|voice",
       "severity": "high|medium|low",
-      "issue": "Mô tả vấn đề ngắn gọn (1 câu)",
-      "suggestion": "Gợi ý cụ thể cách sửa (1-2 câu)",
-      "example": "Ví dụ cụ thể hoặc từ thay thế (nếu có)"
+      "issue": "Brief problem description (1 sentence)",
+      "suggestion": "Specific fix suggestion (1-2 sentences)",
+      "example": "Concrete example or replacement word (if applicable)"
     }
   ]
 }
 
-CHỈ TRẢ VỀ JSON, KHÔNG GIẢI THÍCH THÊM.`;
+RETURN ONLY JSON, NO ADDITIONAL EXPLANATION.`;
 
     const result = await model.generateContent(prompt);
     const responseText = result.response.candidates[0].content.parts[0].text.trim();
     const parsed = JSON.parse(responseText);
     
-    // Map icon cho mỗi type
+    // Map icon for each type (using CDN icons)
     const iconMap = {
-      vocabulary: '/icon/book-open.svg',
-      structure: '/icon/layout.svg',
-      length: '/icon/scissors.svg',
-      formality: '/icon/briefcase.svg',
-      punctuation: '/icon/more-horizontal.svg',
-      voice: '/icon/zap.svg',
-      tone: '/icon/smile.svg'
+      vocabulary: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/book-open.svg',
+      structure: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/layout.svg',
+      length: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/scissors.svg',
+      formality: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/briefcase.svg',
+      punctuation: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/more-horizontal.svg',
+      voice: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/zap.svg',
+      tone: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/smile.svg',
+      coherence: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/link.svg',
+      repetition: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/repeat.svg'
     };
     
-    return parsed.suggestions.map(s => ({
+    const suggestions = parsed.suggestions.map(s => ({
       ...s,
-      icon: iconMap[s.type] || '/icon/lightbulb.svg'
+      icon: iconMap[s.type] || 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/lightbulb.svg'
     }));
+
+    // Cache the result
+    if (profileId) {
+      const cacheKey = getSuggestionAICacheKey(sentence, profileId);
+      suggestionAICache.set(cacheKey, {
+        data: suggestions,
+        timestamp: Date.now()
+      });
+    }
+    
+    return suggestions;
   } catch (error) {
-    console.error('❌ Failed to generate suggestions:', error);
+    console.error('[ERROR] Failed to generate suggestions:', error);
     
     // Fallback to rule-based suggestions
     return generateFallbackSuggestions(issues);
@@ -548,12 +1101,12 @@ CHỈ TRẢ VỀ JSON, KHÔNG GIẢI THÍCH THÊM.`;
 
 function generateFallbackSuggestions(issues) {
   const iconMap = {
-    vocabulary: '/icon/book-open.svg',
-    structure: '/icon/layout.svg',
-    length: '/icon/scissors.svg',
-    formality: '/icon/briefcase.svg',
-    punctuation: '/icon/more-horizontal.svg',
-    voice: '/icon/zap.svg'
+    vocabulary: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/book-open.svg',
+    structure: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/layout.svg',
+    length: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/scissors.svg',
+    formality: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/briefcase.svg',
+    punctuation: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/more-horizontal.svg',
+    voice: 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/zap.svg'
   };
   
   return issues.map(issue => {
@@ -562,30 +1115,30 @@ function generateFallbackSuggestions(issues) {
     
     switch (issue.type) {
       case 'length':
-        suggestion = 'Tách thành 2-3 câu ngắn hơn để dễ đọc và dễ hiểu';
-        example = 'Chia tại dấu phẩy hoặc từ nối';
+        suggestion = 'Break into 2-3 shorter sentences for better readability and clarity';
+        example = 'Split at commas or conjunctions';
         break;
       case 'vocabulary':
-        suggestion = 'Sử dụng từ đơn giản hơn, gần gũi hơn với văn phong mục tiêu';
-        example = 'Thay từ phức tạp bằng từ thông dụng';
+        suggestion = 'Use simpler words that better match the target writing style';
+        example = 'Replace complex words with common ones';
         break;
       case 'formality':
         if (issue.examples) {
-          suggestion = `Thay thế các từ trang trọng: ${issue.examples.join(', ')}`;
+          suggestion = `Replace formal words: ${issue.examples.join(', ')}`;
           example = 'utilize → use, commence → start';
         } else {
-          suggestion = 'Điều chỉnh mức độ trang trọng cho phù hợp với profile';
+          suggestion = 'Adjust formality level to match the profile';
         }
         break;
       case 'punctuation':
-        suggestion = 'Điều chỉnh cách sử dụng dấu câu cho phù hợp với phong cách';
+        suggestion = 'Adjust punctuation usage to match the writing style';
         break;
       case 'voice':
-        suggestion = 'Chuyển từ thể bị động sang thể chủ động';
-        example = 'Được làm → Làm';
+        suggestion = 'Convert from passive to active voice';
+        example = 'Was done → Did';
         break;
       default:
-        suggestion = 'Điều chỉnh để phù hợp hơn với văn phong mục tiêu';
+        suggestion = 'Adjust to better match the target writing style';
     }
     
     return {
@@ -594,7 +1147,7 @@ function generateFallbackSuggestions(issues) {
       issue: issue.detail,
       suggestion,
       example,
-      icon: iconMap[issue.type] || '/icon/lightbulb.svg'
+      icon: iconMap[issue.type] || 'https://cdn.jsdelivr.net/npm/feather-icons/dist/icons/lightbulb.svg'
     };
   });
 }
@@ -603,6 +1156,8 @@ module.exports = {
   createEmbedding,
   createBatchEmbeddings,
   detectAIContent,
+  detectAIContentEnhanced,
+  detectAIContentHeuristic,
   generateVoiceSummary,
   rewriteWithVoice,
   generateImprovementSuggestions,

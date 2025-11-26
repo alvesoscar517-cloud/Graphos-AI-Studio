@@ -34,7 +34,7 @@ exports.getTickets = async (req, res) => {
     
     res.json({ success: true, tickets, count: tickets.length });
   } catch (error) {
-    console.error('❌ Get tickets error:', error);
+    console.error('[ERROR] Get tickets error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -63,7 +63,7 @@ exports.getTicketDetails = async (req, res) => {
     
     res.json({ success: true, ticket });
   } catch (error) {
-    console.error('❌ Get ticket error:', error);
+    console.error('[ERROR] Get ticket error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -86,7 +86,7 @@ exports.updateTicketStatus = async (req, res) => {
     
     res.json({ success: true, message: 'Status updated' });
   } catch (error) {
-    console.error('❌ Update status error:', error);
+    console.error('[ERROR] Update status error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -253,9 +253,9 @@ exports.replyToTicket = async (req, res) => {
           html: htmlContent
         });
         
-        console.log(`✅ Email sent to ${ticket.userEmail}`);
+        console.log(`[SUCCESS] Email sent to ${ticket.userEmail}`);
       } catch (emailError) {
-        console.error('⚠️ Email send failed:', emailError);
+        console.error('[WARNING] Email send failed:', emailError);
       }
     }
     
@@ -286,10 +286,10 @@ exports.replyToTicket = async (req, res) => {
             createdAt: now
           });
           
-          console.log(`✅ Notification sent to user ${userId}`);
+          console.log(`[SUCCESS] Notification sent to user ${userId}`);
         }
       } catch (notifError) {
-        console.error('⚠️ Notification send failed:', notifError);
+        console.error('[WARNING] Notification send failed:', notifError);
       }
     }
     
@@ -299,7 +299,7 @@ exports.replyToTicket = async (req, res) => {
       reply
     });
   } catch (error) {
-    console.error('❌ Reply error:', error);
+    console.error('[ERROR] Reply error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -313,7 +313,7 @@ exports.deleteTicket = async (req, res) => {
     
     res.json({ success: true, message: 'Ticket deleted' });
   } catch (error) {
-    console.error('❌ Delete ticket error:', error);
+    console.error('[ERROR] Delete ticket error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -338,7 +338,7 @@ exports.getStatistics = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ Get statistics error:', error);
+    console.error('[ERROR] Get statistics error:', error);
     res.status(500).json({ error: String(error) });
   }
 };

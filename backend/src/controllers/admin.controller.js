@@ -24,7 +24,7 @@ exports.getUsers = async (req, res) => {
     
     res.json({ success: true, users, count: users.length });
   } catch (error) {
-    console.error('❌ Get users error:', error);
+    console.error('[ERROR] Get users error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -61,7 +61,7 @@ exports.getUserDetails = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ Get user error:', error);
+    console.error('[ERROR] Get user error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -90,7 +90,7 @@ exports.getUserLogs = async (req, res) => {
     
     res.json({ success: true, logs, count: logs.length });
   } catch (error) {
-    console.error('❌ Get user logs error:', error);
+    console.error('[ERROR] Get user logs error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -133,7 +133,7 @@ exports.toggleUserLock = async (req, res) => {
       message: locked ? 'User locked successfully' : 'User unlocked successfully' 
     });
   } catch (error) {
-    console.error('❌ Toggle user lock error:', error);
+    console.error('[ERROR] Toggle user lock error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -189,7 +189,7 @@ exports.deleteUser = async (req, res) => {
     
     res.json({ success: true, message: 'User deleted successfully' });
   } catch (error) {
-    console.error('❌ Delete user error:', error);
+    console.error('[ERROR] Delete user error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -230,7 +230,7 @@ exports.sendUserNotification = async (req, res) => {
     
     res.json({ success: true, message: 'Notification sent successfully' });
   } catch (error) {
-    console.error('❌ Send user notification error:', error);
+    console.error('[ERROR] Send user notification error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -277,7 +277,7 @@ exports.getOverview = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ Get analytics error:', error);
+    console.error('[ERROR] Get analytics error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -347,7 +347,7 @@ exports.getUserAnalytics = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ User analytics error:', error);
+    console.error('[ERROR] User analytics error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -398,7 +398,7 @@ exports.getUsageAnalytics = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ Usage analytics error:', error);
+    console.error('[ERROR] Usage analytics error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -414,7 +414,7 @@ exports.getSettings = async (req, res) => {
     
     res.json({ success: true, settings });
   } catch (error) {
-    console.error('❌ Get settings error:', error);
+    console.error('[ERROR] Get settings error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -428,7 +428,7 @@ exports.updateSettings = async (req, res) => {
     
     res.json({ success: true, settings });
   } catch (error) {
-    console.error('❌ Update settings error:', error);
+    console.error('[ERROR] Update settings error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -464,7 +464,7 @@ exports.translateText = async (req, res) => {
     
     res.json({ success: true, translations });
   } catch (error) {
-    console.error('❌ Translation error:', error);
+    console.error('[ERROR] Translation error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -491,7 +491,7 @@ exports.getNotifications = async (req, res) => {
     
     res.json({ success: true, notifications, count: notifications.length });
   } catch (error) {
-    console.error('❌ Get notifications error:', error);
+    console.error('[ERROR] Get notifications error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -522,7 +522,7 @@ exports.createNotification = async (req, res) => {
       notification: { id: notificationId, ...notification }
     });
   } catch (error) {
-    console.error('❌ Create notification error:', error);
+    console.error('[ERROR] Create notification error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -539,7 +539,7 @@ exports.updateNotification = async (req, res) => {
     
     res.json({ success: true, message: 'Notification updated' });
   } catch (error) {
-    console.error('❌ Update notification error:', error);
+    console.error('[ERROR] Update notification error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -552,7 +552,7 @@ exports.deleteNotification = async (req, res) => {
     
     res.json({ success: true, message: 'Notification deleted' });
   } catch (error) {
-    console.error('❌ Delete notification error:', error);
+    console.error('[ERROR] Delete notification error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -614,7 +614,7 @@ exports.sendNotification = async (req, res) => {
       stats: { sent: targetUserIds.length }
     });
   } catch (error) {
-    console.error('❌ Send notification error:', error);
+    console.error('[ERROR] Send notification error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -646,7 +646,7 @@ exports.getNotificationStats = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ Get notification stats error:', error);
+    console.error('[ERROR] Get notification stats error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -673,7 +673,7 @@ exports.getSystemLogs = async (req, res) => {
     
     res.json({ success: true, logs, count: logs.length });
   } catch (error) {
-    console.error('❌ Get system logs error:', error);
+    console.error('[ERROR] Get system logs error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -709,7 +709,7 @@ exports.clearSystemLogs = async (req, res) => {
       deleted: snapshot.size
     });
   } catch (error) {
-    console.error('❌ Clear system logs error:', error);
+    console.error('[ERROR] Clear system logs error:', error);
     res.status(500).json({ error: String(error) });
   }
 };

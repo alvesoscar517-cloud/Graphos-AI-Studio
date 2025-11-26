@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { motion, MotionConfig } from 'framer-motion'
 import Lottie from 'lottie-react'
-import { rewriteTextStream } from '../../services/api'
+import { rewriteTextStream, iterativeHumanize } from '../../services/api'
 import { useRewrite } from '../../contexts/RewriteContext'
 import modal from '../../utils/modal'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
@@ -9,16 +9,16 @@ import './RewriteToolbar.css'
 
 const transition = {
   type: 'spring',
-  bounce: 0.15,
-  duration: 0.3,
-  stiffness: 300,
-  damping: 25,
+  bounce: 0,
+  duration: 0.2,
+  stiffness: 400,
+  damping: 30,
 }
 
-const Button = ({ children, onClick, disabled, ariaLabel, active }) => {
+const Button = ({ children, onClick, disabled, ariaLabel, active, variant }) => {
   return (
     <button
-      className={`toolbar-btn ${active ? 'active' : ''}`}
+      className={`toolbar-btn ${active ? 'active' : ''} ${variant ? `toolbar-btn-${variant}` : ''}`}
       type="button"
       onClick={onClick}
       disabled={disabled}
@@ -37,36 +37,13 @@ const RewriteToolbar = ({
   disabled 
 }) => {
   const { selectedModel, writingPreferences } = useRewrite()
-  const [isExpanded, setIsExpanded] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const containerRef = useRef(null)
   const fileInputRef = useRef(null)
-
-  // Close when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
-        setIsExpanded(false)
-      }
-    }
-
-    if (isExpanded) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isExpanded])
-
-  // Reset state when visibility changes
-  useEffect(() => {
-    if (!visible) {
-      setIsExpanded(false)
-    }
-  }, [visible])
 
   const handleRewrite = async () => {
     // Check if text exists
     if (!text || text.trim().length === 0) {
-      modal.alert('Vui lòng nhập văn bản trước khi viết lại', 'Không có văn bản')
+      modal.alert('Please enter text before rewriting', 'No Text')
       return
     }
 
@@ -74,6 +51,54 @@ const RewriteToolbar = ({
     
     const originalText = text // Save original text for error recovery
     
+    // Check if iterative refinement is enabled
+    const useIterative = writingPreferences?.useIterativeRefinement
+    
+    if (useIterative) {
+      // Use iterative humanization (non-streaming)
+      console.log('🚀 Starting iterative humanization...')
+      setIsLoading(true)
+      
+      const loadingModal = modal.loading('Đang humanize văn bản... (có thể mất 30-60 giây)')
+      
+      try {
+        const result = await iterativeHumanize(
+          currentProfile.profile_id,
+          originalText,
+          {
+            maxIterations: 3,
+            targetProbability: writingPreferences?.targetAIProbability || 35,
+            model: selectedModel
+          }
+        )
+        
+        loadingModal.close()
+        
+        if (result.success && result.data) {
+          onTextChange(result.data.rewritten_text)
+          
+          const emoji = result.data.reached_target ? '✅' : '⚠️'
+          modal.success(
+            `${emoji} Hoàn thành sau ${result.data.iterations_used} lần lặp\n` +
+            `AI Probability: ${result.data.final_ai_probability}%\n` +
+            (result.data.warning || ''),
+            'Humanization Complete'
+          )
+        } else {
+          throw new Error(result.error || 'Humanization failed')
+        }
+      } catch (error) {
+        loadingModal.close()
+        console.error('❌ Error in iterative humanize:', error)
+        modal.error('Humanization thất bại: ' + error.message)
+        onTextChange(originalText)
+      } finally {
+        setIsLoading(false)
+      }
+      return
+    }
+    
+    // Standard streaming rewrite with enhanced anti-AI detection
     console.log('🚀 Starting rewrite process...')
     setIsLoading(true)
     
@@ -181,11 +206,11 @@ const RewriteToolbar = ({
                        fileName.endsWith('.doc')
 
     if (!isValidType) {
-      modal.error('Chỉ hỗ trợ file .txt, .pdf, .docx')
+      modal.error('Only .txt, .pdf, .docx files are supported')
       return
     }
 
-    const loadingModal = modal.loading('Đang đọc file...')
+    const loadingModal = modal.loading('Reading file...')
 
     try {
       let extractedText = ''
@@ -219,7 +244,7 @@ const RewriteToolbar = ({
         } catch (pdfError) {
           console.error('PDF parsing error:', pdfError)
           loadingModal.close()
-          modal.error('Không thể đọc file PDF: ' + pdfError.message)
+          modal.error('Unable to read PDF file: ' + pdfError.message)
           return
         }
       } else if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
@@ -233,7 +258,7 @@ const RewriteToolbar = ({
         } catch (docxError) {
           console.error('DOCX parsing error:', docxError)
           loadingModal.close()
-          modal.error('Không thể đọc file DOCX: ' + docxError.message)
+          modal.error('Unable to read DOCX file: ' + docxError.message)
           return
         }
       }
@@ -242,14 +267,14 @@ const RewriteToolbar = ({
 
       if (extractedText && onTextChange) {
         onTextChange(extractedText)
-        modal.success('Đã tải nội dung file lên editor')
+        modal.success('File content loaded to editor')
       } else {
-        modal.error('Không thể trích xuất nội dung từ file')
+        modal.error('Unable to extract content from file')
       }
     } catch (error) {
       loadingModal.close()
       console.error('Error reading file:', error)
-      modal.error('Không thể đọc file: ' + error.message)
+      modal.error('Unable to read file: ' + error.message)
     }
 
     // Reset input
@@ -258,102 +283,77 @@ const RewriteToolbar = ({
 
   if (!visible) return null
 
+  // Determine button label based on settings
+  const rewriteLabel = writingPreferences?.useIterativeRefinement 
+    ? 'Humanize' 
+    : writingPreferences?.useAntiAIDetection 
+    ? 'Smart Rewrite' 
+    : 'Rewrite'
+
   return (
     <MotionConfig transition={transition}>
       <motion.div 
-        className="rewrite-toolbar-container" 
-        ref={containerRef}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
+        className="rewrite-toolbar-container"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
+        transition={{ duration: 0.25, ease: 'easeOut' }}
       >
-        <motion.div
-          className="rewrite-toolbar"
-          animate={{
-            width: isExpanded ? '260px' : '100px',
-          }}
-          initial={false}
-        >
+        <div className="rewrite-toolbar">
           <div className="toolbar-content">
-            {!isExpanded ? (
-              <div className="toolbar-collapsed">
-                <Button
-                  onClick={handleRewrite}
-                  disabled={disabled || isLoading || !text || !currentProfile}
-                  ariaLabel="Viết lại văn bản"
-                  active={isLoading}
-                >
-                  {isLoading ? (
-                    <Lottie 
-                      animationData={threeDotsAnimation} 
-                      loop={true}
-                      style={{ width: 32, height: 14 }}
-                    />
-                  ) : (
-                    <img src="/icon/pen.svg" alt="Rewrite" className="toolbar-icon" />
-                  )}
-                </Button>
-                <Button
-                  onClick={() => setIsExpanded(true)}
-                  ariaLabel="Mở thêm tùy chọn"
-                  disabled={isLoading}
-                >
-                  <img src="/icon/chevron-right.svg" alt="Expand" className="toolbar-icon" />
-                </Button>
-              </div>
-            ) : (
-              <div className="toolbar-expanded">
-                <Button
-                  onClick={() => setIsExpanded(false)}
-                  ariaLabel="Thu gọn"
-                  disabled={isLoading}
-                >
-                  <img src="/icon/chevron-left.svg" alt="Collapse" className="toolbar-icon" />
-                </Button>
-                
-                <div className="toolbar-divider" />
-                
-                <Button
-                  onClick={handleRewrite}
-                  disabled={disabled || isLoading || !text || !currentProfile}
-                  ariaLabel="Viết lại văn bản"
-                  active={isLoading}
-                >
-                  {isLoading ? (
-                    <Lottie 
-                      animationData={threeDotsAnimation} 
-                      loop={true}
-                      style={{ width: 42, height: 17 }}
-                    />
-                  ) : (
-                    <>
-                      <img src="/icon/pen.svg" alt="Rewrite" className="toolbar-icon" />
-                      <span className="toolbar-label">Viết lại</span>
-                    </>
-                  )}
-                </Button>
-                
-                <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={disabled || isLoading}
-                  ariaLabel="Tải file lên"
-                >
-                  <img src="/icon/upload.svg" alt="Upload" className="toolbar-icon" />
-                  <span className="toolbar-label">Tải file</span>
-                </Button>
-                
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".txt,.pdf,.docx,.doc"
-                  onChange={handleFileUpload}
-                  style={{ display: 'none' }}
-                />
-              </div>
-            )}
+            {/* Main Rewrite Button */}
+            <Button
+              onClick={handleRewrite}
+              disabled={disabled || isLoading || !text || !currentProfile}
+              ariaLabel="Rewrite text"
+              active={isLoading}
+              variant={writingPreferences?.useIterativeRefinement ? 'primary' : ''}
+            >
+              <img 
+                src={writingPreferences?.useIterativeRefinement ? '/icon/user-check.svg' : '/icon/pen.svg'} 
+                alt="Rewrite" 
+                className="toolbar-icon" 
+              />
+              <span className="toolbar-label">{rewriteLabel}</span>
+              {isLoading && (
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Lottie 
+                    animationData={threeDotsAnimation} 
+                    loop={true}
+                    style={{ width: 40, height: 16 }}
+                  />
+                </div>
+              )}
+            </Button>
+            
+            {/* Upload Button */}
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={disabled || isLoading}
+              ariaLabel="Upload file"
+            >
+              <img src="/icon/upload.svg" alt="Upload" className="toolbar-icon" />
+              <span className="toolbar-label">Upload</span>
+            </Button>
           </div>
-        </motion.div>
+        </div>
+        
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".txt,.pdf,.docx,.doc"
+          onChange={handleFileUpload}
+          style={{ display: 'none' }}
+        />
       </motion.div>
     </MotionConfig>
   )

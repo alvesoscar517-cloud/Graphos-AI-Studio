@@ -90,19 +90,19 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
         // Check if PDF is image-based (very few words extracted)
         const words = text.trim().split(/\s+/).filter(w => w.length > 0)
         if (words.length < 50 && pdf.numPages > 0) {
-          return { error: 'PDF này có thể là ảnh scan. Vui lòng sử dụng file PDF có text hoặc chuyển đổi sang .docx' }
+          return { error: 'This PDF might be a scanned image. Please use a text-based PDF or convert to .docx' }
         }
       }
       
       // Validate text
       const words = text.trim().split(/\s+/).filter(w => w.length > 0)
       if (words.length === 0) {
-        return { error: 'File không chứa văn bản hợp lệ' }
+        return { error: 'File does not contain valid text' }
       }
       
-      // Limit to 3000 words per file
-      if (words.length > 3000) {
-        text = words.slice(0, 3000).join(' ')
+      // Limit to 5000 words per file
+      if (words.length > 5000) {
+        text = words.slice(0, 5000).join(' ')
         return { text, truncated: true, originalCount: words.length }
       }
       
@@ -110,7 +110,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
       
     } catch (error) {
       console.error('Error extracting text:', error)
-      return { error: `Không thể đọc file ${ext.toUpperCase()}` }
+      return { error: `Unable to read ${ext.toUpperCase()} file` }
     }
   }
 
@@ -207,7 +207,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
     const validAnalysis = fileAnalysis.filter(item => item.isValid && item.text)
     
     let currentTotal = 0
-    const MAX_WORDS = 3000
+    const MAX_WORDS = 5000
     
     const processedFiles = validAnalysis.map(item => {
       const words = item.text.trim().split(/\s+/).filter(w => w.length > 0)
@@ -238,11 +238,11 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
   // Get status label
   const getStatusLabel = (status) => {
     switch (status) {
-      case 'too-short': return 'Quá ngắn'
-      case 'acceptable': return 'Chấp nhận được'
-      case 'good': return 'Tốt'
-      case 'great': return 'Rất tốt'
-      case 'excellent': return 'Xuất sắc'
+      case 'too-short': return 'Too Short'
+      case 'acceptable': return 'Acceptable'
+      case 'good': return 'Good'
+      case 'great': return 'Very Good'
+      case 'excellent': return 'Excellent'
       default: return ''
     }
   }
@@ -260,14 +260,17 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
   return (
     <div className="upload-modal-overlay" onClick={handleClose}>
       <div className="upload-modal-container" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
+        {/* Header with Icon */}
         <div className="upload-modal-header">
-          <button className="upload-modal-back-btn" onClick={handleClose}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
-          </button>
-          <h2 className="upload-modal-title">Tải lên Tài liệu</h2>
+          <div className="upload-modal-icon">
+            <img src="/icon/paperclip.svg" alt="" width="24" height="24" />
+          </div>
+          <div>
+            <h2 className="upload-modal-title">Upload Documents</h2>
+            <p className="upload-modal-subtitle">
+              Upload text files so AI can learn your writing style
+            </p>
+          </div>
         </div>
 
         {/* Content */}
@@ -296,7 +299,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
                   <polyline points="17 8 12 3 7 8"/>
                   <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
-                Chọn tệp từ máy tính
+                Select file from computer
               </button>
               <input
                 type="file"
@@ -315,7 +318,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
               {isProcessing && (
                 <div className="upload-processing">
                   <div className="upload-spinner"></div>
-                  <span>Đang phân tích văn bản...</span>
+                  <span>Analyzing text...</span>
                 </div>
               )}
               
@@ -332,19 +335,19 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
                     ) : (
                       <div className="upload-file-analysis">
                         <span className="upload-word-count">
-                          {item.analysis.wordCount} từ
+                          {item.analysis.wordCount} words
                         </span>
                         <span className="upload-status-badge">
                           {getStatusLabel(item.analysis.status)}
                         </span>
                         {item.truncated && (
                           <span className="upload-truncated">
-                            (Đã cắt từ {item.originalCount} từ)
+                            (Trimmed from {item.originalCount} words)
                           </span>
                         )}
                         {!item.isValid && (
                           <span className="upload-warning">
-                            Cần tối thiểu 100 từ
+                            Minimum 100 words required
                           </span>
                         )}
                       </div>
@@ -373,26 +376,26 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
                       <line x1="16" y1="17" x2="8" y2="17"/>
                       <polyline points="10 9 9 9 8 9"/>
                     </svg>
-                    <span>Tổng: {Math.min(totalWordCount, 3000)} từ từ {validFilesCount}/{files.length} file</span>
+                    <span>Total: {Math.min(totalWordCount, 3000)} words from {validFilesCount}/{files.length} files</span>
                   </div>
                   {totalWordCount < 500 && (
                     <div className="upload-summary-hint">
-                      Cần thêm {500 - totalWordCount} từ để đạt tối thiểu
+                      Need {500 - totalWordCount} more words to reach minimum
                     </div>
                   )}
                   {totalWordCount >= 500 && totalWordCount < 1000 && (
                     <div className="upload-summary-hint success">
-                      Đã đủ tối thiểu! Thêm {1000 - totalWordCount} từ để đạt mốc khuyến nghị
+                      Minimum reached! Add {1000 - totalWordCount} more words to reach recommended level
                     </div>
                   )}
                   {totalWordCount >= 1000 && totalWordCount < 3000 && (
                     <div className="upload-summary-hint success">
-                      Xuất sắc! Đủ văn bản để AI học tốt
+                      [EXCELLENT] Enough text for AI to learn well
                     </div>
                   )}
                   {totalWordCount >= 3000 && (
                     <div className="upload-summary-hint success">
-                      Đã đạt giới hạn 3000 từ. Văn bản sẽ được tự động cắt khi lưu.
+                      Reached 3000 word limit. Text will be auto-trimmed when saved.
                     </div>
                   )}
                 </div>
@@ -411,9 +414,9 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
             onClick={handleSave}
             disabled={!canSave || isProcessing}
           >
-            {isProcessing ? 'Đang xử lý...' : 
-             files.length === 0 ? 'Xóa tất cả' : 
-             `Xác nhận (${validFilesCount})`}
+            {isProcessing ? 'Processing...' : 
+             files.length === 0 ? 'Clear All' : 
+             `Confirm (${validFilesCount})`}
           </button>
         </div>
       </div>

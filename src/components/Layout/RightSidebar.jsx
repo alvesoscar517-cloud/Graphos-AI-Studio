@@ -67,11 +67,11 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           <button 
             className={`mode-toggle-btn ${mode === 'analysis' ? 'active' : ''}`}
             onClick={() => handleModeChange('analysis')}
-            data-tooltip="Công cụ phân tích" 
+            data-tooltip="Analysis Tool" 
             data-tooltip-position="bottom"
           >
             <img src="/icon/bar-chart-4.svg" alt="Analysis" />
-            <span>Phân tích</span>
+            <span>Analysis</span>
           </button>
           <button 
             className={`mode-toggle-btn ${mode === 'rewrite' ? 'active' : ''}`}
@@ -108,7 +108,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
             />
 
             <AIDetectionCard 
-              disabled={!hasText || !hasProfile}
+              disabled={!hasText}
               text={currentNote?.content || ''}
             />
 

@@ -1,62 +1,191 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRealtime } from '../../contexts/RealtimeContext';
-import { exportUsersToCSV } from '../../utils/exportUtils';
+import { usersApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
 import LoadingScreen from '../Common/LoadingScreen';
+import CustomSelect from '../Common/CustomSelect';
 import './UserList.css';
 
 export default function UserList() {
-  const { users, loading: realtimeLoading, loadUsers, setActiveTab } = useRealtime();
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState({ tier: 'all', status: 'all' });
+  const [pagination, setPagination] = useState({ total: 0, limit: 20, offset: 0 });
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ sortBy: 'createdAt', sortOrder: 'desc' });
   const navigate = useNavigate();
   const notify = useNotify();
-  const loading = realtimeLoading.users;
+
+  const loadUsers = useCallback(async (resetOffset = false) => {
+    try {
+      setLoading(true);
+      const offset = resetOffset ? 0 : pagination.offset;
+      
+      const response = await usersApi.getAllAdvanced({
+        limit: pagination.limit,
+        offset,
+        search: searchTerm,
+        tier: filters.tier,
+        status: filters.status,
+        ...sortConfig
+      });
+      
+      setUsers(response.users);
+      setPagination(prev => ({
+        ...prev,
+        ...response.pagination,
+        offset
+      }));
+    } catch (err) {
+      notify.error('Failed to load users: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchTerm, filters, pagination.limit, pagination.offset, sortConfig]);
 
   useEffect(() => {
-    setActiveTab('users');
-    handleLoadUsers();
-  }, []);
+    const debounce = setTimeout(() => {
+      loadUsers(true);
+    }, 300);
+    return () => clearTimeout(debounce);
+  }, [searchTerm, filters, sortConfig]);
 
-  const handleLoadUsers = async () => {
-    try {
-      await loadUsers({ limit: 100 });
-    } catch (err) {
-      // Error handled silently
+  const handlePageChange = (newOffset) => {
+    setPagination(prev => ({ ...prev, offset: newOffset }));
+    loadUsers();
+  };
+
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedUsers(users.map(u => u.id));
+    } else {
+      setSelectedUsers([]);
     }
   };
 
-  const filteredUsers = users.filter(user => {
-    const search = searchTerm.toLowerCase();
-    return (
-      user.email?.toLowerCase().includes(search) ||
-      user.name?.toLowerCase().includes(search) ||
-      user.id.toLowerCase().includes(search)
+  const handleSelectUser = (userId) => {
+    setSelectedUsers(prev => 
+      prev.includes(userId) 
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
     );
-  });
+  };
+
+  const handleBulkLock = async (locked) => {
+    if (selectedUsers.length === 0) {
+      notify.warning('Please select users first');
+      return;
+    }
+
+    const confirmed = await notify.confirm({
+      title: locked ? 'Lock Users' : 'Unlock Users',
+      message: `Are you sure you want to ${locked ? 'lock' : 'unlock'} ${selectedUsers.length} users?`,
+      confirmText: locked ? 'Lock' : 'Unlock',
+      type: 'warning'
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await usersApi.bulkLock(selectedUsers, locked, 'Bulk action by admin');
+      notify.success(`Successfully ${locked ? 'locked' : 'unlocked'} ${selectedUsers.length} users`);
+      setSelectedUsers([]);
+      loadUsers();
+    } catch (err) {
+      notify.error('Error: ' + err.message);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedUsers.length === 0) {
+      notify.warning('Please select users first');
+      return;
+    }
+
+    const confirmed = await notify.confirm({
+      title: 'Delete Users',
+      message: `⚠️ Are you sure you want to DELETE ${selectedUsers.length} users?\n\nThis action cannot be undone!`,
+      confirmText: 'Delete',
+      type: 'danger'
+    });
+
+    if (!confirmed) return;
+
+    const confirmation = await notify.prompt({
+      title: 'Confirm Deletion',
+      message: 'Type "DELETE" to confirm:',
+      placeholder: 'DELETE',
+      confirmText: 'Delete'
+    });
+
+    if (confirmation !== 'DELETE') {
+      notify.warning('Incorrect confirmation');
+      return;
+    }
+
+    try {
+      await usersApi.bulkDelete(selectedUsers);
+      notify.success(`Successfully deleted ${selectedUsers.length} users`);
+      setSelectedUsers([]);
+      loadUsers(true);
+    } catch (err) {
+      notify.error('Error: ' + err.message);
+    }
+  };
+
+  const handleExport = async (format) => {
+    try {
+      if (format === 'csv') {
+        const response = await usersApi.export('csv');
+        // Download CSV
+        const blob = new Blob([response], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      } else {
+        const response = await usersApi.export('json');
+        const blob = new Blob([JSON.stringify(response.users, null, 2)], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `users_export_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+      notify.success('Export successful!');
+    } catch (err) {
+      notify.error('Export failed: ' + err.message);
+    }
+  };
+
+  const handleSort = (field) => {
+    setSortConfig(prev => ({
+      sortBy: field,
+      sortOrder: prev.sortBy === field && prev.sortOrder === 'asc' ? 'desc' : 'asc'
+    }));
+  };
 
   const getTierBadge = (tier) => {
     const badges = {
-      free: { label: 'Free', color: '#e0e0e0' },
-      premium: { label: 'Premium', color: '#000' },
-      enterprise: { label: 'Enterprise', color: '#666' }
+      free: { label: 'Free', color: '#e0e0e0', textColor: '#666' },
+      premium: { label: 'Premium', color: '#000', textColor: '#fff' },
+      enterprise: { label: 'Enterprise', color: '#666', textColor: '#fff' }
     };
-    
     const badge = badges[tier] || badges.free;
-    
     return (
-      <span 
-        className="tier-badge" 
-        style={{ 
-          background: badge.color,
-          color: tier === 'free' ? '#666' : '#fff'
-        }}
-      >
+      <span className="tier-badge" style={{ background: badge.color, color: badge.textColor }}>
         {badge.label}
       </span>
     );
   };
+
+  const totalPages = Math.ceil(pagination.total / pagination.limit);
+  const currentPage = Math.floor(pagination.offset / pagination.limit) + 1;
 
   if (loading && users.length === 0) {
     return <LoadingScreen />;
@@ -67,22 +196,14 @@ export default function UserList() {
       <PageHeader
         icon="users.svg"
         title="User Management"
-        subtitle="View and manage all users in the system"
+        subtitle={`${pagination.total} total users`}
         actions={
-          <button 
-            className="btn-export"
-            onClick={() => {
-              try {
-                exportUsersToCSV(users);
-                notify.success('User list exported successfully!');
-              } catch (err) {
-                notify.error('Export error: ' + err.message);
-              }
-            }}
-          >
-            <img src="/icon/download.svg" alt="Export" />
-            Export CSV
-          </button>
+          <div className="header-actions">
+            <button className="btn-export" onClick={() => handleExport('csv')}>
+              <img src="/icon/download.svg" alt="Export" />
+              Export CSV
+            </button>
+          </div>
         }
       />
 
@@ -97,37 +218,92 @@ export default function UserList() {
           />
         </div>
 
-        <div className="list-stats">
-          <span className="stat-item">
-            <strong>{filteredUsers.length}</strong> / {users.length} users
-          </span>
+        <div className="filters">
+          <CustomSelect
+            value={filters.tier}
+            onChange={(e) => setFilters(prev => ({ ...prev, tier: e.target.value }))}
+            options={[
+              { value: 'all', label: 'All Tiers' },
+              { value: 'free', label: 'Free' },
+              { value: 'premium', label: 'Premium' },
+              { value: 'enterprise', label: 'Enterprise' }
+            ]}
+          />
+          <CustomSelect
+            value={filters.status}
+            onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'active', label: 'Active' },
+              { value: 'locked', label: 'Locked' }
+            ]}
+          />
         </div>
       </div>
+
+      {selectedUsers.length > 0 && (
+        <div className="bulk-actions">
+          <span className="selected-count">{selectedUsers.length} selected</span>
+          <button className="btn-bulk" onClick={() => handleBulkLock(true)}>
+            <img src="/icon/lock.svg" alt="Lock" /> Lock
+          </button>
+          <button className="btn-bulk" onClick={() => handleBulkLock(false)}>
+            <img src="/icon/unlock.svg" alt="Unlock" /> Unlock
+          </button>
+          <button className="btn-bulk danger" onClick={handleBulkDelete}>
+            <img src="/icon/trash-2.svg" alt="Delete" /> Delete
+          </button>
+          <button className="btn-bulk-clear" onClick={() => setSelectedUsers([])}>
+            Clear
+          </button>
+        </div>
+      )}
 
       <div className="users-table-container">
         <table className="users-table">
           <thead>
             <tr>
-              <th>User</th>
+              <th className="checkbox-col">
+                <input
+                  type="checkbox"
+                  checked={selectedUsers.length === users.length && users.length > 0}
+                  onChange={handleSelectAll}
+                />
+              </th>
+              <th onClick={() => handleSort('name')} className="sortable">
+                User {sortConfig.sortBy === 'name' && (sortConfig.sortOrder === 'asc' ? '↑' : '↓')}
+              </th>
               <th>Email</th>
               <th>Tier</th>
-              <th>Profiles</th>
-              <th>Analyses</th>
-              <th>Rewrites</th>
-              <th>Created</th>
+              <th>Credits</th>
+              <th className="stat-col">Profiles</th>
+              <th className="stat-col">Analyses</th>
+              <th onClick={() => handleSort('createdAt')} className="sortable">
+                Created {sortConfig.sortBy === 'createdAt' && (sortConfig.sortOrder === 'asc' ? '↑' : '↓')}
+              </th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.length === 0 ? (
+            {users.length === 0 ? (
               <tr>
-                <td colSpan="8" className="empty-row">
-                  {searchTerm ? 'No users found' : 'No users yet'}
+                <td colSpan="10" className="empty-row">
+                  {searchTerm || filters.tier !== 'all' || filters.status !== 'all' 
+                    ? 'No users found matching filters' 
+                    : 'No users yet'}
                 </td>
               </tr>
             ) : (
-              filteredUsers.map(user => (
-                <tr key={user.id}>
+              users.map(user => (
+                <tr key={user.id} className={user.locked ? 'locked-row' : ''}>
+                  <td className="checkbox-col">
+                    <input
+                      type="checkbox"
+                      checked={selectedUsers.includes(user.id)}
+                      onChange={() => handleSelectUser(user.id)}
+                    />
+                  </td>
                   <td>
                     <div className="user-info">
                       <div className="user-avatar">
@@ -139,13 +315,26 @@ export default function UserList() {
                       </div>
                     </div>
                   </td>
-                  <td>{user.email || 'N/A'}</td>
+                  <td className="email-cell">{user.email || 'N/A'}</td>
                   <td>{getTierBadge(user.tier)}</td>
+                  <td className="credits-cell">
+                    <span className="credits-badge">
+                      {user.credits?.balance || 0}
+                    </span>
+                  </td>
                   <td className="stat-cell">{user.usage?.profilesCount || 0}</td>
                   <td className="stat-cell">{user.usage?.analysesCount || 0}</td>
-                  <td className="stat-cell">{user.usage?.rewritesCount || 0}</td>
                   <td className="date-cell">
                     {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US') : 'N/A'}
+                  </td>
+                  <td>
+                    {user.locked ? (
+                      <span className="status-badge locked">
+                        <img src="/icon/lock.svg" alt="Locked" /> Locked
+                      </span>
+                    ) : (
+                      <span className="status-badge active">Active</span>
+                    )}
                   </td>
                   <td>
                     <button
@@ -153,7 +342,6 @@ export default function UserList() {
                       onClick={() => navigate(`/users/${user.id}`)}
                     >
                       <img src="/icon/eye.svg" alt="View" />
-                      View
                     </button>
                   </td>
                 </tr>
@@ -162,6 +350,42 @@ export default function UserList() {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            className="page-btn"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(0)}
+          >
+            First
+          </button>
+          <button
+            className="page-btn"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(pagination.offset - pagination.limit)}
+          >
+            Previous
+          </button>
+          <span className="page-info">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            className="page-btn"
+            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(pagination.offset + pagination.limit)}
+          >
+            Next
+          </button>
+          <button
+            className="page-btn"
+            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange((totalPages - 1) * pagination.limit)}
+          >
+            Last
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,7 +12,7 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
     if (!currentProfile || !text) return
     
     setIsLoading(true)
-    const loadingModal = modal.loading('Đang viết lại văn bản...')
+    const loadingModal = modal.loading('Rewriting text...')
     
     try {
       const result = await rewriteTextAPI(
@@ -61,7 +61,7 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
         onClick={rewriteText}
         disabled={disabled || isLoading}
       >
-        <span className={isLoading ? 'shimmer-text-effect' : ''}>{isLoading ? 'Đang viết lại...' : 'Viết lại'}</span>
+        <span className={isLoading ? 'shimmer-text-effect' : ''}>{isLoading ? 'Rewriting...' : 'Rewrite'}</span>
         <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
       </button>
     </div>

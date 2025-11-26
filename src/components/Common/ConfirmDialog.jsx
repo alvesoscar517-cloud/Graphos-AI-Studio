@@ -4,8 +4,8 @@ import './ConfirmDialog.css';
 export default function ConfirmDialog({ 
   title, 
   message, 
-  confirmText = 'Xác nhận', 
-  cancelText = 'Hủy',
+  confirmText = 'Confirm', 
+  cancelText = 'Cancel',
   type = 'warning',
   onConfirm, 
   onCancel 

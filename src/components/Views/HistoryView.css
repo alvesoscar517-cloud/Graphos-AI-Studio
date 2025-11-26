@@ -289,20 +289,37 @@ body.dark-theme .search-container:hover .search-icon {
 .history-table thead {
   position: sticky;
   top: 0;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   z-index: 10;
+}
+
+.history-table thead::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(0, 0, 0, 0.1) 10%, 
+    rgba(0, 0, 0, 0.1) 90%, 
+    transparent 100%
+  );
 }
 
 .history-table th {
   text-align: left;
-  padding: 16px 12px 16px 0;
+  padding: 10px 12px 10px 0;
   font-weight: 500;
   color: #5f6368;
   font-size: 12px;
   text-transform: none;
-  letter-spacing: 0;
-  background: #fff;
-  height: 48px;
+  letter-spacing: 0.3px;
+  background: transparent;
+  height: 40px;
   border-bottom: none;
 }
 
@@ -545,9 +562,14 @@ body.dark-theme .history-name img {
 .search-highlight {
   background: #fdd663;
   color: #202124;
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-weight: 500;
+  padding: 1px 2px;
+  border-radius: 2px;
+  font-weight: inherit;
+}
+
+body.dark-theme .search-highlight {
+  background: #fdd663;
+  color: #202124;
 }
 
 /* Sync Button - Compact Grayscale */
@@ -681,12 +703,23 @@ body.dark-theme .history-table {
 }
 
 body.dark-theme .history-table thead {
-  background: #1e1e1e;
+  background: rgba(30, 30, 30, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+body.dark-theme .history-table thead::after {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.1) 10%, 
+    rgba(255, 255, 255, 0.1) 90%, 
+    transparent 100%
+  );
 }
 
 body.dark-theme .history-table th {
   color: #9aa0a6;
-  background: #1e1e1e;
+  background: transparent;
 }
 
 body.dark-theme .history-table td {
@@ -828,4 +861,682 @@ body.dark-theme .history-table-container::-webkit-scrollbar-thumb:hover {
 
 body.dark-theme .title-edit-btn:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================
+   TOOLBAR STYLES
+   ======================================== */
+
+.history-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 40px 8px 16px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  gap: 12px;
+  position: relative;
+  z-index: 100;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Base toolbar button styles */
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 16px;
+  min-width: 100px;
+  background: white;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #5f6368;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  line-height: 1.4;
+  height: 32px;
+  box-sizing: border-box;
+}
+
+.toolbar-btn:hover {
+  background: #f8f9fa;
+  border-color: #5f6368;
+}
+
+.toolbar-btn:active {
+  transform: scale(0.98);
+}
+
+/* Select button specific */
+.toolbar-btn.select-btn {
+  min-width: 90px;
+  justify-content: center;
+}
+
+.toolbar-btn.select-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
+/* Sort buttons specific */
+.toolbar-btn.sort-btn {
+  min-width: 85px;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.toolbar-btn.sort-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
+/* Active state for sort buttons */
+.toolbar-btn.sort-btn.active {
+  background: rgba(26, 115, 232, 0.1);
+  border-color: #1a73e8;
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+/* Danger button (Delete) */
+.toolbar-btn.danger {
+  color: #d93025;
+  border-color: rgba(217, 48, 37, 0.3);
+}
+
+.toolbar-btn.danger:hover {
+  background: #fce8e6;
+  border-color: #d93025;
+}
+
+/* Toolbar divider */
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: #dadce0;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* Custom Dropdown */
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.custom-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 12px;
+  min-width: 140px;
+  height: 32px;
+  background: white;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #5f6368;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.custom-dropdown-trigger:hover {
+  background: #f8f9fa;
+  border-color: #5f6368;
+}
+
+.custom-dropdown-trigger svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+
+.custom-dropdown.open .custom-dropdown-trigger svg {
+  transform: rotate(180deg);
+}
+
+.custom-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 4px 0;
+  z-index: 1001;
+  animation: dropdownFadeIn 0.15s ease;
+  min-width: 140px;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 13px;
+  color: #5f6368;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  font-weight: 400;
+}
+
+.custom-dropdown-item:hover {
+  background: #f8f9fa;
+  color: #202124;
+}
+
+.custom-dropdown-item.active {
+  background: rgba(26, 115, 232, 0.1);
+  color: #1a73e8;
+  font-weight: 500;
+}
+
+.custom-dropdown-item.active:hover {
+  background: rgba(26, 115, 232, 0.15);
+}
+
+/* Item count */
+.item-count {
+  font-size: 13px;
+  color: #5f6368;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Selection Mode */
+.history-table tr.selection-mode {
+  cursor: pointer;
+}
+
+.history-table tr.selected {
+  background: #e8f0fe !important;
+}
+
+.history-table tr.selected td {
+  background: #e8f0fe !important;
+}
+
+.checkbox-col {
+  width: 40px;
+  padding-left: 16px !important;
+}
+
+.checkbox-col input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #1a73e8;
+}
+
+/* Pagination */
+.history-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+  background: #fff;
+  border-top: 1px solid #f1f3f4;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #5f6368;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #f8f9fa;
+  border-color: #5f6368;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: #5f6368;
+  font-weight: 500;
+}
+
+/* Sort Buttons */
+.sort-btn {
+  font-family: monospace;
+  min-width: 80px;
+  justify-content: center;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE STYLES
+   ======================================== */
+
+@media (max-width: 768px) {
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .history-title-section {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .history-filter-tabs {
+    width: 100%;
+  }
+
+  .filter-tab {
+    flex: 1;
+    text-align: center;
+  }
+
+  .history-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-container {
+    width: 100%;
+    min-width: auto;
+    max-width: none;
+  }
+
+  .history-toolbar {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-left {
+    width: 100%;
+  }
+
+  .toolbar-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .toolbar-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .toolbar-select {
+    flex: 1;
+  }
+
+  /* Hide table, show cards */
+  .history-table {
+    display: none;
+  }
+
+  .history-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .history-card {
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .history-card:hover {
+    background: #f8f9fa;
+    border-color: #5f6368;
+  }
+
+  .history-card.selected {
+    background: #e8f0fe;
+    border-color: #1a73e8;
+  }
+
+  .card-checkbox {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #1a73e8;
+  }
+
+  .history-card.selected .card-header {
+    margin-left: 32px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-title img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.54;
+    flex-shrink: 0;
+  }
+
+  .card-title span {
+    font-size: 15px;
+    font-weight: 500;
+    color: #202124;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #5f6368;
+    flex-wrap: wrap;
+  }
+
+  .card-separator {
+    color: #dadce0;
+  }
+
+  .history-pagination {
+    padding: 16px;
+  }
+
+  .pagination-btn {
+    padding: 10px 20px;
+  }
+}
+
+/* Desktop only - hide cards */
+@media (min-width: 769px) {
+  .history-cards {
+    display: none;
+  }
+}
+
+/* ========================================
+   DARK THEME FOR NEW FEATURES
+   ======================================== */
+
+body.dark-theme .history-toolbar {
+  background: rgba(30, 30, 30, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .toolbar-btn {
+  color: #9aa0a6;
+  border-color: #5f6368;
+  background: #2d2d2d;
+}
+
+body.dark-theme .toolbar-btn:hover {
+  background: #3c4043;
+  border-color: #9aa0a6;
+}
+
+body.dark-theme .toolbar-btn:active {
+  transform: scale(0.98);
+}
+
+body.dark-theme .toolbar-btn.sort-btn.active {
+  background: rgba(138, 180, 248, 0.15);
+  border-color: #8ab4f8;
+  color: #8ab4f8;
+  font-weight: 600;
+}
+
+body.dark-theme .toolbar-btn.danger {
+  color: #f28b82;
+  border-color: rgba(242, 139, 130, 0.3);
+}
+
+body.dark-theme .toolbar-btn.danger:hover {
+  background: #3c2929;
+  border-color: #f28b82;
+}
+
+body.dark-theme .toolbar-divider {
+  background: #5f6368;
+}
+
+/* Dark theme for custom dropdown */
+body.dark-theme .custom-dropdown-trigger {
+  background: #2d2d2d;
+  color: #e3e3e3;
+  border-color: #5f6368;
+}
+
+body.dark-theme .custom-dropdown-trigger:hover {
+  background: #3c4043;
+  border-color: #9aa0a6;
+}
+
+body.dark-theme .custom-dropdown-trigger svg {
+  stroke: #9aa0a6;
+}
+
+body.dark-theme .custom-dropdown-menu {
+  background: #2d2d2d;
+  border-color: #5f6368;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-theme .custom-dropdown-item {
+  color: #9aa0a6;
+}
+
+body.dark-theme .custom-dropdown-item:hover {
+  background: #3c4043;
+  color: #e3e3e3;
+}
+
+body.dark-theme .custom-dropdown-item.active {
+  background: rgba(138, 180, 248, 0.15);
+  color: #8ab4f8;
+}
+
+body.dark-theme .custom-dropdown-item.active:hover {
+  background: rgba(138, 180, 248, 0.2);
+}
+
+body.dark-theme .item-count {
+  color: #9aa0a6;
+}
+
+body.dark-theme .history-table tr.selected {
+  background: #1a3a52 !important;
+}
+
+body.dark-theme .history-table tr.selected td {
+  background: #1a3a52 !important;
+}
+
+body.dark-theme .history-pagination {
+  background: #1e1e1e;
+  border-top-color: #3c4043;
+}
+
+body.dark-theme .pagination-btn {
+  color: #9aa0a6;
+  border-color: #5f6368;
+  background: transparent;
+}
+
+body.dark-theme .pagination-btn:hover:not(:disabled) {
+  background: #3c4043;
+  border-color: #9aa0a6;
+}
+
+body.dark-theme .pagination-info {
+  color: #9aa0a6;
+}
+
+body.dark-theme .history-card {
+  background: #2d2d2d;
+  border-color: #5f6368;
+}
+
+body.dark-theme .history-card:hover {
+  background: #3c4043;
+  border-color: #9aa0a6;
+}
+
+body.dark-theme .history-card.selected {
+  background: #1a3a52;
+  border-color: #8ab4f8;
+}
+
+body.dark-theme .card-title span {
+  color: #e3e3e3;
+}
+
+body.dark-theme .card-title img {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+body.dark-theme .card-meta {
+  color: #9aa0a6;
+}
+
+body.dark-theme .card-separator {
+  color: #5f6368;
+}
+
+/* Keyboard shortcut hint */
+.search-input::placeholder {
+  color: #5f6368;
+  font-size: 14px;
+}
+
+body.dark-theme .search-input::placeholder {
+  color: #9aa0a6;
+}
+
+/* Accessibility improvements */
+.history-table tbody tr:focus-within {
+  outline: none;
+}
+
+/* Loading animation for sync button */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.history-action-btn.syncing img {
+  animation: spin 1s linear infinite;
+}
+
+/* Smooth transitions */
+.history-table tbody tr,
+.history-card,
+.toolbar-btn,
+.pagination-btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* SVG icons in dark mode */
+body.dark-theme .toolbar-btn svg {
+  opacity: 0.8;
+  stroke: #9aa0a6;
+}
+
+body.dark-theme .toolbar-btn:hover svg {
+  opacity: 1;
+  stroke: #e3e3e3;
+}
+
+body.dark-theme .toolbar-btn.active svg {
+  opacity: 1;
+  stroke: #8ab4f8;
+}
+
+body.dark-theme .toolbar-btn.select-btn svg {
+  stroke: #9aa0a6;
+}
+
+body.dark-theme .toolbar-btn.select-btn:hover svg {
+  stroke: #e3e3e3;
 }

@@ -10,6 +10,7 @@ const creditService = require('../services/credit.service');
 const { CREDIT_PACKAGES, getPackageByVariantId, getPackageByPrice } = require('../config/pricing');
 const logger = require('../utils/logger');
 const realtimeController = require('./realtime.controller');
+const autoNotification = require('../services/autoNotification.service');
 
 // Webhook event types
 const WEBHOOK_EVENTS = {
@@ -255,6 +256,17 @@ async function handleOrderCreated(data, customData) {
       },
       credits: newCredits
     });
+
+    // Send auto notification for purchase
+    if (foundPkg && newCredits) {
+      const totalCredits = foundPkg.credits + foundPkg.bonus;
+      await autoNotification.sendPurchaseNotification(
+        userId,
+        orderData.variantName || orderData.productName || packageId,
+        totalCredits,
+        newCredits.balance || newCredits
+      );
+    }
   }
 }
 

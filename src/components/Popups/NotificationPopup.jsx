@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import './NotificationPopup.css';
 
-export default function NotificationPopup({ onClose }) {
+export default function NotificationPopup({ onClose, onViewChange }) {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   const popupRef = useRef(null);
 
   useEffect(() => {
@@ -21,7 +22,6 @@ export default function NotificationPopup({ onClose }) {
     
     // Click outside to close (with delay to avoid immediate close)
     const handleClickOutside = (e) => {
-      // Check if click is outside popup and not on the notification button
       if (popupRef.current && 
           !popupRef.current.contains(e.target) &&
           !e.target.closest('.notification-btn')) {
@@ -29,7 +29,6 @@ export default function NotificationPopup({ onClose }) {
       }
     };
     
-    // Add listener with slight delay to avoid immediate trigger
     const timeoutId = setTimeout(() => {
       document.addEventListener('mousedown', handleClickOutside);
     }, 100);
@@ -44,7 +43,7 @@ export default function NotificationPopup({ onClose }) {
 
   const loadNotifications = async () => {
     try {
-      // Import notification service
+      setLoading(true);
       const { getUserNotifications } = await import('../../services/notificationService');
       
       const { notifications: notifs, unreadCount: unread } = await getUserNotifications();
@@ -53,12 +52,13 @@ export default function NotificationPopup({ onClose }) {
       setUnreadCount(unread);
     } catch (err) {
       console.error('Load notifications error:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const markAsRead = async (notificationId) => {
     try {
-      // Import notification service
       const { markNotificationAsRead } = await import('../../services/notificationService');
       
       // Optimistic update
@@ -66,12 +66,8 @@ export default function NotificationPopup({ onClose }) {
         n.id === notificationId ? { ...n, read: true } : n
       );
       setNotifications(updated);
+      setUnreadCount(updated.filter(n => !n.read).length);
       
-      // Update unread count
-      const unread = updated.filter(n => !n.read).length;
-      setUnreadCount(unread);
-      
-      // Call API
       await markNotificationAsRead(notificationId);
     } catch (err) {
       console.error('Mark as read error:', err);
@@ -80,33 +76,52 @@ export default function NotificationPopup({ onClose }) {
 
   const markAllAsRead = async () => {
     try {
-      // Import notification service
-      const { markNotificationAsRead } = await import('../../services/notificationService');
+      const { markAllNotificationsAsRead } = await import('../../services/notificationService');
       
       // Optimistic update
       const updated = notifications.map(n => ({ ...n, read: true }));
       setNotifications(updated);
       setUnreadCount(0);
       
-      // Call API for each unread notification
-      const unreadNotifs = notifications.filter(n => !n.read);
-      await Promise.all(unreadNotifs.map(n => markNotificationAsRead(n.id)));
+      // Call batch API
+      await markAllNotificationsAsRead();
     } catch (err) {
       console.error('Mark all as read error:', err);
     }
   };
 
-  const deleteNotification = (notificationId) => {
-    // Local delete only (no backend API for delete yet)
-    const updated = notifications.filter(n => n.id !== notificationId);
-    setNotifications(updated);
-    
-    // Update localStorage
-    localStorage.setItem('user_notifications', JSON.stringify(updated));
-    
-    // Update unread count
-    const unread = updated.filter(n => !n.read).length;
-    setUnreadCount(unread);
+  const handleDelete = async (notificationId) => {
+    try {
+      const { deleteNotification } = await import('../../services/notificationService');
+      
+      // Optimistic update
+      const updated = notifications.filter(n => n.id !== notificationId);
+      setNotifications(updated);
+      setUnreadCount(updated.filter(n => !n.read).length);
+      
+      await deleteNotification(notificationId);
+    } catch (err) {
+      console.error('Delete notification error:', err);
+    }
+  };
+
+  const handleCtaClick = async (notif) => {
+    try {
+      const { handleCtaAction } = await import('../../services/notificationService');
+      
+      // Mark as read first
+      if (!notif.read) {
+        markAsRead(notif.id);
+      }
+      
+      // Handle CTA action
+      handleCtaAction(notif, (view) => {
+        onClose?.();
+        onViewChange?.(view);
+      });
+    } catch (err) {
+      console.error('CTA click error:', err);
+    }
   };
 
   const getNotificationIcon = (type) => {
@@ -118,17 +133,6 @@ export default function NotificationPopup({ onClose }) {
       announcement: 'megaphone.svg'
     };
     return icons[type] || 'bell.svg';
-  };
-
-  const getNotificationColor = (type) => {
-    const colors = {
-      info: '#3b82f6',
-      success: '#10b981',
-      warning: '#f59e0b',
-      error: '#ef4444',
-      announcement: '#8b5cf6'
-    };
-    return colors[type] || '#666';
   };
 
   const formatTime = (timestamp) => {
@@ -173,7 +177,12 @@ export default function NotificationPopup({ onClose }) {
 
       {/* List */}
       <div className="notif-list">
-        {notifications.length === 0 ? (
+        {loading && notifications.length === 0 ? (
+          <div className="notif-loading">
+            <div className="notif-spinner"></div>
+            <p>Loading...</p>
+          </div>
+        ) : notifications.length === 0 ? (
           <div className="notif-empty">
             <img src="/icon/inbox.svg" alt="Empty" />
             <p>No notifications</p>
@@ -182,13 +191,17 @@ export default function NotificationPopup({ onClose }) {
           notifications.map(notif => {
             const userLang = localStorage.getItem('language') || 'vi';
             const content = notif.translations?.[userLang] || notif.translations?.vi || {};
+            const hasCta = content.cta && notif.ctaAction;
 
             return (
               <div 
                 key={notif.id} 
-                className={`notif-item ${!notif.read ? 'unread' : ''}`}
+                className={`notif-item ${!notif.read ? 'unread' : ''} ${notif.priority === 'urgent' ? 'urgent' : ''}`}
                 onClick={() => !notif.read && markAsRead(notif.id)}
               >
+                <div className="notif-item-icon">
+                  <img src={`/icon/${getNotificationIcon(notif.type)}`} alt={notif.type} />
+                </div>
                 <div className="notif-item-content">
                   <div className="notif-item-header">
                     <span className="notif-item-title">
@@ -201,9 +214,16 @@ export default function NotificationPopup({ onClose }) {
                   <p className="notif-item-message">
                     {content.message || ''}
                   </p>
-                  {content.cta && (
-                    <button className="notif-item-cta">
+                  {hasCta && (
+                    <button 
+                      className="notif-item-cta"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCtaClick(notif);
+                      }}
+                    >
                       {content.cta}
+                      <img src="/icon/arrow-right.svg" alt="→" />
                     </button>
                   )}
                 </div>
@@ -212,8 +232,9 @@ export default function NotificationPopup({ onClose }) {
                   className="notif-item-delete"
                   onClick={(e) => {
                     e.stopPropagation();
-                    deleteNotification(notif.id);
+                    handleDelete(notif.id);
                   }}
+                  title="Delete notification"
                 >
                   <img src="/icon/x.svg" alt="Delete" />
                 </button>

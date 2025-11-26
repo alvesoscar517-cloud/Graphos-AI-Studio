@@ -1,0 +1,109 @@
+/* Auto-Show Scrollbar - Show scrollbar when scrolling
+ * Modern, minimal design, supports light/dark theme
+ */
+
+/* Base scrollbar container - hidden by default */
+.auto-scrollbar {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.auto-scrollbar::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+/* When scrolling - show scrollbar with animation */
+.auto-scrollbar.scrollbar-visible {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.auto-scrollbar.scrollbar-visible::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+
+.auto-scrollbar.scrollbar-visible::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+  margin: 4px 0;
+}
+
+.auto-scrollbar.scrollbar-visible::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.auto-scrollbar.scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.auto-scrollbar.scrollbar-visible::-webkit-scrollbar-thumb:active {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* Dark Theme */
+body.dark-theme .auto-scrollbar.scrollbar-visible {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+body.dark-theme .auto-scrollbar.scrollbar-visible::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .auto-scrollbar.scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+body.dark-theme .auto-scrollbar.scrollbar-visible::-webkit-scrollbar-thumb:active {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+/* Fade in/out animation cho scrollbar */
+.auto-scrollbar {
+  --scrollbar-opacity: 0;
+  transition: --scrollbar-opacity 0.3s ease;
+}
+
+.auto-scrollbar.scrollbar-visible {
+  --scrollbar-opacity: 1;
+}
+
+/* Scrollbar với animation opacity (cho browsers hỗ trợ) */
+@supports (animation-timeline: scroll()) {
+  .auto-scrollbar.scrollbar-visible::-webkit-scrollbar-thumb {
+    animation: scrollbar-fade-in 0.3s ease forwards;
+  }
+}
+
+@keyframes scrollbar-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Variant: Scrollbar mỏng hơn cho mobile/compact view */
+.auto-scrollbar.scrollbar-thin.scrollbar-visible::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Variant: Scrollbar dày hơn cho desktop */
+.auto-scrollbar.scrollbar-thick.scrollbar-visible::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Variant: Scrollbar với padding bên phải */
+.auto-scrollbar.scrollbar-padded {
+  padding-right: 4px;
+}
+
+.auto-scrollbar.scrollbar-padded.scrollbar-visible {
+  padding-right: 0;
+}

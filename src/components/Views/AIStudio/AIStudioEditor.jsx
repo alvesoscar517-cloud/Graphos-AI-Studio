@@ -65,7 +65,7 @@ const AIStudioEditor = ({
   const handleShare = async () => {
     try {
       if (!currentNote || !currentNote.content.trim()) {
-        modal.alert('Không có nội dung để chia sẻ', 'Lỗi')
+        modal.alert('No content to share', '[ERROR]')
         return
       }
 
@@ -84,10 +84,10 @@ const AIStudioEditor = ({
       const shareUrl = `${window.location.origin}/shared/${shareData.share_id}`
       await navigator.clipboard.writeText(shareUrl)
       
-      modal.toast('Đã sao chép link chia sẻ', '', 'success')
+      modal.toast('Share link copied', '', 'success')
     } catch (error) {
       console.error('Share error:', error)
-      modal.error('Không thể tạo link chia sẻ: ' + error.message)
+      modal.error('Unable to create share link: ' + error.message)
     }
   }
 
@@ -122,7 +122,7 @@ const AIStudioEditor = ({
           <button 
             className="icon-btn" 
             onClick={handleShare}
-            data-tooltip="Chia sẻ note"
+            data-tooltip="Share note"
           >
             <img src="/icon/share-2.svg" alt="Share" />
           </button>

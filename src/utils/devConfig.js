@@ -1,38 +1,40 @@
 /**
  * Development Configuration
- * Cấu hình cho môi trường development để tránh tạo profile mới mỗi lần test
+ * Configuration for development environment to avoid creating new profiles on each test
  */
 
+import { safeGetJSON, safeSetJSON } from './storageCleanup'
+
 export const DEV_CONFIG = {
-  // Bật chế độ development (sử dụng profile test mặc định)
+  // Enable development mode (use default test profile)
   ENABLE_DEV_MODE: true,
   
-  // User test mặc định - email phải hợp lệ cho Lemon Squeezy
+  // Default test user - email must be valid for Lemon Squeezy
   DEFAULT_TEST_USER: {
     userId: 'dev_user_123',
     email: 'dev.test@example.com',
     name: 'Dev Test User'
   },
   
-  // Tự động chọn profile test khi khởi động
+  // Auto-select test profile on startup
   AUTO_SELECT_TEST_PROFILE: true,
   
-  // Skip profile setup trong dev mode
-  SKIP_PROFILE_SETUP: false, // Set true nếu muốn skip hoàn toàn
+  // Skip profile setup in dev mode
+  SKIP_PROFILE_SETUP: false, // Set true to skip completely
   
-  // Log chi tiết trong dev mode
+  // Verbose logging in dev mode
   VERBOSE_LOGGING: true
 }
 
 /**
- * Kiểm tra xem có đang ở dev mode không
+ * Check if in dev mode
  */
 export function isDevMode() {
   return import.meta.env.DEV && DEV_CONFIG.ENABLE_DEV_MODE
 }
 
 /**
- * Log trong dev mode
+ * Log in dev mode
  */
 export function devLog(...args) {
   if (isDevMode() && DEV_CONFIG.VERBOSE_LOGGING) {
@@ -41,36 +43,36 @@ export function devLog(...args) {
 }
 
 /**
- * Lấy profile test từ localStorage
+ * Get test profile from localStorage
  */
 export function getDefaultTestProfile() {
   if (!isDevMode()) return null
   
-  // Kiểm tra xem đã có profile test trong localStorage chưa
-  const stored = localStorage.getItem('dev_test_profile')
-  if (stored) {
-    try {
-      return JSON.parse(stored)
-    } catch (e) {
-      console.warn('Failed to parse stored test profile')
-    }
-  }
-  
-  return null
+  // Use safe JSON getter
+  return safeGetJSON('dev_test_profile', null)
 }
 
 /**
- * Lưu profile test vào localStorage
+ * Save test profile to localStorage
  */
 export function saveTestProfile(profile) {
   if (!isDevMode()) return
   
-  localStorage.setItem('dev_test_profile', JSON.stringify(profile))
-  devLog('Saved test profile:', profile.profile_name)
+  // Validate profile before saving
+  if (!profile || typeof profile !== 'object') {
+    console.error('Invalid profile object:', profile)
+    return
+  }
+  
+  // Use safe JSON setter
+  const success = safeSetJSON('dev_test_profile', profile)
+  if (success) {
+    devLog('Saved test profile:', profile.profile_name)
+  }
 }
 
 /**
- * Xóa profile test
+ * Clear test profile
  */
 export function clearTestProfile() {
   localStorage.removeItem('dev_test_profile')
@@ -78,7 +80,7 @@ export function clearTestProfile() {
 }
 
 /**
- * Lấy user test mặc định
+ * Get default test user
  */
 export function getDefaultTestUser() {
   if (!isDevMode()) return null
@@ -86,19 +88,19 @@ export function getDefaultTestUser() {
 }
 
 /**
- * Kiểm tra xem có nên sử dụng profile test không
+ * Check if should use test profile
  */
 export function shouldUseTestProfile() {
   return isDevMode() && DEV_CONFIG.AUTO_SELECT_TEST_PROFILE
 }
 
 /**
- * Lấy profile test từ localStorage
+ * Get or create test profile from localStorage
  */
 export async function getOrCreateTestProfile() {
   if (!isDevMode()) return null
   
-  // Kiểm tra localStorage
+  // Check localStorage
   const existing = getDefaultTestProfile()
   if (existing) {
     devLog('Using existing test profile:', existing.profile_name)

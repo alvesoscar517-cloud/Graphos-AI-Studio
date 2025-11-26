@@ -24,15 +24,15 @@ const UserProfilePopup = ({ onClose }) => {
 
   const handleSignOut = async () => {
     const confirmed = await modal.confirm(
-      'Bạn có chắc muốn đăng xuất?',
-      'Xác nhận đăng xuất',
-      { confirmText: 'Đăng xuất', danger: true }
+      'Are you sure you want to sign out?',
+      'Confirm Sign Out',
+      { confirmText: 'Sign Out', danger: true }
     )
     
     if (confirmed) {
       await signOut()
       onClose()
-      modal.toast('Đã đăng xuất', '', 'success')
+      modal.toast('Signed out', '', 'success')
     }
   }
 
@@ -56,8 +56,8 @@ const UserProfilePopup = ({ onClose }) => {
             alt="User Avatar"
             style={user?.picture ? { background: 'none', padding: 0, borderRadius: '50%' } : {}}
           />
-          <h3 className="profile-name">{user?.name || 'Chưa đăng nhập'}</h3>
-          <p className="profile-email">{user?.email || 'Vui lòng đăng nhập'}</p>
+          <h3 className="profile-name">{user?.name || 'Not signed in'}</h3>
+          <p className="profile-email">{user?.email || 'Please sign in'}</p>
         </div>
         
         {/* Credit Balance Section */}
@@ -72,13 +72,13 @@ const UserProfilePopup = ({ onClose }) => {
         <div className="profile-divider"></div>
         
         <button className="profile-action-btn" onClick={handleSignOut}>
-          Đăng xuất
+          Sign Out
         </button>
         <div className="profile-divider"></div>
         <div className="profile-footer">
-          <a href="#" className="profile-link">Chính sách bảo mật</a>
+          <a href="#" className="profile-link">Privacy Policy</a>
           <span className="profile-separator">•</span>
-          <a href="#" className="profile-link">Điều khoản dịch vụ</a>
+          <a href="#" className="profile-link">Terms of Service</a>
         </div>
       </div>
 

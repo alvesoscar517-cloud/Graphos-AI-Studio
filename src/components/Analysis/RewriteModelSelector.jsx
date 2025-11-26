@@ -4,11 +4,11 @@ const REWRITE_MODELS = [
   {
     id: 'gemini-2.0-flash-exp',
     name: 'Gemini 2.0 Flash',
-    speed: { icon: '/icon/gauge.svg', text: 'Rất nhanh' },
-    description: 'Mô hình thử nghiệm thế hệ 2.0 với tốc độ cao và khả năng đa phương thức',
+    speed: { icon: '/icon/gauge.svg', text: 'Very Fast' },
+    description: 'Mô hình thử nghiệm mới nhất, xử lý nhanh và hỗ trợ nhiều loại nội dung như văn bản, hình ảnh',
     details: [
-      { icon: '/icon/zap.svg', text: 'Thử nghiệm' },
-      { icon: '/icon/sparkles.svg', text: 'Tính năng mới' }
+      { icon: '/icon/zap.svg', text: 'Experimental' },
+      { icon: '/icon/sparkles.svg', text: 'New Features' }
     ],
     icon: '/icon/Gemini.svg',
     color: '#ea4335'
@@ -16,11 +16,11 @@ const REWRITE_MODELS = [
   {
     id: 'gemini-2.5-flash-lite',
     name: 'Gemini 2.5 Flash Lite',
-    speed: { icon: '/icon/gauge.svg', text: 'Cực nhanh' },
-    description: 'Mô hình nhỏ nhất và tiết kiệm nhất, được xây dựng cho việc sử dụng quy mô lớn',
+    speed: { icon: '/icon/gauge.svg', text: 'Ultra Fast' },
+    description: 'Mô hình nhỏ gọn, tiết kiệm chi phí nhất, phù hợp cho các tác vụ đơn giản và xử lý số lượng lớn',
     details: [
-      { icon: '/icon/file-text.svg', text: 'Văn bản ngắn' },
-      { icon: '/icon/dollar-sign.svg', text: 'Chi phí thấp' }
+      { icon: '/icon/file-text.svg', text: 'Short Text' },
+      { icon: '/icon/dollar-sign.svg', text: 'Low Cost' }
     ],
     icon: '/icon/Gemini.svg',
     color: '#34a853'
@@ -28,11 +28,11 @@ const REWRITE_MODELS = [
   {
     id: 'gemini-2.5-flash',
     name: 'Gemini 2.5 Flash',
-    speed: { icon: '/icon/gauge.svg', text: 'Nhanh' },
-    description: 'Mô hình lai với khả năng suy luận, cửa sổ ngữ cảnh 1M token và ngân sách suy nghĩ',
+    speed: { icon: '/icon/gauge.svg', text: 'Fast' },
+    description: 'Mô hình cân bằng giữa tốc độ và chất lượng, có khả năng suy luận tốt, phù hợp cho hầu hết các tác vụ',
     details: [
-      { icon: '/icon/layers.svg', text: 'Đa năng' },
-      { icon: '/icon/star.svg', text: 'Khuyến nghị' }
+      { icon: '/icon/layers.svg', text: 'Versatile' },
+      { icon: '/icon/star.svg', text: 'Recommended' }
     ],
     icon: '/icon/Gemini.svg',
     color: '#4285f4'
@@ -40,11 +40,11 @@ const REWRITE_MODELS = [
   {
     id: 'gemini-2.5-pro',
     name: 'Gemini 2.5 Pro',
-    speed: { icon: '/icon/gauge.svg', text: 'Chậm hơn' },
-    description: 'Mô hình mạnh mẽ nhất với khả năng xử lý phức tạp và chất lượng cao nhất',
+    speed: { icon: '/icon/gauge.svg', text: 'Slower' },
+    description: 'Mô hình mạnh nhất, cho kết quả chất lượng cao nhất, phù hợp cho nội dung quan trọng cần độ chính xác cao',
     details: [
-      { icon: '/icon/award.svg', text: 'Văn bản quan trọng' },
-      { icon: '/icon/trending-up.svg', text: 'Chất lượng cao' }
+      { icon: '/icon/award.svg', text: 'Important Text' },
+      { icon: '/icon/trending-up.svg', text: 'High Quality' }
     ],
     icon: '/icon/Gemini.svg',
     color: '#4285f4'
@@ -101,16 +101,6 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
       </div>
     </div>
   )
-}
-
-// Helper function to convert hex color to CSS filter
-function getColorFilter(hexColor) {
-  const colorMap = {
-    '#34a853': 'invert(58%) sepia(78%) saturate(446%) hue-rotate(81deg) brightness(94%) contrast(87%)',
-    '#4285f4': 'invert(38%) sepia(98%) saturate(2618%) hue-rotate(203deg) brightness(95%) contrast(89%)',
-    '#ea4335': 'invert(35%) sepia(95%) saturate(2578%) hue-rotate(347deg) brightness(96%) contrast(90%)'
-  }
-  return colorMap[hexColor] || ''
 }
 
 export default RewriteModelSelector

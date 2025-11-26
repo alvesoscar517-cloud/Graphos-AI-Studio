@@ -138,27 +138,27 @@ function splitByLength(text, minLength, maxLength) {
  */
 export function validateSampleText(text) {
   if (!text || typeof text !== 'string') {
-    return { valid: false, error: 'Văn bản không hợp lệ' }
+    return { valid: false, error: 'Invalid text' }
   }
   
   if (text.length < 50) {
-    return { valid: false, error: 'Văn bản quá ngắn (tối thiểu 50 ký tự)' }
+    return { valid: false, error: 'Text too short (minimum 50 characters)' }
   }
   
   if (text.length > 20000) {
-    return { valid: false, error: 'Văn bản quá dài (tối đa 20,000 ký tự)' }
+    return { valid: false, error: 'Text too long (maximum 20,000 characters)' }
   }
   
   const words = text.split(/\s+/)
   if (words.length < 10) {
-    return { valid: false, error: 'Văn bản phải có ít nhất 10 từ' }
+    return { valid: false, error: 'Text must have at least 10 words' }
   }
   
   // Check if too repetitive
   const uniqueWords = new Set(words.map(w => w.toLowerCase()))
   const diversity = uniqueWords.size / words.length
   if (diversity < 0.2) {
-    return { valid: false, error: 'Văn bản quá lặp lại, cần đa dạng hơn' }
+    return { valid: false, error: 'Text too repetitive, needs more variety' }
   }
   
   return { valid: true }

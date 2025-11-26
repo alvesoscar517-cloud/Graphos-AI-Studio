@@ -42,7 +42,7 @@ export function exportUsersToCSV(users) {
     'ID': user.id,
     'Email': user.email,
     'Tier': user.tier || 'free',
-    'Created': new Date(user.created_at).toLocaleDateString('vi-VN'),
+    'Created': new Date(user.created_at).toLocaleDateString('en-US'),
     'Last Login': user.last_login ? new Date(user.last_login).toLocaleDateString('vi-VN') : 'Never',
     'Profiles': user.profile_count || 0,
     'Analyses': user.analysis_count || 0,

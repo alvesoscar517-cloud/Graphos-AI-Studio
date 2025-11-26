@@ -13,19 +13,19 @@ const FeedbackModal = ({ onClose }) => {
   const fileInputRef = useRef(null)
   const modalRef = useRef(null)
 
-  // Không cần useEffect nữa vì đã xử lý onClick trực tiếp trên overlay
+  // No need for useEffect anymore since onClick is handled directly on overlay
 
   const handleImageSelect = (e) => {
     const files = Array.from(e.target.files)
     if (images.length + files.length > 3) {
-      setError('Tối đa 3 hình ảnh')
+      setError('Maximum 3 images')
       return
     }
 
     const newImages = []
     files.forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
-        setError('Kích thước ảnh không được vượt quá 5MB')
+        setError('Image size must not exceed 5MB')
         return
       }
       const reader = new FileReader()
@@ -50,7 +50,7 @@ const FeedbackModal = ({ onClose }) => {
     e.preventDefault()
     
     if (!title.trim() || !content.trim()) {
-      setError('Vui lòng nhập tiêu đề và nội dung')
+      setError('Please enter title and content')
       return
     }
 
@@ -75,13 +75,13 @@ const FeedbackModal = ({ onClose }) => {
       const data = await response.json()
 
       if (response.ok) {
-        success('Cảm ơn bạn đã gửi feedback! Chúng tôi sẽ phản hồi sớm.')
+        success('Thank you for your feedback! We will respond soon.')
         onClose()
       } else {
-        setError(data.error || 'Có lỗi xảy ra, vui lòng thử lại')
+        setError(data.error || 'An error occurred, please try again')
       }
     } catch (err) {
-      setError('Không thể kết nối đến server')
+      setError('Unable to connect to server')
     } finally {
       setSending(false)
     }
@@ -103,22 +103,22 @@ const FeedbackModal = ({ onClose }) => {
 
         <form onSubmit={handleSubmit} className="feedback-form">
           <div className="feedback-field">
-            <label>Tiêu đề</label>
+            <label>Title</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Nhập tiêu đề feedback..."
+              placeholder="Enter feedback title..."
               maxLength={100}
             />
           </div>
 
           <div className="feedback-field">
-            <label>Nội dung</label>
+            <label>Content</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Mô tả chi tiết feedback của bạn..."
+              placeholder="Describe your feedback in detail..."
               rows={6}
               maxLength={2000}
             />
@@ -126,7 +126,7 @@ const FeedbackModal = ({ onClose }) => {
           </div>
 
           <div className="feedback-field">
-            <label>Hình ảnh (tùy chọn, tối đa 3 ảnh)</label>
+            <label>Images (optional, max 3 images)</label>
             <div className="image-upload-area">
               <input
                 ref={fileInputRef}
@@ -143,7 +143,7 @@ const FeedbackModal = ({ onClose }) => {
                 disabled={images.length >= 3}
               >
                 <img src="/icon/image-plus.svg" alt="Upload" />
-                <span>Thêm ảnh</span>
+                <span>Add Image</span>
               </button>
 
               {images.length > 0 && (
@@ -169,10 +169,10 @@ const FeedbackModal = ({ onClose }) => {
 
           <div className="feedback-actions">
             <button type="button" className="btn-cancel" onClick={onClose}>
-              Hủy
+              Cancel
             </button>
             <button type="submit" className="btn-submit" disabled={sending}>
-              {sending ? 'Đang gửi...' : 'Gửi Feedback'}
+              {sending ? 'Sending...' : 'Send Feedback'}
             </button>
           </div>
         </form>

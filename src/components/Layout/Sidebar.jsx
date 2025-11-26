@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNotes } from '../../contexts/NotesContext'
+import { truncateTitleByWords } from '../../utils/titleUtils'
 import './Sidebar.css'
 import NotificationPopup from '../Popups/NotificationPopup'
 import SettingsPopup from '../Popups/SettingsPopup'
@@ -58,9 +59,9 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
 
   const visibleNotes = getVisibleNotes()
 
-  const truncateTitle = (title, maxLength = 25) => {
-    if (title.length <= maxLength) return title
-    return title.substring(0, maxLength) + '...'
+  // Truncate title to max 7 words for display
+  const truncateTitle = (title) => {
+    return truncateTitleByWords(title, 7)
   }
 
   const handleNoteClick = (note) => {
@@ -72,13 +73,13 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
     e.stopPropagation()
     const note = visibleNotes.find(n => n.id === noteId)
     const confirmed = await modal.confirm(
-      `Bạn có chắc muốn xóa note "${note?.title}"?`,
-      'Xác nhận xóa',
-      { confirmText: 'Xóa', danger: true }
+      `Are you sure you want to delete note "${note?.title}"?`,
+      'Confirm Delete',
+      { confirmText: 'Delete', danger: true }
     )
     if (confirmed) {
       deleteNote(noteId)
-      modal.toast('Đã xóa note', '', 'success')
+      modal.toast('Note deleted', '', 'success')
     }
   }
 
@@ -104,10 +105,10 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
         // Nếu kéo quá 40% width thì toggle
         const threshold = 238 * 0.4
         if (info.offset.x < -threshold && !hidden) {
-          // Đóng sidebar nếu đang mở
-          // Note: Cần thêm callback từ parent để toggle
+          // Close sidebar if open
+          // Note: Need to add callback from parent to toggle
         } else if (info.offset.x > threshold && hidden) {
-          // Mở sidebar nếu đang đóng
+          // Open sidebar if closed
         }
       }}
       style={{
@@ -130,8 +131,8 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
 
         <a 
           href="#" 
-          className={`nav-item ${currentView === 'aistudio' || currentView === 'aistudio-default' ? 'active' : ''}`}
-          onClick={(e) => { e.preventDefault(); onViewChange('aistudio') }}
+          className={`nav-item ${currentView === 'aistudio-editor' && !currentNote ? 'active' : ''}`}
+          onClick={(e) => { e.preventDefault(); onViewChange('aistudio-editor', { createNew: true }) }}
         >
           <img src="/icon/play.svg" alt="AI Studio" />
           <span>AI Studio</span>
@@ -233,7 +234,7 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
         </div>
       </div>
 
-      {showNotifications && <NotificationPopup onClose={() => setShowNotifications(false)} />}
+      {showNotifications && <NotificationPopup onClose={() => setShowNotifications(false)} onViewChange={onViewChange} />}
       {showSettings && <SettingsPopup onClose={() => setShowSettings(false)} />}
       {showUserProfile && <UserProfilePopup onClose={() => setShowUserProfile(false)} />}
     </motion.aside>

@@ -70,21 +70,28 @@ const profileController = require('../controllers/profile.controller');
 const analysisController = require('../controllers/analysis.controller');
 const creditMiddleware = require('../middleware/credit.middleware');
 
+// === Profile legacy endpoints ===
 router.post('/create_profile', profileController.createProfile);
-router.post('/create_profile_complete', profileController.createProfileComplete);
-router.post('/add_sample', profileController.addSample);
-router.post('/add_samples_batch', profileController.addSamplesBatch);
-router.post('/finalize_profile', profileController.finalizeProfile);
+router.post('/create_profile_complete', creditMiddleware.profileComplete, profileController.createProfileComplete);
+router.post('/add_sample', creditMiddleware.profileSampleAdd, profileController.addSample);
+router.post('/add_samples_batch', creditMiddleware.profileSamplesBatch, profileController.addSamplesBatch);
+router.post('/finalize_profile', creditMiddleware.profileFinalize, profileController.finalizeProfile);
 router.get('/get_profile', profileController.getProfile);
 router.get('/get_profiles', profileController.getProfiles);
 router.post('/delete_profile', profileController.deleteProfile);
 
-// Legacy endpoints with credit middleware
+// === Analysis legacy endpoints with credit middleware ===
 router.post('/authenticate', creditMiddleware.aiDetection, analysisController.authenticateContent);
 router.post('/analyze', creditMiddleware.textAnalysis, analysisController.analyzeText);
 router.post('/suggest_improvements', creditMiddleware.improvementSuggestions, analysisController.suggestImprovements);
 router.post('/rewrite', creditMiddleware.textRewrite, analysisController.rewriteText);
 router.post('/rewrite_stream', creditMiddleware.textRewrite, analysisController.rewriteTextStream);
-router.post('/api/translate', analysisController.translateText);
+
+// === Translation legacy endpoint with credit middleware ===
+router.post('/api/translate', creditMiddleware.translation, analysisController.translateText);
+
+// === Humanization legacy endpoints with credit middleware ===
+router.post('/check-humanization', creditMiddleware.checkHumanization, analysisController.checkHumanization);
+router.post('/iterative-humanize', creditMiddleware.iterativeHumanize, analysisController.iterativeHumanize);
 
 module.exports = router;

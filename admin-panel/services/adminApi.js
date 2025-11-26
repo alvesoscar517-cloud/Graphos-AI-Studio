@@ -63,12 +63,12 @@ export const notificationsApi = {
   // Get all notifications
   getAll: async (filters = {}) => {
     const params = new URLSearchParams(filters);
-    return apiCall(`/api/admin/notifications?${params}`);
+    return apiCall(`/api/notifications?${params}`);
   },
 
   // Create notification
   create: async (notification) => {
-    return apiCall('/api/admin/notifications', {
+    return apiCall('/api/notifications', {
       method: 'POST',
       body: JSON.stringify(notification),
     });
@@ -76,7 +76,7 @@ export const notificationsApi = {
 
   // Update notification
   update: async (id, updates) => {
-    return apiCall(`/api/admin/notifications/${id}`, {
+    return apiCall(`/api/notifications/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
@@ -84,21 +84,51 @@ export const notificationsApi = {
 
   // Delete notification
   delete: async (id) => {
-    return apiCall(`/api/admin/notifications/${id}`, {
+    return apiCall(`/api/notifications/${id}`, {
       method: 'DELETE',
     });
   },
 
-  // Send notification
+  // Send notification immediately
   send: async (id) => {
-    return apiCall(`/api/admin/notifications/${id}/send`, {
+    return apiCall(`/api/notifications/${id}/send`, {
       method: 'POST',
+    });
+  },
+
+  // Schedule notification for later
+  schedule: async (id, scheduledAt) => {
+    return apiCall(`/api/notifications/${id}/schedule`, {
+      method: 'POST',
+      body: JSON.stringify({ scheduledAt }),
     });
   },
 
   // Get notification stats
   getStats: async (id) => {
-    return apiCall(`/api/admin/notifications/${id}/stats`);
+    return apiCall(`/api/notifications/${id}/stats`);
+  },
+
+  // Process scheduled notifications (admin trigger)
+  processScheduled: async () => {
+    return apiCall('/api/notifications/process-scheduled', {
+      method: 'POST',
+    });
+  },
+
+  // Cleanup expired notifications
+  cleanupExpired: async () => {
+    return apiCall('/api/notifications/cleanup-expired', {
+      method: 'POST',
+    });
+  },
+
+  // Send auto notification (for system events)
+  sendAutoNotification: async (templateType, data = {}, targetSegments = []) => {
+    return apiCall('/api/notifications/auto-send', {
+      method: 'POST',
+      body: JSON.stringify({ templateType, data, targetSegments }),
+    });
   },
 };
 
@@ -107,7 +137,7 @@ export const notificationsApi = {
 // ============================================================================
 
 export const usersApi = {
-  // Get all users
+  // Get all users (basic)
   getAll: async (params = {}) => {
     const queryParams = new URLSearchParams(params);
     const cacheKey = `users_${queryParams.toString()}`;
@@ -117,6 +147,12 @@ export const usersApi = {
       () => apiCall(`/api/admin/users?${queryParams}`),
       2 * 60 * 1000 // 2 minutes
     );
+  },
+
+  // Get all users with pagination, search, filters
+  getAllAdvanced: async (params = {}) => {
+    const queryParams = new URLSearchParams(params);
+    return apiCall(`/api/admin/users/advanced?${queryParams}`);
   },
 
   // Get user details
@@ -136,17 +172,50 @@ export const usersApi = {
     return apiCall(`/api/admin/users/${id}/logs?${queryParams}`);
   },
 
+  // Get user profiles
+  getProfiles: async (id) => {
+    return apiCall(`/api/admin/users/${id}/profiles`);
+  },
+
+  // Update user info
+  update: async (id, data) => {
+    cache.delete(`user_${id}`);
+    return apiCall(`/api/admin/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
   // Lock/Unlock user
   toggleLock: async (id, locked, reason = null) => {
+    cache.delete(`user_${id}`);
     return apiCall(`/api/admin/users/${id}/lock`, {
       method: 'PUT',
       body: JSON.stringify({ locked, reason }),
     });
   },
 
+  // Adjust user credits
+  adjustCredits: async (id, amount, type, reason) => {
+    cache.delete(`user_${id}`);
+    return apiCall(`/api/admin/users/${id}/credits`, {
+      method: 'PUT',
+      body: JSON.stringify({ amount, type, reason }),
+    });
+  },
+
   // Delete user
   delete: async (id) => {
+    cache.clear();
     return apiCall(`/api/admin/users/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // Delete user profile
+  deleteProfile: async (userId, profileId) => {
+    cache.delete(`user_${userId}`);
+    return apiCall(`/api/admin/users/${userId}/profiles/${profileId}`, {
       method: 'DELETE',
     });
   },
@@ -156,6 +225,29 @@ export const usersApi = {
     return apiCall(`/api/admin/users/${id}/notification`, {
       method: 'POST',
       body: JSON.stringify(notification),
+    });
+  },
+
+  // Export users
+  export: async (format = 'json') => {
+    return apiCall(`/api/admin/users/export?format=${format}`);
+  },
+
+  // Bulk lock/unlock users
+  bulkLock: async (userIds, locked, reason = null) => {
+    cache.clear();
+    return apiCall('/api/admin/bulk/lock', {
+      method: 'POST',
+      body: JSON.stringify({ userIds, locked, reason }),
+    });
+  },
+
+  // Bulk delete users
+  bulkDelete: async (userIds) => {
+    cache.clear();
+    return apiCall('/api/admin/bulk/delete', {
+      method: 'POST',
+      body: JSON.stringify({ userIds, confirm: 'DELETE' }),
     });
   },
 };
@@ -168,6 +260,34 @@ export const analyticsApi = {
   // Get overview
   getOverview: async () => {
     return apiCall('/api/admin/analytics/overview');
+  },
+};
+
+// ============================================================================
+// ORDERS & PAYMENTS
+// ============================================================================
+
+export const ordersApi = {
+  // Get all orders
+  getAll: async (params = {}) => {
+    const queryParams = new URLSearchParams(params);
+    return apiCall(`/api/admin/orders?${queryParams}`);
+  },
+
+  // Get order details
+  getById: async (id) => {
+    return apiCall(`/api/admin/orders/${id}`);
+  },
+
+  // Get subscriptions
+  getSubscriptions: async (params = {}) => {
+    const queryParams = new URLSearchParams(params);
+    return apiCall(`/api/admin/subscriptions?${queryParams}`);
+  },
+
+  // Get revenue stats
+  getRevenueStats: async (days = 30) => {
+    return apiCall(`/api/admin/revenue?days=${days}`);
   },
 };
 
@@ -260,6 +380,55 @@ export const logsApi = {
     const params = olderThan ? `?olderThan=${olderThan}` : '';
     return apiCall(`/api/admin/logs${params}`, {
       method: 'DELETE',
+    });
+  },
+};
+
+// ============================================================================
+// USER ACTIVITY LOGS
+// ============================================================================
+
+export const activityLogsApi = {
+  // Get all activity logs (admin overview)
+  getAll: async (params = {}) => {
+    const queryParams = new URLSearchParams(params);
+    return apiCall(`/api/admin/activity-logs?${queryParams}`);
+  },
+
+  // Get activity statistics
+  getStatistics: async (days = 7) => {
+    return apiCall(`/api/admin/activity-logs/statistics?days=${days}`);
+  },
+
+  // Get user activity logs
+  getUserLogs: async (userId, params = {}) => {
+    const queryParams = new URLSearchParams(params);
+    return apiCall(`/api/admin/activity-logs/user/${userId}?${queryParams}`);
+  },
+
+  // Get user activity summary
+  getUserSummary: async (userId, params = {}) => {
+    const queryParams = new URLSearchParams(params);
+    return apiCall(`/api/admin/activity-logs/user/${userId}/summary?${queryParams}`);
+  },
+
+  // Get user credit transactions
+  getUserCredits: async (userId, params = {}) => {
+    const queryParams = new URLSearchParams(params);
+    return apiCall(`/api/admin/activity-logs/user/${userId}/credits?${queryParams}`);
+  },
+
+  // Get user feature usage
+  getUserFeatures: async (userId, params = {}) => {
+    const queryParams = new URLSearchParams(params);
+    return apiCall(`/api/admin/activity-logs/user/${userId}/features?${queryParams}`);
+  },
+
+  // Cleanup old logs
+  cleanup: async (daysToKeep = 90) => {
+    return apiCall('/api/admin/activity-logs/cleanup', {
+      method: 'POST',
+      body: JSON.stringify({ daysToKeep }),
     });
   },
 };

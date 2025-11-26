@@ -43,7 +43,7 @@ class ErrorBoundary extends Component {
               alt="Error" 
               className="error-icon"
             />
-            <h1 className="error-title">Đã xảy ra lỗi</h1>
+            <h1 className="error-title">An Error Occurred</h1>
             <p className="error-message">
               Rất tiếc, đã có lỗi xảy ra. Vui lòng thử lại sau.
             </p>
@@ -71,7 +71,7 @@ class ErrorBoundary extends Component {
                 className="btn-home"
                 onClick={this.goHome}
               >
-                Quay về trang chủ
+                Back to Home
               </button>
             </div>
           </div>

@@ -1,6 +1,6 @@
 /**
- * Post-build script - Admin đã được build riêng vào dist/admin
- * Script này chỉ cần tạo redirects và verify
+ * Post-build script - Admin has been built separately into dist/admin
+ * This script only needs to create redirects and verify
  */
 
 import fs from 'fs';

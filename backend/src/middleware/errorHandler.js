@@ -8,7 +8,7 @@ const config = require('../config');
  * Global error handler
  */
 function errorHandler(err, req, res, next) {
-  console.error('❌ Error:', err);
+  console.error('[ERROR]', err);
   
   // Default error
   let status = err.status || 500;

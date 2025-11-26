@@ -36,13 +36,13 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
   // Format tone
   const formatTone = (tone) => {
     const toneMap = {
-      'professional': 'Chuyên nghiệp',
-      'casual': 'Thân mật',
-      'academic': 'Học thuật',
-      'creative': 'Sáng tạo',
-      'friendly': 'Thân thiện',
-      'formal': 'Trang trọng',
-      'neutral': 'Trung lập'
+      'professional': 'Professional',
+      'casual': 'Casual',
+      'academic': 'Academic',
+      'creative': 'Creative',
+      'friendly': 'Friendly',
+      'formal': 'Formal',
+      'neutral': 'Neutral'
     }
     return toneMap[tone] || tone
   }
@@ -50,9 +50,9 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
   // Format sentence length
   const formatSentenceLength = (length) => {
     const lengthMap = {
-      'short': 'Ngắn',
-      'medium': 'Trung bình',
-      'long': 'Dài'
+      'short': 'Short',
+      'medium': 'Medium',
+      'long': 'Long'
     }
     return lengthMap[length] || length
   }
@@ -60,9 +60,9 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
   // Format structure preference
   const formatStructure = (structure) => {
     const structureMap = {
-      'simple': 'Đơn giản',
-      'complex': 'Phức tạp',
-      'varied': 'Đa dạng'
+      'simple': 'Simple',
+      'complex': 'Complex',
+      'varied': 'Varied'
     }
     return structureMap[structure] || structure
   }
@@ -74,7 +74,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           <div className="profile-detail-title-section">
             <h2>{profile.profile_name}</h2>
             <span className={`profile-status-badge ${profile.status}`}>
-              {profile.status === 'ready' ? 'Sẵn sàng' : 'Đang xử lý'}
+              {profile.status === 'ready' ? 'Ready' : 'Processing'}
             </span>
           </div>
           <button className="profile-detail-close" onClick={onClose}>
@@ -91,7 +91,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
             <section className="profile-detail-section">
               <h3>
                 <img src="/icon/award.svg" alt="Quality" />
-                Chất lượng hồ sơ
+                Profile Quality
               </h3>
               <div className="profile-quality-score">
                 <div className={`quality-score-display quality-rating-${profile.quality_rating || profile.qualityRating || 'ok'}`}>
@@ -105,7 +105,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
                     {(profile.quality_rating || profile.qualityRating) === 'excellent' && (
                       <>
                         <img src="/icon/star.svg" alt="Excellent" />
-                        <span>Xuất sắc</span>
+                        <span>Excellent</span>
                       </>
                     )}
                     {(profile.quality_rating || profile.qualityRating) === 'good' && (
@@ -123,15 +123,15 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
                     {(profile.quality_rating || profile.qualityRating) === 'poor' && (
                       <>
                         <img src="/icon/alert-circle.svg" alt="Poor" />
-                        <span>Cần cải thiện</span>
+                        <span>Needs Improvement</span>
                       </>
                     )}
                   </div>
                   <p className="quality-description">
-                    {(profile.quality_rating || profile.qualityRating) === 'excellent' && 'Hồ sơ xuất sắc! AI sẽ học rất tốt văn phong của bạn.'}
-                    {(profile.quality_rating || profile.qualityRating) === 'good' && 'Hồ sơ tốt! AI có thể học được văn phong của bạn.'}
-                    {(profile.quality_rating || profile.qualityRating) === 'ok' && 'Hồ sơ đủ dùng, nhưng nên cải thiện để AI học tốt hơn.'}
-                    {(profile.quality_rating || profile.qualityRating) === 'poor' && 'Hồ sơ cần cải thiện. Hãy thêm mẫu và nội dung đa dạng hơn.'}
+                    {(profile.quality_rating || profile.qualityRating) === 'excellent' && 'Excellent profile! AI will learn your writing style very well.'}
+                    {(profile.quality_rating || profile.qualityRating) === 'good' && 'Good profile! AI can learn your writing style.'}
+                    {(profile.quality_rating || profile.qualityRating) === 'ok' && 'Adequate profile, but consider improving for better AI learning.'}
+                    {(profile.quality_rating || profile.qualityRating) === 'poor' && 'Profile needs improvement. Add more samples and diverse content.'}
                   </p>
                 </div>
               </div>
@@ -142,25 +142,25 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           <section className="profile-detail-section">
             <h3>
               <img src="/icon/info.svg" alt="Info" />
-              Tổng quan
+              Overview
             </h3>
             <div className="profile-detail-grid">
               <div className="profile-detail-item">
-                <span className="label">Số lượng mẫu</span>
-                <span className="value">{profile.sample_count || 0} mẫu</span>
+                <span className="label">Sample Count</span>
+                <span className="value">{profile.sample_count || 0} samples</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Tổng số từ</span>
-                <span className="value">{stats.totalWords?.toLocaleString() || 0} từ</span>
+                <span className="label">Total Words</span>
+                <span className="value">{stats.totalWords?.toLocaleString() || 0} words</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Tổng số câu</span>
-                <span className="value">{stats.totalSentences?.toLocaleString() || 0} câu</span>
+                <span className="label">Total Sentences</span>
+                <span className="value">{stats.totalSentences?.toLocaleString() || 0} sentences</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Ngày tạo</span>
+                <span className="label">Created Date</span>
                 <span className="value">
-                  {profile.created_at ? new Date(profile.created_at).toLocaleDateString('vi-VN') : 'N/A'}
+                  {profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US') : 'N/A'}
                 </span>
               </div>
             </div>
@@ -170,27 +170,27 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           <section className="profile-detail-section">
             <h3>
               <img src="/icon/bar-chart.svg" alt="Stats" />
-              Đặc điểm thống kê
+              Statistical Features
             </h3>
             <div className="profile-detail-grid">
               <div className="profile-detail-item">
-                <span className="label">Độ dài từ TB</span>
-                <span className="value">{stats.avgWordLength?.toFixed(2) || 0} ký tự</span>
+                <span className="label">Avg Word Length</span>
+                <span className="value">{stats.avgWordLength?.toFixed(2) || 0} characters</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Độ dài câu TB</span>
-                <span className="value">{stats.avgSentenceLength?.toFixed(1) || 0} từ</span>
+                <span className="label">Avg Sentence Length</span>
+                <span className="value">{stats.avgSentenceLength?.toFixed(1) || 0} words</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Độ phong phú từ vựng</span>
+                <span className="label">Vocabulary Richness</span>
                 <span className="value">{((stats.vocabularyRichness || 0) * 100).toFixed(1)}%</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Tỷ lệ dấu câu</span>
+                <span className="label">Punctuation Ratio</span>
                 <span className="value">{((stats.punctuationRatio || 0) * 100).toFixed(1)}%</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Điểm dễ đọc (Flesch)</span>
+                <span className="label">Readability Score (Flesch)</span>
                 <span className="value">{stats.readabilityScore?.toFixed(0) || 0}/100</span>
               </div>
             </div>
@@ -201,15 +201,15 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
             <section className="profile-detail-section">
               <h3>
                 <img src="/icon/mic.svg" alt="Voice" />
-                Phong cách văn phong
+                Writing Style
               </h3>
               <div className="profile-detail-grid">
                 <div className="profile-detail-item">
-                  <span className="label">Giọng văn</span>
+                  <span className="label">Tone</span>
                   <span className="value">{formatTone(voiceProfile.tone)}</span>
                 </div>
                 <div className="profile-detail-item">
-                  <span className="label">Mức độ trang trọng</span>
+                  <span className="label">Formality Level</span>
                   <span className="value">{voiceProfile.formality_level || 0}/10</span>
                 </div>
                 <div className="profile-detail-item">
@@ -229,7 +229,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
             <section className="profile-detail-section">
               <h3>
                 <img src="/icon/list.svg" alt="Characteristics" />
-                Đặc điểm chính
+                Key Characteristics
               </h3>
               <ul className="profile-characteristics-list">
                 {voiceProfile.key_characteristics.map((char, index) => (
@@ -247,12 +247,12 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
             <section className="profile-detail-section">
               <h3>
                 <img src="/icon/book-open.svg" alt="Vocabulary" />
-                Từ vựng ưa thích
+                Preferred Vocabulary
               </h3>
               
               {vocabPrefs.common_phrases?.length > 0 && (
                 <div className="profile-vocab-group">
-                  <h4>Cụm từ thường dùng</h4>
+                  <h4>Common Phrases</h4>
                   <div className="profile-tags">
                     {vocabPrefs.common_phrases.map((phrase, index) => (
                       <span key={index} className="profile-tag">{phrase}</span>
@@ -263,7 +263,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
 
               {vocabPrefs.preferred_connectors?.length > 0 && (
                 <div className="profile-vocab-group">
-                  <h4>Từ nối ưa thích</h4>
+                  <h4>Preferred Connectors</h4>
                   <div className="profile-tags">
                     {vocabPrefs.preferred_connectors.map((connector, index) => (
                       <span key={index} className="profile-tag">{connector}</span>
@@ -274,7 +274,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
 
               {vocabPrefs.avoid_words?.length > 0 && (
                 <div className="profile-vocab-group">
-                  <h4>Từ nên tránh</h4>
+                  <h4>Words to Avoid</h4>
                   <div className="profile-tags avoid">
                     {vocabPrefs.avoid_words.map((word, index) => (
                       <span key={index} className="profile-tag avoid">{word}</span>
@@ -290,7 +290,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
             <section className="profile-detail-section">
               <h3>
                 <img src="/icon/file-text.svg" alt="Instructions" />
-                Hướng dẫn viết lại
+                Rewriting Guidelines
               </h3>
               <div className="profile-instructions">
                 <p>{voiceProfile.rewrite_instructions}</p>
@@ -303,7 +303,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
             <section className="profile-detail-section">
               <h3>
                 <img src="/icon/align-left.svg" alt="Opening" />
-                Phong cách mở đầu
+                Opening Style
               </h3>
               <div className="profile-instructions">
                 <p>{sentencePatterns.opening_style}</p>
@@ -314,12 +314,12 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
 
         <div className="profile-detail-footer">
           <button className="btn-secondary" onClick={onClose}>
-            Đóng
+            Close
           </button>
           {onUse && profile.status === 'ready' && (
             <button className="btn-primary" onClick={onUse}>
               <img src="/icon/play.svg" alt="Use" />
-              Sử dụng hồ sơ này
+              Use this profile
             </button>
           )}
         </div>

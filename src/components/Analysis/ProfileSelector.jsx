@@ -22,15 +22,15 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
   const handleSelectProfile = (profile) => {
     onProfileSelect(profile)
     setShowModal(false)
-    modal.toast('Đã chọn hồ sơ', profile.profile_name, 'success')
+    modal.toast('Profile Selected', profile.profile_name, 'success')
   }
 
   const handleDeleteProfile = async (e, profileId) => {
     e.stopPropagation()
     const confirmed = await modal.confirm(
-      'Bạn có chắc muốn xóa hồ sơ này? Hành động này không thể hoàn tác.',
-      'Xác nhận xóa hồ sơ',
-      { confirmText: 'Xóa', danger: true }
+      'Are you sure you want to delete this profile? This action cannot be undone.',
+      'Confirm Delete Profile',
+      { confirmText: 'Delete', danger: true }
     )
     
     if (confirmed) {
@@ -47,7 +47,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
           onProfileSelect(null)
         }
       } else {
-        modal.error('Không thể xóa hồ sơ: ' + result.error)
+        modal.error('Unable to delete profile: ' + result.error)
       }
     }
   }
@@ -80,17 +80,17 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
             <img src={`/icon/${getThemeIcon(currentProfile?.theme)}.svg`} alt="Profile" />
           </div>
           <div className="profile-selector-info">
-            <h3>{currentProfile?.profile_name || 'Chưa có hồ sơ'}</h3>
+            <h3>{currentProfile?.profile_name || 'No Profile'}</h3>
             <p className="model-id">
-              {currentProfile ? `${currentProfile.sample_count || 0} mẫu văn bản` : 'Nhấn để chọn hồ sơ'}
+              {currentProfile ? `${currentProfile.sample_count || 0} text samples` : 'Click to select profile'}
             </p>
           </div>
           <img src="/icon/chevron-down.svg" alt="Select" className="profile-selector-arrow" />
         </div>
         <p className="model-description">
           {currentProfile 
-            ? 'Hồ sơ văn phong đang hoạt động' 
-            : 'Chọn hồ sơ văn phong để bắt đầu phân tích và viết lại nội dung.'}
+            ? 'Active writing style profile' 
+            : 'Select a writing style profile to start analyzing and rewriting content.'}
         </p>
       </div>
 
@@ -98,7 +98,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
         <div className="modal-overlay show" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Chọn hồ sơ văn phong</h2>
+              <h2>Select Writing Style Profile</h2>
               <button className="modal-close-btn" onClick={() => setShowModal(false)}>
                 <img src="/icon/x.svg" alt="Close" />
               </button>
@@ -124,7 +124,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
               {loading ? (
                 <div style={{ textAlign: 'center', padding: '40px' }}>
                   <div className="modal-spinner"></div>
-                  <p style={{ marginTop: '16px', color: 'var(--text-secondary)' }}>Đang tải...</p>
+                  <p style={{ marginTop: '16px', color: 'var(--text-secondary)' }}>Loading...</p>
                 </div>
               ) : filteredProfiles.length === 0 ? (
                 <div className="empty-state">
@@ -160,11 +160,11 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                         <div className="profile-modal-name-row">
                           <h3 className="profile-modal-name">{profile.profile_name}</h3>
                           {currentProfile?.profile_id === profile.profile_id ? (
-                            <span className="profile-modal-badge selected">Đang chọn</span>
+                            <span className="profile-modal-badge selected">[SELECTED]</span>
                           ) : profile.status === 'ready' ? (
-                            <span className="profile-modal-badge ready">Sẵn sàng</span>
+                            <span className="profile-modal-badge ready">[READY]</span>
                           ) : (
-                            <span className="profile-modal-badge pending">Đang xử lý</span>
+                            <span className="profile-modal-badge pending">[PROCESSING]</span>
                           )}
                           {(profile.quality_score || profile.qualityScore) && (
                             <span className={`profile-modal-badge quality quality-${profile.quality_rating || profile.qualityRating || 'ok'}`}>
@@ -191,7 +191,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                               <span className="profile-modal-meta-divider">•</span>
                               <span className="profile-modal-meta-item">
                                 <img src="/icon/align-left.svg" alt="Sentences" />
-                                {profile.statistics.totalSentences.toLocaleString()} câu
+                                {profile.statistics.totalSentences.toLocaleString()} sentences
                               </span>
                             </>
                           )}
@@ -220,11 +220,11 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                         <span className="profile-modal-tag">
                           <img src="/icon/mic.svg" alt="Tone" />
                           {profile.voice_profile?.tone ? (
-                            profile.voice_profile.tone === 'professional' ? 'Chuyên nghiệp' :
-                            profile.voice_profile.tone === 'casual' ? 'Thân mật' :
-                            profile.voice_profile.tone === 'academic' ? 'Học thuật' :
-                            profile.voice_profile.tone === 'creative' ? 'Sáng tạo' :
-                            profile.voice_profile.tone === 'friendly' ? 'Thân thiện' :
+                            profile.voice_profile.tone === 'professional' ? 'Professional' :
+                            profile.voice_profile.tone === 'casual' ? 'Casual' :
+                            profile.voice_profile.tone === 'academic' ? 'Academic' :
+                            profile.voice_profile.tone === 'creative' ? 'Creative' :
+                            profile.voice_profile.tone === 'friendly' ? 'Friendly' :
                             profile.voice_profile.tone
                           ) : 'N/A'}
                         </span>
@@ -234,16 +234,16 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                         </span>
                         <span className="profile-modal-tag">
                           <img src="/icon/bar-chart.svg" alt="Length" />
-                          Câu {profile.voice_profile?.sentence_patterns?.typical_length ? (
-                            profile.voice_profile.sentence_patterns.typical_length === 'short' ? 'ngắn' :
-                            profile.voice_profile.sentence_patterns.typical_length === 'medium' ? 'TB' :
-                            profile.voice_profile.sentence_patterns.typical_length === 'long' ? 'dài' :
+                          Sentence {profile.voice_profile?.sentence_patterns?.typical_length ? (
+                            profile.voice_profile.sentence_patterns.typical_length === 'short' ? 'Short' :
+                            profile.voice_profile.sentence_patterns.typical_length === 'medium' ? 'Medium' :
+                            profile.voice_profile.sentence_patterns.typical_length === 'long' ? 'Long' :
                             profile.voice_profile.sentence_patterns.typical_length
                           ) : 'N/A'}
                         </span>
                         <span className="profile-modal-tag">
                           <img src="/icon/hash.svg" alt="Avg" />
-                          TB: {profile.statistics?.avgSentenceLength ? profile.statistics.avgSentenceLength.toFixed(1) : 'N/A'} từ/câu
+                          Avg: {profile.statistics?.avgSentenceLength ? profile.statistics.avgSentenceLength.toFixed(1) : 'N/A'} words/sentence
                         </span>
                       </div>
                     </div>

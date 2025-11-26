@@ -6,33 +6,33 @@ const MODELS = [
   {
     id: 'gemini-2.0-flash-exp',
     name: 'Gemini 2.0 Flash',
-    speed: 'Rất nhanh',
-    description: 'Mô hình thử nghiệm thế hệ 2.0 với tốc độ cao và khả năng đa phương thức',
-    tags: ['Thử nghiệm', 'Tính năng mới'],
+    speed: 'Very Fast',
+    description: 'Mô hình thử nghiệm mới nhất, xử lý nhanh và hỗ trợ nhiều loại nội dung như văn bản, hình ảnh',
+    tags: ['Experimental', 'New Features'],
     icon: '/icon/Gemini.svg'
   },
   {
     id: 'gemini-2.5-flash-lite',
     name: 'Gemini 2.5 Flash Lite',
-    speed: 'Cực nhanh',
-    description: 'Mô hình nhỏ nhất và tiết kiệm nhất, được xây dựng cho việc sử dụng quy mô lớn',
-    tags: ['Văn bản ngắn', 'Chi phí thấp'],
+    speed: 'Ultra Fast',
+    description: 'Mô hình nhỏ gọn, tiết kiệm chi phí nhất, phù hợp cho các tác vụ đơn giản và xử lý số lượng lớn',
+    tags: ['Short Text', 'Low Cost'],
     icon: '/icon/Gemini.svg'
   },
   {
     id: 'gemini-2.5-flash',
     name: 'Gemini 2.5 Flash',
-    speed: 'Nhanh',
-    description: 'Mô hình lai với khả năng suy luận, cửa sổ ngữ cảnh 1M token và ngân sách suy nghĩ',
-    tags: ['Đa năng', 'Khuyến nghị'],
+    speed: 'Fast',
+    description: 'Mô hình cân bằng giữa tốc độ và chất lượng, có khả năng suy luận tốt, phù hợp cho hầu hết các tác vụ',
+    tags: ['Versatile', 'Recommended'],
     icon: '/icon/Gemini.svg'
   },
   {
     id: 'gemini-2.5-pro',
     name: 'Gemini 2.5 Pro',
-    speed: 'Chậm hơn',
-    description: 'Mô hình mạnh mẽ nhất với khả năng xử lý phức tạp và chất lượng cao nhất',
-    tags: ['Văn bản quan trọng', 'Chất lượng cao'],
+    speed: 'Slower',
+    description: 'Mô hình mạnh nhất, cho kết quả chất lượng cao nhất, phù hợp cho nội dung quan trọng cần độ chính xác cao',
+    tags: ['Important Text', 'High Quality'],
     icon: '/icon/Gemini.svg'
   }
 ]
@@ -69,7 +69,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
         <div className="modal-overlay show" onClick={() => setShowModal(false)}>
           <div className="modal-content model-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Chọn mô hình AI</h2>
+              <h2>Select AI Model</h2>
               <button className="modal-close-btn" onClick={() => setShowModal(false)}>
                 <img src="/icon/x.svg" alt="Close" />
               </button>
@@ -90,7 +90,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
                       <h3>
                         {model.name}
                         {selectedModel === model.id && (
-                          <span className="model-modal-badge">Đang dùng</span>
+                          <span className="model-modal-badge">[IN USE]</span>
                         )}
                       </h3>
                       <div className="model-modal-speed">
@@ -109,14 +109,14 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
                     {model.tags.map((tag, idx) => {
                       const getTagIcon = (tagName) => {
                         const iconMap = {
-                          'Thử nghiệm': 'zap',
-                          'Tính năng mới': 'sparkles',
-                          'Văn bản ngắn': 'file-text',
-                          'Chi phí thấp': 'dollar-sign',
-                          'Đa năng': 'layers',
-                          'Khuyến nghị': 'star',
-                          'Văn bản quan trọng': 'file',
-                          'Chất lượng cao': 'award'
+                          'Experimental': 'zap',
+                          'New Features': 'sparkles',
+                          'Short Text': 'file-text',
+                          'Low Cost': 'dollar-sign',
+                          'Versatile': 'layers',
+                          'Recommended': 'star',
+                          'Important Text': 'file',
+                          'High Quality': 'award'
                         }
                         return iconMap[tagName] || 'tag'
                       }

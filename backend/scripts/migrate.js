@@ -8,20 +8,20 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔄 Starting migration...\n');
+console.log('[INFO] Starting migration...\n');
 
 // Check if old index.js exists
 const oldIndexPath = path.join(__dirname, '..', 'index.js.old');
 const newIndexPath = path.join(__dirname, '..', 'index.js');
 
 if (!fs.existsSync(oldIndexPath)) {
-  console.log('⚠️  No index.js.old found.');
-  console.log('💡 If you want to migrate, rename your current index.js to index.js.old first.\n');
+  console.log('[WARNING] No index.js.old found.');
+  console.log('[INFO] If you want to migrate, rename your current index.js to index.js.old first.\n');
   process.exit(0);
 }
 
-console.log('✅ Found index.js.old');
-console.log('📝 Reading old code...\n');
+console.log('[SUCCESS] Found index.js.old');
+console.log('[INFO] Reading old code...\n');
 
 const oldCode = fs.readFileSync(oldIndexPath, 'utf8');
 
@@ -33,14 +33,14 @@ const stats = {
   asyncFunctions: (oldCode.match(/async function \w+\(/g) || []).length
 };
 
-console.log('📊 Old code statistics:');
+console.log('[STATS] Old code statistics:');
 console.log(`   Total lines: ${stats.totalLines}`);
 console.log(`   Routes: ${stats.routes}`);
 console.log(`   Functions: ${stats.functions}`);
 console.log(`   Async functions: ${stats.asyncFunctions}\n`);
 
 // Create new modular structure
-console.log('🏗️  Creating new structure...\n');
+console.log('[INFO] Creating new structure...\n');
 
 const newIndex = `/**
  * AI Content Authenticator - Backend Entry Point
@@ -97,8 +97,8 @@ app.use(errorHandler);
 const PORT = config.PORT;
 app.listen(PORT, () => {
   logger.info(\`🚀 Server running on port \${PORT}\`);
-  logger.info(\`📍 Environment: \${config.NODE_ENV}\`);
-  logger.info(\`🔧 Project: \${config.PROJECT_ID}\`);
+  logger.info(\`[INFO] Environment: \${config.NODE_ENV}\`);
+  logger.info(\`[CONFIG] Project: \${config.PROJECT_ID}\`);
 });
 
 module.exports = app;
@@ -106,24 +106,24 @@ module.exports = app;
 
 // Write new index.js
 fs.writeFileSync(newIndexPath, newIndex);
-console.log('✅ Created new index.js');
+console.log('[SUCCESS] Created new index.js');
 
 // Create migration checklist
 const checklist = `# Migration Checklist
 
-## ✅ Completed:
+## [SUCCESS] Completed:
 - [x] Created new modular structure
 - [x] Created config files
 - [x] Created middleware
 - [x] Created utilities
 
-## 🔄 In Progress:
+## [INFO] In Progress:
 - [ ] Extract routes to separate files
 - [ ] Extract controllers
 - [ ] Extract services
 - [ ] Update tests
 
-## 📝 Next Steps:
+## [INFO] Next Steps:
 
 ### 1. Test new structure locally
 \`\`\`bash
@@ -148,7 +148,7 @@ gcloud run deploy ai-content-authenticator --source .
 - Check logs
 - Monitor performance
 
-## 📊 Migration Progress:
+## [STATS] Migration Progress:
 
 Total routes to migrate: ${stats.routes}
 - [ ] Authentication routes
@@ -163,12 +163,12 @@ See MIGRATION_GUIDE.md for detailed instructions.
 `;
 
 fs.writeFileSync(path.join(__dirname, '..', 'MIGRATION_CHECKLIST.md'), checklist);
-console.log('✅ Created MIGRATION_CHECKLIST.md\n');
+console.log('[SUCCESS] Created MIGRATION_CHECKLIST.md\n');
 
-console.log('🎉 Migration setup complete!\n');
-console.log('📝 Next steps:');
+console.log('[SUCCESS] Migration setup complete!\n');
+console.log('[INFO] Next steps:');
 console.log('   1. Review the new index.js');
 console.log('   2. Copy your routes from index.js.old');
 console.log('   3. Test locally: npm start');
 console.log('   4. Deploy: gcloud run deploy --source .\n');
-console.log('📚 See MIGRATION_CHECKLIST.md for detailed progress tracking.\n');
+console.log('[INFO] See MIGRATION_CHECKLIST.md for detailed progress tracking.\n');

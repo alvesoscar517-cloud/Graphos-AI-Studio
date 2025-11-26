@@ -10,20 +10,28 @@ import './AIDetectionCard.css'
 
 const AIDetectionCard = ({ disabled, text }) => {
   const [result, setResult] = useState(null)
+  const [confidence, setConfidence] = useState(null)
   const [evidence, setEvidence] = useState([])
+  const [humanIndicators, setHumanIndicators] = useState([])
+  const [aiIndicators, setAiIndicators] = useState([])
   const [verdict, setVerdict] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [showResult, setShowResult] = useState(true)
   const [textChanged, setTextChanged] = useState(true)
+  const [analysisDetails, setAnalysisDetails] = useState(null)
   const { currentNote } = useNotes()
 
   // Reset state and load cached result when note changes
   useEffect(() => {
     // Always reset state first when note changes
     setResult(null)
+    setConfidence(null)
     setEvidence([])
+    setHumanIndicators([])
+    setAiIndicators([])
     setVerdict('')
+    setAnalysisDetails(null)
     setTextChanged(true)
 
     if (!currentNote) {
@@ -37,8 +45,12 @@ const AIDetectionCard = ({ disabled, text }) => {
         // In hoa chữ cái đầu của verdict khi load từ cache
         const verdictText = cached.verdict ? cached.verdict.charAt(0).toUpperCase() + cached.verdict.slice(1) : cached.verdict
         setResult(cached.aiScore)
+        setConfidence(cached.confidence || null)
         setVerdict(verdictText)
         setEvidence(cached.evidence || [])
+        setHumanIndicators(cached.humanIndicators || [])
+        setAiIndicators(cached.aiIndicators || [])
+        setAnalysisDetails(cached.analysisDetails || null)
         setTextChanged(false)
         console.log('📦 Loaded cached AI detection result for note:', currentNote.id)
       }
@@ -57,22 +69,30 @@ const AIDetectionCard = ({ disabled, text }) => {
     if (cached) {
       const verdictText = cached.verdict ? cached.verdict.charAt(0).toUpperCase() + cached.verdict.slice(1) : cached.verdict
       setResult(cached.aiScore)
+      setConfidence(cached.confidence || null)
       setVerdict(verdictText)
       setEvidence(cached.evidence || [])
+      setHumanIndicators(cached.humanIndicators || [])
+      setAiIndicators(cached.aiIndicators || [])
+      setAnalysisDetails(cached.analysisDetails || null)
       setTextChanged(false)
       console.log('📦 Loaded cached AI detection result for text change')
     } else {
       // Text changed but no cache - reset result and enable button
       setResult(null)
+      setConfidence(null)
       setEvidence([])
+      setHumanIndicators([])
+      setAiIndicators([])
       setVerdict('')
+      setAnalysisDetails(null)
       setTextChanged(true)
     }
   }, [currentNote?.id, text])
 
   const detectAI = async () => {
     if (!text) {
-      modal.error('Vui lòng nhập văn bản để phát hiện')
+      modal.error('Please enter text to detect')
       return
     }
 
@@ -90,36 +110,50 @@ const AIDetectionCard = ({ disabled, text }) => {
       
       if (apiResult.success && apiResult.data) {
         const aiScore = Math.round(apiResult.data.ai_probability || 0)
-        // Rút ngắn verdict và in hoa chữ cái đầu
-        let verdictText = apiResult.data.verdict || (aiScore < 50 ? 'Có vẻ do con người viết' : 'Có thể do AI tạo ra')
-        verdictText = verdictText.replace('Nội dung ', '').replace('nội dung ', '')
+        const confidenceScore = Math.round(apiResult.data.confidence || 70)
+        
+        // Shorten verdict and capitalize first letter
+        let verdictText = apiResult.data.verdict || (aiScore < 50 ? 'Appears to be human-written' : 'Likely AI-generated')
+        verdictText = verdictText.replace('Content ', '').replace('content ', '')
         // In hoa chữ cái đầu
         verdictText = verdictText.charAt(0).toUpperCase() + verdictText.slice(1)
         
         const resultData = {
           aiScore,
+          confidence: confidenceScore,
           verdict: verdictText,
-          evidence: apiResult.data.evidence || []
+          evidence: apiResult.data.evidence || [],
+          humanIndicators: apiResult.data.human_indicators || [],
+          aiIndicators: apiResult.data.ai_indicators || [],
+          analysisDetails: apiResult.data.analysis_details || null
         }
         
         setResult(aiScore)
+        setConfidence(confidenceScore)
         setVerdict(verdictText)
         setEvidence(apiResult.data.evidence || [])
+        setHumanIndicators(apiResult.data.human_indicators || [])
+        setAiIndicators(apiResult.data.ai_indicators || [])
+        setAnalysisDetails(apiResult.data.analysis_details || null)
         
         // Save to cache
         setCachedAnalysis(currentNote.id, text, 'detect', resultData)
         setTextChanged(false)
         
-        modal.toast('Phát hiện hoàn tất', verdictText, 'success')
+        modal.toast('Detection Complete', verdictText, 'success')
       } else {
         throw new Error(apiResult.error || 'Detection failed')
       }
     } catch (error) {
       console.error('❌ Error detecting AI:', error)
-      modal.error('Phát hiện thất bại: ' + error.message)
+      modal.error('Detection failed: ' + error.message)
       setResult(null)
+      setConfidence(null)
       setEvidence([])
+      setHumanIndicators([])
+      setAiIndicators([])
       setVerdict('')
+      setAnalysisDetails(null)
     } finally {
       setIsLoading(false)
     }
@@ -143,14 +177,14 @@ const AIDetectionCard = ({ disabled, text }) => {
             <img src="/icon/shield-check.svg" alt="AI Detection" />
           </div>
           <div className="feature-info">
-            <h4>Phát hiện AI</h4>
-            <p>Nội dung</p>
+            <h4>AI Detection</h4>
+            <p>Content</p>
           </div>
           {result !== null && (
             <button 
               className={`toggle-result-btn ${showResult ? 'expanded' : 'collapsed'}`}
               onClick={() => setShowResult(!showResult)}
-              data-tooltip={showResult ? 'Ẩn kết quả' : 'Hiện kết quả'}
+              data-tooltip={showResult ? 'Hide results' : 'Show results'}
               data-tooltip-position="left"
             >
               <img 
@@ -190,9 +224,7 @@ const AIDetectionCard = ({ disabled, text }) => {
                       <stop offset="100%" stopColor="#00d4ff" />
                     </linearGradient>
                   </defs>
-                  {/* Progress track */}
                   <circle className="ai-score-bg" cx="55" cy="55" r="50"></circle>
-                  {/* Progress bar */}
                   <circle 
                     className="ai-score-progress" 
                     cx="55" 
@@ -202,7 +234,6 @@ const AIDetectionCard = ({ disabled, text }) => {
                       strokeDashoffset: 314.16 - (result / 100) * 314.16
                     }}
                   ></circle>
-                  {/* White inner circle to create donut effect */}
                   <circle className="ai-score-inner" cx="55" cy="55" r="45"></circle>
                 </svg>
                 <div className="ai-score-text">
@@ -225,6 +256,35 @@ const AIDetectionCard = ({ disabled, text }) => {
                 <span>{verdict}</span>
               </div>
               
+              {confidence !== null && (
+                <div className="confidence-indicator">
+                  <div className="confidence-header">
+                    <span className="confidence-label">Độ tin cậy</span>
+                    <span className="confidence-value">{confidence}%</span>
+                  </div>
+                  <div className="confidence-bar">
+                    <div 
+                      className={`confidence-fill ${confidence < 60 ? 'low' : confidence < 80 ? 'medium' : 'high'}`}
+                      style={{ width: `${confidence}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              
+              {confidence !== null && confidence < 60 && (
+                <div className="low-confidence-warning">
+                  <img src="/icon/alert-circle.svg" alt="warning" />
+                  <span>Kết quả có độ tin cậy thấp. Nên kiểm tra thủ công.</span>
+                </div>
+              )}
+              
+              {analysisDetails?.multi_pass && (
+                <div className="analysis-badge">
+                  <img src="/icon/layers.svg" alt="multi-pass" />
+                  <span>Phân tích đa lớp</span>
+                </div>
+              )}
+              
               <button 
                 className="detail-btn-full"
                 onClick={() => setShowModal(true)}
@@ -237,12 +297,11 @@ const AIDetectionCard = ({ disabled, text }) => {
         )}
       </div>
 
-      {/* Modal hiển thị chi tiết */}
       {showModal && (
         <div className="ai-detail-overlay" onClick={() => setShowModal(false)}>
           <div className="ai-detail-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ai-detail-header">
-              <h3>Phân tích chi tiết</h3>
+              <h3>Detailed Analysis</h3>
               <button className="close-detail-btn" onClick={() => setShowModal(false)}>
                 <img src="/icon/x.svg" alt="close" />
               </button>
@@ -259,16 +318,79 @@ const AIDetectionCard = ({ disabled, text }) => {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div className="ai-detail-label">
-                    Kết luận
+                    Độ tin cậy
                   </div>
-                  <div className="ai-detail-verdict">
-                    {verdict}
+                  <div className="ai-detail-value" style={{ 
+                    color: confidence < 60 ? '#ff9800' : confidence < 80 ? '#4285f4' : '#34a853' 
+                  }}>
+                    {confidence}%
                   </div>
                 </div>
               </div>
 
-              <div className="ai-detail-evidence">
-                <h4 className="ai-detail-evidence-title">
+              <div className="ai-detail-verdict-section">
+                <div className="ai-detail-label">Kết luận</div>
+                <div className="ai-detail-verdict">{verdict}</div>
+              </div>
+
+              {analysisDetails && (
+                <div className="ai-detail-stats">
+                  <div className="stat-item">
+                    <span className="stat-label">Số từ:</span>
+                    <span className="stat-value">{analysisDetails.word_count}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Độ dài:</span>
+                    <span className="stat-value">{analysisDetails.text_length} ký tự</span>
+                  </div>
+                  {analysisDetails.multi_pass && (
+                    <div className="stat-item">
+                      <span className="stat-badge">
+                        <img src="/icon/layers.svg" alt="multi" />
+                        Phân tích đa lớp
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {humanIndicators && humanIndicators.length > 0 && (
+                <div className="ai-detail-section">
+                  <h4 className="ai-detail-section-title">
+                    <img src="/icon/user-check.svg" alt="human" />
+                    Dấu hiệu con người ({humanIndicators.length})
+                  </h4>
+                  <div className="indicator-list human-indicators">
+                    {humanIndicators.map((item, index) => (
+                      <div key={index} className="indicator-item">
+                        <span className="indicator-bullet">✓</span>
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {aiIndicators && aiIndicators.length > 0 && (
+                <div className="ai-detail-section">
+                  <h4 className="ai-detail-section-title">
+                    <img src="/icon/cpu.svg" alt="ai" />
+                    Dấu hiệu AI ({aiIndicators.length})
+                  </h4>
+                  <div className="indicator-list ai-indicators">
+                    {aiIndicators.map((item, index) => (
+                      <div key={index} className="indicator-item">
+                        <span className="indicator-bullet">⚠</span>
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="ai-detail-section">
+                <h4 className="ai-detail-section-title">
+                  <img src="/icon/file-text.svg" alt="evidence" />
                   Bằng chứng phân tích
                 </h4>
                 {evidence && evidence.length > 0 ? (
@@ -283,6 +405,16 @@ const AIDetectionCard = ({ disabled, text }) => {
                   </div>
                 )}
               </div>
+
+              {analysisDetails?.key_factor && (
+                <div className="ai-detail-section key-factor">
+                  <h4 className="ai-detail-section-title">
+                    <img src="/icon/key.svg" alt="key" />
+                    Yếu tố quyết định
+                  </h4>
+                  <p className="key-factor-text">{analysisDetails.key_factor}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

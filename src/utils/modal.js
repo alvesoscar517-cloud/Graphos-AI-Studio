@@ -6,7 +6,7 @@ class ModalSystem {
     this.currentModal = null
   }
 
-  alert(message, title = 'Thông báo', type = 'info', forceLight = false) {
+  alert(message, title = 'Notification', type = 'info', forceLight = false) {
     return new Promise((resolve) => {
       this.showModal({
         type,
@@ -27,11 +27,11 @@ class ModalSystem {
     })
   }
 
-  confirm(message, title = 'Xác nhận', options = {}) {
+  confirm(message, title = 'Confirm', options = {}) {
     const {
       type = 'question',
       confirmText = 'OK',
-      cancelText = 'Hủy',
+      cancelText = 'Cancel',
       confirmStyle = 'primary',
       danger = false,
       forceLight = false
@@ -65,28 +65,80 @@ class ModalSystem {
     })
   }
 
-  success(message, title = 'Thành công') {
+  success(message, title = 'Success') {
     return this.alert(message, title, 'success')
   }
 
-  error(message, title = 'Lỗi') {
+  error(message, title = 'Error') {
     return this.alert(message, title, 'error')
   }
 
-  warning(message, title = 'Cảnh báo') {
+  warning(message, title = 'Warning') {
     return this.alert(message, title, 'warning')
   }
 
-  info(message, title = 'Thông tin') {
+  info(message, title = 'Information') {
     return this.alert(message, title, 'info')
   }
 
   toast(message, title = '', type = 'info') {
-    // Toast removed - no notification shown
+    // Simple toast notification
+    const toast = document.createElement('div')
+    toast.className = `simple-toast ${type}`
+    toast.innerHTML = `
+      <span class="simple-toast-message">${this.escapeHtml(message)}</span>
+    `
+    
+    // Add styles if not exists
+    if (!document.getElementById('simple-toast-styles')) {
+      const style = document.createElement('style')
+      style.id = 'simple-toast-styles'
+      style.textContent = `
+        .simple-toast {
+          position: fixed;
+          bottom: 24px;
+          left: 50%;
+          transform: translateX(-50%) translateY(20px);
+          padding: 10px 16px;
+          background: var(--bg-primary, #1a1a1a);
+          border: 1px solid var(--border-primary, #333);
+          border-radius: 8px;
+          font-size: 13px;
+          color: var(--text-primary, #fff);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          z-index: 10001;
+          opacity: 0;
+          transition: all 0.2s ease;
+        }
+        .simple-toast.show {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+        .simple-toast.warning { border-color: var(--text-warning, #b45309); }
+        .simple-toast.error { border-color: var(--color-error, #dc2626); }
+        .simple-toast.success { border-color: var(--color-success, #16a34a); }
+        body:not(.dark-theme) .simple-toast {
+          background: #fff;
+          color: #333;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+      `
+      document.head.appendChild(style)
+    }
+    
+    document.body.appendChild(toast)
+    
+    requestAnimationFrame(() => toast.classList.add('show'))
+    
+    setTimeout(() => {
+      toast.classList.remove('show')
+      setTimeout(() => toast.remove(), 200)
+    }, 3000)
+    
     return Promise.resolve()
   }
 
-  loading(message = 'Đang xử lý...') {
+  loading(message = 'Processing...') {
     const overlay = document.createElement('div')
     overlay.className = 'notification-modal-overlay show'
     overlay.innerHTML = `

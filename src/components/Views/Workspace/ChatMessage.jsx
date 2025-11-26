@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import './ChatMessage.css'
 
 const ChatMessage = ({ message }) => {
   const [copied, setCopied] = useState(false)
+  const { retryLastMessage, isLoading } = useWorkspace()
   const isUser = message.role === 'user'
   const isError = message.error
 
@@ -11,6 +13,28 @@ const ChatMessage = ({ message }) => {
     navigator.clipboard.writeText(message.content)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleRetry = () => {
+    if (!isLoading) {
+      retryLastMessage()
+    }
+  }
+
+  // Get error icon based on error code
+  const getErrorIcon = () => {
+    switch (message.errorCode) {
+      case 'QUOTA_EXCEEDED':
+        return '/icon/clock.svg'
+      case 'RATE_LIMITED':
+        return '/icon/alert-triangle.svg'
+      case 'CONTENT_BLOCKED':
+        return '/icon/shield.svg'
+      case 'NETWORK_ERROR':
+        return '/icon/wifi-off.svg'
+      default:
+        return '/icon/alert-circle.svg'
+    }
   }
 
   return (
@@ -25,8 +49,11 @@ const ChatMessage = ({ message }) => {
               <div className="chat-message-attachments">
                 {message.attachments.map((attachment, index) => (
                   <div key={index} className="chat-attachment">
-                    {attachment.type?.startsWith('image/') ? (
-                      <img src={attachment.url} alt={attachment.name} />
+                    {attachment.type?.startsWith('image/') || attachment.mimeType?.startsWith('image/') ? (
+                      <img 
+                        src={attachment.url || `data:${attachment.mimeType};base64,${attachment.base64}`} 
+                        alt={attachment.name} 
+                      />
                     ) : (
                       <div className="chat-attachment-file">
                         <img src="/icon/file.svg" alt="File" />
@@ -40,20 +67,41 @@ const ChatMessage = ({ message }) => {
           </div>
         ) : (
           <div className="chat-message-ai-content">
-            <div className="chat-message-markdown">
-              <ReactMarkdown>{message.content}</ReactMarkdown>
-            </div>
-            
-            {/* Chỉ hiển thị nút copy khi không đang streaming và có nội dung */}
-            {!message.streaming && message.content && (
-              <button 
-                className="chat-message-copy"
-                onClick={handleCopy}
-                data-tooltip={copied ? 'Đã sao chép!' : 'Sao chép'}
-                data-tooltip-position="top"
-              >
-                <img src={copied ? "/icon/check.svg" : "/icon/copy.svg"} alt="Copy" />
-              </button>
+            {isError ? (
+              <div className="chat-message-error-content">
+                <div className="chat-error-header">
+                  <img src={getErrorIcon()} alt="Error" className="chat-error-icon" />
+                  <span className="chat-error-text">{message.content}</span>
+                </div>
+                <button 
+                  className="chat-retry-btn"
+                  onClick={handleRetry}
+                  disabled={isLoading}
+                  data-tooltip="Retry message"
+                  data-tooltip-position="top"
+                >
+                  <img src="/icon/refresh-cw.svg" alt="Retry" />
+                  <span>Retry</span>
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="chat-message-markdown">
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                </div>
+                
+                {/* Only show copy button when not streaming and has content */}
+                {!message.streaming && message.content && (
+                  <button 
+                    className="chat-message-copy"
+                    onClick={handleCopy}
+                    data-tooltip={copied ? 'Copied!' : 'Copy'}
+                    data-tooltip-position="top"
+                  >
+                    <img src={copied ? "/icon/check.svg" : "/icon/copy.svg"} alt="Copy" />
+                  </button>
+                )}
+              </>
             )}
           </div>
         )}

@@ -81,7 +81,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
       const data = await response.json();
 
       if (data.packages && data.packages.length > 0) {
-        // Merge với default để giữ icon và popular flag
+        // Merge with default to keep icon and popular flag
         const mergedPackages = data.packages.map((pkg, index) => ({
           ...DEFAULT_PACKAGES[index],
           ...pkg
@@ -120,12 +120,12 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
         window.open(data.checkoutUrl, '_blank');
         onClose();
       } else {
-        // Hiển thị lỗi trong modal thay vì dùng modal.error
-        setError(data.error || 'Không thể tạo thanh toán. Vui lòng thử lại.');
+        // Show error in modal instead of using modal.error
+        setError(data.error || 'Unable to create payment. Please try again.');
       }
     } catch (err) {
       console.error('Error creating checkout:', err);
-      setError('Lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.');
+      setError('Connection error. Please check your network and try again.');
     } finally {
       setLoading(false);
       setLoadingPackageId(null);
@@ -154,9 +154,9 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
         <div className="upgrade-modal-header">
           <div className="header-title">
             <img src="/icon/coins.svg" alt="" className="header-icon" />
-            <h2>Mua Credits</h2>
+            <h2>Buy Credits</h2>
           </div>
-          <button className="close-btn" onClick={onClose} aria-label="Đóng">
+          <button className="close-btn" onClick={onClose} aria-label="Close">
             <img src="/icon/x.svg" alt="" />
           </button>
         </div>
@@ -185,7 +185,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                   {pkg.popular && (
                     <div className="popular-badge">
                       <img src="/icon/tags.svg" alt="" />
-                      <span>Phổ biến</span>
+                      <span>Popular</span>
                     </div>
                   )}
                   
@@ -231,7 +231,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                     {loadingPackageId === pkg.id ? (
                       <>
                         <span className="spinner"></span>
-                        <span>Đang xử lý...</span>
+                        <span>Processing...</span>
                       </>
                     ) : (
                       <>
@@ -249,7 +249,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
         {/* Footer */}
         <div className="upgrade-modal-footer">
           <div className="payment-info">
-            <span className="lemon-text">Thanh toán an toàn qua</span>
+            <span className="lemon-text">Secure payment via</span>
             <img src="/icon/lemonsqueezy-with-name.svg" alt="Lemon Squeezy" className="lemon-logo" />
           </div>
           <div className="payment-methods">

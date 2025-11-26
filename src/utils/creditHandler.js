@@ -1,10 +1,10 @@
 /**
  * Credit Handler Utility
- * Xử lý lỗi credit và hiển thị thông báo cho user
+ * Handle credit errors and display notifications to user
  */
 
 /**
- * Kiểm tra response có phải lỗi credit không
+ * Check if response is a credit error
  */
 export function isCreditError(error) {
   return error?.code === 'INSUFFICIENT_CREDITS' || 
@@ -13,7 +13,7 @@ export function isCreditError(error) {
 }
 
 /**
- * Hiển thị modal thông báo hết credit
+ * Show modal notification for insufficient credits
  */
 export function showCreditErrorModal(error, onUpgradeClick) {
   const required = error?.required || 0;
@@ -28,14 +28,14 @@ export function showCreditErrorModal(error, onUpgradeClick) {
           <path d="M2 10h20"/>
         </svg>
       </div>
-      <h3 style="margin: 0 0 12px; color: #202124;">Không đủ Credits</h3>
+      <h3 style="margin: 0 0 12px; color: #202124;">Insufficient Credits</h3>
       <p style="margin: 0 0 8px; color: #5f6368;">
-        Bạn cần <strong>${required.toFixed(2)}</strong> credits để thực hiện thao tác này/
+        You need <strong>${required.toFixed(2)}</strong> credits to perform this action.
       </p>
       <p style="margin: 0 0 20px; color: #5f6368;">
-        Hiện tại bạn có <strong>${available.toFixed(2)}</strong> credits/
+        You currently have <strong>${available.toFixed(2)}</strong> credits.
         <br/>
-        Thiếu <strong style="color: #d93025;">${shortfall.toFixed(2)}</strong> credits/
+        You need <strong style="color: #d93025;">${shortfall.toFixed(2)}</strong> more credits.
       </p>
       <button 
         onclick="window.handleUpgradeClick()" 
@@ -50,7 +50,7 @@ export function showCreditErrorModal(error, onUpgradeClick) {
           cursor: pointer;
         "
       >
-        Mua Credits Ngay
+        Buy Credits Now
       </button>
     </div>
   `;
@@ -68,7 +68,7 @@ export function showCreditErrorModal(error, onUpgradeClick) {
   if (window.modal) {
     window.modal.show(message);
   } else {
-    alert(`Không đủ credits! Cần ${required.toFixed(2)} credits / bạn có ${available.toFixed(2)} credits/`);
+    alert(`Insufficient credits! Need ${required.toFixed(2)} credits, you have ${available.toFixed(2)} credits.`);
     if (onUpgradeClick) {
       onUpgradeClick();
     }
@@ -76,7 +76,7 @@ export function showCreditErrorModal(error, onUpgradeClick) {
 }
 
 /**
- * Xử lý API response và kiểm tra lỗi credit
+ * Handle API response and check for credit errors
  */
 export async function handleApiResponse(response, onUpgradeClick) {
   // Check HTTP status
@@ -90,7 +90,7 @@ export async function handleApiResponse(response, onUpgradeClick) {
 }
 
 /**
- * Wrapper cho API calls với xử lý credit tự động
+ * Wrapper for API calls with automatic credit handling
  */
 export async function withCreditHandling(apiCall, onUpgradeClick) {
   try {
@@ -104,7 +104,7 @@ export async function withCreditHandling(apiCall, onUpgradeClick) {
 }
 
 /**
- * Tính toán ước lượng credit cho một thao tác
+ * Calculate estimated credit for an operation
  */
 export function estimateCredits(operation, params = {}) {
   const estimates = {
@@ -124,15 +124,15 @@ export function estimateCredits(operation, params = {}) {
 }
 
 /**
- * Hiển thị preview credit cost trước khi thực hiện
+ * Show credit cost preview before performing operation
  */
 export function showCreditPreview(operation, cost) {
   const operationNames = {
-    ai_detection: 'Phát hiện AI',
-    text_analysis: 'Phân tích văn bản',
-    text_rewrite: 'Viết lại văn bản',
-    improvement_suggestions: 'Gợi ý cải thiện',
-    chat_message: 'Tin nhắn chat'
+    ai_detection: 'AI Detection',
+    text_analysis: 'Text Analysis',
+    text_rewrite: 'Text Rewrite',
+    improvement_suggestions: 'Improvement Suggestions',
+    chat_message: 'Chat Message'
   };
 
   const name = operationNames[operation] || operation;

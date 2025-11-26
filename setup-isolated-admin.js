@@ -1,6 +1,6 @@
 /**
- * Script để tách hoàn toàn Admin Panel thành project độc lập
- * Chạy: node setup-isolated-admin.js
+ * Script to completely separate Admin Panel into an independent project
+ * Run: node setup-isolated-admin.js
  */
 
 import fs from 'fs';
@@ -211,10 +211,10 @@ admin-panel/
 └── contexts/           # Admin contexts (copied from src)
 \`\`\`
 
-## Lưu ý
+## Notes
 
-- Admin panel có CSS hoàn toàn riêng biệt
-- Không share components với main app
+- Admin panel has completely separate CSS
+- Does not share components with main app
 - Build output: dist/admin/
 `;
 fs.writeFileSync(path.join(adminPanelDir, 'README.md'), adminReadme);

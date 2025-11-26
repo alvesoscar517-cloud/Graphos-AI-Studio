@@ -2,19 +2,25 @@ import { useState } from 'react'
 import Sidebar from './Sidebar'
 import MainContent from './MainContent'
 import RightSidebar from './RightSidebar'
+import { useNotes } from '../../contexts/NotesContext'
 
 const MainLayout = () => {
   const [leftSidebarHidden, setLeftSidebarHidden] = useState(false)
   const [rightSidebarHidden, setRightSidebarHidden] = useState(false)
-  const [currentView, setCurrentView] = useState('aistudio') // 'home', 'aistudio', 'history', 'workspace'
+  const [currentView, setCurrentView] = useState('home') // Default open Home
   const [highlightedSentence, setHighlightedSentence] = useState(null) // NEW: For highlighting sentence in editor
   const [analysisData, setAnalysisData] = useState(null) // NEW: For inline highlighting
   const [rewriteMode, setRewriteMode] = useState(false) // NEW: For showing rewrite toolbar
+  const { createNote } = useNotes()
 
   // Reset right sidebar state when switching to workspace
-  const handleViewChange = (view) => {
+  const handleViewChange = (view, options = {}) => {
     if (view === 'workspace') {
       setRightSidebarHidden(false) // Show workspace sidebar by default
+    }
+    // Chỉ tạo note mới khi có flag createNew
+    if (view === 'aistudio-editor' && options.createNew) {
+      createNote()
     }
     setCurrentView(view)
   }
@@ -42,7 +48,6 @@ const MainLayout = () => {
         onToggleRightSidebar={() => setRightSidebarHidden(!rightSidebarHidden)}
         rightSidebarHidden={effectiveRightSidebarHidden}
         leftSidebarHidden={leftSidebarHidden}
-        highlightedSentence={highlightedSentence}
         analysisData={analysisData}
         rewriteMode={rewriteMode}
       />

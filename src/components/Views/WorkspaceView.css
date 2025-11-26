@@ -16,16 +16,6 @@
   right: 0;
   bottom: 0;
   z-index: 1;
-  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 /* Chat Container */
@@ -35,18 +25,6 @@
   flex: 1;
   height: 100%;
   overflow: hidden;
-  animation: slideInFromBottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes slideInFromBottom {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Chat Header */
@@ -186,12 +164,55 @@ body.dark-theme .workspace-title-input:focus {
   gap: 16px;
   scroll-behavior: smooth;
   align-items: center;
+  /* Hide default scrollbar */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
+/* Hide default scrollbar for webkit */
 .workspace-messages::-webkit-scrollbar {
+  width: 0;
   display: none;
+}
+
+/* Show scrollbar when scrolling */
+.workspace-messages.scrollbar-visible {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
+}
+
+.workspace-messages.scrollbar-visible::-webkit-scrollbar {
+  width: 6px !important;
+  display: block !important;
+  background: transparent;
+}
+
+.workspace-messages.scrollbar-visible::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+  margin: 8px 0;
+}
+
+.workspace-messages.scrollbar-visible::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.workspace-messages.scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* Dark theme scrollbar */
+body.dark-theme .workspace-messages.scrollbar-visible {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent !important;
+}
+
+body.dark-theme .workspace-messages.scrollbar-visible::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .workspace-messages.scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .workspace-messages > * {
@@ -243,18 +264,6 @@ body.dark-theme .workspace-empty-icon {
   position: sticky;
   bottom: 0;
   z-index: 10;
-  animation: slideUpInput 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
-}
-
-@keyframes slideUpInput {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .workspace-input-wrapper {
@@ -343,18 +352,6 @@ body.dark-theme .workspace-empty-icon {
 .workspace-send-btn {
   background: var(--primary-color);
   color: white;
-  animation: scaleInBtn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes scaleInBtn {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
 }
 
 .workspace-send-btn:hover:not(:disabled) {
@@ -478,20 +475,8 @@ body.dark-theme .workspace-empty-icon {
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   z-index: 50;
-  animation: fadeInScale 0.3s ease-out;
-}
-
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
-  }
 }
 
 .scroll-to-bottom-btn:hover {

@@ -20,6 +20,18 @@ const getRealtimeController = () => {
   return realtimeController;
 };
 
+// Lazy load auto notification service
+let autoNotificationService = null;
+const getAutoNotificationService = () => {
+  if (!autoNotificationService) {
+    autoNotificationService = require('./autoNotification.service');
+  }
+  return autoNotificationService;
+};
+
+// Low credits threshold for warning
+const LOW_CREDITS_THRESHOLD = 10;
+
 // ============================================================================
 // CREDIT BALANCE OPERATIONS
 // ============================================================================
@@ -51,12 +63,20 @@ async function getUserCredits(userId) {
         userId,
         credits: defaultCredits,
         createdAt: new Date().toISOString(),
+        isNewUser: true,
         usage: {
           lastActivity: new Date().toISOString()
         }
       });
       
       logger.info('New user created with default credits', { userId, credits: DEFAULT_NEW_USER_CREDITS });
+      
+      // Send welcome notification for new user
+      try {
+        await getAutoNotificationService().sendWelcomeNotification(userId, DEFAULT_NEW_USER_CREDITS);
+      } catch (notifError) {
+        logger.warn('Failed to send welcome notification', { userId, error: notifError.message });
+      }
       
       return defaultCredits;
     }
@@ -128,6 +148,15 @@ async function deductCredits(userId, amount, featureName, metadata = {}) {
     // Get updated balance and broadcast via SSE
     const updatedCredits = await getUserCredits(userId);
     getRealtimeController().broadcastCredits(userId, updatedCredits);
+    
+    // Check for low credits and send warning
+    if (updatedCredits.balance <= LOW_CREDITS_THRESHOLD && updatedCredits.balance > 0) {
+      try {
+        await getAutoNotificationService().sendLowCreditsWarning(userId, updatedCredits.balance);
+      } catch (notifError) {
+        logger.warn('Failed to send low credits warning', { userId, error: notifError.message });
+      }
+    }
     
     logger.info('Credits deducted', { userId, amount, featureName });
     
@@ -266,12 +295,104 @@ function calculateChatCost(text, model = 'gemini-2.0-flash-exp') {
 }
 
 /**
- * Calculate cost for voice profile generation
+ * Calculate cost for humanized chat message
+ */
+function calculateHumanizedChatCost(text, model = 'gemini-2.0-flash-exp') {
+  const wordCount = countWords(text);
+  
+  return calculateFeatureCost('chat_humanized', {
+    wordCount,
+    model
+  });
+}
+
+/**
+ * Calculate cost for voice profile generation (finalize)
  */
 function calculateVoiceProfileCost(sampleCount) {
   return calculateFeatureCost('voice_profile_generation', {
     sampleCount
   });
+}
+
+/**
+ * Calculate cost for adding a single sample to profile
+ */
+function calculateProfileSampleCost(text) {
+  const wordCount = countWords(text);
+  
+  return calculateFeatureCost('profile_sample_add', {
+    wordCount
+  });
+}
+
+/**
+ * Calculate cost for batch adding samples to profile
+ */
+function calculateProfileBatchCost(samples) {
+  return calculateFeatureCost('profile_samples_batch', {
+    sampleCount: samples.length
+  });
+}
+
+/**
+ * Calculate cost for complete profile creation
+ */
+function calculateProfileCompleteCost(samples) {
+  return calculateFeatureCost('profile_complete', {
+    sampleCount: samples.length
+  });
+}
+
+/**
+ * Calculate cost for translation
+ */
+function calculateTranslationCost(text) {
+  const wordCount = countWords(text);
+  
+  return calculateFeatureCost('translation', {
+    wordCount
+  });
+}
+
+/**
+ * Calculate cost for humanization check
+ */
+function calculateCheckHumanizationCost(text) {
+  const wordCount = countWords(text);
+  
+  return calculateFeatureCost('check_humanization', {
+    wordCount
+  });
+}
+
+/**
+ * Calculate cost for iterative humanization
+ */
+function calculateIterativeHumanizeCost(text, maxIterations = 3) {
+  const wordCount = countWords(text);
+  
+  return calculateFeatureCost('iterative_humanize', {
+    wordCount,
+    iterationCount: maxIterations
+  });
+}
+
+/**
+ * Calculate cost for conversation summarization
+ */
+function calculateSummarizeCost(messageCount) {
+  return calculateFeatureCost('conversation_summarize', {
+    messageCount
+  });
+}
+
+/**
+ * Calculate cost for file upload
+ */
+function calculateFileUploadCost(mimeType) {
+  const isImage = mimeType && mimeType.startsWith('image/');
+  return calculateFeatureCost(isImage ? 'file_upload_image' : 'file_upload_document', {});
 }
 
 // ============================================================================
@@ -357,16 +478,40 @@ async function getUserUsageStats(userId, days = 30) {
 }
 
 module.exports = {
+  // Balance operations
   getUserCredits,
   hasEnoughCredits,
   deductCredits,
   addCredits,
+  
+  // Cost calculations - Detection
   calculateAIDetectionCost,
+  
+  // Cost calculations - Analysis
   calculateAnalysisCost,
-  calculateRewriteCost,
   calculateSuggestionsCost,
+  
+  // Cost calculations - Rewrite & Humanization
+  calculateRewriteCost,
+  calculateCheckHumanizationCost,
+  calculateIterativeHumanizeCost,
+  
+  // Cost calculations - Chat
   calculateChatCost,
+  calculateHumanizedChatCost,
+  calculateSummarizeCost,
+  
+  // Cost calculations - Profile
   calculateVoiceProfileCost,
+  calculateProfileSampleCost,
+  calculateProfileBatchCost,
+  calculateProfileCompleteCost,
+  
+  // Cost calculations - Translation & Files
+  calculateTranslationCost,
+  calculateFileUploadCost,
+  
+  // Usage tracking
   trackFeatureUsage,
   getUserUsageStats
 };

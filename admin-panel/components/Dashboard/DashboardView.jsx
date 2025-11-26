@@ -1,18 +1,25 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRealtime } from '../../contexts/RealtimeContext';
+import { ordersApi, supportApi } from '../../services/adminApi';
 import PageHeader from '../Common/PageHeader';
 import StatsCard from './StatsCard';
+import ActivityStatsWidget from './ActivityStatsWidget';
 import LoadingScreen from '../Common/LoadingScreen';
 import './DashboardView.css';
 
 export default function DashboardView() {
   const { overview: stats, loading: realtimeLoading, loadOverview, setActiveTab } = useRealtime();
   const [error, setError] = useState('');
+  const [revenueStats, setRevenueStats] = useState(null);
+  const [supportStats, setSupportStats] = useState(null);
+  const navigate = useNavigate();
   const loading = realtimeLoading.overview;
 
   useEffect(() => {
     setActiveTab('dashboard');
     loadStats();
+    loadExtraStats();
   }, []);
 
   const loadStats = async () => {
@@ -20,6 +27,19 @@ export default function DashboardView() {
       await loadOverview();
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const loadExtraStats = async () => {
+    try {
+      const [revenue, support] = await Promise.all([
+        ordersApi.getRevenueStats(30).catch(() => null),
+        supportApi.getStatistics().catch(() => null)
+      ]);
+      if (revenue?.stats) setRevenueStats(revenue.stats);
+      if (support?.statistics) setSupportStats(support.statistics);
+    } catch (err) {
+      // Silent fail for extra stats
     }
   };
 
@@ -93,6 +113,23 @@ export default function DashboardView() {
           title="Total Users"
           value={stats?.totalUsers || 0}
           change={`+${stats?.newUsers || 0} this week`}
+          onClick={() => navigate('/users')}
+        />
+        
+        <StatsCard
+          icon="dollar-sign.svg"
+          title="Revenue (30d)"
+          value={`$${revenueStats?.totalRevenue?.toFixed(2) || '0.00'}`}
+          subtitle={`${revenueStats?.orderCount || 0} orders`}
+          onClick={() => navigate('/orders')}
+        />
+        
+        <StatsCard
+          icon="headphones.svg"
+          title="Open Tickets"
+          value={supportStats?.open || 0}
+          subtitle={`${supportStats?.total || 0} total`}
+          onClick={() => navigate('/support')}
         />
         
         <StatsCard
@@ -100,20 +137,6 @@ export default function DashboardView() {
           title="Writing Profiles"
           value={stats?.totalProfiles || 0}
           subtitle="Profiles created"
-        />
-        
-        <StatsCard
-          icon="bell.svg"
-          title="Notifications"
-          value={stats?.totalNotifications || 0}
-          subtitle="Total notifications"
-        />
-        
-        <StatsCard
-          icon="activity.svg"
-          title="Activity"
-          value="Active"
-          subtitle="System running well"
         />
       </div>
 
@@ -172,50 +195,8 @@ export default function DashboardView() {
           </div>
         </div>
 
-        <div className="section">
-          <div className="section-header">
-            <img src="/icon/chart-bar.svg" alt="Stats" />
-            <h2>Quick Stats</h2>
-          </div>
-          <div className="activity-list">
-            <div className="activity-item">
-              <div className="activity-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-              </div>
-              <div className="activity-content">
-                <p className="activity-title">New users (7 days)</p>
-                <p className="activity-time">{stats?.newUsers || 5}</p>
-              </div>
-            </div>
-            <div className="activity-item">
-              <div className="activity-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                </svg>
-              </div>
-              <div className="activity-content">
-                <p className="activity-title">Activity rate</p>
-                <p className="activity-time">85%</p>
-              </div>
-            </div>
-            <div className="activity-item">
-              <div className="activity-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
-                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
-                </svg>
-              </div>
-              <div className="activity-content">
-                <p className="activity-title">Notifications read</p>
-                <p className="activity-time">92%</p>
-              </div>
-            </div>
-          </div>
+        <div className="section activity-stats-section">
+          <ActivityStatsWidget />
         </div>
       </div>
     </div>

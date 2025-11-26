@@ -68,7 +68,7 @@ const SharePopup = ({ item, onClose }) => {
       setShareUrl(data.shareUrl)
     } catch (error) {
       console.error('Failed to create share:', error)
-      modal.error('Không thể tạo liên kết chia sẻ. Vui lòng thử lại.')
+      modal.error('Unable to create share link. Please try again.')
       
       // Fallback to demo URL for development
       const mockShareId = 'demo-' + Math.random().toString(36).substr(2, 9)
@@ -83,10 +83,10 @@ const SharePopup = ({ item, onClose }) => {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl)
-      modal.toast('Đã sao chép', 'Liên kết đã được sao chép vào clipboard', 'success')
+      modal.toast('Copied', 'Link has been copied to clipboard', 'success')
     } catch (error) {
       console.error('Failed to copy:', error)
-      modal.error('Không thể sao chép liên kết')
+      modal.error('Unable to copy link')
     }
   }
 
@@ -128,7 +128,7 @@ const SharePopup = ({ item, onClose }) => {
           {isLoading ? (
             <div className="share-loading">
               <div className="spinner"></div>
-              <p>Đang tạo liên kết...</p>
+              <p>Creating link...</p>
             </div>
           ) : (
             <>

@@ -136,22 +136,48 @@ export default function NotificationEditor() {
       return;
     }
 
+    // Validate segment selection
+    if (notification.target.type === 'segment' && (!notification.target.segments || notification.target.segments.length === 0)) {
+      alert('Please select at least one user group');
+      return;
+    }
+
+    // Validate CTA action
+    if (notification.ctaAction?.type === 'url' && !notification.ctaAction.url) {
+      alert('Please enter a URL for the CTA action');
+      return;
+    }
+    if (notification.ctaAction?.type === 'view' && !notification.ctaAction.action) {
+      alert('Please select a target view for the CTA action');
+      return;
+    }
+
     try {
       setSaving(true);
+
+      // Check if scheduling
+      const isScheduled = notification.scheduledAt && new Date(notification.scheduledAt) > new Date();
 
       if (isEditMode) {
         await notificationsApi.update(id, notification);
         if (sendNow) {
           await notificationsApi.send(id);
+        } else if (isScheduled) {
+          await notificationsApi.schedule(id, notification.scheduledAt);
         }
       } else {
         const response = await notificationsApi.create(notification);
         if (sendNow && response.notificationId) {
           await notificationsApi.send(response.notificationId);
         }
+        // If scheduled, the status is already set by create
       }
 
-      alert(sendNow ? 'Notification sent!' : 'Notification saved!');
+      let message = 'Notification saved!';
+      if (sendNow) message = 'Notification sent!';
+      else if (isScheduled) message = `Notification scheduled for ${new Date(notification.scheduledAt).toLocaleString()}`;
+
+      alert(message);
       navigate('/notifications');
     } catch (err) {
       alert('Error: ' + err.message);
@@ -327,7 +353,7 @@ export default function NotificationEditor() {
                   checked={notification.target.type === 'all'}
                   onChange={() => setNotification({
                     ...notification,
-                    target: { ...notification.target, type: 'all' }
+                    target: { type: 'all', segments: [] }
                   })}
                 />
                 <img src="/icon/users.svg" alt="All users" />
@@ -340,7 +366,7 @@ export default function NotificationEditor() {
                   checked={notification.target.type === 'segment'}
                   onChange={() => setNotification({
                     ...notification,
-                    target: { ...notification.target, type: 'segment' }
+                    target: { type: 'segment', segments: notification.target.segments || [] }
                   })}
                 />
                 <img src="/icon/target.svg" alt="Segment" />
@@ -349,18 +375,93 @@ export default function NotificationEditor() {
 
               {notification.target.type === 'segment' && (
                 <div className="segment-options">
-                  <label>
-                    <input type="checkbox" /> Premium users
-                  </label>
-                  <label>
-                    <input type="checkbox" /> Free users
-                  </label>
-                  <label>
-                    <input type="checkbox" /> Inactive users
-                  </label>
+                  {[
+                    { value: 'inactive', label: 'Inactive users (30+ days)', icon: '😴', desc: 'Users who haven\'t logged in for 30+ days' },
+                    { value: 'new', label: 'New users (< 7 days)', icon: '🆕', desc: 'Users who registered in the last 7 days' },
+                    { value: 'has_profile', label: 'Has voice profile', icon: '🎤', desc: 'Users who have created at least one voice profile' },
+                    { value: 'no_profile', label: 'No voice profile', icon: '❌', desc: 'Users who haven\'t created any voice profile' },
+                    { value: 'low_credits', label: 'Low credits (< 10)', icon: '⚠️', desc: 'Users with less than 10 credits remaining' },
+                    { value: 'active', label: 'Active users (7 days)', icon: '✅', desc: 'Users who have been active in the last 7 days' }
+                  ].map(segment => (
+                    <label key={segment.value} className="segment-checkbox" title={segment.desc}>
+                      <input 
+                        type="checkbox"
+                        checked={notification.target.segments?.includes(segment.value) || false}
+                        onChange={(e) => {
+                          const currentSegments = notification.target.segments || [];
+                          const newSegments = e.target.checked
+                            ? [...currentSegments, segment.value]
+                            : currentSegments.filter(s => s !== segment.value);
+                          setNotification({
+                            ...notification,
+                            target: { ...notification.target, segments: newSegments }
+                          });
+                        }}
+                      />
+                      <span className="segment-icon">{segment.icon}</span>
+                      <span>{segment.label}</span>
+                    </label>
+                  ))}
+                  {notification.target.segments?.length === 0 && (
+                    <p className="segment-warning">⚠️ Please select at least one user group</p>
+                  )}
                 </div>
               )}
             </div>
+          </div>
+
+          {/* CTA Action */}
+          <div className="editor-section">
+            <h3>Call-to-Action Settings</h3>
+            <div className="form-group">
+              <label>Action Type</label>
+              <select
+                value={notification.ctaAction?.type || 'none'}
+                onChange={(e) => setNotification({
+                  ...notification,
+                  ctaAction: e.target.value === 'none' ? null : { type: e.target.value, url: '', action: '' }
+                })}
+              >
+                <option value="none">No action</option>
+                <option value="url">Open URL</option>
+                <option value="view">Navigate to view</option>
+              </select>
+            </div>
+
+            {notification.ctaAction?.type === 'url' && (
+              <div className="form-group">
+                <label>URL</label>
+                <input
+                  type="url"
+                  value={notification.ctaAction.url || ''}
+                  onChange={(e) => setNotification({
+                    ...notification,
+                    ctaAction: { ...notification.ctaAction, url: e.target.value }
+                  })}
+                  placeholder="https://example.com/page"
+                />
+              </div>
+            )}
+
+            {notification.ctaAction?.type === 'view' && (
+              <div className="form-group">
+                <label>Target View</label>
+                <select
+                  value={notification.ctaAction.action || ''}
+                  onChange={(e) => setNotification({
+                    ...notification,
+                    ctaAction: { ...notification.ctaAction, action: e.target.value }
+                  })}
+                >
+                  <option value="">Select view...</option>
+                  <option value="home">Home</option>
+                  <option value="aistudio-editor">AI Studio</option>
+                  <option value="workspace">AI Workspace</option>
+                  <option value="settings">Settings</option>
+                  <option value="upgrade">Upgrade Plan</option>
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Scheduling */}
@@ -397,6 +498,17 @@ export default function NotificationEditor() {
               <img src="/icon/save.svg" alt="Save" />
               {saving ? 'Saving...' : 'Save Draft'}
             </button>
+
+            {notification.scheduledAt && new Date(notification.scheduledAt) > new Date() && (
+              <button
+                className="btn-schedule"
+                onClick={() => handleSave(false)}
+                disabled={saving}
+              >
+                <img src="/icon/clock.svg" alt="Schedule" />
+                {saving ? 'Scheduling...' : 'Schedule'}
+              </button>
+            )}
 
             <button
               className="btn-send"

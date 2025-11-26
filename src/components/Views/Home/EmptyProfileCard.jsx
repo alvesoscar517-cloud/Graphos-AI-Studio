@@ -10,14 +10,14 @@ const EmptyProfileCard = () => {
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0)
 
   const phrases = [
-    'Tạo hồ sơ văn phong độc đáo của bạn',
-    'Phân tích và hiệu chỉnh nội dung thông minh',
-    'Bảo vệ phong cách viết cá nhân',
-    'Phát hiện nội dung AI chính xác'
+    'Create your unique writing style profile',
+    'Analyze and refine content intelligently',
+    'Protect your personal writing style',
+    'Detect AI content accurately'
   ]
 
   useEffect(() => {
-    // Chuyển câu mỗi 4.5 giây (1.5s scramble + 3s hiển thị)
+    // Switch phrase every 4.5 seconds (1.5s scramble + 3s display)
     const interval = setInterval(() => {
       setCurrentPhraseIndex((prev) => (prev + 1) % phrases.length)
     }, 4500)
@@ -57,7 +57,7 @@ const EmptyProfileCard = () => {
 
             <button className="create-profile-btn" onClick={handleCreateProfile}>
               <img src="/icon/plus-circle.svg" alt="Create" />
-              <span>Tạo hồ sơ đầu tiên</span>
+              <span>Create first profile</span>
               <img src="/icon/arrow-right.svg" alt="Arrow" className="arrow-icon" />
             </button>
           </div>

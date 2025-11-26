@@ -15,8 +15,11 @@ const UserDetail = lazy(() => import('./Users/UserDetail'));
 const SupportList = lazy(() => import('./Support/SupportList'));
 const SupportDetail = lazy(() => import('./Support/SupportDetail'));
 const AnalyticsView = lazy(() => import('./Analytics/AnalyticsView'));
+const OrdersView = lazy(() => import('./Orders/OrdersView'));
 const SettingsView = lazy(() => import('./Settings/SettingsView'));
 const SystemLogs = lazy(() => import('./Logs/SystemLogs'));
+const UserActivityLogs = lazy(() => import('./Logs/UserActivityLogs'));
+const AllActivityLogs = lazy(() => import('./Logs/AllActivityLogs'));
 
 // Loading component
 function AdminLoadingFallback() {
@@ -51,11 +54,14 @@ export default function AdminRoutes() {
               <Route path="/notifications/:id" element={<NotificationEditor />} />
               <Route path="/users" element={<UserList />} />
               <Route path="/users/:id" element={<UserDetail />} />
+              <Route path="/users/:userId/activity" element={<UserActivityLogs />} />
               <Route path="/support" element={<SupportList />} />
               <Route path="/support/:id" element={<SupportDetail />} />
               <Route path="/analytics" element={<AnalyticsView />} />
+              <Route path="/orders" element={<OrdersView />} />
               <Route path="/settings" element={<SettingsView />} />
               <Route path="/logs" element={<SystemLogs />} />
+              <Route path="/activity-logs" element={<AllActivityLogs />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>

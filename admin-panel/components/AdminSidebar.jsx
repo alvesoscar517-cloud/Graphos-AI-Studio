@@ -6,9 +6,11 @@ export default function AdminSidebar({ isOpen, onToggle }) {
     { path: '/', icon: 'layout-dashboard.svg', label: 'Dashboard', exact: true },
     { path: '/notifications', icon: 'bell.svg', label: 'Notifications' },
     { path: '/users', icon: 'users.svg', label: 'Users' },
+    { path: '/orders', icon: 'dollar-sign.svg', label: 'Orders & Revenue' },
     { path: '/support', icon: 'headphones.svg', label: 'Support' },
     { path: '/analytics', icon: 'chart-line.svg', label: 'Analytics' },
-    { path: '/logs', icon: 'file-text.svg', label: 'Logs' },
+    { path: '/activity-logs', icon: 'activity.svg', label: 'Activity Logs' },
+    { path: '/logs', icon: 'file-text.svg', label: 'System Logs' },
     { path: '/settings', icon: 'settings.svg', label: 'Settings' },
   ];
 

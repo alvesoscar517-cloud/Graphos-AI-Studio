@@ -10,7 +10,6 @@ const MainContent = ({
   onToggleRightSidebar,
   rightSidebarHidden,
   leftSidebarHidden,
-  highlightedSentence,
   analysisData,
   rewriteMode
 }) => {
@@ -34,14 +33,12 @@ const MainContent = ({
         />
       )}
       
-      {(currentView === 'aistudio' || currentView === 'aistudio-editor') && (
+      {currentView === 'aistudio-editor' && (
         <AIStudioView 
-          showEditor={currentView === 'aistudio-editor'}
           onToggleLeftSidebar={onToggleLeftSidebar}
           onToggleRightSidebar={onToggleRightSidebar}
           rightSidebarHidden={rightSidebarHidden}
           onViewChange={onViewChange}
-          highlightedSentence={highlightedSentence}
           analysisData={analysisData}
           rewriteMode={rewriteMode}
         />

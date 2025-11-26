@@ -2,10 +2,26 @@ import { useState, useEffect } from 'react'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
+import modal from '../../utils/modal'
 import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import './Analysis.css'
 import './CompatibilityCard.css'
+
+// Helper function to format breakdown labels
+const formatBreakdownLabel = (key) => {
+  const labels = {
+    avgWordLength: 'Độ dài từ',
+    avgSentenceLength: 'Độ dài câu',
+    readabilityScore: 'Dễ đọc',
+    vocabularyRichness: 'Từ vựng',
+    punctuationRatio: 'Dấu câu',
+    avgParagraphLength: 'Độ dài đoạn',
+    sentenceStarterSimilarity: 'Cách mở đầu câu',
+    transitionWordSimilarity: 'Từ nối'
+  }
+  return labels[key] || key
+}
 
 const CompatibilityCard = ({ disabled, currentProfile, text }) => {
   const [score, setScore] = useState(null)
@@ -65,7 +81,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
 
   const calculateScore = async () => {
     if (!currentProfile || !text) {
-      modal.error('Vui lòng chọn hồ sơ và nhập văn bản')
+      modal.error('Please select a profile and enter text')
       return
     }
 
@@ -162,7 +178,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
             <button 
               className={`toggle-result-btn ${showResult ? 'expanded' : 'collapsed'}`}
               onClick={() => setShowResult(!showResult)}
-              data-tooltip={showResult ? 'Ẩn kết quả' : 'Hiện kết quả'}
+              data-tooltip={showResult ? 'Hide results' : 'Show results'}
               data-tooltip-position="left"
             >
               <img 
@@ -260,6 +276,43 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                     </div>
                     <span className="breakdown-value">{Math.round(analysisDetails.statistical_score)}%</span>
                   </div>
+                  {analysisDetails.confidence && (
+                    <div className="breakdown-item confidence-item">
+                      <span className="breakdown-label">Độ tin cậy</span>
+                      <div className="breakdown-bar">
+                        <div 
+                          className="breakdown-fill" 
+                          style={{ 
+                            width: `${analysisDetails.confidence}%`,
+                            background: analysisDetails.confidence >= 70 ? '#34a853' : analysisDetails.confidence >= 50 ? '#fbbc04' : '#ea4335'
+                          }}
+                        ></div>
+                      </div>
+                      <span className="breakdown-value">{Math.round(analysisDetails.confidence)}%</span>
+                    </div>
+                  )}
+                  {analysisDetails.deviation_summary && analysisDetails.deviation_summary.total > 0 && (
+                    <div className="deviation-summary">
+                      <span className="deviation-label">Câu lệch văn phong:</span>
+                      <div className="deviation-badges">
+                        {analysisDetails.deviation_summary.by_severity.severe > 0 && (
+                          <span className="deviation-badge severe">
+                            {analysisDetails.deviation_summary.by_severity.severe} nghiêm trọng
+                          </span>
+                        )}
+                        {analysisDetails.deviation_summary.by_severity.moderate > 0 && (
+                          <span className="deviation-badge moderate">
+                            {analysisDetails.deviation_summary.by_severity.moderate} trung bình
+                          </span>
+                        )}
+                        {analysisDetails.deviation_summary.by_severity.mild > 0 && (
+                          <span className="deviation-badge mild">
+                            {analysisDetails.deviation_summary.by_severity.mild} nhẹ
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -283,7 +336,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
         <div className="ai-detail-overlay" onClick={() => setShowModal(false)}>
           <div className="ai-detail-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ai-detail-header">
-              <h3>Phân tích chi tiết</h3>
+              <h3>Detailed Analysis</h3>
               <button className="close-detail-btn" onClick={() => setShowModal(false)}>
                 <img src="/icon/x.svg" alt="close" />
               </button>
@@ -363,6 +416,29 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                 )}
               </div>
 
+              {analysisDetails.statistical_breakdown && (
+                <div className="compatibility-detail-breakdown">
+                  <h4>Chi tiết so sánh thống kê</h4>
+                  <div className="stats-grid">
+                    {Object.entries(analysisDetails.statistical_breakdown).map(([key, value]) => (
+                      <div className="stat-item" key={key}>
+                        <span>{formatBreakdownLabel(key)}</span>
+                        <div className="mini-bar">
+                          <div 
+                            className="mini-bar-fill" 
+                            style={{ 
+                              width: `${value}%`,
+                              background: value >= 70 ? '#34a853' : value >= 50 ? '#fbbc04' : '#ea4335'
+                            }}
+                          ></div>
+                        </div>
+                        <span>{Math.round(value)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {analysisDetails.statistics && (
                 <div className="compatibility-detail-stats-full">
                   <h4>Thống kê văn bản</h4>
@@ -377,12 +453,54 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                     </div>
                     <div className="stat-item">
                       <span>Vocabulary richness</span>
-                      <span>{analysisDetails.statistics.vocabularyRichness.toFixed(3)}</span>
+                      <span>{analysisDetails.statistics.vocabularyRichness?.toFixed(3) || 'N/A'}</span>
                     </div>
                     <div className="stat-item">
                       <span>Readability score</span>
-                      <span>{analysisDetails.statistics.readabilityScore.toFixed(1)}</span>
+                      <span>{analysisDetails.statistics.readabilityScore?.toFixed(1) || 'N/A'}</span>
                     </div>
+                    <div className="stat-item">
+                      <span>Avg paragraph length</span>
+                      <span>{analysisDetails.statistics.avgParagraphLength?.toFixed(1) || 'N/A'}</span>
+                    </div>
+                    {analysisDetails.detected_language && (
+                      <div className="stat-item">
+                        <span>Ngôn ngữ</span>
+                        <span>{analysisDetails.detected_language === 'vi' ? 'Tiếng Việt' : 'English'}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {analysisDetails.confidence_factors && (
+                <div className="compatibility-detail-confidence">
+                  <h4>Yếu tố độ tin cậy</h4>
+                  <div className="confidence-factors">
+                    {analysisDetails.confidence_factors.variancePenalty !== undefined && (
+                      <div className="factor-item negative">
+                        <span>Độ biến thiên</span>
+                        <span>-{analysisDetails.confidence_factors.variancePenalty.toFixed(1)}%</span>
+                      </div>
+                    )}
+                    {analysisDetails.confidence_factors.sampleBonus !== undefined && (
+                      <div className="factor-item positive">
+                        <span>Số mẫu profile</span>
+                        <span>+{analysisDetails.confidence_factors.sampleBonus.toFixed(1)}%</span>
+                      </div>
+                    )}
+                    {analysisDetails.confidence_factors.sentenceBonus !== undefined && (
+                      <div className="factor-item positive">
+                        <span>Số câu phân tích</span>
+                        <span>+{analysisDetails.confidence_factors.sentenceBonus.toFixed(1)}%</span>
+                      </div>
+                    )}
+                    {analysisDetails.confidence_factors.meanCertainty !== undefined && (
+                      <div className="factor-item positive">
+                        <span>Độ rõ ràng</span>
+                        <span>+{analysisDetails.confidence_factors.meanCertainty.toFixed(1)}%</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

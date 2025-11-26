@@ -1,4 +1,4 @@
-/* Global Styles - Ẩn thanh cuộn và thiết lập font cho toàn bộ hệ thống */
+/* Global Styles - Hide scrollbars and set up fonts for the entire system */
 
 /* CSS Variables */
 :root {
@@ -60,7 +60,29 @@ body.dark-theme {
   display: none; /* Chrome, Safari, Opera */
 }
 
-/* Ẩn thanh cuộn cho body và html */
+/* Custom text selection - Xanh dương nhạt phù hợp với brand color */
+::selection {
+  background: rgba(79, 172, 254, 0.2);
+  color: inherit;
+}
+
+::-moz-selection {
+  background: rgba(79, 172, 254, 0.2);
+  color: inherit;
+}
+
+/* Dark theme selection - Xanh dương sáng hơn cho nền tối */
+body.dark-theme ::selection {
+  background: rgba(94, 185, 255, 0.3);
+  color: inherit;
+}
+
+body.dark-theme ::-moz-selection {
+  background: rgba(94, 185, 255, 0.3);
+  color: inherit;
+}
+
+/* Hide scrollbars for body and html */
 html,
 body {
   scrollbar-width: none;
@@ -87,7 +109,7 @@ body.dark-theme {
   background: #1e1e1e;
 }
 
-/* Ẩn thanh cuộn cho root element */
+/* Hide scrollbar for root element */
 #root {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -208,7 +230,7 @@ body.dark-theme .icon-btn:hover img {
   opacity: 1;
 }
 
-/* Ẩn thanh cuộn cho các container có overflow */
+/* Hide scrollbars for containers with overflow */
 .app,
 .main-layout,
 .content-area,
@@ -242,7 +264,7 @@ body.dark-theme .icon-btn:hover img {
   display: none;
 }
 
-/* Đảm bảo vẫn có thể scroll nhưng không hiển thị thanh cuộn */
+/* Ensure scrolling is still possible but scrollbar is not visible */
 .scrollable {
   overflow-y: auto;
   overflow-x: hidden;

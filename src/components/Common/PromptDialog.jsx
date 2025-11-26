@@ -7,8 +7,8 @@ export default function PromptDialog({
   message, 
   placeholder = '',
   defaultValue = '',
-  confirmText = 'Xác nhận', 
-  cancelText = 'Hủy',
+  confirmText = 'Confirm', 
+  cancelText = 'Cancel',
   onConfirm, 
   onCancel 
 }) {

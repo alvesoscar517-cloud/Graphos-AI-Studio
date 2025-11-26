@@ -9,6 +9,8 @@ import './Analysis.css'
 
 const StatisticsCard = ({ disabled, currentProfile, text }) => {
   const [stats, setStats] = useState(null)
+  const [benchmarkData, setBenchmarkData] = useState(null)
+  const [suggestions, setSuggestions] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [showResult, setShowResult] = useState(true)
@@ -19,6 +21,8 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
   useEffect(() => {
     // Always reset state first when note/profile changes
     setStats(null)
+    setBenchmarkData(null)
+    setSuggestions([])
     setTextChanged(true)
 
     if (!currentNote || !currentProfile) {
@@ -30,7 +34,9 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
       const cacheKey = `stats_${currentProfile.profile_id}`
       const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
       if (cached) {
-        setStats(cached)
+        setStats(cached.stats || cached)
+        setBenchmarkData(cached.benchmarkData || null)
+        setSuggestions(cached.suggestions || [])
         setTextChanged(false)
         console.log('📦 Loaded cached statistics for note:', currentNote.id)
       }
@@ -47,19 +53,23 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
     const cacheKey = `stats_${currentProfile.profile_id}`
     const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
     if (cached) {
-      setStats(cached)
+      setStats(cached.stats || cached)
+      setBenchmarkData(cached.benchmarkData || null)
+      setSuggestions(cached.suggestions || [])
       setTextChanged(false)
       console.log('📦 Loaded cached statistics for text change')
     } else {
       // Text changed but no cache - reset result and enable button
       setStats(null)
+      setBenchmarkData(null)
+      setSuggestions([])
       setTextChanged(true)
     }
   }, [currentNote?.id, text, currentProfile?.profile_id])
 
   const analyzeStats = async () => {
     if (!currentProfile || !text) {
-      modal.error('Vui lòng chọn hồ sơ và nhập văn bản')
+      modal.error('Please select a profile and enter text')
       return
     }
     
@@ -84,24 +94,45 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
           punctuationRatio: Math.round((statistics.punctuationRatio || 0) * 100),
           totalWords: statistics.totalWords || 0,
           totalSentences: statistics.totalSentences || 0,
-          avgWordLength: statistics.avgWordLength || 0
+          totalParagraphs: statistics.totalParagraphs || 0,
+          avgWordLength: statistics.avgWordLength || 0,
+          avgParagraphLength: statistics.avgParagraphLength || 0,
+          transitionWordCount: statistics.transitionWordCount || 0,
+          detectedLanguage: statistics.detectedLanguage || 'en'
         }
         
+        // Get benchmark data and suggestions from API
+        const benchmarkResult = result.data.benchmark_comparison || null
+        const improvementSuggestions = result.data.improvement_suggestions || []
+        
         setStats(statsData)
+        setBenchmarkData(benchmarkResult)
+        setSuggestions(improvementSuggestions)
         
         // Save to cache
         const cacheKey = `stats_${currentProfile.profile_id}`
-        setCachedAnalysis(currentNote.id, text, cacheKey, statsData)
+        setCachedAnalysis(currentNote.id, text, cacheKey, {
+          stats: statsData,
+          benchmarkData: benchmarkResult,
+          suggestions: improvementSuggestions
+        })
         setTextChanged(false)
         
-        modal.toast('Phân tích hoàn tất', `${statsData.totalWords} từ, ${statsData.totalSentences} câu`, 'success')
+        const benchmarkScore = result.data.benchmark_score || 0
+        modal.toast(
+          'Analysis Complete', 
+          `${statsData.totalWords} words | Benchmark: ${Math.round(benchmarkScore)}%`, 
+          'success'
+        )
       } else {
         throw new Error(result.error || 'Analysis failed')
       }
     } catch (error) {
       console.error('❌ Error analyzing stats:', error)
-      modal.error('Phân tích thất bại: ' + error.message)
+      modal.error('Analysis failed: ' + error.message)
       setStats(null)
+      setBenchmarkData(null)
+      setSuggestions([])
     } finally {
       setIsLoading(false)
     }
@@ -116,11 +147,32 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
   }
 
   const getReadabilityLabel = (score) => {
-    if (score >= 80) return 'Rất dễ đọc'
-    if (score >= 60) return 'Dễ đọc'
-    if (score >= 40) return 'Trung bình'
-    if (score >= 20) return 'Khó đọc'
-    return 'Rất khó đọc'
+    if (score >= 80) return 'Very Easy to Read'
+    if (score >= 60) return 'Easy to Read'
+    if (score >= 40) return 'Average'
+    if (score >= 20) return 'Difficult to Read'
+    return 'Very Difficult to Read'
+  }
+
+  const getBenchmarkLabel = (key) => {
+    const labels = {
+      avgWordLength: 'Độ dài từ',
+      avgSentenceLength: 'Độ dài câu',
+      readabilityScore: 'Dễ đọc',
+      vocabularyRichness: 'Từ vựng',
+      punctuationRatio: 'Dấu câu'
+    }
+    return labels[key] || key
+  }
+
+  const formatBenchmarkValue = (key, value) => {
+    if (key === 'vocabularyRichness' || key === 'punctuationRatio') {
+      return `${(value * 100).toFixed(0)}%`
+    }
+    if (typeof value === 'number') {
+      return value.toFixed(1)
+    }
+    return value
   }
 
   return (
@@ -131,14 +183,14 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
             <img src="/icon/bar-chart-4.svg" alt="Statistics" />
           </div>
           <div className="feature-info">
-            <h4>Thống kê</h4>
-            <p>Phân tích chi tiết</p>
+            <h4>Statistics</h4>
+            <p>Detailed Analysis</p>
           </div>
           {stats && (
             <button 
               className={`toggle-result-btn ${showResult ? 'expanded' : 'collapsed'}`}
               onClick={() => setShowResult(!showResult)}
-              data-tooltip={showResult ? 'Ẩn kết quả' : 'Hiện kết quả'}
+              data-tooltip={showResult ? 'Hide results' : 'Show results'}
               data-tooltip-position="left"
             >
               <img 
@@ -162,7 +214,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
             />
           ) : (
             <>
-              <span>{!textChanged ? 'Đã phân tích' : 'Phân tích'}</span>
+              <span>{!textChanged ? 'Analyzed' : 'Analyze'}</span>
               <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
             </>
           )}
@@ -174,31 +226,44 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
                 <div className="stat-icon-wrapper readability">
                   <img src="/icon/book-open.svg" alt="Readability" />
                 </div>
-                <span className="stat-label-modern">ĐỘ DỄ ĐỌC</span>
+                <span className="stat-label-modern">READABILITY</span>
                 <span className="stat-value-modern">{stats.readabilityScore}</span>
               </div>
               <div className="stat-item-modern">
                 <div className="stat-icon-wrapper sentence">
                   <img src="/icon/align-left.svg" alt="Sentence" />
                 </div>
-                <span className="stat-label-modern">CÂU TB</span>
+                <span className="stat-label-modern">AVG SENTENCE</span>
                 <span className="stat-value-modern">{stats.avgSentenceLength}</span>
               </div>
               <div className="stat-item-modern">
                 <div className="stat-icon-wrapper complexity">
                   <img src="/icon/zap.svg" alt="Complexity" />
                 </div>
-                <span className="stat-label-modern">PHỨC TẠP</span>
+                <span className="stat-label-modern">VOCABULARY</span>
                 <span className="stat-value-modern">{stats.vocabularyRichness}%</span>
               </div>
               <div className="stat-item-modern">
                 <div className="stat-icon-wrapper words">
                   <img src="/icon/type.svg" alt="Words" />
                 </div>
-                <span className="stat-label-modern">TỔNG TỪ</span>
+                <span className="stat-label-modern">TOTAL WORDS</span>
                 <span className="stat-value-modern">{stats.totalWords}</span>
               </div>
             </div>
+
+            {/* Suggestions preview */}
+            {suggestions.length > 0 && (
+              <div className="suggestions-preview">
+                <div className="suggestions-header">
+                  <img src="/icon/lightbulb.svg" alt="suggestions" className="icon-filter" />
+                  <span>{suggestions.length} suggestion{suggestions.length > 1 ? 's' : ''}</span>
+                </div>
+                <div className="suggestion-item-preview">
+                  {suggestions[0]?.message?.substring(0, 80)}...
+                </div>
+              </div>
+            )}
 
             <button 
               className="detail-btn-full"
@@ -226,7 +291,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
               <div className="ai-detail-score">
                 <div>
                   <div className="ai-detail-label">
-                    Độ dễ đọc
+                    Readability
                   </div>
                   <div 
                     className="ai-detail-value" 
@@ -237,10 +302,10 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div className="ai-detail-label">
-                    Đánh giá
+                    {stats.detectedLanguage === 'vi' ? 'Ngôn ngữ' : 'Language'}
                   </div>
                   <div className="ai-detail-verdict">
-                    {getReadabilityLabel(stats.readabilityScore)}
+                    {stats.detectedLanguage === 'vi' ? '🇻🇳 Tiếng Việt' : '🇺🇸 English'}
                   </div>
                 </div>
               </div>
@@ -248,59 +313,151 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
               {/* Statistics Grid */}
               <div className="compatibility-detail-stats">
                 <div className="stat-card">
-                  <div className="stat-label">Tổng từ</div>
+                  <div className="stat-label">Total Words</div>
                   <div className="stat-value">{stats.totalWords}</div>
                   <div className="stat-desc">Words</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-label">Tổng câu</div>
+                  <div className="stat-label">Sentences</div>
                   <div className="stat-value">{stats.totalSentences}</div>
                   <div className="stat-desc">Sentences</div>
                 </div>
+                <div className="stat-card">
+                  <div className="stat-label">Paragraphs</div>
+                  <div className="stat-value">{stats.totalParagraphs || 1}</div>
+                  <div className="stat-desc">Paragraphs</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-label">Transitions</div>
+                  <div className="stat-value">{stats.transitionWordCount || 0}</div>
+                  <div className="stat-desc">Connectors</div>
+                </div>
               </div>
+
+              {/* Benchmark Comparison */}
+              {benchmarkData && benchmarkData.comparison && (
+                <div className="benchmark-section">
+                  <h4 className="section-title">
+                    <img src="/icon/bar-chart-2.svg" alt="" className="icon-filter" />
+                    So sánh với chuẩn ({benchmarkData.styleType})
+                  </h4>
+                  <div className="benchmark-grid">
+                    {Object.entries(benchmarkData.comparison).map(([key, data]) => (
+                      <div key={key} className={`benchmark-item ${data.status}`}>
+                        <div className="benchmark-label">{getBenchmarkLabel(key)}</div>
+                        <div className="benchmark-values">
+                          <span className="current-value">{formatBenchmarkValue(key, data.value)}</span>
+                          <span className="benchmark-range">
+                            ({data.benchmark.min} - {data.benchmark.max})
+                          </span>
+                        </div>
+                        <div className="benchmark-bar">
+                          <div 
+                            className={`benchmark-fill ${data.status}`}
+                            style={{ width: `${Math.min(100, data.benchmarkScore)}%` }}
+                          />
+                        </div>
+                        <div className="benchmark-score">{Math.round(data.benchmarkScore)}%</div>
+                        {data.profileComparison && (
+                          <div className={`profile-comparison ${data.profileComparison.status}`}>
+                            vs Profile: {data.profileComparison.difference > 0 ? '+' : ''}{data.profileComparison.difference}%
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Improvement Suggestions */}
+              {suggestions.length > 0 && (
+                <div className="suggestions-section">
+                  <h4 className="section-title">
+                    <img src="/icon/lightbulb.svg" alt="" className="icon-filter" />
+                    Gợi ý cải thiện ({suggestions.length})
+                  </h4>
+                  <div className="suggestions-list">
+                    {suggestions.map((suggestion, index) => (
+                      <div key={index} className={`suggestion-item ${suggestion.status}`}>
+                        <div className="suggestion-header">
+                          <span className={`status-badge ${suggestion.status}`}>
+                            {suggestion.status === 'low' ? '↓ Thấp' : '↑ Cao'}
+                          </span>
+                          <span className="metric-name">{getBenchmarkLabel(suggestion.metric)}</span>
+                        </div>
+                        <p className="suggestion-message">{suggestion.message}</p>
+                        <div className="suggestion-meta">
+                          <span>Hiện tại: {formatBenchmarkValue(suggestion.metric, suggestion.currentValue)}</span>
+                          <span>Khuyến nghị: {suggestion.recommendedRange}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Detailed Stats */}
               <div className="compatibility-detail-info">
                 <div className="info-row">
                   <img src="/icon/align-left.svg" alt="" />
-                  <span>Độ dài câu TB:</span>
-                  <span>{stats.avgSentenceLength} từ</span>
+                  <span>Avg Sentence Length:</span>
+                  <span>{stats.avgSentenceLength} words</span>
                 </div>
                 <div className="info-row">
                   <img src="/icon/type.svg" alt="" />
-                  <span>Độ dài từ TB:</span>
-                  <span>{stats.avgWordLength} ký tự</span>
+                  <span>Avg Word Length:</span>
+                  <span>{stats.avgWordLength} chars</span>
                 </div>
                 <div className="info-row">
                   <img src="/icon/zap.svg" alt="" />
-                  <span>Độ phong phú từ vựng:</span>
+                  <span>Vocabulary Richness:</span>
                   <span>{stats.vocabularyRichness}%</span>
                 </div>
                 <div className="info-row">
                   <img src="/icon/more-horizontal.svg" alt="" />
-                  <span>Tỷ lệ dấu câu:</span>
+                  <span>Punctuation Ratio:</span>
                   <span>{stats.punctuationRatio}%</span>
+                </div>
+                <div className="info-row">
+                  <img src="/icon/file-text.svg" alt="" />
+                  <span>Avg Paragraph Length:</span>
+                  <span>{stats.avgParagraphLength || 0} words</span>
                 </div>
               </div>
 
               {/* Readability Explanation */}
               <div className="ai-detail-evidence">
                 <h4 className="ai-detail-evidence-title">
-                  Giải thích độ dễ đọc
+                  {stats.detectedLanguage === 'vi' ? 'Giải thích Readability' : 'Readability Explanation'}
                 </h4>
                 <div className="evidence-paragraphs">
+                  {stats.detectedLanguage === 'vi' ? (
+                    <>
+                      <p className="evidence-paragraph">
+                        Điểm dễ đọc được tính dựa trên độ dài câu và độ dài từ trung bình, tối ưu cho tiếng Việt.
+                      </p>
+                      <p className="evidence-paragraph">
+                        <strong>80-100:</strong> Rất dễ đọc<br/>
+                        <strong>60-80:</strong> Dễ đọc<br/>
+                        <strong>40-60:</strong> Trung bình<br/>
+                        <strong>0-40:</strong> Khó đọc
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="evidence-paragraph">
+                        Readability score is calculated using the Flesch Reading Ease formula.
+                      </p>
+                      <p className="evidence-paragraph">
+                        <strong>90-100:</strong> Very easy to read<br/>
+                        <strong>60-70:</strong> Easy to read<br/>
+                        <strong>30-50:</strong> Difficult to read<br/>
+                        <strong>0-30:</strong> Very difficult to read
+                      </p>
+                    </>
+                  )}
                   <p className="evidence-paragraph">
-                    Điểm dễ đọc được tính theo công thức Flesch Reading Ease, dựa trên độ dài câu và số âm tiết trung bình.
-                  </p>
-                  <p className="evidence-paragraph">
-                    <strong>90-100:</strong> Rất dễ đọc (học sinh lớp 5)<br/>
-                    <strong>60-70:</strong> Dễ đọc (học sinh lớp 8-9)<br/>
-                    <strong>30-50:</strong> Khó đọc (sinh viên đại học)<br/>
-                    <strong>0-30:</strong> Rất khó đọc (chuyên gia)
-                  </p>
-                  <p className="evidence-paragraph">
-                    Văn bản của bạn có điểm <strong>{stats.readabilityScore}</strong>, 
-                    được đánh giá là <strong>{getReadabilityLabel(stats.readabilityScore).toLowerCase()}</strong>.
+                    Your text: <strong>{stats.readabilityScore}</strong> - <strong>{getReadabilityLabel(stats.readabilityScore)}</strong>
                   </p>
                 </div>
               </div>

@@ -19,7 +19,7 @@ const realtimeController = require('./realtime.controller');
 
 exports.createProfile = async (req, res) => {
   try {
-    const { user_id, profile_name = 'Hồ sơ mặc định', email, name = 'User', theme = 'work' } = req.body;
+    const { user_id, profile_name = 'Default Profile', email, name = 'User', theme = 'work' } = req.body;
 
     const userId = validateUserId(user_id);
 
@@ -181,7 +181,7 @@ exports.addSamplesBatch = async (req, res) => {
       sample_ids: sampleIds
     });
   } catch (error) {
-    console.error('❌ Batch add samples error:', error);
+    console.error('[ERROR] Batch add samples error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -218,8 +218,8 @@ exports.finalizeProfile = async (req, res) => {
 
     const promptableSummary = `
 Tone: ${voiceProfile.tone}
-Mức độ trang trọng: ${voiceProfile.formality_level}/10
-Đặc điểm: ${voiceProfile.key_characteristics.join(', ')}
+Formality Level: ${voiceProfile.formality_level}/10
+Characteristics: ${voiceProfile.key_characteristics.join(', ')}
 `.trim();
 
     await db.collection('voice_profiles').doc(profile_id).update({
@@ -242,7 +242,7 @@ Mức độ trang trọng: ${voiceProfile.formality_level}/10
       voice_profile: voiceProfile
     });
   } catch (error) {
-    console.error('❌ Finalize profile error:', error);
+    console.error('[ERROR] Finalize profile error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -251,15 +251,20 @@ Mức độ trang trọng: ${voiceProfile.formality_level}/10
 // CREATE PROFILE COMPLETE (Optimized - One API Call with Progress)
 // ============================================================================
 
+// Rate limit constants
+const PROFILE_RATE_LIMIT_HOURS = 24;
+const PROFILE_RATE_LIMIT_COUNT = 5;
+const SAMPLE_SIMILARITY_THRESHOLD = 0.92;
+
 exports.createProfileComplete = async (req, res) => {
   try {
-    const { user_id, profile_name = 'Hồ sơ mặc định', email, name = 'User', theme = 'work', samples } = req.body;
+    const { user_id, profile_name = 'Default Profile', email, name = 'User', theme = 'work', samples } = req.body;
 
     // Validate inputs
     if (!samples || !Array.isArray(samples) || samples.length < 3) {
       return res.status(400).json({ 
         success: false,
-        error: 'Cần ít nhất 3 mẫu văn bản để tạo hồ sơ',
+        error: 'At least 3 text samples are required to create a profile',
         error_code: 'INSUFFICIENT_SAMPLES'
       });
     }
@@ -267,7 +272,7 @@ exports.createProfileComplete = async (req, res) => {
     if (samples.length > 20) {
       return res.status(400).json({ 
         success: false,
-        error: 'Tối đa 20 mẫu văn bản',
+        error: 'Maximum 20 text samples allowed',
         error_code: 'TOO_MANY_SAMPLES'
       });
     }
@@ -279,13 +284,43 @@ exports.createProfileComplete = async (req, res) => {
       } catch (error) {
         return res.status(400).json({
           success: false,
-          error: `Mẫu #${i + 1}: ${error.message}`,
+          error: `Sample #${i + 1}: ${error.message}`,
           error_code: 'INVALID_SAMPLE_CONTENT'
         });
       }
     }
 
     const userId = validateUserId(user_id);
+
+    // Rate limiting: Check profiles created in last 24 hours
+    const rateLimitTime = new Date(Date.now() - PROFILE_RATE_LIMIT_HOURS * 60 * 60 * 1000);
+    const recentProfilesSnapshot = await db.collection('voice_profiles')
+      .where('userId', '==', userId)
+      .where('createdAt', '>', rateLimitTime)
+      .get();
+
+    if (recentProfilesSnapshot.size >= PROFILE_RATE_LIMIT_COUNT) {
+      logger.warn('Rate limit exceeded', { userId, count: recentProfilesSnapshot.size });
+      return res.status(429).json({
+        success: false,
+        error: `Reached limit of creating ${PROFILE_RATE_LIMIT_COUNT} profiles in ${PROFILE_RATE_LIMIT_HOURS} hours. Please try again later.`,
+        error_code: 'RATE_LIMIT_EXCEEDED'
+      });
+    }
+
+    // Check for duplicate profile name
+    const existingProfileSnapshot = await db.collection('voice_profiles')
+      .where('userId', '==', userId)
+      .where('name', '==', profile_name.trim())
+      .get();
+
+    if (!existingProfileSnapshot.empty) {
+      return res.status(400).json({
+        success: false,
+        error: `Profile name "${profile_name}" already exists. Please choose a different name.`,
+        error_code: 'DUPLICATE_PROFILE_NAME'
+      });
+    }
 
     // Calculate profile quality score
     const { calculateProfileScore } = require('../utils/validation');
@@ -324,19 +359,78 @@ exports.createProfileComplete = async (req, res) => {
     const embeddings = await geminiService.createBatchEmbeddings(texts, 'RETRIEVAL_DOCUMENT');
     logger.info('Embeddings created', { count: embeddings.length });
 
+    // Step 2.5: Cross-sample similarity check (prevent duplicate/near-duplicate samples)
+    const similarPairs = [];
+    for (let i = 0; i < embeddings.length; i++) {
+      for (let j = i + 1; j < embeddings.length; j++) {
+        const similarity = analysisService.calculateCosineSimilarity(embeddings[i], embeddings[j]);
+        if (similarity > SAMPLE_SIMILARITY_THRESHOLD) {
+          similarPairs.push({ i: i + 1, j: j + 1, similarity: Math.round(similarity * 100) });
+        }
+      }
+    }
+
+    if (similarPairs.length > 0) {
+      const firstPair = similarPairs[0];
+      logger.warn('Similar samples detected', { userId, similarPairs });
+      return res.status(400).json({
+        success: false,
+        error: `Sample #${firstPair.i} and #${firstPair.j} are too similar (${firstPair.similarity}%). Please provide more diverse content.`,
+        error_code: 'SIMILAR_SAMPLES',
+        similar_pairs: similarPairs
+      });
+    }
+
     // Step 3: Calculate statistics
     logger.info('Calculating statistics');
     const allText = texts.join(' ');
     const statisticalFeatures = analysisService.calculateStatistics(allText);
 
-    // Step 4: Generate voice summary
+    // Step 4: Generate voice summary with timeout
     logger.info('Generating voice profile');
-    const voiceProfile = await geminiService.generateVoiceSummary(texts, statisticalFeatures);
+    const VOICE_SUMMARY_TIMEOUT = 30000; // 30 seconds
+    
+    let voiceProfile;
+    try {
+      const voicePromise = geminiService.generateVoiceSummary(texts, statisticalFeatures);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('VOICE_SUMMARY_TIMEOUT')), VOICE_SUMMARY_TIMEOUT)
+      );
+      
+      voiceProfile = await Promise.race([voicePromise, timeoutPromise]);
+    } catch (voiceError) {
+      if (voiceError.message === 'VOICE_SUMMARY_TIMEOUT') {
+        logger.warn('Voice summary generation timed out, using fallback');
+        // Use fallback voice profile
+        voiceProfile = {
+          tone: 'neutral',
+          formality_level: 5,
+          key_characteristics: [
+            'Natural writing style',
+            'Uses simple language',
+            'Clear sentence structure'
+          ],
+          vocabulary_preferences: {
+            common_phrases: [],
+            avoid_words: [],
+            preferred_connectors: ['and', 'but', 'because']
+          },
+          sentence_patterns: {
+            typical_length: 'medium',
+            structure_preference: 'simple',
+            opening_style: 'Start with clear subject'
+          },
+          rewrite_instructions: 'Rewrite text while preserving meaning, using natural language.'
+        };
+      } else {
+        throw voiceError;
+      }
+    }
 
     const promptableSummary = `
 Tone: ${voiceProfile.tone}
-Mức độ trang trọng: ${voiceProfile.formality_level}/10
-Đặc điểm: ${voiceProfile.key_characteristics.join(', ')}
+Formality Level: ${voiceProfile.formality_level}/10
+Characteristics: ${voiceProfile.key_characteristics.join(', ')}
 `.trim();
 
     // Step 5: Write everything in a batch
@@ -386,7 +480,30 @@ Mức độ trang trọng: ${voiceProfile.formality_level}/10
       'usage.profilesCount': FieldValue.increment(1)
     });
 
-    await batch.commit();
+    // Commit batch with retry logic
+    const MAX_BATCH_RETRIES = 3;
+    let batchCommitted = false;
+    let lastBatchError = null;
+
+    for (let attempt = 1; attempt <= MAX_BATCH_RETRIES && !batchCommitted; attempt++) {
+      try {
+        await batch.commit();
+        batchCommitted = true;
+      } catch (batchError) {
+        lastBatchError = batchError;
+        logger.warn(`Batch commit attempt ${attempt} failed`, { error: batchError.message });
+        
+        if (attempt < MAX_BATCH_RETRIES) {
+          // Wait before retry (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+      }
+    }
+
+    if (!batchCommitted) {
+      logger.error('All batch commit attempts failed', { error: lastBatchError?.message });
+      throw new Error('DATABASE_WRITE_FAILED: Unable to save profile. Please try again.');
+    }
 
     logger.info('Profile created complete', { 
       profileId, 
@@ -414,25 +531,37 @@ Mức độ trang trọng: ${voiceProfile.formality_level}/10
     logger.error('Create profile complete error', { error: error.message });
     
     // Return user-friendly error messages
-    let errorMessage = 'Không thể tạo hồ sơ. Vui lòng thử lại.';
+    let errorMessage = 'Unable to create profile. Please try again.';
     let errorCode = 'UNKNOWN_ERROR';
+    let statusCode = 500;
     
     if (error.message.includes('INVALID_CONTENT')) {
       errorMessage = error.message.replace('INVALID_CONTENT: ', '');
       errorCode = 'INVALID_CONTENT';
+      statusCode = 400;
     } else if (error.message.includes('QUOTA_EXCEEDED')) {
-      errorMessage = 'Hệ thống đang quá tải. Vui lòng thử lại sau vài phút.';
+      errorMessage = 'System is overloaded. Please try again in a few minutes.';
       errorCode = 'QUOTA_EXCEEDED';
+      statusCode = 503;
     } else if (error.message.includes('EMBEDDING_FAILED')) {
-      errorMessage = 'Lỗi xử lý văn bản. Vui lòng kiểm tra nội dung và thử lại.';
+      errorMessage = 'Text processing error. Please check content and try again.';
       errorCode = 'EMBEDDING_FAILED';
+      statusCode = 500;
+    } else if (error.message.includes('DATABASE_WRITE_FAILED')) {
+      errorMessage = error.message.replace('DATABASE_WRITE_FAILED: ', '');
+      errorCode = 'DATABASE_WRITE_FAILED';
+      statusCode = 503;
+    } else if (error.message.includes('VOICE_SUMMARY_TIMEOUT')) {
+      errorMessage = 'Voice analysis took too long. Please try again.';
+      errorCode = 'VOICE_SUMMARY_TIMEOUT';
+      statusCode = 504;
     }
     
-    res.status(500).json({ 
+    res.status(statusCode).json({ 
       success: false,
       error: errorMessage,
       error_code: errorCode,
-      error_detail: error.message
+      error_detail: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -472,7 +601,7 @@ exports.getProfile = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ Get profile error:', error);
+    console.error('[ERROR] Get profile error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -489,34 +618,24 @@ exports.getProfiles = async (req, res) => {
       return res.status(400).json({ error: 'user_id is required' });
     }
 
+    // Optimized: Use samplesCount stored in profile document instead of N+1 queries
     const profilesSnapshot = await db.collection('voice_profiles')
       .where('userId', '==', user_id)
+      .orderBy('createdAt', 'desc')
       .get();
 
-    const profiles = [];
-    
-    for (const doc of profilesSnapshot.docs) {
+    const profiles = profilesSnapshot.docs.map(doc => {
       const profileData = doc.data();
-      
-      const samplesSnapshot = await db.collection('voice_profiles')
-        .doc(doc.id)
-        .collection('samples')
-        .get();
-      
-      profiles.push({
+      return {
         profile_id: doc.id,
         profile_name: profileData.name,
         theme: profileData.theme || 'work',
         status: profileData.status,
-        sample_count: samplesSnapshot.size,
+        sample_count: profileData.samplesCount || 0, // Use stored count instead of querying
+        quality_score: profileData.qualityScore || null,
+        quality_rating: profileData.qualityRating || null,
         created_at: profileData.createdAt?.toDate().toISOString()
-      });
-    }
-
-    profiles.sort((a, b) => {
-      const dateA = new Date(a.created_at || 0);
-      const dateB = new Date(b.created_at || 0);
-      return dateB - dateA;
+      };
     });
 
     res.json({
@@ -525,7 +644,7 @@ exports.getProfiles = async (req, res) => {
       count: profiles.length
     });
   } catch (error) {
-    console.error('❌ Get profiles error:', error);
+    console.error('[ERROR] Get profiles error:', error);
     res.status(500).json({ error: String(error) });
   }
 };
@@ -536,7 +655,8 @@ exports.getProfiles = async (req, res) => {
 
 exports.deleteProfile = async (req, res) => {
   try {
-    const { profile_id } = req.body;
+    // Support both body and params for flexibility
+    const profile_id = req.body.profile_id || req.params.id;
 
     if (!profile_id) {
       return res.status(400).json({ error: 'profile_id is required' });
@@ -577,7 +697,7 @@ exports.deleteProfile = async (req, res) => {
       message: 'Profile deleted successfully'
     });
   } catch (error) {
-    console.error('❌ Delete profile error:', error);
+    console.error('[ERROR] Delete profile error:', error);
     res.status(500).json({ error: String(error) });
   }
 };

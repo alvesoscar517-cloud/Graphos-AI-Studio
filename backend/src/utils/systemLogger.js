@@ -35,14 +35,14 @@ class SystemLogger {
       });
       
       // Also log to console
-      const emoji = {
-        info: 'ℹ️',
-        success: '✅',
-        warning: '⚠️',
-        error: '❌'
+      const icons = {
+        info: '[INFO]',
+        success: '[SUCCESS]',
+        warning: '[WARNING]',
+        error: '[ERROR]'
       };
       
-      console.log(`${emoji[level] || '📝'} [${level.toUpperCase()}] ${action}: ${message}`);
+      console.log(`${icons[level] || '[LOG]'} [${level.toUpperCase()}] ${action}: ${message}`);
     } catch (error) {
       console.error('Failed to write system log:', error);
     }
@@ -116,7 +116,7 @@ class SystemLogger {
       
       await batch.commit();
       
-      console.log(`✅ Cleaned ${snapshot.size} old logs`);
+      console.log(`[SUCCESS] Cleaned ${snapshot.size} old logs`);
       return snapshot.size;
     } catch (error) {
       console.error('Failed to clean old logs:', error);

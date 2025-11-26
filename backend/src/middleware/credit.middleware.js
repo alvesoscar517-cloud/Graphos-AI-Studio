@@ -77,31 +77,88 @@ function requireCredits(featureName, costCalculator) {
  * Cost calculators for different features
  */
 const costCalculators = {
+  // === Detection ===
   aiDetection: (req) => {
     const { text } = req.body;
     return creditService.calculateAIDetectionCost(text);
   },
   
+  // === Analysis ===
   textAnalysis: (req) => {
     const { text } = req.body;
     return creditService.calculateAnalysisCost(text);
   },
   
+  improvementSuggestions: (req) => {
+    const { sentence } = req.body;
+    return creditService.calculateSuggestionsCost(1);
+  },
+  
+  // === Rewrite & Humanization ===
   textRewrite: (req) => {
     const { text, model } = req.body;
     return creditService.calculateRewriteCost(text, model);
   },
   
-  improvementSuggestions: (req) => {
-    const { sentence } = req.body;
-    // Estimate 1 sentence
-    return creditService.calculateSuggestionsCost(1);
+  checkHumanization: (req) => {
+    const { text } = req.body;
+    return creditService.calculateCheckHumanizationCost(text);
   },
   
+  iterativeHumanize: (req) => {
+    const { text, max_iterations = 3 } = req.body;
+    return creditService.calculateIterativeHumanizeCost(text, max_iterations);
+  },
+  
+  // === Chat ===
   chatMessage: (req) => {
     const { messages, model } = req.body;
     const lastMessage = messages[messages.length - 1];
     return creditService.calculateChatCost(lastMessage.content, model);
+  },
+  
+  chatHumanized: (req) => {
+    const { messages, model } = req.body;
+    const lastMessage = messages[messages.length - 1];
+    return creditService.calculateHumanizedChatCost(lastMessage.content, model);
+  },
+  
+  conversationSummarize: (req) => {
+    const { messages } = req.body;
+    return creditService.calculateSummarizeCost(messages?.length || 0);
+  },
+  
+  // === Profile Operations ===
+  profileSampleAdd: (req) => {
+    const { text } = req.body;
+    return creditService.calculateProfileSampleCost(text);
+  },
+  
+  profileSamplesBatch: (req) => {
+    const { samples } = req.body;
+    return creditService.calculateProfileBatchCost(samples || []);
+  },
+  
+  profileFinalize: (req) => {
+    // Estimate based on typical sample count (will be refined in controller)
+    return creditService.calculateVoiceProfileCost(5);
+  },
+  
+  profileComplete: (req) => {
+    const { samples } = req.body;
+    return creditService.calculateProfileCompleteCost(samples || []);
+  },
+  
+  // === Translation ===
+  translation: (req) => {
+    const { text } = req.body;
+    return creditService.calculateTranslationCost(text);
+  },
+  
+  // === File Upload ===
+  fileUpload: (req) => {
+    const { mimeType } = req.body;
+    return creditService.calculateFileUploadCost(mimeType);
   }
 };
 
@@ -109,11 +166,34 @@ const costCalculators = {
  * Middleware factory for different features
  */
 const creditMiddleware = {
+  // Detection
   aiDetection: requireCredits('ai_detection', costCalculators.aiDetection),
+  
+  // Analysis
   textAnalysis: requireCredits('text_analysis', costCalculators.textAnalysis),
-  textRewrite: requireCredits('text_rewrite', costCalculators.textRewrite),
   improvementSuggestions: requireCredits('improvement_suggestions', costCalculators.improvementSuggestions),
-  chatMessage: requireCredits('chat_message', costCalculators.chatMessage)
+  
+  // Rewrite & Humanization
+  textRewrite: requireCredits('text_rewrite', costCalculators.textRewrite),
+  checkHumanization: requireCredits('check_humanization', costCalculators.checkHumanization),
+  iterativeHumanize: requireCredits('iterative_humanize', costCalculators.iterativeHumanize),
+  
+  // Chat
+  chatMessage: requireCredits('chat_message', costCalculators.chatMessage),
+  chatHumanized: requireCredits('chat_humanized', costCalculators.chatHumanized),
+  conversationSummarize: requireCredits('conversation_summarize', costCalculators.conversationSummarize),
+  
+  // Profile
+  profileSampleAdd: requireCredits('profile_sample_add', costCalculators.profileSampleAdd),
+  profileSamplesBatch: requireCredits('profile_samples_batch', costCalculators.profileSamplesBatch),
+  profileFinalize: requireCredits('voice_profile_generation', costCalculators.profileFinalize),
+  profileComplete: requireCredits('profile_complete', costCalculators.profileComplete),
+  
+  // Translation
+  translation: requireCredits('translation', costCalculators.translation),
+  
+  // File Upload
+  fileUpload: requireCredits('file_upload_image', costCalculators.fileUpload)
 };
 
 module.exports = creditMiddleware;

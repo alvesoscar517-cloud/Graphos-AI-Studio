@@ -936,7 +936,7 @@ body.dark-theme .empty-text {
   background: #fff;
   border-radius: 16px;
   width: 90%;
-  max-width: 500px;
+  max-width: 650px;
   max-height: 80vh;
   overflow: hidden;
   display: flex;
@@ -2707,4 +2707,356 @@ body.dark-theme .shimmer-text-effect {
   100% {
     background-position: -200% center;
   }
+}
+
+
+/* ============================================================================
+   BENCHMARK COMPARISON STYLES
+   ============================================================================ */
+
+/* Suggestions Preview in Card */
+.suggestions-preview {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+  border: 1px solid #ffe0b2;
+  border-radius: 10px;
+}
+
+.suggestions-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #e65100;
+  margin-bottom: 6px;
+}
+
+.suggestions-header img {
+  width: 14px;
+  height: 14px;
+}
+
+.suggestion-item-preview {
+  font-size: 11px;
+  color: #5f6368;
+  line-height: 1.4;
+}
+
+body.dark-theme .suggestions-preview {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 152, 0, 0.1) 100%);
+  border-color: rgba(255, 152, 0, 0.3);
+}
+
+body.dark-theme .suggestions-header {
+  color: #ffb74d;
+}
+
+body.dark-theme .suggestion-item-preview {
+  color: #9aa0a6;
+}
+
+/* Benchmark Section in Modal */
+.benchmark-section {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #202124;
+  margin: 0 0 16px 0;
+}
+
+.section-title img {
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+}
+
+.benchmark-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.benchmark-item {
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  border-left: 3px solid #e8eaed;
+}
+
+.benchmark-item.good {
+  border-left-color: #34a853;
+}
+
+.benchmark-item.low {
+  border-left-color: #fbbc04;
+}
+
+.benchmark-item.high {
+  border-left-color: #ea4335;
+}
+
+.benchmark-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #202124;
+  margin-bottom: 6px;
+}
+
+.benchmark-values {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.current-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #202124;
+}
+
+.benchmark-range {
+  font-size: 11px;
+  color: #5f6368;
+}
+
+.benchmark-bar {
+  height: 6px;
+  background: #e8eaed;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.benchmark-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.benchmark-fill.good {
+  background: linear-gradient(90deg, #34a853, #4caf50);
+}
+
+.benchmark-fill.low {
+  background: linear-gradient(90deg, #fbbc04, #ff9800);
+}
+
+.benchmark-fill.high {
+  background: linear-gradient(90deg, #ea4335, #f44336);
+}
+
+.benchmark-score {
+  font-size: 11px;
+  font-weight: 500;
+  color: #5f6368;
+}
+
+.profile-comparison {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.profile-comparison.match {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.profile-comparison.higher {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.profile-comparison.lower {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+/* Suggestions Section in Modal */
+.suggestions-section {
+  margin-top: 20px;
+}
+
+.suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.suggestion-item {
+  padding: 14px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e8eaed;
+}
+
+.suggestion-item.low {
+  border-left: 3px solid #fbbc04;
+}
+
+.suggestion-item.high {
+  border-left: 3px solid #ea4335;
+}
+
+.suggestion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.status-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.status-badge.low {
+  background: #fff8e1;
+  color: #f57c00;
+}
+
+.status-badge.high {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.metric-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #202124;
+}
+
+.suggestion-message {
+  font-size: 13px;
+  color: #202124;
+  line-height: 1.5;
+  margin: 0 0 10px 0;
+}
+
+.suggestion-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: #5f6368;
+}
+
+/* Dark Theme for Benchmark */
+body.dark-theme .benchmark-section {
+  background: #3c4043;
+}
+
+body.dark-theme .section-title {
+  color: #e3e3e3;
+}
+
+body.dark-theme .benchmark-item {
+  background: #2d2d2d;
+  border-left-color: #5f6368;
+}
+
+body.dark-theme .benchmark-item.good {
+  border-left-color: #81c784;
+}
+
+body.dark-theme .benchmark-item.low {
+  border-left-color: #ffb74d;
+}
+
+body.dark-theme .benchmark-item.high {
+  border-left-color: #e57373;
+}
+
+body.dark-theme .benchmark-label {
+  color: #e3e3e3;
+}
+
+body.dark-theme .current-value {
+  color: #e3e3e3;
+}
+
+body.dark-theme .benchmark-range {
+  color: #9aa0a6;
+}
+
+body.dark-theme .benchmark-bar {
+  background: #5f6368;
+}
+
+body.dark-theme .benchmark-score {
+  color: #9aa0a6;
+}
+
+body.dark-theme .profile-comparison.match {
+  background: rgba(129, 199, 132, 0.2);
+  color: #81c784;
+}
+
+body.dark-theme .profile-comparison.higher {
+  background: rgba(255, 183, 77, 0.2);
+  color: #ffb74d;
+}
+
+body.dark-theme .profile-comparison.lower {
+  background: rgba(100, 181, 246, 0.2);
+  color: #64b5f6;
+}
+
+body.dark-theme .suggestion-item {
+  background: #2d2d2d;
+  border-color: #3c4043;
+}
+
+body.dark-theme .suggestion-item.low {
+  border-left-color: #ffb74d;
+}
+
+body.dark-theme .suggestion-item.high {
+  border-left-color: #e57373;
+}
+
+body.dark-theme .status-badge.low {
+  background: rgba(255, 183, 77, 0.2);
+  color: #ffb74d;
+}
+
+body.dark-theme .status-badge.high {
+  background: rgba(229, 115, 115, 0.2);
+  color: #e57373;
+}
+
+body.dark-theme .metric-name {
+  color: #e3e3e3;
+}
+
+body.dark-theme .suggestion-message {
+  color: #e3e3e3;
+}
+
+body.dark-theme .suggestion-meta {
+  color: #9aa0a6;
+}
+
+body.dark-theme .evidence-paragraphs {
+  background: #3c4043;
+}
+
+body.dark-theme .evidence-paragraph {
+  color: #e3e3e3;
 }

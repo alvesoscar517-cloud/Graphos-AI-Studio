@@ -3,13 +3,50 @@
  * Centralized config management
  */
 
+/**
+ * Main Configuration
+ * Centralized config management with security validation
+ */
+
+const NODE_ENV = process.env.NODE_ENV || 'production'
+const IS_PRODUCTION = NODE_ENV === 'production'
+
+// Validate required environment variables in production
+function validateConfig() {
+  if (IS_PRODUCTION) {
+    const required = [
+      'GOOGLE_CLOUD_PROJECT',
+      'ADMIN_KEY'
+    ]
+    
+    const missing = required.filter(key => !process.env[key])
+    
+    if (missing.length > 0) {
+      throw new Error(
+        `Missing required environment variables in production: ${missing.join(', ')}\n` +
+        'Please set these variables before starting the server.'
+      )
+    }
+    
+    // Validate admin key is not default
+    if (process.env.ADMIN_KEY === 'your-secure-admin-key-here') {
+      throw new Error('ADMIN_KEY must be changed from default value in production')
+    }
+  }
+}
+
+// Run validation
+validateConfig()
+
 module.exports = {
   // Server
   PORT: process.env.PORT || 8080,
-  NODE_ENV: process.env.NODE_ENV || 'production',
+  NODE_ENV,
+  IS_PRODUCTION,
+  IS_DEVELOPMENT: !IS_PRODUCTION,
   
   // Google Cloud
-  PROJECT_ID: process.env.GOOGLE_CLOUD_PROJECT || 'notes-sync-472107',
+  PROJECT_ID: process.env.GOOGLE_CLOUD_PROJECT || (IS_PRODUCTION ? null : 'notes-sync-472107'),
   LOCATION: process.env.VERTEX_AI_LOCATION || 'us-central1',
   
   // API
@@ -19,7 +56,7 @@ module.exports = {
   
   // Rate Limiting
   RATE_LIMIT_WINDOW: 15 * 60 * 1000, // 15 minutes
-  RATE_LIMIT_MAX_REQUESTS: 100,
+  RATE_LIMIT_MAX_REQUESTS: IS_PRODUCTION ? 100 : 1000, // More lenient in dev
   
   // Caching
   CACHE_TTL: {
@@ -39,7 +76,7 @@ module.exports = {
   MAX_TEXT_LENGTH: 20000,
   
   // Admin
-  ADMIN_KEY: process.env.ADMIN_KEY || 'your-secure-admin-key-here',
+  ADMIN_KEY: process.env.ADMIN_KEY || (IS_PRODUCTION ? null : 'dev-admin-key-123'),
   ADMIN_PANEL_URL: process.env.ADMIN_PANEL_URL || 'https://your-domain.com/admin',
   
   // Email (if using)
@@ -51,8 +88,26 @@ module.exports = {
   // Feature Flags
   FEATURES: {
     ENABLE_CACHING: true,
-    ENABLE_RATE_LIMITING: true,
-    ENABLE_ANALYTICS: true,
+    ENABLE_RATE_LIMITING: IS_PRODUCTION, // Only in production
+    ENABLE_ANALYTICS: IS_PRODUCTION,
     ENABLE_EMAIL: false
+  },
+  
+  // Security
+  SECURITY: {
+    // CORS whitelist (add your domains)
+    CORS_WHITELIST: process.env.CORS_WHITELIST 
+      ? process.env.CORS_WHITELIST.split(',')
+      : IS_PRODUCTION 
+        ? [] // Must be configured in production
+        : ['http://localhost:5173', 'http://localhost:3000'],
+    
+    // Request size limits
+    MAX_PROFILE_SAMPLES: 100,
+    MAX_BATCH_SIZE: 10,
+    
+    // Session
+    SESSION_SECRET: process.env.SESSION_SECRET || (IS_PRODUCTION ? null : 'dev-session-secret'),
+    SESSION_MAX_AGE: 24 * 60 * 60 * 1000 // 24 hours
   }
 };

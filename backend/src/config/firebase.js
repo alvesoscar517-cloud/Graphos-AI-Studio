@@ -13,7 +13,7 @@ const db = new Firestore({
   keepAlive: true
 });
 
-console.log('✅ Firestore initialized');
+console.log('[INIT] Firestore initialized');
 
 module.exports = {
   db,

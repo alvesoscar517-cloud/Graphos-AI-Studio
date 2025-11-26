@@ -45,7 +45,7 @@ exports.createShare = async (req, res) => {
     // Save to Firestore
     await db.collection('shares').doc(shareId).set(shareData);
 
-    console.log(`✅ Share created: ${shareId} (${type})`);
+    console.log(`[SUCCESS] Share created: ${shareId} (${type})`);
 
     // Return share URL
     const shareUrl = `${process.env.EXTENSION_URL || 'https://chromewebstore.google.com/detail/your-extension-id'}?share=${shareId}`;
@@ -58,7 +58,7 @@ exports.createShare = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Share creation error:', error);
+    console.error('[ERROR] Share creation error:', error);
     res.status(500).json({ 
       error: 'Failed to create share',
       details: error.message 
@@ -97,7 +97,7 @@ exports.getShare = async (req, res) => {
       lastViewedAt: new Date().toISOString()
     });
 
-    console.log(`✅ Share accessed: ${shareId} (views: ${shareData.viewCount + 1})`);
+    console.log(`[SUCCESS] Share accessed: ${shareId} (views: ${shareData.viewCount + 1})`);
 
     // Return share data
     res.json({
@@ -111,7 +111,7 @@ exports.getShare = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Share retrieval error:', error);
+    console.error('[ERROR] Share retrieval error:', error);
     res.status(500).json({ 
       error: 'Failed to retrieve share',
       details: error.message 
@@ -132,12 +132,12 @@ exports.deleteShare = async (req, res) => {
 
     await db.collection('shares').doc(shareId).delete();
 
-    console.log(`✅ Share deleted: ${shareId}`);
+    console.log(`[SUCCESS] Share deleted: ${shareId}`);
 
     res.json({ success: true, message: 'Share deleted' });
 
   } catch (error) {
-    console.error('❌ Share deletion error:', error);
+    console.error('[ERROR] Share deletion error:', error);
     res.status(500).json({ 
       error: 'Failed to delete share',
       details: error.message 

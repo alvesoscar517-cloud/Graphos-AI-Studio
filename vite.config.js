@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Vite config cho Main App (không bao gồm admin)
+// Vite config for Main App (does not include admin)
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -21,7 +21,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    emptyOutDir: false, // Không xóa admin khi build main
+    emptyOutDir: false, // Don't delete admin when building main
     rollupOptions: {
       output: {
         entryFileNames: 'assets/main-[hash].js',

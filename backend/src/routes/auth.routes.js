@@ -21,7 +21,7 @@ router.post('/send-feedback', async (req, res) => {
     const isBillingSupport = type === 'billing_support';
     const messageType = isBillingSupport ? 'billing_support' : 'feedback';
     
-    console.log(`📝 Saving ${messageType} from ${userName} (${userEmail})...`);
+    console.log(`[INFO] Saving ${messageType} from ${userName} (${userEmail})...`);
 
     // Save to Firestore
     const ticketId = uuidv4();
@@ -43,7 +43,7 @@ router.post('/send-feedback', async (req, res) => {
     };
 
     await db.collection('support_tickets').doc(ticketId).set(ticketData);
-    console.log(`✅ Ticket ${ticketId} saved to Firestore`);
+    console.log(`[SUCCESS] Ticket ${ticketId} saved to Firestore`);
 
     // Send email notification to admin
     try {
@@ -223,9 +223,9 @@ router.post('/send-feedback', async (req, res) => {
         priority: priority === 'urgent' || priority === 'high' ? 'high' : 'normal'
       });
 
-      console.log(`✅ Email notification sent to admin`);
+      console.log(`[SUCCESS] Email notification sent to admin`);
     } catch (emailError) {
-      console.error('⚠️ Email notification failed:', emailError);
+      console.error('[WARNING] Email notification failed:', emailError);
       // Continue even if email fails
     }
 
@@ -236,7 +236,7 @@ router.post('/send-feedback', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Send feedback error:', error);
+    console.error('[ERROR] Send feedback error:', error);
     res.status(500).json({ 
       error: 'Failed to send feedback',
       details: error.message 

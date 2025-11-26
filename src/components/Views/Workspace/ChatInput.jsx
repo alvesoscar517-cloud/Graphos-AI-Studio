@@ -1,9 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
 import './ChatInput.css'
 
+// Supported file types
+const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+const SUPPORTED_DOC_TYPES = ['application/pdf', 'text/plain', 'text/csv', 'application/json']
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+
 const ChatInput = ({ onSendMessage, disabled }) => {
   const [message, setMessage] = useState('')
   const [attachments, setAttachments] = useState([])
+  const [uploadError, setUploadError] = useState(null)
   const textareaRef = useRef(null)
   const fileInputRef = useRef(null)
 
@@ -14,6 +20,14 @@ const ChatInput = ({ onSendMessage, disabled }) => {
       textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px'
     }
   }, [message])
+
+  // Clear upload error after 3 seconds
+  useEffect(() => {
+    if (uploadError) {
+      const timer = setTimeout(() => setUploadError(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [uploadError])
 
   const handleSend = () => {
     if (message.trim() || attachments.length > 0) {
@@ -33,15 +47,59 @@ const ChatInput = ({ onSendMessage, disabled }) => {
     }
   }
 
-  const handleFileSelect = (e) => {
+  const validateFile = (file) => {
+    // Check file type
+    const isImage = SUPPORTED_IMAGE_TYPES.includes(file.type)
+    const isDoc = SUPPORTED_DOC_TYPES.includes(file.type)
+    
+    if (!isImage && !isDoc) {
+      return { valid: false, error: `Unsupported file type: ${file.type || 'unknown'}` }
+    }
+    
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      return { valid: false, error: `File too large: ${(file.size / 1024 / 1024).toFixed(1)}MB (max 10MB)` }
+    }
+    
+    return { valid: true }
+  }
+
+  const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files)
-    const newAttachments = files.map(file => ({
-      file,
-      name: file.name,
-      type: file.type,
-      size: file.size,
-      url: URL.createObjectURL(file)
-    }))
+    setUploadError(null)
+    
+    const validFiles = []
+    const errors = []
+    
+    for (const file of files) {
+      const validation = validateFile(file)
+      if (validation.valid) {
+        validFiles.push(file)
+      } else {
+        errors.push(`${file.name}: ${validation.error}`)
+      }
+    }
+    
+    if (errors.length > 0) {
+      setUploadError(errors.join('\n'))
+    }
+    
+    // Process valid files
+    const newAttachments = await Promise.all(
+      validFiles.map(async (file) => {
+        const isImage = SUPPORTED_IMAGE_TYPES.includes(file.type)
+        
+        return {
+          file,
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          url: URL.createObjectURL(file),
+          isImage
+        }
+      })
+    )
+    
     setAttachments(prev => [...prev, ...newAttachments])
     e.target.value = '' // Reset input
   }
@@ -55,27 +113,77 @@ const ChatInput = ({ onSendMessage, disabled }) => {
     })
   }
 
+  const handlePaste = async (e) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+    
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault()
+        const file = item.getAsFile()
+        if (file) {
+          const validation = validateFile(file)
+          if (validation.valid) {
+            const attachment = {
+              file,
+              name: `pasted-image-${Date.now()}.${file.type.split('/')[1]}`,
+              type: file.type,
+              size: file.size,
+              url: URL.createObjectURL(file),
+              isImage: true
+            }
+            setAttachments(prev => [...prev, attachment])
+          } else {
+            setUploadError(validation.error)
+          }
+        }
+        break
+      }
+    }
+  }
+
+  const formatFileSize = (bytes) => {
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  }
+
   return (
     <div className="workspace-input-container">
       <div className="workspace-input-wrapper">
+        {/* Upload Error */}
+        {uploadError && (
+          <div className="workspace-upload-error">
+            <img src="/icon/alert-circle.svg" alt="Error" />
+            <span>{uploadError}</span>
+          </div>
+        )}
+
         {/* Attachments Preview */}
         {attachments.length > 0 && (
           <div className="workspace-attachments-preview">
             {attachments.map((attachment, index) => (
               <div key={index} className="attachment-chip">
-                {attachment.type.startsWith('image/') ? (
-                  <img src={attachment.url} alt={attachment.name} />
+                {attachment.isImage ? (
+                  <img src={attachment.url} alt={attachment.name} className="attachment-preview-img" />
                 ) : (
-                  <img src="/icon/file.svg" alt="File" />
+                  <div className="attachment-file-icon">
+                    <img src="/icon/file-text.svg" alt="File" />
+                  </div>
                 )}
-                <span className="attachment-name">
-                  {attachment.name.length > 20 
-                    ? attachment.name.substring(0, 20) + '...' 
-                    : attachment.name}
-                </span>
+                <div className="attachment-info">
+                  <span className="attachment-name" title={attachment.name}>
+                    {attachment.name.length > 20 
+                      ? attachment.name.substring(0, 17) + '...' 
+                      : attachment.name}
+                  </span>
+                  <span className="attachment-size">{formatFileSize(attachment.size)}</span>
+                </div>
                 <button 
                   className="attachment-remove"
                   onClick={() => handleRemoveAttachment(index)}
+                  data-tooltip="Remove"
+                  data-tooltip-position="top"
                 >
                   <img src="/icon/x.svg" alt="Remove" />
                 </button>
@@ -90,7 +198,7 @@ const ChatInput = ({ onSendMessage, disabled }) => {
             className="workspace-attach-btn"
             onClick={() => fileInputRef.current?.click()}
             disabled={disabled}
-            data-tooltip="Đính kèm file"
+            data-tooltip="Attach file (images, PDF, text)"
             data-tooltip-position="top"
           >
             <img src="/icon/paperclip.svg" alt="Attach" />
@@ -99,10 +207,11 @@ const ChatInput = ({ onSendMessage, disabled }) => {
           <textarea
             ref={textareaRef}
             className="workspace-textarea"
-            placeholder="Nhập tin nhắn... (Enter để gửi, Shift+Enter để xuống dòng)"
+            placeholder="Type message... (Enter to send, Shift+Enter for new line)"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
             disabled={disabled}
             rows={1}
           />
@@ -112,7 +221,7 @@ const ChatInput = ({ onSendMessage, disabled }) => {
               className="workspace-send-btn"
               onClick={handleSend}
               disabled={disabled}
-              data-tooltip="Gửi tin nhắn"
+              data-tooltip="Send message"
               data-tooltip-position="top"
             >
               <img src="/icon/send.svg" alt="Send" />
@@ -123,10 +232,15 @@ const ChatInput = ({ onSendMessage, disabled }) => {
             ref={fileInputRef}
             type="file"
             multiple
-            accept="image/*,.pdf,.txt,.doc,.docx,.csv,.json"
+            accept={[...SUPPORTED_IMAGE_TYPES, ...SUPPORTED_DOC_TYPES].join(',')}
             style={{ display: 'none' }}
             onChange={handleFileSelect}
           />
+        </div>
+
+        {/* Supported formats hint */}
+        <div className="workspace-input-hint">
+          Supports: Images (JPEG, PNG, GIF, WebP), PDF, TXT, CSV, JSON
         </div>
       </div>
     </div>

@@ -303,6 +303,7 @@ body:not(.dark-theme) .notification-modal-icon.question img {
 /* Force Light Theme for Profile Setup */
 .notification-modal-overlay.force-light-theme .notification-modal-container {
   background: #ffffff !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
 }
 
 .notification-modal-overlay.force-light-theme .notification-modal-title {

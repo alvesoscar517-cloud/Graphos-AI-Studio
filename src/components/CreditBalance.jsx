@@ -1,18 +1,49 @@
 /**
  * CreditBalance Component
- * Real-time credit display using SSE (no polling)
+ * Real-time credit display using SSE with localStorage caching
+ * Shows cached value instantly, updates when new data arrives
  */
 import { useState, useEffect, useCallback } from 'react';
 import { CONFIG } from '../utils/config';
 import realtimeService from '../services/realtimeService';
 import './CreditBalance.css';
 
-const CreditBalance = ({ userId, onUpgradeClick }) => {
-  const [credits, setCredits] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isConnected, setIsConnected] = useState(false);
+const CACHE_KEY = 'cached_credits';
 
-  // Initial fetch (fallback if SSE not connected yet)
+// Get cached credits from localStorage
+const getCachedCredits = (userId) => {
+  try {
+    const cached = localStorage.getItem(`${CACHE_KEY}_${userId}`);
+    return cached ? JSON.parse(cached) : null;
+  } catch {
+    return null;
+  }
+};
+
+// Save credits to localStorage
+const setCachedCredits = (userId, credits) => {
+  try {
+    localStorage.setItem(`${CACHE_KEY}_${userId}`, JSON.stringify(credits));
+  } catch {
+    // Ignore storage errors
+  }
+};
+
+const CreditBalance = ({ userId, onUpgradeClick }) => {
+  // Initialize with cached value to avoid flicker
+  const [credits, setCredits] = useState(() => getCachedCredits(userId));
+  const [loading, setLoading] = useState(!getCachedCredits(userId));
+
+  // Update credits and cache
+  const updateCredits = useCallback((newCredits) => {
+    setCredits(newCredits);
+    setLoading(false);
+    if (userId && newCredits) {
+      setCachedCredits(userId, newCredits);
+    }
+  }, [userId]);
+
+  // Fetch from API
   const fetchCredits = useCallback(async () => {
     try {
       const response = await fetch(
@@ -20,46 +51,37 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
       );
       const data = await response.json();
       if (data.success) {
-        setCredits(data.credits);
+        updateCredits(data.credits);
       }
     } catch (error) {
       console.error('Error fetching credits:', error);
-    } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, updateCredits]);
 
   useEffect(() => {
     if (!userId) return;
 
+    // Fetch fresh data (will update cache)
+    fetchCredits();
+
     // Connect to realtime service
     realtimeService.connect(userId);
 
-    // Subscribe to credits updates
+    // Subscribe to credits updates for real-time changes
     const unsubCredits = realtimeService.subscribe('credits', (data) => {
-      console.log('💰 Credits updated via SSE:', data);
-      setCredits(data.credits);
-      setLoading(false);
+      // Handle both formats: {credits: {...}} or direct {balance, used, purchased}
+      const creditsData = data.credits || data;
+      updateCredits(creditsData);
     });
 
     // Subscribe to connection status
-    const unsubStatus = realtimeService.onStatusChange((status) => {
-      setIsConnected(status === 'connected');
-      // Fetch once if not connected (fallback)
-      if (status !== 'connected' && loading) {
-        fetchCredits();
-      }
-    });
-
-    // Initial fetch as fallback
-    if (realtimeService.getStatus() !== 'connected') {
-      fetchCredits();
-    }
+    const unsubStatus = realtimeService.onStatusChange(() => {});
 
     // Listen for payment success (legacy support)
     const handlePaymentSuccess = (e) => {
       if (e.detail?.credits) {
-        setCredits(e.detail.credits);
+        updateCredits(e.detail.credits);
       }
     };
     window.addEventListener('payment-success', handlePaymentSuccess);
@@ -69,23 +91,19 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
       unsubStatus();
       window.removeEventListener('payment-success', handlePaymentSuccess);
     };
-  }, [userId, fetchCredits, loading]);
+  }, [userId, fetchCredits, updateCredits]);
 
-  const balance = credits?.balance?.toFixed(2) || '0';
-  const used = credits?.used?.toFixed(2) || '0';
+  const balance = credits?.balance != null ? credits.balance.toFixed(2) : '0';
+  const used = credits?.used != null ? credits.used.toFixed(2) : '0';
   const isLowCredit = parseFloat(balance) < 10;
   const isOutOfCredit = parseFloat(balance) <= 0;
 
   return (
     <div className="credit-balance-simple">
       <div className="credit-display">
-        {loading ? (
-          <div className="credit-loading">...</div>
-        ) : (
-          <span className={`credit-text ${isLowCredit ? 'low-credit' : ''} ${isOutOfCredit ? 'out-of-credit' : ''}`}>
-            {balance} credits / {used} used
-          </span>
-        )}
+        <span className={`credit-text ${isLowCredit ? 'low-credit' : ''} ${isOutOfCredit ? 'out-of-credit' : ''}`}>
+          {balance} credits / {used} used
+        </span>
       </div>
       <button className="upgrade-button-simple" onClick={onUpgradeClick}>
         Upgrade Plan

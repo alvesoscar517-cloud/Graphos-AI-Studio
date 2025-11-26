@@ -2,7 +2,7 @@ import { useState } from 'react'
 import SharePopup from '../Popups/SharePopup'
 import './ShareButton.css'
 
-const ShareButton = ({ item, className = '', size = 'medium', tooltip = 'Chia sẻ' }) => {
+const ShareButton = ({ item, className = '', size = 'medium', tooltip = 'Share' }) => {
   const [showSharePopup, setShowSharePopup] = useState(false)
 
   const handleClick = (e) => {

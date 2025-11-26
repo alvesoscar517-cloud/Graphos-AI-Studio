@@ -58,7 +58,7 @@ function validateContentQuality(text) {
   if (codeMatches >= 3) {
     return {
       valid: false,
-      reason: 'Văn bản chứa code. Vui lòng cung cấp văn bản tự nhiên (email, blog, tin nhắn...)'
+      reason: 'Text contains code. Please provide natural text (email, blog, message...)'
     };
   }
   
@@ -69,7 +69,7 @@ function validateContentQuality(text) {
   if (specialCharRatio > 0.3) {
     return {
       valid: false,
-      reason: 'Văn bản chứa quá nhiều ký tự đặc biệt. Vui lòng cung cấp văn bản có nghĩa.'
+      reason: 'Text contains too many special characters. Please provide meaningful text.'
     };
   }
   
@@ -88,7 +88,7 @@ function validateContentQuality(text) {
   if (repetitionRatio > 0.3) {
     return {
       valid: false,
-      reason: 'Văn bản lặp lại quá nhiều. Vui lòng cung cấp nội dung đa dạng hơn.'
+      reason: 'Text repeats too much. Please provide more diverse content.'
     };
   }
   
@@ -99,7 +99,7 @@ function validateContentQuality(text) {
   if (diversity < 0.15 && words.length > 20) {
     return {
       valid: false,
-      reason: 'Văn bản thiếu đa dạng. Vui lòng cung cấp nội dung phong phú hơn.'
+      reason: 'Text lacks diversity. Please provide richer content.'
     };
   }
   
@@ -108,7 +108,7 @@ function validateContentQuality(text) {
   if (meaningfulWords.length < 5) {
     return {
       valid: false,
-      reason: 'Văn bản quá ngắn hoặc không có nội dung có nghĩa.'
+      reason: 'Text is too short or lacks meaningful content.'
     };
   }
   
@@ -183,16 +183,16 @@ function calculateProfileScore(samples) {
   const sampleCount = samples.length;
   if (sampleCount >= 10) {
     score += 25;
-    feedback.push({ type: 'excellent', message: `Số lượng mẫu tuyệt vời (${sampleCount})` });
+    feedback.push({ type: 'excellent', message: `Excellent sample count (${sampleCount})` });
   } else if (sampleCount >= 5) {
     score += 20;
-    feedback.push({ type: 'good', message: `Số lượng mẫu tốt (${sampleCount})` });
+    feedback.push({ type: 'good', message: `Good sample count (${sampleCount})` });
   } else if (sampleCount >= 3) {
     score += 15;
-    feedback.push({ type: 'ok', message: `Số lượng mẫu đủ (${sampleCount})` });
+    feedback.push({ type: 'ok', message: `Sufficient sample count (${sampleCount})` });
   } else {
     score += 5;
-    feedback.push({ type: 'warning', message: `Số lượng mẫu ít (${sampleCount}), nên thêm để AI học tốt hơn` });
+    feedback.push({ type: 'warning', message: `Low sample count (${sampleCount}), add more for better AI learning` });
   }
   
   // 2. Total word count (0-25 points)
@@ -202,16 +202,16 @@ function calculateProfileScore(samples) {
   
   if (totalWords >= 2000) {
     score += 25;
-    feedback.push({ type: 'excellent', message: `Tổng số từ tuyệt vời (${totalWords})` });
+    feedback.push({ type: 'excellent', message: `Excellent total words (${totalWords})` });
   } else if (totalWords >= 1000) {
     score += 20;
-    feedback.push({ type: 'good', message: `Tổng số từ tốt (${totalWords})` });
+    feedback.push({ type: 'good', message: `Good total words (${totalWords})` });
   } else if (totalWords >= 500) {
     score += 15;
-    feedback.push({ type: 'ok', message: `Tổng số từ đủ (${totalWords})` });
+    feedback.push({ type: 'ok', message: `Sufficient total words (${totalWords})` });
   } else {
     score += 10;
-    feedback.push({ type: 'warning', message: `Tổng số từ ít (${totalWords}), nên thêm để AI học tốt hơn` });
+    feedback.push({ type: 'warning', message: `Low total words (${totalWords}), add more for better AI learning` });
   }
   
   // 3. Sample diversity (0-25 points)
@@ -222,16 +222,16 @@ function calculateProfileScore(samples) {
   
   if (diversity >= 0.6) {
     score += 25;
-    feedback.push({ type: 'excellent', message: `Độ đa dạng từ vựng tuyệt vời (${(diversity * 100).toFixed(0)}%)` });
+    feedback.push({ type: 'excellent', message: `Excellent vocabulary diversity (${(diversity * 100).toFixed(0)}%)` });
   } else if (diversity >= 0.4) {
     score += 20;
-    feedback.push({ type: 'good', message: `Độ đa dạng từ vựng tốt (${(diversity * 100).toFixed(0)}%)` });
+    feedback.push({ type: 'good', message: `Good vocabulary diversity (${(diversity * 100).toFixed(0)}%)` });
   } else if (diversity >= 0.3) {
     score += 15;
-    feedback.push({ type: 'ok', message: `Độ đa dạng từ vựng đủ (${(diversity * 100).toFixed(0)}%)` });
+    feedback.push({ type: 'ok', message: `Sufficient vocabulary diversity (${(diversity * 100).toFixed(0)}%)` });
   } else {
     score += 10;
-    feedback.push({ type: 'warning', message: `Độ đa dạng từ vựng thấp (${(diversity * 100).toFixed(0)}%), nên cung cấp nội dung đa dạng hơn` });
+    feedback.push({ type: 'warning', message: `Low vocabulary diversity (${(diversity * 100).toFixed(0)}%), provide more diverse content` });
   }
   
   // 4. Sample type balance (0-25 points)
@@ -240,32 +240,32 @@ function calculateProfileScore(samples) {
   
   if (longSamples >= 2 && shortSamples >= 3) {
     score += 25;
-    feedback.push({ type: 'excellent', message: `Cân bằng tốt giữa văn bản dài (${longSamples}) và ngắn (${shortSamples})` });
+    feedback.push({ type: 'excellent', message: `Good balance between long (${longSamples}) and short (${shortSamples}) text` });
   } else if (longSamples >= 1 && shortSamples >= 2) {
     score += 20;
-    feedback.push({ type: 'good', message: `Có cả văn bản dài (${longSamples}) và ngắn (${shortSamples})` });
+    feedback.push({ type: 'good', message: `Has both long (${longSamples}) and short (${shortSamples}) text` });
   } else if (longSamples >= 1 || shortSamples >= 2) {
     score += 15;
-    feedback.push({ type: 'ok', message: `Nên bổ sung thêm ${longSamples === 0 ? 'văn bản dài' : 'văn bản ngắn'}` });
+    feedback.push({ type: 'ok', message: `Add more ${longSamples === 0 ? 'long text' : 'short text'}` });
   } else {
     score += 10;
-    feedback.push({ type: 'warning', message: `Thiếu cân bằng giữa văn bản dài và ngắn` });
+    feedback.push({ type: 'warning', message: `Lacks balance between long and short text` });
   }
   
   // Determine overall rating
   let rating, recommendation;
   if (score >= 90) {
     rating = 'excellent';
-    recommendation = 'Hồ sơ xuất sắc! AI sẽ học rất tốt văn phong của bạn.';
+    recommendation = 'Excellent profile! AI will learn your writing style very well.';
   } else if (score >= 75) {
     rating = 'good';
-    recommendation = 'Hồ sơ tốt! AI có thể học được văn phong của bạn.';
+    recommendation = 'Good profile! AI can learn your writing style.';
   } else if (score >= 60) {
     rating = 'ok';
-    recommendation = 'Hồ sơ đủ dùng, nhưng nên cải thiện để AI học tốt hơn.';
+    recommendation = 'Profile is usable, but improve it for better AI learning.';
   } else {
     rating = 'poor';
-    recommendation = 'Hồ sơ cần cải thiện. Hãy thêm mẫu và nội dung đa dạng hơn.';
+    recommendation = 'Profile needs improvement. Add more samples and diverse content.';
   }
   
   return {
@@ -283,6 +283,40 @@ function calculateProfileScore(samples) {
   };
 }
 
+/**
+ * Allowed AI models for rewrite and chat features
+ */
+const ALLOWED_MODELS = [
+  'gemini-2.0-flash-exp',
+  'gemini-2.5-flash-lite',
+  'gemini-2.5-flash',
+  'gemini-2.5-pro'
+];
+
+/**
+ * Validate and normalize model name
+ * @param {string} model - Model name from request
+ * @param {string} defaultModel - Default model if invalid
+ * @returns {string} - Valid model name
+ */
+function validateModel(model, defaultModel = 'gemini-2.5-flash') {
+  if (!model || typeof model !== 'string') {
+    return defaultModel;
+  }
+  
+  const normalizedModel = model.trim().toLowerCase();
+  
+  // Check if model is in allowed list
+  const validModel = ALLOWED_MODELS.find(m => m.toLowerCase() === normalizedModel);
+  
+  if (validModel) {
+    return validModel;
+  }
+  
+  console.warn(`[WARN] Invalid model requested: ${model}, using default: ${defaultModel}`);
+  return defaultModel;
+}
+
 module.exports = {
   validateText,
   validateProfileId,
@@ -290,5 +324,7 @@ module.exports = {
   validateEmail,
   sanitizeHtml,
   validateContentQuality,
-  calculateProfileScore
+  calculateProfileScore,
+  validateModel,
+  ALLOWED_MODELS
 };

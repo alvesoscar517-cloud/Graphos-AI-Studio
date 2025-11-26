@@ -1,42 +1,89 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNotes } from '../../../contexts/NotesContext'
-import { useAuth } from '../../../contexts/AuthContext'
 import { useAIProcessing } from '../../../contexts/AIProcessingContext'
 import { useProfiles } from '../../../contexts/ProfileContext'
 import { createShare } from '../../../services/share'
+import { truncateTitleByWords } from '../../../utils/titleUtils'
 import TextHighlightEditor from '../../Analysis/TextHighlightEditor'
+import EditTitleModal from '../../Common/EditTitleModal'
+import TokenBadge from '../../Common/TokenBadge'
 import modal from '../../../utils/modal'
 import './AIStudioEditor.css'
 
 /**
- * AIStudioEditorEnhanced - Editor với ContentEditable và inline highlighting
+ * AIStudioEditorEnhanced - Editor with ContentEditable and inline highlighting
  * 
  * FEATURES:
- * - ContentEditable editor với HTML/CSS đầy đủ
- * - Highlight trực tiếp trong text với gạch chân
- * - Tooltip gợi ý khi click vào câu lệch chuẩn
- * - Hiển thị tốt hơn, tương tác dễ dàng hơn
+ * - ContentEditable editor with full HTML/CSS support
+ * - Direct highlighting in text with underline
+ * - Tooltip suggestions when clicking on deviation sentences
+ * - Better display and easier interaction
  */
 const AIStudioEditorEnhanced = ({ 
   onToggleLeftSidebar, 
   onToggleRightSidebar, 
   rightSidebarHidden,
   onCreateNote,
-  externalAnalysisData,
-  rewriteMode
+  externalAnalysisData
 }) => {
   const { currentNote, updateNote, generateTitle } = useNotes()
-  const { user } = useAuth()
   const { isProcessing } = useAIProcessing()
   const { currentProfile } = useProfiles()
   
   const [analysis, setAnalysis] = useState(null)
   const [showHighlights, setShowHighlights] = useState(true)
   const [hasHighlights, setHasHighlights] = useState(false)
-  const [title, setTitle] = useState('')
   const [displayTitle, setDisplayTitle] = useState('')
-  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [showEditTitleModal, setShowEditTitleModal] = useState(false)
   const [isTypingTitle, setIsTypingTitle] = useState(false)
+  const titleGenerationTimeoutRef = useRef(null)
+  const isGeneratingTitleRef = useRef(false)
+
+  // Auto-generate title when user stops typing (debounced)
+  const triggerAutoGenerateTitle = useCallback(() => {
+    if (!currentNote || currentNote.userEditedTitle || currentNote.titleGenerated || currentNote.title !== 'Untitled') {
+      return
+    }
+    
+    const content = currentNote.content?.trim()
+    if (!content || content.length < 20 || isGeneratingTitleRef.current) {
+      return
+    }
+
+    // Clear existing timeout
+    if (titleGenerationTimeoutRef.current) {
+      clearTimeout(titleGenerationTimeoutRef.current)
+    }
+
+    // Debounce: wait 3 seconds after user stops typing
+    titleGenerationTimeoutRef.current = setTimeout(async () => {
+      if (isGeneratingTitleRef.current) return
+      
+      isGeneratingTitleRef.current = true
+      try {
+        console.log('🏷️ Auto-generating title for note...')
+        const newTitle = await generateTitle(content)
+        if (newTitle && currentNote.title === 'Untitled' && !currentNote.userEditedTitle) {
+          updateNote(currentNote.id, { title: newTitle, titleGenerated: true })
+        }
+      } catch (err) {
+        console.error('Failed to auto-generate title:', err)
+      } finally {
+        isGeneratingTitleRef.current = false
+      }
+    }, 3000) // 3 seconds debounce
+  }, [currentNote, generateTitle, updateNote])
+
+  // Trigger title generation when content changes
+  useEffect(() => {
+    triggerAutoGenerateTitle()
+    
+    return () => {
+      if (titleGenerationTimeoutRef.current) {
+        clearTimeout(titleGenerationTimeoutRef.current)
+      }
+    }
+  }, [currentNote?.content, triggerAutoGenerateTitle])
 
   // Listen for external analysis data from RightSidebar
   useEffect(() => {
@@ -45,12 +92,20 @@ const AIStudioEditorEnhanced = ({
       setAnalysis(externalAnalysisData)
       setShowHighlights(true) // Show highlights when new analysis arrives
       
-      // Auto-generate title when first AI feature is used
+      // Immediately generate title when AI feature is used (if not already generated)
       if (currentNote && !currentNote.userEditedTitle && !currentNote.titleGenerated && currentNote.title === 'Untitled') {
         const content = currentNote.content.trim()
-        if (content.length > 10) {
+        if (content.length > 10 && !isGeneratingTitleRef.current) {
+          // Clear debounce timeout since we're generating immediately
+          if (titleGenerationTimeoutRef.current) {
+            clearTimeout(titleGenerationTimeoutRef.current)
+          }
+          
+          isGeneratingTitleRef.current = true
           generateTitle(content).then(newTitle => {
             updateNote(currentNote.id, { title: newTitle, titleGenerated: true })
+          }).finally(() => {
+            isGeneratingTitleRef.current = false
           })
         }
       }
@@ -61,6 +116,8 @@ const AIStudioEditorEnhanced = ({
   useEffect(() => {
     if (currentNote && currentNote.title !== displayTitle) {
       const newTitle = currentNote.title
+      // Truncate to 7 words for display
+      const truncatedTitle = truncateTitleByWords(newTitle, 7)
       
       // Only apply typing effect if title was just generated
       if (currentNote.titleGenerated && !currentNote.userEditedTitle && newTitle !== 'Untitled') {
@@ -69,8 +126,8 @@ const AIStudioEditorEnhanced = ({
         let timeoutId
         
         const typeNextChar = () => {
-          if (currentIndex < newTitle.length) {
-            setDisplayTitle(newTitle.substring(0, currentIndex + 1))
+          if (currentIndex < truncatedTitle.length) {
+            setDisplayTitle(truncatedTitle.substring(0, currentIndex + 1))
             currentIndex++
             timeoutId = setTimeout(typeNextChar, 30) // 30ms per character
           } else {
@@ -86,56 +143,28 @@ const AIStudioEditorEnhanced = ({
           }
         }
       } else {
-        // No typing effect, just set directly
-        setDisplayTitle(newTitle)
+        // No typing effect, just set directly (still truncate for display)
+        setDisplayTitle(truncatedTitle)
       }
     }
   }, [currentNote?.title, currentNote?.titleGenerated])
 
   useEffect(() => {
-    if (currentNote) {
-      setTitle(currentNote.title)
-      if (!isTypingTitle) {
-        setDisplayTitle(currentNote.title)
-      }
+    if (currentNote && !isTypingTitle) {
+      // Truncate to 7 words for display only
+      setDisplayTitle(truncateTitleByWords(currentNote.title, 7))
     }
   }, [currentNote, isTypingTitle])
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value)
-  }
-
-  const handleTitleSave = () => {
-    setIsEditingTitle(false)
-    const trimmedTitle = title.trim()
-    if (trimmedTitle && trimmedTitle !== currentNote?.title) {
-      // Limit to 60 characters
-      const limitedTitle = trimmedTitle.substring(0, 60)
-      updateNote(currentNote.id, { title: limitedTitle }, true) // true = user edit
-      setTitle(limitedTitle)
-      setDisplayTitle(limitedTitle)
-    } else {
-      setTitle(currentNote?.title || '')
-      setDisplayTitle(currentNote?.title || '')
-    }
-  }
-
-  const handleTitleBlur = () => {
-    handleTitleSave()
-  }
-
-  const handleTitleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleTitleSave()
-    } else if (e.key === 'Escape') {
-      setTitle(currentNote?.title || '')
-      setIsEditingTitle(false)
-    }
-  }
-
   const handleEditClick = () => {
-    setIsEditingTitle(true)
+    setShowEditTitleModal(true)
+  }
+
+  const handleTitleSave = (newTitle) => {
+    if (newTitle && newTitle !== currentNote?.title) {
+      updateNote(currentNote.id, { title: newTitle }, true) // true = user edit
+      setDisplayTitle(truncateTitleByWords(newTitle, 7))
+    }
   }
 
   const handleContentChange = (newContent) => {
@@ -147,7 +176,7 @@ const AIStudioEditorEnhanced = ({
   const handleShare = async () => {
     try {
       if (!currentNote || !currentNote.content.trim()) {
-        modal.alert('Không có nội dung để chia sẻ', 'Lỗi')
+        modal.alert('No content to share', 'Error')
         return
       }
 
@@ -166,10 +195,10 @@ const AIStudioEditorEnhanced = ({
       const shareUrl = `${window.location.origin}/shared/${shareData.share_id}`
       await navigator.clipboard.writeText(shareUrl)
       
-      modal.toast('Đã sao chép link chia sẻ', '', 'success')
+      modal.toast('Share link copied', '', 'success')
     } catch (error) {
       console.error('Share error:', error)
-      modal.error('Không thể tạo link chia sẻ: ' + error.message)
+      modal.error('Unable to create share link: ' + error.message)
     }
   }
 
@@ -194,41 +223,28 @@ const AIStudioEditorEnhanced = ({
         <button 
           className="menu-btn icon-btn" 
           onClick={onToggleLeftSidebar}
-          data-tooltip="Ẩn/hiện sidebar" 
+          data-tooltip="Toggle sidebar" 
           data-tooltip-position="right"
         >
           <img src="/icon/panel-left.svg" alt="Toggle Left Sidebar" />
         </button>
         
         <div className="title-container">
-          {isEditingTitle ? (
-            <input 
-              type="text" 
-              className="title-input" 
-              placeholder="Nhập tiêu đề..."
-              value={title}
-              onChange={handleTitleChange}
-              onKeyDown={handleTitleKeyDown}
-              onBlur={handleTitleBlur}
-              maxLength={60}
-              autoFocus
-            />
-          ) : (
-            <div className="title-display">
-              {displayTitle || 'Untitled'}
-            </div>
-          )}
-          {!isEditingTitle && (
-            <button 
-              className="title-edit-btn"
-              onClick={handleEditClick}
-              data-tooltip="Sửa tiêu đề"
-              data-tooltip-position="bottom"
-              disabled={isTypingTitle}
-            >
-              <img src="/icon/pencil.svg" alt="Edit" />
-            </button>
-          )}
+          <div className="title-display" title={currentNote?.title || ''}>
+            {displayTitle || 'Untitled'}
+          </div>
+          <button 
+            className="title-edit-btn"
+            onClick={handleEditClick}
+            data-tooltip="Edit title"
+            data-tooltip-position="bottom"
+            disabled={isTypingTitle}
+          >
+            <img src="/icon/pencil.svg" alt="Edit" />
+          </button>
+          
+          {/* Token Badge - automatically gets model from RewriteContext */}
+          <TokenBadge text={currentNote?.content || ''} />
         </div>
         
         <div className="header-actions">
@@ -236,24 +252,24 @@ const AIStudioEditorEnhanced = ({
             <button 
               className="done-highlights-btn"
               onClick={() => setShowHighlights(false)}
-              data-tooltip="Ẩn highlight"
+              data-tooltip="Hide highlights"
             >
               <img src="/icon/eye-off.svg" alt="hide" />
-              <span>Xong</span>
+              <span>Done</span>
             </button>
           )}
 
           <button 
             className="icon-btn" 
             onClick={onCreateNote}
-            data-tooltip="Tạo note mới"
+            data-tooltip="Create new note"
           >
             <img src="/icon/plus.svg" alt="Add" />
           </button>
           <button 
             className="icon-btn" 
             onClick={handleShare}
-            data-tooltip="Chia sẻ note"
+            data-tooltip="Share note"
           >
             <img src="/icon/share-2.svg" alt="Share" />
           </button>
@@ -275,7 +291,7 @@ const AIStudioEditorEnhanced = ({
           onChange={handleContentChange}
           analysis={analysis}
           disabled={isProcessing}
-          placeholder="Nhập nội dung..."
+          placeholder="Enter content..."
           showHighlights={showHighlights}
           onHighlightsChange={setHasHighlights}
           showRewriteToolbar={true}
@@ -283,6 +299,14 @@ const AIStudioEditorEnhanced = ({
         />
       </div>
 
+      {/* Edit Title Modal */}
+      <EditTitleModal
+        isOpen={showEditTitleModal}
+        currentTitle={currentNote?.title || ''}
+        onSave={handleTitleSave}
+        onClose={() => setShowEditTitleModal(false)}
+        maxLength={100}
+      />
     </div>
   )
 }

@@ -6,18 +6,18 @@ const { db } = require('../src/config/firebase');
 
 async function createSampleLogs() {
   try {
-    console.log('🔄 Creating sample activity logs...');
+    console.log('[INFO] Creating sample activity logs...');
 
     // Get first user
     const usersSnapshot = await db.collection('users').limit(1).get();
     
     if (usersSnapshot.empty) {
-      console.log('❌ No users found. Please create a user first.');
+      console.log('[ERROR] No users found. Please create a user first.');
       return;
     }
 
     const userId = usersSnapshot.docs[0].id;
-    console.log(`✅ Using user: ${userId}`);
+    console.log(`[SUCCESS] Using user: ${userId}`);
 
     // Sample logs
     const logs = [
@@ -80,10 +80,10 @@ async function createSampleLogs() {
 
     await batch.commit();
 
-    console.log(`✅ Created ${logs.length} sample logs for user ${userId}`);
-    console.log('✅ Done!');
+    console.log(`[SUCCESS] Created ${logs.length} sample logs for user ${userId}`);
+    console.log('[SUCCESS] Done!');
   } catch (error) {
-    console.error('❌ Error:', error);
+    console.error('[ERROR] Error:', error);
   }
 }
 

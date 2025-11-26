@@ -13,8 +13,14 @@
     "build:both": "npm run build:main && npm run build:admin",
     "build:watch": "vite build --watch & node build-extension.js",
     "build:extension": "npm run build",
+    "build:prod": "NODE_ENV=production vite build && node post-build.js && node build-extension.js",
     "preview": "vite preview",
-    "preview:admin": "vite preview --config vite.config.admin.js"
+    "preview:admin": "vite preview --config vite.config.admin.js",
+    "lint": "echo 'Linting not configured yet'",
+    "format": "echo 'Formatting not configured yet'",
+    "analyze": "vite build --mode analyze",
+    "fix": "node scripts/fix-common-errors.js",
+    "clean": "rm -rf node_modules/.vite && rm -rf dist && rm -rf dist-admin"
   },
   "dependencies": {
     "framer-motion": "^12.23.24",
@@ -25,7 +31,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-markdown": "^10.1.0",
-    "react-router-dom": "^6.22.0"
+    "react-router-dom": "^6.22.0",
+    "react-window": "^2.2.3"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",

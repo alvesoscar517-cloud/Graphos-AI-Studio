@@ -612,3 +612,321 @@
     border-radius: 0;
   }
 }
+
+
+/* Credits Card */
+#admin-root .credits-display {
+  text-align: center;
+  padding: 20px 0;
+}
+
+#admin-root .credits-balance {
+  margin-bottom: 24px;
+}
+
+#admin-root .credits-number {
+  display: block;
+  font-size: 48px;
+  font-weight: 700;
+  color: #000;
+  line-height: 1;
+}
+
+#admin-root .credits-label {
+  font-size: 14px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#admin-root .credits-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+#admin-root .credit-stat {
+  text-align: center;
+}
+
+#admin-root .credit-stat .stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+}
+
+#admin-root .credit-stat .stat-label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+#admin-root .btn-adjust-credits {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+#admin-root .btn-adjust-credits:hover {
+  background: #333;
+}
+
+#admin-root .btn-adjust-credits img {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(1);
+}
+
+/* Status indicator */
+#admin-root .status-indicator {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#admin-root .status-indicator.active {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+#admin-root .status-indicator.locked {
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* Action buttons variants */
+#admin-root .action-btn.primary {
+  background: #e3f2fd;
+  border-color: #2196f3;
+}
+
+#admin-root .action-btn.primary:hover {
+  background: #bbdefb;
+}
+
+#admin-root .action-btn.success {
+  background: #e8f5e9;
+  border-color: #4caf50;
+}
+
+#admin-root .action-btn.success:hover {
+  background: #c8e6c9;
+}
+
+/* Credits Modal */
+#admin-root .current-credits-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+#admin-root .current-credits-info strong {
+  font-size: 20px;
+  color: #000;
+}
+
+#admin-root .radio-group {
+  display: flex;
+  gap: 12px;
+}
+
+#admin-root .radio-option {
+  flex: 1;
+  cursor: pointer;
+}
+
+#admin-root .radio-option input {
+  display: none;
+}
+
+#admin-root .radio-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+#admin-root .radio-option input:checked + .radio-label.add {
+  background: #e8f5e9;
+  border-color: #4caf50;
+  color: #2e7d32;
+}
+
+#admin-root .radio-option input:checked + .radio-label.deduct {
+  background: #ffebee;
+  border-color: #f44336;
+  color: #c62828;
+}
+
+#admin-root .radio-label img {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0);
+}
+
+#admin-root .radio-option input:checked + .radio-label.add img {
+  filter: invert(42%) sepia(93%) saturate(352%) hue-rotate(87deg) brightness(92%) contrast(88%);
+}
+
+#admin-root .radio-option input:checked + .radio-label.deduct img {
+  filter: invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+}
+
+#admin-root .preview-adjustment {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+#admin-root .preview-adjustment strong {
+  font-size: 20px;
+}
+
+#admin-root .preview-adjustment strong.positive {
+  color: #2e7d32;
+}
+
+#admin-root .preview-adjustment strong.negative {
+  color: #c62828;
+}
+
+#admin-root .btn-primary.success {
+  background: #4caf50;
+  border-color: #4caf50;
+}
+
+#admin-root .btn-primary.success:hover {
+  background: #43a047;
+  border-color: #43a047;
+}
+
+#admin-root .btn-primary.danger {
+  background: #f44336;
+  border-color: #f44336;
+}
+
+#admin-root .btn-primary.danger:hover {
+  background: #e53935;
+  border-color: #e53935;
+}
+
+/* Form group input */
+#admin-root .form-group input[type="text"],
+#admin-root .form-group input[type="email"],
+#admin-root .form-group input[type="number"] {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+#admin-root .form-group input:focus {
+  outline: none;
+  border-color: #000;
+}
+
+/* Profiles Management */
+#admin-root .profiles-management-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#admin-root .profile-management-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+#admin-root .profile-management-item:hover {
+  background: #e9ecef;
+}
+
+#admin-root .profile-info-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#admin-root .profile-info-main .profile-icon {
+  width: 32px;
+  height: 32px;
+  filter: brightness(0);
+}
+
+#admin-root .profile-info-main .profile-name {
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 4px;
+}
+
+#admin-root .profile-info-main .profile-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+#admin-root .profile-info-main .status-badge {
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+#admin-root .btn-delete-profile {
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#admin-root .btn-delete-profile:hover {
+  background: #ffebee;
+  border-color: #f44336;
+}
+
+#admin-root .btn-delete-profile img {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0);
+}
+
+#admin-root .btn-delete-profile:hover img {
+  filter: invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+}

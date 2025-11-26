@@ -66,3 +66,30 @@
   color: #000;
   font-weight: 500;
 }
+
+
+/* Clickable card */
+#admin-root .stats-card.clickable {
+  cursor: pointer;
+}
+
+#admin-root .stats-card.clickable:hover {
+  background: #fafafa;
+}
+
+#admin-root .stats-arrow {
+  width: 24px;
+  height: 24px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+#admin-root .stats-card.clickable:hover .stats-arrow {
+  opacity: 0.5;
+}
+
+#admin-root .stats-arrow img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0);
+}

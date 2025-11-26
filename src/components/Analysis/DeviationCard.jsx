@@ -7,7 +7,7 @@ import threeDotsAnimation from '../../animation/Three dots loading.json'
 import modal from '../../utils/modal'
 import './Analysis.css'
 
-const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnalysisComplete }) => {
+const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) => {
   const [deviations, setDeviations] = useState([])
   const [analysisData, setAnalysisData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -75,13 +75,19 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
     if (!currentProfile || !text) return
     
     if (!currentNote) {
-      modal.error('Không tìm thấy note hiện tại')
+      modal.error('Current note not found')
       return
     }
     
     setIsLoading(true)
     try {
+      // Show progress toast
+      const progressToast = modal.toast('Đang phân tích...', 'Đang kiểm tra văn phong và tạo gợi ý', 'info', { duration: 0 })
+      
       const result = await analyzeText(currentProfile.profile_id, text)
+      
+      // Dismiss progress toast
+      if (progressToast?.dismiss) progressToast.dismiss()
       
       console.log('📊 Analysis result:', result)
       
@@ -104,12 +110,21 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
         }
         
         const suggestionsCount = result.data.sentence_suggestions ? Object.keys(result.data.sentence_suggestions).length : 0
-        console.log('💡 Suggestions generated:', suggestionsCount)
+        const rewriteCount = result.data.sentence_suggestions 
+          ? Object.values(result.data.sentence_suggestions).filter(s => s.rewritten).length 
+          : 0
+        
+        console.log('💡 Suggestions generated:', suggestionsCount, 'with', rewriteCount, 'rewrites')
         
         if (deviantSentences.length > 0) {
-          modal.toast('Phân tích hoàn tất', `Tìm thấy ${deviantSentences.length} câu cần cải thiện với ${suggestionsCount} gợi ý. Di chuột vào câu để xem chi tiết.`, 'success')
+          const severeSummary = result.data.deviation_summary?.by_severity || {}
+          let summaryText = `Tìm thấy ${deviantSentences.length} câu cần cải thiện`
+          if (severeSummary.severe > 0) summaryText += ` (${severeSummary.severe} nghiêm trọng)`
+          summaryText += `. Click vào câu được đánh dấu để xem gợi ý.`
+          
+          modal.toast('Phân tích hoàn tất', summaryText, 'success')
         } else {
-          modal.toast('Phân tích hoàn tất', 'Văn bản phù hợp với văn phong!', 'success')
+          modal.toast('Phân tích hoàn tất', 'Văn bản phù hợp với văn phong của bạn!', 'success')
         }
       } else {
         throw new Error(result.error || 'Analysis failed')
@@ -129,14 +144,14 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
           <img src="/icon/alert-triangle.svg" alt="Deviation" />
         </div>
         <div className="feature-info">
-          <h4>Lệch chuẩn</h4>
-          <p>Gợi ý & đánh dấu</p>
+          <h4>Deviations</h4>
+          <p>Suggestions & highlights</p>
         </div>
         {analysisData && (
           <button 
             className={`toggle-result-btn ${showResult ? 'expanded' : 'collapsed'}`}
             onClick={() => setShowResult(!showResult)}
-            data-tooltip={showResult ? 'Ẩn kết quả' : 'Hiện kết quả'}
+            data-tooltip={showResult ? 'Hide results' : 'Show results'}
             data-tooltip-position="left"
           >
             <img 
@@ -150,7 +165,7 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
         className={`feature-btn ${isLoading ? 'loading' : ''}`}
         onClick={findDeviations}
         disabled={disabled || isLoading || !textChanged}
-        title={!textChanged ? 'Văn bản chưa thay đổi' : ''}
+        title={!textChanged ? 'Text has not changed' : ''}
       >
         {isLoading ? (
           <Lottie 
@@ -160,7 +175,7 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
           />
         ) : (
           <>
-            <span>{!textChanged ? 'Đã tìm kiếm' : 'Tìm kiếm'}</span>
+            <span>{!textChanged ? 'Already searched' : 'Search'}</span>
             <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
           </>
         )}
@@ -173,14 +188,14 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
               <div className="stat-icon-wrapper">
                 <img src="/icon/target.svg" alt="Compatibility" />
               </div>
-              <span className="stat-label-modern">TƯƠNG THÍCH</span>
+              <span className="stat-label-modern">COMPATIBILITY</span>
               <span className="stat-value-modern">{analysisData.voice_compatibility_score}%</span>
             </div>
             <div className="stat-item-modern">
               <div className="stat-icon-wrapper">
                 <img src="/icon/alert-circle.svg" alt="Suggestions" />
               </div>
-              <span className="stat-label-modern">CÂU CÓ GỢI Ý</span>
+              <span className="stat-label-modern">SENTENCES WITH SUGGESTIONS</span>
               <span className="stat-value-modern">
                 {analysisData.sentence_suggestions ? Object.keys(analysisData.sentence_suggestions).filter(
                   key => analysisData.sentence_suggestions[key].issues_found > 0
@@ -191,8 +206,27 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
 
           {deviations.length > 0 ? (
             <>
-              {/* Simple Summary - based on actual suggestions */}
-              {analysisData.sentence_suggestions && (() => {
+              {/* Severity Summary - using new deviation_summary from API */}
+              {analysisData.deviation_summary ? (
+                <div className="sentence-summary-simple">
+                  {analysisData.deviation_summary.by_severity?.severe > 0 && (
+                    <span className="summary-badge summary-critical">
+                      {analysisData.deviation_summary.by_severity.severe} nghiêm trọng
+                    </span>
+                  )}
+                  {analysisData.deviation_summary.by_severity?.moderate > 0 && (
+                    <span className="summary-badge summary-minor">
+                      {analysisData.deviation_summary.by_severity.moderate} trung bình
+                    </span>
+                  )}
+                  {analysisData.deviation_summary.by_severity?.mild > 0 && (
+                    <span className="summary-badge summary-good">
+                      {analysisData.deviation_summary.by_severity.mild} nhẹ
+                    </span>
+                  )}
+                </div>
+              ) : analysisData.sentence_suggestions && (() => {
+                // Fallback to old logic if deviation_summary not available
                 const suggestions = Object.values(analysisData.sentence_suggestions)
                 const withIssues = suggestions.filter(s => s.issues_found > 0)
                 const high = withIssues.filter(s => s.issues_found >= 3 || s.confidence < 40).length
@@ -203,17 +237,17 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
                   <div className="sentence-summary-simple">
                     {high > 0 && (
                       <span className="summary-badge summary-critical">
-                        {high} quan trọng
+                        {high} critical
                       </span>
                     )}
                     {medium > 0 && (
                       <span className="summary-badge summary-minor">
-                        {medium} trung bình
+                        {medium} medium
                       </span>
                     )}
                     {low > 0 && (
                       <span className="summary-badge summary-good">
-                        {low} nhỏ
+                        {low} minor
                       </span>
                     )}
                   </div>
@@ -222,13 +256,13 @@ const DeviationCard = ({ disabled, currentProfile, text, onSentenceClick, onAnal
               
               <div className="deviation-hint">
                 <img src="/icon/mouse-pointer.svg" alt="info" className="icon-filter" />
-                <span>Click vào câu được đánh dấu để xem gợi ý chi tiết</span>
+                <span>Click on highlighted sentences to see detailed suggestions</span>
               </div>
             </>
           ) : (
             <div className="deviation-success">
               <img src="/icon/check-circle.svg" alt="success" className="icon-filter" />
-              <span>Văn bản phù hợp với văn phong!</span>
+              <span>Text matches your writing style!</span>
             </div>
           )}
         </div>

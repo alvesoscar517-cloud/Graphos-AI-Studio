@@ -113,13 +113,13 @@ Object.entries(categories).forEach(([category, items]) => {
     console.log(`\n${category} (${items.length} endpoints):`);
     console.log('─'.repeat(60));
     items.forEach(({ endpoint, description }) => {
-      console.log(`  ✓ ${endpoint.padEnd(45)} ${description}`);
+      console.log(`  [OK] ${endpoint.padEnd(45)} ${description}`);
     });
   }
 });
 
 console.log('');
 console.log('╔════════════════════════════════════════════════════════════╗');
-console.log('║   ✅ All endpoints verified and mapped correctly!          ║');
+console.log('║   [SUCCESS] All endpoints verified and mapped correctly!   ║');
 console.log('╚════════════════════════════════════════════════════════════╝');
 console.log('');

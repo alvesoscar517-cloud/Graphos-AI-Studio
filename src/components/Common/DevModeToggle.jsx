@@ -72,7 +72,7 @@ const DevModeToggle = () => {
                 />
                 <span>Enable Dev Mode</span>
               </label>
-              <p className="dev-hint">Sử dụng profile test thay vì tạo mới</p>
+              <p className="dev-hint">Use test profile instead of creating new</p>
             </div>
 
             <div className="dev-setting">
@@ -85,7 +85,7 @@ const DevModeToggle = () => {
                 />
                 <span>Auto-select Test Profile</span>
               </label>
-              <p className="dev-hint">Tự động chọn profile test khi khởi động</p>
+              <p className="dev-hint">Auto-select test profile on startup</p>
             </div>
 
             <div className="dev-setting">

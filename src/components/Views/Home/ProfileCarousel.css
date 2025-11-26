@@ -1,6 +1,7 @@
 /* Profile Carousel Styles */
 .profile-showcase {
   width: 100%;
+  box-sizing: border-box;
 }
 
 .profile-showcase-header {

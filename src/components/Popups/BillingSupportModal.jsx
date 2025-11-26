@@ -23,19 +23,19 @@ const BillingSupportModal = ({ onClose }) => {
     'Other'
   ]
 
-  // Không cần useEffect nữa vì đã xử lý onClick trực tiếp trên overlay
+  // No need for useEffect anymore since onClick is handled directly on overlay
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files)
     if (attachments.length + files.length > 3) {
-      setError('Tối đa 3 file đính kèm')
+      setError('Maximum 3 attachments allowed')
       return
     }
 
     const newAttachments = []
     files.forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
-        setError('Kích thước file không được vượt quá 5MB')
+        setError('File size must not exceed 5MB')
         return
       }
       const reader = new FileReader()
@@ -60,7 +60,7 @@ const BillingSupportModal = ({ onClose }) => {
     e.preventDefault()
     
     if (!category || !subject.trim() || !description.trim()) {
-      setError('Vui lòng điền đầy đủ thông tin')
+      setError('Please fill in all required information')
       return
     }
 
@@ -74,9 +74,9 @@ const BillingSupportModal = ({ onClose }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          type: 'billing_support', // Phân biệt với feedback
+          type: 'billing_support', // Distinguish from feedback
           category,
-          priority: 'high', // Mặc định cao vì người dùng luôn muốn được ưu tiên
+          priority: 'high', // Default high since users always want priority
           title: subject,
           content: description,
           images: attachments.map(att => att.data),
@@ -88,13 +88,13 @@ const BillingSupportModal = ({ onClose }) => {
       const data = await response.json()
 
       if (response.ok) {
-        success('Yêu cầu hỗ trợ đã được gửi! Chúng tôi sẽ phản hồi trong vòng 24h.')
+        success('Support request sent! We will respond within 24 hours.')
         onClose()
       } else {
-        setError(data.error || 'Có lỗi xảy ra, vui lòng thử lại')
+        setError(data.error || 'An error occurred, please try again')
       }
     } catch (err) {
-      setError('Không thể kết nối đến server')
+      setError('Unable to connect to server')
     } finally {
       setSending(false)
     }
@@ -142,7 +142,7 @@ const BillingSupportModal = ({ onClose }) => {
 
           {/* Support Categories */}
           <div className="support-categories">
-            <h3>Chọn loại vấn đề</h3>
+            <h3>Select issue type</h3>
             <div className="category-chips">
               {categories.map((cat) => (
                 <div
@@ -164,7 +164,7 @@ const BillingSupportModal = ({ onClose }) => {
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="Mô tả ngắn gọn vấn đề của bạn..."
+                placeholder="Brief description of your issue..."
                 maxLength={100}
               />
             </div>
@@ -174,7 +174,7 @@ const BillingSupportModal = ({ onClose }) => {
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Vui lòng mô tả chi tiết vấn đề bạn gặp phải, bao gồm:&#10;- Thông tin giao dịch (nếu có)&#10;- Thời gian xảy ra vấn đề&#10;- Các bước bạn đã thử&#10;- Ảnh chụp màn hình (nếu có)"
+                placeholder="Please describe the issue in detail, including:&#10;- Transaction information (if applicable)&#10;- When the issue occurred&#10;- Steps you've already tried&#10;- Screenshots (if applicable)"
                 rows={6}
                 maxLength={2000}
               />
@@ -182,7 +182,7 @@ const BillingSupportModal = ({ onClose }) => {
             </div>
 
             <div className="billing-field">
-              <label>File đính kèm (tùy chọn, tối đa 3 file)</label>
+              <label>Attachments (optional, max 3 files)</label>
               <div className="attachment-area">
                 <input
                   ref={fileInputRef}
@@ -199,7 +199,7 @@ const BillingSupportModal = ({ onClose }) => {
                   disabled={attachments.length >= 3}
                 >
                   <img src="/icon/paperclip.svg" alt="Attach" />
-                  <span>Đính kèm file</span>
+                  <span>Attach File</span>
                 </button>
 
                 {attachments.length > 0 && (
@@ -230,10 +230,10 @@ const BillingSupportModal = ({ onClose }) => {
 
             <div className="billing-actions">
               <button type="button" className="btn-cancel" onClick={onClose}>
-                Hủy
+                Cancel
               </button>
               <button type="submit" className="btn-submit" disabled={sending}>
-                {sending ? 'Đang gửi...' : 'Gửi yêu cầu'}
+                {sending ? 'Sending...' : 'Send Request'}
               </button>
             </div>
           </form>

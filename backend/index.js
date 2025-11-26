@@ -9,8 +9,11 @@ const config = require('./src/config');
 const corsMiddleware = require('./src/middleware/cors');
 const { errorHandler, notFoundHandler } = require('./src/middleware/errorHandler');
 const rateLimitMiddleware = require('./src/middleware/rateLimit');
+const { activityLoggerMiddleware } = require('./src/middleware/activityLogger.middleware');
 const routes = require('./src/routes');
 const logger = require('./src/utils/logger');
+const redisService = require('./src/services/redis.service');
+const activityLogService = require('./src/services/activityLog.service');
 
 // ============================================================================
 // INITIALIZE APP
@@ -21,6 +24,15 @@ const app = express();
 // ============================================================================
 // MIDDLEWARE
 // ============================================================================
+
+// Response compression (manual implementation without external dependency)
+app.use((req, res, next) => {
+  // Set cache headers for static responses
+  if (req.method === 'GET') {
+    res.set('Cache-Control', 'public, max-age=300'); // 5 minutes for GET requests
+  }
+  next();
+});
 
 // CORS
 app.use(corsMiddleware);
@@ -56,6 +68,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Activity logging middleware (logs user activities automatically)
+app.use(activityLoggerMiddleware);
+
 // ============================================================================
 // ROUTES
 // ============================================================================
@@ -78,40 +93,57 @@ app.use(errorHandler);
 
 const PORT = config.PORT;
 
-app.listen(PORT, () => {
-  console.log('');
-  console.log('╔════════════════════════════════════════════════════════════╗');
-  console.log('║   AI Content Authenticator - Backend Server               ║');
-  console.log('╚════════════════════════════════════════════════════════════╝');
-  console.log('');
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📦 Environment: ${config.NODE_ENV}`);
-  console.log(`🔧 Project ID: ${config.PROJECT_ID}`);
-  console.log(`📍 Location: ${config.LOCATION}`);
-  console.log(`🤖 Gemini Model: ${config.GEMINI_MODEL}`);
-  console.log('');
-  console.log('✅ Features:');
-  console.log(`   - Caching: ${config.FEATURES.ENABLE_CACHING ? '✓' : '✗'}`);
-  console.log(`   - Rate Limiting: ${config.FEATURES.ENABLE_RATE_LIMITING ? '✓' : '✗'}`);
-  console.log(`   - Analytics: ${config.FEATURES.ENABLE_ANALYTICS ? '✓' : '✗'}`);
-  console.log('');
-  console.log(`🌐 Server ready at http://localhost:${PORT}`);
-  console.log('');
+// Initialize services and start server
+async function startServer() {
+  // Initialize Redis (optional, will fallback to memory cache)
+  const redisConnected = await redisService.initRedis();
   
-  logger.info('Server started successfully', { port: PORT, env: config.NODE_ENV });
-});
+  app.listen(PORT, () => {
+    console.log('');
+    console.log('========================================================');
+    console.log('   AI Content Authenticator - Backend Server');
+    console.log('========================================================');
+    console.log('');
+    console.log(`[START] Server running on port ${PORT}`);
+    console.log(`[ENV] Environment: ${config.NODE_ENV}`);
+    console.log(`[CONFIG] Project ID: ${config.PROJECT_ID}`);
+    console.log(`[CONFIG] Location: ${config.LOCATION}`);
+    console.log(`[MODEL] Gemini Model: ${config.GEMINI_MODEL}`);
+    console.log('');
+    console.log('[FEATURES]');
+    console.log(`   - Caching: ${config.FEATURES.ENABLE_CACHING ? 'ENABLED' : 'DISABLED'}`);
+    console.log(`   - Rate Limiting: ${config.FEATURES.ENABLE_RATE_LIMITING ? 'ENABLED' : 'DISABLED'}`);
+    console.log(`   - Analytics: ${config.FEATURES.ENABLE_ANALYTICS ? 'ENABLED' : 'DISABLED'}`);
+    console.log(`   - Redis Cache: ${redisConnected ? 'ENABLED (distributed)' : 'DISABLED (memory fallback)'}`);
+    console.log('');
+    console.log(`[READY] Server ready at http://localhost:${PORT}`);
+    console.log('');
+    
+    logger.info('Server started successfully', { 
+      port: PORT, 
+      env: config.NODE_ENV,
+      redisConnected 
+    });
+  });
+}
+
+startServer();
 
 // ============================================================================
 // GRACEFUL SHUTDOWN
 // ============================================================================
 
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   logger.info('SIGTERM received, shutting down gracefully');
+  await activityLogService.flushBuffer(); // Flush pending activity logs
+  await redisService.close();
   process.exit(0);
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   logger.info('SIGINT received, shutting down gracefully');
+  await activityLogService.flushBuffer(); // Flush pending activity logs
+  await redisService.close();
   process.exit(0);
 });
 

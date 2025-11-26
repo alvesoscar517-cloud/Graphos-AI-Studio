@@ -2,8 +2,8 @@
 .chat-message {
   display: flex;
   width: 100%;
-  animation: messageSlideIn 0.3s ease-out;
   margin-bottom: 24px;
+  animation: messageSlideIn 0.3s ease-out;
 }
 
 @keyframes messageSlideIn {
@@ -250,4 +250,95 @@ body.dark-theme .chat-message-copy img {
 
 body.dark-theme .workspace-loading-dots {
   background: rgba(60, 64, 67, 0.3);
+}
+
+
+/* Error Message Styles */
+.chat-message-error .chat-message-ai-content {
+  background: rgba(244, 67, 54, 0.08);
+  border: 1px solid rgba(244, 67, 54, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.chat-message-error-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-error-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.chat-error-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  filter: invert(32%) sepia(98%) saturate(1234%) hue-rotate(343deg) brightness(91%) contrast(97%);
+}
+
+.chat-error-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #d32f2f;
+}
+
+.chat-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 8px;
+  color: #d32f2f;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.chat-retry-btn:hover:not(:disabled) {
+  background: rgba(244, 67, 54, 0.15);
+  border-color: rgba(244, 67, 54, 0.4);
+}
+
+.chat-retry-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chat-retry-btn img {
+  width: 14px;
+  height: 14px;
+  filter: invert(32%) sepia(98%) saturate(1234%) hue-rotate(343deg) brightness(91%) contrast(97%);
+}
+
+/* Dark Theme Error Styles */
+body.dark-theme .chat-message-error .chat-message-ai-content {
+  background: rgba(244, 67, 54, 0.12);
+  border-color: rgba(244, 67, 54, 0.25);
+}
+
+body.dark-theme .chat-error-text {
+  color: #ef5350;
+}
+
+body.dark-theme .chat-retry-btn {
+  background: rgba(244, 67, 54, 0.15);
+  border-color: rgba(244, 67, 54, 0.35);
+  color: #ef5350;
+}
+
+body.dark-theme .chat-retry-btn:hover:not(:disabled) {
+  background: rgba(244, 67, 54, 0.2);
+}
+
+body.dark-theme .chat-error-icon,
+body.dark-theme .chat-retry-btn img {
+  filter: invert(47%) sepia(75%) saturate(1234%) hue-rotate(331deg) brightness(101%) contrast(91%);
 }

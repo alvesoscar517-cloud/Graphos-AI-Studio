@@ -35,8 +35,15 @@ export const NotesProvider = ({ children }) => {
         await initDB()
 
         // First, load from IndexedDB (fast)
-        const cachedNotes = await getNotesFromDB()
+        let cachedNotes = await getNotesFromDB()
+        
+        // Migration: Remove visible flag from old notes (no longer needed)
         if (cachedNotes.length > 0) {
+          cachedNotes = cachedNotes.map(note => {
+            const { visible, ...rest } = note
+            return rest
+          })
+          
           setNotes(cachedNotes)
           setLoading(false) // Stop loading immediately when we have cached data
           console.log('✅ Loaded notes from IndexedDB:', cachedNotes.length)
@@ -62,7 +69,13 @@ export const NotesProvider = ({ children }) => {
         }
 
         console.log('🔄 Syncing notes from Drive in background...')
-        const driveNotes = await loadNotesFromDrive()
+        let driveNotes = await loadNotesFromDrive()
+        
+        // Migration: Remove visible flag from old notes
+        driveNotes = driveNotes.map(note => {
+          const { visible, ...rest } = note
+          return rest
+        })
         
         // Update state and cache silently
         setNotes(driveNotes)
@@ -122,23 +135,60 @@ export const NotesProvider = ({ children }) => {
     }, 2000) // Save after 2 seconds of inactivity
   }
 
-  const createNote = () => {
-    const newId = Date.now().toString() // Use timestamp as ID
+  // Check if a note has meaningful content
+  const hasContent = (note) => {
+    if (!note) return false
+    const content = note.content?.trim() || ''
+    const title = note.title?.trim() || ''
+    // Note has content if it has non-empty content OR a custom title (not Untitled)
+    return content.length > 0 || (title.length > 0 && title !== 'Untitled')
+  }
+
+  // Clean up empty notes (notes without content)
+  const cleanupEmptyNotes = async () => {
+    const emptyNotes = notes.filter(n => !hasContent(n))
     
-    // Hide oldest visible note if at max
-    const visibleNotes = notes.filter(n => n.visible)
-    if (visibleNotes.length >= MAX_VISIBLE_NOTES) {
-      const oldestVisible = visibleNotes[0]
-      setNotes(prev => prev.map(n => 
-        n.id === oldestVisible.id ? { ...n, visible: false } : n
-      ))
+    for (const note of emptyNotes) {
+      // Don't delete current note being edited
+      if (currentNote?.id === note.id) continue
+      
+      console.log('🧹 Removing empty note:', note.id)
+      
+      // Remove from state
+      setNotes(prev => prev.filter(n => n.id !== note.id))
+      
+      // Delete from IndexedDB
+      try {
+        await deleteNoteFromDB(note.id)
+      } catch (err) {
+        console.error('Failed to delete empty note from IndexedDB:', err)
+      }
+      
+      // Delete from Drive if exists
+      if (note.driveId) {
+        try {
+          await deleteNoteFromDrive(note.driveId)
+        } catch (err) {
+          console.error('Failed to delete empty note from Drive:', err)
+        }
+      }
     }
+    
+    if (emptyNotes.length > 0) {
+      console.log(`✅ Cleaned up ${emptyNotes.length} empty notes`)
+    }
+  }
+
+  const createNote = () => {
+    // Clean up any existing empty notes before creating new one
+    cleanupEmptyNotes()
+    
+    const newId = Date.now().toString() // Use timestamp as ID
     
     const newNote = {
       id: newId,
       title: 'Untitled',
       content: '',
-      visible: true,
       type: 'Chat prompt',
       updated: new Date(),
       titleGenerated: false, // Track if title was auto-generated
@@ -148,8 +198,7 @@ export const NotesProvider = ({ children }) => {
     setNotes(prev => [...prev, newNote])
     setCurrentNote(newNote)
     
-    // Save to Drive
-    autoSave(newNote)
+    // Don't auto-save empty notes to Drive - will save when content is added
     
     return newNote
   }
@@ -170,11 +219,14 @@ export const NotesProvider = ({ children }) => {
       setCurrentNote(newNote)
     }
 
-    // Save to IndexedDB immediately
-    saveNoteToDB(newNote).catch(err => console.error('Failed to save to IndexedDB:', err))
+    // Only save if note has content
+    if (hasContent(newNote)) {
+      // Save to IndexedDB immediately
+      saveNoteToDB(newNote).catch(err => console.error('Failed to save to IndexedDB:', err))
 
-    // Auto-save to Drive with debounce
-    autoSave(newNote)
+      // Auto-save to Drive with debounce
+      autoSave(newNote)
+    }
   }
 
   const deleteNote = async (id) => {
@@ -183,7 +235,7 @@ export const NotesProvider = ({ children }) => {
     setNotes(prev => prev.filter(note => note.id !== id))
     
     if (currentNote && currentNote.id === id) {
-      const remaining = notes.filter(n => n.id !== id && n.visible)
+      const remaining = notes.filter(n => n.id !== id && hasContent(n))
       setCurrentNote(remaining.length > 0 ? remaining[0] : null)
     }
 
@@ -234,15 +286,23 @@ export const NotesProvider = ({ children }) => {
 
   const getVisibleNotes = () => {
     return notes
-      .filter(n => n.visible)
-      .slice(-MAX_VISIBLE_NOTES)
-      .reverse()
+      .filter(n => hasContent(n)) // Show all notes with content, ignore visible flag
+      .sort((a, b) => new Date(b.updated) - new Date(a.updated)) // Sort by most recent
+      .slice(0, MAX_VISIBLE_NOTES) // Take top 5 most recent
+  }
+
+  // Utility: Truncate title to max 7 words
+  const truncateTitleToWords = (title, maxWords = 7) => {
+    if (!title) return title
+    const words = title.trim().split(/\s+/)
+    if (words.length <= maxWords) return title
+    return words.slice(0, maxWords).join(' ') + '...'
   }
 
   const generateTitle = async (content) => {
     try {
-      // Extract first meaningful sentence or paragraph
-      const firstPart = content.trim().substring(0, 100)
+      // Extract first meaningful sentence or paragraph (limit to reduce token cost)
+      const firstPart = content.trim().substring(0, 150)
       
       const response = await fetch('https://ai-authenticator-472729326429.us-central1.run.app/api/chat', {
         method: 'POST',
@@ -252,24 +312,28 @@ export const NotesProvider = ({ children }) => {
         body: JSON.stringify({
           messages: [{
             role: 'user',
-            content: `Tóm tắt nội dung sau thành tiêu đề ngắn gọn (tối đa 6-8 từ), chỉ trả về tiêu đề không giải thích: "${firstPart}"`
+            content: `Create a short title (maximum 7 words) for the following content. ONLY return the title, no explanation: "${firstPart}"`
           }],
-          systemPrompt: 'Bạn là trợ lý tóm tắt. Chỉ trả về tiêu đề ngắn gọn, không giải thích.',
-          model: 'gemini-2.0-flash-exp',
-          temperature: 0.3
+          systemPrompt: 'You are a title generation assistant. Only return a short title of maximum 7 words, no explanation, no quotes.',
+          model: 'gemini-2.0-flash-lite', // Use lite model for cost efficiency
+          temperature: 0.2,
+          maxTokens: 30 // Limit output tokens for efficiency
         })
       })
 
       if (response.ok) {
         const data = await response.json()
-        return data.message.trim().replace(/^["']|["']$/g, '') // Remove quotes
+        let title = data.message.trim().replace(/^["']|["']$/g, '') // Remove quotes
+        // Enforce 7 word limit
+        return truncateTitleToWords(title, 7)
       }
     } catch (err) {
       console.error('Failed to generate title:', err)
     }
     
-    // Fallback to truncated content
-    return content.substring(0, 50) + (content.length > 50 ? '...' : '')
+    // Fallback: Extract first sentence or truncate
+    const firstSentence = content.split(/[.!?。]/)[0]?.trim() || content
+    return truncateTitleToWords(firstSentence, 7)
   }
 
   const value = {

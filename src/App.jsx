@@ -15,9 +15,13 @@ import SharedContentView from './components/Views/SharedContentView'
 import ErrorBoundary from './components/Common/ErrorBoundary'
 import modal from './utils/modal'
 import { initTooltips } from './utils/tooltips'
+import { initStorageCleanup } from './utils/storageCleanup'
 
 function App() {
   useEffect(() => {
+    // Clean corrupted localStorage data first
+    initStorageCleanup()
+    
     // Make modal available globally for components
     window.modal = modal
     

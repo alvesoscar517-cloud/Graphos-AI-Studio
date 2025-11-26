@@ -31,6 +31,11 @@ export const ProfileProvider = ({ children }) => {
     const setupRealtimeUpdates = async () => {
       try {
         const userInfo = await getUserInfo();
+        if (!userInfo || !userInfo.userId) {
+          console.warn('No user info available for realtime updates');
+          return;
+        }
+        
         realtimeService.connect(userInfo.userId);
         
         // Subscribe to profile updates
@@ -41,7 +46,7 @@ export const ProfileProvider = ({ children }) => {
           }
         });
       } catch (e) {
-        console.warn('Could not setup realtime profile updates:', e);
+        console.warn('Could not setup realtime profile updates:', e.message);
       }
     };
     
@@ -49,11 +54,15 @@ export const ProfileProvider = ({ children }) => {
     
     // Fallback: Check localStorage invalidation (for legacy support)
     const checkInvalidation = () => {
-      const invalidated = localStorage.getItem('profileCacheInvalidated')
-      if (invalidated === 'true') {
-        console.log('🔄 Profile cache invalidated, reloading...')
-        loadProfiles(true)
-        localStorage.removeItem('profileCacheInvalidated')
+      try {
+        const invalidated = localStorage.getItem('profileCacheInvalidated')
+        if (invalidated === 'true') {
+          console.log('🔄 Profile cache invalidated, reloading...')
+          loadProfiles(true)
+          localStorage.removeItem('profileCacheInvalidated')
+        }
+      } catch (e) {
+        console.error('Error checking cache invalidation:', e.message)
       }
     }
     checkInvalidation()
@@ -74,27 +83,32 @@ export const ProfileProvider = ({ children }) => {
     try {
       console.log('🔄 Loading profiles from API...')
       
-      // DEV MODE: Sử dụng profile test nếu được bật
+      // DEV MODE: Use test profile if enabled
       if (isDevMode() && shouldUseTestProfile()) {
         devLog('🧪 Dev mode enabled - using test profile')
-        const testProfile = await getOrCreateTestProfile()
-        
-        if (testProfile) {
-          setProfiles([testProfile])
-          setLastLoaded(Date.now())
+        try {
+          const testProfile = await getOrCreateTestProfile()
           
-          // Auto-select test profile
-          devLog('Auto-selecting test profile:', testProfile.profile_name)
-          setCurrentProfile(testProfile)
-          localStorage.setItem('activeProfileId', testProfile.profile_id)
-          localStorage.setItem('activeProfileName', testProfile.profile_name)
-          
-          setLoading(false)
-          return
+          if (testProfile) {
+            setProfiles([testProfile])
+            setLastLoaded(Date.now())
+            
+            // Auto-select test profile
+            devLog('Auto-selecting test profile:', testProfile.profile_name)
+            setCurrentProfile(testProfile)
+            localStorage.setItem('activeProfileId', testProfile.profile_id)
+            localStorage.setItem('activeProfileName', testProfile.profile_name)
+            
+            setLoading(false)
+            return
+          }
+        } catch (testError) {
+          console.error('❌ Error loading test profile:', testError)
+          // Continue to production mode if test profile fails
         }
       }
       
-      // PRODUCTION: Load từ API như bình thường
+      // PRODUCTION: Load from API as normal
       const data = await loadProfilesAPI()
       setProfiles(data)
       setLastLoaded(Date.now())
@@ -117,6 +131,8 @@ export const ProfileProvider = ({ children }) => {
       console.log(`✅ Loaded ${data.length} profiles`)
     } catch (error) {
       console.error('❌ Error loading profiles:', error)
+      // Set empty profiles array to prevent undefined errors
+      setProfiles([])
     } finally {
       setLoading(false)
     }

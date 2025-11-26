@@ -60,7 +60,7 @@ const LoginOverlay = () => {
     try {
       const success = await signIn()
       if (!success) {
-        alert('Đăng nhập thất bại. Vui lòng thử lại.')
+        alert('Sign in failed. Please try again.')
       }
     } catch (error) {
       console.error('Sign in error:', error)
@@ -90,13 +90,13 @@ const LoginOverlay = () => {
         </div>
         {authLoading ? (
           <>
-            <h2 className="login-title">Đang kiểm tra...</h2>
-            <p className="login-subtitle">Vui lòng đợi trong giây lát</p>
+            <h2 className="login-title">Checking...</h2>
+            <p className="login-subtitle">Please wait a moment</p>
           </>
         ) : (
           <>
-            <h2 className="login-title">Đăng nhập để tiếp tục</h2>
-            <p className="login-subtitle">Vui lòng đăng nhập với tài khoản Google để sử dụng AI Content Authenticator</p>
+            <h2 className="login-title">Sign in to continue</h2>
+            <p className="login-subtitle">Please sign in with your Google account to use AI Content Authenticator</p>
             <button 
               className={`google-signin-btn ${isLoading ? 'loading' : ''}`}
               onClick={handleSignIn}

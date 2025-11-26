@@ -29,7 +29,7 @@ export function getCachedProfileDetail(profileId) {
       return null
     }
 
-    console.log(`✅ Using cached profile detail for: ${profileId}`)
+    console.log(`[SUCCESS] Using cached profile detail for: ${profileId}`)
     return data
   } catch (error) {
     console.error('Error reading profile detail cache:', error)
@@ -51,7 +51,7 @@ export function setCachedProfileDetail(profileId, profileData) {
     }
     
     localStorage.setItem(cacheKey, JSON.stringify(cacheData))
-    console.log(`💾 Cached profile detail for: ${profileId}`)
+    console.log(`[SAVED] Cached profile detail for: ${profileId}`)
   } catch (error) {
     console.error('Error setting profile detail cache:', error)
   }
@@ -65,7 +65,7 @@ export function clearCachedProfileDetail(profileId) {
   try {
     const cacheKey = CACHE_KEY_PREFIX + profileId
     localStorage.removeItem(cacheKey)
-    console.log(`🗑️ Cleared cache for profile: ${profileId}`)
+    console.log(`[CLEARED] Cache cleared for profile: ${profileId}`)
   } catch (error) {
     console.error('Error clearing profile detail cache:', error)
   }
@@ -86,7 +86,7 @@ export function clearAllProfileDetailCaches() {
       }
     })
     
-    console.log(`🗑️ Cleared ${cleared} profile detail caches`)
+    console.log(`[CLEARED] Cleared ${cleared} profile detail caches`)
   } catch (error) {
     console.error('Error clearing all profile detail caches:', error)
   }

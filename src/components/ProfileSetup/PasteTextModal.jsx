@@ -1,21 +1,47 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { debounce } from '../../utils/debounce'
 import './PasteTextModal.css'
 
 const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
   const [text, setText] = useState('')
   const [wordCount, setWordCount] = useState(0)
   const [analysis, setAnalysis] = useState(null)
+  const debouncedAnalyzeRef = useRef(null)
+
+  // Create debounced analyze function
+  const debouncedAnalyze = useCallback((value) => {
+    if (!debouncedAnalyzeRef.current) {
+      debouncedAnalyzeRef.current = debounce((val) => {
+        const result = analyzeText(val)
+        setAnalysis(result)
+      }, 300)
+    }
+    debouncedAnalyzeRef.current(value)
+  }, [])
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      if (debouncedAnalyzeRef.current?.cancel) {
+        debouncedAnalyzeRef.current.cancel()
+      }
+    }
+  }, [])
 
   // Load initial text when modal opens
   useEffect(() => {
     if (isOpen && initialText) {
-      handleTextChange(initialText)
+      handleTextChange(initialText, true) // immediate analysis for initial load
     } else if (!isOpen) {
       // Only reset when modal closes if there's no initial text to preserve
       if (!initialText) {
         setText('')
         setWordCount(0)
         setAnalysis(null)
+      }
+      // Cancel pending debounce when modal closes
+      if (debouncedAnalyzeRef.current?.cancel) {
+        debouncedAnalyzeRef.current.cancel()
       }
     }
   }, [isOpen, initialText])
@@ -51,20 +77,20 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
     
     // 1. Word count analysis (50 points max)
     if (wordCount < 500) {
-      smartHints.push(`Cần thêm ${500 - wordCount} từ để đạt mức tối thiểu (hiện: ${wordCount} từ)`)
+      smartHints.push(`Need ${500 - wordCount} more words to reach minimum level (current: ${wordCount} words)`)
       qualityScore += Math.min((wordCount / 500) * 25, 25)
     } else if (wordCount >= 500 && wordCount < 1000) {
       qualityScore += 30
-      smartHints.push(`Đã đủ tối thiểu. Thêm ${1000 - wordCount} từ nữa để đạt mốc khuyến nghị`)
+      smartHints.push(`Minimum reached. Add ${1000 - wordCount} more words to reach recommended level`)
     } else if (wordCount >= 1000 && wordCount < 1500) {
       qualityScore += 40
-      smartHints.push(`Rất tốt! Thêm ${1500 - wordCount} từ để đạt chất lượng tối ưu`)
+      smartHints.push(`Excellent! Add ${1500 - wordCount} more words to reach optimal quality`)
     } else if (wordCount >= 1500 && wordCount < 2000) {
       qualityScore += 45
-      smartHints.push(`Xuất sắc! Thêm ${2000 - wordCount} từ để AI học sâu hơn`)
+      smartHints.push(`Excellent! Add ${2000 - wordCount} more words for deeper AI learning`)
     } else if (wordCount >= 2000) {
       qualityScore += 50
-      smartHints.push(`Hoàn hảo! Độ dài lý tưởng cho AI học tốt nhất`)
+      smartHints.push(`Perfect! Ideal length for best AI learning`)
     }
     
     // 2. Paragraph structure (15 points max)
@@ -96,7 +122,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
       smartHints.push(`Câu quá ngắn (TB: ${avgSentenceLength.toFixed(1)} từ/câu). Kết hợp câu phức tạp hơn`)
       qualityScore += 5
     } else if (avgSentenceLength > 25) {
-      smartHints.push(`Câu quá dài (TB: ${avgSentenceLength.toFixed(1)} từ/câu). Chia nhỏ để dễ đọc`)
+      smartHints.push(`Sentences too long (avg: ${avgSentenceLength.toFixed(1)} words/sentence). Break them up for readability`)
       qualityScore += 10
     } else {
       qualityScore += 15
@@ -104,7 +130,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
     
     // 5. Repetition detection
     if (repetitiveWords.length > 0 && wordCount > 300) {
-      smartHints.push(`Từ lặp lại nhiều: "${repetitiveWords.slice(0, 2).join('", "')}"`)
+      smartHints.push(`Repeated words: "${repetitiveWords.slice(0, 2).join('", "')}"`)
     }
     
     // 6. Sentence variety
@@ -130,32 +156,38 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
     }
   }
 
-  const handleTextChange = (value) => {
-    // Auto-trim to 3000 words max
+  const handleTextChange = useCallback((value, immediate = false) => {
+    // Auto-trim to 5000 words max
     const words = value.trim().split(/\s+/).filter(w => w.length > 0)
     
-    if (words.length > 3000) {
-      // Keep only first 3000 words
-      const trimmedText = words.slice(0, 3000).join(' ')
+    if (words.length > 5000) {
+      // Keep only first 5000 words
+      const trimmedText = words.slice(0, 5000).join(' ')
       setText(trimmedText)
-      setWordCount(3000)
+      setWordCount(5000)
       
-      // Analyze trimmed text
+      // Analyze trimmed text (immediate for truncation feedback)
       const result = analyzeText(trimmedText)
       setAnalysis(result)
     } else {
       setText(value)
       setWordCount(words.length)
       
-      // Real-time analysis
+      // Real-time analysis with debounce
       if (words.length > 50) {
-        const result = analyzeText(value)
-        setAnalysis(result)
+        if (immediate) {
+          // Immediate analysis for initial load
+          const result = analyzeText(value)
+          setAnalysis(result)
+        } else {
+          // Debounced analysis for typing
+          debouncedAnalyze(value)
+        }
       } else {
         setAnalysis(null)
       }
     }
-  }
+  }, [debouncedAnalyze])
 
   const handleSave = () => {
     if (analysis && analysis.isReady) {
@@ -169,8 +201,8 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
 
   if (!isOpen) return null
 
-  // Dynamic progress based on 3000 words max
-  const progress = Math.min((wordCount / 3000) * 100, 100)
+  // Dynamic progress based on 5000 words max
+  const progress = Math.min((wordCount / 5000) * 100, 100)
   const canSave = analysis && analysis.isReady
   
   // Get progress status for color coding
@@ -185,33 +217,33 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
   // Get dynamic word count label based on milestone
   const getWordCountLabel = () => {
     if (wordCount < 500) {
-      return `/ 500 từ tối thiểu • Cần thêm ${500 - wordCount} từ`
+      return `/ 500 minimum words • Need ${500 - wordCount} more words`
     }
     if (wordCount < 800) {
-      return '/ 500 từ tối thiểu • Cung cấp 500-800 từ để AI nhận diện pattern cơ bản'
+      return '/ 500 minimum words • Provide 500-800 words for AI to recognize basic patterns'
     }
     if (wordCount < 1000) {
-      return `/ 1000 từ • Thêm ${1000 - wordCount} từ để đạt mốc khuyến nghị`
+      return `/ 1000 words • Add ${1000 - wordCount} more words to reach recommended level`
     }
     if (wordCount < 1500) {
-      return '/ 1500 từ • Cung cấp 1000-1500 từ để AI học phong cách rõ ràng'
+      return '/ 1500 words • Provide 1000-1500 words for clear AI style learning'
     }
-    if (wordCount < 2000) {
-      return `/ 2000 từ • Thêm ${2000 - wordCount} từ để đạt mốc tối ưu`
+    if (wordCount < 2500) {
+      return `/ 2500 words • Add ${2500 - wordCount} more words to reach optimal level`
     }
-    if (wordCount < 3000) {
-      return '/ 3000 từ • Cung cấp 2000-3000 từ để AI học sâu (cấu trúc, tone, từ vựng)'
+    if (wordCount < 5000) {
+      return '/ 5000 words • Provide 2500-5000 words for deep AI learning (structure, tone, vocabulary)'
     }
-    return '/ 3000 từ • Xuất sắc! Đã đạt giới hạn tối đa'
+    return '/ 5000 words • Excellent! Reached maximum limit'
   }
 
   // Get primary smart hint for footer (only show most important one)
   const getPrimaryHint = () => {
     if (wordCount === 0) {
-      return 'Dán văn bản của bạn để bắt đầu phân tích'
+      return 'Paste your text to start analysis'
     }
     if (wordCount < 100) {
-      return 'Tiếp tục nhập để phân tích chất lượng văn bản'
+      return 'Keep typing to analyze text quality'
     }
     
     // Show first smart hint from analysis
@@ -219,7 +251,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
       return analysis.smartHints[0]
     }
     
-    return 'Văn bản tốt! AI sẽ học được phong cách viết của bạn'
+    return 'Great text! AI will learn your writing style'
   }
 
   return (
@@ -231,9 +263,9 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
             <img src="/icon/edit-3.svg" alt="" width="24" height="24" />
           </div>
           <div>
-            <h2 className="paste-modal-title">Dán Văn bản</h2>
+            <h2 className="paste-modal-title">Paste Text</h2>
             <p className="paste-modal-subtitle">
-              Cung cấp càng nhiều văn bản, AI càng hiểu sâu phong cách viết của bạn
+              The more text you provide, the better AI understands your writing style
             </p>
           </div>
         </div>
@@ -242,7 +274,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
         <div className="paste-modal-content">
           <textarea
             className="paste-modal-textarea"
-            placeholder="Dán văn bản của bạn vào đây (tối thiểu 500 từ, khuyến nghị 1000-1500 từ)..."
+            placeholder="Paste your text here (minimum 500 words, recommended 1000-1500 words)..."
             value={text}
             onChange={(e) => handleTextChange(e.target.value)}
           />
@@ -257,11 +289,11 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
                 <span className="paste-word-count-max">3000</span>
               </div>
               <div className="paste-progress-status" data-status={getProgressStatus()}>
-                {wordCount >= 3000 ? '✓ Xuất sắc' : 
-                 wordCount >= 2000 ? 'Rất tốt' :
-                 wordCount >= 1500 ? 'Tốt' :
-                 wordCount >= 1000 ? 'Khá' :
-                 wordCount >= 500 ? 'Đạt tối thiểu' : 'Cần thêm'}
+                {wordCount >= 3000 ? '[EXCELLENT]' : 
+                 wordCount >= 2000 ? '[VERY GOOD]' :
+                 wordCount >= 1500 ? '[GOOD]' :
+                 wordCount >= 1000 ? '[FAIR]' :
+                 wordCount >= 500 ? '[MINIMUM]' : '[NEED MORE]'}
               </div>
             </div>
             <div className="paste-progress-bar-wrapper">
@@ -291,14 +323,14 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
           </div>
           <div className="paste-footer-buttons">
             <button className="paste-modal-btn paste-modal-btn-cancel" onClick={handleClose}>
-              Hủy
+              Cancel
             </button>
             <button 
               className="paste-modal-btn paste-modal-btn-save" 
               onClick={handleSave}
               disabled={!canSave}
             >
-              Lưu văn bản
+              Save Text
             </button>
           </div>
         </div>

@@ -1,9 +1,6 @@
 import './ProfileCard.css'
 
 const ProfileCard = ({ profile, onSelect, onUse }) => {
-  // Debug: Log profile data
-  console.log('ProfileCard data:', profile)
-  
   // Theme icon mapping
   const getThemeIcon = (theme) => {
     const themeIcons = {
@@ -61,19 +58,19 @@ const ProfileCard = ({ profile, onSelect, onUse }) => {
         </div>
         <div className="profile-card-meta-item">
           <img src="/icon/type.svg" alt="Words" />
-          <span>{formatNumber(profile.total_words || 0)} từ</span>
+          <span>{formatNumber(profile.total_words || 0)} words</span>
         </div>
       </div>
 
       <div className="profile-card-stats">
         <div className="profile-stat">
-          <span className="profile-stat-label">ĐIỂM SỐ</span>
+          <span className="profile-stat-label">SCORE</span>
           <span className={`profile-stat-value quality-score-${profile.quality_rating || 'ok'}`}>
             {profile.quality_score || profile.qualityScore || 'N/A'}
           </span>
         </div>
         <div className="profile-stat">
-          <span className="profile-stat-label">CÂU TB</span>
+          <span className="profile-stat-label">AVG SENTENCE</span>
           <span className="profile-stat-value">
             {profile.statistics?.avg_sentence_length?.toFixed(0) || 
              profile.avg_sentence_length?.toFixed(0) || '0'}
@@ -83,8 +80,8 @@ const ProfileCard = ({ profile, onSelect, onUse }) => {
 
       <div className="profile-card-tags">
         <span className="profile-tag">
-          <img src="/icon/briefcase.svg" alt="Văn phòng" />
-          Văn phòng
+          <img src="/icon/briefcase.svg" alt="Office" />
+          Office
         </span>
         <span className="profile-tag">
           <img src="/icon/user.svg" alt="Cá nhân" />
@@ -108,8 +105,8 @@ const ProfileCard = ({ profile, onSelect, onUse }) => {
             }
           }}
         >
-          <img src="/icon/play.svg" alt="Sử dụng" />
-          Sử dụng
+          <img src="/icon/play.svg" alt="Use" />
+          Use
         </button>
       </div>
     </div>

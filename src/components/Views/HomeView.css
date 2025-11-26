@@ -8,7 +8,7 @@
   background: var(--bg-primary);
 }
 
-/* Home Header - giống header chuẩn nhưng không có border */
+/* Home Header - similar to standard header but without border */
 .home-header {
   display: flex;
   align-items: center;
@@ -40,6 +40,24 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+@media (max-width: 1024px) {
+  .home-hero {
+    padding: 0 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-hero {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-hero {
+    padding: 0 16px;
+  }
 }
 
 .hero-title {
@@ -108,6 +126,27 @@
   width: 100%;
 }
 
+@media (max-width: 1024px) {
+  .quick-actions {
+    padding: 0 40px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .quick-actions {
+    padding: 0 20px;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-actions {
+    padding: 0 16px;
+  }
+}
+
 .action-card {
   display: flex;
   align-items: center;
@@ -167,6 +206,28 @@
   margin-left: auto;
   margin-right: auto;
   width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .whats-new {
+    padding: 0 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .whats-new {
+    padding: 0 20px;
+  }
+  
+  .news-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .whats-new {
+    padding: 0 16px;
+  }
 }
 
 .section-title {
@@ -251,15 +312,7 @@
   margin: 0;
 }
 
-/* Profile Showcase */
-.profile-showcase {
-  margin-bottom: 48px;
-  padding: 0 80px;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-}
+/* Profile Showcase - styles moved to ProfileCarousel.css */
 
 .profile-showcase-header {
   display: flex;
@@ -350,9 +403,30 @@
 /* Profile Section */
 .profile-section {
   min-height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0 80px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 1024px) {
+  .profile-section {
+    padding: 0 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-section {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-section {
+    padding: 0 16px;
+  }
 }
 
 .loading-profiles {

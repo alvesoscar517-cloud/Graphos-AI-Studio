@@ -20,7 +20,7 @@ const SharedContentView = () => {
     const shareId = searchParams.get('share')
     
     if (!shareId) {
-      setError('Không tìm thấy mã chia sẻ')
+      setError('Share code not found')
       setLoading(false)
       return
     }
@@ -35,7 +35,7 @@ const SharedContentView = () => {
       setSharedData(data)
     } catch (err) {
       console.error('Failed to load shared content:', err)
-      setError(err.message || 'Không thể tải nội dung được chia sẻ')
+      setError(err.message || 'Unable to load shared content')
     } finally {
       setLoading(false)
     }
@@ -54,7 +54,7 @@ const SharedContentView = () => {
           type: 'text'
         })
         
-        modal.toast('Đã nhập', 'Note đã được thêm vào danh sách của bạn', 'success')
+        modal.toast('Imported', 'Note has been added to your list', 'success')
         navigate('/')
       } else if (sharedData.type === 'conversation') {
         // Import as conversation
@@ -66,12 +66,12 @@ const SharedContentView = () => {
           conversation.messages = sharedData.messages
         }
         
-        modal.toast('Đã nhập', 'Cuộc trò chuyện đã được thêm vào workspace', 'success')
+        modal.toast('Imported', 'Conversation has been added to workspace', 'success')
         navigate('/')
       }
     } catch (err) {
       console.error('Failed to import:', err)
-      modal.error('Không thể nhập nội dung')
+      modal.error('Unable to import content')
     }
   }
 
@@ -80,7 +80,7 @@ const SharedContentView = () => {
       <div className="shared-content-view">
         <div className="shared-content-loading">
           <div className="spinner"></div>
-          <p>Đang tải nội dung được chia sẻ...</p>
+          <p>Loading shared content...</p>
         </div>
       </div>
     )
@@ -91,10 +91,10 @@ const SharedContentView = () => {
       <div className="shared-content-view">
         <div className="shared-content-error">
           <img src="/icon/alert-circle.svg" alt="Error" />
-          <h2>Không thể tải nội dung</h2>
+          <h2>Unable to load content</h2>
           <p>{error}</p>
           <button className="btn-primary" onClick={() => navigate('/')}>
-            Về trang chủ
+            Go to Home
           </button>
         </div>
       </div>
@@ -114,11 +114,11 @@ const SharedContentView = () => {
               src={sharedData.type === 'conversation' ? '/icon/message-circle.svg' : '/icon/file-text.svg'} 
               alt={sharedData.type} 
             />
-            <span>{sharedData.type === 'conversation' ? 'Cuộc trò chuyện' : 'Văn bản'}</span>
+            <span>{sharedData.type === 'conversation' ? 'Conversation' : 'Text'}</span>
           </div>
           <h1>{sharedData.title}</h1>
           <p className="shared-content-meta">
-            Được chia sẻ vào {new Date(sharedData.createdAt).toLocaleDateString('vi-VN', {
+            Shared on {new Date(sharedData.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric'
@@ -149,7 +149,7 @@ const SharedContentView = () => {
                   </div>
                   <div className="shared-message-content">
                     <div className="shared-message-role">
-                      {message.role === 'user' ? 'Bạn' : 'AI'}
+                      {message.role === 'user' ? 'You' : 'AI'}
                     </div>
                     <div className="shared-message-text">
                       {message.content}
@@ -163,11 +163,11 @@ const SharedContentView = () => {
 
         <div className="shared-content-footer">
           <button className="btn-secondary" onClick={() => navigate('/')}>
-            Đóng
+            Close
           </button>
           <button className="btn-primary" onClick={handleImport}>
             <img src="/icon/download.svg" alt="Import" />
-            Nhập vào ứng dụng
+            Import to App
           </button>
         </div>
       </div>
