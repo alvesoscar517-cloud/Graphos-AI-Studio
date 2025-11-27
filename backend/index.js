@@ -149,10 +149,12 @@ const PORT = config.PORT;
 
 async function startServer() {
   try {
-    // Initialize Redis (optional, will fallback to memory cache)
-    const redisConnected = await redisService.initRedis();
-    
-    const server = app.listen(PORT, () => {
+    // Start server FIRST to respond to health checks immediately
+    const server = app.listen(PORT, async () => {
+      console.log(`[START] Server listening on port ${PORT}`);
+      
+      // Initialize Redis AFTER server is listening (optional, will fallback to memory cache)
+      const redisConnected = await redisService.initRedis().catch(() => false);
       console.log('');
       console.log('========================================================');
       console.log('   AI Content Authenticator - Backend Server v2.1');

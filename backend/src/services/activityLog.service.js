@@ -9,7 +9,16 @@
  * 4. Store only essential information
  */
 
-const { db, FieldValue } = require('../config/firebase');
+let db, FieldValue;
+try {
+  const firebase = require('../config/firebase');
+  db = firebase.db;
+  FieldValue = firebase.FieldValue;
+} catch (error) {
+  console.error('[WARN] Firebase not available for activity logging:', error.message);
+  db = null;
+  FieldValue = null;
+}
 const logger = require('../utils/logger');
 
 // Activity types
@@ -96,6 +105,12 @@ async function logActivity(userId, type, data = {}) {
  */
 async function flushBuffer() {
   if (logBuffer.length === 0) return;
+  
+  // Skip if Firestore not available
+  if (!db) {
+    logBuffer = [];
+    return;
+  }
   
   const logsToWrite = [...logBuffer];
   logBuffer = [];
@@ -207,6 +222,10 @@ async function logFeatureUsage(userId, featureType, data = {}) {
  * Get user activity logs with pagination
  */
 async function getUserActivityLogs(userId, options = {}) {
+  if (!db) {
+    return { logs: [], hasMore: false };
+  }
+  
   const {
     limit = 50,
     offset = 0,
@@ -256,6 +275,10 @@ async function getUserActivityLogs(userId, options = {}) {
  * Get user activity summary (aggregated)
  */
 async function getUserActivitySummary(userId, days = 30) {
+  if (!db) {
+    return { totalActivities: 0, totalCreditsUsed: 0, byType: {}, byDate: {}, dailyAverage: 0 };
+  }
+  
   try {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
@@ -307,6 +330,10 @@ async function getUserActivitySummary(userId, days = 30) {
  * Get all users activity for admin (with pagination)
  */
 async function getAllUsersActivity(options = {}) {
+  if (!db) {
+    return { logs: [], hasMore: false };
+  }
+  
   const {
     limit = 100,
     offset = 0,
@@ -358,6 +385,10 @@ async function getAllUsersActivity(options = {}) {
  * Get activity statistics for admin dashboard
  */
 async function getActivityStatistics(days = 7) {
+  if (!db) {
+    return { totalActivities: 0, totalCreditsUsed: 0, uniqueUsers: 0, byType: {}, byDate: {}, topUsers: [] };
+  }
+  
   try {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
@@ -428,6 +459,10 @@ async function getActivityStatistics(days = 7) {
  * Cleanup old logs (runs periodically)
  */
 async function cleanupOldLogs(daysToKeep = 90) {
+  if (!db) {
+    return { deleted: 0 };
+  }
+  
   try {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);

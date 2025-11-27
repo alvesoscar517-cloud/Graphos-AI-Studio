@@ -731,7 +731,8 @@
     "refineUntilBelow": "Refine until AI detection is below {{percent}}%",
     "antiAIInfo": "Anti-AI Detection applies advanced rules to make your text indistinguishable from human writing, including natural contractions, varied sentence lengths, and avoiding AI-typical phrases.",
     "new": "NEW",
-    "beta": "BETA"
+    "beta": "BETA",
+    "selectProfileNotice": "Select a profile to enable writing style customization"
   },
   "themes": {
     "work": "Work",
