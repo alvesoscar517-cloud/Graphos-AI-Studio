@@ -22,9 +22,9 @@ const DRAFT_EXPIRY_HOURS = 24
 export const THEMES = [
   { 
     id: 'work', 
-    name: 'Công việc', 
+    name: 'Work', 
     icon: 'briefcase',
-    description: 'Email, báo cáo, giao tiếp công sở',
+    description: 'Email, reports, office communication',
     sampleTemplates: [
       'Dear Sir/Madam,\n\nI am sending the project progress report for this week. Completed tasks include...',
       'Thank you for your response. I will review and update you as soon as possible.',
@@ -49,7 +49,7 @@ export const THEMES = [
     description: 'Thesis, research papers, academic writing',
     sampleTemplates: [
       'Nghiên cứu này nhằm mục đích phân tích và đánh giá tác động của các yếu tố kinh tế vĩ mô đến thị trường chứng khoán Việt Nam.',
-      'Theo lý thuyết của Maslow (1943), nhu cầu của con người được phân chia thành 5 cấp bậc từ cơ bản đến cao cấp.',
+      'Theo lý thuyết của Maslow (1943), nhu cầu của con người được phân chia thành 5 cấp bậc words cơ bản đến cao cấp.',
       'Kết quả phân tích cho thấy có mối tương quan thuận giữa biến độc lập X và biến phụ thuộc Y với hệ số r = 0.85.'
     ]
   },
@@ -88,7 +88,7 @@ export const THEMES = [
   },
   { 
     id: 'technical', 
-    name: 'Kỹ thuật', 
+    name: 'Technical', 
     icon: 'code',
     description: 'Technical documentation, guides',
     sampleTemplates: [
@@ -173,10 +173,10 @@ export const getDraftTimeAgo = (savedAt) => {
   const minutes = Math.floor(diff / 60000)
   const hours = Math.floor(diff / 3600000)
   
-  if (minutes < 1) return 'vừa xong'
-  if (minutes < 60) return `${minutes} phút trước`
-  if (hours < 24) return `${hours} giờ trước`
-  return 'hơn 1 ngày trước'
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${minutes} minutes ago`
+  if (hours < 24) return `${hours} hours ago`
+  return 'over 1 day ago'
 }
 
 /**
@@ -481,9 +481,9 @@ export const useProfileSetup = () => {
         }
         
         const confirmed = await modal.confirm(
-          `Phát hiện ${duplicateIndices.length} đoạn trùng lặp (với nội dung đã có). Chỉ giữ ${uniqueChunks.length} đoạn duy nhất?`,
-          'Phát hiện trùng lặp',
-          { type: 'question', forceLight: true, confirmText: 'Loại bỏ trùng lặp', cancelText: 'Giữ tất cả' }
+          `Detected ${duplicateIndices.length} duplicate sections (with existing content). Keep only ${uniqueChunks.length} unique sections?`,
+          'Duplicates Detected',
+          { type: 'question', forceLight: true, confirmText: 'Remove Duplicates', cancelText: 'Keep All' }
         )
         
         if (confirmed) {
@@ -585,9 +585,9 @@ export const useProfileSetup = () => {
         }
         
         const confirmed = await modal.confirm(
-          `Phát hiện ${duplicateIndices.length} đoạn trùng lặp (với nội dung đã dán). Chỉ giữ ${uniqueChunks.length} đoạn?`,
-          'Phát hiện trùng lặp',
-          { type: 'question', forceLight: true, confirmText: 'Loại bỏ trùng lặp', cancelText: 'Giữ tất cả' }
+          `Detected ${duplicateIndices.length} duplicate sections (with pasted content). Keep only ${uniqueChunks.length} sections?`,
+          'Duplicates Detected',
+          { type: 'question', forceLight: true, confirmText: 'Remove Duplicates', cancelText: 'Keep All' }
         )
         
         if (confirmed) {
@@ -601,7 +601,7 @@ export const useProfileSetup = () => {
       
       // Show warning if truncated
       if (pastedWords > 0 && currentWordCount >= availableWords) {
-        setWordCountWarning(`Đã cắt bớt để không vượt quá ${MAX_WORDS} từ tổng cộng`)
+        setWordCountWarning(`Truncated to not exceed ${MAX_WORDS} words total`)
       } else {
         setWordCountWarning(null)
       }
@@ -609,7 +609,7 @@ export const useProfileSetup = () => {
       setProfileData(prev => ({ ...prev, uploadedChunks: allChunks, uploadedFiles: fileData }))
       setHasUploadedFiles(true)
       setShowUploadModal(false)
-      modal.toast(`Đã xử lý ${allChunks.length} đoạn từ ${fileData.length} file (${uploadedWords} từ)`, '', 'success')
+      modal.toast(`Processed ${allChunks.length} chunks from ${fileData.length} file (${uploadedWords} words)`, '', 'success')
     } catch (error) {
       console.error('Error processing uploaded files:', error)
       modal.alert('Unable to process file.', '[ERROR]', 'error', true)
@@ -796,7 +796,7 @@ export const useProfileSetup = () => {
       setHasDraft(false)
       setDraftInfo(null)
       
-      modal.toast('Đã khôi phục bản nháp', '', 'success')
+      modal.toast('Draft restored', '', 'success')
       return true
     } catch (error) {
       console.error('Error restoring draft:', error)

@@ -1,12 +1,11 @@
 {
   "name": "ai-content-authenticator-backend",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "AI Content Authenticator - Node.js Backend with Gemini Ecosystem",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "node index.js",
-    "test": "echo \"No tests specified\" && exit 0"
+    "dev": "node index.js"
   },
   "engines": {
     "node": "18"
@@ -18,6 +17,7 @@
     "compromise": "^14.10.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "firebase-admin": "^12.0.0",
     "natural": "^6.10.0",
     "nodemailer": "^7.0.10",
     "uuid": "^9.0.1"

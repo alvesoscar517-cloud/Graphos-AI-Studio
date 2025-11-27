@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
@@ -8,6 +9,7 @@ import modal from '../../utils/modal'
 import './Analysis.css'
 
 const StatisticsCard = ({ disabled, currentProfile, text }) => {
+  const { t } = useTranslation()
   const [stats, setStats] = useState(null)
   const [benchmarkData, setBenchmarkData] = useState(null)
   const [suggestions, setSuggestions] = useState([])
@@ -38,7 +40,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
         setBenchmarkData(cached.benchmarkData || null)
         setSuggestions(cached.suggestions || [])
         setTextChanged(false)
-        console.log('📦 Loaded cached statistics for note:', currentNote.id)
+        console.log('[PACKAGE] Loaded cached statistics for note:', currentNote.id)
       }
     }
   }, [currentNote?.id, currentProfile?.profile_id])
@@ -57,7 +59,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
       setBenchmarkData(cached.benchmarkData || null)
       setSuggestions(cached.suggestions || [])
       setTextChanged(false)
-      console.log('📦 Loaded cached statistics for text change')
+      console.log('[PACKAGE] Loaded cached statistics for text change')
     } else {
       // Text changed but no cache - reset result and enable button
       setStats(null)
@@ -69,21 +71,21 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
 
   const analyzeStats = async () => {
     if (!currentProfile || !text) {
-      modal.error('Please select a profile and enter text')
+      modal.error(t('analysis.pleaseSelectProfileAndText'))
       return
     }
     
     if (!currentNote) {
-      modal.error('Không tìm thấy note hiện tại')
+      modal.error(t('analysis.currentNoteNotFound'))
       return
     }
     
     setIsLoading(true)
     try {
-      console.log('📊 Analyzing statistics for text:', text.substring(0, 50) + '...')
+      console.log('[CHART] Analyzing statistics for text:', text.substring(0, 50) + '...')
       const result = await analyzeText(currentProfile.profile_id, text)
       
-      console.log('📊 API Result:', result)
+      console.log('[CHART] API Result:', result)
       
       if (result.success && result.data && result.data.statistics) {
         const statistics = result.data.statistics
@@ -120,16 +122,16 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
         
         const benchmarkScore = result.data.benchmark_score || 0
         modal.toast(
-          'Analysis Complete', 
-          `${statsData.totalWords} words | Benchmark: ${Math.round(benchmarkScore)}%`, 
+          t('analysis.analysisComplete'), 
+          `${statsData.totalWords} ${t('common.words')} | ${t('analysis.benchmark')}: ${Math.round(benchmarkScore)}%`, 
           'success'
         )
       } else {
-        throw new Error(result.error || 'Analysis failed')
+        throw new Error(result.error || t('analysis.analysisFailed'))
       }
     } catch (error) {
-      console.error('❌ Error analyzing stats:', error)
-      modal.error('Analysis failed: ' + error.message)
+      console.error('[FAIL] Error analyzing stats:', error)
+      modal.error(t('analysis.analysisFailed') + ' ' + error.message)
       setStats(null)
       setBenchmarkData(null)
       setSuggestions([])
@@ -147,20 +149,20 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
   }
 
   const getReadabilityLabel = (score) => {
-    if (score >= 80) return 'Very Easy to Read'
-    if (score >= 60) return 'Easy to Read'
-    if (score >= 40) return 'Average'
-    if (score >= 20) return 'Difficult to Read'
-    return 'Very Difficult to Read'
+    if (score >= 80) return t('analysis.veryEasyToRead')
+    if (score >= 60) return t('analysis.easyToRead')
+    if (score >= 40) return t('analysis.average')
+    if (score >= 20) return t('analysis.difficultToRead')
+    return t('analysis.veryDifficultToRead')
   }
 
   const getBenchmarkLabel = (key) => {
     const labels = {
-      avgWordLength: 'Độ dài từ',
-      avgSentenceLength: 'Độ dài câu',
-      readabilityScore: 'Dễ đọc',
-      vocabularyRichness: 'Từ vựng',
-      punctuationRatio: 'Dấu câu'
+      avgWordLength: t('analysis.avgWordLength'),
+      avgSentenceLength: t('analysis.avgSentenceLength'),
+      readabilityScore: t('analysis.readability'),
+      vocabularyRichness: t('analysis.vocabulary'),
+      punctuationRatio: t('analysis.punctuationRatio')
     }
     return labels[key] || key
   }
@@ -180,17 +182,17 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
       <div className="feature-card stats-card">
         <div className="feature-card-header">
           <div className="feature-icon stats-icon">
-            <img src="/icon/bar-chart-4.svg" alt="Statistics" />
+            <img src="/icon/bar-chart-4.svg" alt={t('analysis.statistics')} />
           </div>
           <div className="feature-info">
-            <h4>Statistics</h4>
-            <p>Detailed Analysis</p>
+            <h4>{t('analysis.statistics')}</h4>
+            <p>{t('analysis.detailedAnalysis')}</p>
           </div>
           {stats && (
             <button 
               className={`toggle-result-btn ${showResult ? 'expanded' : 'collapsed'}`}
               onClick={() => setShowResult(!showResult)}
-              data-tooltip={showResult ? 'Hide results' : 'Show results'}
+              data-tooltip={showResult ? t('common.hide') : t('common.show')}
               data-tooltip-position="left"
             >
               <img 
@@ -204,7 +206,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
           className={`feature-btn ${isLoading ? 'loading' : ''}`}
           onClick={analyzeStats}
           disabled={disabled || isLoading || !textChanged}
-          title={!textChanged ? 'Văn bản chưa thay đổi' : ''}
+          title={!textChanged ? t('analysis.analyzed') : ''}
         >
           {isLoading ? (
             <Lottie 
@@ -214,8 +216,8 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
             />
           ) : (
             <>
-              <span>{!textChanged ? 'Analyzed' : 'Analyze'}</span>
-              <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
+              <span>{!textChanged ? t('analysis.analyzed') : t('analysis.analyze')}</span>
+              <img src="/icon/arrow-right.svg" alt="" className="btn-arrow" />
             </>
           )}
         </button>
@@ -224,30 +226,30 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
             <div className="stats-grid-modern">
               <div className="stat-item-modern">
                 <div className="stat-icon-wrapper readability">
-                  <img src="/icon/book-open.svg" alt="Readability" />
+                  <img src="/icon/book-open.svg" alt={t('analysis.readability')} />
                 </div>
-                <span className="stat-label-modern">READABILITY</span>
+                <span className="stat-label-modern">{t('analysis.readability').toUpperCase()}</span>
                 <span className="stat-value-modern">{stats.readabilityScore}</span>
               </div>
               <div className="stat-item-modern">
                 <div className="stat-icon-wrapper sentence">
-                  <img src="/icon/align-left.svg" alt="Sentence" />
+                  <img src="/icon/align-left.svg" alt={t('analysis.avgSentence')} />
                 </div>
-                <span className="stat-label-modern">AVG SENTENCE</span>
+                <span className="stat-label-modern">{t('analysis.avgSentence')}</span>
                 <span className="stat-value-modern">{stats.avgSentenceLength}</span>
               </div>
               <div className="stat-item-modern">
                 <div className="stat-icon-wrapper complexity">
-                  <img src="/icon/zap.svg" alt="Complexity" />
+                  <img src="/icon/zap.svg" alt={t('analysis.vocabulary')} />
                 </div>
-                <span className="stat-label-modern">VOCABULARY</span>
+                <span className="stat-label-modern">{t('analysis.vocabulary').toUpperCase()}</span>
                 <span className="stat-value-modern">{stats.vocabularyRichness}%</span>
               </div>
               <div className="stat-item-modern">
                 <div className="stat-icon-wrapper words">
-                  <img src="/icon/type.svg" alt="Words" />
+                  <img src="/icon/type.svg" alt={t('analysis.totalWords')} />
                 </div>
-                <span className="stat-label-modern">TOTAL WORDS</span>
+                <span className="stat-label-modern">{t('analysis.totalWords')}</span>
                 <span className="stat-value-modern">{stats.totalWords}</span>
               </div>
             </div>
@@ -256,8 +258,8 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
             {suggestions.length > 0 && (
               <div className="suggestions-preview">
                 <div className="suggestions-header">
-                  <img src="/icon/lightbulb.svg" alt="suggestions" className="icon-filter" />
-                  <span>{suggestions.length} suggestion{suggestions.length > 1 ? 's' : ''}</span>
+                  <img src="/icon/lightbulb.svg" alt={t('analysis.suggestions')} className="icon-filter" />
+                  <span>{suggestions.length} {t('analysis.suggestions')}</span>
                 </div>
                 <div className="suggestion-item-preview">
                   {suggestions[0]?.message?.substring(0, 80)}...
@@ -269,21 +271,21 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
               className="detail-btn-full"
               onClick={() => setShowModal(true)}
             >
-              <span>Xem chi tiết</span>
+              <span>{t('common.viewDetails')}</span>
               <img src="/icon/chevron-right.svg" alt="detail" />
             </button>
           </div>
         )}
       </div>
 
-      {/* Modal hiển thị chi tiết */}
+      {/* Modal showing details */}
       {showModal && stats && (
         <div className="ai-detail-overlay" onClick={() => setShowModal(false)}>
           <div className="ai-detail-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ai-detail-header">
-              <h3>Thống kê chi tiết</h3>
+              <h3>{t('analysis.detailedStatistics')}</h3>
               <button className="close-detail-btn" onClick={() => setShowModal(false)}>
-                <img src="/icon/x.svg" alt="close" />
+                <img src="/icon/x.svg" alt={t('common.close')} />
               </button>
             </div>
             <div className="ai-detail-body">
@@ -291,7 +293,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
               <div className="ai-detail-score">
                 <div>
                   <div className="ai-detail-label">
-                    Readability
+                    {t('analysis.readability')}
                   </div>
                   <div 
                     className="ai-detail-value" 
@@ -302,10 +304,10 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div className="ai-detail-label">
-                    {stats.detectedLanguage === 'vi' ? 'Ngôn ngữ' : 'Language'}
+                    {t('analysis.language')}
                   </div>
                   <div className="ai-detail-verdict">
-                    {stats.detectedLanguage === 'vi' ? '🇻🇳 Tiếng Việt' : '🇺🇸 English'}
+                    {stats.detectedLanguage === 'vi' ? `🇻🇳 ${t('analysis.vietnamese')}` : `🇺🇸 ${t('analysis.english')}`}
                   </div>
                 </div>
               </div>
@@ -313,24 +315,24 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
               {/* Statistics Grid */}
               <div className="compatibility-detail-stats">
                 <div className="stat-card">
-                  <div className="stat-label">Total Words</div>
+                  <div className="stat-label">{t('analysis.words')}</div>
                   <div className="stat-value">{stats.totalWords}</div>
-                  <div className="stat-desc">Words</div>
+                  <div className="stat-desc">{t('analysis.words')}</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-label">Sentences</div>
+                  <div className="stat-label">{t('analysis.sentences')}</div>
                   <div className="stat-value">{stats.totalSentences}</div>
-                  <div className="stat-desc">Sentences</div>
+                  <div className="stat-desc">{t('analysis.sentences')}</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-label">Paragraphs</div>
+                  <div className="stat-label">{t('analysis.paragraphs')}</div>
                   <div className="stat-value">{stats.totalParagraphs || 1}</div>
-                  <div className="stat-desc">Paragraphs</div>
+                  <div className="stat-desc">{t('analysis.paragraphs')}</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-label">Transitions</div>
+                  <div className="stat-label">{t('analysis.transitions')}</div>
                   <div className="stat-value">{stats.transitionWordCount || 0}</div>
-                  <div className="stat-desc">Connectors</div>
+                  <div className="stat-desc">{t('analysis.connectors')}</div>
                 </div>
               </div>
 
@@ -339,7 +341,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
                 <div className="benchmark-section">
                   <h4 className="section-title">
                     <img src="/icon/bar-chart-2.svg" alt="" className="icon-filter" />
-                    So sánh với chuẩn ({benchmarkData.styleType})
+                    {t('analysis.benchmarkComparison')} ({benchmarkData.styleType})
                   </h4>
                   <div className="benchmark-grid">
                     {Object.entries(benchmarkData.comparison).map(([key, data]) => (
@@ -360,7 +362,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
                         <div className="benchmark-score">{Math.round(data.benchmarkScore)}%</div>
                         {data.profileComparison && (
                           <div className={`profile-comparison ${data.profileComparison.status}`}>
-                            vs Profile: {data.profileComparison.difference > 0 ? '+' : ''}{data.profileComparison.difference}%
+                            {t('analysis.vsProfile')}: {data.profileComparison.difference > 0 ? '+' : ''}{data.profileComparison.difference}%
                           </div>
                         )}
                       </div>
@@ -374,21 +376,21 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
                 <div className="suggestions-section">
                   <h4 className="section-title">
                     <img src="/icon/lightbulb.svg" alt="" className="icon-filter" />
-                    Gợi ý cải thiện ({suggestions.length})
+                    {t('analysis.improvementSuggestions')} ({suggestions.length})
                   </h4>
                   <div className="suggestions-list">
                     {suggestions.map((suggestion, index) => (
                       <div key={index} className={`suggestion-item ${suggestion.status}`}>
                         <div className="suggestion-header">
                           <span className={`status-badge ${suggestion.status}`}>
-                            {suggestion.status === 'low' ? '↓ Thấp' : '↑ Cao'}
+                            {suggestion.status === 'low' ? `↓ ${t('analysis.low')}` : `↑ ${t('analysis.high')}`}
                           </span>
                           <span className="metric-name">{getBenchmarkLabel(suggestion.metric)}</span>
                         </div>
                         <p className="suggestion-message">{suggestion.message}</p>
                         <div className="suggestion-meta">
-                          <span>Hiện tại: {formatBenchmarkValue(suggestion.metric, suggestion.currentValue)}</span>
-                          <span>Khuyến nghị: {suggestion.recommendedRange}</span>
+                          <span>{t('analysis.current')}: {formatBenchmarkValue(suggestion.metric, suggestion.currentValue)}</span>
+                          <span>{t('analysis.recommended')}: {suggestion.recommendedRange}</span>
                         </div>
                       </div>
                     ))}
@@ -400,64 +402,45 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
               <div className="compatibility-detail-info">
                 <div className="info-row">
                   <img src="/icon/align-left.svg" alt="" />
-                  <span>Avg Sentence Length:</span>
-                  <span>{stats.avgSentenceLength} words</span>
+                  <span>{t('analysis.avgSentenceLength')}:</span>
+                  <span>{stats.avgSentenceLength} {t('common.words')}</span>
                 </div>
                 <div className="info-row">
                   <img src="/icon/type.svg" alt="" />
-                  <span>Avg Word Length:</span>
-                  <span>{stats.avgWordLength} chars</span>
+                  <span>{t('analysis.avgWordLength')}:</span>
+                  <span>{stats.avgWordLength} {t('common.characters')}</span>
                 </div>
                 <div className="info-row">
                   <img src="/icon/zap.svg" alt="" />
-                  <span>Vocabulary Richness:</span>
+                  <span>{t('analysis.vocabularyRichness')}:</span>
                   <span>{stats.vocabularyRichness}%</span>
                 </div>
                 <div className="info-row">
                   <img src="/icon/more-horizontal.svg" alt="" />
-                  <span>Punctuation Ratio:</span>
+                  <span>{t('analysis.punctuationRatio')}</span>
                   <span>{stats.punctuationRatio}%</span>
                 </div>
                 <div className="info-row">
                   <img src="/icon/file-text.svg" alt="" />
-                  <span>Avg Paragraph Length:</span>
-                  <span>{stats.avgParagraphLength || 0} words</span>
+                  <span>{t('analysis.avgParagraphLength')}:</span>
+                  <span>{stats.avgParagraphLength || 0} {t('common.words')}</span>
                 </div>
               </div>
 
               {/* Readability Explanation */}
               <div className="ai-detail-evidence">
                 <h4 className="ai-detail-evidence-title">
-                  {stats.detectedLanguage === 'vi' ? 'Giải thích Readability' : 'Readability Explanation'}
+                  {t('analysis.readabilityExplanation')}
                 </h4>
                 <div className="evidence-paragraphs">
-                  {stats.detectedLanguage === 'vi' ? (
-                    <>
-                      <p className="evidence-paragraph">
-                        Điểm dễ đọc được tính dựa trên độ dài câu và độ dài từ trung bình, tối ưu cho tiếng Việt.
-                      </p>
-                      <p className="evidence-paragraph">
-                        <strong>80-100:</strong> Rất dễ đọc<br/>
-                        <strong>60-80:</strong> Dễ đọc<br/>
-                        <strong>40-60:</strong> Trung bình<br/>
-                        <strong>0-40:</strong> Khó đọc
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="evidence-paragraph">
-                        Readability score is calculated using the Flesch Reading Ease formula.
-                      </p>
-                      <p className="evidence-paragraph">
-                        <strong>90-100:</strong> Very easy to read<br/>
-                        <strong>60-70:</strong> Easy to read<br/>
-                        <strong>30-50:</strong> Difficult to read<br/>
-                        <strong>0-30:</strong> Very difficult to read
-                      </p>
-                    </>
-                  )}
                   <p className="evidence-paragraph">
-                    Your text: <strong>{stats.readabilityScore}</strong> - <strong>{getReadabilityLabel(stats.readabilityScore)}</strong>
+                    <strong>80-100:</strong> {t('analysis.veryEasyToRead')}<br/>
+                    <strong>60-80:</strong> {t('analysis.easyToRead')}<br/>
+                    <strong>40-60:</strong> {t('analysis.average')}<br/>
+                    <strong>0-40:</strong> {t('analysis.difficultToRead')}
+                  </p>
+                  <p className="evidence-paragraph">
+                    <strong>{stats.readabilityScore}</strong> - <strong>{getReadabilityLabel(stats.readabilityScore)}</strong>
                   </p>
                 </div>
               </div>

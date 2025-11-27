@@ -23,9 +23,9 @@ export async function analyzeText(profileId, text, options = {}) {
     }
     
     // Log stats for monitoring
-    console.log('📊 Text stats:', validation.stats.display)
+    console.log('[CHART] Text stats:', validation.stats.display)
     if (validation.warnings.length > 0) {
-      console.warn('⚠️ Warnings:', validation.warnings)
+      console.warn('[WARNING] Warnings:', validation.warnings)
     }
     
     const userInfo = await getUserInfo()
@@ -71,9 +71,10 @@ export async function analyzeText(profileId, text, options = {}) {
  * Detect AI-generated content
  * @param {string} text 
  * @param {boolean} enhanced - Use enhanced multi-pass detection (default: true)
+ * @param {string} language - Language for verdict (default: from localStorage or 'en')
  * @returns {Promise<{success: boolean, data?: Object, error?: string}>}
  */
-export async function detectAI(text, enhanced = true) {
+export async function detectAI(text, enhanced = true, language = null) {
   try {
     // Validate text before sending
     const validation = validateTextBeforeAI(text, 'gemini-2.5-flash', { task: 'detect' })
@@ -86,8 +87,11 @@ export async function detectAI(text, enhanced = true) {
       }
     }
     
-    console.log('📊 AI detection text stats:', validation.stats.display)
-    console.log(`🔍 Using ${enhanced ? 'ENHANCED' : 'STANDARD'} detection mode`)
+    console.log('[CHART] AI detection text stats:', validation.stats.display)
+    console.log(`[SEARCH] Using ${enhanced ? 'ENHANCED' : 'STANDARD'} detection mode`)
+    
+    // Get language from parameter, localStorage, or default to 'en'
+    const lang = language || localStorage.getItem('i18nextLng') || 'en'
     
     const userInfo = await getUserInfo()
     const response = await fetch(`${CONFIG.API_BASE_URL}/authenticate`, {
@@ -99,7 +103,8 @@ export async function detectAI(text, enhanced = true) {
         text: text,
         user_id: userInfo.userId,
         text_stats: validation.stats,
-        enhanced: enhanced
+        enhanced: enhanced,
+        language: lang.substring(0, 2) // Only use first 2 chars (e.g., 'en-US' -> 'en')
       })
     })
     
@@ -157,13 +162,13 @@ export async function getSuggestions(profileId, sentence, sentenceScore, context
     const data = await response.json()
     
     if (response.ok && data.success) {
-      console.log(`✅ Got ${data.suggestions?.length || 0} suggestions`)
+      console.log(`[SUCCESS] Got ${data.suggestions?.length || 0} suggestions`)
       return { success: true, data }
     }
     
     throw new Error(data.error || 'Failed to get suggestions')
   } catch (error) {
-    console.error('❌ Error getting suggestions:', error)
+    console.error('[FAIL] Error getting suggestions:', error)
     return { success: false, error: error.message }
   }
 }
@@ -335,7 +340,7 @@ export async function getSuggestionsOptimized(profileId, sentence, sentenceScore
     
     throw new Error(data.error || 'Failed to get suggestions')
   } catch (error) {
-    console.error('❌ Error getting suggestions:', error)
+    console.error('[FAIL] Error getting suggestions:', error)
     return { success: false, error: error.message }
   }
 }

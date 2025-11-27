@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { loadProfiles, getProfileDetails } from '../../services/api'
 import { getCachedProfiles, setCachedProfiles, checkCacheInvalidation } from '../../utils/profileCache'
@@ -9,6 +10,7 @@ import modal from '../../utils/modal'
 import './HomeView.css'
 
 const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [profiles, setProfiles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -39,7 +41,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
       setCachedProfiles(data)
     } catch (error) {
       console.error('Error loading profiles:', error)
-      modal.error('Unable to load profile list')
+      modal.error(t('home.unableToLoadProfiles'))
     } finally {
       setLoading(false)
     }
@@ -65,14 +67,14 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
       setShowDetailPopup(true)
     } catch (error) {
       console.error('Error loading profile details:', error)
-      modal.error('Unable to load profile details')
+      modal.error(t('home.unableToLoadProfileDetails'))
     }
   }
 
   const handleUseProfile = (profile) => {
     localStorage.setItem('activeProfileId', profile.profile_id)
     localStorage.setItem('activeProfileName', profile.profile_name)
-    modal.toast('Profile selected', profile.profile_name, 'success')
+    modal.toast(t('home.profileSelected'), profile.profile_name, 'success')
     setShowDetailPopup(false)
     
     // Switch to editor with new note
@@ -83,7 +85,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
     // Set active profile
     localStorage.setItem('activeProfileId', profile.profile_id)
     localStorage.setItem('activeProfileName', profile.profile_name)
-    modal.toast('Profile selected', profile.profile_name, 'success')
+    modal.toast(t('home.profileSelected'), profile.profile_name, 'success')
     
     // Switch to editor with new note
     onViewChange('aistudio-editor', { createNew: true })
@@ -99,21 +101,21 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
         <button 
           className="menu-btn icon-btn" 
           onClick={onToggleLeftSidebar}
-          data-tooltip="Toggle sidebar" 
+          data-tooltip={t('common.menu')} 
           data-tooltip-position="right"
         >
-          <img src="/icon/panel-left.svg" alt="Toggle Left Sidebar" />
+          <img src="/icon/panel-left.svg" alt={t('common.menu')} />
         </button>
       </header>
 
       <div className="home-content">
         <div className="home-hero">
-          <h2 className="hero-title">AI Content Authenticator</h2>
+          <h2 className="hero-title">{t('home.heroTitle')}</h2>
           <p className="hero-subtitle">
-            <span>Professional tool for analyzing and refining content style</span>
+            <span>{t('home.heroSubtitle')}</span>
             <button className="new-app-btn" onClick={handleCreateProfile}>
               <img src="/icon/plus.svg" alt="Plus" />
-              <span>New profile</span>
+              <span>{t('home.newProfile')}</span>
             </button>
           </p>
         </div>
@@ -121,61 +123,61 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
         <div className="quick-actions">
           <div className="action-card" onClick={handleCreateProfile} style={{ cursor: 'pointer' }}>
             <div className="action-icon-wrapper">
-              <img src="/icon/user-round.svg" alt="Profile" className="action-icon" />
+              <img src="/icon/user-round.svg" alt={t('nav.profile')} className="action-icon" />
             </div>
-            <h3>Create Style Profile</h3>
+            <h3>{t('home.createStyleProfile')}</h3>
           </div>
           <div className="action-card" onClick={() => onViewChange('aistudio-editor', { createNew: true })} style={{ cursor: 'pointer' }}>
             <div className="action-icon-wrapper">
-              <img src="/icon/file-search.svg" alt="Analyze" className="action-icon" />
+              <img src="/icon/file-search.svg" alt={t('home.analyzeContent')} className="action-icon" />
             </div>
-            <h3>Analyze Content</h3>
+            <h3>{t('home.analyzeContent')}</h3>
           </div>
           <div className="action-card" onClick={() => onViewChange('history')} style={{ cursor: 'pointer' }}>
             <div className="action-icon-wrapper">
-              <img src="/icon/bar-chart.svg" alt="Monitor" className="action-icon" />
+              <img src="/icon/bar-chart.svg" alt={t('home.trackStatistics')} className="action-icon" />
             </div>
-            <h3>Track Statistics</h3>
+            <h3>{t('home.trackStatistics')}</h3>
           </div>
         </div>
 
         <div className="whats-new">
-          <h3 className="section-title">Featured Features</h3>
+          <h3 className="section-title">{t('home.featuredFeatures')}</h3>
           <div className="news-grid">
             <div className="news-card" onClick={handleCreateProfile} style={{ cursor: 'pointer' }}>
               <div className="news-icon-wrapper">
-                <img src="/icon/fingerprint.svg" alt="Voice Profile" className="news-icon" />
+                <img src="/icon/fingerprint.svg" alt={t('home.styleRefinement')} className="news-icon" />
               </div>
               <div className="news-content">
-                <h4>Style Refinement</h4>
-                <p>Create unique writing style profiles from your text samples</p>
+                <h4>{t('home.styleRefinement')}</h4>
+                <p>{t('home.styleRefinementDesc')}</p>
               </div>
             </div>
             <div className="news-card" onClick={() => onViewChange('aistudio-editor', { createNew: true })} style={{ cursor: 'pointer' }}>
               <div className="news-icon-wrapper">
-                <img src="/icon/shield-check.svg" alt="AI Detection" className="news-icon" />
+                <img src="/icon/shield-check.svg" alt={t('home.aiDetection')} className="news-icon" />
               </div>
               <div className="news-content">
-                <h4>AI Detection</h4>
-                <p>Determine the percentage of AI-generated content with high accuracy</p>
+                <h4>{t('home.aiDetection')}</h4>
+                <p>{t('home.aiDetectionDesc')}</p>
               </div>
             </div>
             <div className="news-card" onClick={() => onViewChange('aistudio-editor', { createNew: true })} style={{ cursor: 'pointer' }}>
               <div className="news-icon-wrapper">
-                <img src="/icon/wand-sparkles.svg" alt="Rewrite" className="news-icon" />
+                <img src="/icon/wand-sparkles.svg" alt={t('rightSidebar.rewrite')} className="news-icon" />
               </div>
               <div className="news-content">
-                <h4>Smart Rewriting</h4>
-                <p>Automatically adjust text to match your unique voice</p>
+                <h4>{t('home.smartRewriting')}</h4>
+                <p>{t('home.smartRewritingDesc')}</p>
               </div>
             </div>
             <div className="news-card" onClick={() => onViewChange('history')} style={{ cursor: 'pointer' }}>
               <div className="news-icon-wrapper">
-                <img src="/icon/chart-line.svg" alt="Analytics" className="news-icon" />
+                <img src="/icon/chart-line.svg" alt={t('home.statisticalAnalysis')} className="news-icon" />
               </div>
               <div className="news-content">
-                <h4>Statistical Analysis</h4>
-                <p>Get detailed insights into complexity and writing style characteristics</p>
+                <h4>{t('home.statisticalAnalysis')}</h4>
+                <p>{t('home.statisticalAnalysisDesc')}</p>
               </div>
             </div>
           </div>

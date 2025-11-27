@@ -15,9 +15,9 @@ const AuthModule = isDev ? DevAuth : ProdAuth
 
 // Log which version is being used
 if (isDev) {
-  console.log('🔧 Using Development Auth Provider')
+  console.log('[SETTINGS] Using Development Auth Provider')
 } else {
-  console.log('🚀 Using Production Auth Provider')
+  console.log('[LAUNCH] Using Production Auth Provider')
 }
 
 // Export from selected module

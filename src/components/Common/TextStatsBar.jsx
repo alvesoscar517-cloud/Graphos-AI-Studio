@@ -1,15 +1,16 @@
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTextStats } from '../../hooks/useTextStats'
 import './TextStatsBar.css'
 
 /**
- * TextStatsBar - Hiển thị thống kê text và cảnh báo
+ * TextStatsBar - Display text statistics and warnings
  * 
  * Features:
- * - Hiển thị số ký tự, từ, tokens, trang
- * - Cảnh báo khi text quá dài
- * - Gợi ý model phù hợp
- * - Chi phí ước tính (optional)
+ * - Display character count, words, tokens, pages
+ * - Warning khi text quá dài
+ * - Suggest appropriate model
+ * - Estimated cost (optional)
  */
 const TextStatsBar = ({ 
   text, 
@@ -20,6 +21,7 @@ const TextStatsBar = ({
   compact = false,
   className = ''
 }) => {
+  const { t } = useTranslation()
   const {
     stats,
     status,
@@ -49,16 +51,16 @@ const TextStatsBar = ({
     return (
       <div className={`text-stats-bar compact ${statusColor} ${className}`}>
         <span className="stat-item">
-          {stats.chars.toLocaleString()} ký tự
+          {stats.chars.toLocaleString()} {t('tokens.characters')}
         </span>
         {stats.words > 0 && (
           <span className="stat-item">
-            {stats.words.toLocaleString()} từ
+            {stats.words.toLocaleString()} {t('common.words')}
           </span>
         )}
         {isTooLong && (
-          <span className="stat-warning" title="Text is quite long">
-            ⚠️
+          <span className="stat-warning" title={t('tokens.textQuiteLong')}>
+            [{t('common.warning').toUpperCase()}]
           </span>
         )}
       </div>
@@ -68,30 +70,30 @@ const TextStatsBar = ({
   return (
     <div className={`text-stats-bar ${statusColor} ${className}`}>
       <div className="stats-main">
-        <span className="stat-item" title="Số ký tự">
-          <span className="stat-icon">📝</span>
+        <span className="stat-item" title={t('tokens.characters')}>
+          <span className="stat-icon">[NOTE]</span>
           {stats.chars.toLocaleString()}
         </span>
         
-        <span className="stat-item" title="Số từ">
+        <span className="stat-item" title={t('common.words')}>
           <span className="stat-icon">📖</span>
-          {stats.words.toLocaleString()} từ
+          {stats.words.toLocaleString()} {t('common.words')}
         </span>
         
-        <span className="stat-item" title="Estimated tokens">
-          <span className="stat-icon">🎯</span>
-          ~{stats.tokens.toLocaleString()} tokens
+        <span className="stat-item" title={t('tokens.tokens')}>
+          <span className="stat-icon">[TARGET]</span>
+          ~{stats.tokens.toLocaleString()} {t('tokens.tokens')}
         </span>
         
         {stats.pages > 1 && (
-          <span className="stat-item" title="Estimated A4 pages">
+          <span className="stat-item" title={t('tokens.pages')}>
             <span className="stat-icon">📄</span>
-            ~{stats.pages} trang
+            ~{stats.pages} {t('tokens.pages')}
           </span>
         )}
 
         {showCost && (
-          <span className="stat-item cost" title="Estimated cost">
+          <span className="stat-item cost" title={t('credits.credits')}>
             <span className="stat-icon">💰</span>
             {estimatedCost}
           </span>
@@ -102,7 +104,7 @@ const TextStatsBar = ({
       {warnings.length > 0 && (
         <div className="stats-warnings">
           {warnings.map((w, i) => (
-            <span key={i} className="warning-item">⚠️ {w}</span>
+            <span key={i} className="warning-item">[{t('common.warning').toUpperCase()}] {w}</span>
           ))}
         </div>
       )}
@@ -111,7 +113,7 @@ const TextStatsBar = ({
       {errors.length > 0 && (
         <div className="stats-errors">
           {errors.map((e, i) => (
-            <span key={i} className="error-item">❌ {e}</span>
+            <span key={i} className="error-item">[{t('common.error').toUpperCase()}] {e}</span>
           ))}
         </div>
       )}
@@ -119,7 +121,7 @@ const TextStatsBar = ({
       {/* Model hint */}
       {showModelHint && modelRecommendation.model !== model && (
         <div className="stats-hint">
-          💡 Gợi ý: {modelRecommendation.reason}
+          💡 {t('analysis.suggestions')}: {modelRecommendation.reason}
         </div>
       )}
     </div>

@@ -1,6 +1,6 @@
 /**
  * Main Routes Index
- * Aggregates all route modules
+ * Aggregates all route modules with enhanced security
  */
 
 const express = require('express');
@@ -16,18 +16,33 @@ const paymentRoutes = require('./payment.routes');
 const realtimeRoutes = require('./realtime.routes');
 const paymentController = require('../controllers/payment.controller');
 
+// Middleware
+const { authenticate, optionalAuth } = require('../middleware/auth.middleware');
+const { validators } = require('../middleware/validation.middleware');
+const creditMiddleware = require('../middleware/credit.middleware');
+const { asyncHandler } = require('../middleware/errorHandler.middleware');
+
+// Controllers
+const profileController = require('../controllers/profile.controller');
+const analysisController = require('../controllers/analysis.controller');
+
 const router = express.Router();
+
+// ============================================================================
+// PUBLIC ROUTES (No Auth Required)
+// ============================================================================
 
 // Home
 router.get('/', (_req, res) => {
   res.json({
     service: 'AI Content Authenticator - Backend',
-    version: '2.0',
+    version: '2.1',
     status: 'running',
     powered_by: 'Google Gemini Ecosystem',
     architecture: 'Modular',
     endpoints: {
       '/health': 'GET - Health check',
+      '/ready': 'GET - Readiness check',
       '/profiles/*': 'Profile management',
       '/analysis/*': 'Text analysis & AI detection',
       '/api/chat': 'Workspace chat',
@@ -38,60 +53,153 @@ router.get('/', (_req, res) => {
   });
 });
 
-// Health check
-router.get('/health', (_req, res) => {
-  res.json({
-    status: 'healthy',
-    service: 'ai-content-authenticator',
-    runtime: 'Node.js',
-    version: '2.0',
-    timestamp: new Date().toISOString()
-  });
-});
-
 // Webhook endpoint (NO AUTH - verified by signature)
-// Note: rawBody is captured in main index.js before express.json() parses it
 router.post('/webhooks/lemonsqueezy', paymentController.handleWebhook);
 
-// Mount routes
+// ============================================================================
+// AUTH ROUTES
+// ============================================================================
+
 router.use('/', authRoutes);
+
+// ============================================================================
+// PROTECTED ROUTES (Auth Required)
+// ============================================================================
+
+// Profile routes
 router.use('/profiles', profileRoutes);
+
+// Analysis routes
 router.use('/analysis', analysisRoutes);
+
+// Admin routes (requires admin key)
 router.use('/api/admin', adminRoutes);
+
+// Chat routes
 router.use('/api/chat', chatRoutes);
+
+// Notification routes
 router.use('/api/notifications', notificationRoutes);
+
+// Share routes
 router.use('/api/share', shareRoutes);
+
+// Credit routes
 router.use('/api/credits', creditRoutes);
+
+// Payment routes
 router.use('/api/payment', paymentRoutes);
+
+// Realtime routes (SSE)
 router.use('/api/realtime', realtimeRoutes);
 
-// Backward compatibility routes (legacy endpoints)
-const profileController = require('../controllers/profile.controller');
-const analysisController = require('../controllers/analysis.controller');
-const creditMiddleware = require('../middleware/credit.middleware');
+// ============================================================================
+// LEGACY ROUTES (Backward Compatibility)
+// These will be deprecated in future versions
+// ============================================================================
 
 // === Profile legacy endpoints ===
-router.post('/create_profile', profileController.createProfile);
-router.post('/create_profile_complete', creditMiddleware.profileComplete, profileController.createProfileComplete);
-router.post('/add_sample', creditMiddleware.profileSampleAdd, profileController.addSample);
-router.post('/add_samples_batch', creditMiddleware.profileSamplesBatch, profileController.addSamplesBatch);
-router.post('/finalize_profile', creditMiddleware.profileFinalize, profileController.finalizeProfile);
-router.get('/get_profile', profileController.getProfile);
-router.get('/get_profiles', profileController.getProfiles);
-router.post('/delete_profile', profileController.deleteProfile);
+router.post('/create_profile', 
+  optionalAuth,
+  asyncHandler(profileController.createProfile)
+);
 
-// === Analysis legacy endpoints with credit middleware ===
-router.post('/authenticate', creditMiddleware.aiDetection, analysisController.authenticateContent);
-router.post('/analyze', creditMiddleware.textAnalysis, analysisController.analyzeText);
-router.post('/suggest_improvements', creditMiddleware.improvementSuggestions, analysisController.suggestImprovements);
-router.post('/rewrite', creditMiddleware.textRewrite, analysisController.rewriteText);
-router.post('/rewrite_stream', creditMiddleware.textRewrite, analysisController.rewriteTextStream);
+router.post('/create_profile_complete', 
+  optionalAuth,
+  creditMiddleware.profileComplete, 
+  asyncHandler(profileController.createProfileComplete)
+);
 
-// === Translation legacy endpoint with credit middleware ===
-router.post('/api/translate', creditMiddleware.translation, analysisController.translateText);
+router.post('/add_sample', 
+  optionalAuth,
+  validators.addSample,
+  creditMiddleware.profileSampleAdd, 
+  asyncHandler(profileController.addSample)
+);
 
-// === Humanization legacy endpoints with credit middleware ===
-router.post('/check-humanization', creditMiddleware.checkHumanization, analysisController.checkHumanization);
-router.post('/iterative-humanize', creditMiddleware.iterativeHumanize, analysisController.iterativeHumanize);
+router.post('/add_samples_batch', 
+  optionalAuth,
+  creditMiddleware.profileSamplesBatch, 
+  asyncHandler(profileController.addSamplesBatch)
+);
+
+router.post('/finalize_profile', 
+  optionalAuth,
+  creditMiddleware.profileFinalize, 
+  asyncHandler(profileController.finalizeProfile)
+);
+
+router.get('/get_profile', 
+  optionalAuth,
+  asyncHandler(profileController.getProfile)
+);
+
+router.get('/get_profiles', 
+  optionalAuth,
+  asyncHandler(profileController.getProfiles)
+);
+
+router.post('/delete_profile', 
+  optionalAuth,
+  asyncHandler(profileController.deleteProfile)
+);
+
+// === Analysis legacy endpoints with validation and credit middleware ===
+router.post('/authenticate', 
+  optionalAuth,
+  validators.detectAI,
+  creditMiddleware.aiDetection, 
+  asyncHandler(analysisController.authenticateContent)
+);
+
+router.post('/analyze', 
+  optionalAuth,
+  validators.analyzeText,
+  creditMiddleware.textAnalysis, 
+  asyncHandler(analysisController.analyzeText)
+);
+
+router.post('/suggest_improvements', 
+  optionalAuth,
+  validators.getSuggestions,
+  creditMiddleware.improvementSuggestions, 
+  asyncHandler(analysisController.suggestImprovements)
+);
+
+router.post('/rewrite', 
+  optionalAuth,
+  validators.rewriteText,
+  creditMiddleware.textRewrite, 
+  asyncHandler(analysisController.rewriteText)
+);
+
+router.post('/rewrite_stream', 
+  optionalAuth,
+  validators.rewriteText,
+  creditMiddleware.textRewrite, 
+  asyncHandler(analysisController.rewriteTextStream)
+);
+
+// === Translation legacy endpoint ===
+router.post('/api/translate', 
+  optionalAuth,
+  validators.translate,
+  creditMiddleware.translation, 
+  asyncHandler(analysisController.translateText)
+);
+
+// === Humanization legacy endpoints ===
+router.post('/check-humanization', 
+  optionalAuth,
+  creditMiddleware.checkHumanization, 
+  asyncHandler(analysisController.checkHumanization)
+);
+
+router.post('/iterative-humanize', 
+  optionalAuth,
+  validators.iterativeHumanize,
+  creditMiddleware.iterativeHumanize, 
+  asyncHandler(analysisController.iterativeHumanize)
+);
 
 module.exports = router;

@@ -40,7 +40,7 @@ export function useRealtimeStats(enabled = true) {
       eventSourceRef.current = eventSource;
 
       eventSource.onopen = () => {
-        console.log('✅ Realtime stats connected');
+        console.log('[SUCCESS] Realtime stats connected');
         setIsConnected(true);
         setError(null);
         reconnectAttemptsRef.current = 0;

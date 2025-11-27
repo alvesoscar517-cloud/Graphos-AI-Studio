@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import './NotificationPopup.css';
 
 export default function NotificationPopup({ onClose, onViewChange }) {
+  const { t, i18n } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const popupRef = useRef(null);
 
   useEffect(() => {
-    console.log('🔔 NotificationPopup mounted');
+    console.log('[BELL] NotificationPopup mounted');
     loadNotifications();
     
     // Poll for new notifications every 30 seconds
@@ -47,7 +49,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
       const { getUserNotifications } = await import('../../services/notificationService');
       
       const { notifications: notifs, unreadCount: unread } = await getUserNotifications();
-      console.log('📊 Loaded notifications:', notifs.length, 'Unread:', unread);
+      console.log('[CHART] Loaded notifications:', notifs.length, 'Unread:', unread);
       setNotifications(notifs);
       setUnreadCount(unread);
     } catch (err) {
@@ -143,12 +145,12 @@ export default function NotificationPopup({ onClose, onViewChange }) {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Vừa xong';
-    if (diffMins < 60) return `${diffMins} phút trước`;
-    if (diffHours < 24) return `${diffHours} giờ trước`;
-    if (diffDays < 7) return `${diffDays} ngày trước`;
+    if (diffMins < 1) return t('common.justNow');
+    if (diffMins < 60) return t('common.minutesAgo', { count: diffMins });
+    if (diffHours < 24) return t('common.hoursAgo', { count: diffHours });
+    if (diffDays < 7) return t('time.daysAgo', { count: diffDays });
     
-    return notifTime.toLocaleDateString('vi-VN');
+    return notifTime.toLocaleDateString();
   };
 
   return (
@@ -159,7 +161,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
       {/* Header */}
       <div className="notif-header">
         <div className="notif-title">
-          <span>Notifications</span>
+          <span>{t('notifications.notifications')}</span>
           {unreadCount > 0 && (
             <span className="notif-count">{unreadCount}</span>
           )}
@@ -168,9 +170,9 @@ export default function NotificationPopup({ onClose, onViewChange }) {
           <button 
             className="notif-mark-all"
             onClick={markAllAsRead}
-            title="Mark all as read"
+            title={t('notifications.markAllAsRead')}
           >
-            Mark all read
+            {t('notifications.markAllAsRead')}
           </button>
         )}
       </div>
@@ -180,17 +182,17 @@ export default function NotificationPopup({ onClose, onViewChange }) {
         {loading && notifications.length === 0 ? (
           <div className="notif-loading">
             <div className="notif-spinner"></div>
-            <p>Loading...</p>
+            <p>{t('common.loading')}</p>
           </div>
         ) : notifications.length === 0 ? (
           <div className="notif-empty">
             <img src="/icon/inbox.svg" alt="Empty" />
-            <p>No notifications</p>
+            <p>{t('notifications.noNotifications')}</p>
           </div>
         ) : (
           notifications.map(notif => {
-            const userLang = localStorage.getItem('language') || 'vi';
-            const content = notif.translations?.[userLang] || notif.translations?.vi || {};
+            const userLang = i18n.language || 'en';
+            const content = notif.translations?.[userLang] || notif.translations?.en || {};
             const hasCta = content.cta && notif.ctaAction;
 
             return (
@@ -205,7 +207,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
                 <div className="notif-item-content">
                   <div className="notif-item-header">
                     <span className="notif-item-title">
-                      {content.title || 'Notification'}
+                      {content.title || t('notifications.notification')}
                     </span>
                     <span className="notif-item-time">
                       {formatTime(notif.createdAt)}
@@ -234,9 +236,9 @@ export default function NotificationPopup({ onClose, onViewChange }) {
                     e.stopPropagation();
                     handleDelete(notif.id);
                   }}
-                  title="Delete notification"
+                  title={t('notifications.deleteNotification')}
                 >
-                  <img src="/icon/x.svg" alt="Delete" />
+                  <img src="/icon/x.svg" alt={t('common.delete')} />
                 </button>
               </div>
             );

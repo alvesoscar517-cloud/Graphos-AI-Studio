@@ -45,7 +45,7 @@ export default function BackupSuccessModal({ backupInfo, onClose }) {
             <div className="detail-row">
               <img src="/icon/clock.svg" alt="Time" className="row-icon" />
               <span className="label">Time:</span>
-              <span className="value">{new Date(backupInfo.timestamp).toLocaleString('vi-VN')}</span>
+              <span className="value">{new Date(backupInfo.timestamp).toLocaleString('en-US')}</span>
             </div>
             <div className="detail-row">
               <img src="/icon/database.svg" alt="Bucket" className="row-icon" />

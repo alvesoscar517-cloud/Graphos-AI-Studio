@@ -4,11 +4,21 @@
  */
 
 import { cache } from '../utils/cache';
+import { getApiBaseUrl } from '../utils/config';
+import { getAccessToken } from './authService';
 
-const API_BASE_URL = 'https://ai-backend-admin-472729326429.us-central1.run.app';
+const API_BASE_URL = getApiBaseUrl();
 
-// Get admin key from localStorage
-const getAdminKey = () => localStorage.getItem('adminKey') || '';
+// Get auth token or legacy key
+const getAuthParam = () => {
+  const token = getAccessToken();
+  if (token) return `token=${encodeURIComponent(token)}`;
+  
+  const adminKey = localStorage.getItem('adminKey');
+  if (adminKey && adminKey !== 'jwt-auth') return `adminKey=${encodeURIComponent(adminKey)}`;
+  
+  return '';
+};
 
 // Store for active listeners and their callbacks
 const listeners = new Map();
@@ -28,9 +38,9 @@ let reconnectAttempts = 0;
  * Uses Server-Sent Events (SSE) for real-time updates
  */
 export function subscribeToStats(onUpdate) {
-  const adminKey = getAdminKey();
-  if (!adminKey) {
-    console.warn('No admin key found, skipping realtime subscription');
+  const authParam = getAuthParam();
+  if (!authParam) {
+    console.warn('No auth credentials found, skipping realtime subscription');
     return () => {};
   }
 
@@ -39,13 +49,13 @@ export function subscribeToStats(onUpdate) {
     statsEventSource.close();
   }
 
-  const url = `${API_BASE_URL}/api/admin/realtime/stats?adminKey=${encodeURIComponent(adminKey)}`;
+  const url = `${API_BASE_URL}/api/admin/realtime/stats?${authParam}`;
   
   try {
     statsEventSource = new EventSource(url);
     
     statsEventSource.onopen = () => {
-      console.log('✅ Realtime stats connection established');
+      console.log('[SUCCESS] Realtime stats connection established');
       reconnectAttempts = 0;
     };
 
@@ -96,14 +106,14 @@ export function subscribeToStats(onUpdate) {
  * Subscribe to support ticket updates
  */
 export function subscribeToSupport(onUpdate) {
-  const adminKey = getAdminKey();
-  if (!adminKey) return () => {};
+  const authParam = getAuthParam();
+  if (!authParam) return () => {};
 
   if (supportEventSource) {
     supportEventSource.close();
   }
 
-  const url = `${API_BASE_URL}/api/admin/realtime/support?adminKey=${encodeURIComponent(adminKey)}`;
+  const url = `${API_BASE_URL}/api/admin/realtime/support?${authParam}`;
   
   try {
     supportEventSource = new EventSource(url);

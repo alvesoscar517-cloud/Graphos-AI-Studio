@@ -32,12 +32,12 @@ export async function loadProfiles() {
     const duration = perfMonitor.end(endpoint)
     apiTracker.trackCall(endpoint, duration, { userId: userInfo.userId })
     
-    console.log('✅ Loaded profiles:', data.profiles?.length || 0)
+    console.log('[SUCCESS] Loaded profiles:', data.profiles?.length || 0)
     return data.profiles || []
   } catch (error) {
     perfMonitor.end(endpoint)
     apiTracker.trackError(endpoint, error)
-    console.error('❌ Error loading profiles:', error)
+    console.error('[FAIL] Error loading profiles:', error)
     return []
   }
 }
@@ -75,20 +75,20 @@ export async function getProfileDetails(profileId) {
     console.log('📋 Loading profile details for:', profileId)
     
     const url = `${CONFIG.API_BASE_URL}/get_profile?profile_id=${profileId}`
-    console.log('🔗 API URL:', url)
+    console.log('[LINK] API URL:', url)
     
     const response = await fetch(url)
     const data = await response.json()
     
-    console.log('📦 Profile Details Response:', data)
+    console.log('[PACKAGE] Profile Details Response:', data)
     
     if (response.ok && data.success) {
-      console.log('✅ Loaded profile details')
+      console.log('[SUCCESS] Loaded profile details')
       return data.profile
     }
     throw new Error(data.error || 'Failed to load profile details')
   } catch (error) {
-    console.error('❌ Error loading profile details:', error)
+    console.error('[FAIL] Error loading profile details:', error)
     throw error
   }
 }
@@ -165,7 +165,7 @@ export async function addSample(profileId, text) {
  */
 export async function addSamplesBatch(profileId, samples) {
   try {
-    console.log(`📦 Uploading ${samples.length} samples in batch...`)
+    console.log(`[PACKAGE] Uploading ${samples.length} samples in batch...`)
     const response = await fetch(`${CONFIG.API_BASE_URL}/add_samples_batch`, {
       method: 'POST',
       headers: {
@@ -179,7 +179,7 @@ export async function addSamplesBatch(profileId, samples) {
     
     const data = await response.json()
     if (response.ok && data.success) {
-      console.log(`✅ Batch upload successful: ${data.samples_added} samples`)
+      console.log(`[SUCCESS] Batch upload successful: ${data.samples_added} samples`)
       return data
     }
     throw new Error(data.error || 'Failed to add samples batch')
@@ -228,7 +228,7 @@ export async function finalizeProfile(profileId) {
 export async function createProfileComplete(profileName, theme, samples, options = {}) {
   try {
     const userInfo = await getUserInfo()
-    console.log(`📦 Creating complete profile with ${samples.length} samples...`)
+    console.log(`[PACKAGE] Creating complete profile with ${samples.length} samples...`)
     
     const fetchOptions = {
       method: 'POST',
@@ -254,7 +254,7 @@ export async function createProfileComplete(profileName, theme, samples, options
     
     const data = await response.json()
     if (response.ok && data.success) {
-      console.log(`✅ Profile created successfully: ${data.profile_id}`)
+      console.log(`[SUCCESS] Profile created successfully: ${data.profile_id}`)
       return data
     }
     throw new Error(data.error || 'Failed to create profile')

@@ -1,20 +1,20 @@
-// Xử lý khi click vào icon extension
+// Handle when clicking on extension icon
 chrome.action.onClicked.addListener((tab) => {
   chrome.tabs.create({
     url: chrome.runtime.getURL('index.html')
   });
 });
 
-// Xử lý khi extension được cài đặt hoặc cập nhật
+// Handle when extension is installed or updated
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
-    console.log('✅ Extension installed');
+    console.log('[SUCCESS] Extension installed');
   } else if (details.reason === 'update') {
-    console.log('✅ Extension updated');
+    console.log('[SUCCESS] Extension updated');
   }
 });
 
-// Xử lý URL với share parameter
+// Handle URL with share parameter
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
   const url = new URL(details.url);
   const shareId = url.searchParams.get('share');
@@ -27,16 +27,16 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
   }
 });
 
-// Kiểm tra trạng thái đăng nhập
+// Check authentication status
 async function checkAuthStatus() {
   const result = await chrome.storage.local.get(['userInfo', 'accessToken']);
   return result.userInfo && result.accessToken;
 }
 
-// Xử lý đăng nhập Google
+// Handle Google sign in
 async function signInWithGoogle() {
   try {
-    console.log('🔐 Starting Google sign in...');
+    console.log('[SECURE] Starting Google sign in...');
     
     // Clear any old cached token first
     try {
@@ -44,11 +44,11 @@ async function signInWithGoogle() {
       const oldToken = typeof oldTokenResult === 'string' ? oldTokenResult : oldTokenResult?.token;
       if (oldToken && typeof oldToken === 'string') {
         await chrome.identity.removeCachedAuthToken({ token: oldToken });
-        console.log('🗑️ Removed old token');
+        console.log('[TRASH] Removed old token');
       }
     } catch (e) {
       // Ignore errors, just continue
-      console.log('ℹ️ No old token to remove');
+      console.log('[INFO] No old token to remove');
     }
     
     // Get fresh auth token
@@ -58,13 +58,13 @@ async function signInWithGoogle() {
     const token = typeof tokenResult === 'string' ? tokenResult : tokenResult?.token;
     
     if (!token || typeof token !== 'string') {
-      console.error('❌ No valid token received:', tokenResult);
+      console.error('[FAIL] No valid token received:', tokenResult);
       return { success: false, error: 'No valid token received' };
     }
     
-    console.log('✅ Got auth token');
+    console.log('[SUCCESS] Got auth token');
     
-    // Lấy thông tin người dùng từ Google API
+    // Get user information words Google API
     const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -74,7 +74,7 @@ async function signInWithGoogle() {
     if (!response.ok) {
       // If 401, token is invalid - try one more time
       if (response.status === 401) {
-        console.log('🔄 Token invalid, getting fresh token...');
+        console.log('[SYNC] Token invalid, getting fresh token...');
         
         // Remove the invalid token - ensure it's a string
         if (token && typeof token === 'string') {
@@ -87,7 +87,7 @@ async function signInWithGoogle() {
         const newToken = typeof newTokenResult === 'string' ? newTokenResult : newTokenResult?.token;
         
         if (!newToken || typeof newToken !== 'string') {
-          console.error('❌ Failed to get valid token on retry:', newTokenResult);
+          console.error('[FAIL] Failed to get valid token on retry:', newTokenResult);
           throw new Error('Failed to get valid token on retry');
         }
         
@@ -104,7 +104,7 @@ async function signInWithGoogle() {
         const userInfo = await retryResponse.json();
         const userData = {
           email: userInfo.email,
-          name: userInfo.name || 'Người dùng',
+          name: userInfo.name || 'User',
           picture: userInfo.picture || ''
         };
         
@@ -113,7 +113,7 @@ async function signInWithGoogle() {
           accessToken: newToken
         });
         
-        console.log('✅ Saved to storage (retry):', userData);
+        console.log('[SUCCESS] Saved to storage (retry):', userData);
         
         return { 
           success: true, 
@@ -125,7 +125,7 @@ async function signInWithGoogle() {
     }
     
     const userInfo = await response.json();
-    console.log('👤 User info from Google:', userInfo);
+    console.log('[USER] User info from Google:', userInfo);
     
     // Validate user info
     if (!userInfo || !userInfo.email) {
@@ -135,48 +135,48 @@ async function signInWithGoogle() {
     // Prepare data to save
     const userData = {
       email: userInfo.email,
-      name: userInfo.name || 'Người dùng',
+      name: userInfo.name || 'User',
       picture: userInfo.picture || ''
     };
     
-    // Lưu thông tin người dùng
+    // Save user information
     await chrome.storage.local.set({
       userInfo: userData,
       accessToken: token
     });
     
-    console.log('✅ Saved to storage:', userData);
+    console.log('[SUCCESS] Saved to storage:', userData);
     
     return { 
       success: true, 
       userInfo: userData
     };
   } catch (error) {
-    console.error('❌ Sign in error:', error);
+    console.error('[FAIL] Sign in error:', error);
     return { success: false, error: error.message };
   }
 }
 
-// Xử lý đăng xuất (chỉ xóa storage, giữ token cache)
+// Handle sign out (only clear storage, keep token cache)
 async function signOut() {
   try {
-    console.log('🚪 Starting sign out...');
+    console.log('[DOOR] Starting sign out...');
     
     // Clear storage only, keep token cached for quick re-login
     await chrome.storage.local.remove(['userInfo', 'accessToken']);
-    console.log('✅ Sign out complete');
+    console.log('[SUCCESS] Sign out complete');
     
     return { success: true };
   } catch (error) {
-    console.error('❌ Sign out error:', error);
+    console.error('[FAIL] Sign out error:', error);
     return { success: false, error: error.message };
   }
 }
 
-// Xử lý chuyển tài khoản (xóa hoàn toàn token và revoke)
+// Handle account switching (completely remove token and revoke)
 async function switchAccount() {
   try {
-    console.log('🔄 Starting account switch...');
+    console.log('[SYNC] Starting account switch...');
     
     const result = await chrome.storage.local.get(['accessToken']);
     
@@ -186,17 +186,17 @@ async function switchAccount() {
         await chrome.identity.removeCachedAuthToken({ 
           token: result.accessToken 
         });
-        console.log('✅ Token removed from cache');
+        console.log('[SUCCESS] Token removed from cache');
       } catch (tokenError) {
-        console.warn('⚠️ Could not remove token:', tokenError);
+        console.warn('[WARNING] Could not remove token:', tokenError);
       }
       
       // Revoke token from Google
       try {
         await fetch(`https://accounts.google.com/o/oauth2/revoke?token=${result.accessToken}`);
-        console.log('✅ Token revoked from Google');
+        console.log('[SUCCESS] Token revoked from Google');
       } catch (revokeError) {
-        console.warn('⚠️ Could not revoke token:', revokeError);
+        console.warn('[WARNING] Could not revoke token:', revokeError);
       }
     }
     
@@ -206,24 +206,24 @@ async function switchAccount() {
       const tokenStr = typeof allTokens === 'string' ? allTokens : allTokens?.token;
       if (tokenStr) {
         await chrome.identity.removeCachedAuthToken({ token: tokenStr });
-        console.log('✅ All cached tokens cleared');
+        console.log('[SUCCESS] All cached tokens cleared');
       }
     } catch (e) {
-      console.log('ℹ️ No additional tokens to clear');
+      console.log('[INFO] No additional tokens to clear');
     }
     
     // Clear storage
     await chrome.storage.local.remove(['userInfo', 'accessToken']);
-    console.log('✅ Account switch complete - will show account picker on next login');
+    console.log('[SUCCESS] Account switch complete - will show account picker on next login');
     
     return { success: true };
   } catch (error) {
-    console.error('❌ Account switch error:', error);
+    console.error('[FAIL] Account switch error:', error);
     return { success: false, error: error.message };
   }
 }
 
-// Lắng nghe message từ content script
+// Listen for messages words content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'checkAuth') {
     checkAuthStatus().then(sendResponse);

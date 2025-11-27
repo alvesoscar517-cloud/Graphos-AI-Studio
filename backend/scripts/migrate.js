@@ -96,7 +96,7 @@ app.use(errorHandler);
 // Start server
 const PORT = config.PORT;
 app.listen(PORT, () => {
-  logger.info(\`🚀 Server running on port \${PORT}\`);
+  logger.info(\`[START] Server running on port \${PORT}\`);
   logger.info(\`[INFO] Environment: \${config.NODE_ENV}\`);
   logger.info(\`[CONFIG] Project: \${config.PROJECT_ID}\`);
 });

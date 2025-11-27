@@ -70,7 +70,7 @@ export const PaymentProvider = ({ children }) => {
   }, []);
 
   const handlePaymentSuccess = useCallback((data) => {
-    console.log('✅ Payment detected!', data);
+    console.log('[SUCCESS] Payment detected!', data);
     stopListening();
     
     setPurchaseResult({
@@ -127,7 +127,7 @@ export const PaymentProvider = ({ children }) => {
     const state = getPersistedState();
     if (state) {
       startTimeRef.current = state.startTime;
-      console.log('📦 Resuming payment listener from persisted state');
+      console.log('[PACKAGE] Resuming payment listener from persisted state');
       startPolling();
     }
   }, []);
@@ -160,6 +160,7 @@ export const PaymentProvider = ({ children }) => {
           order={purchaseResult.order}
           credits={purchaseResult.credits}
           onClose={clearPurchaseResult}
+          autoCloseDelay={0}
         />,
         document.body
       )}

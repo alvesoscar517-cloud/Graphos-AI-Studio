@@ -73,10 +73,10 @@ export async function getOrCreateAppFolder() {
     driveFolderId = createData.id
     await chrome.storage.local.set({ driveFolderId })
 
-    console.log('✅ Created Drive folder:', driveFolderId)
+    console.log('[SUCCESS] Created Drive folder:', driveFolderId)
     return driveFolderId
   } catch (error) {
-    console.error('❌ Error with Drive folder:', error)
+    console.error('[FAIL] Error with Drive folder:', error)
     throw error
   }
 }
@@ -145,10 +145,10 @@ export async function syncNotesToDrive(notes) {
       }
     }
 
-    console.log('✅ Notes synced to Drive')
+    console.log('[SUCCESS] Notes synced to Drive')
     return true
   } catch (error) {
-    console.error('❌ Error syncing to Drive:', error)
+    console.error('[FAIL] Error syncing to Drive:', error)
     throw error
   }
 }
@@ -175,7 +175,7 @@ export async function loadNotesFromDrive() {
     )
 
     if (!response.ok) {
-      console.error('❌ Drive API error:', response.status, response.statusText)
+      console.error('[FAIL] Drive API error:', response.status, response.statusText)
       
       // If 401 or 403, token doesn't have Drive permission
       if (response.status === 401 || response.status === 403) {
@@ -215,14 +215,14 @@ export async function loadNotesFromDrive() {
           })
         }
       } catch (error) {
-        console.error(`❌ Failed to load file ${file.name}:`, error)
+        console.error(`[FAIL] Failed to load file ${file.name}:`, error)
       }
     }
 
-    console.log('✅ Loaded notes from Drive:', notes.length)
+    console.log('[SUCCESS] Loaded notes from Drive:', notes.length)
     return notes
   } catch (error) {
-    console.error('❌ Error loading notes from Drive:', error)
+    console.error('[FAIL] Error loading notes from Drive:', error)
     throw error
   }
 }
@@ -266,7 +266,7 @@ export async function saveNoteToDrive(note) {
         }
       )
       
-      console.log('✅ Updated note in Drive:', fileName)
+      console.log('[SUCCESS] Updated note in Drive:', fileName)
       return note.driveId
     }
 
@@ -293,10 +293,10 @@ export async function saveNoteToDrive(note) {
     )
 
     const data = await response.json()
-    console.log('✅ Created note in Drive:', fileName)
+    console.log('[SUCCESS] Created note in Drive:', fileName)
     return data.id
   } catch (error) {
-    console.error('❌ Error saving note to Drive:', error)
+    console.error('[FAIL] Error saving note to Drive:', error)
     throw error
   }
 }
@@ -319,10 +319,10 @@ export async function deleteNoteFromDrive(driveId) {
       }
     )
 
-    console.log('✅ Deleted note from Drive')
+    console.log('[SUCCESS] Deleted note from Drive')
     return true
   } catch (error) {
-    console.error('❌ Error deleting note from Drive:', error)
+    console.error('[FAIL] Error deleting note from Drive:', error)
     throw error
   }
 }
@@ -347,13 +347,13 @@ export async function openDriveFolder(notes) {
     // Sync notes in background
     if (notes && notes.length > 0) {
       syncNotesToDrive(notes).catch(error => {
-        console.error('❌ Failed to sync notes:', error)
+        console.error('[FAIL] Failed to sync notes:', error)
       })
     }
 
     return true
   } catch (error) {
-    console.error('❌ Error opening Drive folder:', error)
+    console.error('[FAIL] Error opening Drive folder:', error)
     throw error
   }
 }

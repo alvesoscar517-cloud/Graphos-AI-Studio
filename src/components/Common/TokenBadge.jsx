@@ -1,19 +1,21 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { useRewrite } from '../../contexts/RewriteContext'
 import { useTextStats } from '../../hooks/useTextStats'
 import { MODEL_LIMITS } from '../../utils/tokenUtils'
 import './TokenBadge.css'
 
-// Ngưỡng cảnh báo
+// Warning threshold
 const WARNING_CHARS = 30000   // ~7500 tokens
 const DANGER_CHARS = 80000    // ~20000 tokens
 
 /**
- * TokenBadge - Hiển thị token count với popup chi tiết
- * Tự động lấy model từ RewriteContext
+ * TokenBadge - Display token count with detailed popup
+ * Auto get model words from RewriteContext
  */
 const TokenBadge = ({ text, task = 'rewrite' }) => {
+  const { t } = useTranslation()
   const { selectedModel } = useRewrite()
   const [showPopup, setShowPopup] = useState(false)
   const [showWarningPopup, setShowWarningPopup] = useState(false)
@@ -28,7 +30,7 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
   const { stats, credits } = useTextStats(text, { model, task })
   const limits = MODEL_LIMITS[model] || MODEL_LIMITS['gemini-2.5-flash']
 
-  // Tính output tokens ước tính
+  // Calculate estimated output tokens
   const estimatedOutput = useMemo(() => {
     if (task === 'analyze') return Math.min(stats.tokens * 0.3, 2000)
     if (task === 'detect') return 500
@@ -37,14 +39,14 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
 
   const totalTokens = stats.tokens + estimatedOutput
 
-  // Xác định mức cảnh báo
+  // Determine warning level
   const warningLevel = useMemo(() => {
     if (stats.chars >= DANGER_CHARS) return 'danger'
     if (stats.chars >= WARNING_CHARS) return 'warning'
     return 'normal'
   }, [stats.chars])
 
-  // Thời gian xử lý ước tính (giây)
+  // Estimated processing time (seconds)
   const estimatedTime = useMemo(() => {
     return Math.max(2, Math.ceil(stats.tokens / 500))
   }, [stats.tokens])
@@ -98,10 +100,10 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
         onMouseEnter={handleBadgeEnter}
         onMouseLeave={handleBadgeLeave}
       >
-        <span className="token-count">{formatNumber(stats.tokens)} tokens</span>
+        <span className="token-count">{formatNumber(stats.tokens)} {t('tokens.tokens')}</span>
       </div>
 
-      {/* Warning Icon - chỉ hiện khi text dài */}
+      {/* Warning Icon - only show when text long */}
       {warningLevel !== 'normal' && (
         <div
           ref={warningRef}
@@ -123,7 +125,7 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
         >
           <div className="token-popup-content">
             <div className="token-popup-section">
-              <span className="token-popup-label">TOKEN USAGE</span>
+              <span className="token-popup-label">{t('tokens.tokenUsage')}</span>
               <span className="token-popup-value primary">
                 {formatNumber(stats.tokens)} / {formatNumber(limits.maxInput)}
               </span>
@@ -132,59 +134,59 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
             <div className="token-popup-divider" />
 
             <div className="token-popup-row">
-              <span>Input tokens</span>
+              <span>{t('tokens.inputTokens')}</span>
               <span>{formatNumber(stats.tokens)}</span>
             </div>
             <div className="token-popup-row">
-              <span>Output tokens</span>
+              <span>{t('tokens.outputTokens')}</span>
               <span>~{formatNumber(estimatedOutput)}</span>
             </div>
             <div className="token-popup-row highlight">
-              <span>Total tokens</span>
+              <span>{t('tokens.totalTokens')}</span>
               <span>{formatNumber(totalTokens)}</span>
             </div>
 
             <div className="token-popup-divider" />
 
             <div className="token-popup-section">
-              <span className="token-popup-label">CREDITS</span>
+              <span className="token-popup-label">{t('credits.credits').toUpperCase()}</span>
             </div>
             <div className="token-popup-row">
-              <span>Input</span>
-              <span>{formatCredits(credits.inputCredits)}</span>
+              <span>{t('tokens.inputTokens')}</span>
+              <span>{formatNumber(credits.inputTokens || 0)}</span>
             </div>
             <div className="token-popup-row">
-              <span>Output</span>
-              <span>~{formatCredits(credits.outputCredits)}</span>
+              <span>{t('tokens.outputTokens')}</span>
+              <span>~{formatNumber(credits.outputTokens || 0)}</span>
             </div>
             <div className="token-popup-row highlight">
-              <span>Total</span>
-              <span>{formatCredits(credits.totalCredits)} credits</span>
+              <span>{t('tokens.total')}</span>
+              <span>{credits.display || formatCredits(credits.totalCredits || 0)} {t('credits.credits')}</span>
             </div>
 
             <div className="token-popup-divider" />
 
             <div className="token-popup-footer">
-              <span>{formatNumber(stats.chars)} ký tự</span>
+              <span>{formatNumber(stats.chars)} {t('tokens.characters')}</span>
               <span>•</span>
-              <span>{formatNumber(stats.words)} từ</span>
+              <span>{formatNumber(stats.words)} {t('common.words')}</span>
               {stats.pages > 1 && (
                 <>
                   <span>•</span>
-                  <span>~{stats.pages} trang</span>
+                  <span>~{stats.pages} {t('tokens.pages')}</span>
                 </>
               )}
             </div>
 
             <div className="token-popup-model">
-              Model: {limits.name}
+              {t('tokens.model')}: {limits.name}
             </div>
           </div>
         </div>,
         document.body
       )}
 
-      {/* Warning Popup - Cảnh báo text dài */}
+      {/* Warning Popup - Warning text dài */}
       {showWarningPopup && warningLevel !== 'normal' && createPortal(
         <div 
           className="token-popup warning-popup"
@@ -194,35 +196,35 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
         >
           <div className="token-popup-content">
             <div className="warning-popup-header">
-              <img src="/icon/alert-triangle.svg" alt="warning" />
-              <span>Text {warningLevel === 'danger' ? 'very long' : 'quite long'}</span>
+              <img src="/icon/alert-triangle.svg" alt={t('common.warning')} />
+              <span>{warningLevel === 'danger' ? t('tokens.textVeryLong') : t('tokens.textQuiteLong')}</span>
             </div>
 
             <div className="token-popup-divider" />
 
             <div className="token-popup-row">
-              <span>Độ dài</span>
-              <span>{formatNumber(stats.words)} từ (~{stats.pages} trang)</span>
+              <span>{t('tokens.length')}</span>
+              <span>{formatNumber(stats.words)} {t('common.words')} (~{stats.pages} {t('tokens.pages')})</span>
             </div>
             <div className="token-popup-row">
-              <span>Tokens</span>
+              <span>{t('tokens.tokens')}</span>
               <span>~{formatNumber(totalTokens)}</span>
             </div>
             <div className="token-popup-row">
-              <span>Thời gian xử lý</span>
+              <span>{t('tokens.processingTime')}</span>
               <span>~{estimatedTime}s</span>
             </div>
             <div className="token-popup-row highlight">
-              <span>Credits</span>
-              <span>~{formatCredits(credits.totalCredits)}</span>
+              <span>{t('credits.credits')}</span>
+              <span>{credits.display || formatCredits(credits.totalCredits || 0)}</span>
             </div>
 
             <div className="token-popup-divider" />
 
             <div className="warning-popup-note">
               {warningLevel === 'danger' 
-                ? 'Very long text may take more time and credits to process.'
-                : 'Long text may take additional processing time.'}
+                ? t('tokens.veryLongWarning')
+                : t('tokens.longWarning')}
             </div>
           </div>
         </div>,

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { CONFIG } from '../utils/config';
 import { getUserInfo } from '../services/api';
 import { usePayment } from '../contexts/PaymentContext';
@@ -48,6 +49,7 @@ const DEFAULT_PACKAGES = [
 ];
 
 const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
+  const { t } = useTranslation();
   const [packages, setPackages] = useState(DEFAULT_PACKAGES);
   const [loading, setLoading] = useState(false);
   const [loadingPackageId, setLoadingPackageId] = useState(null);
@@ -121,11 +123,11 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
         onClose();
       } else {
         // Show error in modal instead of using modal.error
-        setError(data.error || 'Unable to create payment. Please try again.');
+        setError(data.error || t('errors.unableToCreatePayment'));
       }
     } catch (err) {
       console.error('Error creating checkout:', err);
-      setError('Connection error. Please check your network and try again.');
+      setError(t('errors.networkError'));
     } finally {
       setLoading(false);
       setLoadingPackageId(null);
@@ -154,9 +156,9 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
         <div className="upgrade-modal-header">
           <div className="header-title">
             <img src="/icon/coins.svg" alt="" className="header-icon" />
-            <h2>Buy Credits</h2>
+            <h2>{t('billing.buyCredits')}</h2>
           </div>
-          <button className="close-btn" onClick={onClose} aria-label="Close">
+          <button className="close-btn" onClick={onClose} aria-label={t('common.close')}>
             <img src="/icon/x.svg" alt="" />
           </button>
         </div>
@@ -185,7 +187,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                   {pkg.popular && (
                     <div className="popular-badge">
                       <img src="/icon/tags.svg" alt="" />
-                      <span>Popular</span>
+                      <span>{t('billing.popular')}</span>
                     </div>
                   )}
                   
@@ -204,19 +206,19 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                     <div className="credits-main">
                       <img src="/icon/coins.svg" alt="" className="credits-icon" />
                       <strong>{pkg.totalCredits.toLocaleString()}</strong>
-                      <span>credits</span>
+                      <span>{t('billing.credits')}</span>
                     </div>
                     {bonusPercent && (
                       <div className="bonus-tag">
                         <img src="/icon/gift.svg" alt="" />
-                        <span>+{bonusPercent}% bonus</span>
+                        <span>+{bonusPercent}% {t('billing.bonus')}</span>
                       </div>
                     )}
                   </div>
 
                   <div className="package-value">
                     <span className="per-credit">
-                      {formatPrice(pkg.price / pkg.totalCredits)}/credit
+                      {formatPrice(pkg.price / pkg.totalCredits)}{t('billing.perCredit')}
                     </span>
                   </div>
 
@@ -231,12 +233,12 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                     {loadingPackageId === pkg.id ? (
                       <>
                         <span className="spinner"></span>
-                        <span>Processing...</span>
+                        <span>{t('common.processing')}</span>
                       </>
                     ) : (
                       <>
                         <img src="/icon/shopping-cart.svg" alt="" />
-                        <span>Mua ngay</span>
+                        <span>{t('billing.buyNow')}</span>
                       </>
                     )}
                   </button>
@@ -249,13 +251,13 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
         {/* Footer */}
         <div className="upgrade-modal-footer">
           <div className="payment-info">
-            <span className="lemon-text">Secure payment via</span>
+            <span className="lemon-text">{t('billing.securePayment')}</span>
             <img src="/icon/lemonsqueezy-with-name.svg" alt="Lemon Squeezy" className="lemon-logo" />
           </div>
           <div className="payment-methods">
-            <img src="/icon/credit-card.svg" alt="Card" title="Credit/Debit Card" />
+            <img src="/icon/credit-card.svg" alt="Card" title={t('billing.creditDebitCard')} />
             <span className="separator">•</span>
-            <span className="method-text">Visa, Mastercard, PayPal</span>
+            <span className="method-text">{t('billing.paymentMethods')}</span>
           </div>
         </div>
       </div>

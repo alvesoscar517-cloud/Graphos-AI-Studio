@@ -44,7 +44,7 @@
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: auto;
-  /* Ẩn scrollbar mặc định */
+  /* Hide default scrollbar */
   scrollbar-width: none;
   -ms-overflow-style: none;
   /* Smooth rendering optimizations */
@@ -55,13 +55,13 @@
   text-rendering: optimizeSpeed;
 }
 
-/* Ẩn scrollbar mặc định cho webkit */
+/* Hide default scrollbar for webkit */
 .highlight-editor-input::-webkit-scrollbar {
   width: 0;
   display: none;
 }
 
-/* Chỉ hiển thị scrollbar khi có class scrollbar-visible */
+/* Only show scrollbar when scrollbar-visible class is present */
 .highlight-editor-input.scrollbar-visible {
   scrollbar-width: thin !important;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
@@ -109,7 +109,7 @@ body.dark-theme .highlight-editor-input.scrollbar-visible::-webkit-scrollbar-thu
   color: var(--text-tertiary, #9e9e9e);
 }
 
-/* Custom text selection - Xanh dương nhạt phù hợp với brand */
+/* Custom text selection - light blue matching brand */
 .highlight-editor-input::selection {
   background: rgba(79, 172, 254, 0.2);
   color: inherit;
@@ -120,7 +120,7 @@ body.dark-theme .highlight-editor-input.scrollbar-visible::-webkit-scrollbar-thu
   color: inherit;
 }
 
-/* Dark theme selection - Xanh dương sáng hơn cho nền tối */
+/* Dark theme selection - brighter blue for dark background */
 body.dark-theme .highlight-editor-input::selection,
 [data-theme="dark"] .highlight-editor-input::selection {
   background: rgba(94, 185, 255, 0.3);

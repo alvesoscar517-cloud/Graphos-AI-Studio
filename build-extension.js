@@ -13,9 +13,9 @@ function copyFile(src, dest) {
       mkdirSync(destDir, { recursive: true })
     }
     copyFileSync(src, dest)
-    console.log(`✓ Copied: ${src} -> ${dest}`)
+    console.log(`[OK] Copied: ${src} -> ${dest}`)
   } catch (error) {
-    console.error(`✗ Error copying ${src}:`, error.message)
+    console.error(`[ERROR] Error copying ${src}:`, error.message)
   }
 }
 
@@ -39,7 +39,7 @@ function copyDir(src, dest) {
   }
 }
 
-console.log('🔨 Building Chrome Extension...\n')
+console.log('[BUILD] Building Chrome Extension...\n')
 
 // Create dist directory if it doesn't exist
 if (!existsSync('dist')) {
@@ -54,25 +54,25 @@ copyFile('background.js', 'dist/background.js')
 
 // Copy icons
 if (existsSync('icons')) {
-  console.log('📁 Copying icons...')
+  console.log('[FOLDER] Copying icons...')
   copyDir('icons', 'dist/icons')
 }
 
 // Copy icon folder
 if (existsSync('icon')) {
-  console.log('📁 Copying icon...')
+  console.log('[FOLDER] Copying icon...')
   copyDir('icon', 'dist/icon')
 }
 
 // Copy animation folder
 if (existsSync('animation')) {
-  console.log('📁 Copying animations...')
+  console.log('[FOLDER] Copying animations...')
   copyDir('animation', 'dist/animation')
 }
 
 // Copy public folder contents
 if (existsSync('public')) {
-  console.log('📁 Copying public assets...')
+  console.log('[FOLDER] Copying public assets...')
   const publicFiles = readdirSync('public')
   publicFiles.forEach(file => {
     const srcPath = join('public', file)
@@ -86,8 +86,8 @@ if (existsSync('public')) {
   })
 }
 
-console.log('\n✅ Extension files copied successfully!')
-console.log('\n📦 Next steps:')
+console.log('\n[SUCCESS] Extension files copied successfully!')
+console.log('\n[PACKAGE] Next steps:')
 console.log('1. Run: npm run build:watch')
 console.log('2. Open Chrome and go to: chrome://extensions/')
 console.log('3. Enable "Developer mode"')

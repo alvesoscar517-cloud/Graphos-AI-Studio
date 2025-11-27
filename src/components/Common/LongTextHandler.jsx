@@ -1,11 +1,12 @@
 import { useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTextStats } from '../../hooks/useTextStats'
 import { splitTextForModel, MODEL_LIMITS } from '../../utils/tokenUtils'
 import modal from '../../utils/modal'
 import './LongTextHandler.css'
 
 /**
- * LongTextHandler - Xử lý text dài với các options
+ * LongTextHandler - Handle long text with options
  * 
  * When text exceeds limit, allow user to:
  * 1. Continue with original text (may be slow/costly)
@@ -22,6 +23,7 @@ const LongTextHandler = ({
   children,
   disabled = false
 }) => {
+  const { t } = useTranslation()
   const [processing, setProcessing] = useState(false)
   const [currentChunk, setCurrentChunk] = useState(0)
   const [totalChunks, setTotalChunks] = useState(0)
@@ -36,21 +38,20 @@ const LongTextHandler = ({
 
   const limits = MODEL_LIMITS[model] || MODEL_LIMITS['gemini-2.5-flash']
 
-  // Xử lý text bình thường
+  // Handle text normally
   const handleProcess = useCallback(async () => {
     if (disabled || processing) return
 
-    // Nếu text quá dài, hiện dialog xác nhận
+    // If text too long, show confirmation dialog
     if (isTooLong) {
       const chunks = getChunks()
       
       const result = await modal.confirm(
-        `Văn bản của bạn khá dài (${stats.pages} trang, ~${stats.tokens.toLocaleString()} tokens).\n\n` +
-        `Bạn muốn xử lý như thế nào?`,
-        'Văn bản dài',
+        t('longText.longTextMessage', { pages: stats.pages, tokens: stats.tokens.toLocaleString() }),
+        t('longText.longTextTitle'),
         {
-          confirmText: 'Xử lý toàn bộ',
-          cancelText: 'Chia nhỏ (' + chunks.length + ' phần)',
+          confirmText: t('longText.processAll'),
+          cancelText: t('longText.splitParts', { count: chunks.length }),
           showCancel: true
         }
       )
@@ -63,7 +64,7 @@ const LongTextHandler = ({
         // User cancel
         return
       }
-      // result === true: tiếp tục xử lý toàn bộ
+      // result === true: continue processing all
     }
 
     setProcessing(true)
@@ -104,17 +105,17 @@ const LongTextHandler = ({
     }
   }, [onProcess, onProcessChunks])
 
-  // Render warning banner nếu text dài
+  // Render warning banner if text long
   const renderWarning = () => {
     if (!isTooLong || stats.chars === 0) return null
 
     return (
       <div className="long-text-warning">
-        <div className="warning-icon">⚠️</div>
+        <div className="warning-icon">[{t('common.warning').toUpperCase()}]</div>
         <div className="warning-content">
-          <div className="warning-title">Văn bản khá dài</div>
+          <div className="warning-title">{t('longText.textQuiteLong')}</div>
           <div className="warning-desc">
-            {stats.pages} trang • ~{stats.tokens.toLocaleString()} tokens
+            {stats.pages} {t('tokens.pages')} • ~{stats.tokens.toLocaleString()} {t('tokens.tokens')}
           </div>
           {warnings.map((w, i) => (
             <div key={i} className="warning-item">{w}</div>
@@ -126,14 +127,14 @@ const LongTextHandler = ({
             className="change-model-btn"
             onClick={() => onChangeModel(modelRecommendation.model)}
           >
-            Đổi sang {modelRecommendation.model}
+            {t('longText.switchTo', { model: modelRecommendation.model })}
           </button>
         )}
       </div>
     )
   }
 
-  // Render progress khi đang xử lý chunks
+  // Render progress when processing chunks
   const renderProgress = () => {
     if (!processing || totalChunks === 0) return null
 
@@ -148,7 +149,7 @@ const LongTextHandler = ({
           />
         </div>
         <div className="progress-text">
-          Processing part {currentChunk}/{totalChunks}
+          {t('longText.processingPart', { current: currentChunk, total: totalChunks })}
         </div>
       </div>
     )
@@ -159,7 +160,7 @@ const LongTextHandler = ({
       {renderWarning()}
       {renderProgress()}
       
-      {/* Render children với props bổ sung */}
+      {/* Render children with additional props */}
       {typeof children === 'function' 
         ? children({
             onProcess: handleProcess,

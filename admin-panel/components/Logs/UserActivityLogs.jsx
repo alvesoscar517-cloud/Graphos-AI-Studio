@@ -6,31 +6,31 @@ import LoadingScreen from '../Common/LoadingScreen';
 import PageHeader from '../Common/PageHeader';
 import './UserActivityLogs.css';
 
-// Activity type labels và icons
+// Activity type labels and icons
 const ACTIVITY_CONFIG = {
-  login: { label: 'Đăng nhập', icon: 'log-in.svg', color: '#4caf50' },
-  logout: { label: 'Đăng xuất', icon: 'log-out.svg', color: '#607d8b' },
-  profile_create: { label: 'Tạo profile', icon: 'folder-plus.svg', color: '#2196f3' },
-  profile_update: { label: 'Cập nhật profile', icon: 'edit.svg', color: '#ff9800' },
-  profile_delete: { label: 'Xóa profile', icon: 'trash-2.svg', color: '#f44336' },
-  profile_sample_add: { label: 'Thêm sample', icon: 'file-plus.svg', color: '#9c27b0' },
-  profile_finalize: { label: 'Hoàn thành profile', icon: 'check-circle.svg', color: '#4caf50' },
-  ai_detection: { label: 'Phát hiện AI', icon: 'search.svg', color: '#ff5722' },
-  text_analysis: { label: 'Phân tích văn bản', icon: 'bar-chart.svg', color: '#3f51b5' },
-  text_rewrite: { label: 'Viết lại văn bản', icon: 'edit-3.svg', color: '#e91e63' },
+  login: { label: 'Login', icon: 'log-in.svg', color: '#4caf50' },
+  logout: { label: 'Logout', icon: 'log-out.svg', color: '#607d8b' },
+  profile_create: { label: 'Create Profile', icon: 'folder-plus.svg', color: '#2196f3' },
+  profile_update: { label: 'Update Profile', icon: 'edit.svg', color: '#ff9800' },
+  profile_delete: { label: 'Delete Profile', icon: 'trash-2.svg', color: '#f44336' },
+  profile_sample_add: { label: 'Add Sample', icon: 'file-plus.svg', color: '#9c27b0' },
+  profile_finalize: { label: 'Finalize Profile', icon: 'check-circle.svg', color: '#4caf50' },
+  ai_detection: { label: 'AI Detection', icon: 'search.svg', color: '#ff5722' },
+  text_analysis: { label: 'Text Analysis', icon: 'bar-chart.svg', color: '#3f51b5' },
+  text_rewrite: { label: 'Text Rewrite', icon: 'edit-3.svg', color: '#e91e63' },
   humanize: { label: 'Humanize', icon: 'user.svg', color: '#00bcd4' },
-  iterative_humanize: { label: 'Humanize lặp', icon: 'repeat.svg', color: '#009688' },
+  iterative_humanize: { label: 'Iterative Humanize', icon: 'repeat.svg', color: '#009688' },
   chat_message: { label: 'Chat', icon: 'message-circle.svg', color: '#673ab7' },
-  chat_humanized: { label: 'Chat humanized', icon: 'message-square.svg', color: '#795548' },
-  conversation_summarize: { label: 'Tóm tắt hội thoại', icon: 'file-text.svg', color: '#607d8b' },
-  translation: { label: 'Dịch thuật', icon: 'globe.svg', color: '#03a9f4' },
-  file_upload: { label: 'Upload file', icon: 'upload.svg', color: '#8bc34a' },
-  credit_purchase: { label: 'Mua credits', icon: 'credit-card.svg', color: '#4caf50' },
-  credit_deduct: { label: 'Trừ credits', icon: 'minus-circle.svg', color: '#f44336' },
-  credit_bonus: { label: 'Bonus credits', icon: 'gift.svg', color: '#ff9800' },
-  account_update: { label: 'Cập nhật tài khoản', icon: 'settings.svg', color: '#9e9e9e' },
-  account_locked: { label: 'Khóa tài khoản', icon: 'lock.svg', color: '#f44336' },
-  account_unlocked: { label: 'Mở khóa tài khoản', icon: 'unlock.svg', color: '#4caf50' }
+  chat_humanized: { label: 'Chat Humanized', icon: 'message-square.svg', color: '#795548' },
+  conversation_summarize: { label: 'Conversation Summary', icon: 'file-text.svg', color: '#607d8b' },
+  translation: { label: 'Translation', icon: 'globe.svg', color: '#03a9f4' },
+  file_upload: { label: 'Upload File', icon: 'upload.svg', color: '#8bc34a' },
+  credit_purchase: { label: 'Purchase Credits', icon: 'credit-card.svg', color: '#4caf50' },
+  credit_deduct: { label: 'Deduct Credits', icon: 'minus-circle.svg', color: '#f44336' },
+  credit_bonus: { label: 'Bonus Credits', icon: 'gift.svg', color: '#ff9800' },
+  account_update: { label: 'Update Account', icon: 'settings.svg', color: '#9e9e9e' },
+  account_locked: { label: 'Lock Account', icon: 'lock.svg', color: '#f44336' },
+  account_unlocked: { label: 'Unlock Account', icon: 'unlock.svg', color: '#4caf50' }
 };
 
 const getActivityConfig = (type) => {
@@ -82,7 +82,7 @@ export default function UserActivityLogs() {
       const response = await usersApi.getById(userId);
       setUser(response.user);
     } catch (err) {
-      notify.error('Không thể tải thông tin user: ' + err.message);
+      notify.error('Unable to load user info: ' + err.message);
       navigate('/users');
     } finally {
       setLoading(false);
@@ -107,7 +107,7 @@ export default function UserActivityLogs() {
           break;
       }
     } catch (err) {
-      notify.error('Lỗi tải dữ liệu: ' + err.message);
+      notify.error('Error loading data: ' + err.message);
     } finally {
       setLogsLoading(false);
     }
@@ -157,7 +157,7 @@ export default function UserActivityLogs() {
   };
 
   const formatTimestamp = (timestamp) => {
-    return new Date(timestamp).toLocaleString('vi-VN');
+    return new Date(timestamp).toLocaleString('en-US');
   };
 
   const formatCredits = (credits) => {
@@ -174,11 +174,11 @@ export default function UserActivityLogs() {
       <PageHeader
         icon="activity.svg"
         title={`Activity Logs - ${user?.name || user?.email || userId}`}
-        subtitle="Chi tiết hoạt động và sử dụng credits"
+        subtitle="Activity details and credit usage"
         actions={
           <button className="btn-back" onClick={() => navigate(`/users/${userId}`)}>
             <img src="/icon/arrow-left.svg" alt="Back" />
-            Quay lại
+            Back
           </button>
         }
       />
@@ -213,7 +213,7 @@ export default function UserActivityLogs() {
           onClick={() => setActiveTab('summary')}
         >
           <img src="/icon/pie-chart.svg" alt="Summary" />
-          Tổng quan
+          Total quan
         </button>
         <button 
           className={activeTab === 'credits' ? 'active' : ''}
@@ -238,7 +238,7 @@ export default function UserActivityLogs() {
             value={filter.type} 
             onChange={(e) => setFilter({...filter, type: e.target.value})}
           >
-            <option value="all">Tất cả loại</option>
+            <option value="all">All Types</option>
             {Object.entries(ACTIVITY_CONFIG).map(([key, config]) => (
               <option key={key} value={key}>{config.label}</option>
             ))}
@@ -247,17 +247,17 @@ export default function UserActivityLogs() {
             type="date" 
             value={filter.startDate}
             onChange={(e) => setFilter({...filter, startDate: e.target.value})}
-            placeholder="Từ ngày"
+            placeholder="From Date"
           />
           <input 
             type="date" 
             value={filter.endDate}
             onChange={(e) => setFilter({...filter, endDate: e.target.value})}
-            placeholder="Đến ngày"
+            placeholder="To Date"
           />
           <button className="btn-filter" onClick={() => loadActivityLogs()}>
             <img src="/icon/filter.svg" alt="Filter" />
-            Lọc
+            Filter
           </button>
         </div>
       )}
@@ -268,9 +268,9 @@ export default function UserActivityLogs() {
             value={filter.days} 
             onChange={(e) => setFilter({...filter, days: parseInt(e.target.value)})}
           >
-            <option value={7}>7 ngày qua</option>
-            <option value={30}>30 ngày qua</option>
-            <option value={90}>90 ngày qua</option>
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
           </select>
         </div>
       )}
@@ -278,7 +278,7 @@ export default function UserActivityLogs() {
       {/* Content */}
       <div className="activity-content">
         {logsLoading ? (
-          <div className="loading-small">Đang tải...</div>
+          <div className="loading-small">Loading...</div>
         ) : (
           <>
             {/* Activity Logs Tab */}
@@ -287,7 +287,7 @@ export default function UserActivityLogs() {
                 {logs.length === 0 ? (
                   <div className="empty-state">
                     <img src="/icon/inbox.svg" alt="Empty" />
-                    <p>Không có activity logs</p>
+                    <p>No activity logs</p>
                   </div>
                 ) : (
                   <>
@@ -322,7 +322,7 @@ export default function UserActivityLogs() {
                     })}
                     {pagination.hasMore && (
                       <button className="btn-load-more" onClick={loadMore}>
-                        Tải thêm
+                        Load More
                       </button>
                     )}
                   </>
@@ -339,26 +339,26 @@ export default function UserActivityLogs() {
                       <img src="/icon/activity.svg" alt="Activities" />
                     </div>
                     <div className="card-value">{summary.totalActivities}</div>
-                    <div className="card-label">Tổng hoạt động</div>
+                    <div className="card-label">Total Activities</div>
                   </div>
                   <div className="summary-card">
                     <div className="card-icon">
                       <img src="/icon/credit-card.svg" alt="Credits" />
                     </div>
                     <div className="card-value">{summary.totalCreditsUsed.toFixed(2)}</div>
-                    <div className="card-label">Credits đã dùng</div>
+                    <div className="card-label">Credits Used</div>
                   </div>
                   <div className="summary-card">
                     <div className="card-icon">
                       <img src="/icon/trending-up.svg" alt="Average" />
                     </div>
                     <div className="card-value">{summary.averageDaily.toFixed(1)}</div>
-                    <div className="card-label">Trung bình/ngày</div>
+                    <div className="card-label">Average/day</div>
                   </div>
                 </div>
 
                 <div className="summary-section">
-                  <h3>Top tính năng sử dụng</h3>
+                  <h3>Top Features Used</h3>
                   <div className="feature-list">
                     {summary.mostUsedFeatures.map((item, index) => {
                       const config = getActivityConfig(item.type);
@@ -369,7 +369,7 @@ export default function UserActivityLogs() {
                             <img src={`/icon/${config.icon}`} alt={item.type} />
                           </div>
                           <span className="feature-name">{config.label}</span>
-                          <span className="feature-count">{item.count} lần</span>
+                          <span className="feature-count">{item.count} times</span>
                         </div>
                       );
                     })}
@@ -377,7 +377,7 @@ export default function UserActivityLogs() {
                 </div>
 
                 <div className="summary-section">
-                  <h3>Hoạt động theo ngày</h3>
+                  <h3>Activities by Day</h3>
                   <div className="daily-chart">
                     {summary.byDate.map(day => (
                       <div key={day.date} className="day-bar">
@@ -386,7 +386,7 @@ export default function UserActivityLogs() {
                           style={{ 
                             height: `${Math.min(100, (day.activities / Math.max(...summary.byDate.map(d => d.activities))) * 100)}%` 
                           }}
-                          title={`${day.date}: ${day.activities} hoạt động, ${day.credits.toFixed(2)} credits`}
+                          title={`${day.date}: ${day.activities} activities, ${day.credits.toFixed(2)} credits`}
                         />
                         <span className="day-label">{day.date.slice(-5)}</span>
                       </div>
@@ -402,17 +402,17 @@ export default function UserActivityLogs() {
                 {creditTransactions.length === 0 ? (
                   <div className="empty-state">
                     <img src="/icon/inbox.svg" alt="Empty" />
-                    <p>Không có giao dịch credits</p>
+                    <p>No credit transactions</p>
                   </div>
                 ) : (
                   <table className="transactions-table">
                     <thead>
                       <tr>
-                        <th>Thời gian</th>
-                        <th>Loại</th>
-                        <th>Số lượng</th>
-                        <th>Tính năng</th>
-                        <th>Số dư sau</th>
+                        <th>Time</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Feature</th>
+                        <th>Balance After</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -421,7 +421,7 @@ export default function UserActivityLogs() {
                           <td>{formatTimestamp(tx.timestamp)}</td>
                           <td>
                             <span className={`tx-type ${tx.type}`}>
-                              {tx.type === 'addition' ? 'Cộng' : 'Trừ'}
+                              {tx.type === 'addition' ? 'Add' : 'Deduct'}
                             </span>
                           </td>
                           <td className={tx.amount >= 0 ? 'positive' : 'negative'}>
@@ -442,13 +442,13 @@ export default function UserActivityLogs() {
               <div className="feature-usage-content">
                 <div className="usage-summary">
                   <div className="usage-card">
-                    <span className="label">Tổng chi phí</span>
+                    <span className="label">Total Cost</span>
                     <span className="value">{featureUsage.totalCost} credits</span>
                   </div>
                 </div>
 
                 <div className="usage-section">
-                  <h3>Chi tiết theo tính năng</h3>
+                  <h3>Details by Feature</h3>
                   <div className="feature-breakdown">
                     {featureUsage.featureBreakdown.map(item => {
                       const config = getActivityConfig(item.feature);
@@ -462,7 +462,7 @@ export default function UserActivityLogs() {
                             <span className="feature-name">{config.label}</span>
                           </div>
                           <div className="breakdown-stats">
-                            <span className="count">{item.count} lần</span>
+                            <span className="count">{item.count} times</span>
                             <span className="cost">{item.cost} credits</span>
                           </div>
                           <div className="breakdown-bar">
@@ -481,12 +481,12 @@ export default function UserActivityLogs() {
                 </div>
 
                 <div className="usage-section">
-                  <h3>Sử dụng theo ngày</h3>
+                  <h3>Usage by Day</h3>
                   <div className="daily-usage">
                     {featureUsage.dailyUsage.map(day => (
                       <div key={day.date} className="daily-item">
                         <span className="date">{day.date}</span>
-                        <span className="count">{day.count} lần</span>
+                        <span className="count">{day.count} times</span>
                         <span className="cost">{day.cost} credits</span>
                       </div>
                     ))}

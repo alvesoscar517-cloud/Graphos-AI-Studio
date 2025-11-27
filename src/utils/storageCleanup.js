@@ -41,7 +41,7 @@ export function cleanCorruptedStorage() {
   })
   
   if (cleaned > 0) {
-    console.log(`✅ Cleaned ${cleaned} corrupted localStorage items`)
+    console.log(`[SUCCESS] Cleaned ${cleaned} corrupted localStorage items`)
   }
   
   return cleaned
@@ -79,10 +79,10 @@ export function safeSetJSON(key, value) {
  * Initialize storage cleanup on app start
  */
 export function initStorageCleanup() {
-  console.log('🔍 Checking localStorage for corrupted data...')
+  console.log('[SEARCH] Checking localStorage for corrupted data...')
   const cleaned = cleanCorruptedStorage()
   
   if (cleaned === 0) {
-    console.log('✅ localStorage is clean')
+    console.log('[SUCCESS] localStorage is clean')
   }
 }

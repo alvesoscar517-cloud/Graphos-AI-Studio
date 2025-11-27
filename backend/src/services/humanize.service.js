@@ -44,17 +44,17 @@ const AI_PHRASES_TO_AVOID = {
     "all in all", "overall", "ultimately"
   ],
   vi: [
-    // Formal Vietnamese phrases
-    "cần lưu ý rằng", "điều quan trọng là", "cần nhấn mạnh rằng",
-    "không thể phủ nhận", "rõ ràng là", "hiển nhiên là",
+    // Formal phrases
+    "it is important to note", "it is crucial", "it is essential",
+    "it cannot be denied", "it is clear", "it is obvious",
     // Transition overuse
-    "hơn nữa", "ngoài ra", "bên cạnh đó", "do đó", "vì vậy",
-    "tuy nhiên", "mặc dù vậy", "song", "thế nhưng",
+    "however", "moreover", "besides", "therefore", "thus",
+    "nevertheless", "although", "yet", "but",
     // Formal fillers
-    "trong thời đại ngày nay", "trong bối cảnh hiện tại",
-    "trước hết", "cuối cùng nhưng không kém phần quan trọng",
+    "in today's world", "in the current context",
+    "first of all", "last but not least",
     // Conclusion patterns
-    "tóm lại", "kết luận", "tổng kết lại", "nhìn chung"
+    "in summary", "in conclusion", "to summarize", "overall"
   ]
 };
 
@@ -81,9 +81,9 @@ const HUMAN_MARKERS = {
     opinions: ["I think", "I believe", "I feel", "In my opinion", "To me", "Personally"]
   },
   vi: {
-    fillers: ["thực ra", "cơ bản là", "nói thật", "rõ ràng", "đúng là"],
-    starters: ["Và", "Nhưng", "Vậy", "Nói chung", "Thật ra", "À"],
-    opinions: ["tôi nghĩ", "theo tôi", "tôi cho rằng", "cá nhân tôi", "với tôi"]
+    fillers: ["actually", "basically", "honestly", "clearly", "truly"],
+    starters: ["And", "But", "So", "Overall", "Really", "Well"],
+    opinions: ["I think", "I believe", "I feel", "personally", "to me"]
   }
 };
 
@@ -478,7 +478,7 @@ async function rewriteWithIterativeRefinement(originalText, voiceProfile, contex
     
     // Step 3: If below target, we're done
     if (lastDetection.aiProbability < targetProbability) {
-      console.log(`[HUMANIZE] ✅ Target reached! AI probability ${lastDetection.aiProbability}% < ${targetProbability}%`);
+      console.log(`[HUMANIZE] [SUCCESS] Target reached! AI probability ${lastDetection.aiProbability}% < ${targetProbability}%`);
       return {
         text: currentText,
         iterations,
@@ -491,7 +491,7 @@ async function rewriteWithIterativeRefinement(originalText, voiceProfile, contex
     
     // If this is the last iteration, break
     if (i === maxIterations - 1) {
-      console.log(`[HUMANIZE] ⚠️ Max iterations reached. Final AI probability: ${lastDetection.aiProbability}%`);
+      console.log(`[HUMANIZE] [WARN] Max iterations reached. Final AI probability: ${lastDetection.aiProbability}%`);
     }
   }
   
@@ -574,7 +574,7 @@ async function getHumanizationSuggestions(text) {
   
   // Check for transition overuse
   const formalTransitions = lang === 'vi' 
-    ? ['hơn nữa', 'ngoài ra', 'do đó', 'vì vậy', 'tuy nhiên', 'mặc dù vậy']
+    ? ['furthermore', 'moreover', 'additionally', 'consequently', 'nevertheless', 'nonetheless']
     : ['furthermore', 'moreover', 'additionally', 'consequently', 'nevertheless', 'nonetheless'];
   
   let transitionCount = 0;

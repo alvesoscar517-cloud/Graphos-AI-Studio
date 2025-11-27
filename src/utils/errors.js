@@ -1,20 +1,26 @@
 /**
- * Custom Error Classes
- * Standardized error handling across the application
+ * Enhanced Error Handling Utilities
+ * Provides structured error classes and handling functions
  */
+
+import { CONFIG } from './config';
+
+// ============================================================================
+// ERROR CLASSES
+// ============================================================================
 
 /**
- * Base API Error
+ * Base application error
  */
-export class APIError extends Error {
-  constructor(message, code = 'API_ERROR', details = null) {
-    super(message)
-    this.name = 'APIError'
-    this.code = code
-    this.details = details
-    this.timestamp = new Date().toISOString()
+export class AppError extends Error {
+  constructor(message, code = 'APP_ERROR', details = null) {
+    super(message);
+    this.name = 'AppError';
+    this.code = code;
+    this.details = details;
+    this.timestamp = new Date().toISOString();
   }
-
+  
   toJSON() {
     return {
       name: this.name,
@@ -22,135 +28,309 @@ export class APIError extends Error {
       code: this.code,
       details: this.details,
       timestamp: this.timestamp
-    }
+    };
   }
 }
 
 /**
- * Authentication Error
+ * Authentication error
  */
-export class AuthError extends APIError {
-  constructor(message, details = null) {
-    super(message, 'AUTH_ERROR', details)
-    this.name = 'AuthError'
+export class AuthError extends AppError {
+  constructor(message = 'Authentication failed', details = null) {
+    super(message, 'AUTH_ERROR', details);
+    this.name = 'AuthError';
   }
 }
 
 /**
- * Validation Error
+ * Network/API error
  */
-export class ValidationError extends APIError {
-  constructor(message, details = null) {
-    super(message, 'VALIDATION_ERROR', details)
-    this.name = 'ValidationError'
+export class NetworkError extends AppError {
+  constructor(message = 'Network request failed', statusCode = null, details = null) {
+    super(message, 'NETWORK_ERROR', details);
+    this.name = 'NetworkError';
+    this.statusCode = statusCode;
   }
 }
 
 /**
- * Network Error
+ * Validation error
  */
-export class NetworkError extends APIError {
-  constructor(message, details = null) {
-    super(message, 'NETWORK_ERROR', details)
-    this.name = 'NetworkError'
+export class ValidationError extends AppError {
+  constructor(message = 'Validation failed', fields = null) {
+    super(message, 'VALIDATION_ERROR', { fields });
+    this.name = 'ValidationError';
+    this.fields = fields;
   }
 }
 
 /**
- * Rate Limit Error
+ * Analysis error
  */
-export class RateLimitError extends APIError {
-  constructor(message = 'Rate limit exceeded', retryAfter = null) {
-    super(message, 'RATE_LIMIT_ERROR', { retryAfter })
-    this.name = 'RateLimitError'
-    this.retryAfter = retryAfter
+export class AnalysisError extends AppError {
+  constructor(message = 'Analysis failed', details = null) {
+    super(message, 'ANALYSIS_ERROR', details);
+    this.name = 'AnalysisError';
   }
 }
 
 /**
- * Profile Error
+ * Profile error
  */
-export class ProfileError extends APIError {
-  constructor(message, details = null) {
-    super(message, 'PROFILE_ERROR', details)
-    this.name = 'ProfileError'
+export class ProfileError extends AppError {
+  constructor(message = 'Profile operation failed', details = null) {
+    super(message, 'PROFILE_ERROR', details);
+    this.name = 'ProfileError';
   }
 }
 
 /**
- * Analysis Error
+ * Credit/Payment error
  */
-export class AnalysisError extends APIError {
-  constructor(message, details = null) {
-    super(message, 'ANALYSIS_ERROR', details)
-    this.name = 'AnalysisError'
+export class CreditError extends AppError {
+  constructor(message = 'Insufficient credits', required = null, available = null) {
+    super(message, 'CREDIT_ERROR', { required, available });
+    this.name = 'CreditError';
+    this.required = required;
+    this.available = available;
   }
 }
 
 /**
- * Error handler utility
- * @param {Error} error 
- * @returns {Object} Standardized error response
+ * Rate limit error
+ */
+export class RateLimitError extends AppError {
+  constructor(retryAfter = 60) {
+    super('Rate limit exceeded. Please try again later.', 'RATE_LIMIT_ERROR', { retryAfter });
+    this.name = 'RateLimitError';
+    this.retryAfter = retryAfter;
+  }
+}
+
+// ============================================================================
+// ERROR HANDLING FUNCTIONS
+// ============================================================================
+
+/**
+ * Parse API error response
+ */
+export function parseApiError(response, data) {
+  const statusCode = response.status;
+  const errorData = data?.error || data;
+  
+  // Map status codes to error types
+  switch (statusCode) {
+    case 400:
+      return new ValidationError(
+        errorData?.message || 'Invalid request',
+        errorData?.details
+      );
+    
+    case 401:
+      return new AuthError(
+        errorData?.message || 'Authentication required'
+      );
+    
+    case 402:
+      return new CreditError(
+        errorData?.message || 'Insufficient credits',
+        errorData?.details?.required,
+        errorData?.details?.available
+      );
+    
+    case 403:
+      return new AuthError(
+        errorData?.message || 'Access denied'
+      );
+    
+    case 404:
+      return new AppError(
+        errorData?.message || 'Resource not found',
+        'NOT_FOUND'
+      );
+    
+    case 429:
+      return new RateLimitError(
+        errorData?.details?.retryAfter || 60
+      );
+    
+    case 500:
+    case 502:
+    case 503:
+      return new NetworkError(
+        errorData?.message || 'Server error. Please try again later.',
+        statusCode
+      );
+    
+    default:
+      return new NetworkError(
+        errorData?.message || `Request failed with status ${statusCode}`,
+        statusCode
+      );
+  }
+}
+
+/**
+ * Handle error and return standardized response
  */
 export function handleError(error) {
-  // If already an APIError, return as is
-  if (error instanceof APIError) {
+  // Log error in development
+  if (CONFIG.ENABLE_DEBUG_LOGS) {
+    console.error('[ERROR]', error);
+  }
+  
+  // Already an AppError
+  if (error instanceof AppError) {
     return {
       success: false,
       error: error.message,
       code: error.code,
       details: error.details
-    }
+    };
   }
-
-  // Handle fetch errors
-  if (error instanceof TypeError && error.message.includes('fetch')) {
+  
+  // Network errors
+  if (error.name === 'TypeError' && error.message.includes('fetch')) {
     return {
       success: false,
-      error: 'Network error. Please check your connection.',
+      error: 'Network connection failed. Please check your internet connection.',
       code: 'NETWORK_ERROR'
-    }
+    };
   }
-
-  // Handle abort errors
+  
+  // Timeout errors
   if (error.name === 'AbortError') {
     return {
       success: false,
-      error: 'Request was cancelled',
-      code: 'ABORTED'
-    }
+      error: 'Request timed out. Please try again.',
+      code: 'TIMEOUT_ERROR'
+    };
   }
-
+  
   // Generic error
   return {
     success: false,
     error: error.message || 'An unexpected error occurred',
     code: 'UNKNOWN_ERROR'
-  }
+  };
 }
 
 /**
  * Log error with context
- * @param {Error} error 
- * @param {Object} context 
  */
 export function logError(error, context = {}) {
   const errorInfo = {
     message: error.message,
     name: error.name,
+    code: error.code,
     stack: error.stack,
-    ...context
+    ...context,
+    timestamp: new Date().toISOString()
+  };
+  
+  if (CONFIG.ENABLE_DEBUG_LOGS) {
+    console.error('[ERROR LOG]', errorInfo);
   }
-
-  if (error instanceof APIError) {
-    errorInfo.code = error.code
-    errorInfo.details = error.details
+  
+  // In production, could send to error tracking service
+  if (CONFIG.FEATURES.ENABLE_ERROR_TRACKING) {
+    // sendToErrorTracking(errorInfo);
   }
+}
 
-  console.error('❌ Error:', errorInfo)
+/**
+ * Create user-friendly error message
+ */
+export function getUserFriendlyMessage(error) {
+  if (error instanceof CreditError) {
+    return `You need ${error.required} credits but only have ${error.available}. Please purchase more credits.`;
+  }
+  
+  if (error instanceof RateLimitError) {
+    return `Too many requests. Please wait ${error.retryAfter} seconds before trying again.`;
+  }
+  
+  if (error instanceof AuthError) {
+    return 'Please sign in to continue.';
+  }
+  
+  if (error instanceof ValidationError) {
+    return error.message || 'Please check your input and try again.';
+  }
+  
+  if (error instanceof NetworkError) {
+    if (error.statusCode >= 500) {
+      return 'Server is temporarily unavailable. Please try again later.';
+    }
+    return 'Network error. Please check your connection.';
+  }
+  
+  return error.message || 'Something went wrong. Please try again.';
+}
 
-  // TODO: Send to error tracking service (Sentry, etc.)
-  // if (window.Sentry) {
-  //   window.Sentry.captureException(error, { extra: context })
-  // }
+// ============================================================================
+// RETRY LOGIC
+// ============================================================================
+
+/**
+ * Retry a function with exponential backoff
+ */
+export async function withRetry(fn, options = {}) {
+  const {
+    maxRetries = 3,
+    baseDelay = 1000,
+    maxDelay = 10000,
+    shouldRetry = (error) => error instanceof NetworkError && error.statusCode >= 500
+  } = options;
+  
+  let lastError;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      
+      if (attempt === maxRetries || !shouldRetry(error)) {
+        throw error;
+      }
+      
+      const delay = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
+      
+      if (CONFIG.ENABLE_DEBUG_LOGS) {
+        console.log(`[RETRY] Attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError;
+}
+
+// ============================================================================
+// ERROR BOUNDARY HELPERS
+// ============================================================================
+
+/**
+ * Safe JSON parse
+ */
+export function safeJsonParse(str, fallback = null) {
+  try {
+    return JSON.parse(str);
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * Safe async operation
+ */
+export async function safeAsync(fn, fallback = null) {
+  try {
+    return await fn();
+  } catch (error) {
+    logError(error, { context: 'safeAsync' });
+    return fallback;
+  }
 }

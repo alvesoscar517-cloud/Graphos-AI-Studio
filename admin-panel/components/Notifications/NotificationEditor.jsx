@@ -376,12 +376,12 @@ export default function NotificationEditor() {
               {notification.target.type === 'segment' && (
                 <div className="segment-options">
                   {[
-                    { value: 'inactive', label: 'Inactive users (30+ days)', icon: '😴', desc: 'Users who haven\'t logged in for 30+ days' },
-                    { value: 'new', label: 'New users (< 7 days)', icon: '🆕', desc: 'Users who registered in the last 7 days' },
-                    { value: 'has_profile', label: 'Has voice profile', icon: '🎤', desc: 'Users who have created at least one voice profile' },
-                    { value: 'no_profile', label: 'No voice profile', icon: '❌', desc: 'Users who haven\'t created any voice profile' },
-                    { value: 'low_credits', label: 'Low credits (< 10)', icon: '⚠️', desc: 'Users with less than 10 credits remaining' },
-                    { value: 'active', label: 'Active users (7 days)', icon: '✅', desc: 'Users who have been active in the last 7 days' }
+                    { value: 'inactive', label: 'Inactive users (30+ days)', icon: '○', desc: 'Users who haven\'t logged in for 30+ days' },
+                    { value: 'new', label: 'New users (< 7 days)', icon: '●', desc: 'Users who registered in the last 7 days' },
+                    { value: 'has_profile', label: 'Has voice profile', icon: '◆', desc: 'Users who have created at least one voice profile' },
+                    { value: 'no_profile', label: 'No voice profile', icon: '✕', desc: 'Users who haven\'t created any voice profile' },
+                    { value: 'low_credits', label: 'Low credits (< 10)', icon: '!', desc: 'Users with less than 10 credits remaining' },
+                    { value: 'active', label: 'Active users (7 days)', icon: '[OK]', desc: 'Users who have been active in the last 7 days' }
                   ].map(segment => (
                     <label key={segment.value} className="segment-checkbox" title={segment.desc}>
                       <input 
@@ -403,7 +403,7 @@ export default function NotificationEditor() {
                     </label>
                   ))}
                   {notification.target.segments?.length === 0 && (
-                    <p className="segment-warning">⚠️ Please select at least one user group</p>
+                    <p className="segment-warning">Please select at least one user group</p>
                   )}
                 </div>
               )}

@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { isDevMode, DEV_CONFIG, resetDevEnvironment, devLog } from '../../utils/devConfig'
 import './DevModeToggle.css'
 
 /**
  * Dev Mode Toggle Component
- * Hiển thị ở góc dưới bên phải khi ở dev mode
+ * Display at bottom right corner in dev mode
  */
 const DevModeToggle = () => {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [config, setConfig] = useState(DEV_CONFIG)
 
-  // Chỉ hiển thị trong dev mode
+  // Only display in dev mode
   if (!import.meta.env.DEV) return null
 
   const handleToggleDevMode = () => {
@@ -18,7 +20,7 @@ const DevModeToggle = () => {
     setConfig({ ...DEV_CONFIG })
     devLog('Dev mode:', DEV_CONFIG.ENABLE_DEV_MODE ? 'enabled' : 'disabled')
     
-    // Reload để áp dụng thay đổi
+    // Reload to apply changes
     setTimeout(() => window.location.reload(), 500)
   }
 
@@ -35,7 +37,7 @@ const DevModeToggle = () => {
   }
 
   const handleReset = () => {
-    if (confirm('Reset dev environment? Sẽ xóa test profile và reload trang.')) {
+    if (confirm(t('devMode.resetConfirm'))) {
       resetDevEnvironment()
       setTimeout(() => window.location.reload(), 500)
     }
@@ -46,7 +48,7 @@ const DevModeToggle = () => {
       <button 
         className="dev-toggle-btn"
         onClick={() => setIsOpen(!isOpen)}
-        title="Dev Mode Settings"
+        title={t('devMode.devModeSettings')}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="16 18 22 12 16 6"></polyline>
@@ -58,7 +60,7 @@ const DevModeToggle = () => {
       {isOpen && (
         <div className="dev-panel">
           <div className="dev-panel-header">
-            <h3>🧪 Dev Mode</h3>
+            <h3>🧪 {t('devMode.devMode')}</h3>
             <button onClick={() => setIsOpen(false)}>×</button>
           </div>
 
@@ -70,9 +72,9 @@ const DevModeToggle = () => {
                   checked={config.ENABLE_DEV_MODE}
                   onChange={handleToggleDevMode}
                 />
-                <span>Enable Dev Mode</span>
+                <span>{t('devMode.enableDevMode')}</span>
               </label>
-              <p className="dev-hint">Use test profile instead of creating new</p>
+              <p className="dev-hint">{t('devMode.useTestProfile')}</p>
             </div>
 
             <div className="dev-setting">
@@ -83,9 +85,9 @@ const DevModeToggle = () => {
                   onChange={handleToggleAutoSelect}
                   disabled={!config.ENABLE_DEV_MODE}
                 />
-                <span>Auto-select Test Profile</span>
+                <span>{t('devMode.autoSelectTestProfile')}</span>
               </label>
-              <p className="dev-hint">Auto-select test profile on startup</p>
+              <p className="dev-hint">{t('devMode.autoSelectOnStartup')}</p>
             </div>
 
             <div className="dev-setting">
@@ -96,23 +98,23 @@ const DevModeToggle = () => {
                   onChange={handleToggleVerbose}
                   disabled={!config.ENABLE_DEV_MODE}
                 />
-                <span>Verbose Logging</span>
+                <span>{t('devMode.verboseLogging')}</span>
               </label>
-              <p className="dev-hint">Hiển thị log chi tiết trong console</p>
+              <p className="dev-hint">{t('devMode.showDetailedLogs')}</p>
             </div>
 
             <div className="dev-info">
-              <h4>Test Profile</h4>
+              <h4>{t('devMode.testProfile')}</h4>
               <div className="dev-info-item">
-                <span>ID:</span>
+                <span>{t('devMode.id')}:</span>
                 <code>{config.DEFAULT_TEST_PROFILE.profile_id}</code>
               </div>
               <div className="dev-info-item">
-                <span>Name:</span>
+                <span>{t('devMode.name')}:</span>
                 <code>{config.DEFAULT_TEST_PROFILE.profile_name}</code>
               </div>
               <div className="dev-info-item">
-                <span>User:</span>
+                <span>{t('devMode.user')}:</span>
                 <code>{config.DEFAULT_TEST_USER.email}</code>
               </div>
             </div>
@@ -122,7 +124,7 @@ const DevModeToggle = () => {
                 className="dev-btn dev-btn-danger"
                 onClick={handleReset}
               >
-                Reset Environment
+                {t('devMode.resetEnvironment')}
               </button>
             </div>
           </div>

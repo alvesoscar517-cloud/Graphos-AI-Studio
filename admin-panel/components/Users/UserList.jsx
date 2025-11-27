@@ -106,7 +106,7 @@ export default function UserList() {
 
     const confirmed = await notify.confirm({
       title: 'Delete Users',
-      message: `⚠️ Are you sure you want to DELETE ${selectedUsers.length} users?\n\nThis action cannot be undone!`,
+      message: `Are you sure you want to DELETE ${selectedUsers.length} users?\n\nThis action cannot be undone!`,
       confirmText: 'Delete',
       type: 'danger'
     });

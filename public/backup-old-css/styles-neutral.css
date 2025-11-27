@@ -1,9 +1,9 @@
 /* 
  * Neutral Color Scheme Override
- * Đơn giản hóa màu sắc - chỉ sử dụng đen, trắng, xám
+ * Simplify colors - use only black, white, gray
  */
 
-/* Primary colors - chuyển sang xám */
+/* Primary colors - convert to gray */
 .nav-item.active,
 body.light-theme .nav-item.active {
   background: #e8eaed !important;

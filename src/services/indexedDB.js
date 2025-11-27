@@ -12,13 +12,13 @@ export async function initDB() {
     const request = indexedDB.open(DB_NAME, DB_VERSION)
 
     request.onerror = () => {
-      console.error('❌ Failed to open IndexedDB:', request.error)
+      console.error('[FAIL] Failed to open IndexedDB:', request.error)
       reject(request.error)
     }
 
     request.onsuccess = () => {
       db = request.result
-      console.log('✅ IndexedDB initialized')
+      console.log('[SUCCESS] IndexedDB initialized')
       resolve(db)
     }
 
@@ -29,7 +29,7 @@ export async function initDB() {
       if (!db.objectStoreNames.contains(NOTES_STORE)) {
         const notesStore = db.createObjectStore(NOTES_STORE, { keyPath: 'id' })
         notesStore.createIndex('updated', 'updated', { unique: false })
-        console.log('✅ Created notes store')
+        console.log('[SUCCESS] Created notes store')
       }
     }
   })
@@ -47,12 +47,12 @@ export async function getNotesFromDB() {
     const request = store.getAll()
 
     request.onsuccess = () => {
-      console.log('✅ Loaded notes from IndexedDB:', request.result.length)
+      console.log('[SUCCESS] Loaded notes from IndexedDB:', request.result.length)
       resolve(request.result)
     }
 
     request.onerror = () => {
-      console.error('❌ Failed to get notes from IndexedDB:', request.error)
+      console.error('[FAIL] Failed to get notes from IndexedDB:', request.error)
       reject(request.error)
     }
   })
@@ -77,12 +77,12 @@ export async function saveNotesToDB(notes) {
     })
 
     transaction.oncomplete = () => {
-      console.log('✅ Saved notes to IndexedDB:', notes.length)
+      console.log('[SUCCESS] Saved notes to IndexedDB:', notes.length)
       resolve()
     }
 
     transaction.onerror = () => {
-      console.error('❌ Failed to save notes to IndexedDB:', transaction.error)
+      console.error('[FAIL] Failed to save notes to IndexedDB:', transaction.error)
       reject(transaction.error)
     }
   })
@@ -100,12 +100,12 @@ export async function saveNoteToDB(note) {
     const request = store.put(note)
 
     request.onsuccess = () => {
-      console.log('✅ Saved note to IndexedDB:', note.title)
+      console.log('[SUCCESS] Saved note to IndexedDB:', note.title)
       resolve()
     }
 
     request.onerror = () => {
-      console.error('❌ Failed to save note to IndexedDB:', request.error)
+      console.error('[FAIL] Failed to save note to IndexedDB:', request.error)
       reject(request.error)
     }
   })
@@ -123,12 +123,12 @@ export async function deleteNoteFromDB(noteId) {
     const request = store.delete(noteId)
 
     request.onsuccess = () => {
-      console.log('✅ Deleted note from IndexedDB')
+      console.log('[SUCCESS] Deleted note from IndexedDB')
       resolve()
     }
 
     request.onerror = () => {
-      console.error('❌ Failed to delete note from IndexedDB:', request.error)
+      console.error('[FAIL] Failed to delete note from IndexedDB:', request.error)
       reject(request.error)
     }
   })
@@ -146,12 +146,12 @@ export async function clearNotesDB() {
     const request = store.clear()
 
     request.onsuccess = () => {
-      console.log('✅ Cleared notes from IndexedDB')
+      console.log('[SUCCESS] Cleared notes from IndexedDB')
       resolve()
     }
 
     request.onerror = () => {
-      console.error('❌ Failed to clear notes from IndexedDB:', request.error)
+      console.error('[FAIL] Failed to clear notes from IndexedDB:', request.error)
       reject(request.error)
     }
   })

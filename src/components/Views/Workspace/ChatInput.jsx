@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import './ChatInput.css'
 
 // Supported file types
@@ -7,6 +8,7 @@ const SUPPORTED_DOC_TYPES = ['application/pdf', 'text/plain', 'text/csv', 'appli
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
 const ChatInput = ({ onSendMessage, disabled }) => {
+  const { t } = useTranslation()
   const [message, setMessage] = useState('')
   const [attachments, setAttachments] = useState([])
   const [uploadError, setUploadError] = useState(null)
@@ -53,12 +55,12 @@ const ChatInput = ({ onSendMessage, disabled }) => {
     const isDoc = SUPPORTED_DOC_TYPES.includes(file.type)
     
     if (!isImage && !isDoc) {
-      return { valid: false, error: `Unsupported file type: ${file.type || 'unknown'}` }
+      return { valid: false, error: t('errors.unsupportedFileType', { type: file.type || 'unknown' }) }
     }
     
     // Check file size
     if (file.size > MAX_FILE_SIZE) {
-      return { valid: false, error: `File too large: ${(file.size / 1024 / 1024).toFixed(1)}MB (max 10MB)` }
+      return { valid: false, error: t('errors.fileTooLarge', { size: `${(file.size / 1024 / 1024).toFixed(1)}MB` }) }
     }
     
     return { valid: true }
@@ -154,7 +156,7 @@ const ChatInput = ({ onSendMessage, disabled }) => {
         {/* Upload Error */}
         {uploadError && (
           <div className="workspace-upload-error">
-            <img src="/icon/alert-circle.svg" alt="Error" />
+            <img src="/icon/alert-circle.svg" alt={t('common.error')} />
             <span>{uploadError}</span>
           </div>
         )}
@@ -168,7 +170,7 @@ const ChatInput = ({ onSendMessage, disabled }) => {
                   <img src={attachment.url} alt={attachment.name} className="attachment-preview-img" />
                 ) : (
                   <div className="attachment-file-icon">
-                    <img src="/icon/file-text.svg" alt="File" />
+                    <img src="/icon/file-text.svg" alt={t('chat.file')} />
                   </div>
                 )}
                 <div className="attachment-info">
@@ -182,10 +184,10 @@ const ChatInput = ({ onSendMessage, disabled }) => {
                 <button 
                   className="attachment-remove"
                   onClick={() => handleRemoveAttachment(index)}
-                  data-tooltip="Remove"
+                  data-tooltip={t('common.remove')}
                   data-tooltip-position="top"
                 >
-                  <img src="/icon/x.svg" alt="Remove" />
+                  <img src="/icon/x.svg" alt={t('common.remove')} />
                 </button>
               </div>
             ))}
@@ -198,16 +200,16 @@ const ChatInput = ({ onSendMessage, disabled }) => {
             className="workspace-attach-btn"
             onClick={() => fileInputRef.current?.click()}
             disabled={disabled}
-            data-tooltip="Attach file (images, PDF, text)"
+            data-tooltip={t('common.attach')}
             data-tooltip-position="top"
           >
-            <img src="/icon/paperclip.svg" alt="Attach" />
+            <img src="/icon/paperclip.svg" alt={t('common.attach')} />
           </button>
 
           <textarea
             ref={textareaRef}
             className="workspace-textarea"
-            placeholder="Type message... (Enter to send, Shift+Enter for new line)"
+            placeholder={t('workspace.typeMessage')}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -221,10 +223,10 @@ const ChatInput = ({ onSendMessage, disabled }) => {
               className="workspace-send-btn"
               onClick={handleSend}
               disabled={disabled}
-              data-tooltip="Send message"
+              data-tooltip={t('common.send')}
               data-tooltip-position="top"
             >
-              <img src="/icon/send.svg" alt="Send" />
+              <img src="/icon/send.svg" alt={t('common.send')} />
             </button>
           )}
 
@@ -240,7 +242,7 @@ const ChatInput = ({ onSendMessage, disabled }) => {
 
         {/* Supported formats hint */}
         <div className="workspace-input-hint">
-          Supports: Images (JPEG, PNG, GIF, WebP), PDF, TXT, CSV, JSON
+          {t('editor.supportsFormats')}
         </div>
       </div>
     </div>

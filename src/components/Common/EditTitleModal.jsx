@@ -1,16 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import './EditTitleModal.css'
 
 /**
- * EditTitleModal - Modal nhỏ gọn để chỉnh sửa title
+ * EditTitleModal - Compact modal for editing title
  * 
- * @param {boolean} isOpen - Trạng thái hiển thị modal
- * @param {string} currentTitle - Title hiện tại
- * @param {function} onSave - Callback khi lưu title mới
- * @param {function} onClose - Callback khi đóng modal
- * @param {number} maxLength - Độ dài tối đa của title (default: 100)
+ * @param {boolean} isOpen - Modal display status
+ * @param {string} currentTitle - Current title
+ * @param {function} onSave - Callback when saving new title
+ * @param {function} onClose - Callback when closing modal
+ * @param {number} maxLength - Maximum title length (default: 100)
  */
 const EditTitleModal = ({ isOpen, currentTitle, onSave, onClose, maxLength = 100 }) => {
+  const { t } = useTranslation()
   const [title, setTitle] = useState(currentTitle || '')
   const inputRef = useRef(null)
 
@@ -56,8 +58,8 @@ const EditTitleModal = ({ isOpen, currentTitle, onSave, onClose, maxLength = 100
     <div className="edit-title-modal-overlay" onClick={handleOverlayClick}>
       <div className="edit-title-modal">
         <div className="edit-title-modal-header">
-          <img src="/icon/pencil.svg" alt="Edit" className="edit-title-modal-icon" />
-          <span>Chỉnh sửa tiêu đề</span>
+          <img src="/icon/pencil.svg" alt={t('common.edit')} className="edit-title-modal-icon" />
+          <span>{t('editor.editTitle')}</span>
         </div>
 
         <div className="edit-title-modal-body">
@@ -68,7 +70,7 @@ const EditTitleModal = ({ isOpen, currentTitle, onSave, onClose, maxLength = 100
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Nhập tiêu đề..."
+            placeholder={t('editor.enterTitle')}
             maxLength={maxLength}
           />
           <div className="edit-title-modal-counter">
@@ -78,14 +80,14 @@ const EditTitleModal = ({ isOpen, currentTitle, onSave, onClose, maxLength = 100
 
         <div className="edit-title-modal-footer">
           <button className="edit-title-modal-btn cancel" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </button>
           <button 
             className="edit-title-modal-btn save" 
             onClick={handleSave}
             disabled={!title.trim()}
           >
-            Lưu
+            {t('common.save')}
           </button>
         </div>
       </div>

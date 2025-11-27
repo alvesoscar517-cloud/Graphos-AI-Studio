@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../contexts/ThemeContext'
 import FeedbackModal from './FeedbackModal'
 import BillingSupportModal from './BillingSupportModal'
 import './Popups.css'
 
 const SettingsPopup = ({ onClose }) => {
+  const { t } = useTranslation()
   const popupRef = useRef(null)
   const { theme, changeTheme } = useTheme()
   const [showThemeSubmenu, setShowThemeSubmenu] = useState(false)
@@ -28,8 +30,8 @@ const SettingsPopup = ({ onClose }) => {
         className="settings-item" 
         onClick={() => setShowThemeSubmenu(!showThemeSubmenu)}
       >
-        <img src="/icon/palette.svg" className="settings-icon" alt="Theme" />
-        <span>Theme</span>
+        <img src="/icon/palette.svg" className="settings-icon" alt={t('settings.theme')} />
+        <span>{t('settings.theme')}</span>
         <img src="/icon/chevron-right.svg" className="settings-arrow" alt="" />
         
         {showThemeSubmenu && (
@@ -37,22 +39,22 @@ const SettingsPopup = ({ onClose }) => {
             <div className="theme-option" onClick={(e) => { e.stopPropagation(); changeTheme('light'); }}>
               <input type="radio" name="theme" checked={theme === 'light'} readOnly />
               <label>
-                <img src="/icon/sun.svg" className="theme-icon" alt="Light" />
-                <span>Light</span>
+                <img src="/icon/sun.svg" className="theme-icon" alt={t('settings.light')} />
+                <span>{t('settings.light')}</span>
               </label>
             </div>
             <div className="theme-option" onClick={(e) => { e.stopPropagation(); changeTheme('dark'); }}>
               <input type="radio" name="theme" checked={theme === 'dark'} readOnly />
               <label>
-                <img src="/icon/moon.svg" className="theme-icon" alt="Dark" />
-                <span>Dark</span>
+                <img src="/icon/moon.svg" className="theme-icon" alt={t('settings.dark')} />
+                <span>{t('settings.dark')}</span>
               </label>
             </div>
             <div className="theme-option" onClick={(e) => { e.stopPropagation(); changeTheme('system'); }}>
               <input type="radio" name="theme" checked={theme === 'system'} readOnly />
               <label>
-                <img src="/icon/monitor.svg" className="theme-icon" alt="System" />
-                <span>System</span>
+                <img src="/icon/monitor.svg" className="theme-icon" alt={t('settings.system')} />
+                <span>{t('settings.system')}</span>
               </label>
             </div>
           </div>
@@ -60,32 +62,32 @@ const SettingsPopup = ({ onClose }) => {
       </div>
 
       <div className="settings-item">
-        <img src="/icon/upload.svg" className="settings-icon" alt="Submit" />
-        <span>Submit prompt key</span>
+        <img src="/icon/upload.svg" className="settings-icon" alt={t('settings.submitPromptKey')} />
+        <span>{t('settings.submitPromptKey')}</span>
         <img src="/icon/chevron-right.svg" className="settings-arrow" alt="" />
       </div>
 
       <div className="settings-divider"></div>
 
       <div className="settings-item">
-        <img src="/icon/list.svg" className="settings-icon" alt="Status" />
-        <span>View status</span>
+        <img src="/icon/list.svg" className="settings-icon" alt={t('settings.viewStatus')} />
+        <span>{t('settings.viewStatus')}</span>
       </div>
       <div className="settings-item">
-        <img src="/icon/file-text.svg" className="settings-icon" alt="Terms" />
-        <span>Terms of service</span>
+        <img src="/icon/file-text.svg" className="settings-icon" alt={t('settings.termsOfService')} />
+        <span>{t('settings.termsOfService')}</span>
       </div>
       <div className="settings-item">
-        <img src="/icon/shield.svg" className="settings-icon" alt="Privacy" />
-        <span>Privacy policy</span>
+        <img src="/icon/shield.svg" className="settings-icon" alt={t('settings.privacyPolicy')} />
+        <span>{t('settings.privacyPolicy')}</span>
       </div>
       <div className="settings-item" onClick={() => setShowFeedbackModal(true)}>
-        <img src="/icon/flag.svg" className="settings-icon" alt="Feedback" />
-        <span>Send feedback</span>
+        <img src="/icon/flag.svg" className="settings-icon" alt={t('settings.sendFeedback')} />
+        <span>{t('settings.sendFeedback')}</span>
       </div>
       <div className="settings-item" onClick={() => setShowBillingModal(true)}>
-        <img src="/icon/dollar-sign.svg" className="settings-icon" alt="Billing" />
-        <span>Billing Support</span>
+        <img src="/icon/dollar-sign.svg" className="settings-icon" alt={t('settings.billingSupport')} />
+        <span>{t('settings.billingSupport')}</span>
       </div>
       
       {showFeedbackModal && (

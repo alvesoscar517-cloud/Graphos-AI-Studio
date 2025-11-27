@@ -4,6 +4,7 @@
  * Shows cached value instantly, updates when new data arrives
  */
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CONFIG } from '../utils/config';
 import realtimeService from '../services/realtimeService';
 import './CreditBalance.css';
@@ -30,6 +31,7 @@ const setCachedCredits = (userId, credits) => {
 };
 
 const CreditBalance = ({ userId, onUpgradeClick }) => {
+  const { t } = useTranslation();
   // Initialize with cached value to avoid flicker
   const [credits, setCredits] = useState(() => getCachedCredits(userId));
   const [loading, setLoading] = useState(!getCachedCredits(userId));
@@ -102,11 +104,11 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
     <div className="credit-balance-simple">
       <div className="credit-display">
         <span className={`credit-text ${isLowCredit ? 'low-credit' : ''} ${isOutOfCredit ? 'out-of-credit' : ''}`}>
-          {balance} credits / {used} used
+          {balance} {t('credits.credits')} / {used} {t('credits.used')}
         </span>
       </div>
       <button className="upgrade-button-simple" onClick={onUpgradeClick}>
-        Upgrade Plan
+        {t('credits.upgradePlan')}
       </button>
     </div>
   );

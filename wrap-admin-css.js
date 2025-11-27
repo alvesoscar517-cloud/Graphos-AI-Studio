@@ -46,7 +46,7 @@ function wrapCSSWithScope(filePath) {
   }
   
   fs.writeFileSync(filePath, wrapped.join('\n'));
-  console.log(`✓ Wrapped: ${path.relative(__dirname, filePath)}`);
+  console.log(`[OK] Wrapped: ${path.relative(__dirname, filePath)}`);
 }
 
 function walkDir(dir) {
@@ -65,4 +65,4 @@ function walkDir(dir) {
 
 console.log('🎨 Wrapping all CSS with #admin-root scope...\n');
 walkDir(adminComponentsDir);
-console.log('\n✅ All CSS wrapped!');
+console.log('\n[SUCCESS] All CSS wrapped!');

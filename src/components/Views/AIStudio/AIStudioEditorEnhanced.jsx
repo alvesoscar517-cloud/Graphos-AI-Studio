@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNotes } from '../../../contexts/NotesContext'
 import { useAIProcessing } from '../../../contexts/AIProcessingContext'
 import { useProfiles } from '../../../contexts/ProfileContext'
@@ -26,6 +27,7 @@ const AIStudioEditorEnhanced = ({
   onCreateNote,
   externalAnalysisData
 }) => {
+  const { t } = useTranslation()
   const { currentNote, updateNote, generateTitle } = useNotes()
   const { isProcessing } = useAIProcessing()
   const { currentProfile } = useProfiles()
@@ -88,7 +90,7 @@ const AIStudioEditorEnhanced = ({
   // Listen for external analysis data from RightSidebar
   useEffect(() => {
     if (externalAnalysisData) {
-      console.log('📊 Received external analysis data:', externalAnalysisData)
+      console.log('[CHART] Received external analysis data:', externalAnalysisData)
       setAnalysis(externalAnalysisData)
       setShowHighlights(true) // Show highlights when new analysis arrives
       
@@ -176,14 +178,14 @@ const AIStudioEditorEnhanced = ({
   const handleShare = async () => {
     try {
       if (!currentNote || !currentNote.content.trim()) {
-        modal.alert('No content to share', 'Error')
+        modal.alert(t('share.noContentToShare'), t('common.error'))
         return
       }
 
       // Create share link
       const shareData = await createShare(
         'note',
-        currentNote.title || 'Untitled',
+        currentNote.title || t('editor.untitled'),
         currentNote.content,
         null,
         {
@@ -195,10 +197,10 @@ const AIStudioEditorEnhanced = ({
       const shareUrl = `${window.location.origin}/shared/${shareData.share_id}`
       await navigator.clipboard.writeText(shareUrl)
       
-      modal.toast('Share link copied', '', 'success')
+      modal.toast(t('share.shareLinkCopied'), '', 'success')
     } catch (error) {
       console.error('Share error:', error)
-      modal.error('Unable to create share link: ' + error.message)
+      modal.error(t('share.unableToCreate') + ': ' + error.message)
     }
   }
 
@@ -211,7 +213,7 @@ const AIStudioEditorEnhanced = ({
       const currentLength = currentNote.content.length
       
       if (Math.abs(currentLength - originalLength) > originalLength * 0.1) {
-        console.log('📝 Content changed significantly, clearing analysis')
+        console.log('[NOTE] Content changed significantly, clearing analysis')
         setAnalysis(null)
       }
     }
@@ -223,24 +225,24 @@ const AIStudioEditorEnhanced = ({
         <button 
           className="menu-btn icon-btn" 
           onClick={onToggleLeftSidebar}
-          data-tooltip="Toggle sidebar" 
+          data-tooltip={t('common.menu')} 
           data-tooltip-position="right"
         >
-          <img src="/icon/panel-left.svg" alt="Toggle Left Sidebar" />
+          <img src="/icon/panel-left.svg" alt={t('common.menu')} />
         </button>
         
         <div className="title-container">
           <div className="title-display" title={currentNote?.title || ''}>
-            {displayTitle || 'Untitled'}
+            {displayTitle || t('editor.untitled')}
           </div>
           <button 
             className="title-edit-btn"
             onClick={handleEditClick}
-            data-tooltip="Edit title"
+            data-tooltip={t('common.edit')}
             data-tooltip-position="bottom"
             disabled={isTypingTitle}
           >
-            <img src="/icon/pencil.svg" alt="Edit" />
+            <img src="/icon/pencil.svg" alt={t('common.edit')} />
           </button>
           
           {/* Token Badge - automatically gets model from RewriteContext */}
@@ -252,34 +254,34 @@ const AIStudioEditorEnhanced = ({
             <button 
               className="done-highlights-btn"
               onClick={() => setShowHighlights(false)}
-              data-tooltip="Hide highlights"
+              data-tooltip={t('common.hide')}
             >
-              <img src="/icon/eye-off.svg" alt="hide" />
-              <span>Done</span>
+              <img src="/icon/eye-off.svg" alt={t('common.hide')} />
+              <span>{t('common.done')}</span>
             </button>
           )}
 
           <button 
             className="icon-btn" 
             onClick={onCreateNote}
-            data-tooltip="Create new note"
+            data-tooltip={t('common.new')}
           >
-            <img src="/icon/plus.svg" alt="Add" />
+            <img src="/icon/plus.svg" alt={t('common.new')} />
           </button>
           <button 
             className="icon-btn" 
             onClick={handleShare}
-            data-tooltip="Share note"
+            data-tooltip={t('common.share')}
           >
-            <img src="/icon/share-2.svg" alt="Share" />
+            <img src="/icon/share-2.svg" alt={t('common.share')} />
           </button>
           {rightSidebarHidden && (
             <button 
               className="icon-btn" 
               onClick={onToggleRightSidebar}
-              data-tooltip="Hiện sidebar"
+              data-tooltip={t('nav.sidebar')}
             >
-              <img src="/icon/panel-right.svg" alt="Toggle Right Sidebar" />
+              <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} />
             </button>
           )}
         </div>
@@ -291,7 +293,7 @@ const AIStudioEditorEnhanced = ({
           onChange={handleContentChange}
           analysis={analysis}
           disabled={isProcessing}
-          placeholder="Enter content..."
+          placeholder={t('editor.enterYourText')}
           showHighlights={showHighlights}
           onHighlightsChange={setHasHighlights}
           showRewriteToolbar={true}

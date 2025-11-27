@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import ReactMarkdown from 'react-markdown'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import './ChatMessage.css'
 
 const ChatMessage = ({ message }) => {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
   const { retryLastMessage, isLoading } = useWorkspace()
   const isUser = message.role === 'user'
@@ -56,7 +58,7 @@ const ChatMessage = ({ message }) => {
                       />
                     ) : (
                       <div className="chat-attachment-file">
-                        <img src="/icon/file.svg" alt="File" />
+                        <img src="/icon/file.svg" alt={t('chat.file')} />
                         <span>{attachment.name}</span>
                       </div>
                     )}
@@ -70,18 +72,16 @@ const ChatMessage = ({ message }) => {
             {isError ? (
               <div className="chat-message-error-content">
                 <div className="chat-error-header">
-                  <img src={getErrorIcon()} alt="Error" className="chat-error-icon" />
+                  <img src={getErrorIcon()} alt={t('common.error')} className="chat-error-icon" />
                   <span className="chat-error-text">{message.content}</span>
                 </div>
                 <button 
                   className="chat-retry-btn"
                   onClick={handleRetry}
                   disabled={isLoading}
-                  data-tooltip="Retry message"
-                  data-tooltip-position="top"
                 >
-                  <img src="/icon/refresh-cw.svg" alt="Retry" />
-                  <span>Retry</span>
+                  <img src="/icon/refresh-cw.svg" alt={t('common.retry')} />
+                  <span>{t('common.retry')}</span>
                 </button>
               </div>
             ) : (
@@ -95,10 +95,10 @@ const ChatMessage = ({ message }) => {
                   <button 
                     className="chat-message-copy"
                     onClick={handleCopy}
-                    data-tooltip={copied ? 'Copied!' : 'Copy'}
+                    data-tooltip={copied ? t('common.copied') : t('common.copy')}
                     data-tooltip-position="top"
                   >
-                    <img src={copied ? "/icon/check.svg" : "/icon/copy.svg"} alt="Copy" />
+                    <img src={copied ? "/icon/check.svg" : "/icon/copy.svg"} alt={t('common.copy')} />
                   </button>
                 )}
               </>

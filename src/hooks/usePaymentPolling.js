@@ -26,7 +26,7 @@ export function usePaymentPolling() {
     setIsPolling(true);
     setPurchaseResult(null);
     
-    console.log('🔄 Started payment polling');
+    console.log('[SYNC] Started payment polling');
   }, [isPolling]);
 
   // Stop polling
@@ -58,7 +58,7 @@ export function usePaymentPolling() {
       const data = await response.json();
       
       if (data.success && data.hasPurchase) {
-        console.log('✅ Payment detected!', data.order);
+        console.log('[SUCCESS] Payment detected!', data.order);
         setPurchaseResult({
           order: data.order,
           credits: data.credits

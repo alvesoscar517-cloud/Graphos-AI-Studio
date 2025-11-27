@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔧 Running automatic error fixer...\n');
+console.log('[SETTINGS] Running automatic error fixer...\n');
 
 let fixCount = 0;
 
@@ -19,11 +19,11 @@ function checkPackageLock() {
     if (fs.existsSync(lockPath)) {
       const content = fs.readFileSync(lockPath, 'utf8');
       JSON.parse(content);
-      console.log('✅ package-lock.json is valid');
+      console.log('[SUCCESS] package-lock.json is valid');
     }
   } catch (e) {
-    console.log('❌ package-lock.json is corrupted');
-    console.log('🔧 Fixing: Removing corrupted package-lock.json');
+    console.log('[FAIL] package-lock.json is corrupted');
+    console.log('[SETTINGS] Fixing: Removing corrupted package-lock.json');
     fs.unlinkSync(lockPath);
     console.log('💡 Run: npm install');
     fixCount++;
@@ -34,12 +34,12 @@ function checkPackageLock() {
 function checkViteCache() {
   const cachePath = path.join(__dirname, '..', 'node_modules', '.vite');
   if (fs.existsSync(cachePath)) {
-    console.log('🔧 Clearing Vite cache...');
+    console.log('[SETTINGS] Clearing Vite cache...');
     fs.rmSync(cachePath, { recursive: true, force: true });
-    console.log('✅ Vite cache cleared');
+    console.log('[SUCCESS] Vite cache cleared');
     fixCount++;
   } else {
-    console.log('✅ No Vite cache to clear');
+    console.log('[SUCCESS] No Vite cache to clear');
   }
 }
 
@@ -49,10 +49,10 @@ function checkEnvFiles() {
   const env = path.join(__dirname, '..', '.env');
   
   if (!fs.existsSync(env) && fs.existsSync(envExample)) {
-    console.log('⚠️  .env file not found');
+    console.log('[WARNING]  .env file not found');
     console.log('💡 Copy .env.example to .env and fill in your values');
   } else {
-    console.log('✅ .env file exists');
+    console.log('[SUCCESS] .env file exists');
   }
   
   // Backend
@@ -60,10 +60,10 @@ function checkEnvFiles() {
   const backendEnv = path.join(__dirname, '..', 'backend', '.env');
   
   if (!fs.existsSync(backendEnv) && fs.existsSync(backendEnvExample)) {
-    console.log('⚠️  backend/.env file not found');
+    console.log('[WARNING]  backend/.env file not found');
     console.log('💡 Copy backend/.env.example to backend/.env and fill in your values');
   } else {
-    console.log('✅ backend/.env file exists');
+    console.log('[SUCCESS] backend/.env file exists');
   }
 }
 
@@ -71,18 +71,18 @@ function checkEnvFiles() {
 function checkNodeModules() {
   const nodeModules = path.join(__dirname, '..', 'node_modules');
   if (!fs.existsSync(nodeModules)) {
-    console.log('⚠️  node_modules not found');
+    console.log('[WARNING]  node_modules not found');
     console.log('💡 Run: npm install');
   } else {
-    console.log('✅ node_modules exists');
+    console.log('[SUCCESS] node_modules exists');
   }
   
   const backendNodeModules = path.join(__dirname, '..', 'backend', 'node_modules');
   if (!fs.existsSync(backendNodeModules)) {
-    console.log('⚠️  backend/node_modules not found');
+    console.log('[WARNING]  backend/node_modules not found');
     console.log('💡 Run: cd backend && npm install');
   } else {
-    console.log('✅ backend/node_modules exists');
+    console.log('[SUCCESS] backend/node_modules exists');
   }
 }
 
@@ -107,17 +107,17 @@ function checkSyntaxErrors() {
         const closeParens = (content.match(/\)/g) || []).length;
         
         if (openBraces !== closeBraces) {
-          console.log(`⚠️  ${file}: Mismatched braces (${openBraces} open, ${closeBraces} close)`);
+          console.log(`[WARNING]  ${file}: Mismatched braces (${openBraces} open, ${closeBraces} close)`);
         } else if (openParens !== closeParens) {
-          console.log(`⚠️  ${file}: Mismatched parentheses (${openParens} open, ${closeParens} close)`);
+          console.log(`[WARNING]  ${file}: Mismatched parentheses (${openParens} open, ${closeParens} close)`);
         } else {
-          console.log(`✅ ${file}: No obvious syntax errors`);
+          console.log(`[SUCCESS] ${file}: No obvious syntax errors`);
         }
       } catch (e) {
-        console.log(`❌ ${file}: Cannot read file`);
+        console.log(`[FAIL] ${file}: Cannot read file`);
       }
     } else {
-      console.log(`⚠️  ${file}: File not found`);
+      console.log(`[WARNING]  ${file}: File not found`);
     }
   });
 }
@@ -140,9 +140,9 @@ checkSyntaxErrors();
 
 console.log('\n' + '='.repeat(60));
 if (fixCount > 0) {
-  console.log(`✅ Fixed ${fixCount} issue(s)`);
+  console.log(`[SUCCESS] Fixed ${fixCount} issue(s)`);
   console.log('💡 Restart your dev server to apply changes');
 } else {
-  console.log('✅ No issues found');
+  console.log('[SUCCESS] No issues found');
 }
 console.log('='.repeat(60));

@@ -9,11 +9,11 @@ const compromise = require('compromise');
 const tokenizer = new natural.WordTokenizer();
 
 // ============================================================================
-// INDUSTRY BENCHMARKS - Chuẩn ngành để so sánh
+// INDUSTRY BENCHMARKS - Industry standards for comparison
 // ============================================================================
 
 const BENCHMARKS = {
-  // Chuẩn cho văn bản tiếng Anh
+  // Standards for English text
   en: {
     blog: {
       avgWordLength: { min: 4.0, max: 5.5, ideal: 4.8 },
@@ -44,7 +44,7 @@ const BENCHMARKS = {
       punctuationRatio: { min: 0.06, max: 0.14, ideal: 0.1 }
     }
   },
-  // Chuẩn cho văn bản tiếng Việt
+  // Standards for Vietnamese text
   vi: {
     blog: {
       avgWordLength: { min: 3.0, max: 4.5, ideal: 3.8 },
@@ -77,25 +77,25 @@ const BENCHMARKS = {
   }
 };
 
-// Từ nối tiếng Việt mở rộng
+// Extended English transition words
 const VIETNAMESE_TRANSITION_WORDS = [
-  // Bổ sung/liệt kê
-  'ngoài ra', 'thêm vào đó', 'hơn nữa', 'bên cạnh đó', 'cũng', 'đồng thời', 'mặt khác',
-  'không những', 'chẳng những', 'vừa', 'lại còn', 'thậm chí', 'nhất là', 'đặc biệt',
-  // Nguyên nhân/kết quả
-  'vì vậy', 'do đó', 'vì thế', 'cho nên', 'bởi vì', 'vì', 'do', 'bởi', 'nên',
-  'kết quả là', 'hậu quả là', 'dẫn đến', 'gây ra', 'từ đó', 'nhờ đó', 'nhờ vậy',
-  // Tương phản
-  'tuy nhiên', 'nhưng', 'song', 'mà', 'thế nhưng', 'tuy vậy', 'dù vậy', 'mặc dù',
-  'dù', 'cho dù', 'dẫu', 'tuy', 'ngược lại', 'trái lại', 'trong khi đó',
-  // Thời gian/trình tự
-  'đầu tiên', 'trước hết', 'trước tiên', 'thứ nhất', 'thứ hai', 'thứ ba', 'tiếp theo',
-  'sau đó', 'tiếp đến', 'cuối cùng', 'kết luận', 'tóm lại', 'nói chung', 'nhìn chung',
-  // Điều kiện
-  'nếu', 'giả sử', 'trong trường hợp', 'miễn là', 'với điều kiện', 'trừ khi',
-  // Nhấn mạnh
-  'thực ra', 'thật ra', 'trên thực tế', 'rõ ràng', 'hiển nhiên', 'chắc chắn',
-  'quả thật', 'đúng là', 'thực sự', 'rõ ràng là'
+  // Addition/listing
+  'moreover', 'furthermore', 'additionally', 'besides', 'also', 'meanwhile', 'on the other hand',
+  'not only', 'not just', 'both', 'as well as', 'even', 'especially', 'in particular',
+  // Cause/result
+  'therefore', 'thus', 'hence', 'consequently', 'because', 'since', 'as', 'due to',
+  'as a result', 'as a consequence', 'leads to', 'causes', 'from this', 'thanks to', 'because of this',
+  // Contrast
+  'however', 'but', 'yet', 'still', 'nevertheless', 'nonetheless', 'although', 'though',
+  'even though', 'despite', 'in spite of', 'conversely', 'on the contrary', 'while',
+  // Time/sequence
+  'first', 'firstly', 'initially', 'first of all', 'second', 'third', 'next',
+  'then', 'after that', 'finally', 'in conclusion', 'in summary', 'overall', 'in general',
+  // Condition
+  'if', 'suppose', 'in case', 'provided that', 'on condition that', 'unless',
+  // Emphasis
+  'actually', 'really', 'in fact', 'clearly', 'obviously', 'certainly',
+  'indeed', 'truly', 'actually', 'clearly'
 ];
 
 // ============================================================================
@@ -127,7 +127,7 @@ function calculateStatistics(text) {
   const punctuationCount = (text.match(/[,;:!?]/g) || []).length;
   const punctuationRatio = words.length > 0 ? punctuationCount / words.length : 0;
 
-  // Tính syllable và readability theo ngôn ngữ
+  // Calculate syllable and readability by language
   const syllableCount = lang === 'vi' 
     ? countVietnameseSyllables(text)
     : words.reduce((sum, word) => sum + countSyllables(word), 0);
@@ -152,7 +152,7 @@ function calculateStatistics(text) {
     .slice(0, 5)
     .map(([starter]) => starter);
 
-  // Transition words frequency - theo ngôn ngữ
+  // Transition words frequency - by language
   const transitionWords = lang === 'vi' 
     ? VIETNAMESE_TRANSITION_WORDS
     : [
@@ -165,7 +165,7 @@ function calculateStatistics(text) {
   const transitionCounts = {};
   
   transitionWords.forEach(tw => {
-    // Với tiếng Việt, không cần word boundary vì từ được phân cách bằng dấu cách
+    // For Vietnamese, no word boundary needed as words are separated by spaces
     const regex = lang === 'vi' 
       ? new RegExp(tw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
       : new RegExp(`\\b${tw}\\b`, 'gi');
@@ -202,30 +202,30 @@ function calculateStatistics(text) {
 }
 
 /**
- * Đếm âm tiết tiếng Việt - mỗi từ tiếng Việt thường là 1 âm tiết
+ * Count Vietnamese syllables - each Vietnamese word is typically 1 syllable
  */
 function countVietnameseSyllables(text) {
-  // Tiếng Việt: mỗi từ (phân cách bằng dấu cách) thường là 1 âm tiết
+  // Vietnamese: each word (separated by spaces) is typically 1 syllable
   const words = text.split(/\s+/).filter(w => w.length > 0);
   return words.length;
 }
 
 /**
- * Tính readability cho tiếng Việt
- * Dựa trên: độ dài câu trung bình và độ dài từ trung bình
- * Công thức tùy chỉnh cho tiếng Việt
+ * Calculate readability for Vietnamese
+ * Based on: average sentence length and average word length
+ * Custom formula for Vietnamese
  */
 function calculateVietnameseReadability(wordCount, sentenceCount, avgSentenceLength, avgWordLength) {
   if (sentenceCount === 0 || wordCount === 0) return 0;
   
-  // Công thức readability cho tiếng Việt:
-  // - Câu ngắn hơn = dễ đọc hơn
-  // - Từ ngắn hơn = dễ đọc hơn
-  // Điểm cơ sở: 100
-  // Trừ điểm theo độ dài câu và từ
+  // Readability formula for Vietnamese:
+  // - Shorter sentences = more readable
+  // - Shorter words = more readable
+  // Base score: 100
+  // Deduct points based on sentence and word length
   
-  const sentencePenalty = Math.max(0, (avgSentenceLength - 15) * 2); // Câu > 15 từ bị trừ điểm
-  const wordPenalty = Math.max(0, (avgWordLength - 3.5) * 10); // Từ > 3.5 ký tự bị trừ điểm
+  const sentencePenalty = Math.max(0, (avgSentenceLength - 15) * 2); // Sentences > 15 words lose points
+  const wordPenalty = Math.max(0, (avgWordLength - 3.5) * 10); // Words > 3.5 characters lose points
   
   const score = 100 - sentencePenalty - wordPenalty;
   return Math.max(0, Math.min(100, score));
@@ -249,11 +249,11 @@ function calculateReadability(wordCount, sentenceCount, syllableCount) {
 }
 
 /**
- * So sánh stats với profile và benchmark
- * @param {Object} textStats - Thống kê văn bản hiện tại
- * @param {Object} profileStats - Thống kê từ profile (optional)
- * @param {string} styleType - Loại văn bản: 'blog', 'academic', 'casual', 'professional'
- * @returns {Object} - Kết quả so sánh với gợi ý cải thiện
+ * Compare stats with profile and benchmark
+ * @param {Object} textStats - Current text statistics
+ * @param {Object} profileStats - Statistics from profile (optional)
+ * @param {string} styleType - Text type: 'blog', 'academic', 'casual', 'professional'
+ * @returns {Object} - Comparison result with improvement suggestions
  */
 function compareWithBenchmark(textStats, profileStats = null, styleType = 'blog') {
   const lang = textStats.detectedLanguage || 'en';
@@ -264,7 +264,7 @@ function compareWithBenchmark(textStats, profileStats = null, styleType = 'blog'
   let overallScore = 0;
   let totalMetrics = 0;
 
-  // So sánh từng metric
+  // Compare each metric
   const metrics = ['avgWordLength', 'avgSentenceLength', 'readabilityScore', 'vocabularyRichness', 'punctuationRatio'];
   
   metrics.forEach(metric => {
@@ -276,7 +276,7 @@ function compareWithBenchmark(textStats, profileStats = null, styleType = 'blog'
     
     totalMetrics++;
     
-    // Tính điểm so với benchmark
+    // Calculate score against benchmark
     let benchmarkScore = 100;
     let status = 'good';
     let deviation = 0;
@@ -290,15 +290,15 @@ function compareWithBenchmark(textStats, profileStats = null, styleType = 'blog'
       benchmarkScore = Math.max(0, 100 - deviation);
       status = 'high';
     } else {
-      // Trong khoảng tốt, tính điểm dựa trên khoảng cách với ideal
+      // Within good range, calculate score based on distance from ideal
       const distanceFromIdeal = Math.abs(value - bench.ideal);
       const maxDistance = Math.max(bench.ideal - bench.min, bench.max - bench.ideal);
-      benchmarkScore = 100 - (distanceFromIdeal / maxDistance) * 20; // Tối đa trừ 20 điểm
+      benchmarkScore = 100 - (distanceFromIdeal / maxDistance) * 20; // Max deduction 20 points
     }
     
     overallScore += benchmarkScore;
     
-    // So sánh với profile nếu có
+    // Compare with profile if available
     let profileComparison = null;
     if (profileValue !== undefined) {
       const profileDiff = ((value - profileValue) / profileValue) * 100;
@@ -318,7 +318,7 @@ function compareWithBenchmark(textStats, profileStats = null, styleType = 'blog'
       profileComparison
     };
     
-    // Tạo gợi ý cải thiện
+    // Generate improvement suggestions
     if (status !== 'good') {
       suggestions.push(generateSuggestion(metric, status, value, bench, lang));
     }
@@ -334,58 +334,58 @@ function compareWithBenchmark(textStats, profileStats = null, styleType = 'blog'
 }
 
 /**
- * Tạo gợi ý cải thiện dựa trên metric
+ * Generate improvement suggestions based on metric
  */
 function generateSuggestion(metric, status, value, benchmark, lang) {
   const suggestions = {
     avgWordLength: {
       low: {
         en: `Your average word length (${value.toFixed(1)}) is below the recommended range. Consider using more descriptive vocabulary.`,
-        vi: `Độ dài từ trung bình (${value.toFixed(1)}) thấp hơn khuyến nghị. Hãy sử dụng từ vựng phong phú hơn.`
+        vi: `Your average word length (${value.toFixed(1)}) is below the recommended range. Consider using more descriptive vocabulary.`
       },
       high: {
         en: `Your average word length (${value.toFixed(1)}) is above the recommended range. Consider simplifying some complex words.`,
-        vi: `Độ dài từ trung bình (${value.toFixed(1)}) cao hơn khuyến nghị. Hãy đơn giản hóa một số từ phức tạp.`
+        vi: `Your average word length (${value.toFixed(1)}) is above the recommended range. Consider simplifying some complex words.`
       }
     },
     avgSentenceLength: {
       low: {
         en: `Your sentences are quite short (avg ${value.toFixed(0)} words). Consider combining some ideas for better flow.`,
-        vi: `Câu của bạn khá ngắn (TB ${value.toFixed(0)} từ). Hãy kết hợp một số ý để văn bản mạch lạc hơn.`
+        vi: `Your sentences are quite short (avg ${value.toFixed(0)} words). Consider combining some ideas for better flow.`
       },
       high: {
         en: `Your sentences are quite long (avg ${value.toFixed(0)} words). Consider breaking them into shorter sentences for clarity.`,
-        vi: `Câu của bạn khá dài (TB ${value.toFixed(0)} từ). Hãy chia thành các câu ngắn hơn để dễ đọc.`
+        vi: `Your sentences are quite long (avg ${value.toFixed(0)} words). Consider breaking them into shorter sentences for clarity.`
       }
     },
     readabilityScore: {
       low: {
         en: `Readability score (${value.toFixed(0)}) is low. Try using simpler words and shorter sentences.`,
-        vi: `Điểm dễ đọc (${value.toFixed(0)}) thấp. Hãy dùng từ đơn giản và câu ngắn hơn.`
+        vi: `Readability score (${value.toFixed(0)}) is low. Try using simpler words and shorter sentences.`
       },
       high: {
         en: `Readability score (${value.toFixed(0)}) is very high. Your text might be too simple for the target audience.`,
-        vi: `Điểm dễ đọc (${value.toFixed(0)}) rất cao. Văn bản có thể quá đơn giản cho đối tượng mục tiêu.`
+        vi: `Readability score (${value.toFixed(0)}) is very high. Your text might be too simple for the target audience.`
       }
     },
     vocabularyRichness: {
       low: {
         en: `Vocabulary richness (${(value * 100).toFixed(0)}%) is low. Try using more varied words to avoid repetition.`,
-        vi: `Độ phong phú từ vựng (${(value * 100).toFixed(0)}%) thấp. Hãy dùng từ đa dạng hơn để tránh lặp.`
+        vi: `Vocabulary richness (${(value * 100).toFixed(0)}%) is low. Try using more varied words to avoid repetition.`
       },
       high: {
         en: `Vocabulary richness (${(value * 100).toFixed(0)}%) is very high. Consider some repetition for emphasis and clarity.`,
-        vi: `Độ phong phú từ vựng (${(value * 100).toFixed(0)}%) rất cao. Có thể lặp lại một số từ để nhấn mạnh.`
+        vi: `Vocabulary richness (${(value * 100).toFixed(0)}%) is very high. Consider some repetition for emphasis and clarity.`
       }
     },
     punctuationRatio: {
       low: {
         en: `Punctuation usage is low. Consider adding commas or other punctuation for better rhythm.`,
-        vi: `Sử dụng dấu câu ít. Hãy thêm dấu phẩy hoặc dấu câu khác để văn bản có nhịp điệu hơn.`
+        vi: `Punctuation usage is low. Consider adding commas or other punctuation for better rhythm.`
       },
       high: {
         en: `Punctuation usage is high. Consider reducing excessive commas or punctuation marks.`,
-        vi: `Sử dụng dấu câu nhiều. Hãy giảm bớt dấu phẩy hoặc dấu câu thừa.`
+        vi: `Punctuation usage is high. Consider reducing excessive commas or punctuation marks.`
       }
     }
   };
@@ -720,7 +720,7 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
       type: 'length',
       severity: 'high',
       detail: lang === 'vi' 
-        ? `Câu quá dài (${sentenceLength} từ, trung bình: ${Math.round(profileStats.avgSentenceLength)} từ)`
+        ? `Sentence too long (${sentenceLength} words, avg: ${Math.round(profileStats.avgSentenceLength)})`
         : `Sentence too long (${sentenceLength} words, avg: ${Math.round(profileStats.avgSentenceLength)})`,
       metric: sentenceLength,
       threshold: profileStats.avgSentenceLength
@@ -730,7 +730,7 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
       type: 'length',
       severity: 'low',
       detail: lang === 'vi'
-        ? `Câu quá ngắn (${sentenceLength} từ)`
+        ? `Sentence too short (${sentenceLength} words)`
         : `Sentence too short (${sentenceLength} words)`,
       metric: sentenceLength,
       threshold: profileStats.avgSentenceLength
@@ -747,7 +747,7 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
       type: 'vocabulary',
       severity: 'medium',
       detail: lang === 'vi'
-        ? `Từ vựng phức tạp (độ dài từ TB: ${avgWordLen.toFixed(1)}, profile: ${profileStats.avgWordLength.toFixed(1)})`
+        ? `Complex vocabulary (avg word length: ${avgWordLen.toFixed(1)}, profile: ${profileStats.avgWordLength.toFixed(1)})`
         : `Complex vocabulary (avg word length: ${avgWordLen.toFixed(1)}, profile: ${profileStats.avgWordLength.toFixed(1)})`,
       metric: avgWordLen,
       threshold: profileStats.avgWordLength
@@ -768,10 +768,10 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
     
     // Vietnamese formal words
     const formalWordsVI = [
-      'triển khai', 'thực hiện', 'tiến hành', 'căn cứ', 'theo đó',
-      'nhằm mục đích', 'trên cơ sở', 'đối với', 'liên quan đến',
-      'trong khuôn khổ', 'phù hợp với', 'tuân thủ', 'ban hành',
-      'quy định', 'điều khoản', 'nghị quyết', 'chỉ thị', 'thông tư'
+      'implement', 'execute', 'conduct', 'basis', 'accordingly',
+      'aim', 'based on', 'regarding', 'related to',
+      'within', 'comply with', 'adhere', 'issue',
+      'regulation', 'provision', 'resolution', 'directive', 'circular'
     ];
     
     // Informal words (opposite check)
@@ -781,8 +781,8 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
     ];
     
     const informalWordsVI = [
-      'oke', 'ok', 'đc', 'dc', 'ko', 'k', 'nha', 'nhé', 'hen', 'hén',
-      'vậy á', 'dzậy', 'zậy', 'bùn', 'buồn', 'vui ghê', 'quá trời'
+      'ok', 'okay', 'cool', 'hey', 'yeah', 'yep', 'nope', 'sure', 'alright', 'right',
+      'really', 'so', 'like', 'just', 'stuff', 'things', 'awesome', 'great'
     ];
     
     const formalWords = lang === 'vi' ? formalWordsVI : formalWordsEN;
@@ -797,7 +797,7 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
         type: 'formality',
         severity: 'high',
         detail: lang === 'vi'
-          ? `Từ vựng quá trang trọng cho profile (formality: ${formalityLevel}/10)`
+          ? `Vocabulary too formal for profile (formality: ${formalityLevel}/10)`
           : `Vocabulary too formal for profile (formality: ${formalityLevel}/10)`,
         examples: foundFormalWords.slice(0, 3),
         metric: foundFormalWords.length
@@ -810,7 +810,7 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
         type: 'formality',
         severity: 'medium',
         detail: lang === 'vi'
-          ? `Từ vựng quá thân mật cho profile (formality: ${formalityLevel}/10)`
+          ? `Vocabulary too informal for profile (formality: ${formalityLevel}/10)`
           : `Vocabulary too informal for profile (formality: ${formalityLevel}/10)`,
         examples: foundInformalWords.slice(0, 3),
         metric: foundInformalWords.length
@@ -820,11 +820,11 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
 
   // 4. TONE ANALYSIS
   const emotionalMarkersPositive = lang === 'vi'
-    ? ['tuyệt vời', 'xuất sắc', 'tuyệt hảo', 'hoàn hảo', 'tốt đẹp', 'rất tốt']
+    ? ['amazing', 'wonderful', 'excellent', 'fantastic', 'incredible', 'awesome']
     : ['amazing', 'wonderful', 'excellent', 'fantastic', 'incredible', 'awesome'];
   
   const emotionalMarkersNegative = lang === 'vi'
-    ? ['tệ hại', 'kinh khủng', 'thảm họa', 'tồi tệ', 'ghê tởm', 'khủng khiếp']
+    ? ['terrible', 'horrible', 'awful', 'disgusting', 'dreadful', 'catastrophic']
     : ['terrible', 'horrible', 'awful', 'disgusting', 'dreadful', 'catastrophic'];
   
   const foundPositive = emotionalMarkersPositive.filter(w => sentenceLower.includes(w));
@@ -836,7 +836,7 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
         type: 'tone',
         severity: 'medium',
         detail: lang === 'vi'
-          ? `Ngôn ngữ cảm xúc không phù hợp với tone ${voiceProfile.tone}`
+          ? `Emotional language doesn't match ${voiceProfile.tone} tone`
           : `Emotional language doesn't match ${voiceProfile.tone} tone`,
         examples: [...foundPositive, ...foundNegative].slice(0, 3),
         metric: foundPositive.length + foundNegative.length
@@ -858,10 +858,10 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
         type: 'coherence',
         severity: 'low',
         detail: lang === 'vi'
-          ? 'Câu có thể thiếu liên kết với câu trước'
+          ? 'Sentence may lack connection to previous sentence'
           : 'Sentence may lack connection to previous sentence',
         suggestion: lang === 'vi'
-          ? 'Cân nhắc thêm từ nối hoặc tham chiếu'
+          ? 'Consider adding transition or reference'
           : 'Consider adding transition or reference'
       });
     }
@@ -885,7 +885,7 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
       type: 'repetition',
       severity: 'low',
       detail: lang === 'vi'
-        ? `Lặp từ trong câu: ${repeatedWords.join(', ')}`
+        ? `Word repetition in sentence: ${repeatedWords.join(', ')}`
         : `Word repetition in sentence: ${repeatedWords.join(', ')}`,
       examples: repeatedWords,
       metric: repeatedWords.length
@@ -920,7 +920,7 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
       type: 'punctuation',
       severity: 'low',
       detail: lang === 'vi'
-        ? `Quá nhiều dấu câu (${punctuationCount} dấu)`
+        ? `Excessive punctuation (${punctuationCount} marks)`
         : `Excessive punctuation (${punctuationCount} marks)`,
       metric: punctuationCount,
       threshold: expectedPunctuation
@@ -991,8 +991,8 @@ function detectLanguage(text) {
   const textLower = text.toLowerCase();
   
   // Vietnamese indicators
-  const vietnameseChars = /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/;
-  const vietnameseWords = ['của', 'và', 'là', 'trong', 'có', 'được', 'cho', 'này', 'với', 'không', 'những', 'một', 'các', 'để', 'người'];
+  const vietnameseChars = /[a-z]/;
+  const vietnameseWords = ['of', 'and', 'is', 'in', 'have', 'be', 'for', 'this', 'with', 'not', 'some', 'one', 'all', 'to', 'person'];
   
   // Check for Vietnamese characters
   if (vietnameseChars.test(textLower)) {
@@ -1024,10 +1024,10 @@ function getTransitionWords(lang) {
       'first', 'second', 'third', 'finally', 'then', 'next', 'lastly'
     ],
     vi: [
-      'tuy nhiên', 'vì vậy', 'do đó', 'ngoài ra', 'nhưng', 'và', 'nên',
-      'bởi vì', 'mặc dù', 'trong khi', 'đồng thời', 'như vậy', 'vì thế',
-      'thêm vào đó', 'cũng', 'bên cạnh đó', 'tuy vậy', 'song',
-      'đầu tiên', 'thứ hai', 'thứ ba', 'cuối cùng', 'sau đó', 'tiếp theo'
+      'however', 'therefore', 'thus', 'moreover', 'but', 'and', 'so',
+      'because', 'although', 'while', 'meanwhile', 'like', 'so',
+      'additionally', 'also', 'besides', 'yet', 'still',
+      'first', 'second', 'third', 'finally', 'then', 'next'
     ]
   };
   

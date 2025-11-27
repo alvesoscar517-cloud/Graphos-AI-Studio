@@ -372,7 +372,7 @@
       <!-- Loading State -->
       <div id="loadingState" class="loading">
         <div class="spinner"></div>
-        <p class="loading-text">Đang tải nội dung...</p>
+        <p class="loading-text">Loading content...</p>
       </div>
 
       <!-- Error State -->
@@ -382,7 +382,7 @@
           <line x1="12" y1="8" x2="12" y2="12"></line>
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
         </svg>
-        <h2 class="error-title">Không thể tải nội dung</h2>
+        <h2 class="error-title">Unable to Load Content</h2>
         <p class="error-message" id="errorMessage"></p>
       </div>
 
@@ -390,7 +390,7 @@
       <div id="contentState" style="display: none;">
         <!-- Install Prompt (shown if extension not installed) -->
         <div id="installPrompt" class="install-prompt" style="display: none;">
-          <h2>📥 Cài đặt Extension để xem đầy đủ</h2>
+          <h2>📥 Install Extension để xem đầy đủ</h2>
           <p>Để xem và nhập nội dung này vào ứng dụng của bạn, vui lòng cài đặt AI Content Authenticator extension.</p>
           <a href="#" id="installBtn" class="btn btn-primary">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -398,7 +398,7 @@
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            Cài đặt Extension
+            Install Extension
           </a>
         </div>
 
@@ -417,7 +417,7 @@
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
-            Đóng
+            Close
           </button>
           <button class="btn btn-primary" id="openInExtensionBtn" style="display: none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -425,7 +425,7 @@
               <polyline points="15 3 21 3 21 9"></polyline>
               <line x1="10" y1="14" x2="21" y2="3"></line>
             </svg>
-            Mở trong Extension
+            Open in Extension
           </button>
         </div>
       </div>
@@ -447,7 +447,7 @@
     // Load shared content
     async function loadContent() {
       if (!shareId) {
-        showError('Không tìm thấy mã chia sẻ trong URL');
+        showError('Share code not found in URL');
         return;
       }
 
@@ -456,12 +456,12 @@
         
         if (!response.ok) {
           if (response.status === 404) {
-            throw new Error('Nội dung không tồn tại hoặc đã bị xóa');
+            throw new Error('Content does not exist or has been deleted');
           }
           if (response.status === 410) {
-            throw new Error('Nội dung đã hết hạn');
+            throw new Error('Content has expired');
           }
-          throw new Error('Không thể tải nội dung');
+          throw new Error('Unable to load content');
         }
 
         const data = await response.json();
@@ -492,7 +492,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
-          Cuộc trò chuyện
+          Conversation
         `;
       } else {
         badge.innerHTML = `
@@ -500,7 +500,7 @@
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
           </svg>
-          Văn bản
+          Text
         `;
       }
 
@@ -529,7 +529,7 @@
               </svg>
             </div>
             <div class="message-content">
-              <div class="message-role">${msg.role === 'user' ? 'Bạn' : 'AI'}</div>
+              <div class="message-role">${msg.role === 'user' ? 'You' : 'AI'}</div>
               <div class="message-text">${escapeHtml(msg.content)}</div>
             </div>
           </div>

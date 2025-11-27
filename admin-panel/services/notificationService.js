@@ -153,7 +153,7 @@ export function simulateNotification(notification) {
       priority: notification.priority || 'medium',
       translations: notification.translations || {
         vi: {
-          title: notification.title || 'Thông báo',
+          title: notification.title || 'Notification',
           message: notification.message || '',
           cta: notification.cta || ''
         }

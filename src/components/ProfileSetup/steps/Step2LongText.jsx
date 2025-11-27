@@ -1,6 +1,7 @@
 /**
  * Step 2: Long Text Input (Paste or Upload)
  */
+import { useTranslation } from 'react-i18next'
 import LottieWrapper from '../LottieWrapper'
 import biometricAnimation from '../../../animation/biometric-authentication.json'
 
@@ -16,6 +17,8 @@ const Step2LongText = ({
   onNext,
   hasLongText
 }) => {
+  const { t } = useTranslation()
+
   return (
     <div className="step-content step-content-2 active">
       <div className="content-wrapper">
@@ -24,9 +27,9 @@ const Step2LongText = ({
         </div>
         <div className="form-container">
           <div className="step2-form-content">
-            <h1 className="step-title">Provide Long Text</h1>
+            <h1 className="step-title">{t('profileSetup.provideLongText')}</h1>
             <p className="step-description">
-              Paste or upload long articles, blogs, emails (300-800 words optimal) so AI can learn your argument structure and writing style.
+              {t('profileSetup.pasteOrUpload')}
             </p>
           
             <div className="option-cards">
@@ -41,8 +44,8 @@ const Step2LongText = ({
                   </svg>
                 </div>
                 <div className="option-content">
-                  <h3>Paste Text</h3>
-                  <p>Paste your articles, emails, blogs directly</p>
+                  <h3>{t('profileSetup.pasteText')}</h3>
+                  <p>{t('profileSetup.pasteArticles')}</p>
                 </div>
                 {hasPastedText && (
                   <div className="option-badge">
@@ -65,8 +68,8 @@ const Step2LongText = ({
                   </svg>
                 </div>
                 <div className="option-content">
-                  <h3>Upload Documents</h3>
-                  <p>Upload .docx, .pdf, .txt files from your computer</p>
+                  <h3>{t('profileSetup.uploadDocuments')}</h3>
+                  <p>{t('profileSetup.uploadFiles')}</p>
                 </div>
                 {hasUploadedFiles && (
                   <div className="option-badge">
@@ -86,10 +89,10 @@ const Step2LongText = ({
                     <img src="/icon/check-circle.svg" alt="" width="18" height="18" />
                   </div>
                   <div className="saved-chunks-content">
-                    <span className="saved-chunks-label">Saved:</span>
+                    <span className="saved-chunks-label">{t('profileSetup.saved')}:</span>
                     <span className="saved-chunks-count">{totalWords}</span>
-                    <span className="saved-chunks-unit">/ 5000 words</span>
-                    <span className="saved-chunks-detail">({totalChunks} sections)</span>
+                    <span className="saved-chunks-unit">/ 5000 {t('common.words')}</span>
+                    <span className="saved-chunks-detail">({totalChunks} {t('profileSetup.sections')})</span>
                   </div>
                 </div>
                 <div className="saved-chunks-actions">
@@ -97,20 +100,20 @@ const Step2LongText = ({
                     <button 
                       className="btn-edit-text"
                       onClick={onOpenPasteModal}
-                      title="View and edit pasted text"
+                      title={t('profileSetup.viewEditPastedText')}
                     >
                       <img src="/icon/edit-2.svg" alt="" width="16" height="16" />
-                      <span>Edit Text</span>
+                      <span>{t('profileSetup.editText')}</span>
                     </button>
                   )}
                   {hasUploadedFiles && (
                     <button 
                       className="btn-edit-text"
                       onClick={onOpenUploadModal}
-                      title="View and manage uploaded files"
+                      title={t('profileSetup.viewManageFiles')}
                     >
                       <img src="/icon/file-text.svg" alt="" width="16" height="16" />
-                      <span>Manage Files</span>
+                      <span>{t('profileSetup.manageFiles')}</span>
                     </button>
                   )}
                 </div>
@@ -121,19 +124,19 @@ const Step2LongText = ({
                   <img src="/icon/info.svg" alt="" width="18" height="18" />
                 </div>
                 <div className="tip-content">
-                  <span className="tip-text">Provide 1000-2500 words for best AI learning. You can combine pasted text and file uploads (max 5000 words).</span>
+                  <span className="tip-text">{t('profileSetup.provide1000to5000')}</span>
                 </div>
               </div>
             )}
 
             <div className="button-group">
-              <button className="btn btn-secondary" onClick={onBack}>Back</button>
+              <button className="btn btn-secondary" onClick={onBack}>{t('common.back')}</button>
               <button 
                 className="btn btn-primary" 
                 disabled={!hasLongText}
                 onClick={onNext}
               >
-                Next
+                {t('common.next')}
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>

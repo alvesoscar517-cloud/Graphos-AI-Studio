@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import { truncateTitleByWords } from '../../../utils/titleUtils'
 import useAutoScrollbar from '../../../hooks/useAutoScrollbar'
@@ -10,6 +11,7 @@ import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
 
 const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden }) => {
+  const { t } = useTranslation()
   const { currentConversation, isLoading, updateConversationTitle, clearConversation } = useWorkspace()
   const messagesEndRef = useRef(null)
   const [title, setTitle] = useState('')
@@ -35,7 +37,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
       const truncatedTitle = truncateTitleByWords(newTitle, 7)
       
       // Only apply typing effect if title was just generated
-      if (currentConversation.titleGenerated && !currentConversation.userEditedTitle && newTitle !== 'New Chat') {
+      if (currentConversation.titleGenerated && !currentConversation.userEditedTitle && newTitle !== t('workspace.newChat')) {
         setIsTypingTitle(true)
         let currentIndex = 0
         
@@ -61,7 +63,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
         setDisplayTitle(truncatedTitle)
       }
     }
-  }, [currentConversation?.title, currentConversation?.titleGenerated])
+  }, [currentConversation?.title, currentConversation?.titleGenerated, t])
 
   useEffect(() => {
     if (currentConversation) {
@@ -72,8 +74,6 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
       }
     }
   }, [currentConversation, isTypingTitle])
-
-
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -143,10 +143,10 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
           <button 
             className="menu-btn icon-btn" 
             onClick={onToggleLeftSidebar}
-            data-tooltip="Toggle sidebar" 
+            data-tooltip={t('common.menu')} 
             data-tooltip-position="right"
           >
-            <img src="/icon/panel-left.svg" alt="Toggle Sidebar" />
+            <img src="/icon/panel-left.svg" alt={t('common.menu')} />
           </button>
 
           <div className="workspace-title-container">
@@ -159,11 +159,11 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
             <button 
               className="title-edit-btn"
               onClick={handleEditClick}
-              data-tooltip="Edit title"
+              data-tooltip={t('common.edit')}
               data-tooltip-position="bottom"
               disabled={isTypingTitle}
             >
-              <img src="/icon/pencil.svg" alt="Edit" />
+              <img src="/icon/pencil.svg" alt={t('common.edit')} />
             </button>
           </div>
 
@@ -171,28 +171,28 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
             <button 
               className="icon-btn"
               onClick={clearConversation}
-              data-tooltip="New chat" 
+              data-tooltip={t('common.new')} 
               data-tooltip-position="left"
             >
-              <img src="/icon/plus.svg" alt="New Chat" />
+              <img src="/icon/plus.svg" alt={t('workspace.newChat')} />
             </button>
             <button 
               className="icon-btn"
               onClick={handleShareClick}
-              data-tooltip="Share conversation" 
+              data-tooltip={t('common.share')} 
               data-tooltip-position="left"
               disabled={!currentConversation || currentConversation.messages.length === 0}
             >
-              <img src="/icon/share-2.svg" alt="Share" />
+              <img src="/icon/share-2.svg" alt={t('common.share')} />
             </button>
             {rightSidebarHidden && (
               <button 
                 className="icon-btn"
                 onClick={onToggleRightSidebar}
-                data-tooltip="Open sidebar" 
+                data-tooltip={t('nav.sidebar')} 
                 data-tooltip-position="left"
               >
-                <img src="/icon/panel-right.svg" alt="Toggle Right Sidebar" />
+                <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} />
               </button>
             )}
           </div>
@@ -207,9 +207,9 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
         {currentConversation?.messages.length === 0 ? (
           <div className="workspace-empty">
             <img src="/icon/message-circle.svg" alt="Empty" className="workspace-empty-icon" />
-            <h3 className="workspace-empty-title">Start a conversation</h3>
+            <h3 className="workspace-empty-title">{t('workspace.startConversation')}</h3>
             <p className="workspace-empty-desc">
-              Ask anything, AI will respond in your style
+              {t('workspace.askAnythingAI')}
             </p>
           </div>
         ) : (
@@ -236,10 +236,10 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
         <button 
           className="scroll-to-bottom-btn"
           onClick={scrollToBottom}
-          data-tooltip="Go to latest message"
+          data-tooltip={t('workspace.scrollDown')}
           data-tooltip-position="top"
         >
-          <img src="/icon/arrow-down.svg" alt="Scroll to bottom" />
+          <img src="/icon/arrow-down.svg" alt={t('workspace.scrollDown')} />
         </button>
       )}
       </div>

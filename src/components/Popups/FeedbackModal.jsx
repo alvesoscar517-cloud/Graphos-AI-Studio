@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { useNotification } from '../../hooks/useNotification'
 import './FeedbackModal.css'
 
 const FeedbackModal = ({ onClose }) => {
+  const { t } = useTranslation()
   const { success, error: showError } = useNotification()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
@@ -18,14 +20,14 @@ const FeedbackModal = ({ onClose }) => {
   const handleImageSelect = (e) => {
     const files = Array.from(e.target.files)
     if (images.length + files.length > 3) {
-      setError('Maximum 3 images')
+      setError(t('feedback.maxImages'))
       return
     }
 
     const newImages = []
     files.forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
-        setError('Image size must not exceed 5MB')
+        setError(t('feedback.imageSizeLimit'))
         return
       }
       const reader = new FileReader()
@@ -50,7 +52,7 @@ const FeedbackModal = ({ onClose }) => {
     e.preventDefault()
     
     if (!title.trim() || !content.trim()) {
-      setError('Please enter title and content')
+      setError(t('feedback.enterTitleAndContent'))
       return
     }
 
@@ -75,13 +77,13 @@ const FeedbackModal = ({ onClose }) => {
       const data = await response.json()
 
       if (response.ok) {
-        success('Thank you for your feedback! We will respond soon.')
+        success(t('feedback.thankYou'))
         onClose()
       } else {
-        setError(data.error || 'An error occurred, please try again')
+        setError(data.error || t('feedback.errorOccurred'))
       }
     } catch (err) {
-      setError('Unable to connect to server')
+      setError(t('feedback.unableToConnect'))
     } finally {
       setSending(false)
     }
@@ -95,30 +97,30 @@ const FeedbackModal = ({ onClose }) => {
     }}>
       <div className="feedback-modal" ref={modalRef} onClick={(e) => e.stopPropagation()}>
         <div className="feedback-modal-header">
-          <h2>Send Feedback</h2>
+          <h2>{t('feedback.sendFeedback')}</h2>
           <button className="feedback-close-btn" onClick={onClose}>
-            <img src="/icon/x.svg" alt="Close" />
+            <img src="/icon/x.svg" alt={t('common.close')} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="feedback-form">
           <div className="feedback-field">
-            <label>Title</label>
+            <label>{t('feedback.title')}</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter feedback title..."
+              placeholder={t('feedback.titlePlaceholder')}
               maxLength={100}
             />
           </div>
 
           <div className="feedback-field">
-            <label>Content</label>
+            <label>{t('feedback.content')}</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Describe your feedback in detail..."
+              placeholder={t('feedback.contentPlaceholder')}
               rows={6}
               maxLength={2000}
             />
@@ -126,7 +128,7 @@ const FeedbackModal = ({ onClose }) => {
           </div>
 
           <div className="feedback-field">
-            <label>Images (optional, max 3 images)</label>
+            <label>{t('feedback.imagesLabel')}</label>
             <div className="image-upload-area">
               <input
                 ref={fileInputRef}
@@ -142,8 +144,8 @@ const FeedbackModal = ({ onClose }) => {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={images.length >= 3}
               >
-                <img src="/icon/image-plus.svg" alt="Upload" />
-                <span>Add Image</span>
+                <img src="/icon/image-plus.svg" alt={t('feedback.addImage')} />
+                <span>{t('feedback.addImage')}</span>
               </button>
 
               {images.length > 0 && (
@@ -156,7 +158,7 @@ const FeedbackModal = ({ onClose }) => {
                         className="remove-image-btn"
                         onClick={() => removeImage(index)}
                       >
-                        <img src="/icon/x.svg" alt="Remove" />
+                        <img src="/icon/x.svg" alt={t('common.remove')} />
                       </button>
                     </div>
                   ))}
@@ -169,10 +171,10 @@ const FeedbackModal = ({ onClose }) => {
 
           <div className="feedback-actions">
             <button type="button" className="btn-cancel" onClick={onClose}>
-              Cancel
+              {t('common.cancel')}
             </button>
             <button type="submit" className="btn-submit" disabled={sending}>
-              {sending ? 'Sending...' : 'Send Feedback'}
+              {sending ? t('feedback.sending') : t('feedback.sendFeedback')}
             </button>
           </div>
         </form>

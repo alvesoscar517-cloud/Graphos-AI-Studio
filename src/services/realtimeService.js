@@ -34,7 +34,7 @@ class RealtimeService {
    */
   connect(userId) {
     if (!userId) {
-      console.warn('⚠️ RealtimeService: userId required');
+      console.warn('[WARNING] RealtimeService: userId required');
       return;
     }
 
@@ -60,7 +60,7 @@ class RealtimeService {
     this.eventSource = new EventSource(url);
 
     this.eventSource.onopen = () => {
-      console.log('✅ RealtimeService: Connected');
+      console.log('[SUCCESS] RealtimeService: Connected');
       this.reconnectAttempts = 0;
       this.isConnecting = false;
       this.connectionStatus = 'connected';
@@ -86,13 +86,13 @@ class RealtimeService {
 
     this.eventSource.addEventListener('notification', (e) => {
       const data = JSON.parse(e.data);
-      console.log('🔔 Notification:', data);
+      console.log('[BELL] Notification:', data);
       this._notify('notification', data);
     });
 
     this.eventSource.addEventListener('profile', (e) => {
       const data = JSON.parse(e.data);
-      console.log('👤 Profile update:', data);
+      console.log('[USER] Profile update:', data);
       this._notify('profile', data);
     });
 
@@ -101,7 +101,7 @@ class RealtimeService {
     });
 
     this.eventSource.onerror = (error) => {
-      console.error('❌ RealtimeService: Error', error);
+      console.error('[FAIL] RealtimeService: Error', error);
       this.eventSource.close();
       this.eventSource = null;
       this.connectionStatus = 'disconnected';
@@ -183,14 +183,14 @@ class RealtimeService {
 
   _attemptReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.log('⚠️ RealtimeService: Max reconnect attempts reached');
+      console.log('[WARNING] RealtimeService: Max reconnect attempts reached');
       return;
     }
 
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(1.5, this.reconnectAttempts - 1);
     
-    console.log(`🔄 RealtimeService: Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
+    console.log(`[SYNC] RealtimeService: Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
     
     this.reconnectTimeout = setTimeout(() => {
       if (this.userId) {

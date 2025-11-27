@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { useNotification } from '../../hooks/useNotification'
 import './BillingSupportModal.css'
 
 const BillingSupportModal = ({ onClose }) => {
+  const { t } = useTranslation()
   const { success, error: showError } = useNotification()
   const [category, setCategory] = useState('')
   const [subject, setSubject] = useState('')
@@ -15,27 +17,25 @@ const BillingSupportModal = ({ onClose }) => {
   const modalRef = useRef(null)
 
   const categories = [
-    'Billing Issue',
-    'Payment Failed',
-    'Refund Request',
-    'Credit Purchase',
-    'Invoice',
-    'Other'
+    { key: 'billingIssue', label: t('billing.billingIssue') },
+    { key: 'paymentFailed', label: t('billing.paymentFailed') },
+    { key: 'refundRequest', label: t('billing.refundRequest') },
+    { key: 'creditPurchase', label: t('billing.creditPurchase') },
+    { key: 'invoice', label: t('billing.invoice') },
+    { key: 'other', label: t('billing.other') }
   ]
-
-  // No need for useEffect anymore since onClick is handled directly on overlay
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files)
     if (attachments.length + files.length > 3) {
-      setError('Maximum 3 attachments allowed')
+      setError(t('errors.maxAttachments'))
       return
     }
 
     const newAttachments = []
     files.forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
-        setError('File size must not exceed 5MB')
+        setError(t('errors.fileSizeLimit'))
         return
       }
       const reader = new FileReader()
@@ -60,7 +60,7 @@ const BillingSupportModal = ({ onClose }) => {
     e.preventDefault()
     
     if (!category || !subject.trim() || !description.trim()) {
-      setError('Please fill in all required information')
+      setError(t('errors.fillAllRequired'))
       return
     }
 
@@ -74,9 +74,9 @@ const BillingSupportModal = ({ onClose }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          type: 'billing_support', // Distinguish from feedback
+          type: 'billing_support',
           category,
-          priority: 'high', // Default high since users always want priority
+          priority: 'high',
           title: subject,
           content: description,
           images: attachments.map(att => att.data),
@@ -88,13 +88,13 @@ const BillingSupportModal = ({ onClose }) => {
       const data = await response.json()
 
       if (response.ok) {
-        success('Support request sent! We will respond within 24 hours.')
+        success(t('billing.supportRequestSent'))
         onClose()
       } else {
-        setError(data.error || 'An error occurred, please try again')
+        setError(data.error || t('feedback.errorOccurred'))
       }
     } catch (err) {
-      setError('Unable to connect to server')
+      setError(t('feedback.unableToConnect'))
     } finally {
       setSending(false)
     }
@@ -109,14 +109,14 @@ const BillingSupportModal = ({ onClose }) => {
       <div className="billing-modal" ref={modalRef} onClick={(e) => e.stopPropagation()}>
         <div className="billing-modal-header">
           <div className="billing-header-content">
-            <img src="/icon/dollar-sign.svg" alt="Billing" className="billing-icon" />
+            <img src="/icon/dollar-sign.svg" alt={t('settings.billingSupport')} className="billing-icon" />
             <div className="billing-header-text">
-              <h2>Billing Support</h2>
-              <p>Chúng tôi sẵn sàng hỗ trợ bạn 24/7</p>
+              <h2>{t('settings.billingSupport')}</h2>
+              <p>{t('billing.readyToSupport')}</p>
             </div>
           </div>
           <button className="billing-close-btn" onClick={onClose}>
-            <img src="/icon/x.svg" alt="Close" />
+            <img src="/icon/x.svg" alt={t('common.close')} />
           </button>
         </div>
 
@@ -124,33 +124,33 @@ const BillingSupportModal = ({ onClose }) => {
           {/* Info Cards */}
           <div className="billing-info-cards">
             <div className="billing-info-card">
-              <img src="/icon/clock.svg" alt="Response Time" />
-              <h4>Response Time</h4>
+              <img src="/icon/clock.svg" alt={t('billing.responseTime')} />
+              <h4>{t('billing.responseTime')}</h4>
               <p>{'< 24h'}</p>
             </div>
             <div className="billing-info-card">
-              <img src="/icon/users.svg" alt="Support Team" />
-              <h4>Support Team</h4>
-              <p>Available</p>
+              <img src="/icon/users.svg" alt={t('billing.supportTeam')} />
+              <h4>{t('billing.supportTeam')}</h4>
+              <p>{t('billing.available')}</p>
             </div>
             <div className="billing-info-card">
-              <img src="/icon/shield-check.svg" alt="Secure" />
-              <h4>Secure</h4>
-              <p>Encrypted</p>
+              <img src="/icon/shield-check.svg" alt={t('billing.secure')} />
+              <h4>{t('billing.secure')}</h4>
+              <p>{t('billing.encrypted')}</p>
             </div>
           </div>
 
           {/* Support Categories */}
           <div className="support-categories">
-            <h3>Select issue type</h3>
+            <h3>{t('billing.selectIssueType')}</h3>
             <div className="category-chips">
               {categories.map((cat) => (
                 <div
-                  key={cat}
-                  className={`category-chip ${category === cat ? 'selected' : ''}`}
-                  onClick={() => setCategory(cat)}
+                  key={cat.key}
+                  className={`category-chip ${category === cat.key ? 'selected' : ''}`}
+                  onClick={() => setCategory(cat.key)}
                 >
-                  {cat}
+                  {cat.label}
                 </div>
               ))}
             </div>
@@ -159,22 +159,22 @@ const BillingSupportModal = ({ onClose }) => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="billing-form">
             <div className="billing-field">
-              <label>Tiêu đề</label>
+              <label>{t('feedback.title')}</label>
               <input
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="Brief description of your issue..."
+                placeholder={t('billing.briefDescription')}
                 maxLength={100}
               />
             </div>
 
             <div className="billing-field">
-              <label>Mô tả chi tiết</label>
+              <label>{t('billing.detailedDescription')}</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Please describe the issue in detail, including:&#10;- Transaction information (if applicable)&#10;- When the issue occurred&#10;- Steps you've already tried&#10;- Screenshots (if applicable)"
+                placeholder={t('billing.descriptionPlaceholder')}
                 rows={6}
                 maxLength={2000}
               />
@@ -182,7 +182,7 @@ const BillingSupportModal = ({ onClose }) => {
             </div>
 
             <div className="billing-field">
-              <label>Attachments (optional, max 3 files)</label>
+              <label>{t('billing.attachments')}</label>
               <div className="attachment-area">
                 <input
                   ref={fileInputRef}
@@ -198,8 +198,8 @@ const BillingSupportModal = ({ onClose }) => {
                   onClick={() => fileInputRef.current?.click()}
                   disabled={attachments.length >= 3}
                 >
-                  <img src="/icon/paperclip.svg" alt="Attach" />
-                  <span>Attach File</span>
+                  <img src="/icon/paperclip.svg" alt={t('billing.attachFile')} />
+                  <span>{t('billing.attachFile')}</span>
                 </button>
 
                 {attachments.length > 0 && (
@@ -212,7 +212,7 @@ const BillingSupportModal = ({ onClose }) => {
                           className="remove-attachment-btn"
                           onClick={() => removeAttachment(index)}
                         >
-                          <img src="/icon/x.svg" alt="Remove" />
+                          <img src="/icon/x.svg" alt={t('common.remove')} />
                         </button>
                       </div>
                     ))}
@@ -223,17 +223,17 @@ const BillingSupportModal = ({ onClose }) => {
 
             {error && (
               <div className="billing-error">
-                <img src="/icon/alert-circle.svg" alt="Error" />
+                <img src="/icon/alert-circle.svg" alt={t('common.error')} />
                 {error}
               </div>
             )}
 
             <div className="billing-actions">
               <button type="button" className="btn-cancel" onClick={onClose}>
-                Cancel
+                {t('common.cancel')}
               </button>
               <button type="submit" className="btn-submit" disabled={sending}>
-                {sending ? 'Sending...' : 'Send Request'}
+                {sending ? t('feedback.sending') : t('billing.sendRequest')}
               </button>
             </div>
           </form>

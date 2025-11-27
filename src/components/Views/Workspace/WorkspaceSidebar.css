@@ -22,7 +22,6 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border-primary);
 }
 
 .ws-header-title {
@@ -376,9 +375,7 @@ body.dark-theme .workspace-sidebar {
   border-left-color: #3c4043;
 }
 
-body.dark-theme .ws-header {
-  border-bottom-color: #3c4043;
-}
+
 
 body.dark-theme .ws-header-title img,
 body.dark-theme .ws-section-header img,

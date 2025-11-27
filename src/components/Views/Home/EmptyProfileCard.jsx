@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import LottieAnimation from '../../Common/LottieAnimation'
 import TextScramble from '../../Common/TextScramble'
@@ -6,14 +7,15 @@ import '../../Common/TextScramble.css'
 import './EmptyProfileCard.css'
 
 const EmptyProfileCard = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0)
 
   const phrases = [
-    'Create your unique writing style profile',
-    'Analyze and refine content intelligently',
-    'Protect your personal writing style',
-    'Detect AI content accurately'
+    t('home.createUniqueStyle'),
+    t('home.analyzeRefine'),
+    t('home.protectStyle'),
+    t('home.detectAI')
   ]
 
   useEffect(() => {
@@ -23,7 +25,7 @@ const EmptyProfileCard = () => {
     }, 4500)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [phrases.length])
 
   const handleCreateProfile = () => {
     navigate('/profile-setup')
@@ -36,8 +38,8 @@ const EmptyProfileCard = () => {
           <div className="empty-card-left">
             <div className="empty-welcome">
               <h3 className="empty-welcome-title">
-                Chào mừng bạn đến với<br />
-                <span className="app-name">AI Content Authenticator</span>
+                {t('home.welcomeTo')}<br />
+                <span className="app-name">{t('home.appName')}</span>
               </h3>
             </div>
 
@@ -56,9 +58,9 @@ const EmptyProfileCard = () => {
             </div>
 
             <button className="create-profile-btn" onClick={handleCreateProfile}>
-              <img src="/icon/plus-circle.svg" alt="Create" />
-              <span>Create first profile</span>
-              <img src="/icon/arrow-right.svg" alt="Arrow" className="arrow-icon" />
+              <img src="/icon/plus-circle.svg" alt={t('home.createFirstProfile')} />
+              <span>{t('home.createFirstProfile')}</span>
+              <img src="/icon/arrow-right.svg" alt="" className="arrow-icon" />
             </button>
           </div>
 

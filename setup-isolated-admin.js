@@ -10,7 +10,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('\n🚀 Setting up isolated Admin Panel...\n');
+console.log('\n[LAUNCH] Setting up isolated Admin Panel...\n');
 
 // Directories
 const srcAdminDir = path.join(__dirname, 'src/components/Admin');
@@ -23,14 +23,14 @@ const adminContextsDir = path.join(adminPanelDir, 'contexts');
 [adminComponentsDir, adminContextsDir].forEach(dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
-    console.log(`✓ Created ${path.relative(__dirname, dir)}`);
+    console.log(`[OK] Created ${path.relative(__dirname, dir)}`);
   }
 });
 
 // Copy Admin components
 function copyDirectory(src, dest) {
   if (!fs.existsSync(src)) {
-    console.log(`⚠️  Source not found: ${src}`);
+    console.log(`[WARNING]  Source not found: ${src}`);
     return;
   }
 
@@ -61,7 +61,7 @@ function copyDirectory(src, dest) {
 }
 
 // Copy Admin components
-console.log('\n📦 Copying Admin components...');
+console.log('\n[PACKAGE] Copying Admin components...');
 function copyAndFixImports(src, dest) {
   if (!fs.existsSync(src)) return;
   if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
@@ -94,46 +94,46 @@ function copyAndFixImports(src, dest) {
 }
 
 copyAndFixImports(srcAdminDir, adminComponentsDir);
-console.log('✓ Admin components copied and imports fixed');
+console.log('[OK] Admin components copied and imports fixed');
 
 // Copy Common components (NotificationProvider, etc)
 const srcCommonDir = path.join(__dirname, 'src/components/Common');
 const adminCommonDir = path.join(adminComponentsDir, 'Common');
 if (fs.existsSync(srcCommonDir)) {
-  console.log('\n📦 Copying Common components...');
+  console.log('\n[PACKAGE] Copying Common components...');
   copyAndFixImports(srcCommonDir, adminCommonDir);
-  console.log('✓ Common components copied and imports fixed');
+  console.log('[OK] Common components copied and imports fixed');
 }
 
 // Copy services
 const srcServicesDir = path.join(__dirname, 'src/services');
 const adminServicesDir = path.join(adminPanelDir, 'services');
 if (fs.existsSync(srcServicesDir)) {
-  console.log('\n📦 Copying services...');
+  console.log('\n[PACKAGE] Copying services...');
   copyAndFixImports(srcServicesDir, adminServicesDir);
-  console.log('✓ Services copied and imports fixed');
+  console.log('[OK] Services copied and imports fixed');
 }
 
 // Copy utils
 const srcUtilsDir = path.join(__dirname, 'src/utils');
 const adminUtilsDir = path.join(adminPanelDir, 'utils');
 if (fs.existsSync(srcUtilsDir)) {
-  console.log('\n📦 Copying utils...');
+  console.log('\n[PACKAGE] Copying utils...');
   copyAndFixImports(srcUtilsDir, adminUtilsDir);
-  console.log('✓ Utils copied and imports fixed');
+  console.log('[OK] Utils copied and imports fixed');
 }
 
 // Copy hooks
 const srcHooksDir = path.join(__dirname, 'src/hooks');
 const adminHooksDir = path.join(adminPanelDir, 'hooks');
 if (fs.existsSync(srcHooksDir)) {
-  console.log('\n📦 Copying hooks...');
+  console.log('\n[PACKAGE] Copying hooks...');
   copyAndFixImports(srcHooksDir, adminHooksDir);
-  console.log('✓ Hooks copied and imports fixed');
+  console.log('[OK] Hooks copied and imports fixed');
 }
 
 // Copy necessary contexts
-console.log('\n📦 Copying contexts...');
+console.log('\n[PACKAGE] Copying contexts...');
 const contextsToKeep = ['AdminAuthContext.jsx', 'AdminAuthContext.js'];
 const allContextFiles = fs.readdirSync(srcContextsDir);
 
@@ -147,12 +147,12 @@ allContextFiles.forEach(file => {
     content = content.replace(/from ['"]\.\/(?!Admin)/g, "from '../src/contexts/");
     
     fs.writeFileSync(destPath, content);
-    console.log(`✓ Copied ${file}`);
+    console.log(`[OK] Copied ${file}`);
   }
 });
 
 // Update AdminApp.jsx
-console.log('\n📝 Updating AdminApp.jsx...');
+console.log('\n[NOTE] Updating AdminApp.jsx...');
 const adminAppPath = path.join(adminPanelDir, 'AdminApp.jsx');
 const adminAppContent = `import { BrowserRouter as Router } from 'react-router-dom';
 import { AdminAuthProvider } from './contexts/AdminAuthContext';
@@ -169,37 +169,37 @@ export default function AdminApp() {
 }
 `;
 fs.writeFileSync(adminAppPath, adminAppContent);
-console.log('✓ AdminApp.jsx updated');
+console.log('[OK] AdminApp.jsx updated');
 
 // Create admin-specific package.json info
-console.log('\n📝 Creating admin README...');
+console.log('\n[NOTE] Creating admin README...');
 const adminReadme = `# Admin Panel
 
-Admin panel hoàn toàn tách biệt khỏi main app.
+Admin panel is completely separated from main app.
 
 ## Development
 
 \`\`\`bash
-# Chỉ chạy admin
+# Run admin only
 npm run dev:admin
 
-# Chạy cả main app và admin
+# Run both main app and admin
 npm run dev:all
 \`\`\`
 
-Admin sẽ chạy tại: http://localhost:5174
+Admin will run at: http://localhost:5174
 
 ## Build
 
 \`\`\`bash
-# Build cả 2
+# Build both
 npm run build
 
-# Chỉ build admin
+# Build admin only
 npm run build:admin
 \`\`\`
 
-## Cấu trúc
+## Structure
 
 \`\`\`
 admin-panel/
@@ -218,9 +218,9 @@ admin-panel/
 - Build output: dist/admin/
 `;
 fs.writeFileSync(path.join(adminPanelDir, 'README.md'), adminReadme);
-console.log('✓ README created');
+console.log('[OK] README created');
 
-console.log('\n✅ Admin Panel isolation complete!\n');
+console.log('\n[SUCCESS] Admin Panel isolation complete!\n');
 console.log('📍 Next steps:');
 console.log('   1. Run: npm run dev:admin');
 console.log('   2. Open: http://localhost:5174');

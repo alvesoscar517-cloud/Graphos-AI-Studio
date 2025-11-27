@@ -42,18 +42,39 @@ exports.authenticateContent = async (req, res) => {
     // Use detection confidence if available, otherwise calculate from probability
     const confidence = detectionConfidence || Math.abs(aiProbability - 50) * 2;
 
-    // Generate more nuanced verdict based on probability ranges
+    // Get language from request or detect from text
+    const language = req.body.language || textFeatures.detectedLanguage || 'en';
+
+    // Generate more nuanced verdict based on probability ranges (multi-language)
+    const verdicts = {
+      en: {
+        clearlyHuman: 'Clearly human-written content',
+        likelyHuman: 'Likely human-written content',
+        uncertain: 'Uncertain - could be human or AI',
+        likelyAI: 'Likely AI-generated content',
+        clearlyAI: 'Clearly AI-generated content'
+      },
+      vi: {
+        clearlyHuman: 'Nội dung rõ ràng do con người viết',
+        likelyHuman: 'Có thể do con người viết',
+        uncertain: 'Không chắc chắn - có thể là người hoặc AI',
+        likelyAI: 'Có thể do AI tạo ra',
+        clearlyAI: 'Nội dung rõ ràng do AI tạo ra'
+      }
+    };
+
+    const lang = verdicts[language] ? language : 'en';
     let verdict;
     if (aiProbability < 20) {
-      verdict = 'Clearly human-written content';
+      verdict = verdicts[lang].clearlyHuman;
     } else if (aiProbability < 40) {
-      verdict = 'Likely human-written content';
+      verdict = verdicts[lang].likelyHuman;
     } else if (aiProbability < 60) {
-      verdict = 'Uncertain - could be human or AI';
+      verdict = verdicts[lang].uncertain;
     } else if (aiProbability < 80) {
-      verdict = 'Likely AI-generated content';
+      verdict = verdicts[lang].likelyAI;
     } else {
-      verdict = 'Clearly AI-generated content';
+      verdict = verdicts[lang].clearlyAI;
     }
 
     const result = {

@@ -36,7 +36,7 @@ export default function ActivityStatsWidget() {
       const response = await activityLogsApi.getStatistics(days);
       setStats(response.statistics);
     } catch (err) {
-      notify.error('Không thể tải activity statistics');
+      notify.error('Unable to load activity statistics');
     } finally {
       setLoading(false);
     }
@@ -51,7 +51,7 @@ export default function ActivityStatsWidget() {
             Activity Statistics
           </h3>
         </div>
-        <div className="loading-placeholder">Đang tải...</div>
+        <div className="loading-placeholder">Loading...</div>
       </div>
     );
   }
@@ -68,9 +68,9 @@ export default function ActivityStatsWidget() {
           Activity Statistics
         </h3>
         <select value={days} onChange={(e) => setDays(parseInt(e.target.value))}>
-          <option value={7}>7 ngày</option>
-          <option value={14}>14 ngày</option>
-          <option value={30}>30 ngày</option>
+          <option value={7}>7 days</option>
+          <option value={14}>14 days</option>
+          <option value={30}>30 days</option>
         </select>
       </div>
 
@@ -78,21 +78,21 @@ export default function ActivityStatsWidget() {
       <div className="stats-summary">
         <div className="stat-card">
           <div className="stat-value">{stats.totalActivities.toLocaleString()}</div>
-          <div className="stat-label">Tổng hoạt động</div>
+          <div className="stat-label">Total Activities</div>
         </div>
         <div className="stat-card">
           <div className="stat-value">{stats.totalCreditsUsed.toFixed(1)}</div>
-          <div className="stat-label">Credits đã dùng</div>
+          <div className="stat-label">Credits Used</div>
         </div>
         <div className="stat-card">
           <div className="stat-value">{stats.uniqueUsers}</div>
-          <div className="stat-label">Users hoạt động</div>
+          <div className="stat-label">Active Users</div>
         </div>
       </div>
 
       {/* Activity Trend Chart */}
       <div className="trend-section">
-        <h4>Xu hướng hoạt động</h4>
+        <h4>Activity Trends</h4>
         <div className="trend-chart">
           {stats.activityTrend.map((day, index) => {
             const maxActivities = Math.max(...stats.activityTrend.map(d => d.activities));
@@ -102,7 +102,7 @@ export default function ActivityStatsWidget() {
                 <div 
                   className="bar" 
                   style={{ height: `${Math.max(4, height)}%` }}
-                  title={`${day.date}: ${day.activities} hoạt động`}
+                  title={`${day.date}: ${day.activities} activities`}
                 />
                 <span className="bar-label">
                   {day.date.slice(-5)}
@@ -115,7 +115,7 @@ export default function ActivityStatsWidget() {
 
       {/* Feature Usage */}
       <div className="feature-section">
-        <h4>Top tính năng</h4>
+        <h4>Top Features</h4>
         <div className="feature-list">
           {stats.featureUsage.slice(0, 5).map((feature, index) => {
             const maxCount = stats.featureUsage[0]?.count || 1;
@@ -143,7 +143,7 @@ export default function ActivityStatsWidget() {
 
       {/* Top Users */}
       <div className="users-section">
-        <h4>Top users hoạt động</h4>
+        <h4>Top Active Users</h4>
         <div className="users-list">
           {stats.topUsers.slice(0, 5).map((user, index) => (
             <div key={user.userId} className="user-item">
@@ -151,7 +151,7 @@ export default function ActivityStatsWidget() {
               <span className="user-id" title={user.userId}>
                 {user.userId.substring(0, 12)}...
               </span>
-              <span className="user-activities">{user.activities} hoạt động</span>
+              <span className="user-activities">{user.activities} activities</span>
               <span className="user-credits">{user.credits} credits</span>
             </div>
           ))}

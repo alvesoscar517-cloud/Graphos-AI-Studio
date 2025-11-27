@@ -1,9 +1,9 @@
 /**
  * Analysis Cache Service
- * Lưu trữ kết quả phân tích AI để tránh gọi API lặp lại
+ * Save stores AI analysis results to avoid repeated API calls
  */
 
-// Tạo hash đơn giản từ text
+// Create simple hash of text words
 function simpleHash(str) {
   let hash = 0
   for (let i = 0; i < str.length; i++) {
@@ -79,11 +79,11 @@ export function getCachedAnalysis(noteId, text, type) {
   const result = cache[noteId]?.[textHash]?.[type]
   
   if (result) {
-    console.log(`✅ Cache hit for ${type} on note ${noteId}`)
+    console.log(`[SUCCESS] Cache hit for ${type} on note ${noteId}`)
     return result.data
   }
   
-  console.log(`❌ Cache miss for ${type} on note ${noteId}`)
+  console.log(`[FAIL] Cache miss for ${type} on note ${noteId}`)
   return null
 }
 
@@ -114,7 +114,7 @@ export function setCachedAnalysis(noteId, text, type, data) {
   }
   
   saveCache(cache)
-  console.log(`💾 Cached ${type} result for note ${noteId}`)
+  console.log(`[SAVE] Cached ${type} result for note ${noteId}`)
 }
 
 /**
@@ -144,7 +144,7 @@ export function clearNoteCache(noteId) {
   const cache = loadCache()
   delete cache[noteId]
   saveCache(cache)
-  console.log(`🗑️ Cleared cache for note ${noteId}`)
+  console.log(`[TRASH] Cleared cache for note ${noteId}`)
 }
 
 /**
@@ -152,7 +152,7 @@ export function clearNoteCache(noteId) {
  */
 export function clearAllCache() {
   localStorage.removeItem(CACHE_KEY)
-  console.log('🗑️ Cleared all analysis cache')
+  console.log('[TRASH] Cleared all analysis cache')
 }
 
 /**

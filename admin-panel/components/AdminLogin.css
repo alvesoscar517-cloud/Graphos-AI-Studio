@@ -197,6 +197,77 @@
   opacity: 0.5;
 }
 
+#admin-root .admin-login-footer p {
+  margin: 0;
+}
+
+#admin-root .admin-login-divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  color: #999;
+  font-size: 13px;
+}
+
+#admin-root .admin-login-divider::before,
+#admin-root .admin-login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e5e5e5;
+}
+
+#admin-root .admin-login-divider span {
+  padding: 0 16px;
+}
+
+#admin-root .btn-secondary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  min-height: 48px;
+  background: #fff;
+  color: #000;
+  border: 2px solid #e5e5e5;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+#admin-root .btn-secondary:hover {
+  border-color: #000;
+  background: #fafafa;
+}
+
+#admin-root .btn-secondary img {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0);
+}
+
+#admin-root .link-btn {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition: color 0.2s;
+}
+
+#admin-root .link-btn:hover {
+  color: #000;
+}
+
+#admin-root .login-icon.setup {
+  background: #333;
+}
+
 @media (max-width: 480px) {
   #admin-root .admin-login-container {
     padding: 32px 24px;

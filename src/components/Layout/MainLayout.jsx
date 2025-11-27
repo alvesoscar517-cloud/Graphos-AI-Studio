@@ -18,7 +18,7 @@ const MainLayout = () => {
     if (view === 'workspace') {
       setRightSidebarHidden(false) // Show workspace sidebar by default
     }
-    // Chỉ tạo note mới khi có flag createNew
+    // Only create new note when createNew flag is set
     if (view === 'aistudio-editor' && options.createNew) {
       createNote()
     }

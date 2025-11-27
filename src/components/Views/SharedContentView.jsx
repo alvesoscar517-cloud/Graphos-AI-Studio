@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { getShare } from '../../services/share'
 import { useNotes } from '../../contexts/NotesContext'
@@ -7,6 +8,7 @@ import modal from '../../utils/modal'
 import './SharedContentView.css'
 
 const SharedContentView = () => {
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { createNote, updateNote } = useNotes()
@@ -20,13 +22,13 @@ const SharedContentView = () => {
     const shareId = searchParams.get('share')
     
     if (!shareId) {
-      setError('Share code not found')
+      setError(t('errors.shareCodeNotFound'))
       setLoading(false)
       return
     }
 
     loadSharedContent(shareId)
-  }, [searchParams])
+  }, [searchParams, t])
 
   const loadSharedContent = async (shareId) => {
     try {
@@ -35,7 +37,7 @@ const SharedContentView = () => {
       setSharedData(data)
     } catch (err) {
       console.error('Failed to load shared content:', err)
-      setError(err.message || 'Unable to load shared content')
+      setError(err.message || t('errors.unableToLoadShared'))
     } finally {
       setLoading(false)
     }
@@ -54,7 +56,7 @@ const SharedContentView = () => {
           type: 'text'
         })
         
-        modal.toast('Imported', 'Note has been added to your list', 'success')
+        modal.toast(t('sharedContent.imported'), t('sharedContent.noteAdded'), 'success')
         navigate('/')
       } else if (sharedData.type === 'conversation') {
         // Import as conversation
@@ -66,12 +68,12 @@ const SharedContentView = () => {
           conversation.messages = sharedData.messages
         }
         
-        modal.toast('Imported', 'Conversation has been added to workspace', 'success')
+        modal.toast(t('sharedContent.imported'), t('sharedContent.conversationAdded'), 'success')
         navigate('/')
       }
     } catch (err) {
       console.error('Failed to import:', err)
-      modal.error('Unable to import content')
+      modal.error(t('errors.unableToImport'))
     }
   }
 
@@ -80,7 +82,7 @@ const SharedContentView = () => {
       <div className="shared-content-view">
         <div className="shared-content-loading">
           <div className="spinner"></div>
-          <p>Loading shared content...</p>
+          <p>{t('sharedContent.loadingSharedContent')}</p>
         </div>
       </div>
     )
@@ -90,11 +92,11 @@ const SharedContentView = () => {
     return (
       <div className="shared-content-view">
         <div className="shared-content-error">
-          <img src="/icon/alert-circle.svg" alt="Error" />
-          <h2>Unable to load content</h2>
+          <img src="/icon/alert-circle.svg" alt={t('common.error')} />
+          <h2>{t('sharedContent.unableToLoadContent')}</h2>
           <p>{error}</p>
           <button className="btn-primary" onClick={() => navigate('/')}>
-            Go to Home
+            {t('common.goHome')}
           </button>
         </div>
       </div>
@@ -114,11 +116,11 @@ const SharedContentView = () => {
               src={sharedData.type === 'conversation' ? '/icon/message-circle.svg' : '/icon/file-text.svg'} 
               alt={sharedData.type} 
             />
-            <span>{sharedData.type === 'conversation' ? 'Conversation' : 'Text'}</span>
+            <span>{sharedData.type === 'conversation' ? t('history.conversation') : t('history.text')}</span>
           </div>
           <h1>{sharedData.title}</h1>
           <p className="shared-content-meta">
-            Shared on {new Date(sharedData.createdAt).toLocaleDateString('en-US', {
+            {t('sharedContent.sharedOn')} {new Date(sharedData.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric'
@@ -142,14 +144,14 @@ const SharedContentView = () => {
                 >
                   <div className="shared-message-avatar">
                     {message.role === 'user' ? (
-                      <img src="/icon/user.svg" alt="User" />
+                      <img src="/icon/user.svg" alt={t('sharedContent.you')} />
                     ) : (
-                      <img src="/icon/bot.svg" alt="AI" />
+                      <img src="/icon/bot.svg" alt={t('sharedContent.ai')} />
                     )}
                   </div>
                   <div className="shared-message-content">
                     <div className="shared-message-role">
-                      {message.role === 'user' ? 'You' : 'AI'}
+                      {message.role === 'user' ? t('sharedContent.you') : t('sharedContent.ai')}
                     </div>
                     <div className="shared-message-text">
                       {message.content}
@@ -163,11 +165,11 @@ const SharedContentView = () => {
 
         <div className="shared-content-footer">
           <button className="btn-secondary" onClick={() => navigate('/')}>
-            Close
+            {t('common.close')}
           </button>
           <button className="btn-primary" onClick={handleImport}>
-            <img src="/icon/download.svg" alt="Import" />
-            Import to App
+            <img src="/icon/download.svg" alt={t('sharedContent.importToApp')} />
+            {t('sharedContent.importToApp')}
           </button>
         </div>
       </div>

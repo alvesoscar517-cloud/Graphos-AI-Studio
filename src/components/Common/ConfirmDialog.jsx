@@ -1,15 +1,18 @@
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import './ConfirmDialog.css';
 
 export default function ConfirmDialog({ 
   title, 
   message, 
-  confirmText = 'Confirm', 
-  cancelText = 'Cancel',
+  confirmText, 
+  cancelText,
   type = 'warning',
   onConfirm, 
   onCancel 
 }) {
+  const { t } = useTranslation();
+  
   const icons = {
     warning: '/icon/alert-triangle.svg',
     danger: '/icon/alert-octagon.svg',
@@ -26,13 +29,13 @@ export default function ConfirmDialog({
         <p className="confirm-message">{message}</p>
         <div className="confirm-actions">
           <button className="btn-secondary btn-confirm-cancel" onClick={onCancel}>
-            {cancelText}
+            {cancelText || t('common.cancel')}
           </button>
           <button 
             className={`btn-confirm-ok ${type === 'danger' ? 'btn-danger' : type === 'warning' ? 'btn-confirm-warning' : 'btn-primary'}`} 
             onClick={onConfirm}
           >
-            {confirmText}
+            {confirmText || t('common.confirm')}
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 /**
  * Step 1: Profile Name and Theme Selection
  */
+import { useTranslation } from 'react-i18next'
 import LottieWrapper from '../LottieWrapper'
 import { THEMES } from '../hooks/useProfileSetup'
 import loaderCatAnimation from '../../../animation/loader-cat.json'
@@ -15,6 +16,8 @@ const Step1NameTheme = ({
   onCancel,
   isCancelling
 }) => {
+  const { t } = useTranslation()
+
   return (
     <div className="step-content active">
       <div className="content-wrapper">
@@ -23,26 +26,26 @@ const Step1NameTheme = ({
         </div>
         <div className="form-container">
           <div className="step1-form-content">
-            <h1 className="step-title">Start Refining Your Writing Style</h1>
+            <h1 className="step-title">{t('profileSetup.startRefining')}</h1>
             <p className="step-description">
-              Set an easy-to-remember name. You can create multiple profiles (in Premium plan) to switch between different writing styles.
+              {t('profileSetup.setEasyName')}
             </p>
 
             <div className="input-group">
-              <label htmlFor="profileName">Tên Hồ sơ</label>
+              <label htmlFor="profileName">{t('profileSetup.profileName')}</label>
               <input
                 type="text"
                 id="profileName"
-                placeholder="Ví dụ: Blog cá nhân, Email cho sếp, Khách hàng B2B..."
+                placeholder={t('profileSetup.exampleName')}
                 maxLength="50"
                 value={profileName}
                 onChange={(e) => setProfileName(e.target.value)}
               />
-              <div className="input-hint">Tối đa 50 ký tự</div>
+              <div className="input-hint">{t('profileSetup.maxCharacters')}</div>
             </div>
             
             <div className="input-group">
-              <label id="theme-label">Theme</label>
+              <label id="theme-label">{t('common.select')}</label>
               <div 
                 className="theme-selector-wrapper"
                 role="radiogroup"
@@ -57,7 +60,7 @@ const Step1NameTheme = ({
                       onClick={() => setSelectedTheme(theme.id)}
                       role="radio"
                       aria-checked={selectedTheme === theme.id}
-                      aria-label={`Chọn chủ đề ${theme.name}`}
+                      aria-label={`${t('common.select')} ${t(`themes.${theme.id}`)}`}
                       tabIndex={selectedTheme === theme.id ? 0 : -1}
                       onKeyDown={(e) => {
                         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
@@ -77,7 +80,7 @@ const Step1NameTheme = ({
                         aria-hidden="true"
                         className="theme-btn-icon"
                       />
-                      <span className="theme-btn-label">{theme.name}</span>
+                      <span className="theme-btn-label">{t(`themes.${theme.id}`)}</span>
                     </button>
                   ))}
                 </div>
@@ -90,14 +93,14 @@ const Step1NameTheme = ({
                 onClick={onCancel}
                 disabled={isCancelling}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button 
                 className="btn btn-primary" 
                 disabled={!profileName.trim() || isCancelling}
                 onClick={onNext}
               >
-                Tiếp theo
+                {t('common.next')}
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>

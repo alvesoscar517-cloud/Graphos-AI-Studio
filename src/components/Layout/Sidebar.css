@@ -16,7 +16,7 @@
   touch-action: pan-y;
 }
 
-/* Không cần .sidebar.hidden vì Framer Motion xử lý animation */
+/* No need for .sidebar.hidden as Framer Motion handles animation */
 
 .sidebar-header {
   padding: 20px 16px;
@@ -66,6 +66,10 @@
   color: #202124;
   font-weight: 500;
   text-decoration: none !important;
+}
+
+.nav-item.active:hover {
+  background: #dadce0;
 }
 
 .nav-item img {
@@ -425,6 +429,10 @@ body.dark-theme .nav-item.active {
   background: #3c4043;
   color: #e3e3e3;
   text-decoration: none !important;
+}
+
+body.dark-theme .nav-item.active:hover {
+  background: #4a4a4a;
 }
 
 body.dark-theme .nav-label {

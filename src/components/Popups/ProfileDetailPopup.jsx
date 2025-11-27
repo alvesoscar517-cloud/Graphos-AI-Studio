@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import './ProfileDetailPopup.css'
 
 const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
+  const { t } = useTranslation()
   const popupRef = useRef(null)
 
   useEffect(() => {
@@ -35,36 +37,33 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
 
   // Format tone
   const formatTone = (tone) => {
-    const toneMap = {
-      'professional': 'Professional',
-      'casual': 'Casual',
-      'academic': 'Academic',
-      'creative': 'Creative',
-      'friendly': 'Friendly',
-      'formal': 'Formal',
-      'neutral': 'Neutral'
-    }
-    return toneMap[tone] || tone
+    return t(`tones.${tone}`, { defaultValue: tone })
   }
 
   // Format sentence length
   const formatSentenceLength = (length) => {
-    const lengthMap = {
-      'short': 'Short',
-      'medium': 'Medium',
-      'long': 'Long'
-    }
-    return lengthMap[length] || length
+    return t(`sentenceLengths.${length}`, { defaultValue: length })
   }
 
   // Format structure preference
   const formatStructure = (structure) => {
-    const structureMap = {
-      'simple': 'Simple',
-      'complex': 'Complex',
-      'varied': 'Varied'
-    }
-    return structureMap[structure] || structure
+    return t(`structures.${structure}`, { defaultValue: structure })
+  }
+
+  const getQualityRating = () => {
+    const rating = profile.quality_rating || profile.qualityRating
+    if (rating === 'excellent') return { icon: 'star', label: t('profile.excellent') }
+    if (rating === 'good') return { icon: 'thumbs-up', label: t('profile.good') }
+    if (rating === 'ok') return { icon: 'check', label: t('profile.meetsRequirements') }
+    return { icon: 'alert-circle', label: t('profile.needsImprovement') }
+  }
+
+  const getQualityDescription = () => {
+    const rating = profile.quality_rating || profile.qualityRating
+    if (rating === 'excellent') return t('profile.excellentDesc')
+    if (rating === 'good') return t('profile.goodDesc')
+    if (rating === 'ok') return t('profile.okDesc')
+    return t('profile.poorDesc')
   }
 
   return (
@@ -74,7 +73,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           <div className="profile-detail-title-section">
             <h2>{profile.profile_name}</h2>
             <span className={`profile-status-badge ${profile.status}`}>
-              {profile.status === 'ready' ? 'Ready' : 'Processing'}
+              {profile.status === 'ready' ? t('profile.ready') : t('profile.processing')}
             </span>
           </div>
           <button className="profile-detail-close" onClick={onClose}>
@@ -90,8 +89,8 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {(profile.quality_score || profile.qualityScore) && (
             <section className="profile-detail-section">
               <h3>
-                <img src="/icon/award.svg" alt="Quality" />
-                Profile Quality
+                <img src="/icon/award.svg" alt={t('profile.profileQuality')} />
+                {t('profile.profileQuality')}
               </h3>
               <div className="profile-quality-score">
                 <div className={`quality-score-display quality-rating-${profile.quality_rating || profile.qualityRating || 'ok'}`}>
@@ -102,37 +101,10 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
                 </div>
                 <div className="quality-score-info">
                   <div className="quality-rating-badge">
-                    {(profile.quality_rating || profile.qualityRating) === 'excellent' && (
-                      <>
-                        <img src="/icon/star.svg" alt="Excellent" />
-                        <span>Excellent</span>
-                      </>
-                    )}
-                    {(profile.quality_rating || profile.qualityRating) === 'good' && (
-                      <>
-                        <img src="/icon/thumbs-up.svg" alt="Good" />
-                        <span>Tốt</span>
-                      </>
-                    )}
-                    {(profile.quality_rating || profile.qualityRating) === 'ok' && (
-                      <>
-                        <img src="/icon/check.svg" alt="OK" />
-                        <span>Đạt yêu cầu</span>
-                      </>
-                    )}
-                    {(profile.quality_rating || profile.qualityRating) === 'poor' && (
-                      <>
-                        <img src="/icon/alert-circle.svg" alt="Poor" />
-                        <span>Needs Improvement</span>
-                      </>
-                    )}
+                    <img src={`/icon/${getQualityRating().icon}.svg`} alt="" />
+                    <span>{getQualityRating().label}</span>
                   </div>
-                  <p className="quality-description">
-                    {(profile.quality_rating || profile.qualityRating) === 'excellent' && 'Excellent profile! AI will learn your writing style very well.'}
-                    {(profile.quality_rating || profile.qualityRating) === 'good' && 'Good profile! AI can learn your writing style.'}
-                    {(profile.quality_rating || profile.qualityRating) === 'ok' && 'Adequate profile, but consider improving for better AI learning.'}
-                    {(profile.quality_rating || profile.qualityRating) === 'poor' && 'Profile needs improvement. Add more samples and diverse content.'}
-                  </p>
+                  <p className="quality-description">{getQualityDescription()}</p>
                 </div>
               </div>
             </section>
@@ -141,26 +113,26 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {/* Overview Section */}
           <section className="profile-detail-section">
             <h3>
-              <img src="/icon/info.svg" alt="Info" />
-              Overview
+              <img src="/icon/info.svg" alt={t('profile.overview')} />
+              {t('profile.overview')}
             </h3>
             <div className="profile-detail-grid">
               <div className="profile-detail-item">
-                <span className="label">Sample Count</span>
-                <span className="value">{profile.sample_count || 0} samples</span>
+                <span className="label">{t('profile.sampleCount')}</span>
+                <span className="value">{profile.sample_count || 0} {t('common.samples')}</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Total Words</span>
-                <span className="value">{stats.totalWords?.toLocaleString() || 0} words</span>
+                <span className="label">{t('profile.totalWords')}</span>
+                <span className="value">{stats.totalWords?.toLocaleString() || 0} {t('common.words')}</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Total Sentences</span>
-                <span className="value">{stats.totalSentences?.toLocaleString() || 0} sentences</span>
+                <span className="label">{t('profile.totalSentences')}</span>
+                <span className="value">{stats.totalSentences?.toLocaleString() || 0} {t('common.sentences')}</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Created Date</span>
+                <span className="label">{t('profile.createdDate')}</span>
                 <span className="value">
-                  {profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US') : 'N/A'}
+                  {profile.created_at ? new Date(profile.created_at).toLocaleDateString() : 'N/A'}
                 </span>
               </div>
             </div>
@@ -169,28 +141,28 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {/* Statistical Features */}
           <section className="profile-detail-section">
             <h3>
-              <img src="/icon/bar-chart.svg" alt="Stats" />
-              Statistical Features
+              <img src="/icon/bar-chart.svg" alt={t('profile.statisticalFeatures')} />
+              {t('profile.statisticalFeatures')}
             </h3>
             <div className="profile-detail-grid">
               <div className="profile-detail-item">
-                <span className="label">Avg Word Length</span>
-                <span className="value">{stats.avgWordLength?.toFixed(2) || 0} characters</span>
+                <span className="label">{t('profile.avgWordLength')}</span>
+                <span className="value">{stats.avgWordLength?.toFixed(2) || 0} {t('common.characters')}</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Avg Sentence Length</span>
-                <span className="value">{stats.avgSentenceLength?.toFixed(1) || 0} words</span>
+                <span className="label">{t('profile.avgSentenceLength')}</span>
+                <span className="value">{stats.avgSentenceLength?.toFixed(1) || 0} {t('common.words')}</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Vocabulary Richness</span>
+                <span className="label">{t('profile.vocabularyRichness')}</span>
                 <span className="value">{((stats.vocabularyRichness || 0) * 100).toFixed(1)}%</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Punctuation Ratio</span>
+                <span className="label">{t('profile.punctuationRatio')}</span>
                 <span className="value">{((stats.punctuationRatio || 0) * 100).toFixed(1)}%</span>
               </div>
               <div className="profile-detail-item">
-                <span className="label">Readability Score (Flesch)</span>
+                <span className="label">{t('profile.readabilityFlesch')}</span>
                 <span className="value">{stats.readabilityScore?.toFixed(0) || 0}/100</span>
               </div>
             </div>
@@ -200,24 +172,24 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {voiceProfile.tone && (
             <section className="profile-detail-section">
               <h3>
-                <img src="/icon/mic.svg" alt="Voice" />
-                Writing Style
+                <img src="/icon/mic.svg" alt={t('profile.writingStyle')} />
+                {t('profile.writingStyle')}
               </h3>
               <div className="profile-detail-grid">
                 <div className="profile-detail-item">
-                  <span className="label">Tone</span>
+                  <span className="label">{t('profile.tone')}</span>
                   <span className="value">{formatTone(voiceProfile.tone)}</span>
                 </div>
                 <div className="profile-detail-item">
-                  <span className="label">Formality Level</span>
+                  <span className="label">{t('profile.formalityLevel')}</span>
                   <span className="value">{voiceProfile.formality_level || 0}/10</span>
                 </div>
                 <div className="profile-detail-item">
-                  <span className="label">Độ dài câu</span>
+                  <span className="label">{t('profile.sentenceLength')}</span>
                   <span className="value">{formatSentenceLength(sentencePatterns.typical_length)}</span>
                 </div>
                 <div className="profile-detail-item">
-                  <span className="label">Cấu trúc</span>
+                  <span className="label">{t('profile.structure')}</span>
                   <span className="value">{formatStructure(sentencePatterns.structure_preference)}</span>
                 </div>
               </div>
@@ -228,13 +200,13 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {voiceProfile.key_characteristics && voiceProfile.key_characteristics.length > 0 && (
             <section className="profile-detail-section">
               <h3>
-                <img src="/icon/list.svg" alt="Characteristics" />
-                Key Characteristics
+                <img src="/icon/list.svg" alt={t('profile.keyCharacteristics')} />
+                {t('profile.keyCharacteristics')}
               </h3>
               <ul className="profile-characteristics-list">
                 {voiceProfile.key_characteristics.map((char, index) => (
                   <li key={index}>
-                    <img src="/icon/check-circle.svg" alt="Check" />
+                    <img src="/icon/check-circle.svg" alt="" />
                     <span>{char}</span>
                   </li>
                 ))}
@@ -246,13 +218,13 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {(vocabPrefs.common_phrases?.length > 0 || vocabPrefs.preferred_connectors?.length > 0) && (
             <section className="profile-detail-section">
               <h3>
-                <img src="/icon/book-open.svg" alt="Vocabulary" />
-                Preferred Vocabulary
+                <img src="/icon/book-open.svg" alt={t('profile.preferredVocabulary')} />
+                {t('profile.preferredVocabulary')}
               </h3>
               
               {vocabPrefs.common_phrases?.length > 0 && (
                 <div className="profile-vocab-group">
-                  <h4>Common Phrases</h4>
+                  <h4>{t('profile.commonPhrases')}</h4>
                   <div className="profile-tags">
                     {vocabPrefs.common_phrases.map((phrase, index) => (
                       <span key={index} className="profile-tag">{phrase}</span>
@@ -263,7 +235,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
 
               {vocabPrefs.preferred_connectors?.length > 0 && (
                 <div className="profile-vocab-group">
-                  <h4>Preferred Connectors</h4>
+                  <h4>{t('profile.preferredConnectors')}</h4>
                   <div className="profile-tags">
                     {vocabPrefs.preferred_connectors.map((connector, index) => (
                       <span key={index} className="profile-tag">{connector}</span>
@@ -274,7 +246,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
 
               {vocabPrefs.avoid_words?.length > 0 && (
                 <div className="profile-vocab-group">
-                  <h4>Words to Avoid</h4>
+                  <h4>{t('profile.wordsToAvoid')}</h4>
                   <div className="profile-tags avoid">
                     {vocabPrefs.avoid_words.map((word, index) => (
                       <span key={index} className="profile-tag avoid">{word}</span>
@@ -289,8 +261,8 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {voiceProfile.rewrite_instructions && (
             <section className="profile-detail-section">
               <h3>
-                <img src="/icon/file-text.svg" alt="Instructions" />
-                Rewriting Guidelines
+                <img src="/icon/file-text.svg" alt={t('profile.rewritingGuidelines')} />
+                {t('profile.rewritingGuidelines')}
               </h3>
               <div className="profile-instructions">
                 <p>{voiceProfile.rewrite_instructions}</p>
@@ -302,8 +274,8 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {sentencePatterns.opening_style && (
             <section className="profile-detail-section">
               <h3>
-                <img src="/icon/align-left.svg" alt="Opening" />
-                Opening Style
+                <img src="/icon/align-left.svg" alt={t('profile.openingStyle')} />
+                {t('profile.openingStyle')}
               </h3>
               <div className="profile-instructions">
                 <p>{sentencePatterns.opening_style}</p>
@@ -314,12 +286,12 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
 
         <div className="profile-detail-footer">
           <button className="btn-secondary" onClick={onClose}>
-            Close
+            {t('common.close')}
           </button>
           {onUse && profile.status === 'ready' && (
             <button className="btn-primary" onClick={onUse}>
-              <img src="/icon/play.svg" alt="Use" />
-              Use this profile
+              <img src="/icon/play.svg" alt={t('profile.useThisProfile')} />
+              {t('profile.useThisProfile')}
             </button>
           )}
         </div>

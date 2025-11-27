@@ -16,20 +16,20 @@ export function getCachedProfiles() {
     return null
   }
 
-  console.log('✅ Using cached profiles')
+  console.log('[SUCCESS] Using cached profiles')
   return profilesCache.data
 }
 
 export function setCachedProfiles(profiles) {
   profilesCache.data = profiles
   profilesCache.timestamp = Date.now()
-  console.log('💾 Cached profiles:', profiles.length)
+  console.log('[SAVE] Cached profiles:', profiles.length)
 }
 
 export function clearProfileCache() {
   profilesCache.data = null
   profilesCache.timestamp = null
-  console.log('🗑️ Profile cache cleared')
+  console.log('[TRASH] Profile cache cleared')
 }
 
 // Check if cache should be invalidated (after creating new profile)
@@ -37,7 +37,7 @@ export function checkCacheInvalidation() {
   if (localStorage.getItem('profileCacheInvalidated') === 'true') {
     clearProfileCache()
     localStorage.removeItem('profileCacheInvalidated')
-    console.log('✅ Profile cache invalidated after profile creation')
+    console.log('[SUCCESS] Profile cache invalidated after profile creation')
     return true
   }
   return false

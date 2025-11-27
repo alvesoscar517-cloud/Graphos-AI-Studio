@@ -1,44 +1,46 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import './ModelSelector.css'
 
-const MODELS = [
-  {
-    id: 'gemini-2.0-flash-exp',
-    name: 'Gemini 2.0 Flash',
-    speed: 'Very Fast',
-    description: 'Mô hình thử nghiệm mới nhất, xử lý nhanh và hỗ trợ nhiều loại nội dung như văn bản, hình ảnh',
-    tags: ['Experimental', 'New Features'],
-    icon: '/icon/Gemini.svg'
-  },
-  {
-    id: 'gemini-2.5-flash-lite',
-    name: 'Gemini 2.5 Flash Lite',
-    speed: 'Ultra Fast',
-    description: 'Mô hình nhỏ gọn, tiết kiệm chi phí nhất, phù hợp cho các tác vụ đơn giản và xử lý số lượng lớn',
-    tags: ['Short Text', 'Low Cost'],
-    icon: '/icon/Gemini.svg'
-  },
-  {
-    id: 'gemini-2.5-flash',
-    name: 'Gemini 2.5 Flash',
-    speed: 'Fast',
-    description: 'Mô hình cân bằng giữa tốc độ và chất lượng, có khả năng suy luận tốt, phù hợp cho hầu hết các tác vụ',
-    tags: ['Versatile', 'Recommended'],
-    icon: '/icon/Gemini.svg'
-  },
-  {
-    id: 'gemini-2.5-pro',
-    name: 'Gemini 2.5 Pro',
-    speed: 'Slower',
-    description: 'Mô hình mạnh nhất, cho kết quả chất lượng cao nhất, phù hợp cho nội dung quan trọng cần độ chính xác cao',
-    tags: ['Important Text', 'High Quality'],
-    icon: '/icon/Gemini.svg'
-  }
-]
-
 const ModelSelector = ({ selectedModel, onModelSelect }) => {
+  const { t } = useTranslation()
   const [showModal, setShowModal] = useState(false)
+
+  const MODELS = [
+    {
+      id: 'gemini-2.0-flash-exp',
+      name: 'Gemini 2.0 Flash',
+      speed: t('model.veryFast'),
+      description: t('model.geminiFlashExp'),
+      tags: [t('model.experimental'), t('model.newFeatures')],
+      icon: '/icon/Gemini.svg'
+    },
+    {
+      id: 'gemini-2.5-flash-lite',
+      name: 'Gemini 2.5 Flash Lite',
+      speed: t('model.ultraFast'),
+      description: t('model.geminiFlashLite'),
+      tags: [t('model.shortText'), t('model.lowCost')],
+      icon: '/icon/Gemini.svg'
+    },
+    {
+      id: 'gemini-2.5-flash',
+      name: 'Gemini 2.5 Flash',
+      speed: t('model.fast'),
+      description: t('model.geminiFlash'),
+      tags: [t('model.versatile'), t('model.recommended')],
+      icon: '/icon/Gemini.svg'
+    },
+    {
+      id: 'gemini-2.5-pro',
+      name: 'Gemini 2.5 Pro',
+      speed: t('model.slower'),
+      description: t('model.geminiPro'),
+      tags: [t('model.importantText'), t('model.highQuality')],
+      icon: '/icon/Gemini.svg'
+    }
+  ]
 
   const currentModel = MODELS.find(m => m.id === selectedModel) || MODELS[0]
 
@@ -62,16 +64,16 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
             </p>
           </div>
         </div>
-        <img src="/icon/chevron-down.svg" alt="Select" className="model-selector-arrow" />
+        <img src="/icon/chevron-down.svg" alt={t('common.select')} className="model-selector-arrow" />
       </div>
 
       {showModal && createPortal(
         <div className="modal-overlay show" onClick={() => setShowModal(false)}>
           <div className="modal-content model-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Select AI Model</h2>
+              <h2>{t('model.selectAIModel')}</h2>
               <button className="modal-close-btn" onClick={() => setShowModal(false)}>
-                <img src="/icon/x.svg" alt="Close" />
+                <img src="/icon/x.svg" alt={t('common.close')} />
               </button>
             </div>
 
@@ -90,7 +92,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
                       <h3>
                         {model.name}
                         {selectedModel === model.id && (
-                          <span className="model-modal-badge">[IN USE]</span>
+                          <span className="model-modal-badge">{t('model.inUse')}</span>
                         )}
                       </h3>
                       <div className="model-modal-speed">
@@ -106,28 +108,11 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
                   </div>
 
                   <div className="model-modal-tags">
-                    {model.tags.map((tag, idx) => {
-                      const getTagIcon = (tagName) => {
-                        const iconMap = {
-                          'Experimental': 'zap',
-                          'New Features': 'sparkles',
-                          'Short Text': 'file-text',
-                          'Low Cost': 'dollar-sign',
-                          'Versatile': 'layers',
-                          'Recommended': 'star',
-                          'Important Text': 'file',
-                          'High Quality': 'award'
-                        }
-                        return iconMap[tagName] || 'tag'
-                      }
-                      
-                      return (
-                        <span key={idx} className="model-modal-tag">
-                          <img src={`/icon/${getTagIcon(tag)}.svg`} alt="" />
-                          {tag}
-                        </span>
-                      )
-                    })}
+                    {model.tags.map((tag, idx) => (
+                      <span key={idx} className="model-modal-tag">
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
               ))}

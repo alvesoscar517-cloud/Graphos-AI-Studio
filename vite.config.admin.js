@@ -29,7 +29,7 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: resolve(__dirname, 'dist-admin'), // Build vào thư mục riêng
+    outDir: resolve(__dirname, 'dist-admin'), // Build to separate folder
     emptyOutDir: true,
     rollupOptions: {
       input: {

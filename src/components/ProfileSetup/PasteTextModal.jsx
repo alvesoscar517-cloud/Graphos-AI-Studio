@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { debounce } from '../../utils/debounce'
 import './PasteTextModal.css'
 
 const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
+  const { t } = useTranslation()
   const [text, setText] = useState('')
   const [wordCount, setWordCount] = useState(0)
   const [analysis, setAnalysis] = useState(null)
@@ -95,10 +97,10 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
     
     // 2. Paragraph structure (15 points max)
     if (paragraphCount < 2 && wordCount > 200) {
-      smartHints.push(`Nên chia thành nhiều đoạn văn (hiện: ${paragraphCount} đoạn)`)
+      smartHints.push(`Should split into multiple paragraphs (current: ${paragraphCount} paragraphs)`)
       qualityScore += 5
     } else if (avgParagraphLength > 200) {
-      smartHints.push(`Đoạn văn quá dài (TB: ${Math.round(avgParagraphLength)} từ/đoạn). Nên chia nhỏ hơn`)
+      smartHints.push(`Paragraphs too long (Avg: ${Math.round(avgParagraphLength)} words/paragraph). Should split smaller`)
       qualityScore += 10
     } else if (paragraphCount >= 2) {
       qualityScore += 15
@@ -106,20 +108,20 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
     
     // 3. Vocabulary diversity (20 points max)
     if (vocabularyDiversity < 40) {
-      smartHints.push(`Từ vựng lặp lại nhiều (${vocabularyDiversity.toFixed(0)}% unique). Dùng từ đồng nghĩa`)
+      smartHints.push(`Vocabulary repetitive (${vocabularyDiversity.toFixed(0)}% unique). Use synonyms`)
       qualityScore += 5
     } else if (vocabularyDiversity >= 40 && vocabularyDiversity < 60) {
       qualityScore += 15
     } else {
       qualityScore += 20
       if (wordCount >= 1000) {
-        smartHints.push(`Từ vựng đa dạng tuyệt vời (${vocabularyDiversity.toFixed(0)}% unique)`)
+        smartHints.push(`Vocabulary very diverse (${vocabularyDiversity.toFixed(0)}% unique)`)
       }
     }
     
     // 4. Sentence structure (15 points max)
     if (avgSentenceLength < 8) {
-      smartHints.push(`Câu quá ngắn (TB: ${avgSentenceLength.toFixed(1)} từ/câu). Kết hợp câu phức tạp hơn`)
+      smartHints.push(`Sentences too short (Avg: ${avgSentenceLength.toFixed(1)} words/sentence). Combine more complex sentences`)
       qualityScore += 5
     } else if (avgSentenceLength > 25) {
       smartHints.push(`Sentences too long (avg: ${avgSentenceLength.toFixed(1)} words/sentence). Break them up for readability`)
@@ -140,7 +142,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
       1 - Math.abs((shortSentences + longSentences) / sentenceCount - 0.4) : 0
     
     if (sentenceVariety < 0.5 && sentenceCount > 5) {
-      smartHints.push(`Cấu trúc câu đơn điệu. Kết hợp câu ngắn, dài để tạo nhịp điệu`)
+      smartHints.push(`Sentence structure monotonous. Mix short and long sentences for rhythm`)
     }
     
     return {
@@ -217,33 +219,30 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
   // Get dynamic word count label based on milestone
   const getWordCountLabel = () => {
     if (wordCount < 500) {
-      return `/ 500 minimum words • Need ${500 - wordCount} more words`
-    }
-    if (wordCount < 800) {
-      return '/ 500 minimum words • Provide 500-800 words for AI to recognize basic patterns'
+      return `Need ${500 - wordCount} more words to reach minimum`
     }
     if (wordCount < 1000) {
-      return `/ 1000 words • Add ${1000 - wordCount} more words to reach recommended level`
+      return `Add ${1000 - wordCount} more words to reach recommended level`
     }
-    if (wordCount < 1500) {
-      return '/ 1500 words • Provide 1000-1500 words for clear AI style learning'
+    if (wordCount < 2000) {
+      return 'Good progress! Add more for better AI learning'
     }
-    if (wordCount < 2500) {
-      return `/ 2500 words • Add ${2500 - wordCount} more words to reach optimal level`
+    if (wordCount < 3000) {
+      return 'Great! Add more for deeper AI learning'
     }
     if (wordCount < 5000) {
-      return '/ 5000 words • Provide 2500-5000 words for deep AI learning (structure, tone, vocabulary)'
+      return 'Excellent! Ideal length for best AI learning'
     }
-    return '/ 5000 words • Excellent! Reached maximum limit'
+    return 'Perfect! Reached maximum limit'
   }
 
   // Get primary smart hint for footer (only show most important one)
   const getPrimaryHint = () => {
     if (wordCount === 0) {
-      return 'Paste your text to start analysis'
+      return t('profileSetup.pasteToStart')
     }
     if (wordCount < 100) {
-      return 'Keep typing to analyze text quality'
+      return t('profileSetup.keepTyping')
     }
     
     // Show first smart hint from analysis
@@ -251,7 +250,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
       return analysis.smartHints[0]
     }
     
-    return 'Great text! AI will learn your writing style'
+    return t('profileSetup.greatText')
   }
 
   return (
@@ -260,12 +259,12 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
         {/* Header with Icon */}
         <div className="paste-modal-header">
           <div className="paste-modal-icon">
-            <img src="/icon/edit-3.svg" alt="" width="24" height="24" />
+            <img src="/icon/edit-3.svg" alt={t('profileSetup.pasteTextTitle')} width="24" height="24" />
           </div>
           <div>
-            <h2 className="paste-modal-title">Paste Text</h2>
+            <h2 className="paste-modal-title">{t('profileSetup.pasteTextTitle')}</h2>
             <p className="paste-modal-subtitle">
-              The more text you provide, the better AI understands your writing style
+              {t('profileSetup.pasteTextSubtitle')}
             </p>
           </div>
         </div>
@@ -274,7 +273,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
         <div className="paste-modal-content">
           <textarea
             className="paste-modal-textarea"
-            placeholder="Paste your text here (minimum 500 words, recommended 1000-1500 words)..."
+            placeholder={t('profileSetup.pasteTextPlaceholder')}
             value={text}
             onChange={(e) => handleTextChange(e.target.value)}
           />
@@ -283,17 +282,17 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
           <div className="paste-progress-section">
             <div className="paste-progress-header">
               <div className="paste-word-count-badge">
-                <img src="/icon/type.svg" alt="" width="14" height="14" />
-                <span className="paste-word-count-number">{wordCount}</span>
+                <span className="paste-word-count-number">{wordCount.toLocaleString()}</span>
                 <span className="paste-word-count-divider">/</span>
-                <span className="paste-word-count-max">3000</span>
+                <span className="paste-word-count-max">5,000 {t('common.words')}</span>
               </div>
               <div className="paste-progress-status" data-status={getProgressStatus()}>
-                {wordCount >= 3000 ? '[EXCELLENT]' : 
-                 wordCount >= 2000 ? '[VERY GOOD]' :
-                 wordCount >= 1500 ? '[GOOD]' :
-                 wordCount >= 1000 ? '[FAIR]' :
-                 wordCount >= 500 ? '[MINIMUM]' : '[NEED MORE]'}
+                {wordCount >= 5000 ? `[${t('profileSetup.maximum')}]` :
+                 wordCount >= 3000 ? `[${t('profileSetup.excellent')}]` : 
+                 wordCount >= 2000 ? `[${t('profileSetup.veryGood')}]` :
+                 wordCount >= 1500 ? `[${t('profileSetup.good')}]` :
+                 wordCount >= 1000 ? `[${t('profileSetup.fair')}]` :
+                 wordCount >= 500 ? `[${t('profileSetup.minimum')}]` : `[${t('profileSetup.needMore')}]`}
               </div>
             </div>
             <div className="paste-progress-bar-wrapper">
@@ -307,9 +306,9 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
               <div className="paste-progress-milestones">
                 <span className="paste-milestone" data-active={wordCount >= 500}>500</span>
                 <span className="paste-milestone" data-active={wordCount >= 1000}>1K</span>
-                <span className="paste-milestone" data-active={wordCount >= 1500}>1.5K</span>
                 <span className="paste-milestone" data-active={wordCount >= 2000}>2K</span>
                 <span className="paste-milestone" data-active={wordCount >= 3000}>3K</span>
+                <span className="paste-milestone" data-active={wordCount >= 5000}>5K</span>
               </div>
             </div>
           </div>
@@ -318,19 +317,19 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
         {/* Footer */}
         <div className="paste-modal-footer">
           <div className="paste-footer-hint">
-            <img src="/icon/lightbulb.svg" alt="" width="16" height="16" />
+            <img src="/icon/lightbulb.svg" alt="Tip" width="16" height="16" />
             <span>{getPrimaryHint()}</span>
           </div>
           <div className="paste-footer-buttons">
             <button className="paste-modal-btn paste-modal-btn-cancel" onClick={handleClose}>
-              Cancel
+              {t('common.cancel')}
             </button>
             <button 
               className="paste-modal-btn paste-modal-btn-save" 
               onClick={handleSave}
               disabled={!canSave}
             >
-              Save Text
+              {t('profileSetup.saveText')}
             </button>
           </div>
         </div>

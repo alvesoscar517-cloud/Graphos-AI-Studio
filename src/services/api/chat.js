@@ -131,7 +131,7 @@ export async function sendChatMessageStream(
               } else if (json.chunk) {
                 onChunk(json.chunk)
               } else if (json.error) {
-                console.error('❌ Server error:', json.error)
+                console.error('[FAIL] Server error:', json.error)
                 throw {
                   code: json.code || 'INTERNAL_ERROR',
                   message: json.error,
@@ -140,7 +140,7 @@ export async function sendChatMessageStream(
               }
             } catch (e) {
               if (e.code) throw e // Re-throw formatted errors
-              console.warn('⚠️ Failed to parse JSON:', data, e)
+              console.warn('[WARNING] Failed to parse JSON:', data, e)
             }
           }
         }
@@ -149,7 +149,7 @@ export async function sendChatMessageStream(
     
     return { success: true, summary, outputTokens }
   } catch (error) {
-    console.error('❌ Error streaming chat:', error)
+    console.error('[FAIL] Error streaming chat:', error)
     const errorMessage = formatErrorMessage(error)
     throw new Error(errorMessage)
   }
@@ -202,7 +202,7 @@ export async function sendChatMessage(
     
     return await response.json()
   } catch (error) {
-    console.error('❌ Error sending chat:', error)
+    console.error('[FAIL] Error sending chat:', error)
     throw new Error(formatErrorMessage(error))
   }
 }
@@ -238,7 +238,7 @@ export async function uploadChatFile(base64Data, mimeType, fileName) {
     
     return await response.json()
   } catch (error) {
-    console.error('❌ Error uploading file:', error)
+    console.error('[FAIL] Error uploading file:', error)
     throw new Error(formatErrorMessage(error))
   }
 }
@@ -268,7 +268,7 @@ export async function summarizeConversation(messages) {
     
     return await response.json()
   } catch (error) {
-    console.error('❌ Error summarizing:', error)
+    console.error('[FAIL] Error summarizing:', error)
     throw new Error(formatErrorMessage(error))
   }
 }
@@ -395,7 +395,7 @@ export async function sendHumanizedChatStream(
               }
             } catch (e) {
               if (e.code) throw e
-              console.warn('⚠️ Failed to parse JSON:', data, e)
+              console.warn('[WARNING] Failed to parse JSON:', data, e)
             }
           }
         }
@@ -404,7 +404,7 @@ export async function sendHumanizedChatStream(
     
     return { success: true, summary, outputTokens, humanization: humanizationResult }
   } catch (error) {
-    console.error('❌ Error streaming humanized chat:', error)
+    console.error('[FAIL] Error streaming humanized chat:', error)
     throw new Error(formatErrorMessage(error))
   }
 }

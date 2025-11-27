@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
@@ -8,22 +9,23 @@ import threeDotsAnimation from '../../animation/Three dots loading.json'
 import './Analysis.css'
 import './CompatibilityCard.css'
 
-// Helper function to format breakdown labels
-const formatBreakdownLabel = (key) => {
-  const labels = {
-    avgWordLength: 'Độ dài từ',
-    avgSentenceLength: 'Độ dài câu',
-    readabilityScore: 'Dễ đọc',
-    vocabularyRichness: 'Từ vựng',
-    punctuationRatio: 'Dấu câu',
-    avgParagraphLength: 'Độ dài đoạn',
-    sentenceStarterSimilarity: 'Cách mở đầu câu',
-    transitionWordSimilarity: 'Từ nối'
-  }
-  return labels[key] || key
-}
-
 const CompatibilityCard = ({ disabled, currentProfile, text }) => {
+  const { t } = useTranslation()
+
+  // Helper function to format breakdown labels
+  const formatBreakdownLabel = (key) => {
+    const labels = {
+      avgWordLength: t('analysis.avgWordLength'),
+      avgSentenceLength: t('analysis.avgSentenceLength'),
+      readabilityScore: t('analysis.readability'),
+      vocabularyRichness: t('analysis.vocabulary'),
+      punctuationRatio: t('analysis.punctuationRatio'),
+      avgParagraphLength: t('analysis.avgParagraphLength'),
+      sentenceStarterSimilarity: t('analysis.sentenceStarters'),
+      transitionWordSimilarity: t('analysis.transitionWords')
+    }
+    return labels[key] || key
+  }
   const [score, setScore] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [analysisDetails, setAnalysisDetails] = useState(null)
@@ -51,7 +53,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
         setScore(cached.score)
         setAnalysisDetails(cached.details)
         setTextChanged(false)
-        console.log('📦 Loaded cached compatibility result for note:', currentNote.id)
+        console.log('[PACKAGE] Loaded cached compatibility result for note:', currentNote.id)
       }
     }
   }, [currentNote?.id, currentProfile?.profile_id])
@@ -70,7 +72,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
       setScore(cached.score)
       setAnalysisDetails(cached.details)
       setTextChanged(false)
-      console.log('📦 Loaded cached compatibility result for text change')
+      console.log('[PACKAGE] Loaded cached compatibility result for text change')
     } else {
       // Text/profile changed but no cache - reset result and enable button
       setScore(null)
@@ -81,19 +83,19 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
 
   const calculateScore = async () => {
     if (!currentProfile || !text) {
-      modal.error('Please select a profile and enter text')
+      modal.error(t('analysis.pleaseSelectProfileAndText'))
       return
     }
 
     if (!currentNote) {
-      modal.error('Không tìm thấy note hiện tại')
+      modal.error(t('analysis.currentNoteNotFound'))
       return
     }
     
     setIsLoading(true)
     try {
-      console.log('🔍 Analyzing with profile:', currentProfile.profile_id)
-      console.log('📝 Text length:', text.length)
+      console.log('[SEARCH] Analyzing with profile:', currentProfile.profile_id)
+      console.log('[NOTE] Text length:', text.length)
       
       const result = await analyzeText(currentProfile.profile_id, text)
       
@@ -114,15 +116,15 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
         setTextChanged(false)
         
         // Show detailed toast
-        const cacheStatus = result.data.cache_hit ? '⚡ Cache' : '💾 Fresh'
+        const cacheStatus = result.data.cache_hit ? t('common.cached') : t('common.fresh')
         const processingTime = result.data.processing_time_ms || 0
         modal.toast(
-          'Tính toán hoàn tất', 
-          `Điểm: ${compatibilityScore}% | ${cacheStatus} | ${processingTime}ms`, 
+          t('analysis.calculationComplete'), 
+          `${t('profile.score')}: ${compatibilityScore}% | ${cacheStatus} | ${processingTime}ms`, 
           'success'
         )
         
-        console.log('✅ Analysis complete:', {
+        console.log('[SUCCESS] Analysis complete:', {
           score: compatibilityScore,
           vectorScore: result.data.vector_score,
           statisticalScore: result.data.statistical_score,
@@ -133,11 +135,11 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
           sentenceCount: result.data.sentence_analysis?.length || 0
         })
       } else {
-        throw new Error(result.error || 'Calculation failed')
+        throw new Error(result.error || t('analysis.calculationFailed'))
       }
     } catch (error) {
-      console.error('❌ Error calculating score:', error)
-      modal.error('Tính toán thất bại: ' + error.message)
+      console.error('[FAIL] Error calculating score:', error)
+      modal.error(t('analysis.calculationFailed') + ' ' + error.message)
       setScore(null)
       setAnalysisDetails(null)
     } finally {
@@ -154,11 +156,11 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
   }
 
   const getScoreLabel = (score) => {
-    if (score >= 90) return 'Rất tương thích'
-    if (score >= 75) return 'Tương thích tốt'
-    if (score >= 60) return 'Tương thích trung bình'
-    if (score >= 40) return 'Tương thích thấp'
-    return 'Không tương thích'
+    if (score >= 90) return t('analysis.veryCompatible')
+    if (score >= 75) return t('analysis.goodCompatibility')
+    if (score >= 60) return t('analysis.averageCompatibility')
+    if (score >= 40) return t('analysis.lowCompatibility')
+    return t('analysis.notCompatible')
   }
 
 
@@ -168,17 +170,17 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
       <div className="feature-card compatibility-card">
         <div className="feature-card-header">
           <div className="feature-icon compatibility-icon">
-            <img src="/icon/target.svg" alt="Compatibility" />
+            <img src="/icon/target.svg" alt={t('analysis.compatibilityScore')} />
           </div>
           <div className="feature-info">
-            <h4>Điểm tương thích</h4>
-            <p>Văn phong</p>
+            <h4>{t('analysis.compatibilityScore')}</h4>
+            <p>{t('analysis.writingStyle')}</p>
           </div>
           {score !== null && (
             <button 
               className={`toggle-result-btn ${showResult ? 'expanded' : 'collapsed'}`}
               onClick={() => setShowResult(!showResult)}
-              data-tooltip={showResult ? 'Hide results' : 'Show results'}
+              data-tooltip={showResult ? t('common.hide') : t('common.show')}
               data-tooltip-position="left"
             >
               <img 
@@ -192,7 +194,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
           className={`feature-btn ${isLoading ? 'loading' : ''}`}
           onClick={calculateScore}
           disabled={disabled || isLoading || !textChanged}
-          title={!textChanged ? 'Văn bản chưa thay đổi' : ''}
+          title={!textChanged ? t('analysis.calculated') : ''}
         >
           {isLoading ? (
             <Lottie 
@@ -202,8 +204,8 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
             />
           ) : (
             <>
-              <span>{!textChanged ? 'Đã tính' : 'Tính điểm'}</span>
-              <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
+              <span>{!textChanged ? t('analysis.calculated') : t('analysis.calculateScore')}</span>
+              <img src="/icon/arrow-right.svg" alt="" className="btn-arrow" />
             </>
           )}
         </button>
@@ -211,27 +213,24 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
           <div className="feature-result" style={{ display: 'block' }}>
             <div className="compatibility-score-display">
               <div className="compatibility-score-circle">
-                <svg className="compatibility-score-svg" viewBox="0 0 110 110">
+                <svg className="compatibility-score-svg" viewBox="0 0 100 100">
                   <defs>
                     <linearGradient id="compatibilityGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stopColor="#4facfe" />
                       <stop offset="100%" stopColor="#00d4ff" />
                     </linearGradient>
                   </defs>
-                  {/* Progress track */}
-                  <circle className="compatibility-score-bg" cx="55" cy="55" r="50"></circle>
-                  {/* Progress bar */}
+                  <circle className="compatibility-score-bg" cx="50" cy="50" r="45"></circle>
                   <circle 
                     className="compatibility-score-progress" 
-                    cx="55" 
-                    cy="55" 
-                    r="50"
+                    cx="50" 
+                    cy="50" 
+                    r="45"
                     style={{
-                      strokeDashoffset: 314.16 - (score / 100) * 314.16
+                      strokeDashoffset: 282.74 - (score / 100) * 282.74
                     }}
                   ></circle>
-                  {/* White inner circle to create donut effect */}
-                  <circle className="compatibility-score-inner" cx="55" cy="55" r="45"></circle>
+                  <circle className="compatibility-score-inner" cx="50" cy="50" r="40"></circle>
                 </svg>
                 <div className="compatibility-score-text">
                   <div className="compatibility-score-number">{score}</div>
@@ -251,7 +250,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
               {analysisDetails && (
                 <div className="compatibility-breakdown">
                   <div className="breakdown-item">
-                    <span className="breakdown-label">Vector</span>
+                    <span className="breakdown-label">{t('analysis.vector')}</span>
                     <div className="breakdown-bar">
                       <div 
                         className="breakdown-fill" 
@@ -264,7 +263,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                     <span className="breakdown-value">{Math.round(analysisDetails.vector_score)}%</span>
                   </div>
                   <div className="breakdown-item">
-                    <span className="breakdown-label">Thống kê</span>
+                    <span className="breakdown-label">{t('analysis.statistical')}</span>
                     <div className="breakdown-bar">
                       <div 
                         className="breakdown-fill" 
@@ -278,7 +277,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                   </div>
                   {analysisDetails.confidence && (
                     <div className="breakdown-item confidence-item">
-                      <span className="breakdown-label">Độ tin cậy</span>
+                      <span className="breakdown-label">{t('analysis.confidence')}</span>
                       <div className="breakdown-bar">
                         <div 
                           className="breakdown-fill" 
@@ -293,21 +292,21 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                   )}
                   {analysisDetails.deviation_summary && analysisDetails.deviation_summary.total > 0 && (
                     <div className="deviation-summary">
-                      <span className="deviation-label">Câu lệch văn phong:</span>
+                      <span className="deviation-label">{t('analysis.styleDeviationSentences')}</span>
                       <div className="deviation-badges">
                         {analysisDetails.deviation_summary.by_severity.severe > 0 && (
                           <span className="deviation-badge severe">
-                            {analysisDetails.deviation_summary.by_severity.severe} nghiêm trọng
+                            {analysisDetails.deviation_summary.by_severity.severe} {t('analysis.severe')}
                           </span>
                         )}
                         {analysisDetails.deviation_summary.by_severity.moderate > 0 && (
                           <span className="deviation-badge moderate">
-                            {analysisDetails.deviation_summary.by_severity.moderate} trung bình
+                            {analysisDetails.deviation_summary.by_severity.moderate} {t('analysis.moderate')}
                           </span>
                         )}
                         {analysisDetails.deviation_summary.by_severity.mild > 0 && (
                           <span className="deviation-badge mild">
-                            {analysisDetails.deviation_summary.by_severity.mild} nhẹ
+                            {analysisDetails.deviation_summary.by_severity.mild} {t('analysis.mild')}
                           </span>
                         )}
                       </div>
@@ -320,7 +319,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                 className="detail-btn-full"
                 onClick={() => setShowModal(true)}
               >
-                <span>Xem chi tiết</span>
+                <span>{t('common.viewDetails')}</span>
                 <img src="/icon/chevron-right.svg" alt="detail" />
               </button>
             </div>
@@ -331,21 +330,21 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
 
 
 
-      {/* Modal hiển thị chi tiết */}
+      {/* Modal showing details */}
       {showModal && analysisDetails && (
         <div className="ai-detail-overlay" onClick={() => setShowModal(false)}>
           <div className="ai-detail-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ai-detail-header">
-              <h3>Detailed Analysis</h3>
+              <h3>{t('analysis.detailedAnalysis')}</h3>
               <button className="close-detail-btn" onClick={() => setShowModal(false)}>
-                <img src="/icon/x.svg" alt="close" />
+                <img src="/icon/x.svg" alt={t('common.close')} />
               </button>
             </div>
             <div className="ai-detail-body">
               <div className="ai-detail-score">
                 <div>
                   <div className="ai-detail-label">
-                    Điểm tương thích
+                    {t('analysis.compatibilityScore')}
                   </div>
                   <div className="ai-detail-value" style={{ color: getScoreColor(score) }}>
                     {score}%
@@ -353,7 +352,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div className="ai-detail-label">
-                    Hồ sơ
+                    {t('nav.profile')}
                   </div>
                   <div className="ai-detail-verdict">
                     {analysisDetails.profile_name}
@@ -363,25 +362,25 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
 
               <div className="compatibility-detail-stats">
                 <div className="stat-card">
-                  <div className="stat-label">Vector Score</div>
+                  <div className="stat-label">{t('analysis.vectorScore')}</div>
                   <div className="stat-value">{Math.round(analysisDetails.vector_score)}%</div>
-                  <div className="stat-desc">Semantic similarity</div>
+                  <div className="stat-desc">{t('analysis.semanticSimilarity')}</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-label">Statistical Score</div>
+                  <div className="stat-label">{t('analysis.statisticalScore')}</div>
                   <div className="stat-value">{Math.round(analysisDetails.statistical_score)}%</div>
-                  <div className="stat-desc">Structural similarity</div>
+                  <div className="stat-desc">{t('analysis.structuralSimilarity')}</div>
                 </div>
               </div>
 
               <div className="compatibility-detail-weights">
-                <h4>Trọng số tính toán</h4>
+                <h4>{t('analysis.calculationWeights')}</h4>
                 <div className="weight-item">
-                  <span>Embedding</span>
+                  <span>{t('analysis.embedding')}</span>
                   <span>{Math.round(analysisDetails.embedding_weight * 100)}%</span>
                 </div>
                 <div className="weight-item">
-                  <span>Statistical</span>
+                  <span>{t('analysis.statistical')}</span>
                   <span>{Math.round(analysisDetails.statistical_weight * 100)}%</span>
                 </div>
               </div>
@@ -389,28 +388,28 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
               <div className="compatibility-detail-info">
                 <div className="info-row">
                   <img src="/icon/file-text.svg" alt="" />
-                  <span>Samples used:</span>
+                  <span>{t('analysis.samplesUsed')}</span>
                   <span>{analysisDetails.samples_used}</span>
                 </div>
                 <div className="info-row">
                   <img src="/icon/clock.svg" alt="" />
-                  <span>Processing time:</span>
+                  <span>{t('analysis.processingTime')}</span>
                   <span>{analysisDetails.processing_time_ms}ms</span>
                 </div>
                 <div className="info-row">
                   <img src={analysisDetails.cache_hit ? "/icon/zap.svg" : "/icon/database.svg"} alt="" />
-                  <span>Cache status:</span>
-                  <span>{analysisDetails.cache_hit ? 'Cached' : 'Fresh'}</span>
+                  <span>{t('analysis.cacheStatus')}</span>
+                  <span>{analysisDetails.cache_hit ? t('common.cached') : t('common.fresh')}</span>
                 </div>
                 <div className="info-row">
                   <img src="/icon/list.svg" alt="" />
-                  <span>Sentences analyzed:</span>
+                  <span>{t('analysis.sentencesAnalyzed')}</span>
                   <span>{analysisDetails.sentence_analysis?.length || 0}</span>
                 </div>
                 {analysisDetails.deviant_sentences && analysisDetails.deviant_sentences.length > 0 && (
                   <div className="info-row">
                     <img src="/icon/alert-triangle.svg" alt="" />
-                    <span>Deviant sentences:</span>
+                    <span>{t('analysis.deviantSentences')}</span>
                     <span style={{ color: '#ea4335' }}>{analysisDetails.deviant_sentences.length}</span>
                   </div>
                 )}
@@ -418,7 +417,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
 
               {analysisDetails.statistical_breakdown && (
                 <div className="compatibility-detail-breakdown">
-                  <h4>Chi tiết so sánh thống kê</h4>
+                  <h4>{t('analysis.statisticalComparisonDetails')}</h4>
                   <div className="stats-grid">
                     {Object.entries(analysisDetails.statistical_breakdown).map(([key, value]) => (
                       <div className="stat-item" key={key}>
@@ -441,32 +440,32 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
 
               {analysisDetails.statistics && (
                 <div className="compatibility-detail-stats-full">
-                  <h4>Thống kê văn bản</h4>
+                  <h4>{t('analysis.textStatistics')}</h4>
                   <div className="stats-grid">
                     <div className="stat-item">
-                      <span>Avg word length</span>
+                      <span>{t('analysis.avgWordLength')}</span>
                       <span>{analysisDetails.statistics.avgWordLength}</span>
                     </div>
                     <div className="stat-item">
-                      <span>Avg sentence length</span>
+                      <span>{t('analysis.avgSentenceLength')}</span>
                       <span>{analysisDetails.statistics.avgSentenceLength}</span>
                     </div>
                     <div className="stat-item">
-                      <span>Vocabulary richness</span>
+                      <span>{t('analysis.vocabularyRichness')}</span>
                       <span>{analysisDetails.statistics.vocabularyRichness?.toFixed(3) || 'N/A'}</span>
                     </div>
                     <div className="stat-item">
-                      <span>Readability score</span>
+                      <span>{t('analysis.readabilityScore')}</span>
                       <span>{analysisDetails.statistics.readabilityScore?.toFixed(1) || 'N/A'}</span>
                     </div>
                     <div className="stat-item">
-                      <span>Avg paragraph length</span>
+                      <span>{t('analysis.avgParagraphLength')}</span>
                       <span>{analysisDetails.statistics.avgParagraphLength?.toFixed(1) || 'N/A'}</span>
                     </div>
                     {analysisDetails.detected_language && (
                       <div className="stat-item">
-                        <span>Ngôn ngữ</span>
-                        <span>{analysisDetails.detected_language === 'vi' ? 'Tiếng Việt' : 'English'}</span>
+                        <span>{t('analysis.language')}</span>
+                        <span>{analysisDetails.detected_language === 'vi' ? t('analysis.vietnamese') : t('analysis.english')}</span>
                       </div>
                     )}
                   </div>
@@ -475,29 +474,29 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
 
               {analysisDetails.confidence_factors && (
                 <div className="compatibility-detail-confidence">
-                  <h4>Yếu tố độ tin cậy</h4>
+                  <h4>{t('analysis.confidenceFactors')}</h4>
                   <div className="confidence-factors">
                     {analysisDetails.confidence_factors.variancePenalty !== undefined && (
                       <div className="factor-item negative">
-                        <span>Độ biến thiên</span>
+                        <span>{t('analysis.variance')}</span>
                         <span>-{analysisDetails.confidence_factors.variancePenalty.toFixed(1)}%</span>
                       </div>
                     )}
                     {analysisDetails.confidence_factors.sampleBonus !== undefined && (
                       <div className="factor-item positive">
-                        <span>Số mẫu profile</span>
+                        <span>{t('analysis.profileSamples')}</span>
                         <span>+{analysisDetails.confidence_factors.sampleBonus.toFixed(1)}%</span>
                       </div>
                     )}
                     {analysisDetails.confidence_factors.sentenceBonus !== undefined && (
                       <div className="factor-item positive">
-                        <span>Số câu phân tích</span>
+                        <span>{t('analysis.analyzedSentences')}</span>
                         <span>+{analysisDetails.confidence_factors.sentenceBonus.toFixed(1)}%</span>
                       </div>
                     )}
                     {analysisDetails.confidence_factors.meanCertainty !== undefined && (
                       <div className="factor-item positive">
-                        <span>Độ rõ ràng</span>
+                        <span>{t('analysis.clarity')}</span>
                         <span>+{analysisDetails.confidence_factors.meanCertainty.toFixed(1)}%</span>
                       </div>
                     )}

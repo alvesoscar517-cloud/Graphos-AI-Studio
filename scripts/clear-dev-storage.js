@@ -7,16 +7,16 @@ console.log('🧹 Clearing development storage...')
 
 // Clear dev test profile
 localStorage.removeItem('dev_test_profile')
-console.log('✅ Cleared dev_test_profile')
+console.log('[SUCCESS] Cleared dev_test_profile')
 
 // Clear active profile
 localStorage.removeItem('activeProfileId')
 localStorage.removeItem('activeProfileName')
-console.log('✅ Cleared active profile')
+console.log('[SUCCESS] Cleared active profile')
 
 // Clear profile cache invalidation flag
 localStorage.removeItem('profileCacheInvalidated')
-console.log('✅ Cleared cache invalidation flag')
+console.log('[SUCCESS] Cleared cache invalidation flag')
 
 // List remaining items
 console.log('\n📋 Remaining localStorage items:')
@@ -25,5 +25,5 @@ for (let i = 0; i < localStorage.length; i++) {
   console.log(`  - ${key}`)
 }
 
-console.log('\n✅ Development storage cleared!')
+console.log('\n[SUCCESS] Development storage cleared!')
 console.log('💡 Refresh the page to reload with clean state')

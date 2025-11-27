@@ -21,19 +21,19 @@ const NOTIFICATION_TEMPLATES = {
     priority: 'high',
     translations: {
       vi: {
-        title: '🎉 Chào mừng bạn đến với AI Content Auth!',
-        message: 'Bạn đã nhận được {credits} credits miễn phí để bắt đầu. Hãy khám phá các tính năng phân tích AI của chúng tôi!',
-        cta: 'Bắt đầu ngay'
+        title: 'Welcome to AI Content Auth!',
+        message: 'You have received {credits} free credits to get started. Explore our AI analysis features!',
+        cta: 'Get Started'
       },
       en: {
-        title: '🎉 Welcome to AI Content Auth!',
+        title: 'Welcome to AI Content Auth!',
         message: 'You have received {credits} free credits to get started. Explore our AI analysis features!',
         cta: 'Get Started'
       },
       ja: {
-        title: '🎉 AI Content Authへようこそ！',
-        message: '{credits}の無料クレジットを受け取りました。AI分析機能をお試しください！',
-        cta: '始める'
+        title: 'Welcome to AI Content Auth!',
+        message: 'You have received {credits} free credits to get started. Explore our AI analysis features!',
+        cta: 'Get Started'
       }
     },
     ctaAction: { type: 'view', action: 'aistudio-editor' }
@@ -45,19 +45,19 @@ const NOTIFICATION_TEMPLATES = {
     priority: 'high',
     translations: {
       vi: {
-        title: '✅ Thanh toán thành công!',
-        message: 'Bạn đã mua gói {packageName} và nhận được {credits} credits. Số dư hiện tại: {balance} credits.',
-        cta: 'Xem lịch sử'
+        title: 'Payment Successful!',
+        message: 'You purchased {packageName} and received {credits} credits. Current balance: {balance} credits.',
+        cta: 'View History'
       },
       en: {
-        title: '✅ Payment Successful!',
+        title: 'Payment Successful!',
         message: 'You purchased {packageName} and received {credits} credits. Current balance: {balance} credits.',
         cta: 'View History'
       },
       ja: {
-        title: '✅ 支払い完了！',
-        message: '{packageName}を購入し、{credits}クレジットを受け取りました。現在の残高：{balance}クレジット。',
-        cta: '履歴を見る'
+        title: 'Payment Successful!',
+        message: 'You purchased {packageName} and received {credits} credits. Current balance: {balance} credits.',
+        cta: 'View History'
       }
     },
     ctaAction: { type: 'view', action: 'settings' }
@@ -69,19 +69,19 @@ const NOTIFICATION_TEMPLATES = {
     priority: 'medium',
     translations: {
       vi: {
-        title: '⚠️ Credits sắp hết',
-        message: 'Bạn chỉ còn {credits} credits. Hãy nạp thêm để tiếp tục sử dụng dịch vụ.',
-        cta: 'Nạp credits'
+        title: 'Low Credits',
+        message: 'You only have {credits} credits left. Top up to continue using our services.',
+        cta: 'Buy Credits'
       },
       en: {
-        title: '⚠️ Low Credits',
+        title: 'Low Credits',
         message: 'You only have {credits} credits left. Top up to continue using our services.',
         cta: 'Buy Credits'
       },
       ja: {
-        title: '⚠️ クレジット残高が少なくなっています',
-        message: '残り{credits}クレジットです。サービスを継続するにはチャージしてください。',
-        cta: 'クレジットを購入'
+        title: 'Low Credits',
+        message: 'You only have {credits} credits left. Top up to continue using our services.',
+        cta: 'Buy Credits'
       }
     },
     ctaAction: { type: 'view', action: 'upgrade' }
@@ -93,19 +93,19 @@ const NOTIFICATION_TEMPLATES = {
     priority: 'medium',
     translations: {
       vi: {
-        title: '🎤 Voice Profile đã tạo!',
-        message: 'Profile "{profileName}" đã được tạo thành công. Bây giờ bạn có thể sử dụng nó để phân tích văn bản.',
-        cta: 'Sử dụng ngay'
+        title: 'Voice Profile Created!',
+        message: 'Profile "{profileName}" has been created successfully. You can now use it for text analysis.',
+        cta: 'Use Now'
       },
       en: {
-        title: '🎤 Voice Profile Created!',
+        title: 'Voice Profile Created!',
         message: 'Profile "{profileName}" has been created successfully. You can now use it for text analysis.',
         cta: 'Use Now'
       },
       ja: {
-        title: '🎤 ボイスプロファイル作成完了！',
-        message: 'プロファイル「{profileName}」が作成されました。テキスト分析に使用できます。',
-        cta: '今すぐ使う'
+        title: 'Voice Profile Created!',
+        message: 'Profile "{profileName}" has been created successfully. You can now use it for text analysis.',
+        cta: 'Use Now'
       }
     },
     ctaAction: { type: 'view', action: 'aistudio-editor' }
@@ -117,19 +117,19 @@ const NOTIFICATION_TEMPLATES = {
     priority: 'high',
     translations: {
       vi: {
-        title: '⏰ Credits sắp hết hạn',
-        message: '{credits} credits của bạn sẽ hết hạn trong {days} ngày. Hãy sử dụng trước khi hết hạn!',
-        cta: 'Sử dụng ngay'
+        title: 'Credits Expiring Soon',
+        message: 'Your {credits} credits will expire in {days} days. Use them before they expire!',
+        cta: 'Use Now'
       },
       en: {
-        title: '⏰ Credits Expiring Soon',
+        title: 'Credits Expiring Soon',
         message: 'Your {credits} credits will expire in {days} days. Use them before they expire!',
         cta: 'Use Now'
       },
       ja: {
-        title: '⏰ クレジットの有効期限が近づいています',
-        message: '{credits}クレジットが{days}日後に期限切れになります。期限前にご利用ください！',
-        cta: '今すぐ使う'
+        title: 'Credits Expiring Soon',
+        message: 'Your {credits} credits will expire in {days} days. Use them before they expire!',
+        cta: 'Use Now'
       }
     },
     ctaAction: { type: 'view', action: 'aistudio-editor' }
@@ -141,19 +141,19 @@ const NOTIFICATION_TEMPLATES = {
     priority: 'medium',
     translations: {
       vi: {
-        title: '🆕 Tính năng mới!',
+        title: 'New Feature!',
         message: '{featureName}: {description}',
-        cta: 'Khám phá'
+        cta: 'Explore'
       },
       en: {
-        title: '🆕 New Feature!',
+        title: 'New Feature!',
         message: '{featureName}: {description}',
         cta: 'Explore'
       },
       ja: {
-        title: '🆕 新機能！',
-        message: '{featureName}：{description}',
-        cta: '探索する'
+        title: 'New Feature!',
+        message: '{featureName}: {description}',
+        cta: 'Explore'
       }
     },
     ctaAction: { type: 'view', action: 'home' }
@@ -209,7 +209,8 @@ async function sendToUser(userId, notification, expiresInDays = 30) {
   
   const userNotifId = uuidv4();
   
-  await db.collection('user_notifications').doc(userNotifId).set({
+  const notificationData = {
+    id: userNotifId,
     userId,
     notificationId: null, // Auto-generated, not from admin
     type: notification.type,
@@ -221,10 +222,18 @@ async function sendToUser(userId, notification, expiresInDays = 30) {
     clicked: false,
     autoGenerated: true,
     createdAt: now
-  });
+  };
+  
+  await db.collection('user_notifications').doc(userNotifId).set(notificationData);
 
-  // Dispatch event for real-time update (if SSE connected)
-  console.log(`[AUTO-NOTIF] Sent to user ${userId}:`, notification.translations.vi?.title);
+  // Broadcast via SSE for real-time update
+  try {
+    const realtimeController = require('../controllers/realtime.controller');
+    realtimeController.broadcastNotification(userId, notificationData);
+    console.log(`[AUTO-NOTIF] Broadcasted to user ${userId}:`, notification.translations.vi?.title || notification.translations.en?.title);
+  } catch (e) {
+    console.log(`[AUTO-NOTIF] Saved to DB (no SSE):`, notification.translations.vi?.title || notification.translations.en?.title);
+  }
   
   return userNotifId;
 }

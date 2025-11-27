@@ -1,249 +1,353 @@
 /**
- * Monitoring and Analytics Utilities
- * Track performance, errors, and user behavior
+ * Performance Monitoring Utilities
+ * Track API calls, performance metrics, and user interactions
  */
 
-/**
- * Performance monitoring
- */
+import { CONFIG } from './config';
+
+// ============================================================================
+// PERFORMANCE MONITOR
+// ============================================================================
+
 class PerformanceMonitor {
   constructor() {
-    this.marks = new Map()
-    this.measures = []
+    this.timers = new Map();
+    this.metrics = [];
+    this.maxMetrics = 100;
   }
-
+  
   /**
    * Start timing an operation
-   * @param {string} name 
    */
-  start(name) {
-    this.marks.set(name, performance.now())
+  start(operationName) {
+    this.timers.set(operationName, {
+      startTime: performance.now(),
+      startTimestamp: Date.now()
+    });
   }
-
+  
   /**
-   * End timing and log duration
-   * @param {string} name 
-   * @returns {number} Duration in ms
+   * End timing and return duration
    */
-  end(name) {
-    const startTime = this.marks.get(name)
-    if (!startTime) {
-      console.warn(`⚠️ No start mark found for: ${name}`)
-      return 0
-    }
-
-    const duration = performance.now() - startTime
-    this.marks.delete(name)
-
-    const measure = {
-      name,
-      duration,
-      timestamp: new Date().toISOString()
-    }
-
-    this.measures.push(measure)
+  end(operationName) {
+    const timer = this.timers.get(operationName);
+    if (!timer) return 0;
     
-    // Keep only last 100 measures
-    if (this.measures.length > 100) {
-      this.measures.shift()
-    }
-
-    // Log slow operations (> 1s)
-    if (duration > 1000) {
-      console.warn(`⚠️ Slow operation: ${name} took ${duration.toFixed(2)}ms`)
-    } else {
-      console.log(`⏱️ ${name}: ${duration.toFixed(2)}ms`)
-    }
-
-    return duration
+    const duration = performance.now() - timer.startTime;
+    this.timers.delete(operationName);
+    
+    // Store metric
+    this.addMetric({
+      operation: operationName,
+      duration,
+      timestamp: timer.startTimestamp
+    });
+    
+    return Math.round(duration);
   }
-
+  
   /**
-   * Get performance statistics
-   * @returns {Object}
+   * Add metric to history
    */
-  getStats() {
-    if (this.measures.length === 0) return null
-
-    const durations = this.measures.map(m => m.duration)
-    const sum = durations.reduce((a, b) => a + b, 0)
-    const avg = sum / durations.length
-    const max = Math.max(...durations)
-    const min = Math.min(...durations)
-
-    return {
-      count: this.measures.length,
-      average: avg.toFixed(2),
-      max: max.toFixed(2),
-      min: min.toFixed(2),
-      total: sum.toFixed(2)
+  addMetric(metric) {
+    this.metrics.push(metric);
+    
+    // Keep only recent metrics
+    if (this.metrics.length > this.maxMetrics) {
+      this.metrics.shift();
     }
   }
-
+  
   /**
-   * Clear all measures
+   * Get average duration for an operation
+   */
+  getAverageDuration(operationName) {
+    const operationMetrics = this.metrics.filter(m => m.operation === operationName);
+    if (operationMetrics.length === 0) return 0;
+    
+    const total = operationMetrics.reduce((sum, m) => sum + m.duration, 0);
+    return Math.round(total / operationMetrics.length);
+  }
+  
+  /**
+   * Get all metrics for an operation
+   */
+  getMetrics(operationName = null) {
+    if (operationName) {
+      return this.metrics.filter(m => m.operation === operationName);
+    }
+    return [...this.metrics];
+  }
+  
+  /**
+   * Clear all metrics
    */
   clear() {
-    this.marks.clear()
-    this.measures = []
+    this.timers.clear();
+    this.metrics = [];
+  }
+  
+  /**
+   * Get performance summary
+   */
+  getSummary() {
+    const operations = new Map();
+    
+    for (const metric of this.metrics) {
+      if (!operations.has(metric.operation)) {
+        operations.set(metric.operation, {
+          count: 0,
+          totalDuration: 0,
+          minDuration: Infinity,
+          maxDuration: 0
+        });
+      }
+      
+      const stats = operations.get(metric.operation);
+      stats.count++;
+      stats.totalDuration += metric.duration;
+      stats.minDuration = Math.min(stats.minDuration, metric.duration);
+      stats.maxDuration = Math.max(stats.maxDuration, metric.duration);
+    }
+    
+    const summary = {};
+    for (const [operation, stats] of operations) {
+      summary[operation] = {
+        count: stats.count,
+        avgDuration: Math.round(stats.totalDuration / stats.count),
+        minDuration: Math.round(stats.minDuration),
+        maxDuration: Math.round(stats.maxDuration)
+      };
+    }
+    
+    return summary;
   }
 }
 
-// Global instance
-export const perfMonitor = new PerformanceMonitor()
+// ============================================================================
+// API TRACKER
+// ============================================================================
 
-/**
- * Track API calls
- */
-class APITracker {
+class ApiTracker {
   constructor() {
-    this.calls = []
-    this.errors = []
+    this.calls = [];
+    this.errors = [];
+    this.maxHistory = 50;
   }
-
+  
   /**
-   * Track successful API call
-   * @param {string} endpoint 
-   * @param {number} duration 
-   * @param {Object} metadata 
+   * Track API call
    */
   trackCall(endpoint, duration, metadata = {}) {
-    this.calls.push({
+    const call = {
       endpoint,
       duration,
-      metadata,
-      timestamp: new Date().toISOString(),
-      success: true
-    })
-
-    // Keep only last 50 calls
-    if (this.calls.length > 50) {
-      this.calls.shift()
+      timestamp: Date.now(),
+      ...metadata
+    };
+    
+    this.calls.push(call);
+    
+    if (this.calls.length > this.maxHistory) {
+      this.calls.shift();
+    }
+    
+    if (CONFIG.ENABLE_DEBUG_LOGS) {
+      console.log(`[API] ${endpoint} completed in ${duration}ms`, metadata);
     }
   }
-
+  
   /**
    * Track API error
-   * @param {string} endpoint 
-   * @param {Error} error 
-   * @param {Object} metadata 
    */
   trackError(endpoint, error, metadata = {}) {
-    this.errors.push({
+    const errorRecord = {
       endpoint,
-      error: error.message,
+      error: error.message || String(error),
       code: error.code,
-      metadata,
-      timestamp: new Date().toISOString()
-    })
-
-    // Keep only last 20 errors
-    if (this.errors.length > 20) {
-      this.errors.shift()
+      timestamp: Date.now(),
+      ...metadata
+    };
+    
+    this.errors.push(errorRecord);
+    
+    if (this.errors.length > this.maxHistory) {
+      this.errors.shift();
     }
-
-    console.error(`❌ API Error [${endpoint}]:`, error.message)
+    
+    if (CONFIG.ENABLE_DEBUG_LOGS) {
+      console.error(`[API ERROR] ${endpoint}:`, error);
+    }
   }
-
+  
   /**
    * Get API statistics
-   * @returns {Object}
    */
   getStats() {
-    const totalCalls = this.calls.length
-    const totalErrors = this.errors.length
-    const successRate = totalCalls > 0 
-      ? ((totalCalls / (totalCalls + totalErrors)) * 100).toFixed(2)
-      : 0
-
-    const avgDuration = this.calls.length > 0
-      ? (this.calls.reduce((sum, call) => sum + call.duration, 0) / this.calls.length).toFixed(2)
-      : 0
-
+    const now = Date.now();
+    const last5Min = now - 5 * 60 * 1000;
+    
+    const recentCalls = this.calls.filter(c => c.timestamp > last5Min);
+    const recentErrors = this.errors.filter(e => e.timestamp > last5Min);
+    
     return {
-      totalCalls,
-      totalErrors,
-      successRate: `${successRate}%`,
-      avgDuration: `${avgDuration}ms`,
-      recentErrors: this.errors.slice(-5)
-    }
+      totalCalls: this.calls.length,
+      totalErrors: this.errors.length,
+      recentCalls: recentCalls.length,
+      recentErrors: recentErrors.length,
+      errorRate: this.calls.length > 0 
+        ? (this.errors.length / this.calls.length * 100).toFixed(2) + '%'
+        : '0%',
+      avgDuration: recentCalls.length > 0
+        ? Math.round(recentCalls.reduce((sum, c) => sum + c.duration, 0) / recentCalls.length)
+        : 0
+    };
   }
-
+  
   /**
-   * Clear all tracking data
+   * Get recent errors
+   */
+  getRecentErrors(count = 10) {
+    return this.errors.slice(-count);
+  }
+  
+  /**
+   * Clear history
    */
   clear() {
-    this.calls = []
-    this.errors = []
+    this.calls = [];
+    this.errors = [];
   }
 }
 
-// Global instance
-export const apiTracker = new APITracker()
+// ============================================================================
+// USER INTERACTION TRACKER
+// ============================================================================
 
-/**
- * Memory usage monitoring
- */
-export function logMemoryUsage() {
-  if (performance.memory) {
-    const used = (performance.memory.usedJSHeapSize / 1048576).toFixed(2)
-    const total = (performance.memory.totalJSHeapSize / 1048576).toFixed(2)
-    const limit = (performance.memory.jsHeapSizeLimit / 1048576).toFixed(2)
+class InteractionTracker {
+  constructor() {
+    this.interactions = [];
+    this.maxHistory = 100;
+  }
+  
+  /**
+   * Track user interaction
+   */
+  track(action, details = {}) {
+    const interaction = {
+      action,
+      details,
+      timestamp: Date.now()
+    };
     
-    console.log(`💾 Memory: ${used}MB / ${total}MB (Limit: ${limit}MB)`)
+    this.interactions.push(interaction);
     
-    // Warn if using > 80% of limit
-    const usage = (performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit) * 100
-    if (usage > 80) {
-      console.warn(`⚠️ High memory usage: ${usage.toFixed(2)}%`)
+    if (this.interactions.length > this.maxHistory) {
+      this.interactions.shift();
+    }
+    
+    if (CONFIG.ENABLE_DEBUG_LOGS) {
+      console.log(`[INTERACTION] ${action}`, details);
     }
   }
-}
-
-/**
- * User action tracking
- */
-export function trackUserAction(action, metadata = {}) {
-  console.log(`👤 User Action: ${action}`, metadata)
   
-  // TODO: Send to analytics service
-  // if (window.gtag) {
-  //   window.gtag('event', action, metadata)
-  // }
-}
-
-/**
- * Feature usage tracking
- */
-export function trackFeatureUsage(feature, metadata = {}) {
-  console.log(`✨ Feature Used: ${feature}`, metadata)
+  /**
+   * Get interaction history
+   */
+  getHistory(action = null) {
+    if (action) {
+      return this.interactions.filter(i => i.action === action);
+    }
+    return [...this.interactions];
+  }
   
-  // Store in localStorage for analytics
-  try {
-    const key = `feature_usage_${feature}`
-    const current = parseInt(localStorage.getItem(key) || '0')
-    localStorage.setItem(key, (current + 1).toString())
-  } catch (e) {
-    // Ignore localStorage errors
+  /**
+   * Get interaction counts
+   */
+  getCounts() {
+    const counts = {};
+    for (const interaction of this.interactions) {
+      counts[interaction.action] = (counts[interaction.action] || 0) + 1;
+    }
+    return counts;
   }
 }
 
-/**
- * Get all monitoring data
- */
-export function getMonitoringReport() {
-  return {
-    performance: perfMonitor.getStats(),
-    api: apiTracker.getStats(),
-    timestamp: new Date().toISOString()
+// ============================================================================
+// MEMORY MONITOR
+// ============================================================================
+
+class MemoryMonitor {
+  /**
+   * Get current memory usage (if available)
+   */
+  getUsage() {
+    if (performance.memory) {
+      return {
+        usedJSHeapSize: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
+        totalJSHeapSize: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024),
+        jsHeapSizeLimit: Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024)
+      };
+    }
+    return null;
+  }
+  
+  /**
+   * Check if memory usage is high
+   */
+  isHighUsage() {
+    const usage = this.getUsage();
+    if (!usage) return false;
+    
+    return usage.usedJSHeapSize > usage.jsHeapSizeLimit * 0.8;
   }
 }
 
-/**
- * Clear all monitoring data
- */
-export function clearMonitoring() {
-  perfMonitor.clear()
-  apiTracker.clear()
-  console.log('🧹 Monitoring data cleared')
+// ============================================================================
+// SINGLETON INSTANCES
+// ============================================================================
+
+export const perfMonitor = new PerformanceMonitor();
+export const apiTracker = new ApiTracker();
+export const interactionTracker = new InteractionTracker();
+export const memoryMonitor = new MemoryMonitor();
+
+// ============================================================================
+// GLOBAL MONITORING OBJECT
+// ============================================================================
+
+export const monitoring = {
+  performance: perfMonitor,
+  api: apiTracker,
+  interactions: interactionTracker,
+  memory: memoryMonitor,
+  
+  /**
+   * Get full monitoring report
+   */
+  getReport() {
+    return {
+      timestamp: new Date().toISOString(),
+      performance: perfMonitor.getSummary(),
+      api: apiTracker.getStats(),
+      interactions: interactionTracker.getCounts(),
+      memory: memoryMonitor.getUsage()
+    };
+  },
+  
+  /**
+   * Clear all monitoring data
+   */
+  clearAll() {
+    perfMonitor.clear();
+    apiTracker.clear();
+    interactionTracker.interactions = [];
+  }
+};
+
+// Make available globally for debugging
+if (typeof window !== 'undefined') {
+  window.__monitoring = monitoring;
 }
+
+export default monitoring;

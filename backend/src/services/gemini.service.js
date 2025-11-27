@@ -367,7 +367,7 @@ Return JSON:
     
     // Add human/AI indicators to evidence
     if (parsed.human_indicators?.length > 0) {
-      formattedEvidence.push(`✓ Human indicators: ${parsed.human_indicators.slice(0, 2).join(', ')}`);
+      formattedEvidence.push(`[OK] Human indicators: ${parsed.human_indicators.slice(0, 2).join(', ')}`);
     }
     if (parsed.ai_indicators?.length > 0) {
       formattedEvidence.push(`⚠ AI indicators: ${parsed.ai_indicators.slice(0, 2).join(', ')}`);

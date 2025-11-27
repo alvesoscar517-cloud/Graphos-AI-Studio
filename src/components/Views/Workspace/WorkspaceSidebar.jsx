@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useProfiles } from '../../../contexts/ProfileContext'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import ProfileSelector from '../../Analysis/ProfileSelector'
@@ -6,6 +7,7 @@ import ModelSelector from '../../Analysis/ModelSelector'
 import './WorkspaceSidebar.css'
 
 const WorkspaceSidebar = ({ hidden, onClose }) => {
+  const { t } = useTranslation()
   const { currentProfile, selectProfile } = useProfiles()
   const { modelSettings, updateModelSettings } = useWorkspace()
 
@@ -62,26 +64,26 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
     {
       key: 'useVoiceProfile',
       icon: '/icon/user.svg',
-      title: 'Use Voice Profile',
-      description: 'Apply your writing style to AI responses'
+      title: t('workspace.useVoiceProfile'),
+      description: t('workspace.useVoiceProfileDesc')
     },
     {
       key: 'useVocabularyPreferences',
       icon: '/icon/book-open.svg',
-      title: 'Vocabulary Preferences',
-      description: 'Use your preferred phrases and connectors'
+      title: t('workspace.vocabularyPreferences'),
+      description: t('workspace.vocabularyPreferencesDesc')
     },
     {
       key: 'useKeyCharacteristics',
       icon: '/icon/list.svg',
-      title: 'Key Characteristics',
-      description: 'Match your writing characteristics'
+      title: t('workspace.keyCharacteristics'),
+      description: t('workspace.keyCharacteristicsDesc')
     },
     {
       key: 'useSentencePatterns',
       icon: '/icon/align-left.svg',
-      title: 'Sentence Patterns',
-      description: 'Follow your sentence structure style'
+      title: t('workspace.sentencePatterns'),
+      description: t('workspace.sentencePatternsDesc')
     }
   ]
 
@@ -90,31 +92,31 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
     {
       key: 'useAntiAIDetection',
       icon: '/icon/shield.svg',
-      title: 'Anti-AI Detection',
-      description: 'Avoid AI-typical patterns in responses',
+      title: t('workspace.antiAIDetection'),
+      description: t('workspace.antiAIDetectionDesc'),
       badge: 'NEW'
     },
     {
       key: 'humanizeResponse',
       icon: '/icon/user-check.svg',
-      title: 'Humanize Output',
-      description: 'Make responses indistinguishable from human',
+      title: t('workspace.humanizeOutput'),
+      description: t('workspace.humanizeOutputDesc'),
       badge: 'BETA'
     }
   ]
 
   // Response style options
   const responseStyles = [
-    { value: 'concise', label: 'Concise' },
-    { value: 'balanced', label: 'Balanced' },
-    { value: 'detailed', label: 'Detailed' }
+    { value: 'concise', label: t('workspace.concise') },
+    { value: 'balanced', label: t('workspace.balanced') },
+    { value: 'detailed', label: t('workspace.detailed') }
   ]
 
   // Creativity levels
   const creativityLevels = [
-    { value: 'low', label: 'Precise', temp: 0.3 },
-    { value: 'medium', label: 'Balanced', temp: 0.7 },
-    { value: 'high', label: 'Creative', temp: 0.9 }
+    { value: 'low', label: t('workspace.precise'), temp: 0.3 },
+    { value: 'medium', label: t('workspace.balanced'), temp: 0.7 },
+    { value: 'high', label: t('workspace.creative'), temp: 0.9 }
   ]
 
   return (
@@ -122,11 +124,11 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
       {/* Header */}
       <div className="ws-header">
         <div className="ws-header-title">
-          <img src="/icon/settings.svg" alt="Settings" />
-          <span>AI Settings</span>
+          <img src="/icon/settings.svg" alt={t('nav.settings')} />
+          <span>{t('workspace.aiSettings')}</span>
         </div>
-        <button className="ws-close-btn" onClick={onClose}>
-          <img src="/icon/x.svg" alt="Close" />
+        <button className="ws-close-btn" onClick={onClose} data-tooltip={t('common.close')} data-tooltip-position="left">
+          <img src="/icon/x.svg" alt={t('common.close')} />
         </button>
       </div>
 
@@ -145,8 +147,8 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
         {/* Voice Profile Section */}
         <div className="ws-section">
           <div className="ws-section-header">
-            <img src="/icon/mic.svg" alt="Voice" />
-            <span>Voice Profile</span>
+            <img src="/icon/mic.svg" alt={t('workspace.voiceProfile')} />
+            <span>{t('workspace.voiceProfile')}</span>
           </div>
 
           <div className="ws-toggle-list">
@@ -186,8 +188,8 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
 
           {!currentProfile && (
             <div className="ws-notice">
-              <img src="/icon/alert-circle.svg" alt="Info" />
-              <span>Select a profile to enable voice customization</span>
+              <img src="/icon/alert-circle.svg" alt={t('common.info')} />
+              <span>{t('workspace.selectProfileNotice')}</span>
             </div>
           )}
         </div>
@@ -195,9 +197,9 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
         {/* Humanization Section */}
         <div className="ws-section">
           <div className="ws-section-header">
-            <img src="/icon/user-check.svg" alt="Humanize" />
-            <span>Humanization</span>
-            <span className="ws-badge">NEW</span>
+            <img src="/icon/user-check.svg" alt={t('workspace.humanization')} />
+            <span>{t('workspace.humanization')}</span>
+            <span className="ws-badge">{t('common.new').toUpperCase()}</span>
           </div>
 
           <div className="ws-toggle-list">
@@ -229,7 +231,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
           {chatSettings.humanizeResponse && (
             <div className="ws-slider-item">
               <div className="ws-slider-header">
-                <span>Target AI Probability</span>
+                <span>{t('workspace.targetAIProbability')}</span>
                 <span className="ws-slider-value">{chatSettings.targetAIProbability || 35}%</span>
               </div>
               <input
@@ -242,8 +244,8 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
                 className="ws-slider"
               />
               <div className="ws-slider-labels">
-                <span>More human</span>
-                <span>Faster</span>
+                <span>{t('workspace.moreHuman')}</span>
+                <span>{t('workspace.faster')}</span>
               </div>
             </div>
           )}
@@ -252,12 +254,12 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
         {/* Response Style Section */}
         <div className="ws-section">
           <div className="ws-section-header">
-            <img src="/icon/sliders.svg" alt="Style" />
-            <span>Response Style</span>
+            <img src="/icon/sliders.svg" alt={t('workspace.responseStyle')} />
+            <span>{t('workspace.responseStyle')}</span>
           </div>
           
           <div className="ws-option-group">
-            <span className="ws-option-label">Length</span>
+            <span className="ws-option-label">{t('workspace.length')}</span>
             <div className="ws-btn-group">
               {responseStyles.map((style) => (
                 <button
@@ -272,7 +274,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
           </div>
 
           <div className="ws-option-group">
-            <span className="ws-option-label">Creativity</span>
+            <span className="ws-option-label">{t('workspace.creativity')}</span>
             <div className="ws-btn-group">
               {creativityLevels.map((level) => (
                 <button

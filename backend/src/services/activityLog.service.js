@@ -1,12 +1,12 @@
 /**
  * Activity Log Service
- * Ghi log chi tiết hoạt động người dùng với tối ưu chi phí Firestore
+ * Detailed activity logging with Firestore cost optimization
  * 
- * Chiến lược tối ưu:
- * 1. Batch writes để giảm số lần ghi
- * 2. Aggregation theo ngày để giảm số documents
- * 3. TTL để tự động xóa logs cũ
- * 4. Chỉ lưu thông tin cần thiết
+ * Optimization strategy:
+ * 1. Batch writes to reduce write operations
+ * 2. Daily aggregation to reduce document count
+ * 3. TTL to automatically delete old logs
+ * 4. Store only essential information
  */
 
 const { db, FieldValue } = require('../config/firebase');
@@ -56,14 +56,14 @@ const ACTIVITY_TYPES = {
   ACCOUNT_UNLOCKED: 'account_unlocked'
 };
 
-// Buffer để batch write
+// Buffer for batch write
 let logBuffer = [];
 let flushTimeout = null;
 const BUFFER_SIZE = 50;
 const FLUSH_INTERVAL = 5000; // 5 seconds
 
 /**
- * Log activity với buffering để tối ưu writes
+ * Log activity with buffering for optimized writes
  */
 async function logActivity(userId, type, data = {}) {
   try {
@@ -76,11 +76,11 @@ async function logActivity(userId, type, data = {}) {
     
     logBuffer.push(activity);
     
-    // Flush nếu buffer đầy
+    // Flush if buffer is full
     if (logBuffer.length >= BUFFER_SIZE) {
       await flushBuffer();
     } else if (!flushTimeout) {
-      // Set timeout để flush sau một khoảng thời gian
+      // Set timeout to flush after a period of time
       flushTimeout = setTimeout(flushBuffer, FLUSH_INTERVAL);
     }
     
@@ -92,7 +92,7 @@ async function logActivity(userId, type, data = {}) {
 }
 
 /**
- * Flush buffer vào Firestore
+ * Flush buffer to Firestore
  */
 async function flushBuffer() {
   if (logBuffer.length === 0) return;
@@ -140,12 +140,12 @@ async function flushBuffer() {
 }
 
 /**
- * Sanitize data để chỉ lưu thông tin cần thiết
+ * Sanitize data to store only essential information
  */
 function sanitizeData(data) {
   const sanitized = {};
   
-  // Chỉ lưu các fields quan trọng
+  // Store only important fields
   const allowedFields = [
     'creditsUsed', 'creditsBefore', 'creditsAfter',
     'feature', 'model', 'wordCount', 'sentenceCount',
@@ -170,7 +170,7 @@ function sanitizeData(data) {
 }
 
 /**
- * Log credit usage với chi tiết
+ * Log credit usage with details
  */
 async function logCreditUsage(userId, feature, creditsUsed, metadata = {}) {
   return logActivity(userId, ACTIVITY_TYPES.CREDIT_DEDUCT, {
@@ -204,7 +204,7 @@ async function logFeatureUsage(userId, featureType, data = {}) {
 }
 
 /**
- * Get user activity logs với pagination
+ * Get user activity logs with pagination
  */
 async function getUserActivityLogs(userId, options = {}) {
   const {
@@ -425,7 +425,7 @@ async function getActivityStatistics(days = 7) {
 }
 
 /**
- * Cleanup old logs (chạy định kỳ)
+ * Cleanup old logs (runs periodically)
  */
 async function cleanupOldLogs(daysToKeep = 90) {
   try {

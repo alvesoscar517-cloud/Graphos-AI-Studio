@@ -3,7 +3,7 @@ import { isDevMode, getDefaultTestUser, devLog } from '../utils/devConfig'
 
 // Get user info helper
 export async function getUserInfo() {
-  // DEV MODE: Sử dụng test user
+  // DEV MODE: Use test user
   if (isDevMode()) {
     const testUser = getDefaultTestUser()
     if (testUser) {
@@ -12,7 +12,7 @@ export async function getUserInfo() {
     }
   }
   
-  // PRODUCTION: Lấy user thật
+  // PRODUCTION: Get real user
   try {
     // Check if running in Chrome extension context
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
@@ -64,21 +64,21 @@ export async function loadProfiles() {
     console.log('📋 Loading profiles for user:', userInfo.userId)
     
     const url = `${CONFIG.API_BASE_URL}/get_profiles?user_id=${userInfo.userId}`
-    console.log('🔗 API URL:', url)
+    console.log('[LINK] API URL:', url)
     
     const response = await fetch(url)
     const data = await response.json()
     
-    console.log('📦 API Response:', data)
+    console.log('[PACKAGE] API Response:', data)
     
     if (response.ok && data.success) {
-      console.log('✅ Loaded profiles:', data.profiles?.length || 0)
+      console.log('[SUCCESS] Loaded profiles:', data.profiles?.length || 0)
       return data.profiles || []
     }
-    console.warn('⚠️ API returned error:', data)
+    console.warn('[WARNING] API returned error:', data)
     return []
   } catch (error) {
-    console.error('❌ Error loading profiles:', error)
+    console.error('[FAIL] Error loading profiles:', error)
     return []
   }
 }
@@ -294,7 +294,7 @@ export async function addSample(profileId, text) {
 
 export async function addSamplesBatch(profileId, samples) {
   try {
-    console.log(`📦 Uploading ${samples.length} samples in batch...`)
+    console.log(`[PACKAGE] Uploading ${samples.length} samples in batch...`)
     const response = await fetch(`${CONFIG.API_BASE_URL}/add_samples_batch`, {
       method: 'POST',
       headers: {
@@ -308,7 +308,7 @@ export async function addSamplesBatch(profileId, samples) {
     
     const data = await response.json()
     if (response.ok && data.success) {
-      console.log(`✅ Batch upload successful: ${data.samples_added} samples`)
+      console.log(`[SUCCESS] Batch upload successful: ${data.samples_added} samples`)
       return data
     }
     throw new Error(data.error || 'Failed to add samples batch')
@@ -346,20 +346,20 @@ export async function getProfileDetails(profileId) {
     console.log('📋 Loading profile details for:', profileId)
     
     const url = `${CONFIG.API_BASE_URL}/get_profile?profile_id=${profileId}`
-    console.log('🔗 API URL:', url)
+    console.log('[LINK] API URL:', url)
     
     const response = await fetch(url)
     const data = await response.json()
     
-    console.log('📦 Profile Details Response:', data)
+    console.log('[PACKAGE] Profile Details Response:', data)
     
     if (response.ok && data.success) {
-      console.log('✅ Loaded profile details')
+      console.log('[SUCCESS] Loaded profile details')
       return data.profile
     }
     throw new Error(data.error || 'Failed to load profile details')
   } catch (error) {
-    console.error('❌ Error loading profile details:', error)
+    console.error('[FAIL] Error loading profile details:', error)
     throw error
   }
 }
@@ -385,13 +385,13 @@ export async function getSuggestions(profileId, sentence, sentenceScore, context
     const data = await response.json()
     
     if (response.ok && data.success) {
-      console.log(`✅ Got ${data.suggestions?.length || 0} suggestions`)
+      console.log(`[SUCCESS] Got ${data.suggestions?.length || 0} suggestions`)
       return { success: true, data }
     }
     
     throw new Error(data.error || 'Failed to get suggestions')
   } catch (error) {
-    console.error('❌ Error getting suggestions:', error)
+    console.error('[FAIL] Error getting suggestions:', error)
     return { success: false, error: error.message }
   }
 }
@@ -523,7 +523,7 @@ export async function getSuggestionsOptimized(profileId, sentence, sentenceScore
     
     throw new Error(data.error || 'Failed to get suggestions')
   } catch (error) {
-    console.error('❌ Error getting suggestions:', error)
+    console.error('[FAIL] Error getting suggestions:', error)
     return { success: false, error: error.message }
   }
 }

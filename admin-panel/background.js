@@ -1,6 +1,6 @@
 // Admin Panel Background Script
 
-// Xử lý khi click vào icon extension
+// Handle when clicking on extension icon
 chrome.action.onClicked.addListener((tab) => {
   chrome.tabs.create({
     url: chrome.runtime.getURL('index.html')

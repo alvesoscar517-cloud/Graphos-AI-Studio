@@ -71,7 +71,7 @@ body.dark-theme {
   color: inherit;
 }
 
-/* Dark theme selection - Xanh dương sáng hơn cho nền tối */
+/* Dark theme selection - brighter blue for dark background */
 body.dark-theme ::selection {
   background: rgba(94, 185, 255, 0.3);
   color: inherit;

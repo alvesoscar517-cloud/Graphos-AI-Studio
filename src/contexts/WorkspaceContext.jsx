@@ -60,7 +60,7 @@ export const WorkspaceProvider = ({ children }) => {
           setConversations(limited)
           
           if (parsed.length > MAX_CONVERSATIONS) {
-            console.log(`⚠️ Loaded ${MAX_CONVERSATIONS} of ${parsed.length} conversations`)
+            console.log(`[WARNING] Loaded ${MAX_CONVERSATIONS} of ${parsed.length} conversations`)
           }
         } catch (err) {
           console.error('Failed to load conversations:', err)
@@ -109,7 +109,7 @@ export const WorkspaceProvider = ({ children }) => {
   // Generate system prompt based on user profile
   const generateSystemPrompt = useCallback(() => {
     if (!currentProfile) {
-      return 'Bạn là một trợ lý AI thông minh và hữu ích. Hãy trả lời một cách tự nhiên và chính xác.'
+      return 'You are an intelligent and helpful AI assistant. Please respond naturally and accurately.'
     }
 
     const { writing_style, tone, expertise } = currentProfile
@@ -395,7 +395,7 @@ export const WorkspaceProvider = ({ children }) => {
             conversationSummary: conversation?.summary,
             onContext: (contextInfo) => {
               if (contextInfo.wasSummarized) {
-                console.log(`📝 Conversation summarized (${contextInfo.summarizedCount} messages)`)
+                console.log(`[NOTE] Conversation summarized (${contextInfo.summarizedCount} messages)`)
               }
             },
             onHumanized: (humanizedText) => {
@@ -441,7 +441,7 @@ export const WorkspaceProvider = ({ children }) => {
             conversationSummary: conversation?.summary,
             onContext: (contextInfo) => {
               if (contextInfo.wasSummarized) {
-                console.log(`📝 Conversation summarized (${contextInfo.summarizedCount} messages)`)
+                console.log(`[NOTE] Conversation summarized (${contextInfo.summarizedCount} messages)`)
               }
             },
             onComplete: (completeInfo) => {

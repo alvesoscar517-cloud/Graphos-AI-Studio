@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import * as lottie from 'lottie-web'
 import './LoginOverlay.css'
 
 const LoginOverlay = () => {
+  const { t } = useTranslation()
   const { isAuthenticated, signIn, isLoading: authLoading } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [shouldShow, setShouldShow] = useState(false)
@@ -12,12 +14,12 @@ const LoginOverlay = () => {
 
   useEffect(() => {
     // Show overlay when loading OR not authenticated
-    console.log('🔐 LoginOverlay state:', { authLoading, isAuthenticated, shouldShow })
+    console.log('[SECURE] LoginOverlay state:', { authLoading, isAuthenticated, shouldShow })
     if (authLoading || !isAuthenticated) {
-      console.log('⚠️ Showing login overlay')
+      console.log('[WARNING] Showing login overlay')
       setShouldShow(true)
     } else {
-      console.log('✅ Hiding login overlay')
+      console.log('[SUCCESS] Hiding login overlay')
       setShouldShow(false)
     }
   }, [authLoading, isAuthenticated])
@@ -60,11 +62,11 @@ const LoginOverlay = () => {
     try {
       const success = await signIn()
       if (!success) {
-        alert('Sign in failed. Please try again.')
+        alert(t('auth.signInFailed'))
       }
     } catch (error) {
       console.error('Sign in error:', error)
-      alert('Đăng nhập thất bại: ' + error.message)
+      alert(t('auth.loginFailed') + ': ' + error.message)
     } finally {
       setIsLoading(false)
     }
@@ -90,13 +92,13 @@ const LoginOverlay = () => {
         </div>
         {authLoading ? (
           <>
-            <h2 className="login-title">Checking...</h2>
-            <p className="login-subtitle">Please wait a moment</p>
+            <h2 className="login-title">{t('auth.checking')}</h2>
+            <p className="login-subtitle">{t('auth.pleaseWait')}</p>
           </>
         ) : (
           <>
-            <h2 className="login-title">Sign in to continue</h2>
-            <p className="login-subtitle">Please sign in with your Google account to use AI Content Authenticator</p>
+            <h2 className="login-title">{t('auth.signInToContinue')}</h2>
+            <p className="login-subtitle">{t('auth.signInSubtitle')}</p>
             <button 
               className={`google-signin-btn ${isLoading ? 'loading' : ''}`}
               onClick={handleSignIn}
@@ -108,12 +110,12 @@ const LoginOverlay = () => {
                 <path d="M3.96409 10.71C3.78409 10.17 3.68182 9.59318 3.68182 9C3.68182 8.40682 3.78409 7.83 3.96409 7.29V4.95818H0.957275C0.347727 6.17318 0 7.54772 0 9C0 10.4523 0.347727 11.8268 0.957275 13.0418L3.96409 10.71Z" fill="#FBBC05"/>
                 <path d="M9 3.57955C10.3214 3.57955 11.5077 4.03364 12.4405 4.92545L15.0218 2.34409C13.4632 0.891818 11.4259 0 9 0C5.48182 0 2.43818 2.01682 0.957275 4.95818L3.96409 7.29C4.67182 5.16273 6.65591 3.57955 9 3.57955Z" fill="#EA4335"/>
               </svg>
-              <span>{isLoading ? 'Đang đăng nhập...' : 'Đăng nhập với Google'}</span>
+              <span>{isLoading ? t('auth.loggingIn') : t('auth.loginWithGoogle')}</span>
             </button>
             <p className="login-footer">
-              Bằng cách đăng nhập, bạn đồng ý với{' '}
-              <a href="#" className="login-link">Điều khoản dịch vụ</a> và{' '}
-              <a href="#" className="login-link">Chính sách bảo mật</a>
+              {t('auth.termsAgreement')}{' '}
+              <a href="#" className="login-link">{t('auth.termsOfService')}</a> {t('auth.and')}{' '}
+              <a href="#" className="login-link">{t('auth.privacyPolicy')}</a>
             </p>
           </>
         )}

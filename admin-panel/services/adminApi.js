@@ -4,37 +4,42 @@
  */
 
 import { cache } from '../utils/cache';
+import { getApiBaseUrl } from '../utils/config';
+import { getAuthHeader, getAccessToken, clearAuthData } from './authService';
 
-const API_BASE_URL = 'https://ai-backend-admin-472729326429.us-central1.run.app';
+const API_BASE_URL = getApiBaseUrl();
 
-// Get admin key from localStorage or environment
-const getAdminKey = () => {
-  return localStorage.getItem('adminKey') || '';
-};
-
-// Helper function for API calls
+// Helper function for API calls with auth
 async function apiCall(endpoint, options = {}) {
-  const adminKey = getAdminKey();
+  const authHeaders = getAuthHeader();
   
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      'X-Admin-Key': adminKey,
+      ...authHeaders,
       ...options.headers,
     },
   });
 
+  // Handle 401 - clear auth and redirect
+  if (response.status === 401) {
+    clearAuthData();
+    window.location.reload();
+    throw new Error('Session expired');
+  }
+
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Request failed' }));
-    throw new Error(error.error || `HTTP ${response.status}`);
+    const error = await response.json().catch(() => ({ error: { message: 'Request failed' } }));
+    throw new Error(error.error?.message || error.error || `HTTP ${response.status}`);
   }
 
   return response.json();
 }
 
 // ============================================================================
-// AUTHENTICATION
+// AUTHENTICATION (Legacy - kept for backward compatibility)
 // ============================================================================
 
 export const adminAuth = {
@@ -47,11 +52,11 @@ export const adminAuth = {
   },
   
   clearAdminKey: () => {
-    localStorage.removeItem('adminKey');
+    clearAuthData();
   },
   
   isAuthenticated: () => {
-    return !!localStorage.getItem('adminKey');
+    return !!getAccessToken() || !!localStorage.getItem('adminKey');
   }
 };
 

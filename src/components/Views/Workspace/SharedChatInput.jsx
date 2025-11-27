@@ -1,15 +1,18 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import './SharedChatInput.css'
 
 const SharedChatInput = ({ 
   onSendMessage, 
   disabled, 
   isCentered = false,
-  placeholder = "Hỏi bất cứ điều gì...",
+  placeholder,
   autoFocus = false,
   rightSidebarHidden = false,
   leftSidebarHidden = false
 }) => {
+  const { t } = useTranslation()
+  const defaultPlaceholder = placeholder || t('workspace.askAnything')
   const [message, setMessage] = useState('')
   const [showSendBtn, setShowSendBtn] = useState(false)
   const textareaRef = useRef(null)
@@ -69,16 +72,16 @@ const SharedChatInput = ({
             className="shared-attach-btn"
             onClick={() => fileInputRef.current?.click()}
             disabled={disabled}
-            data-tooltip="Đính kèm file"
+            data-tooltip={t('common.attach')}
             data-tooltip-position="top"
           >
-            <img src="/icon/paperclip.svg" alt="Attach" />
+            <img src="/icon/paperclip.svg" alt={t('common.attach')} />
           </button>
 
           <textarea
             ref={textareaRef}
             className="shared-textarea"
-            placeholder={placeholder}
+            placeholder={defaultPlaceholder}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -93,7 +96,7 @@ const SharedChatInput = ({
               className="shared-send-btn"
               onClick={handleSend}
               disabled={disabled}
-              data-tooltip="Gửi tin nhắn"
+              data-tooltip={t('common.send')}
               data-tooltip-position="top"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

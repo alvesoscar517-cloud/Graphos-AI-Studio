@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../../contexts/AuthContext'
 import './WorkspaceDefault.css'
 
 const WorkspaceDefault = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden }) => {
+  const { t } = useTranslation()
   const { user } = useAuth()
 
   return (
@@ -10,23 +12,23 @@ const WorkspaceDefault = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSide
         <button 
           className="menu-btn icon-btn" 
           onClick={onToggleLeftSidebar}
-          data-tooltip="Toggle sidebar" 
+          data-tooltip={t('common.menu')} 
           data-tooltip-position="right"
         >
-          <img src="/icon/panel-left.svg" alt="Toggle Sidebar" />
+          <img src="/icon/panel-left.svg" alt={t('common.menu')} />
         </button>
         
-        <span className="workspace-default-title">AI Workspace</span>
+        <span className="workspace-default-title">{t('nav.aiWorkspace')}</span>
         
         {rightSidebarHidden && (
           <div style={{ marginLeft: 'auto' }}>
             <button 
               className="icon-btn"
               onClick={onToggleRightSidebar}
-              data-tooltip="Open sidebar" 
+              data-tooltip={t('nav.sidebar')} 
               data-tooltip-position="left"
             >
-              <img src="/icon/panel-right.svg" alt="Toggle Right Sidebar" />
+              <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} />
             </button>
           </div>
         )}
@@ -35,7 +37,7 @@ const WorkspaceDefault = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSide
       <div className="workspace-default-content">
         <div className="workspace-welcome">
           <h1 className="workspace-welcome-text">
-            Hello, {user?.name || user?.email?.split('@')[0] || 'friend'}
+            {t('workspace.hello', { name: user?.name || user?.email?.split('@')[0] || 'friend' })}
           </h1>
         </div>
       </div>

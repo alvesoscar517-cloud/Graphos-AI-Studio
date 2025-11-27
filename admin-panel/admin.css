@@ -1,6 +1,6 @@
 /* Admin Panel Styles - Standalone Extension */
 
-/* CSS Reset - CHỈ áp dụng trong #admin-root */
+/* CSS Reset - ONLY applied within #admin-root */
 
 /* Base styles */
 #admin-root {
@@ -16,7 +16,7 @@
   font-size: 14px;
 }
 
-/* Ẩn thanh cuộn trên toàn hệ thống admin - phải đặt sau all: initial */
+/* Hide scrollbar across admin system - must be placed after all: initial */
 #admin-root::-webkit-scrollbar,
 #admin-root *::-webkit-scrollbar {
   width: 0px !important;
@@ -40,7 +40,7 @@
   -ms-overflow-style: none !important; /* IE and Edge */
 }
 
-/* Reset tất cả elements trong admin */
+/* Reset all elements in admin */
 #admin-root *,
 #admin-root *::before,
 #admin-root *::after {
@@ -54,7 +54,7 @@
   border: none;
 }
 
-/* Không reset button/input quá mức - để components tự style */
+/* Don't over-reset button/input - let components style themselves */
 #admin-root button {
   font-family: inherit;
   box-sizing: border-box;
@@ -139,7 +139,7 @@
   border-radius: 0 !important;
 }
 
-/* Thử force border-radius cho dropdown (không hoạt động trên tất cả trình duyệt) */
+/* Try force border-radius for dropdown (doesn't work on all browsers) */
 #admin-root select::-ms-expand {
   display: none;
 }
@@ -174,7 +174,7 @@
   -moz-border-radius: 8px !important;
 }
 
-/* Admin-specific icon filters - FIX: Hiển thị màu trắng trên nền tối */
+/* Admin-specific icon filters - FIX: Display white color on dark background */
 #admin-root .stats-icon img,
 #admin-root .activity-icon img,
 #admin-root .login-icon img,
@@ -224,7 +224,7 @@
   font-size: 14px;
 }
 
-/* Sidebar icons - màu xám sáng trên nền đen */
+/* Sidebar icons - light gray color on black background */
 #admin-root .admin-sidebar .nav-icon {
   filter: brightness(0) invert(0.6) !important;
 }

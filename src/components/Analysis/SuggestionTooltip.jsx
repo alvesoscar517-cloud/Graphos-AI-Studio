@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import './SuggestionTooltip.css'
 
 /**
@@ -15,6 +16,7 @@ const SuggestionTooltip = ({
   canUndo = false,
   onUndo
 }) => {
+  const { t } = useTranslation()
   const [showAllIssues, setShowAllIssues] = useState(false)
   const tooltipRef = useRef(null)
   
@@ -74,10 +76,10 @@ const SuggestionTooltip = ({
   
   const getSeverityLabel = () => {
     switch (severity) {
-      case 'high': return 'Cần sửa'
-      case 'medium': return 'Cải thiện'
-      case 'low': return 'Gợi ý'
-      default: return 'Gợi ý'
+      case 'high': return t('tooltip.needsFix')
+      case 'medium': return t('tooltip.improve')
+      case 'low': return t('tooltip.suggestion')
+      default: return t('tooltip.suggestion')
     }
   }
   
@@ -98,17 +100,7 @@ const SuggestionTooltip = ({
 
   // Get issue type label
   const getIssueLabel = (type) => {
-    const labels = {
-      length: 'Độ dài',
-      vocabulary: 'Từ vựng',
-      formality: 'Trang trọng',
-      tone: 'Giọng điệu',
-      coherence: 'Liên kết',
-      repetition: 'Lặp từ',
-      voice: 'Thể câu',
-      punctuation: 'Dấu câu'
-    }
-    return labels[type] || type
+    return t(`tooltip.issueTypes.${type}`, { defaultValue: type })
   }
 
   return createPortal(
@@ -125,14 +117,14 @@ const SuggestionTooltip = ({
           </div>
           <div className="tooltip-header-actions">
             <span className="tooltip-issues-count">
-              {suggestions.issues_found} vấn đề
+              {suggestions.issues_found} {t('analysis.issues')}
             </span>
             <button 
               className="tooltip-close-btn"
               onClick={onClose}
-              title="Đóng (Esc)"
+              title={t('tooltip.closeEsc')}
             >
-              <img src="/icon/x.svg" alt="close" />
+              <img src="/icon/x.svg" alt={t('common.close')} />
             </button>
           </div>
         </div>
@@ -147,7 +139,7 @@ const SuggestionTooltip = ({
                     <img src={getIssueIcon(issue.type)} alt={issue.type} className="issue-icon" />
                     <span className="issue-type-label">{getIssueLabel(issue.type)}</span>
                     <span className={`issue-severity-badge ${issue.severity}`}>
-                      {issue.severity === 'high' ? 'Cao' : issue.severity === 'medium' ? 'TB' : 'Thấp'}
+                      {issue.severity === 'high' ? t('tooltip.high') : issue.severity === 'medium' ? t('tooltip.medium') : t('tooltip.low')}
                     </span>
                   </div>
                   <div className="issue-detail-text">{issue.detail}</div>
@@ -158,7 +150,7 @@ const SuggestionTooltip = ({
                   )}
                   {issue.examples && issue.examples.length > 0 && (
                     <div className="issue-examples">
-                      Ví dụ: {issue.examples.join(', ')}
+                      {t('tooltip.example')}: {issue.examples.join(', ')}
                     </div>
                   )}
                 </div>
@@ -168,7 +160,7 @@ const SuggestionTooltip = ({
                   className="show-more-issues-btn"
                   onClick={() => setShowAllIssues(!showAllIssues)}
                 >
-                  {showAllIssues ? 'Thu gọn' : `Xem thêm ${suggestions.issues.length - 2} vấn đề`}
+                  {showAllIssues ? t('tooltip.collapse') : t('tooltip.viewMoreIssues', { count: suggestions.issues.length - 2 })}
                 </button>
               )}
             </div>
@@ -188,7 +180,7 @@ const SuggestionTooltip = ({
           {/* Rewrite suggestion */}
           {suggestions.rewritten && (
             <div className="suggestion-rewrite">
-              <div className="rewrite-label">✨ Gợi ý viết lại:</div>
+              <div className="rewrite-label">[SPARKLE] {t('rewrite.rewriteSuggestion')}</div>
               <div className="rewrite-text">{suggestions.rewritten}</div>
             </div>
           )}
@@ -198,15 +190,15 @@ const SuggestionTooltip = ({
         <div className="suggestion-tooltip-footer">
           <div className="tooltip-footer-left">
             {canUndo && onUndo && (
-              <button className="tooltip-action-btn undo-btn" onClick={onUndo} title="Hoàn tác (Ctrl+Z)">
-                <img src="/icon/rotate-ccw.svg" alt="undo" />
-                <span>Hoàn tác</span>
+              <button className="tooltip-action-btn undo-btn" onClick={onUndo} title={t('tooltip.undoCtrlZ')}>
+                <img src="/icon/rotate-ccw.svg" alt={t('common.undo')} />
+                <span>{t('tooltip.undo')}</span>
               </button>
             )}
             {onDismiss && (
-              <button className="tooltip-action-btn dismiss-btn" onClick={onDismiss} title="Bỏ qua gợi ý này">
-                <img src="/icon/x-circle.svg" alt="dismiss" />
-                <span>Bỏ qua</span>
+              <button className="tooltip-action-btn dismiss-btn" onClick={onDismiss} title={t('tooltip.skipSuggestion')}>
+                <img src="/icon/x-circle.svg" alt={t('tooltip.skip')} />
+                <span>{t('tooltip.skip')}</span>
               </button>
             )}
           </div>
@@ -218,8 +210,8 @@ const SuggestionTooltip = ({
                   onApply(suggestions.rewritten)
                 }}
               >
-                <img src="/icon/check.svg" alt="apply" />
-                <span>Áp dụng</span>
+                <img src="/icon/check.svg" alt={t('common.apply')} />
+                <span>{t('tooltip.apply')}</span>
               </button>
             )}
           </div>
@@ -227,9 +219,9 @@ const SuggestionTooltip = ({
 
         {/* Keyboard hint */}
         <div className="tooltip-keyboard-hint">
-          <span>Tab: Chuyển tiếp</span>
-          <span>Shift+Tab: Quay lại</span>
-          <span>Esc: Đóng</span>
+          <span>{t('tooltip.tabNext')}</span>
+          <span>{t('tooltip.shiftTabBack')}</span>
+          <span>{t('tooltip.escClose')}</span>
         </div>
       </div>
     </>,

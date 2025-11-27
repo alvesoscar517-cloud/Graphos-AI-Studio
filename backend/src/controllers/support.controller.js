@@ -278,7 +278,7 @@ exports.replyToTicket = async (req, res) => {
             type: 'info',
             priority: 'high',
             translations: {
-              vi: `Phản hồi cho: ${ticket.title}\n\n${message}`,
+              vi: `Response to: ${ticket.title}\n\n${message}`,
               en: `Response to: ${ticket.title}\n\n${message}`
             },
             read: false,

@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, MotionConfig } from 'framer-motion'
 import Lottie from 'lottie-react'
 import { rewriteTextStream, iterativeHumanize } from '../../services/api'
@@ -36,6 +37,7 @@ const RewriteToolbar = ({
   onTextChange,
   disabled 
 }) => {
+  const { t } = useTranslation()
   const { selectedModel, writingPreferences } = useRewrite()
   const [isLoading, setIsLoading] = useState(false)
   const fileInputRef = useRef(null)
@@ -43,7 +45,7 @@ const RewriteToolbar = ({
   const handleRewrite = async () => {
     // Check if text exists
     if (!text || text.trim().length === 0) {
-      modal.alert('Please enter text before rewriting', 'No Text')
+      modal.alert(t('rewrite.pleaseEnterTextFirst'), t('rewrite.noText'))
       return
     }
 
@@ -56,10 +58,10 @@ const RewriteToolbar = ({
     
     if (useIterative) {
       // Use iterative humanization (non-streaming)
-      console.log('🚀 Starting iterative humanization...')
+      console.log('[LAUNCH] Starting iterative humanization...')
       setIsLoading(true)
       
-      const loadingModal = modal.loading('Đang humanize văn bản... (có thể mất 30-60 giây)')
+      const loadingModal = modal.loading(t('rewrite.humanizing'))
       
       try {
         const result = await iterativeHumanize(
@@ -77,20 +79,20 @@ const RewriteToolbar = ({
         if (result.success && result.data) {
           onTextChange(result.data.rewritten_text)
           
-          const emoji = result.data.reached_target ? '✅' : '⚠️'
+          const emoji = result.data.reached_target ? '[SUCCESS]' : '[WARNING]'
           modal.success(
-            `${emoji} Hoàn thành sau ${result.data.iterations_used} lần lặp\n` +
-            `AI Probability: ${result.data.final_ai_probability}%\n` +
+            `${emoji} ${t('rewrite.completedIterations', { count: result.data.iterations_used })}\n` +
+            `${t('rewrite.aiProbability', { percent: result.data.final_ai_probability })}\n` +
             (result.data.warning || ''),
-            'Humanization Complete'
+            t('rewrite.humanizationComplete')
           )
         } else {
-          throw new Error(result.error || 'Humanization failed')
+          throw new Error(result.error || t('rewrite.humanizationFailed'))
         }
       } catch (error) {
         loadingModal.close()
-        console.error('❌ Error in iterative humanize:', error)
-        modal.error('Humanization thất bại: ' + error.message)
+        console.error('[FAIL] Error in iterative humanize:', error)
+        modal.error(t('rewrite.humanizationFailed') + ' ' + error.message)
         onTextChange(originalText)
       } finally {
         setIsLoading(false)
@@ -99,7 +101,7 @@ const RewriteToolbar = ({
     }
     
     // Standard streaming rewrite with enhanced anti-AI detection
-    console.log('🚀 Starting rewrite process...')
+    console.log('[LAUNCH] Starting rewrite process...')
     setIsLoading(true)
     
     try {
@@ -134,12 +136,12 @@ const RewriteToolbar = ({
         writingPreferences,
         (chunk) => {
           chunkCount++
-          console.log(`📦 Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
+          console.log(`[PACKAGE] Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
           
           // First chunk - clear editor
           if (!hasStartedStreaming) {
             hasStartedStreaming = true
-            console.log('🔄 First chunk - clearing editor')
+            console.log('[SYNC] First chunk - clearing editor')
             onTextChange('') // Clear old text immediately
             displayedText = ''
           }
@@ -174,11 +176,11 @@ const RewriteToolbar = ({
       await waitForAnimation()
       
       // Success - text is already in editor
-      console.log(`✅ Rewrite completed successfully - ${chunkCount} chunks received`)
+      console.log(`[SUCCESS] Rewrite completed successfully - ${chunkCount} chunks received`)
       
     } catch (error) {
-      console.error('❌ Error rewriting:', error)
-      modal.error('Viết lại thất bại: ' + error.message)
+      console.error('[FAIL] Error rewriting:', error)
+      modal.error(t('rewrite.rewriteFailed') + ' ' + error.message)
       // Restore original text on error
       onTextChange(originalText)
     } finally {
@@ -206,11 +208,11 @@ const RewriteToolbar = ({
                        fileName.endsWith('.doc')
 
     if (!isValidType) {
-      modal.error('Only .txt, .pdf, .docx files are supported')
+      modal.error(t('rewrite.onlyTxtPdfDocx'))
       return
     }
 
-    const loadingModal = modal.loading('Reading file...')
+    const loadingModal = modal.loading(t('rewrite.readingFile'))
 
     try {
       let extractedText = ''
@@ -244,7 +246,7 @@ const RewriteToolbar = ({
         } catch (pdfError) {
           console.error('PDF parsing error:', pdfError)
           loadingModal.close()
-          modal.error('Unable to read PDF file: ' + pdfError.message)
+          modal.error(t('rewrite.unableToReadPdf') + ' ' + pdfError.message)
           return
         }
       } else if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
@@ -258,7 +260,7 @@ const RewriteToolbar = ({
         } catch (docxError) {
           console.error('DOCX parsing error:', docxError)
           loadingModal.close()
-          modal.error('Unable to read DOCX file: ' + docxError.message)
+          modal.error(t('rewrite.unableToReadDocx') + ' ' + docxError.message)
           return
         }
       }
@@ -267,14 +269,14 @@ const RewriteToolbar = ({
 
       if (extractedText && onTextChange) {
         onTextChange(extractedText)
-        modal.success('File content loaded to editor')
+        modal.success(t('rewrite.fileContentLoaded'))
       } else {
-        modal.error('Unable to extract content from file')
+        modal.error(t('rewrite.unableToExtractContent'))
       }
     } catch (error) {
       loadingModal.close()
       console.error('Error reading file:', error)
-      modal.error('Unable to read file: ' + error.message)
+      modal.error(t('rewrite.unableToReadFile') + ' ' + error.message)
     }
 
     // Reset input
@@ -285,10 +287,8 @@ const RewriteToolbar = ({
 
   // Determine button label based on settings
   const rewriteLabel = writingPreferences?.useIterativeRefinement 
-    ? 'Humanize' 
-    : writingPreferences?.useAntiAIDetection 
-    ? 'Smart Rewrite' 
-    : 'Rewrite'
+    ? t('rewrite.humanize') 
+    : t('rewrite.rewrite')
 
   return (
     <MotionConfig transition={transition}>
@@ -305,13 +305,13 @@ const RewriteToolbar = ({
             <Button
               onClick={handleRewrite}
               disabled={disabled || isLoading || !text || !currentProfile}
-              ariaLabel="Rewrite text"
+              ariaLabel={t('rewrite.rewriteText')}
               active={isLoading}
               variant={writingPreferences?.useIterativeRefinement ? 'primary' : ''}
             >
               <img 
                 src={writingPreferences?.useIterativeRefinement ? '/icon/user-check.svg' : '/icon/pen.svg'} 
-                alt="Rewrite" 
+                alt={t('rewrite.rewrite')} 
                 className="toolbar-icon" 
               />
               <span className="toolbar-label">{rewriteLabel}</span>
@@ -338,10 +338,10 @@ const RewriteToolbar = ({
             <Button
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled || isLoading}
-              ariaLabel="Upload file"
+              ariaLabel={t('rewrite.uploadFile')}
             >
-              <img src="/icon/upload.svg" alt="Upload" className="toolbar-icon" />
-              <span className="toolbar-label">Upload</span>
+              <img src="/icon/upload.svg" alt={t('common.upload')} className="toolbar-icon" />
+              <span className="toolbar-label">{t('common.upload')}</span>
             </Button>
           </div>
         </div>

@@ -15,7 +15,7 @@ export async function getUserInfo() {
     }
   }
   
-  // PRODUCTION: Lấy user thật
+  // PRODUCTION: Get real user
   try {
     // Check if running in Chrome extension context
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {

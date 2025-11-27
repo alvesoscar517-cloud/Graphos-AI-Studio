@@ -1,21 +1,28 @@
 /* AI Detection Card Specific Styles */
 
+.ai-card .feature-result {
+  border-top: none;
+  margin-top: 8px;
+  padding-top: 0;
+}
+
 .ai-card .ai-score-display {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0;
+  gap: 8px;
+  padding: 0;
 }
 
 /* Modern Circle Design */
 .ai-card .ai-score-circle {
   position: relative;
-  width: 110px;
-  height: 110px;
+  width: 100px;
+  height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 4px 0;
 }
 
 .ai-card .ai-score-svg {
@@ -30,7 +37,7 @@
 .ai-card .ai-score-bg {
   fill: none;
   stroke: #f1f3f4;
-  stroke-width: 10;
+  stroke-width: 8;
 }
 
 .ai-card .ai-score-inner {
@@ -40,9 +47,9 @@
 .ai-card .ai-score-progress {
   fill: none;
   stroke: #4facfe;
-  stroke-width: 10;
+  stroke-width: 8;
   stroke-linecap: round;
-  stroke-dasharray: 314.16;
+  stroke-dasharray: 282.74;
   transition: none;
 }
 
@@ -59,15 +66,15 @@
 }
 
 .ai-card .ai-score-number {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 600;
   line-height: 1;
-  letter-spacing: -1.5px;
+  letter-spacing: -1px;
   color: var(--text-primary);
 }
 
 .ai-card .ai-score-symbol {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1;
   color: var(--text-secondary);
@@ -81,7 +88,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 12px;
+  padding: 8px 12px;
   background: var(--bg-secondary);
   border: none;
   border-radius: 8px;
@@ -111,7 +118,7 @@
 /* Detail Button */
 .ai-card .detail-btn-full {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 12px;
   margin-top: 0;
   background: var(--bg-secondary);
   border: none;
@@ -153,7 +160,7 @@
   padding: 8px 12px;
   background: var(--bg-secondary);
   border-radius: 8px;
-  margin-top: 8px;
+  margin-top: 0;
 }
 
 .ai-card .confidence-header {
@@ -213,7 +220,7 @@
   background: rgba(255, 152, 0, 0.1);
   border: 1px solid rgba(255, 152, 0, 0.3);
   border-radius: 8px;
-  margin-top: 8px;
+  margin-top: 0;
   font-size: 11px;
   color: #ff9800;
   line-height: 1.4;
@@ -238,7 +245,7 @@
   font-size: 11px;
   font-weight: 500;
   color: #4285f4;
-  margin-top: 8px;
+  margin-top: 0;
 }
 
 .ai-card .analysis-badge img {

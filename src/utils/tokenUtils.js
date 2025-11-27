@@ -9,7 +9,7 @@
  * - English: ~1.3 tokens/word
  */
 
-// Model limits - Chỉ Gemini models (hệ thống chỉ dùng Gemini)
+// Model limits - Only Gemini models (system only uses Gemini)
 export const MODEL_LIMITS = {
   // Gemini 2.0 Flash Experimental
   'gemini-2.0-flash-exp': {
@@ -77,7 +77,7 @@ export function detectLanguage(text) {
 }
 
 /**
- * Ước tính số token từ text
+ * Ước tính số token words text
  * Công thức: 
  * - Tiếng Việt: chars / 2.5 (vì unicode + dấu)
  * - Tiếng Anh: chars / 4 (standard)
@@ -134,7 +134,7 @@ export function estimatePages(text) {
 }
 
 /**
- * Lấy thông tin chi tiết về text
+ * Get detailed text information
  * @param {string} text 
  * @returns {TextStats}
  */
@@ -165,7 +165,7 @@ export function formatTextStats({ chars, words, tokens, pages }) {
   const parts = []
   
   if (chars > 0) {
-    parts.push(`${chars.toLocaleString()} ký tự`)
+    parts.push(`${chars.toLocaleString()} chars`)
   }
   if (words > 0) {
     parts.push(`${words.toLocaleString()} words`)
@@ -216,7 +216,7 @@ export function validateTextForModel(text, model = DEFAULT_MODEL) {
   // Check hard limit
   if (stats.tokens > limits.maxInput * 0.8) {
     result.valid = false
-    result.errors.push(`Nội dung vượt giới hạn model (${stats.tokens.toLocaleString()} tokens)`)
+    result.errors.push(`Content exceeds model limit (${stats.tokens.toLocaleString()} tokens)`)
     result.recommendation = 'split'
   }
   

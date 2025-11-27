@@ -38,9 +38,9 @@ export default function ShadowRoot({ children, styles }) {
       reactRootRef.current.render(children);
       
       isInitialized.current = true;
-      console.log('✅ Shadow DOM created successfully for Admin Panel');
+      console.log('[SUCCESS] Shadow DOM created successfully for Admin Panel');
     } catch (error) {
-      console.error('❌ Failed to create Shadow DOM:', error);
+      console.error('[ERROR] Failed to create Shadow DOM:', error);
     }
   }, []);
 

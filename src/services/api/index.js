@@ -1,51 +1,37 @@
 /**
- * API Service - Centralized exports
- * Modular API structure for better maintainability
+ * API Services Index
+ * Re-exports all API functions for easy importing
  */
 
-// Auth
-export { getUserInfo } from './auth'
+// API Client
+export { apiClient, apiFetch } from './client';
 
-// Profile
-export {
-  loadProfiles,
-  deleteProfile,
-  getProfileDetails,
-  createProfile,
-  addSample,
-  addSamplesBatch,
-  finalizeProfile,
-  createProfileComplete
-} from './profile'
+// Auth
+export { getUserInfo } from './auth';
 
 // Analysis
-export {
-  analyzeText,
-  detectAI,
+export { 
+  analyzeText, 
+  detectAI, 
   getSuggestions,
   analyzeTextBatch,
   analyzeTextOptimized,
   getSuggestionsOptimized
-} from './analysis'
-
-// Rewrite & Humanization
-export {
-  rewriteText,
-  rewriteTextStream,
-  iterativeHumanize
-} from './rewrite'
-
-// Chat
-export {
-  sendChatMessageStream,
-  sendChatMessage,
-  sendHumanizedChatStream,
-  uploadChatFile,
-  summarizeConversation,
-  estimateTokens
-} from './chat'
+} from './analysis';
 
 // Validation
-export {
-  validateTextBeforeAI
-} from './validation'
+export { 
+  validateTextBeforeAI,
+  splitTextForModel,
+  validateProfileData,
+  validateSampleData
+} from './validation';
+
+// Profile (if exists)
+export * from './profile';
+
+// Rewrite (if exists)
+export * from './rewrite';
+
+// Chat (if exists)
+export * from './chat';

@@ -23,7 +23,7 @@ export async function rewriteText(profileId, text, model = 'gemini-2.5-flash', w
       }
     }
     
-    console.log('📊 Rewrite text stats:', validation.stats.display)
+    console.log('[CHART] Rewrite text stats:', validation.stats.display)
     
     const userInfo = await getUserInfo()
     const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite`, {
@@ -71,7 +71,7 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
       throw new Error(validation.errors.join(', '))
     }
     
-    console.log('📊 Stream rewrite text stats:', validation.stats.display)
+    console.log('[CHART] Stream rewrite text stats:', validation.stats.display)
     
     const userInfo = await getUserInfo()
     console.log('📡 Sending rewrite_stream request...')
@@ -127,21 +127,21 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
             try {
               const json = JSON.parse(data)
               if (json.chunk) {
-                console.log('📦 Chunk received:', json.chunk.substring(0, 30) + '...')
+                console.log('[PACKAGE] Chunk received:', json.chunk.substring(0, 30) + '...')
                 onChunk(json.chunk)
               } else if (json.error) {
-                console.error('❌ Server error:', json.error)
+                console.error('[FAIL] Server error:', json.error)
                 throw new Error(json.error)
               }
             } catch (e) {
-              console.warn('⚠️ Failed to parse JSON:', data, e)
+              console.warn('[WARNING] Failed to parse JSON:', data, e)
             }
           }
         }
       }
     }
   } catch (error) {
-    console.error('❌ Error streaming rewrite:', error)
+    console.error('[FAIL] Error streaming rewrite:', error)
     throw error
   }
 }

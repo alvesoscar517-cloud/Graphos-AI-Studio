@@ -46,13 +46,13 @@ export const NotesProvider = ({ children }) => {
           
           setNotes(cachedNotes)
           setLoading(false) // Stop loading immediately when we have cached data
-          console.log('✅ Loaded notes from IndexedDB:', cachedNotes.length)
+          console.log('[SUCCESS] Loaded notes from IndexedDB:', cachedNotes.length)
         }
 
         // Then, sync with Drive in background (don't block UI)
         // Check if chrome.storage is available (extension context)
         if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) {
-          console.log('ℹ️ Not in extension context, skipping Drive sync')
+          console.log('[INFO] Not in extension context, skipping Drive sync')
           if (cachedNotes.length === 0) {
             setLoading(false)
           }
@@ -61,14 +61,14 @@ export const NotesProvider = ({ children }) => {
         
         const result = await chrome.storage.local.get(['accessToken'])
         if (!result.accessToken) {
-          console.log('ℹ️ Not authenticated, skipping Drive sync')
+          console.log('[INFO] Not authenticated, skipping Drive sync')
           if (cachedNotes.length === 0) {
             setLoading(false)
           }
           return
         }
 
-        console.log('🔄 Syncing notes from Drive in background...')
+        console.log('[SYNC] Syncing notes from Drive in background...')
         let driveNotes = await loadNotesFromDrive()
         
         // Migration: Remove visible flag from old notes
@@ -81,13 +81,13 @@ export const NotesProvider = ({ children }) => {
         setNotes(driveNotes)
         await saveNotesToDB(driveNotes)
         
-        console.log('✅ Synced notes from Drive:', driveNotes.length)
+        console.log('[SUCCESS] Synced notes from Drive:', driveNotes.length)
       } catch (error) {
-        console.error('❌ Failed to load notes:', error)
+        console.error('[FAIL] Failed to load notes:', error)
         
         // If need reauth, show message
         if (error.message === 'NEED_REAUTH') {
-          console.warn('⚠️ Token does not have Drive permission. User needs to re-authenticate.')
+          console.warn('[WARNING] Token does not have Drive permission. User needs to re-authenticate.')
           setNeedsReauth(true)
         }
       } finally {
@@ -109,13 +109,13 @@ export const NotesProvider = ({ children }) => {
       try {
         // Check if chrome.storage is available
         if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) {
-          console.log('ℹ️ Not in extension context, skipping auto-save')
+          console.log('[INFO] Not in extension context, skipping auto-save')
           return
         }
         
         const result = await chrome.storage.local.get(['accessToken'])
         if (!result.accessToken) {
-          console.log('ℹ️ Not authenticated, skipping auto-save')
+          console.log('[INFO] Not authenticated, skipping auto-save')
           return
         }
 
@@ -128,9 +128,9 @@ export const NotesProvider = ({ children }) => {
           ))
         }
         
-        console.log('✅ Auto-saved to Drive:', note.title)
+        console.log('[SUCCESS] Auto-saved to Drive:', note.title)
       } catch (error) {
-        console.error('❌ Auto-save failed:', error)
+        console.error('[FAIL] Auto-save failed:', error)
       }
     }, 2000) // Save after 2 seconds of inactivity
   }
@@ -175,7 +175,7 @@ export const NotesProvider = ({ children }) => {
     }
     
     if (emptyNotes.length > 0) {
-      console.log(`✅ Cleaned up ${emptyNotes.length} empty notes`)
+      console.log(`[SUCCESS] Cleaned up ${emptyNotes.length} empty notes`)
     }
   }
 
@@ -242,18 +242,18 @@ export const NotesProvider = ({ children }) => {
     // Delete from IndexedDB
     try {
       await deleteNoteFromDB(id)
-      console.log('✅ Deleted from IndexedDB')
+      console.log('[SUCCESS] Deleted from IndexedDB')
     } catch (error) {
-      console.error('❌ Failed to delete from IndexedDB:', error)
+      console.error('[FAIL] Failed to delete from IndexedDB:', error)
     }
 
     // Delete from Drive
     if (note && note.driveId) {
       try {
         await deleteNoteFromDrive(note.driveId)
-        console.log('✅ Deleted from Drive')
+        console.log('[SUCCESS] Deleted from Drive')
       } catch (error) {
-        console.error('❌ Failed to delete from Drive:', error)
+        console.error('[FAIL] Failed to delete from Drive:', error)
       }
     }
   }
@@ -267,10 +267,10 @@ export const NotesProvider = ({ children }) => {
       // Update IndexedDB cache
       await saveNotesToDB(driveNotes)
       
-      console.log('✅ Synced notes from Drive:', driveNotes.length)
+      console.log('[SUCCESS] Synced notes from Drive:', driveNotes.length)
       return true
     } catch (error) {
-      console.error('❌ Failed to sync notes:', error)
+      console.error('[FAIL] Failed to sync notes:', error)
       throw error
     } finally {
       setLoading(false)

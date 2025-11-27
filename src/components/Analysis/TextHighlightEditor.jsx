@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAIProcessing } from '../../contexts/AIProcessingContext'
 import useAutoScrollbar from '../../hooks/useAutoScrollbar'
 import SuggestionTooltip from './SuggestionTooltip'
@@ -13,12 +14,13 @@ const TextHighlightEditor = ({
   onChange, 
   analysis: externalAnalysis,
   disabled = false,
-  placeholder = "Nhập văn bản...",
+  placeholder,
   showHighlights = true,
   onHighlightsChange,
   showRewriteToolbar = false,
   currentProfile = null
 }) => {
+  const { t } = useTranslation()
   const [analysis, setAnalysis] = useState(externalAnalysis)
   const [activeTooltip, setActiveTooltip] = useState(null)
   const [activeHighlightIndex, setActiveHighlightIndex] = useState(-1)
@@ -31,7 +33,7 @@ const TextHighlightEditor = ({
   const textareaRef = useRef(null)
   const highlightRefs = useRef([])
   
-  // Auto-show scrollbar khi scroll nhiều - áp dụng cho textarea
+  // Auto-show scrollbar when scrolling - apply to textarea
   const { scrollbarClassName } = useAutoScrollbar({
     scrollThreshold: 30,
     hideDelay: 1200,
@@ -56,7 +58,7 @@ const TextHighlightEditor = ({
           ).length
         : 0
       
-      console.log('📊 Highlighting', sentencesWithIssues, 'sentences with issues')
+      console.log('[CHART] Highlighting', sentencesWithIssues, 'sentences with issues')
       
       if (onHighlightsChange) {
         onHighlightsChange(sentencesWithIssues > 0)
@@ -259,7 +261,7 @@ const TextHighlightEditor = ({
     setActiveTooltip(null)
     setActiveHighlightIndex(-1)
     
-    console.log('✅ Suggestion applied:', activeTooltip.originalText.substring(0, 30), '→', rewrittenText.substring(0, 30))
+    console.log('[SUCCESS] Suggestion applied:', activeTooltip.originalText.substring(0, 30), '→', rewrittenText.substring(0, 30))
   }, [activeTooltip, value, onChange])
 
   // Dismiss suggestion (ignore this highlight)
@@ -332,7 +334,7 @@ const TextHighlightEditor = ({
                   ref={el => highlightRefs.current[highlightIndex] = el}
                   className={`highlight-text-marked level-${segment.level} ${isActive ? 'active' : ''}`}
                   onClick={(e) => handleHighlightClick(segment, e, highlightIndex)}
-                  title={`${segment.suggestions.issues_found} vấn đề - Click để xem (Tab để chuyển)`}
+                  title={`${segment.suggestions.issues_found} issues - Click to view (Tab to navigate)`}
                   style={{
                     backgroundColor: bgColor,
                     transition: 'none',
@@ -374,7 +376,7 @@ const TextHighlightEditor = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          placeholder={placeholder}
+          placeholder={placeholder || t('editor.enterYourText')}
           spellCheck={false}
         />
       </div>

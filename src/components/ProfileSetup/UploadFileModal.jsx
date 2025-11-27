@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import './UploadFileModal.css'
 
 const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRemove }) => {
+  const { t } = useTranslation()
   const [files, setFiles] = useState([])
   const [isDragging, setIsDragging] = useState(false)
   const [fileAnalysis, setFileAnalysis] = useState([])
@@ -90,14 +92,14 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
         // Check if PDF is image-based (very few words extracted)
         const words = text.trim().split(/\s+/).filter(w => w.length > 0)
         if (words.length < 50 && pdf.numPages > 0) {
-          return { error: 'This PDF might be a scanned image. Please use a text-based PDF or convert to .docx' }
+          return { error: t('profileSetup.scannedPdfWarning') }
         }
       }
       
       // Validate text
       const words = text.trim().split(/\s+/).filter(w => w.length > 0)
       if (words.length === 0) {
-        return { error: 'File does not contain valid text' }
+        return { error: t('profileSetup.noValidText') }
       }
       
       // Limit to 5000 words per file
@@ -110,7 +112,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
       
     } catch (error) {
       console.error('Error extracting text:', error)
-      return { error: `Unable to read ${ext.toUpperCase()} file` }
+      return { error: t('profileSetup.unableToReadFormat', { format: ext.toUpperCase() }) }
     }
   }
 
@@ -238,11 +240,11 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
   // Get status label
   const getStatusLabel = (status) => {
     switch (status) {
-      case 'too-short': return 'Too Short'
-      case 'acceptable': return 'Acceptable'
-      case 'good': return 'Good'
-      case 'great': return 'Very Good'
-      case 'excellent': return 'Excellent'
+      case 'too-short': return t('profileSetup.tooShort')
+      case 'acceptable': return t('profileSetup.acceptable')
+      case 'good': return t('profileSetup.good')
+      case 'great': return t('profileSetup.veryGood')
+      case 'excellent': return t('profileSetup.excellent')
       default: return ''
     }
   }
@@ -263,12 +265,12 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
         {/* Header with Icon */}
         <div className="upload-modal-header">
           <div className="upload-modal-icon">
-            <img src="/icon/paperclip.svg" alt="" width="24" height="24" />
+            <img src="/icon/paperclip.svg" alt={t('profileSetup.uploadDocumentsTitle')} width="24" height="24" />
           </div>
           <div>
-            <h2 className="upload-modal-title">Upload Documents</h2>
+            <h2 className="upload-modal-title">{t('profileSetup.uploadDocumentsTitle')}</h2>
             <p className="upload-modal-subtitle">
-              Upload text files so AI can learn your writing style
+              {t('profileSetup.uploadDocumentsSubtitle')}
             </p>
           </div>
         </div>
@@ -289,7 +291,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
             
             {/* Upload Info */}
             <div className="upload-info-section">
-              <p className="upload-support-text">Hỗ trợ: .docx, .pdf, .txt (tối đa 10MB mỗi file)</p>
+              <p className="upload-support-text">{t('profileSetup.supportedFormats')}</p>
               <button 
                 className="upload-modern-btn"
                 onClick={() => document.getElementById('uploadFileInput').click()}
@@ -299,7 +301,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
                   <polyline points="17 8 12 3 7 8"/>
                   <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
-                Select file from computer
+                {t('profileSetup.selectFromComputer')}
               </button>
               <input
                 type="file"
@@ -318,7 +320,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
               {isProcessing && (
                 <div className="upload-processing">
                   <div className="upload-spinner"></div>
-                  <span>Analyzing text...</span>
+                  <span>{t('profileSetup.analyzingText')}</span>
                 </div>
               )}
               
@@ -335,19 +337,19 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
                     ) : (
                       <div className="upload-file-analysis">
                         <span className="upload-word-count">
-                          {item.analysis.wordCount} words
+                          {item.analysis.wordCount} {t('common.words')}
                         </span>
                         <span className="upload-status-badge">
                           {getStatusLabel(item.analysis.status)}
                         </span>
                         {item.truncated && (
                           <span className="upload-truncated">
-                            (Trimmed from {item.originalCount} words)
+                            ({t('profileSetup.trimmedFrom', { count: item.originalCount })})
                           </span>
                         )}
                         {!item.isValid && (
                           <span className="upload-warning">
-                            Minimum 100 words required
+                            {t('profileSetup.minimum100Words')}
                           </span>
                         )}
                       </div>
@@ -356,6 +358,8 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
                   <button 
                     className="upload-file-remove"
                     onClick={() => handleRemoveFile(index)}
+                    data-tooltip={t('common.remove')}
+                    data-tooltip-position="left"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <line x1="18" y1="6" x2="6" y2="18"/>
@@ -376,26 +380,26 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
                       <line x1="16" y1="17" x2="8" y2="17"/>
                       <polyline points="10 9 9 9 8 9"/>
                     </svg>
-                    <span>Total: {Math.min(totalWordCount, 3000)} words from {validFilesCount}/{files.length} files</span>
+                    <span>{t('profileSetup.totalFromFiles', { words: Math.min(totalWordCount, 5000), valid: validFilesCount, total: files.length })}</span>
                   </div>
                   {totalWordCount < 500 && (
                     <div className="upload-summary-hint">
-                      Need {500 - totalWordCount} more words to reach minimum
+                      {t('profileSetup.needMoreWordsFile', { count: 500 - totalWordCount })}
                     </div>
                   )}
                   {totalWordCount >= 500 && totalWordCount < 1000 && (
                     <div className="upload-summary-hint success">
-                      Minimum reached! Add {1000 - totalWordCount} more words to reach recommended level
+                      {t('profileSetup.minimumReachedFile', { count: 1000 - totalWordCount })}
                     </div>
                   )}
-                  {totalWordCount >= 1000 && totalWordCount < 3000 && (
+                  {totalWordCount >= 1000 && totalWordCount < 5000 && (
                     <div className="upload-summary-hint success">
-                      [EXCELLENT] Enough text for AI to learn well
+                      [{t('profileSetup.excellent').toUpperCase()}] {t('profileSetup.excellentEnough')}
                     </div>
                   )}
-                  {totalWordCount >= 3000 && (
+                  {totalWordCount >= 5000 && (
                     <div className="upload-summary-hint success">
-                      Reached 3000 word limit. Text will be auto-trimmed when saved.
+                      {t('profileSetup.perfectMaximum')}
                     </div>
                   )}
                 </div>
@@ -407,16 +411,16 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [], onFileRem
         {/* Footer */}
         <div className="upload-modal-footer">
           <button className="upload-modal-btn upload-modal-btn-cancel" onClick={handleClose}>
-            Hủy
+            {t('common.cancel')}
           </button>
           <button 
             className="upload-modal-btn upload-modal-btn-save" 
             onClick={handleSave}
             disabled={!canSave || isProcessing}
           >
-            {isProcessing ? 'Processing...' : 
-             files.length === 0 ? 'Clear All' : 
-             `Confirm (${validFilesCount})`}
+            {isProcessing ? t('common.processing') : 
+             files.length === 0 ? t('profileSetup.clearAll') : 
+             t('profileSetup.confirmCount', { count: validFilesCount })}
           </button>
         </div>
       </div>

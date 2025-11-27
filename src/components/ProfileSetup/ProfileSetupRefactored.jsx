@@ -4,6 +4,7 @@
  * Split into smaller components for better maintainability
  */
 import { useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { createProfileComplete } from '../../services/api'
 import { clearAllProfileDetailCaches } from '../../utils/profileDetailCache'
 import useProfileSetup, { getDraftTimeAgo } from './hooks/useProfileSetup'
@@ -15,6 +16,7 @@ import '../../styles/ProfileSetup.css'
 import '../../styles/ThemeSelector.css'
 
 const ProfileSetup = () => {
+  const { t } = useTranslation()
   const {
     // State
     currentStep,
@@ -113,7 +115,7 @@ const ProfileSetup = () => {
     setShowError(false)
     setShowCompletion(false)
     setProcessingStep(1)
-    setProcessingMessage('Preparing data...')
+    setProcessingMessage(t('profileSetupErrors.preparingData'))
 
     try {
       // Prepare all samples
@@ -123,11 +125,11 @@ const ProfileSetup = () => {
         ...profileData.shortSamples.map(text => ({ text, type: 'short' }))
       ]
 
-      console.log(`📦 Creating profile with ${allSamples.length} samples (attempt ${retryCount + 1})`)
+      console.log(`[PACKAGE] Creating profile with ${allSamples.length} samples (attempt ${retryCount + 1})`)
 
       if (allSamples.length < 3) {
         if (mountedRef.current) {
-          setErrorMessage('At least 3 text samples are required to create a profile')
+          setErrorMessage(t('profileSetupErrors.atLeast3Samples'))
           setShowError(true)
           setProcessing(false)
         }
@@ -140,7 +142,7 @@ const ProfileSetup = () => {
       
       // Step 1: Preparing
       setProcessingStep(1)
-      setProcessingMessage(`Preparing ${allSamples.length} text samples...`)
+      setProcessingMessage(t('profileSetupErrors.preparingSamples', { count: allSamples.length }))
       
       await new Promise(resolve => {
         const timeout = setTimeout(resolve, 3000)
@@ -151,7 +153,7 @@ const ProfileSetup = () => {
       
       // Step 2: Creating embeddings
       setProcessingStep(2)
-      setProcessingMessage(`Creating embeddings and analyzing writing style... (${estimatedTime}s)`)
+      setProcessingMessage(t('profileSetupErrors.creatingEmbeddings', { time: estimatedTime }))
       
       try {
         const response = await createProfileComplete(
@@ -164,7 +166,7 @@ const ProfileSetup = () => {
         if (!mountedRef.current) return
         
         if (!response.success) {
-          throw new Error(response.error || 'Unable to create profile')
+          throw new Error(response.error || t('profileSetupErrors.unableToCreate'))
         }
         
         setProfileData(prev => ({ ...prev, profileId: response.profile_id }))
@@ -177,7 +179,7 @@ const ProfileSetup = () => {
         
         // Step 3: Finalizing
         setProcessingStep(3)
-        setProcessingMessage('Finalizing profile...')
+        setProcessingMessage(t('profileSetupErrors.finalizingProfile'))
         
         await new Promise(resolve => {
           const timeout = setTimeout(resolve, 2000)
@@ -201,15 +203,15 @@ const ProfileSetup = () => {
         const errMsg = apiError.message?.toLowerCase() || ''
         const isRetryable = (
           errMsg.includes('quota') || 
-          errMsg.includes('quá tải') ||
+          errMsg.includes('overload') ||
           errMsg.includes('timeout') ||
           errMsg.includes('network') ||
           errMsg.includes('database_write')
         ) && !errMsg.includes('rate_limit') && !errMsg.includes('duplicate') && !errMsg.includes('similar')
         
         if (isRetryable && retryCount < MAX_RETRIES) {
-          console.log(`🔄 Retrying... (${retryCount + 1}/${MAX_RETRIES})`)
-          setProcessingMessage(`Retrying... (${retryCount + 1}/${MAX_RETRIES})`)
+          console.log(`[SYNC] Retrying... (${retryCount + 1}/${MAX_RETRIES})`)
+          setProcessingMessage(t('profileSetupErrors.retrying', { current: retryCount + 1, max: MAX_RETRIES }))
           
           await new Promise(resolve => {
             const timeout = setTimeout(resolve, 2000 * (retryCount + 1))
@@ -220,28 +222,28 @@ const ProfileSetup = () => {
         }
         
         if (mountedRef.current) {
-          let errorMsg = 'Unable to create profile. Please try again.'
+          let errorMsg = t('profileSetupErrors.unableToCreate')
           const errMessage = apiError.message || ''
           
           // Handle specific error types
           if (errMessage.includes('code') || errMessage.includes('Code')) {
-            errorMsg = 'Text contains code. Please provide natural text.'
+            errorMsg = t('profileSetupErrors.textContainsCode')
           } else if (errMessage.includes('ký tự đặc biệt')) {
-            errorMsg = 'Text contains too many special characters.'
+            errorMsg = t('profileSetupErrors.tooManySpecialChars')
           } else if (errMessage.includes('repetition')) {
-            errorMsg = 'Text has too much repetition.'
-          } else if (errMessage.includes('quota') || errMessage.includes('quá tải')) {
-            errorMsg = 'System is overloaded. Please try again in a few minutes.'
-          } else if (errMessage.includes('giới hạn') || errMessage.includes('RATE_LIMIT')) {
+            errorMsg = t('profileSetupErrors.tooMuchRepetition')
+          } else if (errMessage.includes('quota') || errMessage.includes('overload')) {
+            errorMsg = t('profileSetupErrors.systemOverloaded')
+          } else if (errMessage.includes('limit') || errMessage.includes('RATE_LIMIT')) {
             errorMsg = errMessage // Use the rate limit message from backend
-          } else if (errMessage.includes('đã tồn tại') || errMessage.includes('DUPLICATE')) {
+          } else if (errMessage.includes('already exists') || errMessage.includes('DUPLICATE')) {
             errorMsg = errMessage // Use the duplicate name message from backend
-          } else if (errMessage.includes('quá giống') || errMessage.includes('SIMILAR_SAMPLES')) {
+          } else if (errMessage.includes('too similar') || errMessage.includes('SIMILAR_SAMPLES')) {
             errorMsg = errMessage // Use the similar samples message from backend
           } else if (errMessage.includes('timeout') || errMessage.includes('TIMEOUT')) {
-            errorMsg = 'Processing took too long. Please try again.'
+            errorMsg = t('profileSetupErrors.processingTooLong')
           } else if (errMessage.includes('DATABASE_WRITE')) {
-            errorMsg = 'Data save error. Please try again.'
+            errorMsg = t('profileSetupErrors.dataSaveError')
           } else if (errMessage) {
             errorMsg = errMessage
           }
@@ -254,7 +256,7 @@ const ProfileSetup = () => {
     } catch (error) {
       console.error('Create profile error:', error)
       if (mountedRef.current) {
-        setErrorMessage('An unexpected error occurred. Please try again.')
+        setErrorMessage(t('profileSetupErrors.unexpectedError'))
         setShowError(true)
         setProcessing(false)
       }
@@ -278,11 +280,11 @@ const ProfileSetup = () => {
     <div className="profile-setup-page">
       <div className="setup-container">
         {/* Progress Bar */}
-        <div className="progress-bar-container" role="progressbar" aria-valuenow={currentStep} aria-valuemin={1} aria-valuemax={4} aria-label={`Tiến độ: Bước ${currentStep} trên 4`}>
+        <div className="progress-bar-container" role="progressbar" aria-valuenow={currentStep} aria-valuemin={1} aria-valuemax={4} aria-label={`Progress: Step ${currentStep} of 4`}>
           <div className="progress-bar">
             <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
           </div>
-          <div className="progress-text">Bước {currentStep} / 4</div>
+          <div className="progress-text">{t('profileSetupErrors.step')} {currentStep} / 4</div>
         </div>
 
         {/* Step 1: Profile Name & Theme */}
@@ -395,21 +397,21 @@ const ProfileSetup = () => {
             </svg>
           </div>
           <div className="draft-toast-content">
-            <div className="draft-toast-title">Có bản nháp chưa hoàn thành</div>
+            <div className="draft-toast-title">{t('profileSetup.incompleteDraft')}</div>
             <div className="draft-toast-subtitle">
-              {draftInfo.profileName ? `"${draftInfo.profileName}"` : 'Hồ sơ'} • Bước {draftInfo.currentStep || 1}
+              {draftInfo.profileName ? `"${draftInfo.profileName}"` : t('nav.profile')} • {t('profileSetupErrors.step')} {draftInfo.currentStep || 1}
               {draftInfo.savedAt && ` • ${getDraftTimeAgo(draftInfo.savedAt)}`}
             </div>
           </div>
           <div className="draft-toast-actions">
             <button className="draft-toast-btn draft-toast-btn-secondary" onClick={handleDiscardDraft}>
-              Bỏ qua
+              {t('common.skip')}
             </button>
             <button className="draft-toast-btn draft-toast-btn-primary" onClick={handleRestoreDraft}>
-              Khôi phục
+              {t('profileSetup.restore')}
             </button>
           </div>
-          <button className="draft-toast-close" onClick={handleDiscardDraft} aria-label="Close">
+          <button className="draft-toast-close" onClick={handleDiscardDraft} aria-label={t('common.close')}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
@@ -420,23 +422,23 @@ const ProfileSetup = () => {
 
       {/* Auto-save indicator - subtle floating badge */}
       {lastSavedAt && currentStep < 4 && (
-        <div className="auto-save-badge" title="Auto-saving draft">
+        <div className="auto-save-badge" title={t('profileSetup.autoSavingDraft')}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
-          <span>Saved</span>
+          <span>{t('profileSetup.saved')}</span>
         </div>
       )}
 
       {/* Cancel Confirm Modal - renders inside profile-setup-page */}
       <ConfirmModal
         isOpen={showCancelConfirm}
-        title="Cancel Profile Creation?"
-        message="All entered data will be lost."
+        title={t('profileSetup.cancelProfileCreation')}
+        message={t('profileSetup.allDataWillBeLost')}
         type="warning"
         danger={true}
-        confirmText="Cancel"
-        cancelText="Continue"
+        confirmText={t('common.cancel')}
+        cancelText={t('common.continue')}
         onConfirm={handleConfirmCancel}
         onCancel={handleCancelCancel}
       />

@@ -22,11 +22,11 @@ const TextScramble = ({ children, className = '' }) => {
 
     queueRef.current = []
     
-    // Scramble từ trái sang phải
+    // Scramble words left to right
     for (let i = 0; i < length; i++) {
       const from = oldText[i] || ''
       const to = newText[i] || ''
-      const start = i * 3 // Mỗi chữ bắt đầu sau chữ trước 3 frame
+      const start = i * 3 // Each character starts 3 frames after previous
       const end = start + 15 // Scramble trong 15 frame
       queueRef.current.push({ from, to, start, end })
     }

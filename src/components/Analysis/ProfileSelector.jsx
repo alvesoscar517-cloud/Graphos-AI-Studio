@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useProfiles } from '../../contexts/ProfileContext'
 import { deleteProfile as deleteProfileAPI } from '../../services/api'
@@ -9,6 +10,7 @@ import './Analysis.css'
 import '../Popups/ProfileModal.css'
 
 const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { profiles, loading, loadProfiles, removeProfile } = useProfiles()
   const [showModal, setShowModal] = useState(false)
@@ -22,21 +24,21 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
   const handleSelectProfile = (profile) => {
     onProfileSelect(profile)
     setShowModal(false)
-    modal.toast('Profile Selected', profile.profile_name, 'success')
+    modal.toast(t('profile.profileSelected'), profile.profile_name, 'success')
   }
 
   const handleDeleteProfile = async (e, profileId) => {
     e.stopPropagation()
     const confirmed = await modal.confirm(
-      'Are you sure you want to delete this profile? This action cannot be undone.',
-      'Confirm Delete Profile',
-      { confirmText: 'Delete', danger: true }
+      t('profile.confirmDeleteProfile'),
+      t('profile.confirmDeleteTitle'),
+      { confirmText: t('common.delete'), danger: true }
     )
     
     if (confirmed) {
       const result = await deleteProfileAPI(profileId)
       if (result.success) {
-        modal.toast('Đã xóa hồ sơ', '', 'success')
+        modal.toast(t('profile.profileDeleted'), '', 'success')
         removeProfile(profileId)
         
         // Invalidate cache for deleted profile
@@ -47,7 +49,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
           onProfileSelect(null)
         }
       } else {
-        modal.error('Unable to delete profile: ' + result.error)
+        modal.error(t('profile.unableToDelete') + ': ' + result.error)
       }
     }
   }
@@ -80,17 +82,17 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
             <img src={`/icon/${getThemeIcon(currentProfile?.theme)}.svg`} alt="Profile" />
           </div>
           <div className="profile-selector-info">
-            <h3>{currentProfile?.profile_name || 'No Profile'}</h3>
+            <h3>{currentProfile?.profile_name || t('profile.noProfile')}</h3>
             <p className="model-id">
-              {currentProfile ? `${currentProfile.sample_count || 0} text samples` : 'Click to select profile'}
+              {currentProfile ? t('profile.textSamples', { count: currentProfile.sample_count || 0 }) : t('profile.clickToSelect')}
             </p>
           </div>
           <img src="/icon/chevron-down.svg" alt="Select" className="profile-selector-arrow" />
         </div>
         <p className="model-description">
           {currentProfile 
-            ? 'Active writing style profile' 
-            : 'Select a writing style profile to start analyzing and rewriting content.'}
+            ? t('profile.activeProfile') 
+            : t('profile.selectProfileDesc')}
         </p>
       </div>
 
@@ -98,24 +100,24 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
         <div className="modal-overlay show" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Select Writing Style Profile</h2>
+              <h2>{t('profile.selectWritingStyleProfile')}</h2>
               <button className="modal-close-btn" onClick={() => setShowModal(false)}>
-                <img src="/icon/x.svg" alt="Close" />
+                <img src="/icon/x.svg" alt={t('common.close')} />
               </button>
             </div>
             
             <div className="modal-search">
-              <img src="/icon/search.svg" alt="Search" className="modal-search-icon" />
+              <img src="/icon/search.svg" alt={t('common.search')} className="modal-search-icon" />
               <input 
                 type="text" 
                 className="modal-search-input" 
-                placeholder="Tìm kiếm hồ sơ"
+                placeholder={t('profile.searchProfiles')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               {searchTerm && (
                 <button className="modal-search-clear show" onClick={() => setSearchTerm('')}>
-                  <img src="/icon/x.svg" alt="Clear" />
+                  <img src="/icon/x.svg" alt={t('common.close')} />
                 </button>
               )}
             </div>
@@ -124,7 +126,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
               {loading ? (
                 <div style={{ textAlign: 'center', padding: '40px' }}>
                   <div className="modal-spinner"></div>
-                  <p style={{ marginTop: '16px', color: 'var(--text-secondary)' }}>Loading...</p>
+                  <p style={{ marginTop: '16px', color: 'var(--text-secondary)' }}>{t('common.loading')}</p>
                 </div>
               ) : filteredProfiles.length === 0 ? (
                 <div className="empty-state">
@@ -136,12 +138,12 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                     />
                   </div>
                   <p className="empty-text">
-                    {searchTerm ? 'Không tìm thấy hồ sơ' : 'Chưa có hồ sơ nào'}
+                    {searchTerm ? t('profile.noProfilesFound') : t('profile.noProfilesYet')}
                   </p>
                   {!searchTerm && (
                     <button className="profile-modal-create-btn" onClick={() => navigate('/profile-setup')}>
-                      <img src="/icon/plus.svg" alt="Create" />
-                      <span>Tạo hồ sơ mới</span>
+                      <img src="/icon/plus.svg" alt={t('profile.createNewProfile')} />
+                      <span>{t('profile.createNewProfile')}</span>
                     </button>
                   )}
                 </div>
@@ -160,11 +162,11 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                         <div className="profile-modal-name-row">
                           <h3 className="profile-modal-name">{profile.profile_name}</h3>
                           {currentProfile?.profile_id === profile.profile_id ? (
-                            <span className="profile-modal-badge selected">[SELECTED]</span>
+                            <span className="profile-modal-badge selected">{t('profile.selected')}</span>
                           ) : profile.status === 'ready' ? (
-                            <span className="profile-modal-badge ready">[READY]</span>
+                            <span className="profile-modal-badge ready">[{t('profile.ready').toUpperCase()}]</span>
                           ) : (
-                            <span className="profile-modal-badge pending">[PROCESSING]</span>
+                            <span className="profile-modal-badge pending">[{t('profile.processing').toUpperCase()}]</span>
                           )}
                           {(profile.quality_score || profile.qualityScore) && (
                             <span className={`profile-modal-badge quality quality-${profile.quality_rating || profile.qualityRating || 'ok'}`}>
@@ -174,15 +176,15 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                         </div>
                         <div className="profile-modal-meta">
                           <span className="profile-modal-meta-item">
-                            <img src="/icon/file-text.svg" alt="Samples" />
-                            {profile.sample_count || 0} mẫu
+                            <img src="/icon/file-text.svg" alt={t('common.samples')} />
+                            {profile.sample_count || 0} {t('common.samples')}
                           </span>
                           {profile.statistics?.totalWords && (
                             <>
                               <span className="profile-modal-meta-divider">•</span>
                               <span className="profile-modal-meta-item">
-                                <img src="/icon/type.svg" alt="Words" />
-                                {profile.statistics.totalWords.toLocaleString()} từ
+                                <img src="/icon/type.svg" alt={t('common.words')} />
+                                {profile.statistics.totalWords.toLocaleString()} {t('common.words')}
                               </span>
                             </>
                           )}
@@ -190,8 +192,8 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                             <>
                               <span className="profile-modal-meta-divider">•</span>
                               <span className="profile-modal-meta-item">
-                                <img src="/icon/align-left.svg" alt="Sentences" />
-                                {profile.statistics.totalSentences.toLocaleString()} sentences
+                                <img src="/icon/align-left.svg" alt={t('common.sentences')} />
+                                {profile.statistics.totalSentences.toLocaleString()} {t('common.sentences')}
                               </span>
                             </>
                           )}
@@ -199,8 +201,8 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                             <>
                               <span className="profile-modal-meta-divider">•</span>
                               <span className="profile-modal-meta-item">
-                                <img src="/icon/calendar.svg" alt="Created" />
-                                {new Date(profile.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                <img src="/icon/calendar.svg" alt={t('profile.createdDate')} />
+                                {new Date(profile.created_at).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                               </span>
                             </>
                           )}
@@ -209,41 +211,30 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                       <button 
                         className="profile-modal-delete-btn" 
                         onClick={(e) => handleDeleteProfile(e, profile.profile_id)}
-                        title="Xóa hồ sơ"
+                        data-tooltip={t('common.delete')}
+                        data-tooltip-position="left"
                       >
-                        <img src="/icon/trash-2.svg" alt="Delete" />
+                        <img src="/icon/trash-2.svg" alt={t('common.delete')} />
                       </button>
                     </div>
                     
                     <div className="profile-modal-card-body">
                       <div className="profile-modal-tags">
                         <span className="profile-modal-tag">
-                          <img src="/icon/mic.svg" alt="Tone" />
-                          {profile.voice_profile?.tone ? (
-                            profile.voice_profile.tone === 'professional' ? 'Professional' :
-                            profile.voice_profile.tone === 'casual' ? 'Casual' :
-                            profile.voice_profile.tone === 'academic' ? 'Academic' :
-                            profile.voice_profile.tone === 'creative' ? 'Creative' :
-                            profile.voice_profile.tone === 'friendly' ? 'Friendly' :
-                            profile.voice_profile.tone
-                          ) : 'N/A'}
+                          <img src="/icon/mic.svg" alt={t('profile.tone')} />
+                          {profile.voice_profile?.tone ? t(`tones.${profile.voice_profile.tone}`, { defaultValue: profile.voice_profile.tone }) : 'N/A'}
                         </span>
                         <span className="profile-modal-tag">
-                          <img src="/icon/award.svg" alt="Formality" />
-                          Trang trọng: {profile.voice_profile?.formality_level || 'N/A'}/10
+                          <img src="/icon/award.svg" alt={t('profile.formalityLevel')} />
+                          {t('profile.formalityLevel')}: {profile.voice_profile?.formality_level || 'N/A'}/10
                         </span>
                         <span className="profile-modal-tag">
-                          <img src="/icon/bar-chart.svg" alt="Length" />
-                          Sentence {profile.voice_profile?.sentence_patterns?.typical_length ? (
-                            profile.voice_profile.sentence_patterns.typical_length === 'short' ? 'Short' :
-                            profile.voice_profile.sentence_patterns.typical_length === 'medium' ? 'Medium' :
-                            profile.voice_profile.sentence_patterns.typical_length === 'long' ? 'Long' :
-                            profile.voice_profile.sentence_patterns.typical_length
-                          ) : 'N/A'}
+                          <img src="/icon/bar-chart.svg" alt={t('profile.sentenceLength')} />
+                          {t('profile.sentenceLength')} {profile.voice_profile?.sentence_patterns?.typical_length ? t(`sentenceLengths.${profile.voice_profile.sentence_patterns.typical_length}`, { defaultValue: profile.voice_profile.sentence_patterns.typical_length }) : 'N/A'}
                         </span>
                         <span className="profile-modal-tag">
-                          <img src="/icon/hash.svg" alt="Avg" />
-                          Avg: {profile.statistics?.avgSentenceLength ? profile.statistics.avgSentenceLength.toFixed(1) : 'N/A'} words/sentence
+                          <img src="/icon/hash.svg" alt={t('analysis.avgSentenceLength')} />
+                          {t('analysis.avgSentenceLength')}: {profile.statistics?.avgSentenceLength ? profile.statistics.avgSentenceLength.toFixed(1) : 'N/A'} {t('profile.wordsPerSentence')}
                         </span>
                       </div>
                     </div>

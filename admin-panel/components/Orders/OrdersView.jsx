@@ -409,7 +409,7 @@ function ProfitCalculator({ revenueStats, costs, setCosts, timeRange, setTimeRan
 
       <div className="profit-details">
         <div className="costs-breakdown">
-          <h3>📊 Cost Breakdown</h3>
+          <h3>[CHART] Cost Breakdown</h3>
           
           <div className="cost-item highlight">
             <div className="cost-info">
@@ -548,7 +548,7 @@ function ProfitCalculator({ revenueStats, costs, setCosts, timeRange, setTimeRan
       </div>
 
       <div className="profit-projections">
-        <h3>📈 Projections</h3>
+        <h3>[GROWTH] Projections</h3>
         <div className="projections-grid">
           <div className="projection-card">
             <span className="projection-label">Daily Average</span>

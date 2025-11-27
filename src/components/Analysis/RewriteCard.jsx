@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { rewriteText as rewriteTextAPI } from '../../services/api'
 import { useRewrite } from '../../contexts/RewriteContext'
 import modal from '../../utils/modal'
 import './Analysis.css'
 
 const RewriteCard = ({ disabled, currentProfile, text }) => {
+  const { t } = useTranslation()
   const { selectedModel, writingPreferences } = useRewrite()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -12,7 +14,7 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
     if (!currentProfile || !text) return
     
     setIsLoading(true)
-    const loadingModal = modal.loading('Rewriting text...')
+    const loadingModal = modal.loading(t('rewrite.rewrite') + '...')
     
     try {
       const result = await rewriteTextAPI(
@@ -30,16 +32,16 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
         // Show result in modal
         await modal.alert(
           rewrittenText,
-          'Văn bản đã được viết lại',
+          t('rewrite.rewrite'),
           'success'
         )
       } else {
-        throw new Error(result.error || 'Rewrite failed')
+        throw new Error(result.error || t('rewrite.rewriteFailed'))
       }
     } catch (error) {
       loadingModal.close()
       console.error('Error rewriting:', error)
-      modal.error('Viết lại thất bại: ' + error.message)
+      modal.error(t('rewrite.rewriteFailed') + ' ' + error.message)
     } finally {
       setIsLoading(false)
     }
@@ -49,11 +51,11 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
     <div className="feature-card rewrite-card">
       <div className="feature-card-header">
         <div className="feature-icon rewrite-icon">
-          <img src="/icon/pen.svg" alt="Rewrite" />
+          <img src="/icon/pen.svg" alt={t('rewrite.rewrite')} />
         </div>
         <div className="feature-info">
-          <h4>Viết lại</h4>
-          <p>Theo văn phong</p>
+          <h4>{t('rewrite.rewrite')}</h4>
+          <p>{t('rewrite.matchYourStyle')}</p>
         </div>
       </div>
       <button 
@@ -61,8 +63,8 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
         onClick={rewriteText}
         disabled={disabled || isLoading}
       >
-        <span className={isLoading ? 'shimmer-text-effect' : ''}>{isLoading ? 'Rewriting...' : 'Rewrite'}</span>
-        <img src="/icon/arrow-right.svg" alt="Go" className="btn-arrow" />
+        <span className={isLoading ? 'shimmer-text-effect' : ''}>{isLoading ? t('rewrite.rewrite') + '...' : t('rewrite.rewrite')}</span>
+        <img src="/icon/arrow-right.svg" alt="" className="btn-arrow" />
       </button>
     </div>
   )

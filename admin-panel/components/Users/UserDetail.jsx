@@ -162,7 +162,7 @@ export default function UserDetail() {
   const handleDeleteUser = async () => {
     const confirmed = await notify.confirm({
       title: 'Delete User',
-      message: '⚠️ ARE YOU SURE YOU WANT TO DELETE THIS USER?\n\nThis action cannot be undone!',
+      message: 'Are you sure you want to DELETE this user?\n\nThis action cannot be undone!',
       confirmText: 'Continue',
       type: 'danger'
     });
@@ -293,7 +293,7 @@ export default function UserDetail() {
             <div className="info-item">
               <span className="info-label">Status:</span>
               <span className={`status-indicator ${user.locked ? 'locked' : 'active'}`}>
-                {user.locked ? '🔒 Locked' : '✅ Active'}
+                {user.locked ? 'Locked' : 'Active'}
               </span>
             </div>
           </div>

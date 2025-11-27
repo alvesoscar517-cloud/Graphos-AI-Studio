@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNotes } from '../../../contexts/NotesContext'
 import { useAuth } from '../../../contexts/AuthContext'
 import { useAIProcessing } from '../../../contexts/AIProcessingContext'
@@ -14,6 +15,7 @@ const AIStudioEditor = ({
   onCreateNote,
   highlightedSentence // NEW: Sentence to highlight from deviation card
 }) => {
+  const { t } = useTranslation()
   const { currentNote, updateNote } = useNotes()
   const { user } = useAuth()
   const { isProcessing, processingType } = useAIProcessing()
@@ -57,7 +59,7 @@ const AIStudioEditor = ({
         
         console.log('📍 Highlighted sentence at position:', { startIndex, endIndex, lines })
       } else {
-        console.warn('⚠️ Sentence not found in content')
+        console.warn('[WARNING] Sentence not found in content')
       }
     }
   }, [highlightedSentence, currentNote?.content])
@@ -65,14 +67,14 @@ const AIStudioEditor = ({
   const handleShare = async () => {
     try {
       if (!currentNote || !currentNote.content.trim()) {
-        modal.alert('No content to share', '[ERROR]')
+        modal.alert(t('share.noContentToShare'), t('common.error'))
         return
       }
 
       // Create share link
       const shareData = await createShare(
         'note',
-        currentNote.title || 'Untitled',
+        currentNote.title || t('editor.untitled'),
         currentNote.content,
         null,
         {
@@ -84,10 +86,10 @@ const AIStudioEditor = ({
       const shareUrl = `${window.location.origin}/shared/${shareData.share_id}`
       await navigator.clipboard.writeText(shareUrl)
       
-      modal.toast('Share link copied', '', 'success')
+      modal.toast(t('share.shareLinkCopied'), '', 'success')
     } catch (error) {
       console.error('Share error:', error)
-      modal.error('Unable to create share link: ' + error.message)
+      modal.error(t('share.unableToCreate') + ': ' + error.message)
     }
   }
 
@@ -97,16 +99,16 @@ const AIStudioEditor = ({
         <button 
           className="menu-btn icon-btn" 
           onClick={onToggleLeftSidebar}
-          data-tooltip="Ẩn/hiện sidebar" 
+          data-tooltip={t('common.menu')} 
           data-tooltip-position="right"
         >
-          <img src="/icon/panel-left.svg" alt="Toggle Left Sidebar" />
+          <img src="/icon/panel-left.svg" alt={t('common.menu')} />
         </button>
         
         <input 
           type="text" 
           className="title-input" 
-          placeholder="Title..."
+          placeholder={t('editor.enterTitle')}
           value={currentNote?.title || ''}
           onChange={handleTitleChange}
         />
@@ -115,24 +117,24 @@ const AIStudioEditor = ({
           <button 
             className="icon-btn" 
             onClick={onCreateNote}
-            data-tooltip="Tạo note mới"
+            data-tooltip={t('common.new')}
           >
-            <img src="/icon/plus.svg" alt="Add" />
+            <img src="/icon/plus.svg" alt={t('common.new')} />
           </button>
           <button 
             className="icon-btn" 
             onClick={handleShare}
-            data-tooltip="Share note"
+            data-tooltip={t('common.share')}
           >
-            <img src="/icon/share-2.svg" alt="Share" />
+            <img src="/icon/share-2.svg" alt={t('common.share')} />
           </button>
           {rightSidebarHidden && (
             <button 
               className="icon-btn" 
               onClick={onToggleRightSidebar}
-              data-tooltip="Hiện sidebar"
+              data-tooltip={t('nav.sidebar')}
             >
-              <img src="/icon/panel-right.svg" alt="Toggle Right Sidebar" />
+              <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} />
             </button>
           )}
         </div>

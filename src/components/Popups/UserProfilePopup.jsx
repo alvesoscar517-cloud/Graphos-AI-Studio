@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import CreditBalance from '../CreditBalance'
 import UpgradePlanModal from '../UpgradePlanModal'
@@ -6,6 +7,7 @@ import modal from '../../utils/modal'
 import './Popups.css'
 
 const UserProfilePopup = ({ onClose }) => {
+  const { t } = useTranslation()
   const popupRef = useRef(null)
   const { user, signOut } = useAuth()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
@@ -24,15 +26,15 @@ const UserProfilePopup = ({ onClose }) => {
 
   const handleSignOut = async () => {
     const confirmed = await modal.confirm(
-      'Are you sure you want to sign out?',
-      'Confirm Sign Out',
-      { confirmText: 'Sign Out', danger: true }
+      t('auth.confirmSignOut'),
+      t('auth.confirmSignOutTitle'),
+      { confirmText: t('auth.signOut'), danger: true }
     )
     
     if (confirmed) {
       await signOut()
       onClose()
-      modal.toast('Signed out', '', 'success')
+      modal.toast(t('auth.signedOut'), '', 'success')
     }
   }
 
@@ -56,8 +58,8 @@ const UserProfilePopup = ({ onClose }) => {
             alt="User Avatar"
             style={user?.picture ? { background: 'none', padding: 0, borderRadius: '50%' } : {}}
           />
-          <h3 className="profile-name">{user?.name || 'Not signed in'}</h3>
-          <p className="profile-email">{user?.email || 'Please sign in'}</p>
+          <h3 className="profile-name">{user?.name || t('auth.notSignedIn')}</h3>
+          <p className="profile-email">{user?.email || t('auth.pleaseSignIn')}</p>
         </div>
         
         {/* Credit Balance Section */}
@@ -72,13 +74,13 @@ const UserProfilePopup = ({ onClose }) => {
         <div className="profile-divider"></div>
         
         <button className="profile-action-btn" onClick={handleSignOut}>
-          Sign Out
+          {t('auth.signOut')}
         </button>
         <div className="profile-divider"></div>
         <div className="profile-footer">
-          <a href="#" className="profile-link">Privacy Policy</a>
+          <a href="#" className="profile-link">{t('auth.privacyPolicy')}</a>
           <span className="profile-separator">•</span>
-          <a href="#" className="profile-link">Terms of Service</a>
+          <a href="#" className="profile-link">{t('auth.termsOfService')}</a>
         </div>
       </div>
 

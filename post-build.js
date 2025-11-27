@@ -13,30 +13,30 @@ const __dirname = path.dirname(__filename);
 const distDir = path.join(__dirname, 'dist');
 const adminDir = path.join(distDir, 'admin');
 
-console.log('\n📦 Post-build: Verifying isolated builds...\n');
+console.log('\n[PACKAGE] Post-build: Verifying isolated builds...\n');
 
 // Verify admin exists
 if (fs.existsSync(adminDir)) {
-  console.log('✓ Admin panel build found at dist/admin');
+  console.log('[OK] Admin panel build found at dist/admin');
   
   const adminIndexPath = path.join(adminDir, 'index.html');
   if (fs.existsSync(adminIndexPath)) {
-    console.log('✓ Admin index.html exists');
+    console.log('[OK] Admin index.html exists');
   } else {
-    console.error('❌ Admin index.html not found!');
+    console.error('[FAIL] Admin index.html not found!');
     process.exit(1);
   }
 } else {
-  console.error('❌ Admin build not found! Run: npm run build:admin');
+  console.error('[FAIL] Admin build not found! Run: npm run build:admin');
   process.exit(1);
 }
 
 // Verify main app exists
 const mainIndexPath = path.join(distDir, 'index.html');
 if (fs.existsSync(mainIndexPath)) {
-  console.log('✓ Main app build found');
+  console.log('[OK] Main app build found');
 } else {
-  console.error('❌ Main app build not found! Run: npm run build:main');
+  console.error('[FAIL] Main app build not found! Run: npm run build:main');
   process.exit(1);
 }
 
@@ -50,7 +50,7 @@ const redirectsContent = `# Admin panel routes (completely isolated)
 /*                  /index.html         200
 `;
 fs.writeFileSync(redirectsFile, redirectsContent);
-console.log('✓ Created _redirects file');
+console.log('[OK] Created _redirects file');
 
 // Create verification report
 const adminIndexPath = path.join(adminDir, 'index.html');
@@ -67,11 +67,11 @@ const report = {
   isolated: true
 };
 
-console.log('\n✅ Build verification complete!\n');
-console.log('📊 Build Report:');
-console.log(`   Main App: ${report.mainApp.exists ? '✓' : '✗'} ${report.mainApp.path}`);
-console.log(`   Admin Panel: ${report.adminPanel.exists ? '✓' : '✗'} ${report.adminPanel.path}`);
-console.log(`   Isolation: ${report.isolated ? '✓ Complete' : '✗ Failed'}\n`);
+console.log('\n[SUCCESS] Build verification complete!\n');
+console.log('[CHART] Build Report:');
+console.log(`   Main App: ${report.mainApp.exists ? '[OK]' : '[ERROR]'} ${report.mainApp.path}`);
+console.log(`   Admin Panel: ${report.adminPanel.exists ? '[OK]' : '[ERROR]'} ${report.adminPanel.path}`);
+console.log(`   Isolation: ${report.isolated ? '[OK] Complete' : '[ERROR] Failed'}\n`);
 console.log('🌐 URLs:');
 console.log('   Main App: /');
 console.log('   Admin Panel: /admin\n');

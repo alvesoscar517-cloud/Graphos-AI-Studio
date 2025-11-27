@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNotes } from '../../contexts/NotesContext'
 import { useWorkspace } from '../../contexts/WorkspaceContext'
 import { useAuth } from '../../contexts/AuthContext'
@@ -28,6 +29,7 @@ const HighlightText = ({ text, searchTerm, regex }) => {
 }
 
 const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
+  const { t } = useTranslation()
   const { notes, loadNote, loading, syncNotes, needsReauth, deleteNote } = useNotes()
   const { conversations, loadConversation, deleteConversation } = useWorkspace()
   const { user, signOut } = useAuth()
@@ -109,11 +111,11 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
     const diffDays = Math.floor(diffHours / 24)
     
-    if (diffHours < 1) return 'Just now'
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
-    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+    if (diffHours < 1) return t('common.justNow')
+    if (diffHours < 24) return t('common.hoursAgo', { count: diffHours })
+    if (diffDays < 7) return t('common.daysAgo', { count: diffDays })
     return date.toLocaleDateString()
-  }, [])
+  }, [t])
 
   // Memoized search regex
   const searchRegex = useMemo(() => {
@@ -241,9 +243,9 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     if (selectedItems.size === 0) return
     
     const confirmed = await modal.confirm(
-      `Are you sure you want to delete ${selectedItems.size} item${selectedItems.size > 1 ? 's' : ''}?`,
-      'Confirm Bulk Delete',
-      { confirmText: 'Delete All', danger: true }
+      t('history.confirmBulkDelete', { count: selectedItems.size }),
+      t('history.confirmBulkDeleteTitle'),
+      { confirmText: t('history.deleteAll'), danger: true }
     )
     
     if (confirmed) {
@@ -262,9 +264,9 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         
         setSelectedItems(new Set())
         setIsSelectionMode(false)
-        modal.toast('Deleted', `${itemsToDelete.length} items deleted`, 'success')
+        modal.toast(t('history.deleted'), t('history.itemsDeleted', { count: itemsToDelete.length }), 'success')
       } catch (error) {
-        modal.error('Unable to delete some items: ' + error.message)
+        modal.error(t('history.unableToDeleteSome') + ': ' + error.message)
       }
     }
   }
@@ -311,9 +313,9 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const handleDeleteItem = async (item) => {
     setActiveMenu(null)
     const confirmed = await modal.confirm(
-      `Are you sure you want to delete "${item.title}"?`,
-      'Confirm Delete',
-      { confirmText: 'Delete', danger: true }
+      t('history.confirmDeleteItem', { title: item.title }),
+      t('sidebar.confirmDelete'),
+      { confirmText: t('common.delete'), danger: true }
     )
     
     if (confirmed) {
@@ -323,9 +325,9 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         } else {
           await deleteConversation(item.id)
         }
-        modal.toast('Deleted', '', 'success')
+        modal.toast(t('history.deleted'), '', 'success')
       } catch (error) {
-        modal.error('Unable to delete: ' + error.message)
+        modal.error(t('history.unableToDelete') + ': ' + error.message)
       }
     }
   }
@@ -338,28 +340,28 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const handleOpenInDrive = async () => {
     try {
       if (!user) {
-        modal.alert('Please sign in to use this feature', 'Not Signed In')
+        modal.alert(t('auth.pleaseSignIn'), t('auth.notSignedIn'))
         return
       }
 
       await openDriveFolder(notes)
-      modal.toast('Drive folder opened', '', 'success')
+      modal.toast(t('history.driveFolderOpened'), '', 'success')
     } catch (error) {
       if (error.message === 'Not authenticated') {
-        modal.alert('Please sign in to use this feature', 'Not Signed In')
+        modal.alert(t('auth.pleaseSignIn'), t('auth.notSignedIn'))
       } else if (error.message === 'NEED_REAUTH') {
         const confirmed = await modal.confirm(
-          'The app needs Google Drive access to sync notes. Please sign in again to grant permission.',
-          'Drive Permission Required',
-          { confirmText: 'Sign In Again', danger: false }
+          t('auth.needReauth'),
+          t('auth.drivePermissionRequired'),
+          { confirmText: t('auth.signInAgain'), danger: false }
         )
         
         if (confirmed) {
           await signOut()
-          modal.info('Please sign in again to grant Google Drive access.')
+          modal.info(t('history.needSignInAgain'))
         }
       } else {
-        modal.error('Unable to open Drive folder: ' + error.message)
+        modal.error(t('history.unableToOpenDrive') + ': ' + error.message)
       }
     }
   }
@@ -403,19 +405,19 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         {!isMobile && (
           <>
             <td className="type-col">
-              <span className="history-type">{item.type === 'chat' ? 'Chat' : 'Text'}</span>
+              <span className="history-type">{item.type === 'chat' ? t('history.chat') : t('history.text')}</span>
             </td>
             <td className="source-col">
               <span className="history-source">
                 {item.source === 'drive' ? (
                   <>
-                    <img src="/icon/google-drive-svgrepo-com.svg" alt="Drive" />
-                    Drive
+                    <img src="/icon/google-drive-svgrepo-com.svg" alt={t('history.drive')} />
+                    {t('history.drive')}
                   </>
                 ) : (
                   <>
-                    <img src="/icon/monitor.svg" alt="Local" />
-                    Local
+                    <img src="/icon/monitor.svg" alt={t('history.local')} />
+                    {t('history.local')}
                   </>
                 )}
               </span>
@@ -429,8 +431,10 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           <button 
             className="history-actions-btn" 
             onClick={(e) => handleMenuClick(e, item)}
+            data-tooltip={t('common.more')}
+            data-tooltip-position="left"
           >
-            <img src="/icon/more-vertical.svg" alt="Actions" />
+            <img src="/icon/more-vertical.svg" alt={t('common.more')} />
           </button>
           {activeMenu === item.id && (
             <>
@@ -454,8 +458,8 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                     handleShareItem(item)
                   }}
                 >
-                  <img src="/icon/share-2.svg" alt="Share" />
-                  Share
+                  <img src="/icon/share-2.svg" alt={t('common.share')} />
+                  {t('common.share')}
                 </button>
                 <button 
                   className="history-menu-item danger"
@@ -464,8 +468,8 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                     handleDeleteItem(item)
                   }}
                 >
-                  <img src="/icon/trash-2.svg" alt="Delete" />
-                  Delete
+                  <img src="/icon/trash-2.svg" alt={t('common.delete')} />
+                  {t('common.delete')}
                 </button>
               </div>
             </>
@@ -499,7 +503,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           <div className="card-title">
             <img 
               src={item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg"} 
-              alt={item.type === 'chat' ? "Chat" : "Text"} 
+              alt={item.type === 'chat' ? t('history.chat') : t('history.text')} 
             />
             <span>
               <HighlightText 
@@ -512,15 +516,17 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           <button 
             className="history-actions-btn" 
             onClick={(e) => handleMenuClick(e, item)}
+            data-tooltip={t('common.more')}
+            data-tooltip-position="left"
           >
-            <img src="/icon/more-vertical.svg" alt="Actions" />
+            <img src="/icon/more-vertical.svg" alt={t('common.more')} />
           </button>
         </div>
         <div className="card-meta">
-          <span className="card-type">{item.type === 'chat' ? 'Chat' : 'Text'}</span>
+          <span className="card-type">{item.type === 'chat' ? t('history.chat') : t('history.text')}</span>
           <span className="card-separator">•</span>
           <span className="card-source">
-            {item.source === 'drive' ? 'Drive' : 'Local'}
+            {item.source === 'drive' ? t('history.drive') : t('history.local')}
           </span>
           <span className="card-separator">•</span>
           <span className="card-time">{formatTimeAgo(item.updated)}</span>
@@ -547,8 +553,8 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                   handleShareItem(item)
                 }}
               >
-                <img src="/icon/share-2.svg" alt="Share" />
-                Share
+                <img src="/icon/share-2.svg" alt={t('common.share')} />
+                {t('common.share')}
               </button>
               <button 
                 className="history-menu-item danger"
@@ -557,8 +563,8 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                   handleDeleteItem(item)
                 }}
               >
-                <img src="/icon/trash-2.svg" alt="Delete" />
-                Delete
+                <img src="/icon/trash-2.svg" alt={t('common.delete')} />
+                {t('common.delete')}
               </button>
             </div>
           </>
@@ -580,35 +586,35 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           <button 
             className="menu-btn icon-btn" 
             onClick={onToggleLeftSidebar}
-            data-tooltip="Toggle sidebar" 
+            data-tooltip={t('common.menu')} 
             data-tooltip-position="right"
           >
-            <img src="/icon/panel-left.svg" alt="Toggle Left Sidebar" />
+            <img src="/icon/panel-left.svg" alt={t('common.menu')} />
           </button>
         </div>
 
         <div className="history-content">
           <div className="history-header">
             <div className="history-title-section">
-              <h2 className="history-title">My History</h2>
+              <h2 className="history-title">{t('history.title')}</h2>
               <div className="history-filter-tabs">
                 <button 
                   className={`filter-tab ${filterType === 'all' ? 'active' : ''}`}
                   onClick={() => setFilterType('all')}
                 >
-                  Tất cả
+                  {t('history.all')}
                 </button>
                 <button 
                   className={`filter-tab ${filterType === 'text' ? 'active' : ''}`}
                   onClick={() => setFilterType('text')}
                 >
-                  Text
+                  {t('history.text')}
                 </button>
                 <button 
                   className={`filter-tab ${filterType === 'chat' ? 'active' : ''}`}
                   onClick={() => setFilterType('chat')}
                 >
-                  Trò chuyện
+                  {t('history.chat')}
                 </button>
               </div>
             </div>
@@ -616,8 +622,8 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
               {!isMobile && (
                 <>
                   <button className="history-action-btn" onClick={handleOpenInDrive}>
-                    <img src="/icon/google-drive-svgrepo-com.svg" alt="Open in Drive" />
-                    <span>Open in Drive</span>
+                    <img src="/icon/google-drive-svgrepo-com.svg" alt={t('history.openInDrive')} />
+                    <span>{t('history.openInDrive')}</span>
                   </button>
                   <button 
                     className={`history-action-btn ${isSyncing ? 'syncing' : ''}`}
@@ -625,29 +631,27 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                       try {
                         setIsSyncing(true)
                         await syncNotes()
-                        modal.toast('Synced', 'Notes have been synced with Drive', 'success')
+                        modal.toast(t('history.synced'), t('history.notesSynced'), 'success')
                       } catch (error) {
-                        modal.error('Unable to sync: ' + error.message)
+                        modal.error(t('history.unableToSync') + ': ' + error.message)
                       } finally {
                         setIsSyncing(false)
                       }
                     }}
-                    data-tooltip="Sync with Drive"
-                    data-tooltip-position="bottom"
                     disabled={isSyncing}
                   >
-                    <img src="/icon/refresh-cw.svg" alt="Sync" />
-                    <span>Sync</span>
+                    <img src="/icon/refresh-cw.svg" alt={t('history.sync')} />
+                    <span>{t('history.sync')}</span>
                   </button>
                 </>
               )}
               <div className="search-container">
-                <img src="/icon/search.svg" alt="Search" className="search-icon" />
+                <img src="/icon/search.svg" alt={t('common.search')} className="search-icon" />
                 <input 
                   ref={searchInputRef}
                   type="text" 
                   className="search-input" 
-                  placeholder="Search (Press / to focus)"
+                  placeholder={t('history.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -668,20 +672,20 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                         setSelectedItems(new Set())
                       }}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                     <button 
                       className="toolbar-btn"
                       onClick={handleSelectAll}
                     >
-                      {selectedItems.size === paginatedItems.length ? 'Deselect All' : 'Select All'}
+                      {selectedItems.size === paginatedItems.length ? t('common.deselectAll') : t('common.selectAll')}
                     </button>
                     {selectedItems.size > 0 && (
                       <button 
                         className="toolbar-btn danger"
                         onClick={handleBulkDelete}
                       >
-                        Delete ({selectedItems.size})
+                        {t('common.delete')} ({selectedItems.size})
                       </button>
                     )}
                   </>
@@ -695,7 +699,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                         <polyline points="9 11 12 14 22 4"></polyline>
                         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                       </svg>
-                      Select
+                      {t('common.select')}
                     </button>
                     <div className="toolbar-divider" />
                     <button 
@@ -708,7 +712,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                         <line x1="8" y1="2" x2="8" y2="6"></line>
                         <line x1="3" y1="10" x2="21" y2="10"></line>
                       </svg>
-                      Date {sortBy === 'updated' && (sortOrder === 'asc' ? '↑' : '↓')}
+                      {t('history.date')} {sortBy === 'updated' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </button>
                     <button 
                       className={`toolbar-btn sort-btn ${sortBy === 'name' ? 'active' : ''}`}
@@ -717,7 +721,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M4 7h16M4 12h16M4 17h10"></path>
                       </svg>
-                      Name {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+                      {t('history.name')} {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </button>
                     <button 
                       className={`toolbar-btn sort-btn ${sortBy === 'type' ? 'active' : ''}`}
@@ -727,7 +731,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
                       </svg>
-                      Type {sortBy === 'type' && (sortOrder === 'asc' ? '↑' : '↓')}
+                      {t('history.type')} {sortBy === 'type' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </button>
                     <div className="toolbar-divider" />
                     <div className="custom-dropdown" ref={sourceDropdownRef}>
@@ -736,9 +740,9 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                         onClick={() => setIsSourceDropdownOpen(!isSourceDropdownOpen)}
                       >
                         <span>
-                          {filterSource === 'all' && 'All Sources'}
-                          {filterSource === 'drive' && 'Drive Only'}
-                          {filterSource === 'local' && 'Local Only'}
+                          {filterSource === 'all' && t('history.allSources')}
+                          {filterSource === 'drive' && t('history.driveOnly')}
+                          {filterSource === 'local' && t('history.localOnly')}
                         </span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polyline points="6 9 12 15 18 9"></polyline>
@@ -753,7 +757,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                               setIsSourceDropdownOpen(false)
                             }}
                           >
-                            All Sources
+                            {t('history.allSources')}
                           </button>
                           <button 
                             className={`custom-dropdown-item ${filterSource === 'drive' ? 'active' : ''}`}
@@ -762,7 +766,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                               setIsSourceDropdownOpen(false)
                             }}
                           >
-                            Drive Only
+                            {t('history.driveOnly')}
                           </button>
                           <button 
                             className={`custom-dropdown-item ${filterSource === 'local' ? 'active' : ''}`}
@@ -771,7 +775,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                               setIsSourceDropdownOpen(false)
                             }}
                           >
-                            Local Only
+                            {t('history.localOnly')}
                           </button>
                         </div>
                       )}
@@ -780,7 +784,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                 )}
               </div>
               <div className="toolbar-right">
-                <span className="item-count">{sortedItems.length} items</span>
+                <span className="item-count">{sortedItems.length} {t('common.items')}</span>
               </div>
             </div>
           )}
@@ -788,40 +792,40 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           <div className="history-table-container">
             {loading ? (
               <div className="history-empty-state">
-                <p className="history-empty-desc">Loading notes from Drive...</p>
+                <p className="history-empty-desc">{t('history.loadingFromDrive')}</p>
               </div>
             ) : needsReauth ? (
               <div className="history-empty-state">
-                <img src="/icon/shield-check.svg" alt="Need Auth" className="history-empty-icon" />
-                <h3 className="history-empty-title">Drive Permission Required</h3>
+                <img src="/icon/shield-check.svg" alt={t('auth.drivePermissionRequired')} className="history-empty-icon" />
+                <h3 className="history-empty-title">{t('auth.drivePermissionRequired')}</h3>
                 <p className="history-empty-desc">
-                  The app needs Google Drive access to sync notes.<br/>
-                  Please sign in again to grant permission.
+                  {t('history.drivePermissionDesc')}<br/>
+                  {t('history.signInAgainDesc')}
                 </p>
                 <button 
                   className="sync-drive-btn"
                   onClick={async () => {
                     const confirmed = await modal.confirm(
-                      'You need to sign in again to grant Google Drive access.',
-                      'Sign In Again',
-                      { confirmText: 'Sign In Again', danger: false }
+                      t('history.needSignInAgain'),
+                      t('auth.signInAgain'),
+                      { confirmText: t('auth.signInAgain'), danger: false }
                     )
                     
                     if (confirmed) {
                       await signOut()
-                      modal.info('Please sign in again to grant Google Drive access.')
+                      modal.info(t('history.needSignInAgain'))
                     }
                   }}
                 >
-                  Sign In Again
+                  {t('auth.signInAgain')}
                 </button>
               </div>
             ) : sortedItems.length === 0 ? (
               <div className="history-empty-state">
-                <img src="/icon/message-square.svg" alt="No items" className="history-empty-icon" />
-                <h3 className="history-empty-title">No items yet</h3>
+                <img src="/icon/message-square.svg" alt={t('history.noItems')} className="history-empty-icon" />
+                <h3 className="history-empty-title">{t('history.noItems')}</h3>
                 <p className="history-empty-desc">
-                  {user ? 'Create your first note or chat, or sync from Drive' : 'Please sign in to view history'}
+                  {user ? t('history.noItemsDesc') : t('history.pleaseSignInToView')}
                 </p>
                 {user && (
                   <button 
@@ -848,10 +852,10 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                 <thead>
                   <tr>
                     {isSelectionMode && <th className="checkbox-col"></th>}
-                    <th className="name-col">Name</th>
-                    <th className="type-col">Type</th>
-                    <th className="source-col">Source</th>
-                    <th className="updated-col">Updated</th>
+                    <th className="name-col">{t('history.name')}</th>
+                    <th className="type-col">{t('history.type')}</th>
+                    <th className="source-col">{t('history.source')}</th>
+                    <th className="updated-col">{t('history.updated')}</th>
                     <th className="actions-col"></th>
                   </tr>
                 </thead>
@@ -870,17 +874,17 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
               >
-                Previous
+                {t('common.back')}
               </button>
               <span className="pagination-info">
-                Page {currentPage} of {totalPages}
+                {currentPage} / {totalPages}
               </span>
               <button 
                 className="pagination-btn"
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
               >
-                Next
+                {t('common.next')}
               </button>
             </div>
           )}

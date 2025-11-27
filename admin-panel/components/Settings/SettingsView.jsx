@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { settingsApi, backupApi } from '../../services/adminApi';
+import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
 import LoadingScreen from '../Common/LoadingScreen';
@@ -8,7 +9,15 @@ import './SettingsView.css';
 import './SettingsIcons.css';
 
 export default function SettingsView() {
-  console.log('SettingsView rendering...');
+  const { admin, changePassword, logoutAdmin } = useAdminAuth();
+  
+  // Password change state
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [changingPassword, setChangingPassword] = useState(false);
   
   // Default settings - always available
   const defaultSettings = {
@@ -49,7 +58,7 @@ export default function SettingsView() {
   const [settings, setSettings] = useState(defaultSettings);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('system');
+  const [activeTab, setActiveTab] = useState('account');
   const [backingUp, setBackingUp] = useState(false);
   const [backupList, setBackupList] = useState([]);
   const [showBackupModal, setShowBackupModal] = useState(false);
@@ -129,7 +138,7 @@ export default function SettingsView() {
         // Show modal with backup information
         setBackupResult(response.data);
         setShowBackupModal(true);
-        notify.success('✅ Backup completed!');
+        notify.success('Backup completed successfully!');
         loadBackupList(); // Refresh list
       } else {
         notify.error('Backup failed: ' + (response.message || 'Unknown error'));
@@ -160,7 +169,43 @@ export default function SettingsView() {
     }
   };
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    
+    if (!passwordData.currentPassword || !passwordData.newPassword) {
+      notify.error('Please fill in all password fields');
+      return;
+    }
+    
+    if (passwordData.newPassword.length < 8) {
+      notify.error('New password must be at least 8 characters');
+      return;
+    }
+    
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      notify.error('New passwords do not match');
+      return;
+    }
+    
+    try {
+      setChangingPassword(true);
+      const result = await changePassword(passwordData.currentPassword, passwordData.newPassword);
+      
+      if (result.success) {
+        notify.success('Password changed successfully! Please login again.');
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        notify.error(result.error?.message || 'Failed to change password');
+      }
+    } catch (err) {
+      notify.error('Error changing password: ' + err.message);
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const tabs = [
+    { id: 'account', label: 'Account', icon: 'user.svg' },
     { id: 'system', label: 'System', icon: 'settings.svg' },
     { id: 'limits', label: 'Limits', icon: 'shield.svg' },
     { id: 'features', label: 'Features', icon: 'toggle-right.svg' },
@@ -206,6 +251,83 @@ export default function SettingsView() {
         </div>
 
         <div className="settings-content">
+          {/* Account Settings */}
+          {activeTab === 'account' && (
+            <div className="settings-section">
+              <h2>Account Settings</h2>
+              
+              <div className="account-info">
+                <div className="account-avatar">
+                  {admin?.name?.charAt(0).toUpperCase() || 'A'}
+                </div>
+                <div className="account-details">
+                  <h3>{admin?.name || 'Admin'}</h3>
+                  <p>{admin?.email || 'admin@example.com'}</p>
+                  <span className="account-role">{admin?.role || 'admin'}</span>
+                </div>
+              </div>
+
+              <div className="password-section">
+                <h3>Change Password</h3>
+                <form onSubmit={handleChangePassword}>
+                  <div className="setting-group">
+                    <label>Current Password</label>
+                    <input
+                      type="password"
+                      value={passwordData.currentPassword}
+                      onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                      placeholder="Enter current password"
+                      required
+                    />
+                  </div>
+
+                  <div className="setting-group">
+                    <label>New Password</label>
+                    <input
+                      type="password"
+                      value={passwordData.newPassword}
+                      onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                      placeholder="Minimum 8 characters"
+                      required
+                    />
+                  </div>
+
+                  <div className="setting-group">
+                    <label>Confirm New Password</label>
+                    <input
+                      type="password"
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      placeholder="Confirm new password"
+                      required
+                    />
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    className="btn-primary"
+                    disabled={changingPassword}
+                  >
+                    <img src="/icon/lock.svg" alt="Change" />
+                    {changingPassword ? 'Changing...' : 'Change Password'}
+                  </button>
+                </form>
+              </div>
+
+              <div className="danger-zone">
+                <h3>Session</h3>
+                <p>Logout from all devices and end your current session.</p>
+                <button 
+                  className="btn-danger"
+                  onClick={logoutAdmin}
+                >
+                  <img src="/icon/log-out.svg" alt="Logout" />
+                  Logout
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* System Settings */}
           {activeTab === 'system' && (
             <div className="settings-section">

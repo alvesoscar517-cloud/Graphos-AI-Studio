@@ -1,17 +1,17 @@
 /**
  * CSS Isolation Utilities
- * Các công cụ để đảm bảo CSS của admin không xung đột với main app
+ * Tools to ensure admin CSS doesn't conflict with main app
  */
 
 /**
- * Kiểm tra xem Shadow DOM có được hỗ trợ không
+ * Check if Shadow DOM is supported
  */
 export function isShadowDOMSupported() {
   return 'attachShadow' in Element.prototype;
 }
 
 /**
- * Kiểm tra xem có CSS conflicts không
+ * Check for CSS conflicts
  */
 export function detectCSSConflicts() {
   const adminRoot = document.getElementById('admin-root');
@@ -20,7 +20,7 @@ export function detectCSSConflicts() {
   const conflicts = [];
   const computedStyle = window.getComputedStyle(adminRoot);
 
-  // Kiểm tra các properties quan trọng
+  // Check critical properties
   const criticalProps = [
     'margin',
     'padding',
@@ -52,21 +52,21 @@ export function logCSSIsolationStatus() {
   
   // Check Shadow DOM support
   const shadowSupported = isShadowDOMSupported();
-  console.log('Shadow DOM Support:', shadowSupported ? '✅' : '❌');
+  console.log('Shadow DOM Support:', shadowSupported ? '[SUCCESS]' : '[FAIL]');
 
   // Check for conflicts
   const conflicts = detectCSSConflicts();
   if (conflicts.length > 0) {
-    console.warn('⚠️ Potential CSS conflicts detected:', conflicts);
+    console.warn('[WARNING] Potential CSS conflicts detected:', conflicts);
   } else {
-    console.log('✅ No CSS conflicts detected');
+    console.log('[SUCCESS] No CSS conflicts detected');
   }
 
   // Check admin root
   const adminRoot = document.getElementById('admin-root');
   if (adminRoot) {
     const hasShadowRoot = !!adminRoot.shadowRoot;
-    console.log('Admin Root Shadow DOM:', hasShadowRoot ? '✅' : '❌');
+    console.log('Admin Root Shadow DOM:', hasShadowRoot ? '[SUCCESS]' : '[FAIL]');
     
     if (hasShadowRoot) {
       console.log('Shadow Root Mode:', adminRoot.shadowRoot.mode);
@@ -107,17 +107,17 @@ export function addCSSResetToShadowDOM(shadowRoot) {
 }
 
 /**
- * Fallback: Thêm prefix vào tất cả CSS selectors
+ * Fallback: Add prefix to all CSS selectors
  */
 export function prefixCSSSelectors(css, prefix = '#admin-root') {
-  // Bỏ qua @rules và :root
+  // Skip @rules and :root
   return css.replace(
     /([^{}@]+)\{/g,
     (match, selector) => {
-      // Bỏ qua @rules
+      // Skip @rules
       if (selector.trim().startsWith('@')) return match;
       
-      // Bỏ qua :root
+      // Skip :root
       if (selector.trim().includes(':root')) return match;
       
       // Thêm prefix
@@ -125,7 +125,7 @@ export function prefixCSSSelectors(css, prefix = '#admin-root') {
         .split(',')
         .map(s => {
           const trimmed = s.trim();
-          // Nếu đã có prefix, bỏ qua
+          // If already has prefix, skip
           if (trimmed.startsWith(prefix)) return trimmed;
           // Thêm prefix
           return `${prefix} ${trimmed}`;
@@ -144,11 +144,11 @@ export function monitorCSSChanges() {
   const adminRoot = document.getElementById('admin-root');
   if (!adminRoot) return;
 
-  // Sử dụng MutationObserver để theo dõi thay đổi
+  // Use MutationObserver to track changes
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-        console.warn('⚠️ Admin root style changed externally:', mutation.target.style.cssText);
+        console.warn('[WARNING] Admin root style changed externally:', mutation.target.style.cssText);
       }
     });
   });

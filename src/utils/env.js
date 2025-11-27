@@ -43,7 +43,7 @@ export function validateEnv() {
   }
   
   if (warnings.length > 0) {
-    console.warn('⚠️ Environment Configuration Warnings:')
+    console.warn('[WARNING] Environment Configuration Warnings:')
     warnings.forEach(w => console.warn(`  - ${w}`))
   }
   
@@ -52,7 +52,7 @@ export function validateEnv() {
 
 // Log environment on load
 if (ENV.IS_DEV) {
-  console.log('🔧 Environment Configuration:', {
+  console.log('[SETTINGS] Environment Configuration:', {
     mode: ENV.NODE_ENV,
     apiUrl: ENV.API_BASE_URL,
     devMode: ENV.ENABLE_DEV_MODE,

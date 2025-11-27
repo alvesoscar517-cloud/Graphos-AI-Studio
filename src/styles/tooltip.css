@@ -1,7 +1,7 @@
 /* ===== CUSTOM TOOLTIP ===== */
 .tooltip {
-  position: absolute;
-  padding: 6px 12px;
+  position: fixed;
+  padding: 8px 12px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
@@ -10,18 +10,15 @@
   z-index: 10000;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+  transition: opacity 0.15s ease-out, visibility 0.15s ease-out;
   
-  /* Fix chromatic aberration / color fringing for Vietnamese text */
+  /* Typography */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: geometricPrecision;
+  text-rendering: optimizeLegibility;
   letter-spacing: 0.01em;
-  
-  /* Force sharp rendering - no transforms */
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
+  line-height: 1.4;
 }
 
 .tooltip.show {
@@ -29,103 +26,37 @@
   visibility: visible;
 }
 
-.tooltip::before {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  transition: border-color 0.3s ease;
-  display: none; /* Temporarily hide arrow to test */
-}
-
-/* Light theme tooltip - light background */
+/* Light theme - matches system tooltip style */
 body.light-theme .tooltip,
 body:not(.dark-theme):not(.light-theme) .tooltip {
-  background: #fff;
-  color: #202124;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e8eaed;
+  background: rgba(32, 33, 36, 0.95);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Light theme tooltip arrows */
-body.light-theme .tooltip.bottom::before,
-body:not(.dark-theme):not(.light-theme) .tooltip.bottom::before {
-  top: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 0 4px 4px 4px;
-  border-color: transparent transparent #fff transparent;
-}
-
-body.light-theme .tooltip.top::before,
-body:not(.dark-theme):not(.light-theme) .tooltip.top::before {
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 4px 4px 0 4px;
-  border-color: #fff transparent transparent transparent;
-}
-
-body.light-theme .tooltip.left::before,
-body:not(.dark-theme):not(.light-theme) .tooltip.left::before {
-  right: -4px;
-  top: 50%;
-  transform: translateY(-50%);
-  border-width: 4px 0 4px 4px;
-  border-color: transparent transparent transparent #fff;
-}
-
-body.light-theme .tooltip.right::before,
-body:not(.dark-theme):not(.light-theme) .tooltip.right::before {
-  left: -4px;
-  top: 50%;
-  transform: translateY(-50%);
-  border-width: 4px 4px 4px 0;
-  border-color: transparent #fff transparent transparent;
-}
-
-/* Dark theme tooltip - dark background */
+/* Dark theme - matches system tooltip style */
 body.dark-theme .tooltip {
-  background: #2d2d2d;
-  color: #e3e3e3;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  border: 1px solid #3c4043;
+  background: rgba(60, 64, 67, 0.95);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-body.dark-theme .tooltip.bottom::before {
-  top: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 0 4px 4px 4px;
-  border-color: transparent transparent #2d2d2d transparent;
-}
-
-body.dark-theme .tooltip.top::before {
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 4px 4px 0 4px;
-  border-color: #2d2d2d transparent transparent transparent;
-}
-
-body.dark-theme .tooltip.left::before {
-  right: -4px;
-  top: 50%;
-  transform: translateY(-50%);
-  border-width: 4px 0 4px 4px;
-  border-color: transparent transparent transparent #2d2d2d;
-}
-
-body.dark-theme .tooltip.right::before {
-  left: -4px;
-  top: 50%;
-  transform: translateY(-50%);
-  border-width: 4px 4px 4px 0;
-  border-color: transparent #2d2d2d transparent transparent;
+/* Position classes */
+.tooltip-top,
+.tooltip-bottom,
+.tooltip-left,
+.tooltip-right {
+  position: fixed;
 }
 
 /* Elements with tooltip */
 [data-tooltip] {
+  position: relative;
+}
+
+button[data-tooltip],
+a[data-tooltip],
+div[data-tooltip],
+span[data-tooltip] {
   position: relative;
 }

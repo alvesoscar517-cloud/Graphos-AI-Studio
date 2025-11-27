@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const checkAuthentication = async () => {
-    console.log('🔧 DEV MODE: Auto-authenticating...')
+    console.log('[SETTINGS] DEV MODE: Auto-authenticating...')
     
     const devUserId = 'dev_user_123'
     localStorage.setItem('userId', devUserId)
@@ -41,12 +41,12 @@ export const AuthProvider = ({ children }) => {
   }
 
   const signIn = async () => {
-    console.log('🔧 DEV MODE: Sign in')
+    console.log('[SETTINGS] DEV MODE: Sign in')
     return true
   }
 
   const signOut = async () => {
-    console.log('🔧 DEV MODE: Sign out')
+    console.log('[SETTINGS] DEV MODE: Sign out')
     localStorage.removeItem('userId')
     setIsAuthenticated(false)
     setUser(null)

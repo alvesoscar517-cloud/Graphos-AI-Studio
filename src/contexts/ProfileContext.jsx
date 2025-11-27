@@ -40,7 +40,7 @@ export const ProfileProvider = ({ children }) => {
         
         // Subscribe to profile updates
         unsubscribe = realtimeService.subscribe('profile', (data) => {
-          console.log('👤 Profile update via SSE:', data);
+          console.log('[USER] Profile update via SSE:', data);
           if (data.type === 'created' || data.type === 'updated' || data.type === 'deleted') {
             loadProfiles(true); // Force reload
           }
@@ -57,7 +57,7 @@ export const ProfileProvider = ({ children }) => {
       try {
         const invalidated = localStorage.getItem('profileCacheInvalidated')
         if (invalidated === 'true') {
-          console.log('🔄 Profile cache invalidated, reloading...')
+          console.log('[SYNC] Profile cache invalidated, reloading...')
           loadProfiles(true)
           localStorage.removeItem('profileCacheInvalidated')
         }
@@ -75,13 +75,13 @@ export const ProfileProvider = ({ children }) => {
   const loadProfiles = async (force = false) => {
     // Don't reload if already loaded recently (unless forced)
     if (!force && lastLoaded && Date.now() - lastLoaded < 30000) {
-      console.log('📦 Using cached profiles (loaded', Math.round((Date.now() - lastLoaded) / 1000), 's ago)')
+      console.log('[PACKAGE] Using cached profiles (loaded', Math.round((Date.now() - lastLoaded) / 1000), 's ago)')
       return
     }
 
     setLoading(true)
     try {
-      console.log('🔄 Loading profiles from API...')
+      console.log('[SYNC] Loading profiles from API...')
       
       // DEV MODE: Use test profile if enabled
       if (isDevMode() && shouldUseTestProfile()) {
@@ -103,7 +103,7 @@ export const ProfileProvider = ({ children }) => {
             return
           }
         } catch (testError) {
-          console.error('❌ Error loading test profile:', testError)
+          console.error('[FAIL] Error loading test profile:', testError)
           // Continue to production mode if test profile fails
         }
       }
@@ -118,19 +118,19 @@ export const ProfileProvider = ({ children }) => {
       if (activeProfileId) {
         const profile = data.find(p => p.profile_id === activeProfileId)
         if (profile) {
-          console.log('✅ Current profile verified:', profile.profile_name)
+          console.log('[SUCCESS] Current profile verified:', profile.profile_name)
           setCurrentProfile(profile)
         } else {
-          console.warn('⚠️ Current profile not found, clearing...')
+          console.warn('[WARNING] Current profile not found, clearing...')
           setCurrentProfile(null)
           localStorage.removeItem('activeProfileId')
           localStorage.removeItem('activeProfileName')
         }
       }
       
-      console.log(`✅ Loaded ${data.length} profiles`)
+      console.log(`[SUCCESS] Loaded ${data.length} profiles`)
     } catch (error) {
-      console.error('❌ Error loading profiles:', error)
+      console.error('[FAIL] Error loading profiles:', error)
       // Set empty profiles array to prevent undefined errors
       setProfiles([])
     } finally {
@@ -152,7 +152,7 @@ export const ProfileProvider = ({ children }) => {
   }
 
   const invalidateCache = () => {
-    console.log('🔄 Invalidating profile cache...')
+    console.log('[SYNC] Invalidating profile cache...')
     setLastLoaded(null)
     loadProfiles(true)
   }

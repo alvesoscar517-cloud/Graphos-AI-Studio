@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import Lottie from 'lottie-react';
 import confettiAnimation from '../animation/Confetti.json';
 import './PaymentSuccessNotification.css';
@@ -16,6 +17,7 @@ const PaymentSuccessNotification = ({
   onClose,
   autoCloseDelay = 8000 
 }) => {
+  const { t } = useTranslation();
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
@@ -58,31 +60,30 @@ const PaymentSuccessNotification = ({
       {/* Notification Card */}
       <div className="payment-success-notification">
         <button className="close-notification" onClick={handleClose}>
-          <img src="/icon/x.svg" alt="Close" />
+          <img src="/icon/x.svg" alt={t('common.close')} />
         </button>
 
         <div className="success-icon-wrapper">
           <div className="success-icon">
-            <img src="/icon/check.svg" alt="Success" />
+            <img src="/icon/check.svg" alt={t('common.success')} />
           </div>
         </div>
 
-        <h3 className="success-title">Thanks for your order!</h3>
+        <h3 className="success-title">{t('payment.thanksForOrder')}</h3>
         
         <p className="success-message">
-          Woohoo! Your payment was successful, and your order is complete. 
-          A receipt is on its way to your inbox.
+          {t('payment.paymentSuccessful')}
         </p>
 
         {credits && (
           <div className="credits-info">
-            <img src="/icon/coins.svg" alt="Credits" />
-            <span>New balance: <strong>{credits.balance?.toFixed(2)}</strong> credits</span>
+            <img src="/icon/coins.svg" alt={t('credits.credits')} />
+            <span>{t('payment.newBalance')} <strong>{credits.balance?.toFixed(2)}</strong> {t('credits.credits')}</span>
           </div>
         )}
 
         <button className="continue-btn" onClick={handleClose}>
-          Continue
+          {t('payment.continue')}
         </button>
       </div>
     </div>

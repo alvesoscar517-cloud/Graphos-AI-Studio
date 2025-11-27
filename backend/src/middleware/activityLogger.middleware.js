@@ -1,7 +1,7 @@
 /**
  * Activity Logger Middleware
- * Tự động ghi log hoạt động người dùng khi API được gọi
- * Tối ưu: Không block request, ghi log async
+ * Automatically logs user activity when API is called
+ * Optimization: Non-blocking request, async logging
  */
 
 const activityLogService = require('../services/activityLog.service');

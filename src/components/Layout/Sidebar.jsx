@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNotes } from '../../contexts/NotesContext'
@@ -26,17 +27,36 @@ const NotificationBadge = () => {
 
     loadUnreadCount();
 
-    // Listen for new notifications
+    // Listen for new notifications (local events)
     const handleNewNotification = () => {
       loadUnreadCount();
     };
     window.addEventListener('new-notification', handleNewNotification);
 
-    // Poll every 30 seconds
+    // Subscribe to realtime notifications from SSE
+    let unsubscribeRealtime = null;
+    const setupRealtimeListener = async () => {
+      try {
+        const realtimeService = (await import('../../services/realtimeService')).default;
+        unsubscribeRealtime = realtimeService.subscribe('notification', (data) => {
+          console.log('[BELL] Realtime notification received:', data);
+          // Dispatch event to update UI
+          window.dispatchEvent(new CustomEvent('new-notification', { detail: data }));
+          // Reload notifications
+          loadUnreadCount();
+        });
+      } catch (err) {
+        console.error('Setup realtime notification listener error:', err);
+      }
+    };
+    setupRealtimeListener();
+
+    // Poll every 30 seconds as fallback
     const interval = setInterval(loadUnreadCount, 30000);
 
     return () => {
       window.removeEventListener('new-notification', handleNewNotification);
+      if (unsubscribeRealtime) unsubscribeRealtime();
       clearInterval(interval);
     };
   }, []);
@@ -51,6 +71,7 @@ const NotificationBadge = () => {
 };
 
 const Sidebar = ({ hidden, currentView, onViewChange }) => {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const { getVisibleNotes, loadNote, deleteNote, currentNote } = useNotes()
   const [showNotifications, setShowNotifications] = useState(false)
@@ -73,13 +94,13 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
     e.stopPropagation()
     const note = visibleNotes.find(n => n.id === noteId)
     const confirmed = await modal.confirm(
-      `Are you sure you want to delete note "${note?.title}"?`,
-      'Confirm Delete',
-      { confirmText: 'Delete', danger: true }
+      t('sidebar.confirmDeleteNote', { title: note?.title }),
+      t('sidebar.confirmDelete'),
+      { confirmText: t('common.delete'), danger: true }
     )
     if (confirmed) {
       deleteNote(noteId)
-      modal.toast('Note deleted', '', 'success')
+      modal.toast(t('sidebar.noteDeleted'), '', 'success')
     }
   }
 
@@ -102,7 +123,7 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
       dragElastic={0.2}
       dragMomentum={false}
       onDragEnd={(event, info) => {
-        // Nếu kéo quá 40% width thì toggle
+        // If dragged over 40% width then toggle
         const threshold = 238 * 0.4
         if (info.offset.x < -threshold && !hidden) {
           // Close sidebar if open
@@ -116,7 +137,7 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
       }}
     >
       <div className="sidebar-header">
-        <h1 className="logo-title">AI Content Auth</h1>
+        <h1 className="logo-title">{t('sidebar.appTitle')}</h1>
       </div>
 
       <nav className="nav">
@@ -125,17 +146,17 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
           className={`nav-item ${currentView === 'home' ? 'active' : ''}`}
           onClick={(e) => { e.preventDefault(); onViewChange('home') }}
         >
-          <img src="/icon/home.svg" alt="Home" />
-          <span>Home</span>
+          <img src="/icon/home.svg" alt={t('nav.home')} />
+          <span>{t('nav.home')}</span>
         </a>
 
         <a 
           href="#" 
-          className={`nav-item ${currentView === 'aistudio-editor' && !currentNote ? 'active' : ''}`}
+          className={`nav-item ${currentView === 'aistudio-editor' && (!currentNote || !visibleNotes.some(n => n.id === currentNote?.id)) ? 'active' : ''}`}
           onClick={(e) => { e.preventDefault(); onViewChange('aistudio-editor', { createNew: true }) }}
         >
-          <img src="/icon/play.svg" alt="AI Studio" />
-          <span>AI Studio</span>
+          <img src="/icon/play.svg" alt={t('nav.aiStudio')} />
+          <span>{t('nav.aiStudio')}</span>
         </a>
 
         <a 
@@ -143,13 +164,13 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
           className={`nav-item ${currentView === 'workspace' ? 'active' : ''}`}
           onClick={(e) => { e.preventDefault(); onViewChange('workspace') }}
         >
-          <img src="/icon/message-square.svg" alt="AI Workspace" />
-          <span>AI Workspace</span>
+          <img src="/icon/message-square.svg" alt={t('nav.aiWorkspace')} />
+          <span>{t('nav.aiWorkspace')}</span>
         </a>
 
         <div className="nav-label">
-          <img src="/icon/clock.svg" alt="History" />
-          <span>History</span>
+          <img src="/icon/clock.svg" alt={t('nav.history')} />
+          <span>{t('nav.history')}</span>
         </div>
 
         <div className="nav-section" id="notesList">
@@ -159,14 +180,16 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
               className={`nav-subitem note-item ${currentNote?.id === note.id && currentView === 'aistudio-editor' ? 'active' : ''}`}
               onClick={() => handleNoteClick(note)}
             >
-              <span className="note-item-text" title={note.title}>
+              <span className="note-item-text">
                 {truncateTitle(note.title)}
               </span>
               <button 
                 className="delete-note-btn"
                 onClick={(e) => handleDeleteNote(e, note.id)}
+                data-tooltip={t('common.delete')}
+                data-tooltip-position="left"
               >
-                <img src="/icon/trash.svg" alt="Delete" />
+                <img src="/icon/trash.svg" alt={t('common.delete')} />
               </button>
             </div>
           ))}
@@ -177,7 +200,7 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
           className={`view-all ${currentView === 'history' ? 'active' : ''}`}
           onClick={(e) => { e.preventDefault(); onViewChange('history') }}
         >
-          View all history →
+          {t('nav.viewAllHistory')} →
         </a>
       </nav>
 
@@ -194,10 +217,10 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
             }}
           >
             <div className="notification-icon-wrapper">
-              <img src="/icon/bell.svg" alt="Notifications" />
+              <img src="/icon/bell.svg" alt={t('nav.notification')} />
               <NotificationBadge />
             </div>
-            Thông báo
+            {t('nav.notification')}
           </button>
 
           <button 
@@ -210,8 +233,8 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
               setShowSettings(!showSettings)
             }}
           >
-            <img src="/icon/settings.svg" alt="Settings" />
-            Settings
+            <img src="/icon/settings.svg" alt={t('nav.settings')} />
+            {t('nav.settings')}
           </button>
 
           <button 
@@ -229,7 +252,7 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
               alt="User"
               style={user?.picture ? { borderRadius: '50%', width: '20px', height: '20px' } : {}}
             />
-            <span>{user?.email || 'Chưa đăng nhập'}</span>
+            <span>{user?.email || t('common.notLoggedIn')}</span>
           </button>
         </div>
       </div>

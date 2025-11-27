@@ -16,7 +16,7 @@
   overscroll-behavior: contain;
 }
 
-/* Không cần .right-sidebar.hidden vì Framer Motion xử lý animation */
+/* No need for .right-sidebar.hidden as Framer Motion handles animation */
 
 .right-header {
   display: flex;

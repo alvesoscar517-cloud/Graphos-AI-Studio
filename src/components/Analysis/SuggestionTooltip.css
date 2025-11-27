@@ -1,4 +1,4 @@
-/* Overlay để đóng tooltip khi click bên ngoài */
+/* Overlay to close tooltip when clicking outside */
 .suggestion-tooltip-overlay {
   position: fixed;
   top: 0;
@@ -100,7 +100,7 @@ body.dark-theme .tooltip-issues-count,
   gap: 12px;
 }
 
-/* Suggestions list - 1 nền chung cho tất cả */
+/* Suggestions list - 1 common background for all */
 .suggestions-list {
   display: flex;
   flex-direction: column;

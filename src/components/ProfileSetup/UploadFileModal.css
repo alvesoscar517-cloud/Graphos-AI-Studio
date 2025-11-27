@@ -64,6 +64,7 @@
   background: #f5f7fa;
   border-radius: 12px;
   flex-shrink: 0;
+  position: relative;
 }
 
 .upload-modal-icon img {
@@ -250,6 +251,7 @@
   transition: all 0.2s ease;
   color: #ef4444;
   flex-shrink: 0;
+  position: relative;
 }
 
 .upload-file-remove:hover {

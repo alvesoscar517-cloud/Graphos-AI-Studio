@@ -7,25 +7,25 @@ import './AllActivityLogs.css';
 
 // Activity type config
 const ACTIVITY_CONFIG = {
-  login: { label: 'Đăng nhập', icon: 'log-in.svg', color: '#4caf50' },
-  logout: { label: 'Đăng xuất', icon: 'log-out.svg', color: '#607d8b' },
-  profile_create: { label: 'Tạo profile', icon: 'folder-plus.svg', color: '#2196f3' },
-  profile_update: { label: 'Cập nhật profile', icon: 'edit.svg', color: '#ff9800' },
-  profile_delete: { label: 'Xóa profile', icon: 'trash-2.svg', color: '#f44336' },
-  profile_sample_add: { label: 'Thêm sample', icon: 'file-plus.svg', color: '#9c27b0' },
-  profile_finalize: { label: 'Hoàn thành profile', icon: 'check-circle.svg', color: '#4caf50' },
-  ai_detection: { label: 'Phát hiện AI', icon: 'search.svg', color: '#ff5722' },
-  text_analysis: { label: 'Phân tích văn bản', icon: 'bar-chart.svg', color: '#3f51b5' },
-  text_rewrite: { label: 'Viết lại văn bản', icon: 'edit-3.svg', color: '#e91e63' },
+  login: { label: 'Login', icon: 'log-in.svg', color: '#4caf50' },
+  logout: { label: 'Logout', icon: 'log-out.svg', color: '#607d8b' },
+  profile_create: { label: 'Create Profile', icon: 'folder-plus.svg', color: '#2196f3' },
+  profile_update: { label: 'Update Profile', icon: 'edit.svg', color: '#ff9800' },
+  profile_delete: { label: 'Delete Profile', icon: 'trash-2.svg', color: '#f44336' },
+  profile_sample_add: { label: 'Add Sample', icon: 'file-plus.svg', color: '#9c27b0' },
+  profile_finalize: { label: 'Finalize Profile', icon: 'check-circle.svg', color: '#4caf50' },
+  ai_detection: { label: 'AI Detection', icon: 'search.svg', color: '#ff5722' },
+  text_analysis: { label: 'Text Analysis', icon: 'bar-chart.svg', color: '#3f51b5' },
+  text_rewrite: { label: 'Text Rewrite', icon: 'edit-3.svg', color: '#e91e63' },
   humanize: { label: 'Humanize', icon: 'user.svg', color: '#00bcd4' },
-  iterative_humanize: { label: 'Humanize lặp', icon: 'repeat.svg', color: '#009688' },
+  iterative_humanize: { label: 'Iterative Humanize', icon: 'repeat.svg', color: '#009688' },
   chat_message: { label: 'Chat', icon: 'message-circle.svg', color: '#673ab7' },
-  chat_humanized: { label: 'Chat humanized', icon: 'message-square.svg', color: '#795548' },
-  conversation_summarize: { label: 'Tóm tắt hội thoại', icon: 'file-text.svg', color: '#607d8b' },
-  translation: { label: 'Dịch thuật', icon: 'globe.svg', color: '#03a9f4' },
-  file_upload: { label: 'Upload file', icon: 'upload.svg', color: '#8bc34a' },
-  credit_purchase: { label: 'Mua credits', icon: 'credit-card.svg', color: '#4caf50' },
-  credit_deduct: { label: 'Trừ credits', icon: 'minus-circle.svg', color: '#f44336' }
+  chat_humanized: { label: 'Chat Humanized', icon: 'message-square.svg', color: '#795548' },
+  conversation_summarize: { label: 'Conversation Summary', icon: 'file-text.svg', color: '#607d8b' },
+  translation: { label: 'Translation', icon: 'globe.svg', color: '#03a9f4' },
+  file_upload: { label: 'Upload File', icon: 'upload.svg', color: '#8bc34a' },
+  credit_purchase: { label: 'Purchase Credits', icon: 'credit-card.svg', color: '#4caf50' },
+  credit_deduct: { label: 'Deduct Credits', icon: 'minus-circle.svg', color: '#f44336' }
 };
 
 const getActivityConfig = (type) => {
@@ -86,7 +86,7 @@ export default function AllActivityLogs() {
         hasMore: response.pagination.hasMore
       });
     } catch (err) {
-      notify.error('Không thể tải activity logs: ' + err.message);
+      notify.error('Unable to load activity logs: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -111,8 +111,8 @@ export default function AllActivityLogs() {
 
   const handleCleanup = async () => {
     const confirmed = await notify.confirm({
-      title: 'Dọn dẹp logs cũ',
-      message: 'Xóa tất cả activity logs cũ hơn 90 ngày?',
+      title: 'Clean Up Old Logs',
+      message: 'Delete all activity logs older than 90 days?',
       type: 'warning'
     });
     
@@ -120,16 +120,16 @@ export default function AllActivityLogs() {
     
     try {
       const result = await activityLogsApi.cleanup(90);
-      notify.success(`Đã xóa ${result.deleted.logs} logs và ${result.deleted.aggregations} aggregations`);
+      notify.success(`Deleted ${result.deleted.logs} logs and ${result.deleted.aggregations} aggregations`);
       loadLogs();
       loadStats();
     } catch (err) {
-      notify.error('Lỗi: ' + err.message);
+      notify.error('Error: ' + err.message);
     }
   };
 
   const formatTimestamp = (timestamp) => {
-    return new Date(timestamp).toLocaleString('vi-VN');
+    return new Date(timestamp).toLocaleString('en-US');
   };
 
   return (
@@ -137,11 +137,11 @@ export default function AllActivityLogs() {
       <PageHeader
         icon="activity.svg"
         title="Activity Logs"
-        subtitle="Theo dõi tất cả hoạt động của người dùng"
+        subtitle="Track all user activities"
         actions={
           <button className="btn-cleanup" onClick={handleCleanup}>
             <img src="/icon/trash-2.svg" alt="Cleanup" />
-            Dọn dẹp logs cũ
+            Clean Up Old Logs
           </button>
         }
       />
@@ -155,7 +155,7 @@ export default function AllActivityLogs() {
             </div>
             <div className="stat-info">
               <div className="stat-value">{stats.totalActivities.toLocaleString()}</div>
-              <div className="stat-label">Hoạt động (7 ngày)</div>
+              <div className="stat-label">Activities (7 days)</div>
             </div>
           </div>
           <div className="stat-card">
@@ -164,7 +164,7 @@ export default function AllActivityLogs() {
             </div>
             <div className="stat-info">
               <div className="stat-value">{stats.totalCreditsUsed.toFixed(1)}</div>
-              <div className="stat-label">Credits đã dùng</div>
+              <div className="stat-label">Credits Used</div>
             </div>
           </div>
           <div className="stat-card">
@@ -173,7 +173,7 @@ export default function AllActivityLogs() {
             </div>
             <div className="stat-info">
               <div className="stat-value">{stats.uniqueUsers}</div>
-              <div className="stat-label">Users hoạt động</div>
+              <div className="stat-label">Active Users</div>
             </div>
           </div>
         </div>
@@ -185,7 +185,7 @@ export default function AllActivityLogs() {
           value={filter.type} 
           onChange={(e) => setFilter({...filter, type: e.target.value})}
         >
-          <option value="all">Tất cả loại</option>
+          <option value="all">All Types</option>
           {Object.entries(ACTIVITY_CONFIG).map(([key, config]) => (
             <option key={key} value={key}>{config.label}</option>
           ))}
@@ -212,18 +212,18 @@ export default function AllActivityLogs() {
         
         <button className="btn-filter" onClick={handleFilter}>
           <img src="/icon/filter.svg" alt="Filter" />
-          Lọc
+          Filter
         </button>
       </div>
 
       {/* Logs List */}
       <div className="logs-container">
         {loading ? (
-          <div className="loading-state">Đang tải...</div>
+          <div className="loading-state">Loading...</div>
         ) : logs.length === 0 ? (
           <div className="empty-state">
             <img src="/icon/inbox.svg" alt="Empty" />
-            <p>Không có activity logs</p>
+            <p>No activity logs</p>
           </div>
         ) : (
           <>
@@ -244,7 +244,7 @@ export default function AllActivityLogs() {
                         <span 
                           className="user-id" 
                           onClick={() => navigate(`/users/${log.userId}/activity`)}
-                          title="Xem chi tiết user"
+                          title="View Details user"
                         >
                           {log.userId.substring(0, 16)}...
                         </span>
@@ -268,7 +268,7 @@ export default function AllActivityLogs() {
             
             {pagination.hasMore && (
               <button className="btn-load-more" onClick={() => loadLogs(true)}>
-                Tải thêm
+                Load More
               </button>
             )}
           </>

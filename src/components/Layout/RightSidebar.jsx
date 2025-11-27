@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { useNotes } from '../../contexts/NotesContext'
 import { useProfiles } from '../../contexts/ProfileContext'
@@ -13,6 +14,7 @@ import WritingPreferences from '../Analysis/WritingPreferences'
 import './RightSidebar.css'
 
 const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => {
+  const { t } = useTranslation()
   const { currentNote } = useNotes()
   const { currentProfile, selectProfile } = useProfiles()
   const { selectedModel, setSelectedModel, writingPreferences, setWritingPreferences } = useRewrite()
@@ -52,7 +54,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       dragElastic={0.2}
       dragMomentum={false}
       onDragEnd={(event, info) => {
-        // Nếu kéo quá 40% width thì đóng
+        // If dragged over 40% width then close
         const threshold = 300 * 0.4
         if (info.offset.x > threshold && !hidden) {
           onClose?.()
@@ -67,29 +69,25 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           <button 
             className={`mode-toggle-btn ${mode === 'analysis' ? 'active' : ''}`}
             onClick={() => handleModeChange('analysis')}
-            data-tooltip="Analysis Tool" 
-            data-tooltip-position="bottom"
           >
-            <img src="/icon/bar-chart-4.svg" alt="Analysis" />
-            <span>Analysis</span>
+            <img src="/icon/bar-chart-4.svg" alt={t('rightSidebar.analysis')} />
+            <span>{t('rightSidebar.analysis')}</span>
           </button>
           <button 
             className={`mode-toggle-btn ${mode === 'rewrite' ? 'active' : ''}`}
             onClick={() => handleModeChange('rewrite')}
-            data-tooltip="Viết lại văn bản" 
-            data-tooltip-position="bottom"
           >
-            <img src="/icon/pen.svg" alt="Rewrite" />
-            <span>Viết lại</span>
+            <img src="/icon/pen.svg" alt={t('rightSidebar.rewrite')} />
+            <span>{t('rightSidebar.rewrite')}</span>
           </button>
         </div>
         <button 
           className="icon-btn close-sidebar-btn" 
           onClick={onClose}
-          data-tooltip="Đóng sidebar" 
+          data-tooltip={t('common.close')} 
           data-tooltip-position="left"
         >
-          <img src="/icon/x.svg" alt="Close" />
+          <img src="/icon/x.svg" alt={t('common.close')} />
         </button>
       </div>
 

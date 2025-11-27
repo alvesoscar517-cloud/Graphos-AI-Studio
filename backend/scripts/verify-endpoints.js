@@ -1,6 +1,6 @@
 /**
  * Endpoint Verification Script
- * Kiểm tra tất cả endpoints đã được map đúng
+ * Verify all endpoints are mapped correctly
  */
 
 const endpoints = {
