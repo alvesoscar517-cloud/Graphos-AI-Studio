@@ -13,6 +13,8 @@ const IS_PRODUCTION = NODE_ENV === 'production'
 
 // Validate required environment variables in production
 function validateConfig() {
+  const warnings = [];
+  
   if (IS_PRODUCTION) {
     const required = [
       'GOOGLE_CLOUD_PROJECT',
@@ -22,23 +24,27 @@ function validateConfig() {
     const missing = required.filter(key => !process.env[key])
     
     if (missing.length > 0) {
-      throw new Error(
-        `Missing required environment variables in production: ${missing.join(', ')}\n` +
-        'Please set these variables before starting the server.'
-      )
+      warnings.push(`Missing environment variables: ${missing.join(', ')}`);
+      console.error(`[CONFIG WARNING] Missing required environment variables: ${missing.join(', ')}`);
     }
     
     // Validate admin key is not default
     if (process.env.ADMIN_KEY === 'your-secure-admin-key-here') {
-      throw new Error('ADMIN_KEY must be changed from default value in production')
+      warnings.push('ADMIN_KEY is set to default value');
+      console.error('[CONFIG WARNING] ADMIN_KEY must be changed from default value in production');
     }
   }
+  
+  return warnings;
 }
 
-// Run validation
-validateConfig()
+// Run validation (log warnings but don't throw - let server start for health checks)
+const configWarnings = validateConfig();
 
 module.exports = {
+  // Config validation warnings (empty if all good)
+  CONFIG_WARNINGS: configWarnings,
+  
   // Server
   PORT: process.env.PORT || 8080,
   NODE_ENV,

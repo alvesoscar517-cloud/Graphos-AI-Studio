@@ -178,6 +178,14 @@ async function startServer() {
       console.log(`   - Request Timeout: 30s`);
       console.log(`   - Correlation IDs: Enabled`);
       console.log('');
+      
+      // Log config warnings if any
+      if (config.CONFIG_WARNINGS && config.CONFIG_WARNINGS.length > 0) {
+        console.log('[WARNINGS]');
+        config.CONFIG_WARNINGS.forEach(w => console.log(`   ⚠️  ${w}`));
+        console.log('');
+      }
+      
       console.log(`[READY] Server ready at http://localhost:${PORT}`);
       console.log('');
       
