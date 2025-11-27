@@ -215,13 +215,6 @@ const FEATURE_COSTS = {
 // ============================================================================
 
 const CREDIT_PACKAGES = {
-  'starter': {
-    credits: 50,
-    price: 1.99,
-    bonus: 0,
-    description: 'Starter',
-    variantId: process.env.LS_VARIANT_STARTER || null  // ~$0.04/credit
-  },
   'basic': {
     credits: 150,
     price: 4.99,

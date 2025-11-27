@@ -24,6 +24,12 @@
   flex: 1;
   padding: 32px;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+#admin-root .admin-content::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
 }
 
 @media (max-width: 768px) {

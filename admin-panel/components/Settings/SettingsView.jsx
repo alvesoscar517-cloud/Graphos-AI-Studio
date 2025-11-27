@@ -18,6 +18,7 @@ export default function SettingsView() {
     confirmPassword: ''
   });
   const [changingPassword, setChangingPassword] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
   
   // Default settings - always available
   const defaultSettings = {
@@ -65,8 +66,13 @@ export default function SettingsView() {
   const [backupResult, setBackupResult] = useState(null);
   const notify = useNotify();
 
+  // Load settings only once on mount
   useEffect(() => {
     loadSettings();
+  }, []);
+
+  // Load backup list when switching to backup tab
+  useEffect(() => {
     if (activeTab === 'backup') {
       loadBackupList();
     }
@@ -267,63 +273,91 @@ export default function SettingsView() {
                 </div>
               </div>
 
-              <div className="password-section">
-                <h3>Change Password</h3>
-                <form onSubmit={handleChangePassword}>
-                  <div className="setting-group">
-                    <label>Current Password</label>
-                    <input
-                      type="password"
-                      value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                      placeholder="Enter current password"
-                      required
-                    />
+              <div className="account-actions">
+                <div className="action-card" onClick={() => setShowPasswordForm(!showPasswordForm)}>
+                  <div className="action-icon">
+                    <img src="/icon/lock.svg" alt="Password" />
                   </div>
-
-                  <div className="setting-group">
-                    <label>New Password</label>
-                    <input
-                      type="password"
-                      value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                      placeholder="Minimum 8 characters"
-                      required
-                    />
+                  <div className="action-content">
+                    <h4>Change Password</h4>
+                    <p>Update your account password</p>
                   </div>
+                  <img 
+                    src="/icon/chevron-down.svg" 
+                    alt="Toggle" 
+                    className={`action-chevron ${showPasswordForm ? 'expanded' : ''}`}
+                  />
+                </div>
 
-                  <div className="setting-group">
-                    <label>Confirm New Password</label>
-                    <input
-                      type="password"
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      placeholder="Confirm new password"
-                      required
-                    />
+                {showPasswordForm && (
+                  <div className="password-form-container">
+                    <form onSubmit={handleChangePassword}>
+                      <div className="setting-group">
+                        <label>Current Password</label>
+                        <input
+                          type="password"
+                          value={passwordData.currentPassword}
+                          onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                          placeholder="Enter current password"
+                          required
+                        />
+                      </div>
+
+                      <div className="setting-group">
+                        <label>New Password</label>
+                        <input
+                          type="password"
+                          value={passwordData.newPassword}
+                          onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                          placeholder="Minimum 8 characters"
+                          required
+                        />
+                      </div>
+
+                      <div className="setting-group">
+                        <label>Confirm New Password</label>
+                        <input
+                          type="password"
+                          value={passwordData.confirmPassword}
+                          onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                          placeholder="Confirm new password"
+                          required
+                        />
+                      </div>
+
+                      <div className="password-form-actions">
+                        <button 
+                          type="button" 
+                          className="btn-secondary"
+                          onClick={() => {
+                            setShowPasswordForm(false);
+                            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                          }}
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          type="submit" 
+                          className="btn-primary"
+                          disabled={changingPassword}
+                        >
+                          <img src="/icon/lock.svg" alt="Change" />
+                          {changingPassword ? 'Changing...' : 'Update Password'}
+                        </button>
+                      </div>
+                    </form>
                   </div>
+                )}
 
-                  <button 
-                    type="submit" 
-                    className="btn-primary"
-                    disabled={changingPassword}
-                  >
-                    <img src="/icon/lock.svg" alt="Change" />
-                    {changingPassword ? 'Changing...' : 'Change Password'}
-                  </button>
-                </form>
-              </div>
-
-              <div className="danger-zone">
-                <h3>Session</h3>
-                <p>Logout from all devices and end your current session.</p>
-                <button 
-                  className="btn-danger"
-                  onClick={logoutAdmin}
-                >
-                  <img src="/icon/log-out.svg" alt="Logout" />
-                  Logout
-                </button>
+                <div className="action-card logout-card" onClick={logoutAdmin}>
+                  <div className="action-icon logout-icon">
+                    <img src="/icon/log-out.svg" alt="Logout" />
+                  </div>
+                  <div className="action-content">
+                    <h4>Logout</h4>
+                    <p>End your current session</p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

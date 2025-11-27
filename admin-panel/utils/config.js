@@ -5,13 +5,8 @@
 
 // API Base URL - auto-detect based on environment
 export function getApiBaseUrl() {
-  // Check if running in development
-  if (import.meta.env.DEV) {
-    return import.meta.env.VITE_API_URL || 'http://localhost:8081';
-  }
-  
-  // Production URL
-  return 'https://ai-backend-admin-472729326429.us-central1.run.app';
+  // Use env variable if set, otherwise use Cloud Run URL
+  return import.meta.env.VITE_API_URL || 'https://ai-backend-admin-472729326429.us-central1.run.app';
 }
 
 // App Configuration
@@ -53,11 +48,12 @@ export const APP_CONFIG = {
     { value: 'urgent', label: 'Urgent', color: '#000' }
   ],
   
-  // User tiers
-  USER_TIERS: [
-    { value: 'free', label: 'Free', color: '#e0e0e0', textColor: '#666' },
-    { value: 'premium', label: 'Premium', color: '#000', textColor: '#fff' },
-    { value: 'enterprise', label: 'Enterprise', color: '#666', textColor: '#fff' }
+  // Credit segments for analytics
+  CREDIT_SEGMENTS: [
+    { value: 'noCredits', label: 'No Credits', color: '#ef4444', desc: 'Users with 0 credits' },
+    { value: 'low', label: 'Low (1-50)', color: '#f59e0b', desc: 'Users with 1-50 credits' },
+    { value: 'medium', label: 'Medium (51-200)', color: '#3b82f6', desc: 'Users with 51-200 credits' },
+    { value: 'high', label: 'High (200+)', color: '#10b981', desc: 'Users with 200+ credits' }
   ],
   
   // Ticket statuses

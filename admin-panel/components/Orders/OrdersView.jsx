@@ -362,7 +362,7 @@ function ProfitCalculator({ revenueStats, costs, setCosts, timeRange, setTimeRan
     <div className="profit-calculator-section">
       <div className="profit-header">
         <div className="profit-title">
-          <h2>💰 Profit Calculator</h2>
+          <h2><img src="/icon/coins.svg" alt="Profit" className="title-icon" /> Profit Calculator</h2>
           <p>Estimate your actual profit after deducting all costs</p>
         </div>
         <CustomSelect
@@ -409,7 +409,7 @@ function ProfitCalculator({ revenueStats, costs, setCosts, timeRange, setTimeRan
 
       <div className="profit-details">
         <div className="costs-breakdown">
-          <h3>[CHART] Cost Breakdown</h3>
+          <h3><img src="/icon/chart-pie.svg" alt="Chart" className="section-icon" /> Cost Breakdown</h3>
           
           <div className="cost-item highlight">
             <div className="cost-info">
@@ -466,7 +466,7 @@ function ProfitCalculator({ revenueStats, costs, setCosts, timeRange, setTimeRan
         </div>
 
         <div className="costs-editor">
-          <h3>⚙️ Adjust Monthly Costs</h3>
+          <h3><img src="/icon/settings.svg" alt="Settings" className="section-icon" /> Adjust Monthly Costs</h3>
           <p className="editor-note">Edit these values to match your actual costs</p>
 
           <div className="cost-input-group">
@@ -548,7 +548,7 @@ function ProfitCalculator({ revenueStats, costs, setCosts, timeRange, setTimeRan
       </div>
 
       <div className="profit-projections">
-        <h3>[GROWTH] Projections</h3>
+        <h3><img src="/icon/trending-up.svg" alt="Growth" className="section-icon" /> Projections</h3>
         <div className="projections-grid">
           <div className="projection-card">
             <span className="projection-label">Daily Average</span>

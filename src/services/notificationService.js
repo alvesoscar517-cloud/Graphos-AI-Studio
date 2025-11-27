@@ -14,8 +14,15 @@ const API_BASE_URL = 'https://ai-authenticator-472729326429.us-central1.run.app'
 
 // Get user ID from auth
 const getUserId = () => {
+  // Try direct userId first (set by AuthContext)
+  const directUserId = localStorage.getItem('userId');
+  if (directUserId) {
+    return directUserId;
+  }
+  
+  // Fallback to user object
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  return user.uid || user.email || null;
+  return user.uid || user.id || user.email || null;
 };
 
 /**

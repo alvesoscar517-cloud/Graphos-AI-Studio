@@ -97,14 +97,13 @@ export default function SupportDetail() {
     return <div className="error">Ticket not found</div>;
   }
 
-  const getStatusColor = (status) => {
-    const colors = {
-      open: '#2196f3',
-      in_progress: '#ff9800',
-      resolved: '#4caf50',
-      closed: '#9e9e9e'
+  const getPriorityStyle = (priority) => {
+    const styles = {
+      low: { bg: '#f5f5f5', color: '#666' },
+      medium: { bg: '#e8e8e8', color: '#333' },
+      high: { bg: '#000', color: '#fff' }
     };
-    return colors[status] || colors.open;
+    return styles[priority] || styles.medium;
   };
 
   return (
@@ -128,7 +127,7 @@ export default function SupportDetail() {
                 <img src={`/icon/${ticket.type === 'billing_support' ? 'dollar-sign' : 'message-square'}.svg`} alt={ticket.type} />
                 {ticket.type === 'billing_support' ? 'Billing Support' : 'Feedback'}
               </span>
-              <span className="priority-badge" style={{ background: ticket.priority === 'high' ? '#f44336' : '#ff9800' }}>
+              <span className="priority-badge" style={{ background: getPriorityStyle(ticket.priority).bg, color: getPriorityStyle(ticket.priority).color }}>
                 {ticket.priority === 'high' ? 'High' : ticket.priority === 'medium' ? 'Medium' : 'Low'}
               </span>
             </div>

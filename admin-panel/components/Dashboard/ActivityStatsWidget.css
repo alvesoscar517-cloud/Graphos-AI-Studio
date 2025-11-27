@@ -1,5 +1,6 @@
 .activity-stats-widget {
-  background: var(--bg-secondary, #1a1a2e);
+  background: #fff;
+  border: 1px solid #e5e5e5;
   border-radius: 16px;
   padding: 24px;
   height: 100%;
@@ -23,24 +24,28 @@
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-primary, #fff);
+  color: #000;
 }
 
 .activity-stats-widget .widget-header h3 img {
-  width: 20px;
-  height: 20px;
-  filter: brightness(0) invert(1);
-  opacity: 0.8;
+  width: 24px;
+  height: 24px;
+  opacity: 0.85;
 }
 
 .activity-stats-widget .widget-header select {
   padding: 8px 12px;
-  background: var(--bg-tertiary, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border-color, #333);
+  background: #fff;
+  border: 1px solid #e5e5e5;
   border-radius: 8px;
-  color: var(--text-primary, #fff);
+  color: #000;
   font-size: 13px;
   cursor: pointer;
+}
+
+.activity-stats-widget .widget-header select:focus {
+  outline: none;
+  border-color: #000;
 }
 
 .loading-placeholder {
@@ -48,34 +53,35 @@
   align-items: center;
   justify-content: center;
   height: 200px;
-  color: var(--text-secondary, #888);
+  color: #999;
 }
 
 /* Summary Cards */
-.stats-summary {
+.activity-stats-widget .stats-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin-bottom: 24px;
 }
 
-.stat-card {
+.activity-stats-widget .stat-card {
   padding: 16px;
-  background: var(--bg-tertiary, rgba(255, 255, 255, 0.03));
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
   border-radius: 12px;
   text-align: center;
 }
 
-.stat-card .stat-value {
+.activity-stats-widget .stat-card .stat-value {
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-primary, #fff);
+  color: #000;
   margin-bottom: 4px;
 }
 
-.stat-card .stat-label {
+.activity-stats-widget .stat-card .stat-label {
   font-size: 12px;
-  color: var(--text-secondary, #888);
+  color: #666;
 }
 
 /* Trend Section */
@@ -89,7 +95,7 @@
   margin: 0 0 12px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-secondary, #888);
+  color: #666;
 }
 
 .trend-chart {
@@ -98,7 +104,8 @@
   gap: 6px;
   height: 100px;
   padding: 12px;
-  background: var(--bg-tertiary, rgba(255, 255, 255, 0.02));
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
   border-radius: 10px;
 }
 
@@ -113,7 +120,7 @@
 .trend-bar .bar {
   width: 100%;
   max-width: 30px;
-  background: linear-gradient(180deg, var(--primary-color, #6366f1) 0%, rgba(99, 102, 241, 0.5) 100%);
+  background: linear-gradient(180deg, #000 0%, #666 100%);
   border-radius: 4px 4px 0 0;
   transition: height 0.3s ease;
   margin-top: auto;
@@ -122,7 +129,7 @@
 .trend-bar .bar-label {
   margin-top: 6px;
   font-size: 9px;
-  color: var(--text-secondary, #888);
+  color: #999;
 }
 
 /* Feature Section */
@@ -151,24 +158,24 @@
 .feature-rank {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-secondary, #888);
+  color: #999;
   width: 24px;
 }
 
 .feature-name {
   flex: 1;
   font-size: 13px;
-  color: var(--text-primary, #fff);
+  color: #000;
 }
 
 .feature-count {
   font-size: 12px;
-  color: var(--text-secondary, #888);
+  color: #666;
 }
 
 .feature-bar {
   height: 4px;
-  background: var(--bg-tertiary, rgba(255, 255, 255, 0.05));
+  background: #f0f0f0;
   border-radius: 2px;
   overflow: hidden;
   margin-left: 32px;
@@ -176,7 +183,7 @@
 
 .feature-bar .bar-fill {
   height: 100%;
-  background: var(--primary-color, #6366f1);
+  background: #000;
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -193,44 +200,45 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: var(--bg-tertiary, rgba(255, 255, 255, 0.02));
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
   border-radius: 8px;
 }
 
 .user-rank {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-secondary, #888);
+  color: #999;
   width: 24px;
 }
 
 .user-id {
   flex: 1;
   font-size: 12px;
-  color: var(--text-primary, #fff);
+  color: #000;
   font-family: monospace;
 }
 
 .user-activities {
   font-size: 11px;
-  color: var(--primary-color, #6366f1);
-  background: rgba(99, 102, 241, 0.1);
+  color: #000;
+  background: #f0f0f0;
   padding: 4px 8px;
   border-radius: 4px;
 }
 
 .user-credits {
   font-size: 11px;
-  color: var(--text-secondary, #888);
+  color: #666;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .stats-summary {
+  .activity-stats-widget .stats-summary {
     grid-template-columns: 1fr;
   }
   
-  .stat-card .stat-value {
+  .activity-stats-widget .stat-card .stat-value {
     font-size: 20px;
   }
 }

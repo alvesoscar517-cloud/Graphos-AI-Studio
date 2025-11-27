@@ -41,7 +41,7 @@ export function exportUsersToCSV(users) {
   const data = users.map(user => ({
     'ID': user.id,
     'Email': user.email,
-    'Tier': user.tier || 'free',
+    'Credits': user.credits?.balance || 0,
     'Created': new Date(user.created_at).toLocaleDateString('vi-VN'),
     'Last Login': user.last_login ? new Date(user.last_login).toLocaleDateString('vi-VN') : 'Never',
     'Profiles': user.profile_count || 0,
@@ -70,13 +70,13 @@ export function exportAnalyticsToCSV(analytics) {
     });
   }
 
-  // Tier distribution
-  if (analytics.tierDistribution) {
-    Object.entries(analytics.tierDistribution).forEach(([tier, count]) => {
+  // Credit distribution
+  if (analytics.creditDistribution) {
+    Object.entries(analytics.creditDistribution).forEach(([segment, count]) => {
       data.push({
-        'Type': 'Tier Distribution',
+        'Type': 'Credit Distribution',
         'Date': new Date().toLocaleDateString('vi-VN'),
-        'Tier': tier,
+        'Segment': segment,
         'Count': count
       });
     });
@@ -213,19 +213,19 @@ export function generateAnalyticsReport(overview, userAnalytics, usageAnalytics)
       </div>
     </div>
     
-    <h2>Tier Distribution</h2>
+    <h2>Credit Distribution</h2>
     <table>
       <thead>
         <tr>
-          <th>Tier</th>
+          <th>Segment</th>
           <th>Count</th>
           <th>Percentage</th>
         </tr>
       </thead>
       <tbody>
-        ${Object.entries(userAnalytics?.tierDistribution || {}).map(([tier, count]) => `
+        ${Object.entries(userAnalytics?.creditDistribution || {}).map(([segment, count]) => `
           <tr>
-            <td>${tier}</td>
+            <td>${segment}</td>
             <td>${count}</td>
             <td>${((count / (overview?.totalUsers || 1)) * 100).toFixed(1)}%</td>
           </tr>

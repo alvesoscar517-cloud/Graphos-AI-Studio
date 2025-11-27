@@ -180,25 +180,25 @@
   border-radius: 12px;
 }
 
-#admin-root .stat-icon {
+#admin-root .user-detail .stat-icon {
   width: 32px;
   height: 32px;
   flex-shrink: 0;
   filter: brightness(0);
 }
 
-#admin-root .stat-content {
+#admin-root .user-detail .stat-content {
   flex: 1;
 }
 
-#admin-root .stat-value {
+#admin-root .user-detail .stat-value {
   font-size: 24px;
   font-weight: 700;
   color: #000;
   margin-bottom: 4px;
 }
 
-#admin-root .stat-label {
+#admin-root .user-detail .stat-label {
   font-size: 13px;
   color: #666;
 }

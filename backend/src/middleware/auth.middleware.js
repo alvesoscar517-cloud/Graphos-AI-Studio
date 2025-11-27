@@ -160,32 +160,6 @@ async function optionalAuth(req, res, next) {
 }
 
 /**
- * Require admin authentication
- * Checks X-Admin-Key header
- */
-function requireAdmin(req, res, next) {
-  const adminKey = req.headers['x-admin-key'];
-  
-  if (!adminKey) {
-    return res.status(401).json({
-      error: 'Admin authentication required',
-      code: 'ADMIN_AUTH_REQUIRED'
-    });
-  }
-  
-  if (adminKey !== config.ADMIN_KEY) {
-    logger.warn('Invalid admin key attempt', { ip: req.ip });
-    return res.status(403).json({
-      error: 'Invalid admin credentials',
-      code: 'INVALID_ADMIN_KEY'
-    });
-  }
-  
-  req.isAdmin = true;
-  next();
-}
-
-/**
  * Rate limit by user - more granular than IP-based
  */
 const userRateLimits = new Map();
@@ -237,7 +211,6 @@ setInterval(() => {
 module.exports = {
   authenticate,
   optionalAuth,
-  requireAdmin,
   userRateLimit,
   verifyFirebaseToken,
   extractBearerToken

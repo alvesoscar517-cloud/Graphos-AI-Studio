@@ -10,14 +10,14 @@
     "service_worker": "background.js"
   },
   "icons": {
-    "16": "public/icons/content.png",
-    "48": "public/icons/content.png",
-    "128": "public/icons/content.png"
+    "16": "icons/content.png",
+    "48": "icons/content.png",
+    "128": "icons/content.png"
   },
   "permissions": [
     "storage"
   ],
   "host_permissions": [
-    "https://ai-authenticator-472729326429.us-central1.run.app/*"
+    "https://ai-backend-admin-472729326429.us-central1.run.app/*"
   ]
 }

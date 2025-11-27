@@ -19,6 +19,7 @@ const {
   hasMultimodalContent
 } = require('../utils/multimodalHelper');
 const { validateModel } = require('../utils/validation');
+const activityLogService = require('../services/activityLog.service');
 
 /**
  * Send chat message (non-streaming)
@@ -116,6 +117,17 @@ exports.sendMessage = async (req, res) => {
     }
 
     console.log(`[SUCCESS] Chat response generated (${text.length} chars)`);
+
+    // Log activity if user_id is available from request
+    const userId = req.body.user_id || req.headers['x-user-id'];
+    if (userId) {
+      activityLogService.logFeatureUsage(userId, 'chat_message', {
+        profileId,
+        model,
+        inputLength: messages.reduce((sum, m) => sum + (m.content?.length || 0), 0),
+        outputLength: text.length
+      });
+    }
 
     res.json({
       message: text,

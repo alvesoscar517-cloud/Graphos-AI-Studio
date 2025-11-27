@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { activityLogsApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
+import CustomSelect from '../Common/CustomSelect';
 import './AllActivityLogs.css';
 
 // Activity type config
@@ -148,32 +149,32 @@ export default function AllActivityLogs() {
 
       {/* Stats Summary */}
       {!statsLoading && stats && (
-        <div className="stats-summary">
-          <div className="stat-card">
-            <div className="stat-icon">
+        <div className="activity-logs-stats">
+          <div className="activity-logs-stat-card">
+            <div className="activity-logs-stat-icon">
               <img src="/icon/activity.svg" alt="Activities" />
             </div>
-            <div className="stat-info">
-              <div className="stat-value">{stats.totalActivities.toLocaleString()}</div>
-              <div className="stat-label">Activities (7 days)</div>
+            <div className="activity-logs-stat-info">
+              <div className="activity-logs-stat-value">{stats.totalActivities.toLocaleString()}</div>
+              <div className="activity-logs-stat-label">Activities (7 days)</div>
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon">
+          <div className="activity-logs-stat-card">
+            <div className="activity-logs-stat-icon">
               <img src="/icon/credit-card.svg" alt="Credits" />
             </div>
-            <div className="stat-info">
-              <div className="stat-value">{stats.totalCreditsUsed.toFixed(1)}</div>
-              <div className="stat-label">Credits Used</div>
+            <div className="activity-logs-stat-info">
+              <div className="activity-logs-stat-value">{stats.totalCreditsUsed.toFixed(1)}</div>
+              <div className="activity-logs-stat-label">Credits Used</div>
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon">
+          <div className="activity-logs-stat-card">
+            <div className="activity-logs-stat-icon">
               <img src="/icon/users.svg" alt="Users" />
             </div>
-            <div className="stat-info">
-              <div className="stat-value">{stats.uniqueUsers}</div>
-              <div className="stat-label">Active Users</div>
+            <div className="activity-logs-stat-info">
+              <div className="activity-logs-stat-value">{stats.uniqueUsers}</div>
+              <div className="activity-logs-stat-label">Active Users</div>
             </div>
           </div>
         </div>
@@ -181,15 +182,18 @@ export default function AllActivityLogs() {
 
       {/* Filters */}
       <div className="filters-section">
-        <select 
-          value={filter.type} 
+        <CustomSelect
+          value={filter.type}
           onChange={(e) => setFilter({...filter, type: e.target.value})}
-        >
-          <option value="all">All Types</option>
-          {Object.entries(ACTIVITY_CONFIG).map(([key, config]) => (
-            <option key={key} value={key}>{config.label}</option>
-          ))}
-        </select>
+          options={[
+            { value: 'all', label: 'All Types' },
+            ...Object.entries(ACTIVITY_CONFIG).map(([key, config]) => ({
+              value: key,
+              label: config.label
+            }))
+          ]}
+          className="activity-type-select"
+        />
         
         <input 
           type="text"

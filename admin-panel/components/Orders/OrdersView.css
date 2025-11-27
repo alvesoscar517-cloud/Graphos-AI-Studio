@@ -58,6 +58,37 @@
 #admin-root .data-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
+}
+
+#admin-root .data-table th:nth-child(1),
+#admin-root .data-table td:nth-child(1) {
+  width: 12%;
+}
+
+#admin-root .data-table th:nth-child(2),
+#admin-root .data-table td:nth-child(2) {
+  width: 22%;
+}
+
+#admin-root .data-table th:nth-child(3),
+#admin-root .data-table td:nth-child(3) {
+  width: 18%;
+}
+
+#admin-root .data-table th:nth-child(4),
+#admin-root .data-table td:nth-child(4) {
+  width: 12%;
+}
+
+#admin-root .data-table th:nth-child(5),
+#admin-root .data-table td:nth-child(5) {
+  width: 12%;
+}
+
+#admin-root .data-table th:nth-child(6),
+#admin-root .data-table td:nth-child(6) {
+  width: 14%;
 }
 
 #admin-root .data-table thead {
@@ -105,6 +136,9 @@
 #admin-root .user-email {
   font-size: 13px;
   color: #000;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #admin-root .btn-link {
@@ -114,11 +148,14 @@
   font-size: 12px;
   cursor: pointer;
   padding: 0;
-  text-decoration: underline;
+  text-decoration: none;
+  text-align: left;
+  white-space: nowrap;
 }
 
 #admin-root .btn-link:hover {
   color: #1976d2;
+  text-decoration: underline;
 }
 
 #admin-root .product-cell {
@@ -198,7 +235,7 @@
 #admin-root .revenue-stat-card .stat-icon img {
   width: 28px;
   height: 28px;
-  filter: brightness(0);
+  opacity: 0.7;
 }
 
 #admin-root .revenue-stat-card .stat-value {
@@ -352,6 +389,24 @@
   margin: 0 0 4px 0;
   font-size: 24px;
   color: #000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#admin-root .title-icon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0);
+}
+
+#admin-root .section-icon {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0);
+  opacity: 0.7;
+  vertical-align: middle;
+  margin-right: 4px;
 }
 
 #admin-root .profit-title p {

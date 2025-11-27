@@ -12,6 +12,7 @@ const logger = require('../utils/logger');
 const { validateText, validateProfileId, validateUserId } = require('../utils/validation');
 const { FREE_CREDITS } = require('../config/pricing');
 const realtimeController = require('./realtime.controller');
+const activityLogService = require('../services/activityLog.service');
 
 // ============================================================================
 // CREATE PROFILE
@@ -57,6 +58,13 @@ exports.createProfile = async (req, res) => {
     });
 
     logger.info('Profile created', { profileId, userId });
+    
+    // Log activity
+    activityLogService.logFeatureUsage(userId, 'profile_create', {
+      profileId,
+      profileName: profile_name,
+      theme
+    });
 
     // Broadcast profile update via SSE
     realtimeController.broadcastProfileUpdate(userId, {

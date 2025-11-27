@@ -7,7 +7,6 @@
 const { 
   authenticate, 
   optionalAuth, 
-  requireAdmin, 
   userRateLimit 
 } = require('./auth.middleware');
 
@@ -54,7 +53,6 @@ module.exports = {
   // Auth
   authenticate,
   optionalAuth,
-  requireAdmin,
   userRateLimit,
   
   // Validation

@@ -174,37 +174,44 @@
 }
 
 #admin-root .tickets-table thead {
-  background: #f8f9fa;
+  background: #fafafa;
+  border-bottom: 1px solid #eee;
 }
 
 #admin-root .tickets-table th {
-  padding: 16px;
+  padding: 14px 16px;
   text-align: left;
   font-weight: 600;
-  font-size: 13px;
-  color: #666;
+  font-size: 12px;
+  color: #888;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
+#admin-root .tickets-table tbody tr {
+  transition: all 0.15s ease;
+}
+
 #admin-root .tickets-table td {
   padding: 16px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #f5f5f5;
+  vertical-align: middle;
 }
 
 #admin-root .tickets-table tr.unread {
-  background: #f0f7ff;
+  background: linear-gradient(90deg, #f0f7ff 0%, #fff 100%);
+  border-left: 3px solid #2196f3;
 }
 
-#admin-root .tickets-table tr:hover {
-  background: #f8f9fa;
+#admin-root .tickets-table tbody tr:hover {
+  background: #fafafa;
 }
 
 #admin-root .ticket-id {
-  font-family: monospace;
-  font-weight: 600;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-weight: 500;
   color: #666;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 #admin-root .type-badge {
@@ -212,46 +219,51 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border-radius: 20px !important;
+  border-radius: 6px !important;
   font-size: 12px;
   font-weight: 600;
-  border: 2px solid;
-  background: white;
+  border: 1px solid #e0e0e0;
+  background: #fafafa;
+  color: #333;
 }
 
 #admin-root .type-badge img {
   width: 14px;
   height: 14px;
-  filter: none !important;
-  opacity: 1;
+  filter: brightness(0);
+  opacity: 0.7;
 }
 
 #admin-root .ticket-title {
-  max-width: 300px;
+  max-width: 280px;
 }
 
 #admin-root .title-content {
   font-weight: 600;
-  color: #000;
-  margin-bottom: 4px;
+  color: #1a1a1a;
+  margin-bottom: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 14px;
 }
 
 #admin-root .reply-count {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
-  color: #666;
+  font-size: 11px;
+  color: #888;
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 #admin-root .reply-count img {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   filter: brightness(0) !important;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 #admin-root .user-info-mini {
@@ -260,66 +272,68 @@
   gap: 2px;
 }
 
-#admin-root .user-name {
+#admin-root .user-info-mini .user-name {
   font-weight: 600;
-  color: #000;
-  font-size: 14px;
+  color: #1a1a1a;
+  font-size: 13px;
 }
 
-#admin-root .user-email {
-  font-size: 12px;
-  color: #666;
+#admin-root .user-info-mini .user-email {
+  font-size: 11px;
+  color: #888;
 }
 
 #admin-root .priority-badge {
-  padding: 4px 10px;
-  border-radius: 20px !important;
-  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 6px !important;
+  font-size: 11px;
   font-weight: 600;
-  color: white;
   display: inline-block;
+  text-transform: capitalize;
 }
 
 #admin-root .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px !important;
-  font-size: 12px;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px !important;
+  font-size: 11px;
   font-weight: 600;
-  color: white;
+  white-space: nowrap;
 }
 
 #admin-root .status-badge img {
-  width: 14px;
-  height: 14px;
-  filter: brightness(0) invert(1);
+  width: 12px;
+  height: 12px;
 }
 
 #admin-root .date-cell {
-  color: #666;
-  font-size: 13px;
+  color: #888;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 #admin-root .btn-view {
-  padding: 8px 16px;
-  background: white;
-  border: 2px solid #e0e0e0;
-  border-radius: 10px !important;
-  font-weight: 600;
-  font-size: 13px;
+  padding: 6px 14px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px !important;
+  font-weight: 500;
+  font-size: 12px;
+  color: #333;
   cursor: pointer;
   transition: all 0.2s;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  white-space: nowrap;
 }
 
 #admin-root .btn-view:hover {
   border-color: #000;
   background: #000;
-  color: white;
+  color: #fff;
 }
 
 #admin-root .btn-view:hover img {
@@ -329,14 +343,28 @@
 #admin-root .btn-view img {
   width: 14px;
   height: 14px;
-  filter: brightness(0) !important;
-  opacity: 0.8;
+  filter: brightness(0);
+  opacity: 0.6;
 }
 
-#admin-root .empty-row {
+#admin-root .btn-view span {
+  color: inherit;
+}
+
+#admin-root .tickets-table .empty-row {
   text-align: center;
-  padding: 60px !important;
+  padding: 60px 20px !important;
   color: #999;
+  font-size: 14px;
+  background: #fafafa;
+}
+
+/* Actions column */
+#admin-root .tickets-table th:last-child,
+#admin-root .tickets-table td:last-child {
+  text-align: center;
+  width: 120px;
+  min-width: 120px;
 }
 
 @media (max-width: 1400px) {
@@ -388,4 +416,21 @@
   width: 16px;
   height: 16px;
   filter: brightness(0) invert(1);
+}
+
+
+/* Status badge icon colors based on background */
+#admin-root .status-badge[style*="background: rgb(0, 0, 0)"] img,
+#admin-root .status-badge[style*="background: #000"] img,
+#admin-root .status-badge[style*="background: rgb(102, 102, 102)"] img,
+#admin-root .status-badge[style*="background: #666"] img {
+  filter: brightness(0) invert(1);
+}
+
+#admin-root .status-badge[style*="background: rgb(232, 232, 232)"] img,
+#admin-root .status-badge[style*="background: #e8e8e8"] img,
+#admin-root .status-badge[style*="background: rgb(245, 245, 245)"] img,
+#admin-root .status-badge[style*="background: #f5f5f5"] img {
+  filter: brightness(0);
+  opacity: 0.6;
 }

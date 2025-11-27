@@ -19,7 +19,7 @@ export default function UserDetail() {
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreditsModal, setShowCreditsModal] = useState(false);
-  const [editData, setEditData] = useState({ name: '', email: '', tier: 'free' });
+  const [editData, setEditData] = useState({ name: '', email: '' });
   const [creditsData, setCreditsData] = useState({ amount: 0, type: 'add', reason: '' });
   const [notificationData, setNotificationData] = useState({
     type: 'info',
@@ -38,8 +38,7 @@ export default function UserDetail() {
       setUser(response.user);
       setEditData({
         name: response.user.name || '',
-        email: response.user.email || '',
-        tier: response.user.tier || 'free'
+        email: response.user.email || ''
       });
     } catch (err) {
       notify.error('Error: ' + err.message);
@@ -277,13 +276,7 @@ export default function UserDetail() {
               <span className="info-label">ID:</span>
               <span className="info-value user-id">{user.id}</span>
             </div>
-            <div className="info-item">
-              <span className="info-label">Tier:</span>
-              <span className={`tier-badge ${user.tier}`}>
-                <img src={`/icon/${user.tier === 'premium' ? 'star' : 'circle'}.svg`} alt={user.tier} />
-                {user.tier === 'premium' ? 'Premium' : 'Free'}
-              </span>
-            </div>
+
             <div className="info-item">
               <span className="info-label">Created:</span>
               <span className="info-value">
@@ -629,17 +622,6 @@ export default function UserDetail() {
                   onChange={(e) => setEditData({...editData, email: e.target.value})}
                   placeholder="user@example.com"
                 />
-              </div>
-              <div className="form-group">
-                <label>Tier</label>
-                <select 
-                  value={editData.tier}
-                  onChange={(e) => setEditData({...editData, tier: e.target.value})}
-                >
-                  <option value="free">Free</option>
-                  <option value="premium">Premium</option>
-                  <option value="enterprise">Enterprise</option>
-                </select>
               </div>
             </div>
             <div className="modal-footer">

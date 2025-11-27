@@ -7,7 +7,6 @@ const express = require('express');
 const authRoutes = require('./auth.routes');
 const profileRoutes = require('./profile.routes');
 const analysisRoutes = require('./analysis.routes');
-const adminRoutes = require('./admin.routes');
 const chatRoutes = require('./chat.routes');
 const notificationRoutes = require('./notification.routes');
 const shareRoutes = require('./share.routes');
@@ -47,7 +46,6 @@ router.get('/', (_req, res) => {
       '/analysis/*': 'Text analysis & AI detection',
       '/api/chat': 'Workspace chat',
       '/api/notifications': 'User notifications',
-      '/api/admin/*': 'Admin panel',
       '/send-feedback': 'Feedback & support'
     }
   });
@@ -71,9 +69,6 @@ router.use('/profiles', profileRoutes);
 
 // Analysis routes
 router.use('/analysis', analysisRoutes);
-
-// Admin routes (requires admin key)
-router.use('/api/admin', adminRoutes);
 
 // Chat routes
 router.use('/api/chat', chatRoutes);

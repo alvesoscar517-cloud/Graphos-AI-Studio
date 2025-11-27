@@ -14,32 +14,72 @@ exports.getUserNotifications = async (req, res) => {
       return res.status(400).json({ error: 'user_id is required' });
     }
     
-    let query = db.collection('user_notifications')
-      .where('userId', '==', user_id)
-      .orderBy('createdAt', 'desc');
+    let snapshot;
     
-    if (unread_only === 'true') {
-      query = query.where('read', '==', false);
+    try {
+      // Try with composite index first (faster)
+      let query = db.collection('user_notifications')
+        .where('userId', '==', user_id);
+      
+      if (unread_only === 'true') {
+        query = query.where('read', '==', false);
+      }
+      
+      query = query.orderBy('createdAt', 'desc').limit(parseInt(limit));
+      snapshot = await query.get();
+    } catch (indexError) {
+      // Fallback: query without orderBy, sort in memory
+      // This happens when composite index is not yet created
+      console.warn('[WARN] Composite index not available, using fallback query:', indexError.message);
+      
+      let query = db.collection('user_notifications')
+        .where('userId', '==', user_id);
+      
+      snapshot = await query.get();
     }
     
-    query = query.limit(parseInt(limit));
-    
-    const snapshot = await query.get();
     const now = new Date();
     
-    const notifications = snapshot.docs
-      .map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate().toISOString(),
-        expiresAt: doc.data().expiresAt?.toDate().toISOString()
-      }))
-      .filter(notif => {
-        if (notif.expiresAt) {
-          return new Date(notif.expiresAt) > now;
+    let notifications = snapshot.docs
+      .map(doc => {
+        const data = doc.data();
+        // Handle both Timestamp and string formats for createdAt/expiresAt
+        let createdAt = data.createdAt;
+        if (createdAt?.toDate) {
+          createdAt = createdAt.toDate().toISOString();
+        } else if (typeof createdAt === 'string') {
+          createdAt = createdAt;
         }
+        
+        let expiresAt = data.expiresAt;
+        if (expiresAt?.toDate) {
+          expiresAt = expiresAt.toDate().toISOString();
+        } else if (typeof expiresAt === 'string') {
+          expiresAt = expiresAt;
+        }
+        
+        return {
+          id: doc.id,
+          ...data,
+          createdAt,
+          expiresAt
+        };
+      })
+      .filter(notif => {
+        // Filter expired notifications
+        if (notif.expiresAt) {
+          if (new Date(notif.expiresAt) <= now) return false;
+        }
+        // Filter by read status if needed (fallback case)
+        if (unread_only === 'true' && notif.read) return false;
         return true;
       });
+    
+    // Sort by createdAt desc (for fallback case)
+    notifications.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    
+    // Apply limit
+    notifications = notifications.slice(0, parseInt(limit));
     
     const unreadCount = notifications.filter(n => !n.read).length;
     
@@ -51,7 +91,13 @@ exports.getUserNotifications = async (req, res) => {
     });
   } catch (error) {
     console.error('[ERROR] Get user notifications error:', error);
-    res.status(500).json({ error: String(error) });
+    logger.error('Get user notifications error', { 
+      userId: req.query?.user_id,
+      error: error.message, 
+      stack: error.stack,
+      code: error.code 
+    });
+    res.status(500).json({ error: error.message || String(error) });
   }
 };
 
@@ -181,14 +227,21 @@ exports.markAllAsRead = async (req, res) => {
       return res.status(400).json({ error: 'user_id is required' });
     }
     
-    const snapshot = await db.collection('user_notifications')
+    // Query all user notifications and filter unread in memory
+    // This avoids needing composite index
+    const allSnapshot = await db.collection('user_notifications')
       .where('userId', '==', user_id)
-      .where('read', '==', false)
       .get();
     
-    if (snapshot.empty) {
+    // Filter unread notifications
+    const unreadDocs = allSnapshot.docs.filter(doc => doc.data().read === false);
+    
+    if (unreadDocs.length === 0) {
       return res.json({ success: true, message: 'No unread notifications', updated: 0 });
     }
+    
+    // Use unreadDocs instead of snapshot
+    const snapshot = { docs: unreadDocs, empty: false, size: unreadDocs.length };
     
     const batch = db.batch();
     const now = new Date();

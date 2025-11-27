@@ -5,8 +5,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { cache } from '../utils/cache';
+import { getApiBaseUrl } from '../utils/config';
 
-const API_BASE_URL = 'https://ai-backend-admin-472729326429.us-central1.run.app';
+const API_BASE_URL = getApiBaseUrl();
 const RECONNECT_DELAY = 5000;
 const MAX_RECONNECT_ATTEMPTS = 5;
 const FALLBACK_POLL_INTERVAL = 60000; // 1 minute fallback polling

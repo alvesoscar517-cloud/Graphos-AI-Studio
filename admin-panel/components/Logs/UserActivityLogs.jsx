@@ -4,6 +4,7 @@ import { activityLogsApi, usersApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
 import LoadingScreen from '../Common/LoadingScreen';
 import PageHeader from '../Common/PageHeader';
+import CustomSelect from '../Common/CustomSelect';
 import './UserActivityLogs.css';
 
 // Activity type labels and icons
@@ -193,10 +194,6 @@ export default function UserActivityLogs() {
           <span className="label">Credits:</span>
           <span className="value">{user?.credits?.balance?.toFixed(2) || 0}</span>
         </div>
-        <div className="info-item">
-          <span className="label">Tier:</span>
-          <span className={`tier-badge ${user?.tier}`}>{user?.tier || 'free'}</span>
-        </div>
       </div>
 
       {/* Tabs */}
@@ -234,15 +231,18 @@ export default function UserActivityLogs() {
       {/* Filters */}
       {activeTab === 'logs' && (
         <div className="activity-filters">
-          <select 
-            value={filter.type} 
+          <CustomSelect
+            value={filter.type}
             onChange={(e) => setFilter({...filter, type: e.target.value})}
-          >
-            <option value="all">All Types</option>
-            {Object.entries(ACTIVITY_CONFIG).map(([key, config]) => (
-              <option key={key} value={key}>{config.label}</option>
-            ))}
-          </select>
+            options={[
+              { value: 'all', label: 'All Types' },
+              ...Object.entries(ACTIVITY_CONFIG).map(([key, config]) => ({
+                value: key,
+                label: config.label
+              }))
+            ]}
+            className="activity-type-select"
+          />
           <input 
             type="date" 
             value={filter.startDate}
@@ -264,14 +264,16 @@ export default function UserActivityLogs() {
 
       {(activeTab === 'summary' || activeTab === 'features') && (
         <div className="activity-filters">
-          <select 
-            value={filter.days} 
+          <CustomSelect
+            value={filter.days}
             onChange={(e) => setFilter({...filter, days: parseInt(e.target.value)})}
-          >
-            <option value={7}>Last 7 days</option>
-            <option value={30}>Last 30 days</option>
-            <option value={90}>Last 90 days</option>
-          </select>
+            options={[
+              { value: 7, label: 'Last 7 days' },
+              { value: 30, label: 'Last 30 days' },
+              { value: 90, label: 'Last 90 days' }
+            ]}
+            className="days-select"
+          />
         </div>
       )}
 

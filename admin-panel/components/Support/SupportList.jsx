@@ -37,16 +37,16 @@ export default function SupportList() {
 
   const getStatusBadge = (status) => {
     const badges = {
-      open: { label: 'New', color: '#2196f3', icon: 'circle-dot.svg' },
-      in_progress: { label: 'In Progress', color: '#ff9800', icon: 'clock.svg' },
-      resolved: { label: 'Resolved', color: '#4caf50', icon: 'check-circle.svg' },
-      closed: { label: 'Closed', color: '#9e9e9e', icon: 'x-circle.svg' }
+      open: { label: 'New', bg: '#000', color: '#fff', icon: 'circle-dot.svg' },
+      in_progress: { label: 'In Progress', bg: '#666', color: '#fff', icon: 'clock.svg' },
+      resolved: { label: 'Resolved', bg: '#e8e8e8', color: '#333', icon: 'check-circle.svg' },
+      closed: { label: 'Closed', bg: '#f5f5f5', color: '#888', icon: 'x-circle.svg' }
     };
     
     const badge = badges[status] || badges.open;
     
     return (
-      <span className="status-badge" style={{ background: badge.color }}>
+      <span className="status-badge" style={{ background: badge.bg, color: badge.color }}>
         <img src={`/icon/${badge.icon}`} alt={status} />
         {badge.label}
       </span>
@@ -55,15 +55,15 @@ export default function SupportList() {
 
   const getTypeBadge = (type) => {
     const badges = {
-      feedback: { label: 'Feedback', icon: 'message-square.svg', color: '#9c27b0' },
-      billing_support: { label: 'Billing', icon: 'dollar-sign.svg', color: '#f44336' }
+      feedback: { label: 'Feedback', icon: 'message-square.svg' },
+      billing_support: { label: 'Billing', icon: 'dollar-sign.svg' }
     };
     
     const badge = badges[type] || badges.feedback;
     
     return (
-      <span className="type-badge" style={{ borderColor: badge.color, color: badge.color }}>
-        <img src={`/icon/${badge.icon}`} alt={type} style={{ filter: 'none' }} />
+      <span className="type-badge">
+        <img src={`/icon/${badge.icon}`} alt={type} />
         {badge.label}
       </span>
     );
@@ -71,15 +71,15 @@ export default function SupportList() {
 
   const getPriorityBadge = (priority) => {
     const badges = {
-      low: { label: 'Low', color: '#4caf50' },
-      medium: { label: 'Medium', color: '#ff9800' },
-      high: { label: 'High', color: '#f44336' }
+      low: { label: 'Low', bg: '#f5f5f5', color: '#666' },
+      medium: { label: 'Medium', bg: '#e8e8e8', color: '#333' },
+      high: { label: 'High', bg: '#000', color: '#fff' }
     };
     
     const badge = badges[priority] || badges.medium;
     
     return (
-      <span className="priority-badge" style={{ background: badge.color }}>
+      <span className="priority-badge" style={{ background: badge.bg, color: badge.color }}>
         {badge.label}
       </span>
     );
@@ -246,9 +246,10 @@ export default function SupportList() {
                     <button
                       className="btn-view"
                       onClick={() => navigate(`/support/${ticket.id}`)}
+                      title="View details"
                     >
                       <img src="/icon/eye.svg" alt="View" />
-                      View
+                      <span>View</span>
                     </button>
                   </td>
                 </tr>

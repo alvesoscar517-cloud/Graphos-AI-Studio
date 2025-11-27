@@ -11,7 +11,7 @@ export default function UserList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({ tier: 'all', status: 'all' });
+  const [filters, setFilters] = useState({ status: 'all' });
   const [pagination, setPagination] = useState({ total: 0, limit: 20, offset: 0 });
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [sortConfig, setSortConfig] = useState({ sortBy: 'createdAt', sortOrder: 'desc' });
@@ -27,7 +27,6 @@ export default function UserList() {
         limit: pagination.limit,
         offset,
         search: searchTerm,
-        tier: filters.tier,
         status: filters.status,
         ...sortConfig
       });
@@ -170,16 +169,25 @@ export default function UserList() {
     }));
   };
 
-  const getTierBadge = (tier) => {
-    const badges = {
-      free: { label: 'Free', color: '#e0e0e0', textColor: '#666' },
-      premium: { label: 'Premium', color: '#000', textColor: '#fff' },
-      enterprise: { label: 'Enterprise', color: '#666', textColor: '#fff' }
-    };
-    const badge = badges[tier] || badges.free;
+  const getCreditsBadge = (credits) => {
+    const balance = credits?.balance || 0;
+    let color, bgColor;
+    if (balance === 0) {
+      color = '#dc2626';
+      bgColor = '#fef2f2';
+    } else if (balance <= 50) {
+      color = '#d97706';
+      bgColor = '#fffbeb';
+    } else if (balance <= 200) {
+      color = '#2563eb';
+      bgColor = '#eff6ff';
+    } else {
+      color = '#16a34a';
+      bgColor = '#f0fdf4';
+    }
     return (
-      <span className="tier-badge" style={{ background: badge.color, color: badge.textColor }}>
-        {badge.label}
+      <span className="credits-badge" style={{ background: bgColor, color }}>
+        {balance}
       </span>
     );
   };
@@ -219,16 +227,6 @@ export default function UserList() {
         </div>
 
         <div className="filters">
-          <CustomSelect
-            value={filters.tier}
-            onChange={(e) => setFilters(prev => ({ ...prev, tier: e.target.value }))}
-            options={[
-              { value: 'all', label: 'All Tiers' },
-              { value: 'free', label: 'Free' },
-              { value: 'premium', label: 'Premium' },
-              { value: 'enterprise', label: 'Enterprise' }
-            ]}
-          />
           <CustomSelect
             value={filters.status}
             onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
@@ -274,7 +272,6 @@ export default function UserList() {
                 User {sortConfig.sortBy === 'name' && (sortConfig.sortOrder === 'asc' ? '↑' : '↓')}
               </th>
               <th>Email</th>
-              <th>Tier</th>
               <th>Credits</th>
               <th className="stat-col">Profiles</th>
               <th className="stat-col">Analyses</th>
@@ -288,8 +285,8 @@ export default function UserList() {
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan="10" className="empty-row">
-                  {searchTerm || filters.tier !== 'all' || filters.status !== 'all' 
+                <td colSpan="9" className="empty-row">
+                  {searchTerm || filters.status !== 'all' 
                     ? 'No users found matching filters' 
                     : 'No users yet'}
                 </td>
@@ -316,11 +313,8 @@ export default function UserList() {
                     </div>
                   </td>
                   <td className="email-cell">{user.email || 'N/A'}</td>
-                  <td>{getTierBadge(user.tier)}</td>
                   <td className="credits-cell">
-                    <span className="credits-badge">
-                      {user.credits?.balance || 0}
-                    </span>
+                    {getCreditsBadge(user.credits)}
                   </td>
                   <td className="stat-cell">{user.usage?.profilesCount || 0}</td>
                   <td className="stat-cell">{user.usage?.analysesCount || 0}</td>

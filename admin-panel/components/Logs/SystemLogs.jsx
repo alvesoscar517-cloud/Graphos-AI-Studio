@@ -53,7 +53,7 @@ export default function SystemLogs() {
   };
 
   const getLevelColor = () => {
-    return '#fff';
+    return '#1a1a1a'; // Minimalist black
   };
 
   const formatTimestamp = (timestamp) => {
@@ -126,27 +126,28 @@ export default function SystemLogs() {
           <div className="logs-list">
             {filteredLogs.map(log => (
               <div key={log.id} className="log-item">
-                <div className="log-icon" style={{ background: getLevelColor(log.level) }}>
+                <div className="log-icon" style={{ background: getLevelColor() }}>
                   <img src={`/icon/${getLevelIcon(log.level)}`} alt={log.level} />
                 </div>
                 
                 <div className="log-content">
-                  <div className="log-header">
-                    <span className="log-action">{log.action}</span>
-                    <span className="log-timestamp">{formatTimestamp(log.timestamp)}</span>
-                  </div>
                   <div className="log-message">{log.message}</div>
                   <div className="log-meta">
-                    <span>
+                    <span className="log-level-badge">
+                      {log.level.toUpperCase()}
+                    </span>
+                    <span className="log-user">
                       <img src="/icon/user.svg" alt="User" />
                       {log.user}
                     </span>
-                    <span>
+                    <span className="log-ip">
                       <img src="/icon/globe.svg" alt="IP" />
                       {log.ip}
                     </span>
                   </div>
                 </div>
+                
+                <div className="log-timestamp">{formatTimestamp(log.timestamp)}</div>
               </div>
             ))}
           </div>

@@ -132,11 +132,11 @@ export default function AnalyticsView() {
           <div className="analytics-chart-header">
             <div className="analytics-chart-title-group">
               <img src="/icon/pie-chart.svg" alt="Distribution" className="analytics-chart-icon" />
-              <h3 className="analytics-chart-title">Tier Distribution</h3>
+              <h3 className="analytics-chart-title">Credit Distribution</h3>
             </div>
             <span className="analytics-chart-subtitle">{(safeOverview.totalUsers || 0).toLocaleString()} total users</span>
           </div>
-          <TierDistributionChart data={safeUserAnalytics.tierDistribution || {}} />
+          <TierDistributionChart data={safeUserAnalytics.creditDistribution || safeUserAnalytics.tierDistribution || {}} />
         </div>
 
         <div className="analytics-chart-card analytics-chart-full">

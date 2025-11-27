@@ -27,9 +27,19 @@ export function AdminAuthProvider({ children }) {
   const checkAuth = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       
       // First check if setup is needed
-      const setupResult = await authApi.checkSetup();
+      let setupResult;
+      try {
+        setupResult = await authApi.checkSetup();
+      } catch (fetchError) {
+        console.error('Cannot connect to server:', fetchError);
+        setError('Unable to connect to server. Please make sure backend-admin is running on port 8081.');
+        setIsLoading(false);
+        return;
+      }
+
       if (setupResult.success && setupResult.needsSetup) {
         setNeedsSetup(true);
         setIsLoading(false);
@@ -44,15 +54,21 @@ export function AdminAuthProvider({ children }) {
         startTokenRefresh();
       } else {
         // Try to refresh token
-        const refreshResult = await authApi.refresh();
-        if (refreshResult.success && refreshResult.accessToken) {
-          setAuthData(refreshResult.accessToken, getAdminInfo(), refreshResult.expiresIn);
-          setIsAdminAuthenticated(true);
-          startTokenRefresh();
+        try {
+          const refreshResult = await authApi.refresh();
+          if (refreshResult.success && refreshResult.accessToken) {
+            setAuthData(refreshResult.accessToken, getAdminInfo(), refreshResult.expiresIn);
+            setIsAdminAuthenticated(true);
+            startTokenRefresh();
+          }
+        } catch (refreshError) {
+          // Refresh failed, user needs to login
+          console.log('Token refresh failed, user needs to login');
         }
       }
     } catch (err) {
       console.error('Auth check error:', err);
+      setError('Authentication check failed');
     } finally {
       setIsLoading(false);
     }

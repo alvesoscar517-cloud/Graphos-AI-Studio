@@ -9,6 +9,7 @@ const analysisService = require('../services/analysis.service');
 const cacheService = require('../services/cache.service');
 const logger = require('../utils/logger');
 const { validateText, validateProfileId, validateModel } = require('../utils/validation');
+const activityLogService = require('../services/activityLog.service');
 
 // ============================================================================
 // AUTHENTICATE CONTENT (AI DETECTION)
@@ -98,6 +99,13 @@ exports.authenticateContent = async (req, res) => {
     if (user_id) {
       await db.collection('users').doc(user_id).update({
         'usage.analysesCount': FieldValue.increment(1)
+      });
+      
+      // Log activity
+      activityLogService.logFeatureUsage(user_id, 'ai_detection', {
+        wordCount: textFeatures.totalWords,
+        aiProbability,
+        isAuthentic
       });
     }
 
@@ -406,6 +414,14 @@ exports.analyzeText = async (req, res) => {
       await db.collection('users').doc(user_id).update({
         'usage.analysesCount': FieldValue.increment(1)
       });
+      
+      // Log activity
+      activityLogService.logFeatureUsage(user_id, 'text_analysis', {
+        profileId,
+        wordCount: textFeatures.totalWords,
+        voiceCompatibility: parseFloat(voiceCompatibility.toFixed(2)),
+        duration: processingTime
+      });
     }
 
     logger.info('Text analyzed', { profileId, voiceCompatibility, processingTime });
@@ -582,6 +598,15 @@ exports.rewriteText = async (req, res) => {
       await db.collection('users').doc(user_id).update({
         'usage.rewritesCount': FieldValue.increment(1)
       });
+      
+      // Log activity
+      activityLogService.logFeatureUsage(user_id, 'text_rewrite', {
+        profileId: profile_id,
+        inputLength: text.length,
+        outputLength: rewrittenText.length,
+        duration: processingTime,
+        model
+      });
     }
 
     res.json({
@@ -720,6 +745,15 @@ exports.rewriteTextStream = async (req, res) => {
       await db.collection('users').doc(user_id).update({
         'usage.rewritesCount': FieldValue.increment(1)
       });
+      
+      // Log activity
+      activityLogService.logFeatureUsage(user_id, 'text_rewrite', {
+        profileId: profile_id,
+        inputLength: text.length,
+        outputLength: fullText.length,
+        model,
+        streaming: true
+      });
     }
   } catch (error) {
     console.error('[ERROR] Streaming rewrite error:', error);
@@ -841,6 +875,18 @@ exports.iterativeHumanize = async (req, res) => {
     if (user_id) {
       await db.collection('users').doc(user_id).update({
         'usage.rewritesCount': FieldValue.increment(result.iterations)
+      });
+      
+      // Log activity
+      activityLogService.logFeatureUsage(user_id, 'iterative_humanize', {
+        profileId: profile_id,
+        inputLength: text.length,
+        outputLength: result.text.length,
+        iterations: result.iterations,
+        aiProbability: result.aiProbability,
+        reachedTarget: result.reachedTarget,
+        duration: processingTime,
+        model
       });
     }
 

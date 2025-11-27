@@ -323,28 +323,17 @@ export const translationApi = {
   // Auto-translate text using Gemini
   translate: async (text, sourceLang = 'vi', targetLang = 'en') => {
     try {
-      // Use Gemini for translation
-      const response = await fetch('https://ai-backend-admin-472729326429.us-central1.run.app/api/translate', {
+      const result = await apiCall('/api/admin/translate', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           text,
-          source_lang: sourceLang,
-          target_lang: targetLang
+          sourceLang,
+          targetLangs: [targetLang]
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Translation failed');
-      }
-
-      const data = await response.json();
       return {
-        translations: {
-          [targetLang]: data.translated_text
-        }
+        translations: result.translations || { [targetLang]: text }
       };
     } catch (error) {
       console.error('Translation error:', error);
@@ -450,7 +439,7 @@ export const supportApi = {
     
     return cache.getOrFetch(
       cacheKey,
-      () => apiCall(`/api/admin/support?${queryParams}`),
+      () => apiCall(`/api/support?${queryParams}`),
       1 * 60 * 1000 // 1 minute
     );
   },
@@ -461,7 +450,7 @@ export const supportApi = {
     
     return cache.getOrFetch(
       cacheKey,
-      () => apiCall(`/api/admin/support/${id}`),
+      () => apiCall(`/api/support/${id}`),
       1 * 60 * 1000
     );
   },
@@ -470,14 +459,14 @@ export const supportApi = {
   getStatistics: async () => {
     return cache.getOrFetch(
       'support_statistics',
-      () => apiCall('/api/admin/support/statistics'),
+      () => apiCall('/api/support/statistics'),
       2 * 60 * 1000
     );
   },
 
   // Update ticket status
   updateStatus: async (id, status) => {
-    const result = await apiCall(`/api/admin/support/${id}/status`, {
+    const result = await apiCall(`/api/support/${id}/status`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
     });
@@ -491,7 +480,7 @@ export const supportApi = {
 
   // Reply to ticket
   reply: async (id, data) => {
-    const result = await apiCall(`/api/admin/support/${id}/reply`, {
+    const result = await apiCall(`/api/support/${id}/reply`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -504,7 +493,7 @@ export const supportApi = {
 
   // Delete ticket
   delete: async (id) => {
-    const result = await apiCall(`/api/admin/support/${id}`, {
+    const result = await apiCall(`/api/support/${id}`, {
       method: 'DELETE',
     });
     

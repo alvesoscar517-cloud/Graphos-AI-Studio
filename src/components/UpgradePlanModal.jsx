@@ -83,9 +83,14 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
       const data = await response.json();
 
       if (data.packages && data.packages.length > 0) {
-        // Merge with default to keep icon and popular flag
-        const mergedPackages = data.packages.map((pkg, index) => ({
-          ...DEFAULT_PACKAGES[index],
+        // Merge with default to keep icon and popular flag (match by id)
+        const defaultMap = DEFAULT_PACKAGES.reduce((acc, pkg) => {
+          acc[pkg.id] = pkg;
+          return acc;
+        }, {});
+        
+        const mergedPackages = data.packages.map((pkg) => ({
+          ...defaultMap[pkg.id],
           ...pkg
         }));
         setPackages(mergedPackages);
