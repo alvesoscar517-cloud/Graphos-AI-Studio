@@ -276,7 +276,6 @@ export default function UserDetail() {
               <span className="info-label">ID:</span>
               <span className="info-value user-id">{user.id}</span>
             </div>
-
             <div className="info-item">
               <span className="info-label">Created:</span>
               <span className="info-value">
@@ -292,7 +291,7 @@ export default function UserDetail() {
           </div>
         </div>
 
-        {/* Credits Card */}
+        {/* Right Column: Credits + Usage Stats */}
         <div className="detail-card">
           <h2>
             <img src="/icon/dollar-sign.svg" alt="Credits" />
@@ -325,7 +324,7 @@ export default function UserDetail() {
         </div>
 
         {/* Usage Stats Card */}
-        <div className="detail-card">
+        <div className="detail-card full-width">
           <h2>
             <img src="/icon/chart-bar.svg" alt="Stats" />
             Usage Statistics

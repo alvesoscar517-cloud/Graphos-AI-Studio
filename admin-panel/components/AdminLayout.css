@@ -1,8 +1,10 @@
 #admin-root .admin-layout {
   display: flex;
   min-height: 100vh;
+  height: 100vh;
   width: 100%;
   background: #fafafa;
+  overflow: hidden;
 }
 
 #admin-root .admin-main {
@@ -10,6 +12,8 @@
   display: flex;
   flex-direction: column;
   transition: margin-left 0.2s ease;
+  height: 100vh;
+  overflow: hidden;
 }
 
 #admin-root .admin-main.admin-sidebar-open {
@@ -24,12 +28,20 @@
   flex: 1;
   padding: 32px;
   overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100vh - 64px); /* Trừ đi header height */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
 }
 
 #admin-root .admin-content::-webkit-scrollbar {
   display: none; /* Chrome/Safari/Opera */
+}
+
+/* Container cho mỗi page view */
+#admin-root .admin-content > * {
+  width: 100%;
+  min-height: 0;
 }
 
 @media (max-width: 768px) {

@@ -302,13 +302,13 @@ export default function UserList() {
                     />
                   </td>
                   <td>
-                    <div className="user-info">
-                      <div className="user-avatar">
+                    <div className="user-cell">
+                      <div className="user-cell-avatar">
                         {user.name?.charAt(0).toUpperCase() || '?'}
                       </div>
-                      <div className="user-details">
-                        <div className="user-name">{user.name || 'Unnamed'}</div>
-                        <div className="user-id">{user.id.substring(0, 12)}...</div>
+                      <div className="user-cell-details">
+                        <div className="user-cell-name">{user.name || 'Unnamed'}</div>
+                        <div className="user-cell-id">{user.id.substring(0, 12)}...</div>
                       </div>
                     </div>
                   </td>
@@ -330,7 +330,7 @@ export default function UserList() {
                       <span className="status-badge active">Active</span>
                     )}
                   </td>
-                  <td>
+                  <td className="actions-col">
                     <button
                       className="btn-view"
                       onClick={() => navigate(`/users/${user.id}`)}

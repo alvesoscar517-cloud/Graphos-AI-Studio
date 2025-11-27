@@ -76,15 +76,15 @@ export default function ActivityStatsWidget() {
 
       {/* Summary Cards */}
       <div className="stats-summary">
-        <div className="stat-card">
+        <div className="activity-stat-item">
           <div className="stat-value">{stats.totalActivities.toLocaleString()}</div>
           <div className="stat-label">Total Activities</div>
         </div>
-        <div className="stat-card">
+        <div className="activity-stat-item">
           <div className="stat-value">{stats.totalCreditsUsed.toFixed(1)}</div>
           <div className="stat-label">Credits Used</div>
         </div>
-        <div className="stat-card">
+        <div className="activity-stat-item">
           <div className="stat-value">{stats.uniqueUsers}</div>
           <div className="stat-label">Active Users</div>
         </div>

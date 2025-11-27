@@ -10,7 +10,7 @@ import SettingsPopup from '../Popups/SettingsPopup'
 import UserProfilePopup from '../Popups/UserProfilePopup'
 import modal from '../../utils/modal'
 
-// Notification Badge Component
+// Notification Badge Component - Simple Dot
 const NotificationBadge = () => {
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -18,19 +18,38 @@ const NotificationBadge = () => {
     const loadUnreadCount = async () => {
       try {
         const { getUserNotifications } = await import('../../services/notificationService');
-        const { unreadCount } = await getUserNotifications(true);
-        setUnreadCount(unreadCount);
+        let { unreadCount: apiUnread } = await getUserNotifications(true);
+        
+        // Also count unread from localStorage (for realtime notifications)
+        try {
+          const stored = localStorage.getItem('user_notifications');
+          if (stored) {
+            const localNotifs = JSON.parse(stored);
+            const localUnread = localNotifs.filter(n => !n.read).length;
+            apiUnread = Math.max(apiUnread, localUnread);
+          }
+        } catch (e) {
+          // Ignore localStorage errors
+        }
+        
+        setUnreadCount(apiUnread);
       } catch (err) {
         console.error('Load unread count error:', err);
+        try {
+          const stored = localStorage.getItem('user_notifications');
+          if (stored) {
+            const localNotifs = JSON.parse(stored);
+            setUnreadCount(localNotifs.filter(n => !n.read).length);
+          }
+        } catch (e) {
+          // Ignore
+        }
       }
     };
 
     loadUnreadCount();
 
-    // Listen for new notifications (local events)
-    const handleNewNotification = () => {
-      loadUnreadCount();
-    };
+    const handleNewNotification = () => loadUnreadCount();
     window.addEventListener('new-notification', handleNewNotification);
 
     // Subscribe to realtime notifications from SSE
@@ -40,9 +59,22 @@ const NotificationBadge = () => {
         const realtimeService = (await import('../../services/realtimeService')).default;
         unsubscribeRealtime = realtimeService.subscribe('notification', (data) => {
           console.log('[BELL] Realtime notification received:', data);
-          // Dispatch event to update UI
+          
+          if (data?.notification) {
+            try {
+              const stored = localStorage.getItem('user_notifications');
+              const notifications = stored ? JSON.parse(stored) : [];
+              const exists = notifications.some(n => n.id === data.notification.id);
+              if (!exists) {
+                notifications.unshift(data.notification);
+                localStorage.setItem('user_notifications', JSON.stringify(notifications));
+              }
+            } catch (e) {
+              console.error('[BELL] Failed to save notification to localStorage:', e);
+            }
+          }
+          
           window.dispatchEvent(new CustomEvent('new-notification', { detail: data }));
-          // Reload notifications
           loadUnreadCount();
         });
       } catch (err) {
@@ -51,7 +83,6 @@ const NotificationBadge = () => {
     };
     setupRealtimeListener();
 
-    // Poll every 30 seconds as fallback
     const interval = setInterval(loadUnreadCount, 30000);
 
     return () => {
@@ -63,11 +94,7 @@ const NotificationBadge = () => {
 
   if (unreadCount === 0) return null;
 
-  return (
-    <span className="notification-badge">
-      {unreadCount > 99 ? '99+' : unreadCount}
-    </span>
-  );
+  return <span className="notification-badge" />;
 };
 
 const Sidebar = ({ hidden, currentView, onViewChange }) => {

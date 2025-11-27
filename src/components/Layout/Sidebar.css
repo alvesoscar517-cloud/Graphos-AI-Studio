@@ -339,40 +339,21 @@
   justify-content: center;
 }
 
-/* Notification Badge */
+/* Notification Badge - Simple Dot */
 .notification-badge {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #1a1a1a;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 600;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 5px;
-  box-shadow: 0 0 0 2px #f8f9fa, 0 2px 4px rgba(0, 0, 0, 0.15);
-  animation: badgePulse 2s ease-in-out infinite;
-  animation: badge-pulse 2s ease-in-out infinite;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 2px #f8f9fa;
+  z-index: 10;
 }
 
 .notification-badge.hidden {
   display: none;
-}
-
-@keyframes badge-pulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  }
-  50% {
-    transform: scale(1.1);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  }
 }
 
 /* Scrollbar */
@@ -551,9 +532,8 @@ body.dark-theme .footer-link:visited {
 }
 
 body.dark-theme .notification-badge {
-  background: var(--color-blue);
-  color: #ffffff;
-  box-shadow: 0 0 0 2px #1e1e1e, 0 2px 4px var(--color-blue-border);
+  background: #ef4444;
+  box-shadow: 0 0 0 2px #1e1e1e;
 }
 
 body.dark-theme .sidebar::-webkit-scrollbar-track {

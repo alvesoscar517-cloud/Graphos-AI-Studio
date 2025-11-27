@@ -107,7 +107,7 @@ export default function DashboardView() {
         subtitle="System overview and recent activities"
       />
 
-      <div className="stats-grid">
+      <div className="dashboard-stats-grid">
         <StatsCard
           icon="users.svg"
           title="Total Users"

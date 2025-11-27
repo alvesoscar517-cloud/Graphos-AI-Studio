@@ -7,6 +7,8 @@
   align-items: center;
   gap: 16px;
   transition: all 0.2s;
+  min-height: 120px;
+  box-sizing: border-box;
 }
 
 #admin-root .stats-card:hover {
