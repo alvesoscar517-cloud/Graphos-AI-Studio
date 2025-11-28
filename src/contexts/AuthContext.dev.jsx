@@ -26,15 +26,19 @@ export const AuthProvider = ({ children }) => {
   const checkAuthentication = async () => {
     console.log('[SETTINGS] DEV MODE: Auto-authenticating...')
     
-    const devUserId = 'dev_user_123'
+    const devUserId = 'google_oauth_test_12345678901234567890'
     localStorage.setItem('userId', devUserId)
     
     setIsAuthenticated(true)
     setUser({
       id: devUserId,
-      email: 'dev@example.com',
-      name: 'Development User',
-      picture: null
+      email: 'nguyen.vantest@gmail.com',
+      name: 'Nguyễn Văn Test',
+      displayName: 'Nguyễn Văn Test',
+      picture: 'https://lh3.googleusercontent.com/a/default-user=s96-c',
+      photoURL: 'https://lh3.googleusercontent.com/a/default-user=s96-c',
+      emailVerified: true,
+      providerId: 'google.com'
     })
     
     setIsLoading(false)

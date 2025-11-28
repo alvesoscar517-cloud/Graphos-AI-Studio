@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { usersApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
 import LoadingScreen from '../Common/LoadingScreen';
+import CustomSelect from '../Common/CustomSelect';
 import './UserDetail.css';
 
 export default function UserDetail() {
@@ -24,8 +25,10 @@ export default function UserDetail() {
   const [notificationData, setNotificationData] = useState({
     type: 'info',
     priority: 'medium',
-    translations: { vi: '', en: '' }
+    title: '',
+    message: ''
   });
+  const [sendingNotification, setSendingNotification] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -129,6 +132,8 @@ export default function UserDetail() {
   };
 
   const handleLockUser = async () => {
+    console.log('[UserDetail] handleLockUser called', { userId: id, currentLocked: user.locked });
+    
     const confirmed = await notify.confirm({
       title: user.locked ? 'Unlock Account' : 'Lock Account',
       message: `Are you sure you want to ${user.locked ? 'unlock' : 'lock'} this account?`,
@@ -136,6 +141,7 @@ export default function UserDetail() {
       type: 'warning'
     });
 
+    console.log('[UserDetail] Lock confirmation result:', confirmed);
     if (!confirmed) return;
 
     let reason = null;
@@ -146,19 +152,25 @@ export default function UserDetail() {
         placeholder: 'E.g., Terms of service violation',
         confirmText: 'Lock'
       });
+      console.log('[UserDetail] Lock reason:', reason);
       if (!reason) return;
     }
 
     try {
-      await usersApi.toggleLock(id, !user.locked, reason);
+      console.log('[UserDetail] Calling toggleLock API...', { id, locked: !user.locked, reason });
+      const result = await usersApi.toggleLock(id, !user.locked, reason);
+      console.log('[UserDetail] toggleLock API result:', result);
       notify.success(`Account ${user.locked ? 'unlocked' : 'locked'} successfully!`);
       loadUser();
     } catch (err) {
+      console.error('[UserDetail] toggleLock error:', err);
       notify.error('Error: ' + err.message);
     }
   };
 
   const handleDeleteUser = async () => {
+    console.log('[UserDetail] handleDeleteUser called', { userId: id });
+    
     const confirmed = await notify.confirm({
       title: 'Delete User',
       message: 'Are you sure you want to DELETE this user?\n\nThis action cannot be undone!',
@@ -166,6 +178,7 @@ export default function UserDetail() {
       type: 'danger'
     });
 
+    console.log('[UserDetail] Delete confirmation result:', confirmed);
     if (!confirmed) return;
 
     const confirmation = await notify.prompt({
@@ -175,37 +188,54 @@ export default function UserDetail() {
       confirmText: 'Delete'
     });
 
+    console.log('[UserDetail] Delete confirmation text:', confirmation);
     if (confirmation !== 'DELETE') {
       notify.warning('Incorrect confirmation. Action cancelled.');
       return;
     }
 
     try {
-      await usersApi.delete(id);
+      console.log('[UserDetail] Calling delete API...', { id });
+      const result = await usersApi.delete(id);
+      console.log('[UserDetail] Delete API result:', result);
       notify.success('User deleted successfully!');
       navigate('/users');
     } catch (err) {
+      console.error('[UserDetail] Delete error:', err);
       notify.error('Error: ' + err.message);
     }
   };
 
   const handleSendNotification = async () => {
-    if (!notificationData.translations.vi || !notificationData.translations.en) {
-      notify.warning('Please enter notification content in both Vietnamese and English!');
+    if (!notificationData.title || !notificationData.message) {
+      notify.warning('Please enter notification title and message!');
       return;
     }
 
     try {
-      await usersApi.sendNotification(id, notificationData);
+      setSendingNotification(true);
+      
+      // Send with English content, backend will auto-translate based on user's language
+      const payload = {
+        type: notificationData.type,
+        priority: notificationData.priority,
+        title: notificationData.title,
+        message: notificationData.message
+      };
+      
+      await usersApi.sendNotification(id, payload);
       notify.success('Notification sent successfully!');
       setShowNotificationModal(false);
       setNotificationData({
         type: 'info',
         priority: 'medium',
-        translations: { vi: '', en: '' }
+        title: '',
+        message: ''
       });
     } catch (err) {
-      alert('Error: ' + err.message);
+      notify.error('Error: ' + err.message);
+    } finally {
+      setSendingNotification(false);
     }
   };
 
@@ -524,69 +554,89 @@ export default function UserDetail() {
       {/* Notification Modal */}
       {showNotificationModal && (
         <div className="modal-overlay" onClick={() => setShowNotificationModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content notification-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Send notification to user</h2>
+              <h2>
+                <img src="/icon/bell.svg" alt="Notification" />
+                Send Notification
+              </h2>
               <button className="btn-close" onClick={() => setShowNotificationModal(false)}>
                 <img src="/icon/x.svg" alt="Close" />
               </button>
             </div>
             <div className="modal-body">
-              <div className="form-group">
-                <label>Notification type</label>
-                <select 
-                  value={notificationData.type}
-                  onChange={(e) => setNotificationData({...notificationData, type: e.target.value})}
-                >
-                  <option value="info">Information</option>
-                  <option value="warning">Warning</option>
-                  <option value="success">Success</option>
-                  <option value="error">Error</option>
-                </select>
+              <div className="notification-info-banner">
+                <img src="/icon/info.svg" alt="Info" />
+                <span>Write in English. The notification will be automatically translated to the user's language.</span>
               </div>
-              <div className="form-group">
-                <label>Priority</label>
-                <select 
-                  value={notificationData.priority}
-                  onChange={(e) => setNotificationData({...notificationData, priority: e.target.value})}
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
+              
+              <div className="form-row">
+                <div className="form-group half">
+                  <CustomSelect
+                    label="Type"
+                    value={notificationData.type}
+                    onChange={(e) => setNotificationData({...notificationData, type: e.target.value})}
+                    options={[
+                      { value: 'info', label: 'Information' },
+                      { value: 'success', label: 'Success' },
+                      { value: 'warning', label: 'Warning' },
+                      { value: 'error', label: 'Error' }
+                    ]}
+                  />
+                </div>
+                <div className="form-group half">
+                  <CustomSelect
+                    label="Priority"
+                    value={notificationData.priority}
+                    onChange={(e) => setNotificationData({...notificationData, priority: e.target.value})}
+                    options={[
+                      { value: 'low', label: 'Low' },
+                      { value: 'medium', label: 'Medium' },
+                      { value: 'high', label: 'High' }
+                    ]}
+                  />
+                </div>
               </div>
+              
               <div className="form-group">
-                <label>Content (Vietnamese)</label>
-                <textarea
-                  value={notificationData.translations.vi}
-                  onChange={(e) => setNotificationData({
-                    ...notificationData,
-                    translations: {...notificationData.translations, vi: e.target.value}
-                  })}
-                  placeholder="Enter notification content in Vietnamese..."
-                  rows="3"
+                <label>Title *</label>
+                <input
+                  type="text"
+                  value={notificationData.title}
+                  onChange={(e) => setNotificationData({...notificationData, title: e.target.value})}
+                  placeholder="E.g.: Account Update, Special Offer..."
+                  maxLength={100}
                 />
               </div>
+              
               <div className="form-group">
-                <label>Content (English)</label>
+                <label>Message *</label>
                 <textarea
-                  value={notificationData.translations.en}
-                  onChange={(e) => setNotificationData({
-                    ...notificationData,
-                    translations: {...notificationData.translations, en: e.target.value}
-                  })}
-                  placeholder="Enter notification content in English..."
-                  rows="3"
+                  value={notificationData.message}
+                  onChange={(e) => setNotificationData({...notificationData, message: e.target.value})}
+                  placeholder="Enter your notification message here..."
+                  rows="4"
+                  maxLength={500}
                 />
+                <div className="char-count">{notificationData.message.length}/500</div>
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn-cancel" onClick={() => setShowNotificationModal(false)}>
+              <button className="btn-cancel" onClick={() => setShowNotificationModal(false)} disabled={sendingNotification}>
                 Cancel
               </button>
-              <button className="btn-primary" onClick={handleSendNotification}>
-                <img src="/icon/send.svg" alt="Send" />
-                Send notification
+              <button className="btn-primary" onClick={handleSendNotification} disabled={sendingNotification}>
+                {sendingNotification ? (
+                  <>
+                    <span className="spinner-small"></span>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <img src="/icon/send.svg" alt="Send" />
+                    Send Notification
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -685,16 +735,20 @@ export default function UserDetail() {
               <div className="form-group">
                 <label>Amount</label>
                 <input
-                  type="number"
-                  min="1"
-                  value={creditsData.amount}
-                  onChange={(e) => setCreditsData({...creditsData, amount: parseInt(e.target.value) || 0})}
+                  type="text"
+                  className="credits-amount-input"
+                  value={creditsData.amount || ''}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    setCreditsData({...creditsData, amount: value ? parseInt(value) : 0});
+                  }}
                   placeholder="Enter amount"
                 />
               </div>
               <div className="form-group">
                 <label>Reason *</label>
                 <textarea
+                  className="credits-reason-input"
                   value={creditsData.reason}
                   onChange={(e) => setCreditsData({...creditsData, reason: e.target.value})}
                   placeholder="Enter reason for adjustment (required)"

@@ -17,16 +17,25 @@ export default function DashboardView() {
   const loading = realtimeLoading.overview;
 
   useEffect(() => {
+    // Reset error state when component mounts
+    setError('');
     setActiveTab('dashboard');
     loadStats();
     loadExtraStats();
+    
+    // Cleanup function
+    return () => {
+      // Optional: cleanup if needed
+    };
   }, []);
 
   const loadStats = async () => {
     try {
+      setError(''); // Clear any previous errors
       await loadOverview();
     } catch (err) {
-      setError(err.message);
+      console.error('Dashboard load error:', err);
+      setError(err.message || 'Failed to load dashboard data');
     }
   };
 
@@ -39,6 +48,7 @@ export default function DashboardView() {
       if (revenue?.stats) setRevenueStats(revenue.stats);
       if (support?.statistics) setSupportStats(support.statistics);
     } catch (err) {
+      console.error('Extra stats load error:', err);
       // Silent fail for extra stats
     }
   };

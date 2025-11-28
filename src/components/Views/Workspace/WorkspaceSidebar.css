@@ -12,8 +12,10 @@
   z-index: 100;
 }
 
-.workspace-sidebar.hidden {
-  display: none;
+/* Hidden state handled by Framer Motion */
+.workspace-sidebar {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 
 /* Header */

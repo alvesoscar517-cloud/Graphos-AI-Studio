@@ -2,435 +2,372 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { notificationsApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
-import NotificationPreview from './NotificationPreview';
+import CustomSelect from '../Common/CustomSelect';
 import './NotificationEditor.css';
+
+// Supported languages for translation
+const SUPPORTED_LANGUAGES = [
+  { code: 'vi', name: 'Vietnamese', flag: '🇻🇳' },
+  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+  { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+  { code: 'es', name: 'Spanish', flag: '🇪🇸' },
+  { code: 'fr', name: 'French', flag: '🇫🇷' },
+  { code: 'de', name: 'German', flag: '🇩🇪' },
+  { code: 'pt', name: 'Portuguese', flag: '🇧🇷' },
+  { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+  { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
+  { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
+  { code: 'th', name: 'Thai', flag: '🇹🇭' },
+];
 
 export default function NotificationEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const notify = useNotify();
   const isEditMode = !!id;
 
   const [notification, setNotification] = useState({
     type: 'info',
     priority: 'medium',
-    translations: {
-      vi: { title: '', message: '', cta: '' },
-      en: { title: '', message: '', cta: '' },
-      ja: { title: '', message: '', cta: '' }
-    },
-    target: {
-      type: 'all',
-      userIds: [],
-      segments: []
-    },
+    content: { title: '', message: '', cta: '' },
+    targetLanguages: ['vi'],
+    translations: {},
+    target: { type: 'all', userIds: [], segments: [] },
     scheduledAt: '',
     expiresAt: ''
   });
 
-  const [activeLanguage, setActiveLanguage] = useState('vi');
-  const [showPreview, setShowPreview] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [translating, setTranslating] = useState(false);
 
   useEffect(() => {
-    if (isEditMode) {
-      loadNotification();
-    }
+    if (isEditMode) loadNotification();
   }, [id]);
 
   const loadNotification = async () => {
     try {
       setLoading(true);
-      const response = await notificationsApi.getAll({ limit: 1 });
+      const response = await notificationsApi.getAll({ limit: 100 });
       const notif = response.notifications.find(n => n.id === id);
       if (notif) {
+        const content = notif.content || notif.translations?.en || {
+          title: notif.translations?.en?.title || notif.translations?.vi?.title || '',
+          message: notif.translations?.en?.message || notif.translations?.vi?.message || '',
+          cta: notif.translations?.en?.cta || notif.translations?.vi?.cta || ''
+        };
+        const existingLangs = Object.keys(notif.translations || {}).filter(l => l !== 'en');
         setNotification({
           ...notif,
+          content,
+          targetLanguages: existingLangs.length > 0 ? existingLangs : ['vi'],
           scheduledAt: notif.scheduledAt || '',
           expiresAt: notif.expiresAt || ''
         });
       }
     } catch (err) {
-      alert('Error: ' + err.message);
+      notify.error('Error: ' + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleTranslationChange = (lang, field, value) => {
+  const handleContentChange = (field, value) => {
     setNotification(prev => ({
       ...prev,
-      translations: {
-        ...prev.translations,
-        [lang]: {
-          ...prev.translations[lang],
-          [field]: value
-        }
-      }
+      content: { ...prev.content, [field]: value }
     }));
   };
 
-  const handleAutoTranslate = async () => {
-    if (!notification.translations.vi.title || !notification.translations.vi.message) {
-      alert('Please enter Vietnamese content first');
-      return;
-    }
-
-    try {
-      setSaving(true);
-      
-      // Import translation API
-      const { translationApi } = await import('../../services/adminApi');
-      
-      // Translate title
-      const titleRes = await translationApi.translate(
-        notification.translations.vi.title,
-        'vi',
-        activeLanguage
-      );
-      
-      // Translate message
-      const messageRes = await translationApi.translate(
-        notification.translations.vi.message,
-        'vi',
-        activeLanguage
-      );
-      
-      // Translate CTA if exists
-      let ctaTranslation = '';
-      if (notification.translations.vi.cta) {
-        const ctaRes = await translationApi.translate(
-          notification.translations.vi.cta,
-          'vi',
-          activeLanguage
-        );
-        ctaTranslation = ctaRes.translations[activeLanguage];
-      }
-      
-      // Update notification
-      setNotification(prev => ({
+  const toggleLanguage = (langCode) => {
+    setNotification(prev => {
+      const current = prev.targetLanguages || [];
+      return {
         ...prev,
-        translations: {
-          ...prev.translations,
-          [activeLanguage]: {
-            title: titleRes.translations[activeLanguage],
-            message: messageRes.translations[activeLanguage],
-            cta: ctaTranslation
-          }
-        }
-      }));
-      
-      alert('Auto-translation successful!');
-    } catch (err) {
-      console.error('Translation error:', err);
-      alert('Translation error: ' + err.message);
-    } finally {
-      setSaving(false);
-    }
+        targetLanguages: current.includes(langCode)
+          ? current.filter(l => l !== langCode)
+          : [...current, langCode]
+      };
+    });
   };
 
   const handleSave = async (sendNow = false) => {
-    // Validate
-    if (!notification.translations.vi.title || !notification.translations.vi.message) {
-      alert('Please enter Vietnamese title and content');
+    if (!notification.content.title || !notification.content.message) {
+      notify.error('Please enter title and content');
       return;
     }
-
-    // Validate segment selection
     if (notification.target.type === 'segment' && (!notification.target.segments || notification.target.segments.length === 0)) {
-      alert('Please select at least one user group');
-      return;
-    }
-
-    // Validate CTA action
-    if (notification.ctaAction?.type === 'url' && !notification.ctaAction.url) {
-      alert('Please enter a URL for the CTA action');
-      return;
-    }
-    if (notification.ctaAction?.type === 'view' && !notification.ctaAction.action) {
-      alert('Please select a target view for the CTA action');
+      notify.error('Please select at least one user group');
       return;
     }
 
     try {
       setSaving(true);
+      const translations = {
+        en: {
+          title: notification.content.title,
+          message: notification.content.message,
+          cta: notification.content.cta || ''
+        }
+      };
 
-      // Check if scheduling
+      if (sendNow && notification.targetLanguages.length > 0) {
+        setTranslating(true);
+        try {
+          const { translationApi } = await import('../../services/adminApi');
+          for (const lang of notification.targetLanguages) {
+            try {
+              const titleRes = await translationApi.translate(notification.content.title, 'en', lang);
+              const messageRes = await translationApi.translate(notification.content.message, 'en', lang);
+              let ctaTranslation = '';
+              if (notification.content.cta) {
+                const ctaRes = await translationApi.translate(notification.content.cta, 'en', lang);
+                ctaTranslation = ctaRes.translations?.[lang] || notification.content.cta;
+              }
+              translations[lang] = {
+                title: titleRes.translations?.[lang] || notification.content.title,
+                message: messageRes.translations?.[lang] || notification.content.message,
+                cta: ctaTranslation
+              };
+            } catch (langErr) {
+              translations[lang] = translations.en;
+            }
+          }
+        } catch (err) {
+          notify.warning('Translation failed, using English for all languages');
+        } finally {
+          setTranslating(false);
+        }
+      }
+
+      const notificationData = {
+        type: notification.type,
+        priority: notification.priority,
+        translations,
+        targetLanguages: notification.targetLanguages,
+        target: notification.target,
+        scheduledAt: notification.scheduledAt || null,
+        expiresAt: notification.expiresAt || null,
+        ctaAction: notification.ctaAction || null
+      };
+
       const isScheduled = notification.scheduledAt && new Date(notification.scheduledAt) > new Date();
 
       if (isEditMode) {
-        await notificationsApi.update(id, notification);
-        if (sendNow) {
-          await notificationsApi.send(id);
-        } else if (isScheduled) {
-          await notificationsApi.schedule(id, notification.scheduledAt);
-        }
+        await notificationsApi.update(id, notificationData);
+        if (sendNow) await notificationsApi.send(id);
+        else if (isScheduled) await notificationsApi.schedule(id, notification.scheduledAt);
       } else {
-        const response = await notificationsApi.create(notification);
-        if (sendNow && response.notificationId) {
-          await notificationsApi.send(response.notificationId);
-        }
-        // If scheduled, the status is already set by create
+        const response = await notificationsApi.create(notificationData);
+        if (sendNow && response.notificationId) await notificationsApi.send(response.notificationId);
       }
 
-      let message = 'Notification saved!';
-      if (sendNow) message = 'Notification sent!';
-      else if (isScheduled) message = `Notification scheduled for ${new Date(notification.scheduledAt).toLocaleString()}`;
-
-      alert(message);
+      notify.success(sendNow ? 'Notification sent!' : isScheduled ? 'Notification scheduled!' : 'Notification saved!');
       navigate('/notifications');
     } catch (err) {
-      alert('Error: ' + err.message);
+      notify.error('Error: ' + err.message);
     } finally {
       setSaving(false);
+      setTranslating(false);
     }
   };
 
-  if (loading) {
-    return <div className="editor-loading">Loading...</div>;
-  }
+  if (loading) return <div className="editor-loading">Loading...</div>;
 
   return (
     <div className="notification-editor">
+      {/* Header */}
       <div className="editor-header">
-        <div className="header-title">
-          <img src={`/icon/${isEditMode ? 'edit' : 'plus'}.svg`} alt={isEditMode ? 'Edit' : 'Create'} />
+        <div className="header-left">
+          <div className="header-icon-wrapper">
+            <img src={`/icon/${isEditMode ? 'edit' : 'bell'}.svg`} alt="" />
+          </div>
           <div>
-            <h1>{isEditMode ? 'Edit Notification' : 'Create New Notification'}</h1>
-            <p>Create multilingual notifications to send to users</p>
+            <h1>{isEditMode ? 'Edit Notification' : 'New Notification'}</h1>
+            <p>Write in English, auto-translate to selected languages</p>
           </div>
         </div>
-
-        <div className="header-actions">
-          <button 
-            className="btn-preview"
-            onClick={() => setShowPreview(!showPreview)}
-          >
-            <img src="/icon/eye.svg" alt="Preview" />
-            {showPreview ? 'Hide' : 'Show'} Preview
-          </button>
-          <button 
-            className="btn-secondary"
-            onClick={() => navigate('/notifications')}
-          >
-            <img src="/icon/arrow-left.svg" alt="Back" />
-            Back
-          </button>
-        </div>
+        <button className="btn-back" onClick={() => navigate('/notifications')}>
+          <img src="/icon/arrow-left.svg" alt="Back" /> Back
+        </button>
       </div>
 
-      <div className="editor-layout">
-        <div className="editor-main">
-          {/* Type & Priority */}
-          <div className="editor-section">
-            <h3>Notification Type</h3>
-            <div className="type-selector">
-              {[
-                { value: 'info', icon: 'info.svg', label: 'Info', color: '#666' },
-                { value: 'success', icon: 'check-circle.svg', label: 'Success', color: '#000' },
-                { value: 'warning', icon: 'alert-triangle.svg', label: 'Warning', color: '#999' },
-                { value: 'error', icon: 'x-circle.svg', label: 'Error', color: '#000' },
-                { value: 'announcement', icon: 'megaphone.svg', label: 'Announcement', color: '#333' }
-              ].map(type => (
-                <button
-                  key={type.value}
-                  className={`type-btn ${notification.type === type.value ? 'active' : ''}`}
-                  style={{ 
-                    borderColor: notification.type === type.value ? type.color : '#e0e0e0',
-                    background: notification.type === type.value ? `${type.color}20` : 'white'
-                  }}
-                  onClick={() => setNotification({ ...notification, type: type.value })}
-                >
-                  <img src={`/icon/${type.icon}`} alt={type.label} className="type-icon" />
-                  <span className="type-label">{type.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Priority */}
-          <div className="editor-section">
-            <h3>Priority Level</h3>
-            <div className="priority-selector">
-              {[
-                { value: 'low', label: 'Low', color: '#ccc' },
-                { value: 'medium', label: 'Medium', color: '#999' },
-                { value: 'high', label: 'High', color: '#666' },
-                { value: 'urgent', label: 'Urgent', color: '#000' }
-              ].map(priority => (
-                <button
-                  key={priority.value}
-                  className={`priority-btn ${notification.priority === priority.value ? 'active' : ''}`}
-                  style={{
-                    borderColor: notification.priority === priority.value ? priority.color : '#e0e0e0',
-                    background: notification.priority === priority.value ? `${priority.color}20` : 'white'
-                  }}
-                  onClick={() => setNotification({ ...notification, priority: priority.value })}
-                >
-                  {priority.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Language Tabs */}
-          <div className="editor-section">
-            <div className="section-header-with-action">
-              <h3>Notification Content</h3>
-              {activeLanguage !== 'vi' && (
-                <button 
-                  className="btn-translate"
-                  onClick={handleAutoTranslate}
-                  disabled={!notification.translations.vi.title || !notification.translations.vi.message}
-                  title="Auto-translate from Vietnamese"
-                >
-                  <img src="/icon/languages.svg" alt="Translate" />
-                  Auto Translate
-                </button>
-              )}
-            </div>
-            <div className="language-tabs">
-              <button
-                className={activeLanguage === 'vi' ? 'active' : ''}
-                onClick={() => setActiveLanguage('vi')}
-              >
-                🇻🇳 Vietnamese
-              </button>
-              <button
-                className={activeLanguage === 'en' ? 'active' : ''}
-                onClick={() => setActiveLanguage('en')}
-              >
-                🇬🇧 English
-              </button>
-              <button
-                className={activeLanguage === 'ja' ? 'active' : ''}
-                onClick={() => setActiveLanguage('ja')}
-              >
-                🇯🇵 日本語
-              </button>
-            </div>
-
-            <div className="translation-form">
-              <div className="form-group">
-                <label>Title {activeLanguage === 'vi' && <span className="required">*</span>}</label>
-                <input
-                  type="text"
-                  value={notification.translations[activeLanguage].title}
-                  onChange={(e) => handleTranslationChange(activeLanguage, 'title', e.target.value)}
-                  placeholder="Enter notification title"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Content {activeLanguage === 'vi' && <span className="required">*</span>}</label>
-                <textarea
-                  value={notification.translations[activeLanguage].message}
-                  onChange={(e) => handleTranslationChange(activeLanguage, 'message', e.target.value)}
-                  placeholder="Enter notification content"
-                  rows={6}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Call-to-Action (Optional)</label>
-                <input
-                  type="text"
-                  value={notification.translations[activeLanguage].cta}
-                  onChange={(e) => handleTranslationChange(activeLanguage, 'cta', e.target.value)}
-                  placeholder="E.g.: View Details, Update Now"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Target Audience */}
-          <div className="editor-section">
-            <h3>Target Audience</h3>
-            <div className="target-selector">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  checked={notification.target.type === 'all'}
-                  onChange={() => setNotification({
-                    ...notification,
-                    target: { type: 'all', segments: [] }
-                  })}
-                />
-                <img src="/icon/users.svg" alt="All users" />
-                <span>All Users</span>
-              </label>
-
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  checked={notification.target.type === 'segment'}
-                  onChange={() => setNotification({
-                    ...notification,
-                    target: { type: 'segment', segments: notification.target.segments || [] }
-                  })}
-                />
-                <img src="/icon/target.svg" alt="Segment" />
-                <span>User Groups</span>
-              </label>
-
-              {notification.target.type === 'segment' && (
-                <div className="segment-options">
-                  {[
-                    { value: 'inactive', label: 'Inactive users (30+ days)', icon: '○', desc: 'Users who haven\'t logged in for 30+ days' },
-                    { value: 'new', label: 'New users (< 7 days)', icon: '●', desc: 'Users who registered in the last 7 days' },
-                    { value: 'has_profile', label: 'Has voice profile', icon: '◆', desc: 'Users who have created at least one voice profile' },
-                    { value: 'no_profile', label: 'No voice profile', icon: '✕', desc: 'Users who haven\'t created any voice profile' },
-                    { value: 'low_credits', label: 'Low credits (< 10)', icon: '!', desc: 'Users with less than 10 credits remaining' },
-                    { value: 'active', label: 'Active users (7 days)', icon: '[OK]', desc: 'Users who have been active in the last 7 days' }
-                  ].map(segment => (
-                    <label key={segment.value} className="segment-checkbox" title={segment.desc}>
-                      <input 
-                        type="checkbox"
-                        checked={notification.target.segments?.includes(segment.value) || false}
-                        onChange={(e) => {
-                          const currentSegments = notification.target.segments || [];
-                          const newSegments = e.target.checked
-                            ? [...currentSegments, segment.value]
-                            : currentSegments.filter(s => s !== segment.value);
-                          setNotification({
-                            ...notification,
-                            target: { ...notification.target, segments: newSegments }
-                          });
-                        }}
-                      />
-                      <span className="segment-icon">{segment.icon}</span>
-                      <span>{segment.label}</span>
-                    </label>
-                  ))}
-                  {notification.target.segments?.length === 0 && (
-                    <p className="segment-warning">Please select at least one user group</p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* CTA Action */}
-          <div className="editor-section">
-            <h3>Call-to-Action Settings</h3>
+      {/* Two Column Layout */}
+      <div className="editor-grid">
+        {/* Left Column - Content */}
+        <div className="editor-col-left">
+          <div className="editor-card">
+            <h3>🇬🇧 Content (English)</h3>
             <div className="form-group">
-              <label>Action Type</label>
-              <select
+              <label>Title <span className="required">*</span></label>
+              <input
+                type="text"
+                value={notification.content.title}
+                onChange={(e) => handleContentChange('title', e.target.value)}
+                placeholder="Notification title"
+              />
+            </div>
+            <div className="form-group">
+              <label>Message <span className="required">*</span></label>
+              <textarea
+                value={notification.content.message}
+                onChange={(e) => handleContentChange('message', e.target.value)}
+                placeholder="Notification message"
+                rows={10}
+              />
+            </div>
+            <div className="form-group">
+              <label>CTA Button (Optional)</label>
+              <input
+                type="text"
+                value={notification.content.cta}
+                onChange={(e) => handleContentChange('cta', e.target.value)}
+                placeholder="E.g.: View Details"
+              />
+            </div>
+          </div>
+
+          <div className="editor-card">
+            <h3>Target Audience</h3>
+            <div className="target-options-horizontal">
+              <label className={`target-option-h ${notification.target.type === 'all' ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="target-type"
+                  checked={notification.target.type === 'all'}
+                  onChange={() => setNotification({ ...notification, target: { type: 'all', segments: [] } })}
+                />
+                <div className="option-content">
+                  <img src="/icon/users.svg" alt="" />
+                  <span>All Users</span>
+                </div>
+              </label>
+              <label className={`target-option-h ${notification.target.type === 'segment' ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="target-type"
+                  checked={notification.target.type === 'segment'}
+                  onChange={() => setNotification({ ...notification, target: { type: 'segment', segments: [] } })}
+                />
+                <div className="option-content">
+                  <img src="/icon/target.svg" alt="" />
+                  <span>Segments</span>
+                </div>
+              </label>
+            </div>
+            {notification.target.type === 'segment' && (
+              <div className="segment-list">
+                {[
+                  { value: 'new', label: 'New users (< 7 days)' },
+                  { value: 'active', label: 'Active (7 days)' },
+                  { value: 'inactive', label: 'Inactive (30+ days)' },
+                  { value: 'low_credits', label: 'Low credits (< 10)' },
+                  { value: 'has_profile', label: 'Has voice profile' },
+                  { value: 'no_profile', label: 'No voice profile' }
+                ].map(seg => (
+                  <label key={seg.value} className="segment-item">
+                    <input
+                      type="checkbox"
+                      checked={notification.target.segments?.includes(seg.value) || false}
+                      onChange={(e) => {
+                        const segs = notification.target.segments || [];
+                        setNotification({
+                          ...notification,
+                          target: {
+                            ...notification.target,
+                            segments: e.target.checked ? [...segs, seg.value] : segs.filter(s => s !== seg.value)
+                          }
+                        });
+                      }}
+                    />
+                    <span>{seg.label}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="editor-card">
+            <h3>Auto-Translate To</h3>
+            <div className="language-grid">
+              {SUPPORTED_LANGUAGES.map(lang => (
+                <label 
+                  key={lang.code} 
+                  className={`lang-item ${notification.targetLanguages?.includes(lang.code) ? 'selected' : ''}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={notification.targetLanguages?.includes(lang.code) || false}
+                    onChange={() => toggleLanguage(lang.code)}
+                  />
+                  <span className="lang-flag">{lang.flag}</span>
+                  <span>{lang.name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Settings */}
+        <div className="editor-col-right">
+          <div className="editor-card">
+            <h3>Type & Priority</h3>
+            <div className="form-group">
+              <label>Type</label>
+              <div className="type-grid">
+                {[
+                  { value: 'info', icon: 'info.svg', label: 'Info' },
+                  { value: 'success', icon: 'check-circle.svg', label: 'Success' },
+                  { value: 'warning', icon: 'alert-triangle.svg', label: 'Warning' },
+                  { value: 'error', icon: 'x-circle.svg', label: 'Error' },
+                  { value: 'announcement', icon: 'megaphone.svg', label: 'Announce' }
+                ].map(type => (
+                  <button
+                    key={type.value}
+                    className={`type-btn ${notification.type === type.value ? 'active' : ''}`}
+                    onClick={() => setNotification({ ...notification, type: type.value })}
+                  >
+                    <img src={`/icon/${type.icon}`} alt="" />
+                    <span>{type.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="form-group">
+              <label>Priority</label>
+              <div className="priority-grid">
+                {['low', 'medium', 'high', 'urgent'].map(p => (
+                  <button
+                    key={p}
+                    className={`priority-btn ${notification.priority === p ? 'active' : ''}`}
+                    onClick={() => setNotification({ ...notification, priority: p })}
+                  >
+                    {p.charAt(0).toUpperCase() + p.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="editor-card">
+            <h3>CTA Action</h3>
+            <div className="form-group">
+              <CustomSelect
                 value={notification.ctaAction?.type || 'none'}
                 onChange={(e) => setNotification({
                   ...notification,
                   ctaAction: e.target.value === 'none' ? null : { type: e.target.value, url: '', action: '' }
                 })}
-              >
-                <option value="none">No action</option>
-                <option value="url">Open URL</option>
-                <option value="view">Navigate to view</option>
-              </select>
+                options={[
+                  { value: 'none', label: 'No action' },
+                  { value: 'url', label: 'Open URL' },
+                  { value: 'view', label: 'Navigate to view' }
+                ]}
+              />
             </div>
-
             {notification.ctaAction?.type === 'url' && (
               <div className="form-group">
-                <label>URL</label>
                 <input
                   type="url"
                   value={notification.ctaAction.url || ''}
@@ -438,95 +375,60 @@ export default function NotificationEditor() {
                     ...notification,
                     ctaAction: { ...notification.ctaAction, url: e.target.value }
                   })}
-                  placeholder="https://example.com/page"
+                  placeholder="https://..."
                 />
               </div>
             )}
-
             {notification.ctaAction?.type === 'view' && (
               <div className="form-group">
-                <label>Target View</label>
-                <select
+                <CustomSelect
                   value={notification.ctaAction.action || ''}
                   onChange={(e) => setNotification({
                     ...notification,
                     ctaAction: { ...notification.ctaAction, action: e.target.value }
                   })}
-                >
-                  <option value="">Select view...</option>
-                  <option value="home">Home</option>
-                  <option value="aistudio-editor">AI Studio</option>
-                  <option value="workspace">AI Workspace</option>
-                  <option value="settings">Settings</option>
-                  <option value="upgrade">Upgrade Plan</option>
-                </select>
+                  options={[
+                    { value: '', label: 'Select view...' },
+                    { value: 'home', label: 'Home' },
+                    { value: 'workspace', label: 'AI Workspace' },
+                    { value: 'settings', label: 'Settings' },
+                    { value: 'upgrade', label: 'Upgrade' }
+                  ]}
+                />
               </div>
             )}
           </div>
 
-          {/* Scheduling */}
-          <div className="editor-section">
-            <h3>Schedule Sending</h3>
+          <div className="editor-card">
+            <h3>Schedule (Optional)</h3>
             <div className="form-group">
-              <label>Send Time (Optional)</label>
+              <label>Send Time</label>
               <input
                 type="datetime-local"
                 value={notification.scheduledAt}
                 onChange={(e) => setNotification({ ...notification, scheduledAt: e.target.value })}
               />
-              <small>Leave empty to send immediately when clicking "Send Now"</small>
             </div>
-
             <div className="form-group">
-              <label>Expiration Time (Optional)</label>
+              <label>Expires At</label>
               <input
                 type="datetime-local"
                 value={notification.expiresAt}
                 onChange={(e) => setNotification({ ...notification, expiresAt: e.target.value })}
               />
-              <small>Notification will auto-hide after this time</small>
             </div>
           </div>
-
-          {/* Actions */}
-          <div className="editor-actions">
-            <button
-              className="btn-save"
-              onClick={() => handleSave(false)}
-              disabled={saving}
-            >
-              <img src="/icon/save.svg" alt="Save" />
-              {saving ? 'Saving...' : 'Save Draft'}
-            </button>
-
-            {notification.scheduledAt && new Date(notification.scheduledAt) > new Date() && (
-              <button
-                className="btn-schedule"
-                onClick={() => handleSave(false)}
-                disabled={saving}
-              >
-                <img src="/icon/clock.svg" alt="Schedule" />
-                {saving ? 'Scheduling...' : 'Schedule'}
-              </button>
-            )}
-
-            <button
-              className="btn-send"
-              onClick={() => handleSave(true)}
-              disabled={saving}
-            >
-              <img src="/icon/send.svg" alt="Send" />
-              {saving ? 'Sending...' : 'Send Now'}
-            </button>
-          </div>
         </div>
+      </div>
 
-        {/* Preview Panel */}
-        {showPreview && (
-          <div className="editor-preview">
-            <NotificationPreview notification={notification} language={activeLanguage} />
-          </div>
-        )}
+      {/* Footer Actions */}
+      <div className="editor-footer">
+        <button className="btn-draft" onClick={() => handleSave(false)} disabled={saving}>
+          {saving ? 'Saving...' : 'Save Draft'}
+        </button>
+        <button className="btn-send" onClick={() => handleSave(true)} disabled={saving || translating}>
+          {translating ? 'Translating...' : saving ? 'Sending...' : `Send Now${notification.targetLanguages?.length > 0 ? ` (+${notification.targetLanguages.length})` : ''}`}
+        </button>
       </div>
     </div>
   );

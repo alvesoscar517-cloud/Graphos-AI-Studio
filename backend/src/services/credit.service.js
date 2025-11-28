@@ -7,7 +7,8 @@ const { db, FieldValue } = require('../config/firebase');
 const { 
   calculateFeatureCost, 
   countWords, 
-  countSentences
+  countSentences,
+  FREE_CREDITS
 } = require('../config/pricing');
 const logger = require('../utils/logger');
 
@@ -37,9 +38,9 @@ const LOW_CREDITS_THRESHOLD = 10;
 // ============================================================================
 
 /**
- * Default credits for new users
+ * Default credits for new users (imported from pricing.js)
  */
-const DEFAULT_NEW_USER_CREDITS = 10;
+const DEFAULT_NEW_USER_CREDITS = FREE_CREDITS; // 100 credits
 
 /**
  * Get user's current credit balance

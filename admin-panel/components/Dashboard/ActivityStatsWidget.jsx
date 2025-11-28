@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { activityLogsApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
+import CustomSelect from '../Common/CustomSelect';
 import './ActivityStatsWidget.css';
 
 // Activity type config
@@ -24,23 +25,40 @@ export default function ActivityStatsWidget() {
   const notify = useNotify();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [days, setDays] = useState(7);
 
   useEffect(() => {
-    loadStats();
-  }, [days]);
+    let isMounted = true;
+    
+    const loadStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await activityLogsApi.getStatistics(days);
+        
+        if (isMounted) {
+          setStats(response.statistics);
+        }
+      } catch (err) {
+        console.error('Activity stats load error:', err);
+        if (isMounted) {
+          setError(err.message || 'Failed to load statistics');
+          notify.error('Unable to load activity statistics');
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
 
-  const loadStats = async () => {
-    try {
-      setLoading(true);
-      const response = await activityLogsApi.getStatistics(days);
-      setStats(response.statistics);
-    } catch (err) {
-      notify.error('Unable to load activity statistics');
-    } finally {
-      setLoading(false);
-    }
-  };
+    loadStats();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [days, notify]);
 
   if (loading) {
     return (
@@ -56,9 +74,27 @@ export default function ActivityStatsWidget() {
     );
   }
 
-  if (!stats) {
-    return null;
+  if (error || !stats) {
+    return (
+      <div className="activity-stats-widget">
+        <div className="widget-header">
+          <h3>
+            <img src="/icon/activity.svg" alt="Activity" />
+            Activity Statistics
+          </h3>
+        </div>
+        <div className="loading-placeholder">
+          {error || 'No data available'}
+        </div>
+      </div>
+    );
   }
+
+  const timeRangeOptions = [
+    { value: 7, label: '7 days' },
+    { value: 14, label: '14 days' },
+    { value: 30, label: '30 days' }
+  ];
 
   return (
     <div className="activity-stats-widget">
@@ -67,11 +103,12 @@ export default function ActivityStatsWidget() {
           <img src="/icon/activity.svg" alt="Activity" />
           Activity Statistics
         </h3>
-        <select value={days} onChange={(e) => setDays(parseInt(e.target.value))}>
-          <option value={7}>7 days</option>
-          <option value={14}>14 days</option>
-          <option value={30}>30 days</option>
-        </select>
+        <CustomSelect
+          value={days}
+          onChange={(e) => setDays(parseInt(e.target.value))}
+          options={timeRangeOptions}
+          className="time-range-select"
+        />
       </div>
 
       {/* Summary Cards */}
@@ -94,7 +131,7 @@ export default function ActivityStatsWidget() {
       <div className="trend-section">
         <h4>Activity Trends</h4>
         <div className="trend-chart">
-          {stats.activityTrend.map((day, index) => {
+          {stats.activityTrend.map((day) => {
             const maxActivities = Math.max(...stats.activityTrend.map(d => d.activities));
             const height = maxActivities > 0 ? (day.activities / maxActivities) * 100 : 0;
             return (

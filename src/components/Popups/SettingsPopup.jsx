@@ -62,18 +62,6 @@ const SettingsPopup = ({ onClose }) => {
       </div>
 
       <div className="settings-item">
-        <img src="/icon/upload.svg" className="settings-icon" alt={t('settings.submitPromptKey')} />
-        <span>{t('settings.submitPromptKey')}</span>
-        <img src="/icon/chevron-right.svg" className="settings-arrow" alt="" />
-      </div>
-
-      <div className="settings-divider"></div>
-
-      <div className="settings-item">
-        <img src="/icon/list.svg" className="settings-icon" alt={t('settings.viewStatus')} />
-        <span>{t('settings.viewStatus')}</span>
-      </div>
-      <div className="settings-item">
         <img src="/icon/file-text.svg" className="settings-icon" alt={t('settings.termsOfService')} />
         <span>{t('settings.termsOfService')}</span>
       </div>

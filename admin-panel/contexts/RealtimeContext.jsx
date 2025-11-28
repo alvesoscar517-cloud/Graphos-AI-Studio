@@ -83,6 +83,7 @@ export function RealtimeProvider({ children }) {
    * Load overview data (Dashboard)
    */
   const loadOverview = useCallback(async (force = false) => {
+    // Check cache first
     if (!force && !shouldRefresh('overview')) {
       const cached = cache.get('admin_overview');
       if (cached) {
@@ -94,15 +95,18 @@ export function RealtimeProvider({ children }) {
     setLoading(prev => ({ ...prev, overview: true }));
     try {
       const response = await analyticsApi.getOverview();
-      const data = response.overview;
+      const data = response?.overview || null;
       
-      setOverview(data);
-      cache.set('admin_overview', data, CACHE_TTL.overview);
-      lastFetch.current.overview = Date.now();
+      if (data) {
+        setOverview(data);
+        cache.set('admin_overview', data, CACHE_TTL.overview);
+        lastFetch.current.overview = Date.now();
+      }
       
       return data;
     } catch (err) {
       console.error('Load overview error:', err);
+      // Don't clear existing data on error, just throw
       throw err;
     } finally {
       setLoading(prev => ({ ...prev, overview: false }));

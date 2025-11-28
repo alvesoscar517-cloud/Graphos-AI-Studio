@@ -4,10 +4,8 @@
  */
 
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { getUserInfo } from '../services/api';
 import realtimeService from '../services/realtimeService';
-import PaymentSuccessNotification from '../components/PaymentSuccessNotification';
 
 const PaymentContext = createContext();
 
@@ -154,16 +152,6 @@ export const PaymentProvider = ({ children }) => {
   return (
     <PaymentContext.Provider value={value}>
       {children}
-      {purchaseResult && createPortal(
-        <PaymentSuccessNotification
-          isVisible={true}
-          order={purchaseResult.order}
-          credits={purchaseResult.credits}
-          onClose={clearPurchaseResult}
-          autoCloseDelay={0}
-        />,
-        document.body
-      )}
     </PaymentContext.Provider>
   );
 };

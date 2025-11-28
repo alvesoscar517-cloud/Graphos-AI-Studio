@@ -21,9 +21,11 @@ export const ENV = {
   GA_TRACKING_ID: import.meta.env.VITE_GA_TRACKING_ID,
   SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
   
-  // Development
-  DEV_USER_EMAIL: import.meta.env.VITE_DEV_USER_EMAIL || 'dev@example.com',
-  DEV_USER_NAME: import.meta.env.VITE_DEV_USER_NAME || 'Development User'
+  // Development - simulating Google OAuth login
+  DEV_USER_EMAIL: import.meta.env.VITE_DEV_USER_EMAIL || 'nguyen.vantest@gmail.com',
+  DEV_USER_NAME: import.meta.env.VITE_DEV_USER_NAME || 'Nguyễn Văn Test',
+  DEV_USER_ID: import.meta.env.VITE_DEV_USER_ID || 'google_oauth_test_12345678901234567890',
+  DEV_USER_PHOTO: import.meta.env.VITE_DEV_USER_PHOTO || 'https://lh3.googleusercontent.com/a/default-user=s96-c'
 }
 
 /**

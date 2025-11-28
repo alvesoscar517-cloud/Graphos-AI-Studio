@@ -145,24 +145,14 @@
 }
 
 .notif-item.unread {
-  background: #e8f0fe;
-  border-color: #c2d7f7;
+  background: rgba(25, 103, 210, 0.08);
+  border-color: transparent;
 }
 
-.notif-item.unread::before {
-  content: '';
-  position: absolute;
-  left: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
-  background: #1967d2;
-  border-radius: 50%;
-}
+/* Blue dot is rendered inline in JSX */
 
 .notif-item.unread:hover {
-  background: #d2e3fc;
+  background: rgba(25, 103, 210, 0.12);
 }
 
 .notif-item-icon {
@@ -177,9 +167,9 @@
 }
 
 .notif-item-icon img {
-  width: 18px;
-  height: 18px;
-  opacity: 0.6;
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) saturate(100%) invert(35%) sepia(98%) saturate(1500%) hue-rotate(200deg) brightness(95%) contrast(90%);
 }
 
 .notif-item-content {
@@ -448,16 +438,14 @@ body.dark-theme .notif-item:hover {
 }
 
 body.dark-theme .notif-item.unread {
-  background: #1e3a5f;
-  border-color: #3d5a80;
+  background: rgba(138, 180, 248, 0.12);
+  border-color: transparent;
 }
 
-body.dark-theme .notif-item.unread::before {
-  background: #8ab4f8;
-}
+/* Blue dot dark theme handled in JSX */
 
 body.dark-theme .notif-item.unread:hover {
-  background: #264a6e;
+  background: rgba(138, 180, 248, 0.18);
 }
 
 body.dark-theme .notif-item-icon {
@@ -465,7 +453,7 @@ body.dark-theme .notif-item-icon {
 }
 
 body.dark-theme .notif-item-icon img {
-  filter: invert(1) brightness(0.9);
+  filter: brightness(0) saturate(100%) invert(70%) sepia(50%) saturate(500%) hue-rotate(190deg) brightness(100%) contrast(95%);
 }
 
 body.dark-theme .notif-item-title {
@@ -543,5 +531,37 @@ body.dark-theme .notif-detail-cta img {
 
 /* Hide scrollbar for modal body */
 .notif-detail-body-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Detail Popup Animation */
+@keyframes notifDetailSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Selected notification item */
+.notif-item.selected {
+  background: #d2e3fc !important;
+  border-color: #a8c7fa !important;
+}
+
+body.dark-theme .notif-item.selected {
+  background: #3c4043 !important;
+  border-color: #5f6368 !important;
+}
+
+/* Detail Popup Styles */
+.notif-detail-popup {
+  backdrop-filter: blur(20px);
+}
+
+.notif-detail-popup .notif-detail-body-scroll::-webkit-scrollbar {
   display: none;
 }

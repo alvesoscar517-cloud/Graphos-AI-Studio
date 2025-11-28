@@ -137,7 +137,14 @@ class ApiClient {
         
         // Handle error responses
         if (!response.ok) {
-          throw parseApiError(response, data);
+          const error = parseApiError(response, data);
+          
+          // Special handling for locked account
+          if (data?.code === 'ACCOUNT_LOCKED') {
+            this.handleAccountLocked(data);
+          }
+          
+          throw error;
         }
         
         return { data, response };
@@ -166,6 +173,50 @@ class ApiClient {
       // Not in extension context
     }
     return null;
+  }
+  
+  /**
+   * Handle account locked error
+   * Show modal and prevent further access
+   */
+  handleAccountLocked(errorData) {
+    console.error('[API] Account locked:', errorData);
+    
+    // Dispatch custom event for UI to handle
+    const event = new CustomEvent('accountLocked', {
+      detail: {
+        reason: errorData.reason || 'Your account has been locked.',
+        message: errorData.message,
+        locked: true
+      }
+    });
+    window.dispatchEvent(event);
+    
+    // Clear auth data
+    this.clearAuth();
+  }
+  
+  /**
+   * Clear authentication data
+   */
+  async clearAuth() {
+    try {
+      // Clear from Chrome storage
+      if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+        await chrome.storage.local.remove(['authToken', 'userInfo']);
+      }
+      
+      // Clear from localStorage
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userInfo');
+      
+      // Send message to background script
+      if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
+        chrome.runtime.sendMessage({ action: 'clearAuth' });
+      }
+    } catch (error) {
+      console.error('[API] Failed to clear auth:', error);
+    }
   }
   
   // ============================================================================

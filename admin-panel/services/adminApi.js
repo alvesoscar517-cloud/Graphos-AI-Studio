@@ -13,6 +13,12 @@ const API_BASE_URL = getApiBaseUrl();
 async function apiCall(endpoint, options = {}) {
   const authHeaders = getAuthHeader();
   
+  console.log('[adminApi] Making API call:', {
+    endpoint,
+    method: options.method || 'GET',
+    hasAuth: !!authHeaders['Authorization'] || !!authHeaders['X-Admin-Key']
+  });
+  
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     credentials: 'include',
@@ -23,8 +29,15 @@ async function apiCall(endpoint, options = {}) {
     },
   });
 
+  console.log('[adminApi] Response received:', {
+    endpoint,
+    status: response.status,
+    ok: response.ok
+  });
+
   // Handle 401 - clear auth and redirect
   if (response.status === 401) {
+    console.error('[adminApi] Unauthorized - clearing auth');
     clearAuthData();
     window.location.reload();
     throw new Error('Session expired');
@@ -32,10 +45,13 @@ async function apiCall(endpoint, options = {}) {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: { message: 'Request failed' } }));
+    console.error('[adminApi] API error:', error);
     throw new Error(error.error?.message || error.error || `HTTP ${response.status}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  console.log('[adminApi] Success:', { endpoint, data });
+  return data;
 }
 
 // ============================================================================
@@ -321,14 +337,15 @@ export const settingsApi = {
 
 export const translationApi = {
   // Auto-translate text using Gemini
-  translate: async (text, sourceLang = 'vi', targetLang = 'en') => {
+  // sourceLang defaults to 'en' (English as default source)
+  translate: async (text, sourceLang = 'en', targetLang = 'vi') => {
     try {
       const result = await apiCall('/api/admin/translate', {
         method: 'POST',
         body: JSON.stringify({
           text,
           sourceLang,
-          targetLangs: [targetLang]
+          targetLang
         }),
       });
 

@@ -9,8 +9,8 @@ async function initUserCredits() {
   try {
     console.log('[INFO] Initializing user credits...\n');
 
-    // Create or update dev user
-    const devUserId = 'dev_user_123';
+    // Create or update dev user - simulating Google OAuth login
+    const devUserId = 'google_oauth_test_12345678901234567890';
     const devUserRef = db.collection('users').doc(devUserId);
     
     const devUserDoc = await devUserRef.get();
@@ -19,8 +19,12 @@ async function initUserCredits() {
       console.log('Creating dev user...');
       await devUserRef.set({
         userId: devUserId,
-        email: 'dev@example.com',
-        name: 'Development User',
+        email: 'nguyen.vantest@gmail.com',
+        name: 'Nguyễn Văn Test',
+        displayName: 'Nguyễn Văn Test',
+        photoURL: 'https://lh3.googleusercontent.com/a/default-user=s96-c',
+        emailVerified: true,
+        providerId: 'google.com',
         credits: {
           balance: 100,
           purchased: 100,
@@ -78,7 +82,7 @@ async function initUserCredits() {
 
     console.log('[SUCCESS] Initialization complete!\n');
     console.log('Summary:');
-    console.log(`- Dev user: dev_user_123 (100 credits)`);
+    console.log(`- Dev user: google_oauth_test_12345678901234567890 (nguyen.vantest@gmail.com) - 100 credits`);
     console.log(`- Other users updated: ${updatedCount}`);
     console.log('\nYou can now test the credit system!');
     

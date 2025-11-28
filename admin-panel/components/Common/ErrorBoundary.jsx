@@ -12,10 +12,18 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
+    console.error('ErrorBoundary caught error:', error, errorInfo);
     this.setState({
       error,
       errorInfo
     });
+  }
+
+  componentDidUpdate(prevProps) {
+    // Reset error state when children change (e.g., route change)
+    if (this.state.hasError && prevProps.children !== this.props.children) {
+      this.setState({ hasError: false, error: null, errorInfo: null });
+    }
   }
 
   handleReload = () => {

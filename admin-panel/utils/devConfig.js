@@ -7,11 +7,28 @@ export const DEV_CONFIG = {
   // Enable development mode (use default test profile)
   ENABLE_DEV_MODE: true,
   
-  // Default test user
+  // Default test user - simulating Google OAuth login
   DEFAULT_TEST_USER: {
-    userId: 'dev_test_user',
-    email: 'dev@test.local',
-    name: 'Dev Test User'
+    userId: 'google_oauth_test_12345678901234567890',
+    email: 'nguyen.vantest@gmail.com',
+    name: 'Nguyễn Văn Test',
+    displayName: 'Nguyễn Văn Test',
+    photoURL: 'https://lh3.googleusercontent.com/a/default-user=s96-c',
+    emailVerified: true,
+    providerId: 'google.com',
+    providerData: [{
+      providerId: 'google.com',
+      uid: '12345678901234567890',
+      displayName: 'Nguyễn Văn Test',
+      email: 'nguyen.vantest@gmail.com',
+      photoURL: 'https://lh3.googleusercontent.com/a/default-user=s96-c'
+    }],
+    metadata: {
+      creationTime: new Date().toISOString(),
+      lastSignInTime: new Date().toISOString()
+    },
+    locale: 'vi',
+    isAnonymous: false
   },
   
   // Auto select test profile on startup

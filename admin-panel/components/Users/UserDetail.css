@@ -13,11 +13,11 @@
 #admin-root .btn-back {
   padding: 10px 20px;
   background: white;
-  border: 2px solid #e0e0e0;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.15s;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -30,8 +30,7 @@
 }
 
 #admin-root .btn-back:hover {
-  border-color: #000;
-  color: #000;
+  background: #f2f2f2;
 }
 
 #admin-root .header-title {
@@ -226,13 +225,12 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: #f8f9fa;
+  background: #fafafa;
   border-radius: 12px;
-  transition: background 0.2s;
 }
 
 #admin-root .profile-item:hover {
-  background: #e9ecef;
+  background: #f2f2f2;
 }
 
 #admin-root .profile-icon {
@@ -295,41 +293,50 @@
   gap: 12px;
 }
 
-#admin-root .action-btn {
+#admin-root .user-detail .action-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
   padding: 18px 12px;
-  background: #f8f9fa;
-  border: 2px solid transparent;
-  border-radius: 14px;
+  background: #fafafa !important;
+  border: 1px solid #eaeaea !important;
+  border-radius: 12px !important;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.15s !important;
 }
 
-#admin-root .action-btn:hover {
-  background: white;
-  border-color: #000;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+#admin-root .user-detail .action-btn:hover,
+#admin-root .user-detail .action-btn:hover:not(:disabled) {
+  background: #f2f2f2 !important;
+  border-color: #e0e0e0 !important;
+  color: #444 !important;
 }
 
-#admin-root .action-btn.danger:hover {
-  border-color: #dc3545;
-  background: #fff5f5;
+#admin-root .user-detail .action-btn:hover img,
+#admin-root .user-detail .action-btn:hover:not(:disabled) img {
+  filter: brightness(0) !important;
+  opacity: 0.6 !important;
 }
 
-#admin-root .action-icon {
-  width: 28px;
-  height: 28px;
+#admin-root .user-detail .action-btn.danger:hover,
+#admin-root .user-detail .action-btn.danger:hover:not(:disabled) {
+  background: #f2f2f2 !important;
+  border-color: #e0e0e0 !important;
+  color: #444 !important;
+}
+
+#admin-root .user-detail .action-icon {
+  width: 24px;
+  height: 24px;
   filter: brightness(0);
+  opacity: 0.6;
 }
 
-#admin-root .action-label {
-  font-weight: 600;
+#admin-root .user-detail .action-label {
+  font-weight: 500;
   font-size: 12px;
-  color: #000;
+  color: #444;
   text-align: center;
   line-height: 1.3;
 }
@@ -416,11 +423,10 @@
   border: none;
   cursor: pointer;
   border-radius: 6px;
-  transition: background 0.2s;
 }
 
 #admin-root .btn-close:hover {
-  background: #f0f0f0;
+  background: #f2f2f2;
 }
 
 #admin-root .btn-close img {
@@ -447,13 +453,12 @@
   display: flex;
   gap: 12px;
   padding: 16px;
-  background: #f8f9fa;
+  background: #fafafa;
   border-radius: 12px;
-  transition: background 0.2s;
 }
 
 #admin-root .log-item:hover {
-  background: #e9ecef;
+  background: #f2f2f2;
 }
 
 #admin-root .log-icon {
@@ -600,34 +605,33 @@
 #admin-root .btn-cancel {
   padding: 12px 24px;
   background: white;
-  border: 2px solid #e0e0e0;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.15s;
 }
 
 #admin-root .btn-cancel:hover {
-  border-color: #000;
+  background: #f2f2f2;
 }
 
 #admin-root .btn-primary {
   padding: 12px 24px;
   background: #000;
   color: white;
-  border: 2px solid #000;
+  border: 1px solid #000;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.15s;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 #admin-root .btn-primary:hover {
-  background: #333;
-  border-color: #333;
+  background: #222;
 }
 
 #admin-root .btn-primary img {
@@ -645,83 +649,106 @@
 }
 
 
-/* Credits Card */
+/* Credits Card - with flex layout */
+#admin-root .detail-card:has(.credits-display) {
+  display: flex;
+  flex-direction: column;
+}
+
+#admin-root .detail-card:has(.credits-display) h2 {
+  flex-shrink: 0;
+}
+
 #admin-root .credits-display {
   text-align: center;
-  padding: 16px 0;
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 #admin-root .credits-balance {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 #admin-root .credits-number {
   display: block;
-  font-size: 42px;
+  font-size: 48px;
   font-weight: 700;
   color: #000;
   line-height: 1;
+  margin-bottom: 6px;
 }
 
 #admin-root .credits-label {
-  font-size: 12px;
-  color: #666;
+  display: block;
+  font-size: 11px;
+  color: #999;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 4px;
+  letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 #admin-root .credits-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 14px;
-  background: #f8f9fa;
-  border-radius: 12px;
+  gap: 0;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 10px;
 }
 
 #admin-root .credit-stat {
   text-align: center;
+  padding: 8px 4px;
 }
 
 #admin-root .credit-stat .stat-value {
-  font-size: 18px;
+  display: block;
+  font-size: 20px;
   font-weight: 700;
   color: #000;
+  line-height: 1;
+  margin-bottom: 4px;
 }
 
 #admin-root .credit-stat .stat-label {
+  display: block;
   font-size: 10px;
-  color: #666;
+  color: #999;
   text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 500;
 }
 
 #admin-root .btn-adjust-credits {
   width: 100%;
-  margin-top: 16px;
-  padding: 12px;
+  margin-top: auto;
+  padding: 11px;
   background: #000;
   color: #fff;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: all 0.2s;
+  gap: 6px;
+  transition: background 0.15s;
+  flex-shrink: 0;
 }
 
 #admin-root .btn-adjust-credits:hover {
-  background: #333;
-  transform: translateY(-1px);
+  background: #222;
 }
 
 #admin-root .btn-adjust-credits img {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   filter: brightness(0) invert(1);
 }
 
@@ -743,23 +770,25 @@
   color: #c62828;
 }
 
-/* Action buttons variants */
-#admin-root .action-btn.primary {
-  background: #e3f2fd;
-  border-color: #2196f3;
+/* Action buttons variants - all grayscale */
+#admin-root .user-detail .action-btn.primary {
+  background: #fafafa !important;
+  border-color: #eaeaea !important;
 }
 
-#admin-root .action-btn.primary:hover {
-  background: #bbdefb;
+#admin-root .user-detail .action-btn.primary:hover,
+#admin-root .user-detail .action-btn.primary:hover:not(:disabled) {
+  background: #f2f2f2 !important;
 }
 
-#admin-root .action-btn.success {
-  background: #e8f5e9;
-  border-color: #4caf50;
+#admin-root .user-detail .action-btn.success {
+  background: #fafafa !important;
+  border-color: #eaeaea !important;
 }
 
-#admin-root .action-btn.success:hover {
-  background: #c8e6c9;
+#admin-root .user-detail .action-btn.success:hover,
+#admin-root .user-detail .action-btn.success:hover:not(:disabled) {
+  background: #f2f2f2 !important;
 }
 
 /* Credits Modal */
@@ -798,10 +827,10 @@
   justify-content: center;
   gap: 8px;
   padding: 16px;
-  border: 2px solid #e0e0e0;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   font-weight: 600;
-  transition: all 0.2s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 #admin-root .radio-option input:checked + .radio-label.add {
@@ -858,8 +887,7 @@
 }
 
 #admin-root .btn-primary.success:hover {
-  background: #43a047;
-  border-color: #43a047;
+  background: #45a049;
 }
 
 #admin-root .btn-primary.danger {
@@ -869,7 +897,6 @@
 
 #admin-root .btn-primary.danger:hover {
   background: #e53935;
-  border-color: #e53935;
 }
 
 /* Form group input */
@@ -902,13 +929,12 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: #f8f9fa;
+  background: #fafafa;
   border-radius: 12px;
-  transition: background 0.2s;
 }
 
 #admin-root .profile-management-item:hover {
-  background: #e9ecef;
+  background: #f2f2f2;
 }
 
 #admin-root .profile-info-main {
@@ -947,20 +973,108 @@
   border: 1px solid #ddd;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.15s;
 }
 
 #admin-root .btn-delete-profile:hover {
-  background: #ffebee;
-  border-color: #f44336;
+  background: #f2f2f2;
 }
 
 #admin-root .btn-delete-profile img {
   width: 16px;
   height: 16px;
   filter: brightness(0);
+  opacity: 0.6;
 }
 
-#admin-root .btn-delete-profile:hover img {
-  filter: invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+
+/* Credits modal input styles */
+#admin-root .credits-amount-input {
+  -moz-appearance: textfield;
+}
+
+#admin-root .credits-amount-input::-webkit-outer-spin-button,
+#admin-root .credits-amount-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+
+#admin-root .form-group textarea.credits-reason-input {
+  resize: none;
+}
+
+
+/* Notification Modal - Improved */
+#admin-root .modal-content.notification-modal {
+  max-width: 500px;
+}
+
+#admin-root .modal-content.notification-modal .modal-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#admin-root .modal-content.notification-modal .modal-header h2 img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0);
+}
+
+#admin-root .notification-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #e3f2fd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: #1565c0;
+  line-height: 1.4;
+}
+
+#admin-root .notification-info-banner img {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  filter: invert(32%) sepia(98%) saturate(1234%) hue-rotate(196deg) brightness(97%) contrast(91%);
+}
+
+#admin-root .form-row {
+  display: flex;
+  gap: 12px;
+}
+
+#admin-root .form-group.half {
+  flex: 1;
+}
+
+#admin-root .char-count {
+  text-align: right;
+  font-size: 11px;
+  color: #999;
+  margin-top: 4px;
+}
+
+#admin-root .spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+#admin-root .btn-primary:disabled,
+#admin-root .btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

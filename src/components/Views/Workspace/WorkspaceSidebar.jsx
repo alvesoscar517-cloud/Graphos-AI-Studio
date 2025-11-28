@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { motion } from 'framer-motion'
 import { useProfiles } from '../../../contexts/ProfileContext'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import ProfileSelector from '../../Analysis/ProfileSelector'
@@ -120,7 +121,34 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
   ]
 
   return (
-    <aside className={`workspace-sidebar right-sidebar ${hidden ? 'hidden' : ''}`}>
+    <motion.aside 
+      className="workspace-sidebar right-sidebar"
+      initial={{ x: 0, opacity: 1 }}
+      animate={{
+        x: hidden ? 300 : 0,
+        opacity: hidden ? 0 : 1
+      }}
+      transition={hidden ? {
+        type: "tween",
+        duration: 0.2,
+        ease: "easeOut"
+      } : {
+        duration: 0
+      }}
+      drag="x"
+      dragConstraints={{ left: 0, right: 300 }}
+      dragElastic={0.2}
+      dragMomentum={false}
+      onDragEnd={(event, info) => {
+        const threshold = 300 * 0.4
+        if (info.offset.x > threshold && !hidden) {
+          onClose?.()
+        }
+      }}
+      style={{
+        pointerEvents: hidden ? 'none' : 'auto'
+      }}
+    >
       {/* Header */}
       <div className="ws-header">
         <div className="ws-header-title">
@@ -292,7 +320,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
           </div>
         </div>
       </div>
-    </aside>
+    </motion.aside>
   )
 }
 

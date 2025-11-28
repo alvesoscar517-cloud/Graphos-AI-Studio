@@ -51,6 +51,28 @@
   border-color: #000;
 }
 
+/* CustomSelect styling for time range */
+#admin-root .activity-stats-widget .time-range-select {
+  min-width: 120px;
+}
+
+#admin-root .activity-stats-widget .time-range-select .custom-select-button {
+  padding: 8px 12px;
+  font-size: 13px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  color: #000;
+}
+
+#admin-root .activity-stats-widget .time-range-select .custom-select-button:hover {
+  border-color: #000;
+}
+
+#admin-root .activity-stats-widget .time-range-select .custom-select-dropdown {
+  min-width: 120px;
+}
+
 #admin-root .activity-stats-widget .loading-placeholder {
   display: flex;
   align-items: center;
