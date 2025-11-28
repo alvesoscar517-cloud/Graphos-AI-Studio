@@ -4,8 +4,9 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { CONFIG, debugLog } from '../utils/config';
+import { debugLog } from '../utils/config';
 import { getUserInfo } from '../services/api/auth';
+import apiClient from '../services/api/client';
 import realtimeService from '../services/realtimeService';
 
 const CACHE_KEY = 'user_credits';
@@ -65,13 +66,7 @@ export function useCredits() {
         throw new Error('User not authenticated');
       }
       
-      const response = await fetch(`${CONFIG.API_BASE_URL}/api/credits/balance?user_id=${userInfo.userId}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch credits');
-      }
-      
-      const data = await response.json();
+      const { data } = await apiClient.get(`/api/credits/balance?user_id=${userInfo.userId}`);
       
       if (data.success && data.credits) {
         setCredits(data.credits);

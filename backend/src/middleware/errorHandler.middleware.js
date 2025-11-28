@@ -6,6 +6,8 @@
 const config = require('../config');
 const logger = require('../utils/logger');
 const { v4: uuidv4 } = require('uuid');
+const localization = require('../services/localization.service');
+const { getLanguage } = require('./language.middleware');
 
 // ============================================================================
 // CUSTOM ERROR CLASSES
@@ -128,6 +130,9 @@ function errorHandler(err, req, res, next) {
   // Generate error ID for tracking
   const errorId = uuidv4().substring(0, 8);
   
+  // Get language for localized error messages
+  const lang = getLanguage(req);
+  
   // Default error values
   let statusCode = err.statusCode || 500;
   let code = err.code || 'INTERNAL_ERROR';
@@ -140,6 +145,28 @@ function errorHandler(err, req, res, next) {
     statusCode = mapped.statusCode;
     code = mapped.code;
     message = mapped.message;
+  }
+  
+  // Try to get localized message
+  const errorKeyMap = {
+    'VALIDATION_ERROR': 'invalid_input',
+    'AUTH_ERROR': 'unauthorized',
+    'FORBIDDEN': 'forbidden',
+    'NOT_FOUND': 'not_found',
+    'RATE_LIMIT_EXCEEDED': 'rate_limited',
+    'INSUFFICIENT_CREDITS': 'insufficient_credits',
+    'QUOTA_EXCEEDED': 'quota_exceeded',
+    'SERVICE_ERROR': 'service_unavailable',
+    'REQUEST_TIMEOUT': 'timeout',
+    'INTERNAL_ERROR': 'server_error'
+  };
+  
+  const errorKey = errorKeyMap[code];
+  if (errorKey) {
+    const localizedMessage = localization.translate(`errors.${errorKey}`, lang);
+    if (localizedMessage && !localizedMessage.startsWith('errors.')) {
+      message = localizedMessage;
+    }
   }
   
   // Handle specific error types
@@ -187,7 +214,8 @@ function errorHandler(err, req, res, next) {
       code,
       message: config.IS_PRODUCTION ? sanitizeErrorMessage(message) : message,
       errorId
-    }
+    },
+    language: lang
   };
   
   // Add details if available and not in production
@@ -229,13 +257,17 @@ function sanitizeErrorMessage(message) {
  * 404 handler
  */
 function notFoundHandler(req, res) {
+  const lang = getLanguage(req);
+  const message = localization.translate('errors.not_found', lang) || `Route ${req.method} ${req.path} not found`;
+  
   res.status(404).json({
     success: false,
     error: {
       code: 'NOT_FOUND',
-      message: `Route ${req.method} ${req.path} not found`,
+      message,
       errorId: uuidv4().substring(0, 8)
-    }
+    },
+    language: lang
   });
 }
 

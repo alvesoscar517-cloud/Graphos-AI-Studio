@@ -2,13 +2,30 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import * as lottie from 'lottie-web'
+import EmailLoginForm from './EmailLoginForm'
+import EmailRegisterForm from './EmailRegisterForm'
+import OTPVerification from './OTPVerification'
+import ForgotPassword from './ForgotPassword'
 import './LoginOverlay.css'
+import './EmailAuth.css'
 
 const LoginOverlay = () => {
   const { t } = useTranslation()
-  const { isAuthenticated, signIn, isLoading: authLoading } = useAuth()
+  const { 
+    isAuthenticated, 
+    signIn, 
+    signInWithEmail, 
+    registerWithEmail, 
+    verifyEmail, 
+    resendVerificationOTP,
+    requestPasswordReset,
+    resetPassword,
+    isLoading: authLoading 
+  } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [shouldShow, setShouldShow] = useState(false)
+  const [authMode, setAuthMode] = useState('select') // select, google, email-login, email-register, otp, forgot-password
+  const [pendingEmail, setPendingEmail] = useState('')
   const animationContainer = useRef(null)
   const animationInstance = useRef(null)
 
@@ -57,7 +74,7 @@ const LoginOverlay = () => {
     }
   }
 
-  const handleSignIn = async () => {
+  const handleGoogleSignIn = async () => {
     setIsLoading(true)
     try {
       const success = await signIn()
@@ -72,6 +89,64 @@ const LoginOverlay = () => {
     }
   }
 
+  const handleEmailLogin = async (email, password) => {
+    setIsLoading(true)
+    try {
+      await signInWithEmail(email, password)
+    } catch (error) {
+      console.error('Email login error:', error)
+      throw error
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleEmailRegister = async (email, password, displayName) => {
+    setIsLoading(true)
+    try {
+      await registerWithEmail(email, password, displayName)
+      setPendingEmail(email)
+      setAuthMode('otp')
+    } catch (error) {
+      console.error('Registration error:', error)
+      throw error
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleVerifyOTP = async (otp) => {
+    setIsLoading(true)
+    try {
+      await verifyEmail(pendingEmail, otp)
+    } catch (error) {
+      console.error('OTP verification error:', error)
+      throw error
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleResendOTP = async () => {
+    try {
+      await resendVerificationOTP(pendingEmail)
+    } catch (error) {
+      console.error('Resend OTP error:', error)
+      throw error
+    }
+  }
+
+  const handlePasswordReset = {
+    request: async (email) => {
+      await requestPasswordReset(email)
+      setPendingEmail(email)
+    },
+    complete: async (email, otp, newPassword) => {
+      await resetPassword(email, otp, newPassword)
+      setAuthMode('email-login')
+    }
+  }
+
   // Don't show overlay while checking auth or if already authenticated
   if (!shouldShow) {
     console.log('🚫 LoginOverlay: Not rendering (shouldShow = false)')
@@ -79,29 +154,70 @@ const LoginOverlay = () => {
   }
 
   console.log('✨ LoginOverlay: Rendering overlay')
-  return (
-    <div className="login-overlay">
-      <div className="login-container">
-        <div className="login-animation" ref={animationContainer}>
-          <svg className="fallback-icon" width="120" height="120" viewBox="0 0 48 48" style={{ display: 'none' }}>
-            <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
-            <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
-            <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
-            <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
-          </svg>
-        </div>
-        {authLoading ? (
-          <>
-            <h2 className="login-title">{t('auth.checking')}</h2>
-            <p className="login-subtitle">{t('auth.pleaseWait')}</p>
-          </>
-        ) : (
+
+  const renderAuthContent = () => {
+    if (authLoading) {
+      return (
+        <>
+          <h2 className="login-title">{t('auth.checking')}</h2>
+          <p className="login-subtitle">{t('auth.pleaseWait')}</p>
+        </>
+      )
+    }
+
+    switch (authMode) {
+      case 'email-login':
+        return (
+          <EmailLoginForm
+            onLogin={handleEmailLogin}
+            onSwitchToRegister={() => setAuthMode('email-register')}
+            onForgotPassword={() => setAuthMode('forgot-password')}
+            isLoading={isLoading}
+          />
+        )
+
+      case 'email-register':
+        return (
+          <EmailRegisterForm
+            onRegister={handleEmailRegister}
+            onSwitchToLogin={() => setAuthMode('email-login')}
+            isLoading={isLoading}
+          />
+        )
+
+      case 'otp':
+        return (
+          <OTPVerification
+            email={pendingEmail}
+            onVerify={handleVerifyOTP}
+            onResend={handleResendOTP}
+            onCancel={() => {
+              setAuthMode('email-register')
+              setPendingEmail('')
+            }}
+            isLoading={isLoading}
+          />
+        )
+
+      case 'forgot-password':
+        return (
+          <ForgotPassword
+            onResetPassword={handlePasswordReset}
+            onCancel={() => setAuthMode('email-login')}
+            isLoading={isLoading}
+          />
+        )
+
+      default:
+        return (
           <>
             <h2 className="login-title">{t('auth.signInToContinue')}</h2>
             <p className="login-subtitle">{t('auth.signInSubtitle')}</p>
+            
+            {/* Google Sign In Button */}
             <button 
               className={`google-signin-btn ${isLoading ? 'loading' : ''}`}
-              onClick={handleSignIn}
+              onClick={handleGoogleSignIn}
               disabled={isLoading}
             >
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -112,13 +228,60 @@ const LoginOverlay = () => {
               </svg>
               <span>{isLoading ? t('auth.loggingIn') : t('auth.loginWithGoogle')}</span>
             </button>
+            
+            {/* Divider */}
+            <div className="form-divider">
+              <span>{t('auth.email.or')}</span>
+            </div>
+            
+            {/* Email Sign In Button */}
+            <button 
+              className="email-signin-btn"
+              onClick={() => setAuthMode('email-login')}
+              disabled={isLoading}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <span>{t('auth.email.signInWithEmail')}</span>
+            </button>
+            
             <p className="login-footer">
               {t('auth.termsAgreement')}{' '}
               <a href="#" className="login-link">{t('auth.termsOfService')}</a> {t('auth.and')}{' '}
               <a href="#" className="login-link">{t('auth.privacyPolicy')}</a>
             </p>
           </>
+        )
+    }
+  }
+
+  return (
+    <div className="login-overlay">
+      <div className="login-container">
+        {authMode === 'select' && (
+          <div className="login-animation" ref={animationContainer}>
+            <svg className="fallback-icon" width="120" height="120" viewBox="0 0 48 48" style={{ display: 'none' }}>
+              <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+              <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+              <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
+              <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+            </svg>
+          </div>
         )}
+        
+        {authMode !== 'select' && authMode !== 'otp' && (
+          <button 
+            className="back-btn"
+            onClick={() => setAuthMode('select')}
+            disabled={isLoading}
+          >
+            ← {t('auth.email.back')}
+          </button>
+        )}
+        
+        {renderAuthContent()}
       </div>
     </div>
   )

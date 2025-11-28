@@ -219,21 +219,21 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
   // Get dynamic word count label based on milestone
   const getWordCountLabel = () => {
     if (wordCount < 500) {
-      return `Need ${500 - wordCount} more words to reach minimum`
+      return t('profileSetup.needMoreWords', { count: 500 - wordCount })
     }
     if (wordCount < 1000) {
-      return `Add ${1000 - wordCount} more words to reach recommended level`
+      return t('profileSetup.addMoreRecommended', { count: 1000 - wordCount })
     }
     if (wordCount < 2000) {
-      return 'Good progress! Add more for better AI learning'
+      return t('profileSetup.goodProgress')
     }
     if (wordCount < 3000) {
-      return 'Great! Add more for deeper AI learning'
+      return t('profileSetup.greatProgress')
     }
     if (wordCount < 5000) {
-      return 'Excellent! Ideal length for best AI learning'
+      return t('profileSetup.excellentProgress')
     }
-    return 'Perfect! Reached maximum limit'
+    return t('profileSetup.perfectProgress')
   }
 
   // Get primary smart hint for footer (only show most important one)

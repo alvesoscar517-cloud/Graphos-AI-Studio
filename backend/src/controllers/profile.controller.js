@@ -13,12 +13,16 @@ const { validateText, validateProfileId, validateUserId } = require('../utils/va
 const { FREE_CREDITS } = require('../config/pricing');
 const realtimeController = require('./realtime.controller');
 const activityLogService = require('../services/activityLog.service');
+const { createLocalizer } = require('../utils/localized-messages.util');
+const autoNotification = require('../services/autoNotification.service');
 
 // ============================================================================
 // CREATE PROFILE
 // ============================================================================
 
 exports.createProfile = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { user_id, profile_name = 'Default Profile', email, name = 'User', theme = 'work' } = req.body;
 
@@ -75,11 +79,12 @@ exports.createProfile = async (req, res) => {
     res.status(201).json({
       success: true,
       profile_id: profileId,
-      profile: { userId, name: profile_name, theme, status: 'pending', samplesCount: 0 }
+      profile: { userId, name: profile_name, theme, status: 'pending', samplesCount: 0 },
+      message: l.t('voice_profile.created')
     });
   } catch (error) {
     logger.error('Create profile error', { error: error.message });
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('profile_creation_failed'), details: String(error) });
   }
 };
 
@@ -88,6 +93,8 @@ exports.createProfile = async (req, res) => {
 // ============================================================================
 
 exports.addSample = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { profile_id, text } = req.body;
 
@@ -96,7 +103,7 @@ exports.addSample = async (req, res) => {
 
     const profileDoc = await db.collection('voice_profiles').doc(profileId).get();
     if (!profileDoc.exists) {
-      return res.status(404).json({ error: 'Profile not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
 
     const vector = await geminiService.createEmbedding(validText, 'RETRIEVAL_DOCUMENT');
@@ -119,11 +126,12 @@ exports.addSample = async (req, res) => {
     res.status(201).json({
       success: true,
       sample_id: sampleId,
-      sample: { text: validText, vector_length: vector.length }
+      sample: { text: validText, vector_length: vector.length },
+      message: l.t('voice_profile.sample_added')
     });
   } catch (error) {
     logger.error('Add sample error', { error: error.message });
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
 
@@ -132,20 +140,22 @@ exports.addSample = async (req, res) => {
 // ============================================================================
 
 exports.addSamplesBatch = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { profile_id, samples } = req.body;
 
     if (!profile_id || !samples || !Array.isArray(samples)) {
-      return res.status(400).json({ error: 'profile_id and samples array are required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     if (samples.length === 0 || samples.length > 20) {
-      return res.status(400).json({ error: 'Samples must be between 1 and 20' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input'), details: 'Samples must be between 1 and 20' });
     }
 
     const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
     if (!profileDoc.exists) {
-      return res.status(404).json({ error: 'Profile not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
 
     const texts = samples.map(s => s.text);
@@ -186,11 +196,12 @@ exports.addSamplesBatch = async (req, res) => {
       success: true,
       profile_id,
       samples_added: samples.length,
-      sample_ids: sampleIds
+      sample_ids: sampleIds,
+      message: l.t('voice_profile.sample_added')
     });
   } catch (error) {
     console.error('[ERROR] Batch add samples error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
 
@@ -199,23 +210,25 @@ exports.addSamplesBatch = async (req, res) => {
 // ============================================================================
 
 exports.finalizeProfile = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { profile_id } = req.body;
 
     if (!profile_id) {
-      return res.status(400).json({ error: 'profile_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
     if (!profileDoc.exists) {
-      return res.status(404).json({ error: 'Profile not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
 
     const samplesSnapshot = await db.collection('voice_profiles').doc(profile_id).collection('samples').get();
     const samples = samplesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     if (samples.length < 3) {
-      return res.status(400).json({ error: 'Profile needs at least 3 samples' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input'), details: l.t('voice_profile.insufficient_samples', { min: 3 }) });
     }
 
     const allText = samples.map(s => s.text).join(' ');
@@ -241,17 +254,26 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
 
     cacheService.invalidateProfileCache(profile_id);
 
+    // Send notification for profile creation
+    const profileData = profileDoc.data();
+    try {
+      await autoNotification.sendProfileCreatedNotification(profileData.userId, profileData.name);
+    } catch (notifError) {
+      console.warn('[WARN] Failed to send profile created notification:', notifError.message);
+    }
+
     res.json({
       success: true,
       profile_id,
       status: 'ready',
       samples_count: samples.length,
       statistical_features: statisticalFeatures,
-      voice_profile: voiceProfile
+      voice_profile: voiceProfile,
+      message: l.t('voice_profile.updated')
     });
   } catch (error) {
     console.error('[ERROR] Finalize profile error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
 
@@ -265,6 +287,8 @@ const PROFILE_RATE_LIMIT_COUNT = 5;
 const SAMPLE_SIMILARITY_THRESHOLD = 0.92;
 
 exports.createProfileComplete = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { user_id, profile_name = 'Default Profile', email, name = 'User', theme = 'work', samples } = req.body;
 
@@ -272,7 +296,8 @@ exports.createProfileComplete = async (req, res) => {
     if (!samples || !Array.isArray(samples) || samples.length < 3) {
       return res.status(400).json({ 
         success: false,
-        error: 'At least 3 text samples are required to create a profile',
+        ...l.error('invalid_input'),
+        details: l.t('voice_profile.insufficient_samples', { min: 3 }),
         error_code: 'INSUFFICIENT_SAMPLES'
       });
     }
@@ -280,7 +305,8 @@ exports.createProfileComplete = async (req, res) => {
     if (samples.length > 20) {
       return res.status(400).json({ 
         success: false,
-        error: 'Maximum 20 text samples allowed',
+        ...l.error('invalid_input'),
+        details: 'Maximum 20 text samples allowed',
         error_code: 'TOO_MANY_SAMPLES'
       });
     }
@@ -526,6 +552,13 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
       profile: { profile_id: profileId, profile_name, theme, status: 'ready', samples_count: samples.length }
     });
 
+    // Send notification for profile creation
+    try {
+      await autoNotification.sendProfileCreatedNotification(userId, profile_name);
+    } catch (notifError) {
+      console.warn('[WARN] Failed to send profile created notification:', notifError.message);
+    }
+
     res.status(201).json({
       success: true,
       profile_id: profileId,
@@ -579,17 +612,19 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
 // ============================================================================
 
 exports.getProfile = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { profile_id } = req.query;
 
     if (!profile_id) {
-      return res.status(400).json({ error: 'profile_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
 
     if (!profileDoc.exists) {
-      return res.status(404).json({ error: 'Profile not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
 
     const profileData = profileDoc.data();
@@ -610,7 +645,7 @@ exports.getProfile = async (req, res) => {
     });
   } catch (error) {
     console.error('[ERROR] Get profile error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
 
@@ -619,11 +654,13 @@ exports.getProfile = async (req, res) => {
 // ============================================================================
 
 exports.getProfiles = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { user_id } = req.query;
 
     if (!user_id) {
-      return res.status(400).json({ error: 'user_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     // Optimized: Use samplesCount stored in profile document instead of N+1 queries
@@ -653,7 +690,7 @@ exports.getProfiles = async (req, res) => {
     });
   } catch (error) {
     console.error('[ERROR] Get profiles error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
 
@@ -662,18 +699,20 @@ exports.getProfiles = async (req, res) => {
 // ============================================================================
 
 exports.deleteProfile = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     // Support both body and params for flexibility
     const profile_id = req.body.profile_id || req.params.id;
 
     if (!profile_id) {
-      return res.status(400).json({ error: 'profile_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
 
     if (!profileDoc.exists) {
-      return res.status(404).json({ error: 'Profile not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
 
     const samplesSnapshot = await db.collection('voice_profiles')
@@ -702,10 +741,10 @@ exports.deleteProfile = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Profile deleted successfully'
+      message: l.t('voice_profile.deleted')
     });
   } catch (error) {
     console.error('[ERROR] Delete profile error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };

@@ -11,6 +11,7 @@ const { CREDIT_PACKAGES, getPackageByVariantId, getPackageByPrice } = require('.
 const logger = require('../utils/logger');
 const realtimeController = require('./realtime.controller');
 const autoNotification = require('../services/autoNotification.service');
+const { createLocalizer } = require('../utils/localized-messages.util');
 
 // Webhook event types
 const WEBHOOK_EVENTS = {
@@ -33,11 +34,13 @@ const WEBHOOK_EVENTS = {
  * Create checkout session for credit package
  */
 exports.createCheckout = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { variantId, packageId, userId, email } = req.body;
 
     if (!variantId || !userId) {
-      return res.status(400).json({ error: 'variantId and userId are required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const checkoutUrl = await lemonSqueezy.createCheckout(variantId, {
@@ -51,7 +54,7 @@ exports.createCheckout = async (req, res) => {
     res.json({ success: true, checkoutUrl });
   } catch (error) {
     logger.error('Create checkout failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -75,7 +78,7 @@ exports.handleWebhook = async (req, res) => {
     if (webhookSecret && signature) {
       if (!lemonSqueezy.verifyWebhookSignature(rawBody, signature)) {
         logger.warn('Invalid webhook signature', { signature: signature?.substring(0, 20) + '...' });
-        return res.status(401).json({ error: 'Invalid signature' });
+        return res.status(401).json({ success: false, error: 'Invalid signature', code: 'INVALID_SIGNATURE' });
       }
       logger.info('Webhook signature verified');
     } else if (!webhookSecret) {
@@ -156,7 +159,7 @@ exports.handleWebhook = async (req, res) => {
       stack: error.stack,
       body: req.body 
     });
-    res.status(500).json({ error: 'Webhook processing failed', details: error.message });
+    res.status(500).json({ success: false, error: 'Webhook processing failed', code: 'WEBHOOK_ERROR', details: error.message });
   }
 };
 
@@ -574,11 +577,13 @@ async function handleLicenseKeyCreated(data, customData) {
  * Get user subscription status
  */
 exports.getSubscriptionStatus = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { user_id } = req.query;
 
     if (!user_id) {
-      return res.status(400).json({ error: 'user_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const subsSnapshot = await db.collection('subscriptions')
@@ -606,7 +611,7 @@ exports.getSubscriptionStatus = async (req, res) => {
     });
   } catch (error) {
     logger.error('Get subscription status failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -614,22 +619,24 @@ exports.getSubscriptionStatus = async (req, res) => {
  * Cancel subscription
  */
 exports.cancelSubscription = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { subscription_id } = req.body;
 
     if (!subscription_id) {
-      return res.status(400).json({ error: 'subscription_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     await lemonSqueezy.cancelSubscription(subscription_id);
 
     res.json({
       success: true,
-      message: 'Subscription will be cancelled at the end of billing period. No refund will be issued.'
+      message: l.t('success.updated')
     });
   } catch (error) {
     logger.error('Cancel subscription failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -637,19 +644,21 @@ exports.cancelSubscription = async (req, res) => {
  * Pause subscription
  */
 exports.pauseSubscription = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { subscription_id, mode = 'void' } = req.body;
 
     if (!subscription_id) {
-      return res.status(400).json({ error: 'subscription_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const result = await lemonSqueezy.pauseSubscription(subscription_id, mode);
 
-    res.json({ success: true, message: 'Subscription paused', subscription: result });
+    res.json({ success: true, message: l.t('success.updated'), subscription: result });
   } catch (error) {
     logger.error('Pause subscription failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -657,19 +666,21 @@ exports.pauseSubscription = async (req, res) => {
  * Resume subscription
  */
 exports.resumeSubscription = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { subscription_id } = req.body;
 
     if (!subscription_id) {
-      return res.status(400).json({ error: 'subscription_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const result = await lemonSqueezy.resumeSubscription(subscription_id);
 
-    res.json({ success: true, message: 'Subscription resumed', subscription: result });
+    res.json({ success: true, message: l.t('success.updated'), subscription: result });
   } catch (error) {
     logger.error('Resume subscription failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -677,19 +688,21 @@ exports.resumeSubscription = async (req, res) => {
  * Update subscription plan
  */
 exports.updateSubscriptionPlan = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { subscription_id, variant_id } = req.body;
 
     if (!subscription_id || !variant_id) {
-      return res.status(400).json({ error: 'subscription_id and variant_id are required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const result = await lemonSqueezy.updateSubscription(subscription_id, variant_id);
 
-    res.json({ success: true, message: 'Subscription plan updated', subscription: result });
+    res.json({ success: true, message: l.t('success.updated'), subscription: result });
   } catch (error) {
     logger.error('Update subscription plan failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -697,6 +710,8 @@ exports.updateSubscriptionPlan = async (req, res) => {
  * Get available products/plans from Lemon Squeezy
  */
 exports.getProducts = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const products = await lemonSqueezy.getProducts();
 
@@ -722,7 +737,7 @@ exports.getProducts = async (req, res) => {
     res.json({ success: true, products: productsWithVariants });
   } catch (error) {
     logger.error('Get products failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -730,11 +745,13 @@ exports.getProducts = async (req, res) => {
  * Get customer portal URL
  */
 exports.getCustomerPortal = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { customer_id } = req.query;
 
     if (!customer_id) {
-      return res.status(400).json({ error: 'customer_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const portalUrl = await lemonSqueezy.getCustomerPortalUrl(customer_id);
@@ -742,7 +759,7 @@ exports.getCustomerPortal = async (req, res) => {
     res.json({ success: true, portalUrl });
   } catch (error) {
     logger.error('Get customer portal failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -750,11 +767,13 @@ exports.getCustomerPortal = async (req, res) => {
  * Validate license key
  */
 exports.validateLicense = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { license_key } = req.body;
 
     if (!license_key) {
-      return res.status(400).json({ error: 'license_key is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const result = await lemonSqueezy.validateLicenseKey(license_key);
@@ -762,7 +781,7 @@ exports.validateLicense = async (req, res) => {
     res.json({ success: true, ...result });
   } catch (error) {
     logger.error('Validate license failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -770,11 +789,13 @@ exports.validateLicense = async (req, res) => {
  * Activate license key
  */
 exports.activateLicense = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { license_key, instance_name } = req.body;
 
     if (!license_key || !instance_name) {
-      return res.status(400).json({ error: 'license_key and instance_name are required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const result = await lemonSqueezy.activateLicenseKey(license_key, instance_name);
@@ -782,7 +803,7 @@ exports.activateLicense = async (req, res) => {
     res.json({ success: true, ...result });
   } catch (error) {
     logger.error('Activate license failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -790,11 +811,13 @@ exports.activateLicense = async (req, res) => {
  * Deactivate license key
  */
 exports.deactivateLicense = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { license_key, instance_id } = req.body;
 
     if (!license_key || !instance_id) {
-      return res.status(400).json({ error: 'license_key and instance_id are required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const result = await lemonSqueezy.deactivateLicenseKey(license_key, instance_id);
@@ -802,7 +825,7 @@ exports.deactivateLicense = async (req, res) => {
     res.json({ success: true, ...result });
   } catch (error) {
     logger.error('Deactivate license failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -810,11 +833,13 @@ exports.deactivateLicense = async (req, res) => {
  * Get order history for user
  */
 exports.getOrderHistory = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { user_id, limit = 20 } = req.query;
 
     if (!user_id) {
-      return res.status(400).json({ error: 'user_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const ordersSnapshot = await db.collection('orders')
@@ -831,7 +856,7 @@ exports.getOrderHistory = async (req, res) => {
     res.json({ success: true, orders });
   } catch (error) {
     logger.error('Get order history failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
@@ -840,11 +865,13 @@ exports.getOrderHistory = async (req, res) => {
  * Returns the latest order created after a given timestamp
  */
 exports.checkPaymentStatus = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { user_id, since } = req.query;
 
     if (!user_id) {
-      return res.status(400).json({ error: 'user_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     // Parse since timestamp (default: 5 minutes ago)
@@ -919,7 +946,7 @@ exports.checkPaymentStatus = async (req, res) => {
     });
   } catch (error) {
     logger.error('Check payment status failed', { error: error.message });
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 

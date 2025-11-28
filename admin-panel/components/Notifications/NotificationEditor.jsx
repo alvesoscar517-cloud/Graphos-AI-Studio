@@ -5,20 +5,22 @@ import { useNotify } from '../Common/NotificationProvider';
 import CustomSelect from '../Common/CustomSelect';
 import './NotificationEditor.css';
 
-// Supported languages for translation
+// Supported languages for translation (matches main app's 15 languages)
 const SUPPORTED_LANGUAGES = [
   { code: 'vi', name: 'Vietnamese', flag: '🇻🇳' },
   { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
   { code: 'ko', name: 'Korean', flag: '🇰🇷' },
-  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+  { code: 'zh-CN', name: 'Chinese (Simplified)', flag: '🇨🇳' },
   { code: 'es', name: 'Spanish', flag: '🇪🇸' },
   { code: 'fr', name: 'French', flag: '🇫🇷' },
   { code: 'de', name: 'German', flag: '🇩🇪' },
   { code: 'pt', name: 'Portuguese', flag: '🇧🇷' },
   { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+  { code: 'it', name: 'Italian', flag: '🇮🇹' },
+  { code: 'th', name: 'Thai', flag: '🇹🇭' },
+  { code: 'id', name: 'Indonesian', flag: '🇮🇩' },
   { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
   { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
-  { code: 'th', name: 'Thai', flag: '🇹🇭' },
 ];
 
 export default function NotificationEditor() {

@@ -55,7 +55,7 @@
 
 #admin-root .detail-grid {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr 280px;
   gap: 24px;
 }
 
@@ -92,176 +92,207 @@
   filter: brightness(0);
 }
 
-/* Main Card */
-#admin-root .card-header {
+/* Compact Header */
+#admin-root .card-header-compact {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
   margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #f0f0f0;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-#admin-root .ticket-meta {
+#admin-root .meta-row {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#admin-root .meta-divider {
+  color: #ccc;
+  font-size: 10px;
+}
+
+#admin-root .meta-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #666;
+}
+
+#admin-root .meta-info img {
+  width: 12px;
+  height: 12px;
+  filter: brightness(0);
+  opacity: 0.5;
 }
 
 #admin-root .support-detail .type-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 6px !important;
-  font-size: 12px;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 4px !important;
+  font-size: 11px;
   font-weight: 600;
-  background: #fafafa;
+  background: #f5f5f5;
   color: #333;
   border: 1px solid #e0e0e0;
 }
 
 #admin-root .support-detail .type-badge img {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   filter: brightness(0);
-  opacity: 0.7;
-}
-
-#admin-root .support-detail .type-badge.billing_support,
-#admin-root .support-detail .type-badge.feedback {
-  background: #fafafa;
-  color: #333;
-  border: 1px solid #e0e0e0;
+  opacity: 0.6;
 }
 
 #admin-root .support-detail .priority-badge {
-  padding: 8px 14px;
-  border-radius: 6px !important;
-  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 4px !important;
+  font-size: 11px;
   font-weight: 600;
+  text-transform: capitalize;
 }
 
-#admin-root .status-selector {
-  display: flex;
-  align-items: center;
-  gap: 0;
+/* Large Title Section */
+#admin-root .ticket-title-section {
+  margin-bottom: 20px;
 }
 
-#admin-root .status-selector label {
-  font-weight: 600;
-  font-size: 14px;
-  color: #666;
-}
-
-/* Legacy select styles - kept for backwards compatibility */
-#admin-root .status-selector select {
-  padding: 10px 16px;
-  border: 2px solid;
-  border-radius: 12px !important;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: white;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 36px;
-}
-
-#admin-root .status-selector select:hover {
-  opacity: 0.8;
-}
-
-#admin-root .status-selector select:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
-}
-
-#admin-root .ticket-title {
-  font-size: 24px;
+#admin-root .ticket-title-large {
+  font-size: 28px;
   font-weight: 700;
   color: #000;
-  margin: 0 0 24px 0;
-}
-
-#admin-root .ticket-info {
+  margin: 0;
+  line-height: 1.3;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-#admin-root .info-row {
-  display: flex;
+  align-items: center;
   gap: 12px;
-  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
-#admin-root .info-row > img {
-  width: 20px;
-  height: 20px;
-  margin-top: 2px;
-  flex-shrink: 0;
-  filter: brightness(0);
+#admin-root .translated-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 12px;
 }
 
-#admin-root .info-label {
-  font-size: 12px;
-  color: #999;
-  margin-bottom: 4px;
-}
-
-#admin-root .info-value {
-  font-weight: 600;
-  color: #000;
-  font-size: 14px;
-}
-
-#admin-root .info-sub {
-  font-size: 13px;
-  color: #666;
-  margin-top: 2px;
-}
-
-#admin-root .ticket-content {
-  padding: 20px;
+/* Large Content Section */
+#admin-root .ticket-content-large {
   background: #fafafa;
   border-radius: 12px !important;
-  margin-bottom: 24px;
   border: 1px solid #eee !important;
+  overflow: hidden;
 }
 
-#admin-root .ticket-content h3 {
-  margin: 0 0 12px 0;
+#admin-root .content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #eee;
+}
+
+#admin-root .content-label {
   font-size: 11px;
+  font-weight: 600;
   color: #888;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-weight: 600;
 }
 
-#admin-root .ticket-content p {
+#admin-root .translate-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#admin-root .translate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#admin-root .translate-btn:hover:not(:disabled) {
+  border-color: #000;
+  background: #000;
+  color: white;
+}
+
+#admin-root .translate-btn.active {
+  background: #000;
+  border-color: #000;
+  color: white;
+}
+
+#admin-root .translate-btn.original-btn {
+  background: #fff3e0;
+  border-color: #ffb74d;
+  color: #e65100;
+}
+
+#admin-root .translate-btn.original-btn:hover:not(:disabled) {
+  background: #e65100;
+  border-color: #e65100;
+  color: white;
+}
+
+#admin-root .translate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#admin-root .translating-indicator {
+  font-size: 11px;
+  color: #666;
+  font-style: italic;
+}
+
+#admin-root .content-body {
+  padding: 24px;
+}
+
+#admin-root .content-body p {
   margin: 0;
   color: #333;
-  line-height: 1.7;
+  line-height: 1.8;
   white-space: pre-wrap;
-  font-size: 14px;
+  font-size: 16px;
 }
 
-#admin-root .ticket-images h3 {
-  margin: 0 0 16px 0;
-  font-size: 14px;
+/* Ticket Images */
+#admin-root .ticket-images {
+  margin-top: 20px;
+}
+
+#admin-root .ticket-images h4 {
+  margin: 0 0 12px 0;
+  font-size: 13px;
   color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-weight: 600;
 }
 
 #admin-root .images-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
 }
 
 #admin-root .images-grid a {
@@ -278,12 +309,16 @@
 
 #admin-root .images-grid img {
   width: 100%;
-  height: 150px;
+  height: 100px;
   object-fit: cover;
   display: block;
 }
 
 /* Actions Card */
+#admin-root .actions-card {
+  height: fit-content;
+}
+
 #admin-root .actions-card h3 {
   margin-bottom: 16px;
   font-size: 14px;
@@ -342,6 +377,13 @@
   height: 16px;
   filter: brightness(0);
   opacity: 0.7;
+}
+
+/* Status Selector */
+#admin-root .status-selector {
+  display: flex;
+  align-items: center;
+  gap: 0;
 }
 
 /* Replies */
@@ -516,4 +558,177 @@
   #admin-root .detail-grid {
     grid-template-columns: 1fr;
   }
+  
+  #admin-root .actions-card {
+    order: -1;
+  }
+  
+  #admin-root .quick-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  #admin-root .action-btn {
+    flex: 1;
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 768px) {
+  #admin-root .card-header-compact {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  #admin-root .ticket-title-large {
+    font-size: 22px;
+  }
+  
+  #admin-root .content-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  #admin-root .translate-buttons {
+    width: 100%;
+  }
+  
+  #admin-root .translate-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+
+/* Image Thumbnail */
+#admin-root .image-thumbnail {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#admin-root .image-thumbnail:hover {
+  border-color: #000;
+  transform: scale(1.02);
+}
+
+#admin-root .image-thumbnail img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  display: block;
+}
+
+#admin-root .image-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+#admin-root .image-thumbnail:hover .image-overlay {
+  opacity: 1;
+}
+
+#admin-root .image-overlay img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+/* Image Lightbox */
+#admin-root .image-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 40px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+#admin-root .lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+#admin-root .lightbox-content > img {
+  max-width: 100%;
+  max-height: calc(90vh - 80px);
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+#admin-root .lightbox-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#admin-root .lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+#admin-root .lightbox-actions {
+  display: flex;
+  gap: 12px;
+}
+
+#admin-root .lightbox-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+#admin-root .lightbox-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#admin-root .lightbox-btn img {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(1);
 }

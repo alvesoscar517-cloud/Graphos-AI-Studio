@@ -11,6 +11,7 @@
 
 const { db } = require('../config/firebase');
 const logger = require('../utils/logger');
+const { createLocalizer } = require('../utils/localized-messages.util');
 
 // Store active SSE connections by userId
 const activeConnections = new Map();
@@ -54,10 +55,11 @@ const broadcastToUser = (userId, eventType, data) => {
  * SSE endpoint - single connection for all real-time updates
  */
 exports.events = async (req, res) => {
+  const l = createLocalizer(req);
   const { userId } = req.params;
 
   if (!userId) {
-    return res.status(400).json({ error: 'userId is required' });
+    return res.status(400).json({ success: false, ...l.error('invalid_input') });
   }
 
   // Setup SSE headers

@@ -20,11 +20,14 @@ const {
 } = require('../utils/multimodalHelper');
 const { validateModel } = require('../utils/validation');
 const activityLogService = require('../services/activityLog.service');
+const { createLocalizer } = require('../utils/localized-messages.util');
 
 /**
  * Send chat message (non-streaming)
  */
 exports.sendMessage = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { 
       messages, 
@@ -41,7 +44,8 @@ exports.sendMessage = async (req, res) => {
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ 
-        error: 'Messages array is required',
+        success: false,
+        ...l.error('invalid_input'),
         code: 'INVALID_INPUT'
       });
     }

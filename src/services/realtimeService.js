@@ -30,9 +30,24 @@ class RealtimeService {
   }
 
   /**
+   * Get auth token from Chrome extension or storage
+   */
+  async getAuthToken() {
+    try {
+      if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
+        const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' });
+        return response?.token || null;
+      }
+    } catch {
+      // Not in extension context
+    }
+    return null;
+  }
+
+  /**
    * Connect to SSE endpoint
    */
-  connect(userId) {
+  async connect(userId) {
     if (!userId) {
       console.warn('[WARNING] RealtimeService: userId required');
       return;
@@ -56,7 +71,13 @@ class RealtimeService {
 
     console.log('🔌 RealtimeService: Connecting...', { userId });
 
-    const url = `${CONFIG.API_BASE_URL}/api/realtime/events/${userId}`;
+    // Get auth token for SSE connection (EventSource doesn't support headers)
+    let url = `${CONFIG.API_BASE_URL}/api/realtime/events/${userId}`;
+    const authToken = await this.getAuthToken();
+    if (authToken) {
+      url += `?token=${encodeURIComponent(authToken)}`;
+    }
+    
     this.eventSource = new EventSource(url);
 
     this.eventSource.onopen = () => {
@@ -192,9 +213,9 @@ class RealtimeService {
     
     console.log(`[SYNC] RealtimeService: Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
     
-    this.reconnectTimeout = setTimeout(() => {
+    this.reconnectTimeout = setTimeout(async () => {
       if (this.userId) {
-        this.connect(this.userId);
+        await this.connect(this.userId);
       }
     }, delay);
   }
@@ -205,12 +226,12 @@ const realtimeService = new RealtimeService();
 
 // Auto-reconnect when tab becomes visible
 if (typeof document !== 'undefined') {
-  document.addEventListener('visibilitychange', () => {
+  document.addEventListener('visibilitychange', async () => {
     if (document.visibilityState === 'visible' && realtimeService.userId) {
       if (realtimeService.connectionStatus !== 'connected') {
         console.log('👁️ Tab visible, reconnecting...');
         realtimeService.reconnectAttempts = 0;
-        realtimeService.connect(realtimeService.userId);
+        await realtimeService.connect(realtimeService.userId);
       }
     }
   });

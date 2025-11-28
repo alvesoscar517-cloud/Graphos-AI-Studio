@@ -9,6 +9,11 @@ export function getApiBaseUrl() {
   return import.meta.env.VITE_API_URL || 'https://ai-backend-admin-472729326429.us-central1.run.app';
 }
 
+// Legacy CONFIG export for backward compatibility
+export const CONFIG = {
+  API_BASE_URL: getApiBaseUrl()
+};
+
 // App Configuration
 export const APP_CONFIG = {
   APP_NAME: 'AI Content Authenticator Admin',
@@ -90,11 +95,23 @@ export const APP_CONFIG = {
     { value: 'upgrade', label: 'Upgrade Plan' }
   ],
   
-  // Languages
+  // Languages (matches main app's 15 languages)
   LANGUAGES: [
-    { code: 'vi', label: 'Vietnamese', flag: '🇻🇳' },
     { code: 'en', label: 'English', flag: '🇬🇧' },
-    { code: 'ja', label: '日本語', flag: '🇯🇵' }
+    { code: 'vi', label: 'Vietnamese', flag: '🇻🇳' },
+    { code: 'zh-CN', label: 'Chinese (Simplified)', flag: '🇨🇳' },
+    { code: 'es', label: 'Spanish', flag: '🇪🇸' },
+    { code: 'fr', label: 'French', flag: '🇫🇷' },
+    { code: 'de', label: 'German', flag: '🇩🇪' },
+    { code: 'ja', label: 'Japanese', flag: '🇯🇵' },
+    { code: 'ko', label: 'Korean', flag: '🇰🇷' },
+    { code: 'pt', label: 'Portuguese', flag: '🇧🇷' },
+    { code: 'ru', label: 'Russian', flag: '🇷🇺' },
+    { code: 'it', label: 'Italian', flag: '🇮🇹' },
+    { code: 'th', label: 'Thai', flag: '🇹🇭' },
+    { code: 'id', label: 'Indonesian', flag: '🇮🇩' },
+    { code: 'ar', label: 'Arabic', flag: '🇸🇦' },
+    { code: 'hi', label: 'Hindi', flag: '🇮🇳' }
   ]
 };
 

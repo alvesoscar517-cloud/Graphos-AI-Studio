@@ -11,12 +11,7 @@ export default function UserDetail() {
   const navigate = useNavigate();
   const notify = useNotify();
   const [user, setUser] = useState(null);
-  const [logs, setLogs] = useState([]);
-  const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [logsLoading, setLogsLoading] = useState(false);
-  const [showLogs, setShowLogs] = useState(false);
-  const [showProfiles, setShowProfiles] = useState(false);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreditsModal, setShowCreditsModal] = useState(false);
@@ -51,15 +46,7 @@ export default function UserDetail() {
     }
   };
 
-  const loadProfiles = async () => {
-    try {
-      const response = await usersApi.getProfiles(id);
-      setProfiles(response.profiles);
-      setShowProfiles(true);
-    } catch (err) {
-      notify.error('Error loading profiles: ' + err.message);
-    }
-  };
+
 
   const handleEditUser = async () => {
     try {
@@ -98,38 +85,7 @@ export default function UserDetail() {
     }
   };
 
-  const handleDeleteProfile = async (profileId, profileName) => {
-    const confirmed = await notify.confirm({
-      title: 'Delete Profile',
-      message: `Are you sure you want to delete profile "${profileName}"?`,
-      confirmText: 'Delete',
-      type: 'danger'
-    });
 
-    if (!confirmed) return;
-
-    try {
-      await usersApi.deleteProfile(id, profileId);
-      notify.success('Profile deleted successfully!');
-      loadProfiles();
-      loadUser();
-    } catch (err) {
-      notify.error('Error: ' + err.message);
-    }
-  };
-
-  const loadLogs = async () => {
-    try {
-      setLogsLoading(true);
-      const response = await usersApi.getLogs(id, { limit: 100 });
-      setLogs(response.logs);
-      setShowLogs(true);
-    } catch (err) {
-      notify.error('Error loading logs: ' + err.message);
-    } finally {
-      setLogsLoading(false);
-    }
-  };
 
   const handleLockUser = async () => {
     console.log('[UserDetail] handleLockUser called', { userId: id, currentLocked: user.locked });
@@ -239,31 +195,7 @@ export default function UserDetail() {
     }
   };
 
-  const getLogIcon = (type) => {
-    const icons = {
-      'account_status': 'shield.svg',
-      'notification': 'bell.svg',
-      'profile': 'folder.svg',
-      'analysis': 'search.svg',
-      'rewrite': 'edit.svg',
-      'login': 'log-in.svg',
-      'logout': 'log-out.svg'
-    };
-    return icons[type] || 'activity.svg';
-  };
 
-  const getLogColor = (type) => {
-    const colors = {
-      'account_status': '#f44336',
-      'notification': '#2196f3',
-      'profile': '#4caf50',
-      'analysis': '#ff9800',
-      'rewrite': '#9c27b0',
-      'login': '#00bcd4',
-      'logout': '#607d8b'
-    };
-    return colors[type] || '#666';
-  };
 
   if (loading) {
     return <LoadingScreen />;
@@ -425,130 +357,114 @@ export default function UserDetail() {
             Actions
           </h2>
           <div className="actions-grid">
-            <button className="action-btn primary" onClick={() => setShowEditModal(true)}>
+            <button 
+              className="action-btn primary" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[UserDetail] Edit User button clicked');
+                setShowEditModal(true);
+              }}
+              type="button"
+            >
               <img src="/icon/edit.svg" alt="Edit" className="action-icon" />
               <span className="action-label">Edit User</span>
             </button>
-            <button className="action-btn success" onClick={() => setShowCreditsModal(true)}>
+            <button 
+              className="action-btn success" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[UserDetail] Adjust Credits button clicked');
+                setShowCreditsModal(true);
+              }}
+              type="button"
+            >
               <img src="/icon/dollar-sign.svg" alt="Credits" className="action-icon" />
               <span className="action-label">Adjust Credits</span>
             </button>
-            <button className="action-btn" onClick={() => setShowNotificationModal(true)}>
+            <button 
+              className="action-btn" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[UserDetail] Send notification button clicked');
+                setShowNotificationModal(true);
+              }}
+              type="button"
+            >
               <img src="/icon/bell.svg" alt="Notification" className="action-icon" />
               <span className="action-label">Send notification</span>
             </button>
-            <button className="action-btn" onClick={loadProfiles}>
+            <button 
+              className="action-btn" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[UserDetail] Manage Profiles button clicked');
+                navigate(`/users/${id}/profiles`);
+              }}
+              type="button"
+            >
               <img src="/icon/folder.svg" alt="Profiles" className="action-icon" />
               <span className="action-label">Manage Profiles</span>
             </button>
-            <button className="action-btn" onClick={loadLogs}>
+            <button 
+              className="action-btn" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[UserDetail] View logs button clicked');
+                navigate(`/users/${id}/logs`);
+              }}
+              type="button"
+            >
               <img src="/icon/activity.svg" alt="Logs" className="action-icon" />
               <span className="action-label">View logs</span>
             </button>
-            <button className="action-btn" onClick={() => navigate(`/users/${id}/activity`)}>
+            <button 
+              className="action-btn" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[UserDetail] Activity Details button clicked');
+                navigate(`/users/${id}/activity`);
+              }}
+              type="button"
+            >
               <img src="/icon/bar-chart-2.svg" alt="Activity" className="action-icon" />
               <span className="action-label">Activity Details</span>
             </button>
-            <button className="action-btn" onClick={handleLockUser}>
+            <button 
+              className="action-btn" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[UserDetail] Lock/Unlock button clicked');
+                handleLockUser();
+              }}
+              type="button"
+            >
               <img src={`/icon/${user.locked ? 'unlock' : 'lock'}.svg`} alt="Lock" className="action-icon" />
               <span className="action-label">{user.locked ? 'Unlock' : 'Lock'} account</span>
             </button>
-            <button className="action-btn danger" onClick={handleDeleteUser}>
+            <button 
+              className="action-btn danger" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[UserDetail] Delete user button clicked');
+                handleDeleteUser();
+              }}
+              type="button"
+            >
               <img src="/icon/trash-2.svg" alt="Delete" className="action-icon" />
               <span className="action-label">Delete user</span>
             </button>
           </div>
         </div>
 
-        {/* Profiles Card */}
-        {showProfiles && (
-          <div className="detail-card full-width">
-            <div className="card-header-with-action">
-              <h2>
-                <img src="/icon/folder.svg" alt="Profiles" />
-                Voice Profiles ({profiles.length})
-              </h2>
-              <button className="btn-close" onClick={() => setShowProfiles(false)}>
-                <img src="/icon/x.svg" alt="Close" />
-              </button>
-            </div>
-            {profiles.length > 0 ? (
-              <div className="profiles-management-list">
-                {profiles.map(profile => (
-                  <div key={profile.id} className="profile-management-item">
-                    <div className="profile-info-main">
-                      <img src="/icon/file-text.svg" alt="Profile" className="profile-icon" />
-                      <div>
-                        <div className="profile-name">{profile.name}</div>
-                        <div className="profile-meta">
-                          <span className={`status-badge ${profile.status}`}>
-                            {profile.status === 'ready' ? 'Ready' : 'Processing'}
-                          </span>
-                          <span>{profile.samplesCount} samples</span>
-                          <span>{profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'N/A'}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button 
-                      className="btn-delete-profile"
-                      onClick={() => handleDeleteProfile(profile.id, profile.name)}
-                    >
-                      <img src="/icon/trash-2.svg" alt="Delete" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state">
-                <img src="/icon/inbox.svg" alt="Empty" />
-                <p>No profiles found</p>
-              </div>
-            )}
-          </div>
-        )}
 
-        {/* Logs Card */}
-        {showLogs && (
-          <div className="detail-card full-width">
-            <div className="card-header-with-action">
-              <h2>
-                <img src="/icon/activity.svg" alt="Logs" />
-                Activity Logs ({logs.length})
-              </h2>
-              <button className="btn-close" onClick={() => setShowLogs(false)}>
-                <img src="/icon/x.svg" alt="Close" />
-              </button>
-            </div>
-            {logsLoading ? (
-              <div className="loading-small">Loading logs...</div>
-            ) : logs.length > 0 ? (
-              <div className="logs-list">
-                {logs.map(log => (
-                  <div key={log.id} className="log-item">
-                    <div className="log-icon" style={{ background: getLogColor(log.type) }}>
-                      <img src={`/icon/${getLogIcon(log.type)}`} alt={log.type} />
-                    </div>
-                    <div className="log-content">
-                      <div className="log-header">
-                        <span className="log-type">{log.type}</span>
-                        <span className="log-action">{log.action}</span>
-                      </div>
-                      {log.reason && <div className="log-reason">Reason: {log.reason}</div>}
-                      <div className="log-time">
-                        {new Date(log.timestamp).toLocaleString('en-US')}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state">
-                <img src="/icon/inbox.svg" alt="Empty" />
-                <p>No activities yet</p>
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Notification Modal */}

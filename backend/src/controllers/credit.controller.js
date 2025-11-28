@@ -7,6 +7,7 @@ const { db } = require('../config/firebase');
 const { CREDIT_PACKAGES } = require('../config/pricing');
 const creditService = require('../services/credit.service');
 const logger = require('../utils/logger');
+const { createLocalizer } = require('../utils/localized-messages.util');
 
 // ============================================================================
 // GET CREDIT PACKAGES
@@ -16,6 +17,8 @@ const logger = require('../utils/logger');
  * Get all available credit packages
  */
 exports.getCreditPackages = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const packages = Object.entries(CREDIT_PACKAGES).map(([key, pkg]) => ({
       id: key,
@@ -25,11 +28,12 @@ exports.getCreditPackages = async (req, res) => {
     
     res.json({
       success: true,
-      packages
+      packages,
+      language: l.lang
     });
   } catch (error) {
     logger.error('Error getting packages', { error: error.message });
-    res.status(500).json({ error: 'Failed to get packages' });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 
@@ -41,17 +45,19 @@ exports.getCreditPackages = async (req, res) => {
  * Purchase credit package
  */
 exports.purchaseCreditPackage = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { user_id, package_id, payment_method } = req.body;
     
     if (!user_id || !package_id) {
-      return res.status(400).json({ error: 'user_id and package_id are required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
     const pkg = CREDIT_PACKAGES[package_id];
     
     if (!pkg) {
-      return res.status(400).json({ error: 'Invalid package_id' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input'), details: 'Invalid package_id' });
     }
     
     // TODO: Process payment with payment_method
@@ -82,17 +88,18 @@ exports.purchaseCreditPackage = async (req, res) => {
     
     res.json({
       success: true,
-      message: `Successfully purchased ${totalCredits} credits`,
+      message: l.t('credits.purchase_success', { amount: totalCredits }),
       package: {
         id: package_id,
         ...pkg,
         totalCredits
       },
-      creditsAdded: totalCredits
+      creditsAdded: totalCredits,
+      language: l.lang
     });
   } catch (error) {
     logger.error('Error purchasing package', { error: error.message });
-    res.status(500).json({ error: 'Failed to purchase package' });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 
@@ -104,22 +111,26 @@ exports.purchaseCreditPackage = async (req, res) => {
  * Get user's credit balance
  */
 exports.getCreditBalance = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { user_id } = req.query;
     
     if (!user_id) {
-      return res.status(400).json({ error: 'user_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
     const credits = await creditService.getUserCredits(user_id);
     
     res.json({
       success: true,
-      credits
+      credits,
+      balance_message: l.t('credits.balance', { amount: credits.balance }),
+      language: l.lang
     });
   } catch (error) {
     logger.error('Error getting credit balance', { error: error.message });
-    res.status(500).json({ error: 'Failed to get credit balance' });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 
@@ -127,11 +138,13 @@ exports.getCreditBalance = async (req, res) => {
  * Get credit transaction history
  */
 exports.getCreditHistory = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { user_id, limit = 50 } = req.query;
     
     if (!user_id) {
-      return res.status(400).json({ error: 'user_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
     const transactionsSnapshot = await db.collection('credit_transactions')
@@ -147,11 +160,12 @@ exports.getCreditHistory = async (req, res) => {
     
     res.json({
       success: true,
-      transactions
+      transactions,
+      language: l.lang
     });
   } catch (error) {
     logger.error('Error getting credit history', { error: error.message });
-    res.status(500).json({ error: 'Failed to get credit history' });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 

@@ -6,6 +6,8 @@
 const admin = require('firebase-admin');
 const config = require('../config');
 const logger = require('../utils/logger');
+const localization = require('../services/localization.service');
+const { getLanguage } = require('./language.middleware');
 
 // Initialize Firebase Admin if not already initialized
 let firebaseAdmin = null;
@@ -67,14 +69,20 @@ function extractBearerToken(authHeader) {
  * Authentication middleware - verifies user identity
  * Checks in order:
  * 1. Firebase ID token in Authorization header
- * 2. API key in X-API-Key header (for service-to-service)
- * 3. Legacy user_id in body/query (deprecated, will be removed)
+ * 2. Firebase ID token in query param (for SSE/EventSource which doesn't support headers)
+ * 3. API key in X-API-Key header (for service-to-service)
+ * 4. Legacy user_id in body/query (deprecated, will be removed)
  */
 async function authenticate(req, res, next) {
   try {
-    // 1. Try Firebase token authentication
+    // 1. Try Firebase token authentication from header
     const authHeader = req.headers.authorization;
-    const idToken = extractBearerToken(authHeader);
+    let idToken = extractBearerToken(authHeader);
+    
+    // 2. Try token from query param (for SSE/EventSource)
+    if (!idToken && req.query.token) {
+      idToken = req.query.token;
+    }
     
     if (idToken) {
       const user = await verifyFirebaseToken(idToken);
@@ -110,15 +118,18 @@ async function authenticate(req, res, next) {
     }
     
     // No valid authentication found
+    const lang = getLanguage(req);
     return res.status(401).json({
-      error: 'Authentication required',
-      code: 'AUTH_REQUIRED',
-      message: 'Please provide a valid authentication token'
+      success: false,
+      error: localization.translate('errors.unauthorized', lang),
+      code: 'AUTH_REQUIRED'
     });
   } catch (error) {
     logger.error('Authentication error', { error: error.message });
+    const lang = getLanguage(req);
     return res.status(500).json({
-      error: 'Authentication failed',
+      success: false,
+      error: localization.translate('errors.server_error', lang),
       code: 'AUTH_ERROR'
     });
   }
@@ -182,8 +193,10 @@ function userRateLimit(req, res, next) {
   const validRequests = requests.filter(t => now - t < USER_RATE_LIMIT_WINDOW);
   
   if (validRequests.length >= USER_RATE_LIMIT_MAX) {
+    const lang = getLanguage(req);
     return res.status(429).json({
-      error: 'Rate limit exceeded',
+      success: false,
+      error: localization.translate('errors.rate_limited', lang),
       code: 'RATE_LIMIT_EXCEEDED',
       retryAfter: Math.ceil(USER_RATE_LIMIT_WINDOW / 1000)
     });

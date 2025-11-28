@@ -304,6 +304,9 @@
   border-radius: 12px !important;
   cursor: pointer;
   transition: background 0.15s !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 #admin-root .user-detail .action-btn:hover,

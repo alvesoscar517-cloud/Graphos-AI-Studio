@@ -10,6 +10,8 @@ const corsMiddleware = require('./src/middleware/cors');
 const { errorHandler, notFoundHandler, requestTimeout } = require('./src/middleware/errorHandler.middleware');
 const rateLimitMiddleware = require('./src/middleware/rateLimit');
 const { activityLoggerMiddleware } = require('./src/middleware/activityLogger.middleware');
+const { languageMiddleware } = require('./src/middleware/language.middleware');
+const { responseLocalizationMiddleware } = require('./src/utils/response.util');
 const { correlationMiddleware, requestLogger } = require('./src/utils/logger');
 const routes = require('./src/routes');
 const logger = require('./src/utils/logger');
@@ -91,6 +93,12 @@ app.use(requestLogger);
 
 // 8. Activity logging middleware
 app.use(activityLoggerMiddleware);
+
+// 9. Language detection middleware
+app.use(languageMiddleware);
+
+// 10. Response localization helpers
+app.use(responseLocalizationMiddleware);
 
 // ============================================================================
 // HEALTH CHECK (before auth)

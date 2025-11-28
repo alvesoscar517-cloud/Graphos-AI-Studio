@@ -833,13 +833,13 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                     onClick={async () => {
                       try {
                         await syncNotes()
-                        modal.toast('Synced', '', 'success')
+                        modal.toast(t('history.synced'), '', 'success')
                       } catch (error) {
-                        modal.error('Unable to sync: ' + error.message)
+                        modal.error(t('history.unableToSync') + ': ' + error.message)
                       }
                     }}
                   >
-                    Sync from Drive
+                    {t('history.syncFromDrive')}
                   </button>
                 )}
               </div>

@@ -5,13 +5,27 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "node index.js"
+    "dev": "node index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "engines": {
     "node": "18"
   },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "fast-check": "^3.15.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/__tests__/**/*.test.js"],
+    "collectCoverageFrom": ["src/**/*.js"],
+    "coveragePathIgnorePatterns": ["/node_modules/", "/__tests__/"]
+  },
   "dependencies": {
     "@google-cloud/aiplatform": "^3.11.0",
+    "bcryptjs": "^2.4.3",
     "@google-cloud/firestore": "^7.1.0",
     "@google-cloud/vertexai": "^1.1.0",
     "compromise": "^14.10.0",

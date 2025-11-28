@@ -5,13 +5,16 @@
 
 const { db, FieldValue } = require('../config/firebase');
 const logger = require('../utils/logger');
+const { createLocalizer } = require('../utils/localized-messages.util');
 
 exports.getUserNotifications = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { user_id, unread_only = false, limit = 50 } = req.query;
     
     if (!user_id) {
-      return res.status(400).json({ error: 'user_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
     let snapshot;
@@ -83,11 +86,26 @@ exports.getUserNotifications = async (req, res) => {
     
     const unreadCount = notifications.filter(n => !n.read).length;
     
+    // Localize notifications based on user language
+    const localizedNotifications = notifications.map(notif => {
+      // If notification has translations, use the appropriate language
+      if (notif.translations && notif.translations[l.lang]) {
+        return {
+          ...notif,
+          title: notif.translations[l.lang].title || notif.title,
+          message: notif.translations[l.lang].message || notif.message,
+          cta: notif.translations[l.lang].cta || notif.cta
+        };
+      }
+      return notif;
+    });
+
     res.json({
       success: true,
-      notifications,
-      count: notifications.length,
-      unreadCount
+      notifications: localizedNotifications,
+      count: localizedNotifications.length,
+      unreadCount,
+      language: l.lang
     });
   } catch (error) {
     console.error('[ERROR] Get user notifications error:', error);
@@ -97,28 +115,30 @@ exports.getUserNotifications = async (req, res) => {
       stack: error.stack,
       code: error.code 
     });
-    res.status(500).json({ error: error.message || String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
   }
 };
 
 exports.markAsRead = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { id } = req.params;
     const { user_id } = req.body;
     
     if (!user_id) {
-      return res.status(400).json({ error: 'user_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
     const notifRef = db.collection('user_notifications').doc(id);
     const notifDoc = await notifRef.get();
     
     if (!notifDoc.exists) {
-      return res.status(404).json({ error: 'Notification not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
     
     if (notifDoc.data().userId !== user_id) {
-      return res.status(403).json({ error: 'Unauthorized' });
+      return res.status(403).json({ success: false, ...l.error('forbidden') });
     }
     
     await notifRef.update({
@@ -135,32 +155,34 @@ exports.markAsRead = async (req, res) => {
     
     res.json({
       success: true,
-      message: 'Notification marked as read'
+      message: l.t('notifications.mark_read')
     });
   } catch (error) {
     console.error('[ERROR] Mark notification as read error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 
 exports.markAsClicked = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { id } = req.params;
     const { user_id } = req.body;
     
     if (!user_id) {
-      return res.status(400).json({ error: 'user_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
     const notifRef = db.collection('user_notifications').doc(id);
     const notifDoc = await notifRef.get();
     
     if (!notifDoc.exists) {
-      return res.status(404).json({ error: 'Notification not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
     
     if (notifDoc.data().userId !== user_id) {
-      return res.status(403).json({ error: 'Unauthorized' });
+      return res.status(403).json({ success: false, ...l.error('forbidden') });
     }
     
     await notifRef.update({
@@ -177,54 +199,58 @@ exports.markAsClicked = async (req, res) => {
     
     res.json({
       success: true,
-      message: 'Notification marked as clicked'
+      message: l.t('success.updated')
     });
   } catch (error) {
     console.error('[ERROR] Mark notification as clicked error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 
 // Delete user notification
 exports.deleteNotification = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { id } = req.params;
     const { user_id } = req.body;
     
     if (!user_id) {
-      return res.status(400).json({ error: 'user_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
     const notifRef = db.collection('user_notifications').doc(id);
     const notifDoc = await notifRef.get();
     
     if (!notifDoc.exists) {
-      return res.status(404).json({ error: 'Notification not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
     
     if (notifDoc.data().userId !== user_id) {
-      return res.status(403).json({ error: 'Unauthorized' });
+      return res.status(403).json({ success: false, ...l.error('forbidden') });
     }
     
     await notifRef.delete();
     
     res.json({
       success: true,
-      message: 'Notification deleted'
+      message: l.t('success.deleted')
     });
   } catch (error) {
     console.error('[ERROR] Delete notification error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 
 // Mark all notifications as read
 exports.markAllAsRead = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { user_id } = req.body;
     
     if (!user_id) {
-      return res.status(400).json({ error: 'user_id is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
     // Query all user notifications and filter unread in memory
@@ -269,12 +295,12 @@ exports.markAllAsRead = async (req, res) => {
     
     res.json({
       success: true,
-      message: `Marked ${snapshot.size} notifications as read`,
+      message: l.t('notifications.mark_all_read'),
       updated: snapshot.size
     });
   } catch (error) {
     console.error('[ERROR] Mark all as read error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 

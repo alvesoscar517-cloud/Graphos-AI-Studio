@@ -5,18 +5,23 @@
 
 const creditService = require('../services/credit.service');
 const logger = require('../utils/logger');
+const localization = require('../services/localization.service');
+const { getLanguage } = require('./language.middleware');
 
 /**
  * Middleware to check and deduct credits for a feature
  */
 function requireCredits(featureName, costCalculator) {
   return async (req, res, next) => {
+    const lang = getLanguage(req);
+    
     try {
       const userId = req.body.user_id || req.query.user_id;
       
       if (!userId) {
         return res.status(401).json({ 
-          error: 'User ID required',
+          success: false,
+          error: localization.translate('errors.unauthorized', lang),
           code: 'USER_ID_REQUIRED'
         });
       }
@@ -30,7 +35,11 @@ function requireCredits(featureName, costCalculator) {
       if (!hasEnough) {
         const credits = await creditService.getUserCredits(userId);
         return res.status(402).json({ 
-          error: 'Insufficient credits',
+          success: false,
+          error: localization.translate('credits.insufficient', lang, { 
+            required: cost, 
+            available: credits.balance 
+          }),
           code: 'INSUFFICIENT_CREDITS',
           required: cost,
           available: credits.balance,
@@ -60,13 +69,15 @@ function requireCredits(featureName, costCalculator) {
       
       if (error.message === 'Insufficient credits') {
         return res.status(402).json({ 
-          error: 'Insufficient credits',
+          success: false,
+          error: localization.translate('errors.insufficient_credits', lang),
           code: 'INSUFFICIENT_CREDITS'
         });
       }
       
       return res.status(500).json({ 
-        error: 'Credit validation failed',
+        success: false,
+        error: localization.translate('errors.server_error', lang),
         details: error.message
       });
     }

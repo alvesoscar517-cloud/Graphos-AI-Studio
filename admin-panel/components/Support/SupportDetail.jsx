@@ -6,6 +6,26 @@ import LoadingScreen from '../Common/LoadingScreen';
 import CustomSelect from '../Common/CustomSelect';
 import './SupportDetail.css';
 
+// Free Google Translate API (unofficial)
+async function translateText(text, targetLang) {
+  if (!text || !text.trim()) return text;
+  
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    // Extract translated text from response
+    if (data && data[0]) {
+      return data[0].map(item => item[0]).join('');
+    }
+    return text;
+  } catch (error) {
+    console.error('Translation error:', error);
+    throw new Error('Translation failed');
+  }
+}
+
 export default function SupportDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -16,10 +36,26 @@ export default function SupportDetail() {
   const [sendEmail, setSendEmail] = useState(true);
   const [sendNotification, setSendNotification] = useState(true);
   const [sending, setSending] = useState(false);
+  
+  // Translation state
+  const [translating, setTranslating] = useState(false);
+  const [translatedTitle, setTranslatedTitle] = useState('');
+  const [translatedContent, setTranslatedContent] = useState('');
+  const [currentTranslateLang, setCurrentTranslateLang] = useState('');
+  
+  // Image lightbox state
+  const [lightboxImage, setLightboxImage] = useState(null);
 
   useEffect(() => {
     loadTicket();
   }, [id]);
+
+  // Reset translation when ticket changes
+  useEffect(() => {
+    setTranslatedTitle('');
+    setTranslatedContent('');
+    setCurrentTranslateLang('');
+  }, [ticket?.id]);
 
   const loadTicket = async () => {
     try {
@@ -41,6 +77,36 @@ export default function SupportDetail() {
       loadTicket();
     } catch (err) {
       notify.error('Error: ' + err.message);
+    }
+  };
+
+  const handleTranslate = async (targetLang) => {
+    if (translating) return;
+    
+    // If already translated to this language, clear translation
+    if (currentTranslateLang === targetLang) {
+      setTranslatedTitle('');
+      setTranslatedContent('');
+      setCurrentTranslateLang('');
+      return;
+    }
+
+    try {
+      setTranslating(true);
+      
+      const [titleResult, contentResult] = await Promise.all([
+        translateText(ticket.title, targetLang),
+        translateText(ticket.content, targetLang)
+      ]);
+      
+      setTranslatedTitle(titleResult);
+      setTranslatedContent(contentResult);
+      setCurrentTranslateLang(targetLang);
+      notify.success(`Translated to ${targetLang === 'en' ? 'English' : 'Vietnamese'}`);
+    } catch (err) {
+      notify.error('Translation failed: ' + err.message);
+    } finally {
+      setTranslating(false);
     }
   };
 
@@ -106,6 +172,9 @@ export default function SupportDetail() {
     return styles[priority] || styles.medium;
   };
 
+  const displayTitle = translatedTitle || ticket.title;
+  const displayContent = translatedContent || ticket.content;
+
   return (
     <div className="support-detail">
       <div className="detail-header">
@@ -120,16 +189,37 @@ export default function SupportDetail() {
       </div>
 
       <div className="detail-grid">
+        {/* Main Content Card - Redesigned */}
         <div className="detail-card main-card">
-          <div className="card-header">
-            <div className="ticket-meta">
+          {/* Compact Header with Meta */}
+          <div className="card-header-compact">
+            <div className="meta-row">
               <span className={`type-badge ${ticket.type}`}>
                 <img src={`/icon/${ticket.type === 'billing_support' ? 'dollar-sign' : 'message-square'}.svg`} alt={ticket.type} />
-                {ticket.type === 'billing_support' ? 'Billing Support' : 'Feedback'}
+                {ticket.type === 'billing_support' ? 'Billing' : 'Feedback'}
               </span>
               <span className="priority-badge" style={{ background: getPriorityStyle(ticket.priority).bg, color: getPriorityStyle(ticket.priority).color }}>
-                {ticket.priority === 'high' ? 'High' : ticket.priority === 'medium' ? 'Medium' : 'Low'}
+                {ticket.priority}
               </span>
+              <span className="meta-divider">•</span>
+              <span className="meta-info">
+                <img src="/icon/user.svg" alt="User" />
+                {ticket.userName || 'Anonymous'}
+              </span>
+              <span className="meta-info">
+                <img src="/icon/mail.svg" alt="Email" />
+                {ticket.userEmail}
+              </span>
+              <span className="meta-info">
+                <img src="/icon/calendar.svg" alt="Date" />
+                {new Date(ticket.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
+              {ticket.category && (
+                <span className="meta-info">
+                  <img src="/icon/tag.svg" alt="Category" />
+                  {ticket.category}
+                </span>
+              )}
             </div>
             <div className="status-selector">
               <CustomSelect
@@ -146,54 +236,87 @@ export default function SupportDetail() {
             </div>
           </div>
 
-          <h2 className="ticket-title">{ticket.title}</h2>
-
-          <div className="ticket-info">
-            <div className="info-row">
-              <img src="/icon/user.svg" alt="User" />
-              <div>
-                <div className="info-label">Sender</div>
-                <div className="info-value">{ticket.userName}</div>
-                <div className="info-sub">{ticket.userEmail}</div>
-              </div>
-            </div>
-            <div className="info-row">
-              <img src="/icon/calendar.svg" alt="Date" />
-              <div>
-                <div className="info-label">Created</div>
-                <div className="info-value">{new Date(ticket.createdAt).toLocaleString('en-US')}</div>
-              </div>
-            </div>
-            {ticket.category && (
-              <div className="info-row">
-                <img src="/icon/tag.svg" alt="Category" />
-                <div>
-                  <div className="info-label">Category</div>
-                  <div className="info-value">{ticket.category}</div>
-                </div>
-              </div>
-            )}
+          {/* Large Title */}
+          <div className="ticket-title-section">
+            <h2 className="ticket-title-large">
+              {displayTitle}
+              {currentTranslateLang && (
+                <span className="translated-badge">
+                  {currentTranslateLang === 'en' ? '🇬🇧' : '🇻🇳'} Translated
+                </span>
+              )}
+            </h2>
           </div>
 
-          <div className="ticket-content">
-            <h3>Content</h3>
-            <p>{ticket.content}</p>
+          {/* Large Content */}
+          <div className="ticket-content-large">
+            <div className="content-header">
+              <span className="content-label">Message</span>
+              <div className="translate-buttons">
+                {currentTranslateLang && (
+                  <button 
+                    className="translate-btn original-btn"
+                    onClick={() => {
+                      setTranslatedTitle('');
+                      setTranslatedContent('');
+                      setCurrentTranslateLang('');
+                    }}
+                    disabled={translating}
+                    title="Show original"
+                  >
+                    ↩ Original
+                  </button>
+                )}
+                <button 
+                  className={`translate-btn ${currentTranslateLang === 'en' ? 'active' : ''}`}
+                  onClick={() => handleTranslate('en')}
+                  disabled={translating || currentTranslateLang === 'en'}
+                  title="Translate to English"
+                >
+                  🇬🇧 English
+                </button>
+                <button 
+                  className={`translate-btn ${currentTranslateLang === 'vi' ? 'active' : ''}`}
+                  onClick={() => handleTranslate('vi')}
+                  disabled={translating || currentTranslateLang === 'vi'}
+                  title="Translate to Vietnamese"
+                >
+                  🇻🇳 Tiếng Việt
+                </button>
+                {translating && <span className="translating-indicator">Translating...</span>}
+              </div>
+            </div>
+            <div className="content-body">
+              <p>{displayContent}</p>
+            </div>
           </div>
 
+          {/* Attached Images */}
           {ticket.images && ticket.images.length > 0 && (
             <div className="ticket-images">
-              <h3>Attached images</h3>
+              <h4>Attachments ({ticket.images.length})</h4>
               <div className="images-grid">
                 {ticket.images.map((img, index) => (
-                  <a key={index} href={img} target="_blank" rel="noopener noreferrer">
+                  <div 
+                    key={index} 
+                    className="image-thumbnail"
+                    onClick={() => setLightboxImage(img)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setLightboxImage(img)}
+                  >
                     <img src={img} alt={`Attachment ${index + 1}`} />
-                  </a>
+                    <div className="image-overlay">
+                      <img src="/icon/zoom-in.svg" alt="View" />
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
           )}
         </div>
 
+        {/* Quick Actions Card */}
         <div className="detail-card actions-card">
           <h3>Quick actions</h3>
           <div className="quick-actions">
@@ -231,6 +354,7 @@ export default function SupportDetail() {
           </div>
         </div>
 
+        {/* Replies Section */}
         <div className="detail-card full-width">
           <h3>
             <img src="/icon/message-circle.svg" alt="Replies" />
@@ -295,6 +419,44 @@ export default function SupportDetail() {
           </form>
         </div>
       </div>
+
+      {/* Image Lightbox */}
+      {lightboxImage && (
+        <div 
+          className="image-lightbox"
+          onClick={() => setLightboxImage(null)}
+        >
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="lightbox-close"
+              onClick={() => setLightboxImage(null)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+            <img src={lightboxImage} alt="Full size attachment" />
+            <div className="lightbox-actions">
+              <a 
+                href={lightboxImage} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="lightbox-btn"
+              >
+                <img src="/icon/external-link.svg" alt="Open" />
+                Open in new tab
+              </a>
+              <a 
+                href={lightboxImage} 
+                download
+                className="lightbox-btn"
+              >
+                <img src="/icon/download.svg" alt="Download" />
+                Download
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

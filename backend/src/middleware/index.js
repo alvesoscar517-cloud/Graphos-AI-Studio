@@ -49,6 +49,15 @@ const creditMiddleware = require('./credit.middleware');
 // Activity Logger
 const { activityLoggerMiddleware, logUserActivity } = require('./activityLogger.middleware');
 
+// Language
+const { 
+  languageMiddleware, 
+  getLanguage, 
+  isSupported,
+  SUPPORTED_LANGUAGES,
+  DEFAULT_LANGUAGE 
+} = require('./language.middleware');
+
 module.exports = {
   // Auth
   authenticate,
@@ -85,5 +94,12 @@ module.exports = {
   rateLimitMiddleware,
   creditMiddleware,
   activityLoggerMiddleware,
-  logUserActivity
+  logUserActivity,
+  
+  // Language
+  languageMiddleware,
+  getLanguage,
+  isSupported,
+  SUPPORTED_LANGUAGES,
+  DEFAULT_LANGUAGE
 };

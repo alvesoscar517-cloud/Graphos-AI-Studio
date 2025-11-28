@@ -1,10 +1,12 @@
+/* Confirm Dialog Styles - Modern Minimalist Design */
 #admin-root .confirm-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,64 +26,86 @@
 
 #admin-root .confirm-dialog {
   background: #000;
-  border-radius: 8px;
-  border: 1px solid #333;
-  padding: 32px;
-  max-width: 440px;
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 480px;
   width: 100%;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
   text-align: center;
   animation: slideUp 0.3s ease-out;
 }
 
+#admin-root .confirm-dialog-warning,
+#admin-root .confirm-dialog-info {
+  background: white;
+}
+
 @keyframes slideUp {
   from {
-    transform: translateY(40px);
     opacity: 0;
+    transform: translateY(20px);
   }
   to {
-    transform: translateY(0);
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
+#admin-root .confirm-icon-wrapper {
+  margin-bottom: 24px;
+}
+
 #admin-root .confirm-icon {
-  width: 48px;
-  height: 48px;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 20px;
-  background: #111;
-  border: 1px solid #333;
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.confirm-icon-warning,
-.confirm-icon-danger,
-#admin-root .confirm-icon-info {
-  background: #111;
-  border: 1px solid #333;
+#admin-root .confirm-dialog-warning .confirm-icon,
+#admin-root .confirm-dialog-info .confirm-icon {
+  border: 2px solid rgba(0, 0, 0, 0.08);
 }
 
 #admin-root .confirm-icon img {
-  width: 24px;
-  height: 24px;
-  filter: invert(1);
+  width: 32px;
+  height: 32px;
+  filter: brightness(0) invert(1);
+}
+
+#admin-root .confirm-dialog-warning .confirm-icon img,
+#admin-root .confirm-dialog-info .confirm-icon img {
+  filter: brightness(0);
 }
 
 #admin-root .confirm-title {
-  margin: 0 0 12px 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.5px;
+}
+
+#admin-root .confirm-dialog-warning .confirm-title,
+#admin-root .confirm-dialog-info .confirm-title {
+  color: #000;
 }
 
 #admin-root .confirm-message {
-  margin: 0 0 28px 0;
-  font-size: 14px;
-  color: #999;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 32px 0;
   line-height: 1.6;
   white-space: pre-line;
+}
+
+#admin-root .confirm-dialog-warning .confirm-message,
+#admin-root .confirm-dialog-info .confirm-message {
+  color: #666;
 }
 
 #admin-root .confirm-actions {
@@ -89,48 +113,73 @@
   gap: 12px;
 }
 
-#admin-root .btn-confirm-cancel {
+#admin-root .btn-confirm-cancel,
+#admin-root .btn-confirm-ok {
   flex: 1;
-  background: #111;
-  color: #fff;
-  border: 1px solid #333;
+  padding: 16px 28px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
 }
 
-#admin-root .btn-confirm-cancel:hover {
+/* Dark dialog buttons (danger type) */
+#admin-root .confirm-dialog-danger .btn-confirm-cancel {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#admin-root .confirm-dialog-danger .btn-confirm-cancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+#admin-root .confirm-dialog-danger .btn-confirm-ok {
+  background: white;
+  color: #000;
+}
+
+#admin-root .confirm-dialog-danger .btn-confirm-ok:hover {
+  background: #f0f0f0;
+}
+
+/* Light dialog buttons (warning/info type) */
+#admin-root .confirm-dialog-warning .btn-confirm-cancel,
+#admin-root .confirm-dialog-info .btn-confirm-cancel {
+  background: white;
+  color: #000;
+  border: 1px solid #e0e0e0;
+}
+
+#admin-root .confirm-dialog-warning .btn-confirm-cancel:hover,
+#admin-root .confirm-dialog-info .btn-confirm-cancel:hover {
+  background: #f8f8f8;
+}
+
+#admin-root .confirm-dialog-warning .btn-confirm-ok,
+#admin-root .confirm-dialog-info .btn-confirm-ok {
+  background: #000;
+  color: white;
+}
+
+#admin-root .confirm-dialog-warning .btn-confirm-ok:hover,
+#admin-root .confirm-dialog-info .btn-confirm-ok:hover {
   background: #222;
 }
 
-#admin-root .btn-confirm-ok {
-  flex: 1;
-  background: #fff;
-  color: #000;
-  border: 1px solid #fff;
-}
-
-#admin-root .btn-confirm-ok:hover {
-  background: #e5e5e5;
-}
-
-.btn-confirm-warning,
-.btn-confirm-danger,
-#admin-root .btn-confirm-info {
-  background: #fff;
-  color: #000;
-  border: 1px solid #fff;
-}
-
-.btn-confirm-warning:hover,
-.btn-confirm-danger:hover,
-#admin-root .btn-confirm-info:hover {
-  background: #e5e5e5;
-}
-
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   #admin-root .confirm-dialog {
-    padding: 24px;
+    padding: 32px 24px;
+    border-radius: 20px;
   }
-
+  
+  #admin-root .confirm-title {
+    font-size: 24px;
+  }
+  
   #admin-root .confirm-actions {
-    flex-direction: column-reverse;
+    flex-direction: column;
   }
 }

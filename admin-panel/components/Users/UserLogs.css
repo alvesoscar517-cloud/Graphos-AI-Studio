@@ -1,0 +1,306 @@
+.user-logs-page {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* User Quick Info */
+.user-logs-page .user-quick-info {
+  display: flex;
+  gap: 24px;
+  padding: 16px 20px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.user-logs-page .user-quick-info .info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-logs-page .user-quick-info .label {
+  color: #666;
+  font-size: 14px;
+}
+
+.user-logs-page .user-quick-info .value {
+  color: #000;
+  font-weight: 500;
+}
+
+/* Filters */
+.user-logs-page .logs-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.user-logs-page .filter-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+.user-logs-page .filter-btn:hover {
+  background: #f5f5f5;
+  border-color: #d0d0d0;
+}
+
+.user-logs-page .filter-btn.active {
+  background: #000;
+  color: white;
+  border-color: #000;
+}
+
+/* Logs Content */
+.user-logs-page .logs-content {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 32px;
+  flex: 1;
+  min-height: 400px;
+  overflow-y: auto;
+}
+
+/* Empty State */
+.user-logs-page .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.user-logs-page .empty-state img {
+  width: 80px;
+  height: 80px;
+  opacity: 0.2;
+  filter: brightness(0);
+  margin-bottom: 20px;
+}
+
+.user-logs-page .empty-state h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+}
+
+.user-logs-page .empty-state p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Logs List */
+.user-logs-page .logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Log Card */
+.user-logs-page .log-card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.user-logs-page .log-card:hover {
+  background: #f5f5f5;
+  border-color: #d0d0d0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.user-logs-page .log-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-logs-page .log-card-icon img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+.user-logs-page .log-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.user-logs-page .log-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.user-logs-page .log-card-type {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+  text-transform: capitalize;
+}
+
+.user-logs-page .log-card-action {
+  padding: 4px 10px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+.user-logs-page .log-card-reason {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.user-logs-page .log-card-reason img {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0);
+  opacity: 0.5;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.user-logs-page .log-card-reason span {
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.user-logs-page .log-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.user-logs-page .log-detail-item {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.user-logs-page .log-detail-key {
+  font-weight: 600;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.user-logs-page .log-detail-value {
+  color: #000;
+  word-break: break-word;
+}
+
+.user-logs-page .log-card-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #999;
+}
+
+.user-logs-page .log-card-time img {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0);
+  opacity: 0.4;
+}
+
+/* Back Button */
+.user-logs-page .btn-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  color: #000;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.user-logs-page .btn-back:hover {
+  background: #f5f5f5;
+  border-color: #000;
+}
+
+.user-logs-page .btn-back img {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .user-logs-page {
+    padding: 16px;
+  }
+
+  .user-logs-page .user-quick-info {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .user-logs-page .logs-content {
+    padding: 20px;
+  }
+
+  .user-logs-page .log-card {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .user-logs-page .log-card-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .user-logs-page .log-card-icon img {
+    width: 20px;
+    height: 20px;
+  }
+}

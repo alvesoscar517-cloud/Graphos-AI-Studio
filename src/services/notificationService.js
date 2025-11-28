@@ -10,7 +10,7 @@
  * - LocalStorage fallback
  */
 
-const API_BASE_URL = 'https://ai-authenticator-472729326429.us-central1.run.app';
+import apiClient from './api/client';
 
 // Get user ID from auth
 const getUserId = () => {
@@ -41,13 +41,8 @@ export async function getUserNotifications(unreadOnly = false, limit = 50) {
       limit: limit.toString()
     });
 
-    const response = await fetch(`${API_BASE_URL}/api/notifications?${params}`);
+    const { data } = await apiClient.get(`/api/notifications?${params}`);
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch notifications');
-    }
-
-    const data = await response.json();
     return {
       notifications: data.notifications || [],
       unreadCount: data.unreadCount || 0,
@@ -67,13 +62,7 @@ export async function markNotificationAsRead(notificationId) {
     const userId = getUserId();
     if (!userId) return false;
 
-    const response = await fetch(`${API_BASE_URL}/api/notifications/${notificationId}/read`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
-    });
-
-    if (!response.ok) throw new Error('Failed to mark as read');
+    await apiClient.post(`/api/notifications/${notificationId}/read`, { user_id: userId });
     return true;
   } catch (error) {
     console.error('Mark as read error:', error);
@@ -90,13 +79,7 @@ export async function markAllNotificationsAsRead() {
     const userId = getUserId();
     if (!userId) return false;
 
-    const response = await fetch(`${API_BASE_URL}/api/notifications/mark-all-read`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
-    });
-
-    if (!response.ok) throw new Error('Failed to mark all as read');
+    await apiClient.post('/api/notifications/mark-all-read', { user_id: userId });
     return true;
   } catch (error) {
     console.error('Mark all as read error:', error);
@@ -114,13 +97,7 @@ export async function markNotificationAsClicked(notificationId) {
     const userId = getUserId();
     if (!userId) return false;
 
-    const response = await fetch(`${API_BASE_URL}/api/notifications/${notificationId}/click`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
-    });
-
-    if (!response.ok) throw new Error('Failed to mark as clicked');
+    await apiClient.post(`/api/notifications/${notificationId}/click`, { user_id: userId });
     return true;
   } catch (error) {
     console.error('Mark as clicked error:', error);
@@ -139,13 +116,7 @@ export async function deleteNotification(notificationId) {
       return true;
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/notifications/${notificationId}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
-    });
-
-    if (!response.ok) throw new Error('Failed to delete notification');
+    await apiClient.delete(`/api/notifications/${notificationId}?user_id=${userId}`);
     return true;
   } catch (error) {
     console.error('Delete notification error:', error);

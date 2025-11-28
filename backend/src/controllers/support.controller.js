@@ -6,9 +6,12 @@
 const { v4: uuidv4 } = require('uuid');
 const { db } = require('../config/firebase');
 const logger = require('../utils/logger');
+const { createLocalizer } = require('../utils/localized-messages.util');
 
 // Get all tickets
 exports.getTickets = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { status, type, limit = 50 } = req.query;
     
@@ -25,58 +28,71 @@ exports.getTickets = async (req, res) => {
     query = query.limit(parseInt(limit));
     
     const snapshot = await query.get();
-    const tickets = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate().toISOString(),
-      updatedAt: doc.data().updatedAt?.toDate().toISOString()
-    }));
+    const tickets = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate().toISOString(),
+        updatedAt: data.updatedAt?.toDate().toISOString(),
+        // Localized status and priority labels
+        statusLabel: l.t(`support.status_${data.status}`),
+        priorityLabel: data.priority ? l.t(`support.priority_${data.priority}`) : null
+      };
+    });
     
-    res.json({ success: true, tickets, count: tickets.length });
+    res.json({ success: true, tickets, count: tickets.length, language: l.lang });
   } catch (error) {
     console.error('[ERROR] Get tickets error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 
 // Get ticket details
 exports.getTicketDetails = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { id } = req.params;
     
     const ticketDoc = await db.collection('support_tickets').doc(id).get();
     
     if (!ticketDoc.exists) {
-      return res.status(404).json({ error: 'Ticket not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
     
+    const data = ticketDoc.data();
     const ticket = {
       id: ticketDoc.id,
-      ...ticketDoc.data(),
-      createdAt: ticketDoc.data().createdAt?.toDate().toISOString(),
-      updatedAt: ticketDoc.data().updatedAt?.toDate().toISOString(),
-      replies: ticketDoc.data().replies?.map(reply => ({
+      ...data,
+      createdAt: data.createdAt?.toDate().toISOString(),
+      updatedAt: data.updatedAt?.toDate().toISOString(),
+      statusLabel: l.t(`support.status_${data.status}`),
+      priorityLabel: data.priority ? l.t(`support.priority_${data.priority}`) : null,
+      replies: data.replies?.map(reply => ({
         ...reply,
         timestamp: reply.timestamp?.toDate().toISOString()
       })) || []
     };
     
-    res.json({ success: true, ticket });
+    res.json({ success: true, ticket, language: l.lang });
   } catch (error) {
     console.error('[ERROR] Get ticket error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 
 // Update ticket status
 exports.updateTicketStatus = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { id } = req.params;
     const { status } = req.body;
     
     const validStatuses = ['open', 'in_progress', 'resolved', 'closed'];
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ error: 'Invalid status' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
     await db.collection('support_tickets').doc(id).update({
@@ -84,26 +100,28 @@ exports.updateTicketStatus = async (req, res) => {
       updatedAt: new Date()
     });
     
-    res.json({ success: true, message: 'Status updated' });
+    res.json({ success: true, message: l.t('support.ticket_updated') });
   } catch (error) {
     console.error('[ERROR] Update status error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 
 // Reply to ticket
 exports.replyToTicket = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { id } = req.params;
     const { message, sendEmail, sendNotification } = req.body;
     
     if (!message || !message.trim()) {
-      return res.status(400).json({ error: 'Message is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
     const ticketDoc = await db.collection('support_tickets').doc(id).get();
     if (!ticketDoc.exists) {
-      return res.status(404).json({ error: 'Ticket not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
     
     const ticket = ticketDoc.data();
@@ -130,6 +148,8 @@ exports.replyToTicket = async (req, res) => {
     if (sendEmail) {
       try {
         const nodemailer = require('nodemailer');
+        const { supportReplyEmail } = require('../services/emailTemplate.service');
+        
         const transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
@@ -138,113 +158,29 @@ exports.replyToTicket = async (req, res) => {
           }
         });
         
-        const htmlContent = `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          </head>
-          <body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
-              <tr>
-                <td align="center">
-                  <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    
-                    <!-- Header -->
-                    <tr>
-                      <td style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 40px 40px 30px; text-align: center;">
-                        <div style="background-color: #ffffff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 20px; display: inline-flex; align-items: center; justify-content: center;">
-                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <line x1="9" y1="10" x2="15" y2="10" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
-                            <line x1="9" y1="14" x2="13" y2="14" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
-                          </svg>
-                        </div>
-                        <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">
-                          We've Responded to Your ${ticket.type === 'billing_support' ? 'Support Request' : 'Feedback'}
-                        </h1>
-                        <p style="margin: 10px 0 0; color: #cccccc; font-size: 14px;">
-                          Ticket #${id.substring(0, 8).toUpperCase()}
-                        </p>
-                      </td>
-                    </tr>
-
-                    <!-- Content -->
-                    <tr>
-                      <td style="padding: 40px;">
-                        
-                        <!-- Greeting -->
-                        <p style="margin: 0 0 24px; color: #1a1a1a; font-size: 16px;">
-                          Hi <strong>${ticket.userName}</strong>,
-                        </p>
-                        
-                        <p style="margin: 0 0 30px; color: #666666; font-size: 15px; line-height: 1.6;">
-                          Thank you for reaching out. Our team has reviewed your request and provided a response below.
-                        </p>
-
-                        <!-- Original Request -->
-                        <div style="margin-bottom: 24px;">
-                          <p style="margin: 0 0 8px; color: #999999; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
-                            Your Original Request
-                          </p>
-                          <div style="padding: 16px 20px; background-color: #fafafa; border-left: 4px solid #e5e5e5; border-radius: 4px;">
-                            <p style="margin: 0; color: #333333; font-size: 15px; font-weight: 500;">
-                              ${ticket.title}
-                            </p>
-                          </div>
-                        </div>
-
-                        <!-- Response -->
-                        <div style="margin-bottom: 30px;">
-                          <p style="margin: 0 0 8px; color: #999999; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
-                            Our Response
-                          </p>
-                          <div style="padding: 20px; background-color: #1a1a1a; border-radius: 6px;">
-                            <p style="margin: 0; color: #ffffff; font-size: 15px; line-height: 1.7; white-space: pre-wrap;">${message}</p>
-                          </div>
-                        </div>
-
-                        <!-- Divider -->
-                        <div style="height: 1px; background-color: #e5e5e5; margin: 30px 0;"></div>
-
-                        <!-- Additional Info -->
-                        <p style="margin: 0 0 20px; color: #666666; font-size: 14px; line-height: 1.6;">
-                          If you have any further questions or need additional assistance, please don't hesitate to reply to this email. We're here to help!
-                        </p>
-
-                        <!-- Signature -->
-                        <div style="margin-top: 30px;">
-                          <p style="margin: 0 0 4px; color: #1a1a1a; font-size: 15px; font-weight: 600;">
-                            Best regards,
-                          </p>
-                          <p style="margin: 0; color: #666666; font-size: 15px;">
-                            LocalizeAI Support Team
-                          </p>
-                        </div>
-
-                      </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                      <td style="padding: 30px 40px; background-color: #fafafa; border-top: 1px solid #e5e5e5; text-align: center;">
-                        <p style="margin: 0 0 8px; color: #999999; font-size: 13px; line-height: 1.6;">
-                          This email was sent in response to your support ticket
-                        </p>
-                        <p style="margin: 0; color: #cccccc; font-size: 12px;">
-                          © ${new Date().getFullYear()} LocalizeAI. All rights reserved.
-                        </p>
-                      </td>
-                    </tr>
-
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </body>
-          </html>
-        `;
+        // Get user's preferred language
+        let userLang = 'en';
+        try {
+          const userSnapshot = await db.collection('users')
+            .where('email', '==', ticket.userEmail)
+            .limit(1)
+            .get();
+          if (!userSnapshot.empty) {
+            const userData = userSnapshot.docs[0].data();
+            userLang = userData.preferredLanguage || userData.language || 'en';
+          }
+        } catch (langError) {
+          console.log('[INFO] Could not get user language, using default');
+        }
+        
+        const htmlContent = supportReplyEmail({
+          ticketId: id,
+          ticketType: ticket.type,
+          userName: ticket.userName,
+          ticketTitle: ticket.title,
+          replyMessage: message,
+          lang: userLang
+        });
         
         await transporter.sendMail({
           from: process.env.EMAIL_USER || 'alvesoscar517@gmail.com',
@@ -253,7 +189,7 @@ exports.replyToTicket = async (req, res) => {
           html: htmlContent
         });
         
-        console.log(`[SUCCESS] Email sent to ${ticket.userEmail}`);
+        console.log(`[SUCCESS] Email sent to ${ticket.userEmail} (lang: ${userLang})`);
       } catch (emailError) {
         console.error('[WARNING] Email send failed:', emailError);
       }
@@ -273,30 +209,93 @@ exports.replyToTicket = async (req, res) => {
           const notificationId = uuidv4();
           const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
           
-          const notificationTitle = ticket.type === 'billing_support' 
-            ? 'Phản hồi yêu cầu hỗ trợ thanh toán' 
-            : 'Phản hồi feedback của bạn';
-          const notificationTitleEn = ticket.type === 'billing_support'
-            ? 'Response to your billing support request'
-            : 'Response to your feedback';
+          const isBilling = ticket.type === 'billing_support';
+          
+          // Full i18n support for notification (15 languages)
+          const translations = {
+            en: {
+              title: isBilling ? 'Response to your billing support request' : 'Response to your feedback',
+              message: `We have responded to "${ticket.title}":\n\n${message}`,
+              cta: 'View Details'
+            },
+            vi: {
+              title: isBilling ? 'Phản hồi yêu cầu hỗ trợ thanh toán' : 'Phản hồi feedback của bạn',
+              message: `Chúng tôi đã phản hồi "${ticket.title}":\n\n${message}`,
+              cta: 'Xem chi tiết'
+            },
+            zh: {
+              title: isBilling ? '账单支持请求回复' : '您的反馈回复',
+              message: `我们已回复"${ticket.title}"：\n\n${message}`,
+              cta: '查看详情'
+            },
+            ja: {
+              title: isBilling ? '請求サポートリクエストへの回答' : 'フィードバックへの回答',
+              message: `「${ticket.title}」に回答しました：\n\n${message}`,
+              cta: '詳細を見る'
+            },
+            ko: {
+              title: isBilling ? '결제 지원 요청에 대한 답변' : '피드백에 대한 답변',
+              message: `"${ticket.title}"에 답변했습니다:\n\n${message}`,
+              cta: '자세히 보기'
+            },
+            fr: {
+              title: isBilling ? 'Réponse à votre demande de support facturation' : 'Réponse à votre feedback',
+              message: `Nous avons répondu à "${ticket.title}" :\n\n${message}`,
+              cta: 'Voir les détails'
+            },
+            de: {
+              title: isBilling ? 'Antwort auf Ihre Abrechnungsanfrage' : 'Antwort auf Ihr Feedback',
+              message: `Wir haben auf "${ticket.title}" geantwortet:\n\n${message}`,
+              cta: 'Details anzeigen'
+            },
+            es: {
+              title: isBilling ? 'Respuesta a su solicitud de soporte de facturación' : 'Respuesta a su comentario',
+              message: `Hemos respondido a "${ticket.title}":\n\n${message}`,
+              cta: 'Ver detalles'
+            },
+            pt: {
+              title: isBilling ? 'Resposta à sua solicitação de suporte de faturamento' : 'Resposta ao seu feedback',
+              message: `Respondemos a "${ticket.title}":\n\n${message}`,
+              cta: 'Ver detalhes'
+            },
+            it: {
+              title: isBilling ? 'Risposta alla tua richiesta di supporto fatturazione' : 'Risposta al tuo feedback',
+              message: `Abbiamo risposto a "${ticket.title}":\n\n${message}`,
+              cta: 'Vedi dettagli'
+            },
+            ru: {
+              title: isBilling ? 'Ответ на ваш запрос по оплате' : 'Ответ на ваш отзыв',
+              message: `Мы ответили на "${ticket.title}":\n\n${message}`,
+              cta: 'Подробнее'
+            },
+            ar: {
+              title: isBilling ? 'رد على طلب دعم الفواتير' : 'رد على ملاحظاتك',
+              message: `لقد قمنا بالرد على "${ticket.title}":\n\n${message}`,
+              cta: 'عرض التفاصيل'
+            },
+            th: {
+              title: isBilling ? 'ตอบกลับคำขอสนับสนุนการเรียกเก็บเงิน' : 'ตอบกลับความคิดเห็นของคุณ',
+              message: `เราได้ตอบกลับ "${ticket.title}":\n\n${message}`,
+              cta: 'ดูรายละเอียด'
+            },
+            id: {
+              title: isBilling ? 'Tanggapan permintaan dukungan tagihan Anda' : 'Tanggapan umpan balik Anda',
+              message: `Kami telah menanggapi "${ticket.title}":\n\n${message}`,
+              cta: 'Lihat Detail'
+            },
+            ms: {
+              title: isBilling ? 'Maklum balas permintaan sokongan bil anda' : 'Maklum balas kepada maklum balas anda',
+              message: `Kami telah membalas "${ticket.title}":\n\n${message}`,
+              cta: 'Lihat Butiran'
+            }
+          };
           
           await db.collection('user_notifications').doc(notificationId).set({
             userId,
             notificationId: null,
             type: 'info',
             priority: 'high',
-            translations: {
-              vi: {
-                title: notificationTitle,
-                message: `Chúng tôi đã phản hồi "${ticket.title}":\n\n${message}`,
-                cta: 'Xem chi tiết'
-              },
-              en: {
-                title: notificationTitleEn,
-                message: `We have responded to "${ticket.title}":\n\n${message}`,
-                cta: 'View Details'
-              }
-            },
+            translations,
             ctaAction: { type: 'view', action: 'support' },
             expiresAt,
             read: false,
@@ -316,31 +315,35 @@ exports.replyToTicket = async (req, res) => {
     
     res.json({ 
       success: true, 
-      message: 'Reply sent successfully',
+      message: l.t('support.reply_sent'),
       reply
     });
   } catch (error) {
     console.error('[ERROR] Reply error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 
 // Delete ticket
 exports.deleteTicket = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { id } = req.params;
     
     await db.collection('support_tickets').doc(id).delete();
     
-    res.json({ success: true, message: 'Ticket deleted' });
+    res.json({ success: true, message: l.t('success.deleted') });
   } catch (error) {
     console.error('[ERROR] Delete ticket error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 
 // Get statistics
 exports.getStatistics = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const [allTickets, openTickets, feedbackTickets, billingTickets] = await Promise.all([
       db.collection('support_tickets').count().get(),
@@ -356,11 +359,12 @@ exports.getStatistics = async (req, res) => {
         open: openTickets.data().count,
         feedback: feedbackTickets.data().count,
         billing: billingTickets.data().count
-      }
+      },
+      language: l.lang
     });
   } catch (error) {
     console.error('[ERROR] Get statistics error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
 

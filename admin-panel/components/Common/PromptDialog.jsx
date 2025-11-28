@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './PromptDialog.css';
 
 export default function PromptDialog({ 
@@ -13,6 +13,13 @@ export default function PromptDialog({
   onCancel 
 }) {
   const [value, setValue] = useState(defaultValue);
+  const portalContainerRef = useRef(null);
+
+  useEffect(() => {
+    // Find the shadow root container or use document.body as fallback
+    const shadowContainer = document.querySelector('#admin-root') || document.body;
+    portalContainerRef.current = shadowContainer;
+  }, []);
 
   const handleConfirm = () => {
     onConfirm(value);
@@ -24,11 +31,13 @@ export default function PromptDialog({
     }
   };
 
-  return createPortal(
+  const dialogContent = (
     <div className="prompt-overlay" onClick={onCancel}>
       <div className="prompt-dialog" onClick={(e) => e.stopPropagation()}>
-        <div className="prompt-icon">
-          <img src="/icon/edit.svg" alt="Prompt" />
+        <div className="prompt-icon-wrapper">
+          <div className="prompt-icon">
+            <img src="/icon/edit.svg" alt="Prompt" />
+          </div>
         </div>
         <h2 className="prompt-title">{title}</h2>
         {message && <p className="prompt-message">{message}</p>}
@@ -42,15 +51,24 @@ export default function PromptDialog({
           autoFocus
         />
         <div className="prompt-actions">
-          <button className="btn-secondary btn-prompt-cancel" onClick={onCancel}>
+          <button className="btn-prompt-cancel" onClick={onCancel}>
             {cancelText}
           </button>
-          <button className="btn-primary btn-prompt-ok" onClick={handleConfirm}>
+          <button className="btn-prompt-ok" onClick={handleConfirm}>
             {confirmText}
           </button>
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
+
+  // If we're in Shadow DOM, render directly instead of using portal
+  if (portalContainerRef.current && portalContainerRef.current.id === 'admin-root') {
+    return dialogContent;
+  }
+
+  // Fallback to portal for non-shadow DOM
+  return portalContainerRef.current 
+    ? createPortal(dialogContent, portalContainerRef.current)
+    : dialogContent;
 }

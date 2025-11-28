@@ -5,6 +5,7 @@
 
 const express = require('express');
 const authRoutes = require('./auth.routes');
+const emailAuthRoutes = require('./emailAuth.routes');
 const profileRoutes = require('./profile.routes');
 const analysisRoutes = require('./analysis.routes');
 const chatRoutes = require('./chat.routes');
@@ -61,6 +62,9 @@ router.post('/webhooks/lemonsqueezy', paymentController.handleWebhook);
 // ============================================================================
 
 router.use('/', authRoutes);
+
+// Email authentication routes
+router.use('/auth/email', emailAuthRoutes);
 
 // ============================================================================
 // PROTECTED ROUTES (Auth Required + Locked Check)

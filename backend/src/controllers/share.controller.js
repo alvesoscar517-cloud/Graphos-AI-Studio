@@ -6,24 +6,27 @@
 const { v4: uuidv4 } = require('uuid');
 const { db } = require('../config/firebase');
 const logger = require('../utils/logger');
+const { createLocalizer } = require('../utils/localized-messages.util');
 
 /**
  * Create a shareable link for content
  */
 exports.createShare = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { type, title, content, messages, metadata } = req.body;
 
     if (!type || !title) {
-      return res.status(400).json({ error: 'Type and title are required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     if (type === 'note' && !content) {
-      return res.status(400).json({ error: 'Content is required for notes' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input'), details: 'Content is required for notes' });
     }
 
     if (type === 'conversation' && (!messages || !Array.isArray(messages))) {
-      return res.status(400).json({ error: 'Messages array is required for conversations' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input'), details: 'Messages array is required for conversations' });
     }
 
     // Generate unique share ID
@@ -51,16 +54,19 @@ exports.createShare = async (req, res) => {
     const shareUrl = `${process.env.EXTENSION_URL || 'https://chromewebstore.google.com/detail/your-extension-id'}?share=${shareId}`;
 
     res.json({
+      success: true,
       shareId,
       shareUrl,
       type,
-      title
+      title,
+      message: l.t('success.created')
     });
 
   } catch (error) {
     console.error('[ERROR] Share creation error:', error);
     res.status(500).json({ 
-      error: 'Failed to create share',
+      success: false,
+      ...l.error('server_error'),
       details: error.message 
     });
   }
@@ -70,25 +76,27 @@ exports.createShare = async (req, res) => {
  * Get shared content by ID
  */
 exports.getShare = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { shareId } = req.params;
 
     if (!shareId) {
-      return res.status(400).json({ error: 'Share ID is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     // Get share document
     const shareDoc = await db.collection('shares').doc(shareId).get();
 
     if (!shareDoc.exists) {
-      return res.status(404).json({ error: 'Share not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
 
     const shareData = shareDoc.data();
 
     // Check if expired
     if (shareData.expiresAt && new Date(shareData.expiresAt) < new Date()) {
-      return res.status(410).json({ error: 'Share has expired' });
+      return res.status(410).json({ success: false, ...l.error('not_found'), details: 'Share has expired' });
     }
 
     // Increment view count
@@ -101,6 +109,7 @@ exports.getShare = async (req, res) => {
 
     // Return share data
     res.json({
+      success: true,
       shareId: shareData.shareId,
       type: shareData.type,
       title: shareData.title,
@@ -113,7 +122,8 @@ exports.getShare = async (req, res) => {
   } catch (error) {
     console.error('[ERROR] Share retrieval error:', error);
     res.status(500).json({ 
-      error: 'Failed to retrieve share',
+      success: false,
+      ...l.error('server_error'),
       details: error.message 
     });
   }
@@ -123,23 +133,26 @@ exports.getShare = async (req, res) => {
  * Delete a share
  */
 exports.deleteShare = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { shareId } = req.params;
 
     if (!shareId) {
-      return res.status(400).json({ error: 'Share ID is required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     await db.collection('shares').doc(shareId).delete();
 
     console.log(`[SUCCESS] Share deleted: ${shareId}`);
 
-    res.json({ success: true, message: 'Share deleted' });
+    res.json({ success: true, message: l.t('success.deleted') });
 
   } catch (error) {
     console.error('[ERROR] Share deletion error:', error);
     res.status(500).json({ 
-      error: 'Failed to delete share',
+      success: false,
+      ...l.error('server_error'),
       details: error.message 
     });
   }

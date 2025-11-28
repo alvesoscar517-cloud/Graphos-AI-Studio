@@ -10,6 +10,8 @@ const cacheService = require('../services/cache.service');
 const logger = require('../utils/logger');
 const { validateText, validateProfileId, validateModel } = require('../utils/validation');
 const activityLogService = require('../services/activityLog.service');
+const { createLocalizer } = require('../utils/localized-messages.util');
+const localization = require('../services/localization.service');
 
 // ============================================================================
 // AUTHENTICATE CONTENT (AI DETECTION)
@@ -43,51 +45,27 @@ exports.authenticateContent = async (req, res) => {
     // Use detection confidence if available, otherwise calculate from probability
     const confidence = detectionConfidence || Math.abs(aiProbability - 50) * 2;
 
-    // Get language from request or detect from text
-    const language = req.body.language || textFeatures.detectedLanguage || 'en';
+    // Get language from request
+    const l = createLocalizer(req);
+    const language = req.body.language || textFeatures.detectedLanguage || l.lang;
 
-    // Generate more nuanced verdict based on probability ranges (multi-language)
-    const verdicts = {
-      en: {
-        clearlyHuman: 'Clearly human-written content',
-        likelyHuman: 'Likely human-written content',
-        uncertain: 'Uncertain - could be human or AI',
-        likelyAI: 'Likely AI-generated content',
-        clearlyAI: 'Clearly AI-generated content'
-      },
-      vi: {
-        clearlyHuman: 'Nội dung rõ ràng do con người viết',
-        likelyHuman: 'Có thể do con người viết',
-        uncertain: 'Không chắc chắn - có thể là người hoặc AI',
-        likelyAI: 'Có thể do AI tạo ra',
-        clearlyAI: 'Nội dung rõ ràng do AI tạo ra'
-      }
-    };
-
-    const lang = verdicts[language] ? language : 'en';
-    let verdict;
-    if (aiProbability < 20) {
-      verdict = verdicts[lang].clearlyHuman;
-    } else if (aiProbability < 40) {
-      verdict = verdicts[lang].likelyHuman;
-    } else if (aiProbability < 60) {
-      verdict = verdicts[lang].uncertain;
-    } else if (aiProbability < 80) {
-      verdict = verdicts[lang].likelyAI;
-    } else {
-      verdict = verdicts[lang].clearlyAI;
-    }
+    // Generate localized verdict based on probability ranges
+    const verdict = l.verdict(aiProbability);
+    const confidenceInfo = l.confidence(confidence);
 
     const result = {
       success: true,
       is_authentic: isAuthentic,
       ai_probability: parseFloat(aiProbability.toFixed(2)),
       confidence: parseFloat(confidence.toFixed(2)),
+      confidence_level: confidenceInfo.level,
+      confidence_message: confidenceInfo.message,
       evidence,
       human_indicators: humanIndicators,
       ai_indicators: aiIndicators,
       text_statistics: textFeatures,
       verdict,
+      language,
       analysis_details: {
         multi_pass: multiPass,
         key_factor: keyFactor,
@@ -120,7 +98,12 @@ exports.authenticateContent = async (req, res) => {
     res.json(result);
   } catch (error) {
     logger.error('Authentication error', { error: error.message });
-    res.status(500).json({ error: String(error) });
+    const l = createLocalizer(req);
+    res.status(500).json({ 
+      success: false,
+      ...l.error('analysis_failed'),
+      details: String(error)
+    });
   }
 };
 
@@ -129,6 +112,8 @@ exports.authenticateContent = async (req, res) => {
 // ============================================================================
 
 exports.analyzeText = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { profile_id, text, user_id, use_cache = true } = req.body;
 
@@ -139,7 +124,9 @@ exports.analyzeText = async (req, res) => {
       const cachedResult = cacheService.getCachedAnalysis(profileId, validText);
       if (cachedResult) {
         logger.info('Analysis cache hit', { profileId });
-        return res.json({ ...cachedResult, cache_hit: true });
+        // Localize cached result
+        const localizedResult = l.localizeResult(cachedResult);
+        return res.json({ ...localizedResult, cache_hit: true });
       }
     }
 
@@ -155,13 +142,13 @@ exports.analyzeText = async (req, res) => {
     } else {
       const profileDoc = await db.collection('voice_profiles').doc(profileId).get();
       if (!profileDoc.exists) {
-        return res.status(404).json({ error: 'Profile not found' });
+        return res.status(404).json({ success: false, ...l.error('not_found') });
       }
 
       profileData = profileDoc.data();
 
       if (profileData.status !== 'ready') {
-        return res.status(400).json({ error: 'Profile is not ready for analysis' });
+        return res.status(400).json({ success: false, ...l.error('invalid_input'), details: l.t('voice_profile.not_found') });
       }
 
       const samplesSnapshot = await db.collection('voice_profiles')
@@ -183,7 +170,7 @@ exports.analyzeText = async (req, res) => {
       sampleVectors = samplesWithType.map(s => s.vector);
 
       if (sampleVectors.length === 0) {
-        return res.status(400).json({ error: 'Profile samples have no embeddings' });
+        return res.status(400).json({ success: false, ...l.error('invalid_input'), details: 'Profile samples have no embeddings' });
       }
 
       // Use weighted centroid - long samples have higher weight
@@ -200,7 +187,7 @@ exports.analyzeText = async (req, res) => {
     const validSentences = sentences.filter(s => s.split(/\s+/).length >= 3);
 
     if (validSentences.length === 0) {
-      return res.status(400).json({ error: 'Text must contain at least 1 sentence with 3 or more words' });
+      return res.status(400).json({ success: false, ...l.error('text_too_short', { min: 3 }) });
     }
 
     // Use multi-language aware statistics
@@ -372,17 +359,34 @@ exports.analyzeText = async (req, res) => {
       styleType
     );
 
+    // Get voice match info
+    const voiceMatchInfo = l.voiceMatch(voiceCompatibility);
+    const confidenceInfo = l.confidence(confidenceResult.confidence);
+
+    // Localize deviant sentences with severity messages
+    const localizedDeviantSentences = deviantSentences.map(s => ({
+      ...s,
+      severity_message: l.deviation(s.severity)
+    }));
+
+    // Localize benchmark comparison
+    const localizedBenchmark = l.localizeBenchmark(benchmarkComparison);
+
     const result = {
       success: true,
       voice_compatibility_score: parseFloat(voiceCompatibility.toFixed(2)),
+      voice_match_level: voiceMatchInfo.level,
+      voice_match_message: voiceMatchInfo.message,
       vector_score: parseFloat(vectorScore.toFixed(2)),
       statistical_score: parseFloat(statisticalScore.toFixed(2)),
       statistical_breakdown: statisticalBreakdown,
       confidence: confidenceResult.confidence,
+      confidence_level: confidenceInfo.level,
+      confidence_message: confidenceInfo.message,
       confidence_factors: confidenceResult.factors,
       sentence_analysis: sentenceAnalyses,
       sentence_suggestions: sentenceSuggestions,
-      deviant_sentences: deviantSentences,
+      deviant_sentences: localizedDeviantSentences,
       deviation_summary: {
         total: deviationCounts.mild + deviationCounts.moderate + deviationCounts.severe,
         by_severity: deviationCounts
@@ -394,9 +398,10 @@ exports.analyzeText = async (req, res) => {
       },
       statistics: textFeatures,
       detected_language: textFeatures.detectedLanguage,
-      // NEW: Benchmark comparison with suggestions
-      benchmark_comparison: benchmarkComparison,
-      improvement_suggestions: benchmarkComparison.suggestions,
+      language: l.lang,
+      // Localized benchmark comparison with suggestions
+      benchmark_comparison: localizedBenchmark,
+      improvement_suggestions: localizedBenchmark.suggestions,
       benchmark_score: benchmarkComparison.overallBenchmarkScore,
       profile_name: profileData.name,
       samples_used: sampleCount,
@@ -429,7 +434,11 @@ exports.analyzeText = async (req, res) => {
     res.json(result);
   } catch (error) {
     logger.error('Analysis error', { error: error.message });
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ 
+      success: false,
+      ...l.error('analysis_failed'),
+      details: String(error)
+    });
   }
 };
 
@@ -438,11 +447,13 @@ exports.analyzeText = async (req, res) => {
 // ============================================================================
 
 exports.suggestImprovements = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { profile_id, sentence, sentence_score } = req.body;
 
     if (!profile_id || !sentence) {
-      return res.status(400).json({ error: 'profile_id and sentence are required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     if (sentence_score >= 0.8) {
@@ -457,7 +468,7 @@ exports.suggestImprovements = async (req, res) => {
 
     const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
     if (!profileDoc.exists) {
-      return res.status(404).json({ error: 'Profile not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
 
     const profileData = profileDoc.data();
@@ -491,7 +502,7 @@ exports.suggestImprovements = async (req, res) => {
     });
   } catch (error) {
     console.error('[ERROR] Suggestion generation error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
 
@@ -500,6 +511,8 @@ exports.suggestImprovements = async (req, res) => {
 // ============================================================================
 
 exports.rewriteText = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { 
       profile_id, 
@@ -519,25 +532,27 @@ exports.rewriteText = async (req, res) => {
     const model = validateModel(requestedModel, 'gemini-2.5-flash');
 
     if (!profile_id || !text) {
-      return res.status(400).json({ error: 'profile_id and text are required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
     if (!profileDoc.exists) {
-      return res.status(404).json({ error: 'Profile not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
 
     const profileData = profileDoc.data();
 
     if (profileData.status !== 'ready') {
-      return res.status(400).json({ error: 'Profile is not ready for rewriting' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input'), details: l.t('voice_profile.not_found') });
     }
 
     const voiceProfile = profileData.voiceProfile || profileData.promptableSummary;
 
     if (!voiceProfile) {
       return res.status(400).json({
-        error: 'Profile does not have voice profile. Please finalize the profile first.'
+        success: false,
+        ...l.error('invalid_input'),
+        details: l.t('voice_profile.not_found')
       });
     }
 
@@ -609,6 +624,16 @@ exports.rewriteText = async (req, res) => {
       });
     }
 
+    // Localize AI check results
+    const localizedAiCheck = aiCheck ? {
+      ai_probability: aiCheck.aiProbability,
+      confidence: aiCheck.confidence,
+      verdict: l.verdict(aiCheck.aiProbability),
+      confidence_info: l.confidence(aiCheck.confidence),
+      human_indicators: aiCheck.humanIndicators || [],
+      ai_indicators: aiCheck.aiIndicators || []
+    } : null;
+
     res.json({
       success: true,
       original_text: text,
@@ -616,18 +641,14 @@ exports.rewriteText = async (req, res) => {
       profile_name: profileData.name,
       tone: profileData.voiceProfile?.tone || 'neutral',
       processing_time_ms: processingTime,
-      // New: AI detection results
-      ai_check: aiCheck ? {
-        ai_probability: aiCheck.aiProbability,
-        confidence: aiCheck.confidence,
-        human_indicators: aiCheck.humanIndicators || [],
-        ai_indicators: aiCheck.aiIndicators || []
-      } : null,
-      humanization_applied: true
+      language: l.lang,
+      ai_check: localizedAiCheck,
+      humanization_applied: true,
+      message: l.t('humanize.complete')
     });
   } catch (error) {
     console.error('[ERROR] Rewrite error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
 
@@ -636,6 +657,8 @@ exports.rewriteText = async (req, res) => {
 // ============================================================================
 
 exports.rewriteTextStream = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { profile_id, text, model: requestedModel, user_id, writing_preferences } = req.body;
 
@@ -643,12 +666,12 @@ exports.rewriteTextStream = async (req, res) => {
     const model = validateModel(requestedModel, 'gemini-2.5-flash');
 
     if (!profile_id || !text) {
-      return res.status(400).json({ error: 'profile_id and text are required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
     if (!profileDoc.exists) {
-      return res.status(404).json({ error: 'Profile not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
 
     const profileData = profileDoc.data();
@@ -767,11 +790,13 @@ exports.rewriteTextStream = async (req, res) => {
 // ============================================================================
 
 exports.checkHumanization = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { text } = req.body;
 
     if (!text) {
-      return res.status(400).json({ error: 'text is required' });
+      return res.status(400).json({ success: false, ...l.error('text_required') });
     }
 
     const humanizeService = require('../services/humanize.service');
@@ -782,23 +807,32 @@ exports.checkHumanization = async (req, res) => {
     // Also run AI detection
     const aiDetection = await geminiService.detectAIContentEnhanced(text);
 
+    // Localized recommendation
+    const recommendation = l.t(
+      aiDetection.aiProbability > 60 
+        ? 'humanize.changes_applied'
+        : aiDetection.aiProbability > 40
+        ? 'ai_detection.result_mixed'
+        : 'humanize.no_changes_needed',
+      { count: suggestions.suggestions?.length || 0 }
+    );
+
     res.json({
       success: true,
       ai_probability: aiDetection.aiProbability,
       ai_confidence: aiDetection.confidence,
+      verdict: l.verdict(aiDetection.aiProbability),
+      confidence_info: l.confidence(aiDetection.confidence),
       humanization_suggestions: suggestions.suggestions,
       overall_risk: suggestions.overallRisk,
       ai_indicators: aiDetection.aiIndicators || [],
       human_indicators: aiDetection.humanIndicators || [],
-      recommendation: aiDetection.aiProbability > 60 
-        ? 'Text is likely AI-generated. Consider using iterative refinement.'
-        : aiDetection.aiProbability > 40
-        ? 'Text has some AI patterns. Minor adjustments recommended.'
-        : 'Text appears human-like. No major changes needed.'
+      recommendation,
+      language: l.lang
     });
   } catch (error) {
     console.error('[ERROR] Humanization check error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
 
@@ -807,6 +841,8 @@ exports.checkHumanization = async (req, res) => {
 // ============================================================================
 
 exports.iterativeHumanize = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { 
       profile_id, 
@@ -821,12 +857,12 @@ exports.iterativeHumanize = async (req, res) => {
     const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
 
     if (!profile_id || !text) {
-      return res.status(400).json({ error: 'profile_id and text are required' });
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
     const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
     if (!profileDoc.exists) {
-      return res.status(404).json({ error: 'Profile not found' });
+      return res.status(404).json({ success: false, ...l.error('not_found') });
     }
 
     const profileData = profileDoc.data();
@@ -834,7 +870,9 @@ exports.iterativeHumanize = async (req, res) => {
 
     if (!voiceProfile) {
       return res.status(400).json({
-        error: 'Profile does not have voice profile. Please finalize the profile first.'
+        success: false,
+        ...l.error('invalid_input'),
+        details: l.t('voice_profile.not_found')
       });
     }
 
@@ -897,23 +935,31 @@ exports.iterativeHumanize = async (req, res) => {
       processingTime
     });
 
+    // Localized response
+    const confidenceInfo = l.confidence(result.confidence);
+
     res.json({
       success: true,
       original_text: text,
       rewritten_text: result.text,
       iterations_used: result.iterations,
       final_ai_probability: result.aiProbability,
+      verdict: l.verdict(result.aiProbability),
       confidence: result.confidence,
+      confidence_level: confidenceInfo.level,
+      confidence_message: confidenceInfo.message,
       reached_target: result.reachedTarget,
       target_probability: target_probability,
       improved: result.improved,
       warning: result.warning || null,
       profile_name: profileData.name,
-      processing_time_ms: processingTime
+      processing_time_ms: processingTime,
+      language: l.lang,
+      message: l.t('humanize.complete')
     });
   } catch (error) {
     console.error('[ERROR] Iterative humanize error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
 
@@ -922,11 +968,13 @@ exports.iterativeHumanize = async (req, res) => {
 // ============================================================================
 
 exports.translateText = async (req, res) => {
+  const l = createLocalizer(req);
+  
   try {
     const { text, source_lang = 'vi', target_lang = 'en' } = req.body;
 
     if (!text) {
-      return res.status(400).json({ error: 'text is required' });
+      return res.status(400).json({ success: false, ...l.error('text_required') });
     }
 
     const model = geminiService.vertexAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
@@ -940,10 +988,11 @@ exports.translateText = async (req, res) => {
       success: true,
       translated_text: translatedText,
       source_lang,
-      target_lang
+      target_lang,
+      language: l.lang
     });
   } catch (error) {
     console.error('[ERROR] Translation error:', error);
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };

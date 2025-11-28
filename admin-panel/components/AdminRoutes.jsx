@@ -12,6 +12,8 @@ const NotificationList = lazy(() => import('./Notifications/NotificationList'));
 const NotificationEditor = lazy(() => import('./Notifications/NotificationEditor'));
 const UserList = lazy(() => import('./Users/UserList'));
 const UserDetail = lazy(() => import('./Users/UserDetail'));
+const UserProfiles = lazy(() => import('./Users/UserProfiles'));
+const UserLogs = lazy(() => import('./Users/UserLogs'));
 const SupportList = lazy(() => import('./Support/SupportList'));
 const SupportDetail = lazy(() => import('./Support/SupportDetail'));
 const AnalyticsView = lazy(() => import('./Analytics/AnalyticsView'));
@@ -54,6 +56,8 @@ export default function AdminRoutes() {
               <Route path="/notifications/:id" element={<NotificationEditor />} />
               <Route path="/users" element={<UserList />} />
               <Route path="/users/:id" element={<UserDetail />} />
+              <Route path="/users/:userId/profiles" element={<UserProfiles />} />
+              <Route path="/users/:userId/logs" element={<UserLogs />} />
               <Route path="/users/:userId/activity" element={<UserActivityLogs />} />
               <Route path="/support" element={<SupportList />} />
               <Route path="/support/:id" element={<SupportDetail />} />
