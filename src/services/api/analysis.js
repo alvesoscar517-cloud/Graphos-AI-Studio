@@ -3,6 +3,7 @@ import { getUserInfo } from './auth'
 import { validateTextBeforeAI } from './validation'
 import { handleError, AnalysisError, NetworkError } from '../../utils/errors'
 import { perfMonitor, apiTracker } from '../../utils/monitoring'
+import apiClient from './client'
 
 /**
  * Analyze text against a profile
@@ -28,25 +29,11 @@ export async function analyzeText(profileId, text, options = {}) {
       console.warn('[WARNING] Warnings:', validation.warnings)
     }
     
-    const userInfo = await getUserInfo()
-    const response = await fetch(`${CONFIG.API_BASE_URL}/analyze`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        profile_id: profileId,
-        text: text,
-        user_id: userInfo.userId,
-        text_stats: validation.stats
-      })
+    const { data } = await apiClient.post('/analyze', {
+      profile_id: profileId,
+      text: text,
+      text_stats: validation.stats
     })
-    
-    if (!response.ok) {
-      throw new NetworkError(`HTTP ${response.status}: ${response.statusText}`)
-    }
-    
-    const data = await response.json()
     
     if (!data.success) {
       throw new AnalysisError(data.error || 'Analysis failed')
@@ -93,26 +80,12 @@ export async function detectAI(text, enhanced = true, language = null) {
     // Get language from parameter, localStorage, or default to 'en'
     const lang = language || localStorage.getItem('i18nextLng') || 'en'
     
-    const userInfo = await getUserInfo()
-    const response = await fetch(`${CONFIG.API_BASE_URL}/authenticate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        text: text,
-        user_id: userInfo.userId,
-        text_stats: validation.stats,
-        enhanced: enhanced,
-        language: lang.substring(0, 2) // Only use first 2 chars (e.g., 'en-US' -> 'en')
-      })
+    const { data } = await apiClient.post('/authenticate', {
+      text: text,
+      text_stats: validation.stats,
+      enhanced: enhanced,
+      language: lang.substring(0, 2) // Only use first 2 chars (e.g., 'en-US' -> 'en')
     })
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    
-    const data = await response.json()
     
     return { 
       success: data.success, 
@@ -146,22 +119,14 @@ export async function getSuggestions(profileId, sentence, sentenceScore, context
   try {
     console.log('💡 Getting suggestions for sentence...')
     
-    const response = await fetch(`${CONFIG.API_BASE_URL}/suggest_improvements`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        profile_id: profileId,
-        sentence: sentence,
-        sentence_score: sentenceScore,
-        context: context
-      })
+    const { data } = await apiClient.post('/suggest_improvements', {
+      profile_id: profileId,
+      sentence: sentence,
+      sentence_score: sentenceScore,
+      context: context
     })
     
-    const data = await response.json()
-    
-    if (response.ok && data.success) {
+    if (data.success) {
       console.log(`[SUCCESS] Got ${data.suggestions?.length || 0} suggestions`)
       return { success: true, data }
     }
@@ -181,21 +146,12 @@ export async function getSuggestions(profileId, sentence, sentenceScore, context
  */
 export async function analyzeTextBatch(profileId, texts) {
   try {
-    const userInfo = await getUserInfo()
-    const response = await fetch(`${CONFIG.API_BASE_URL}/analyze_batch`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        profile_id: profileId,
-        texts: texts,
-        user_id: userInfo.userId
-      })
+    const { data } = await apiClient.post('/analyze_batch', {
+      profile_id: profileId,
+      texts: texts
     })
     
-    const data = await response.json()
-    return { success: response.ok && data.success, data, error: data.error }
+    return { success: data.success, data, error: data.error }
   } catch (error) {
     console.error('Error batch analyzing:', error)
     return { success: false, error: error.message }
@@ -258,23 +214,13 @@ export async function analyzeTextOptimized(profileId, text) {
       return { success: true, data: cached }
     }
     
-    const userInfo = await getUserInfo()
-    const response = await fetch(`${CONFIG.API_BASE_URL}/analyze`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        profile_id: profileId,
-        text: text,
-        user_id: userInfo.userId,
-        use_cache: true
-      })
+    const { data } = await apiClient.post('/analyze', {
+      profile_id: profileId,
+      text: text,
+      use_cache: true
     })
     
-    const data = await response.json()
-    
-    if (response.ok && data.success) {
+    if (data.success) {
       // Cache the result
       setCachedData(cacheKey, data)
       return { success: true, data }
@@ -317,22 +263,14 @@ export async function getSuggestionsOptimized(profileId, sentence, sentenceScore
       return { success: true, data: cached }
     }
     
-    const response = await fetch(`${CONFIG.API_BASE_URL}/suggest_improvements`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        profile_id: profileId,
-        sentence: sentence,
-        sentence_score: sentenceScore,
-        lightweight: true
-      })
+    const { data } = await apiClient.post('/suggest_improvements', {
+      profile_id: profileId,
+      sentence: sentence,
+      sentence_score: sentenceScore,
+      lightweight: true
     })
     
-    const data = await response.json()
-    
-    if (response.ok && data.success) {
+    if (data.success) {
       // Cache the result
       setCachedData(cacheKey, data)
       return { success: true, data }

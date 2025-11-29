@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { CONFIG } from '../utils/config';
 import { getUserInfo } from '../services/api';
 import { usePayment } from '../contexts/PaymentContext';
+import apiClient from '../services/api/client';
 
 import './UpgradePlanModal.css';
 
@@ -79,8 +79,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
 
   const fetchPackages = async () => {
     try {
-      const response = await fetch(`${CONFIG.API_BASE_URL}/api/credits/packages`);
-      const data = await response.json();
+      const { data } = await apiClient.get('/api/credits/packages');
 
       if (data.packages && data.packages.length > 0) {
         // Merge with default to keep icon and popular flag (match by id)
@@ -108,18 +107,12 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
     try {
       const userInfo = await getUserInfo();
       
-      const response = await fetch(`${CONFIG.API_BASE_URL}/api/payment/checkout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          packageId: pkg.id,
-          variantId: pkg.variantId,
-          userId: userInfo.userId,
-          email: userInfo.email
-        })
+      const { data } = await apiClient.post('/api/payment/checkout', {
+        packageId: pkg.id,
+        variantId: pkg.variantId,
+        userId: userInfo.userId,
+        email: userInfo.email
       });
-
-      const data = await response.json();
 
       if (data.success && data.checkoutUrl) {
         // Start polling for payment status

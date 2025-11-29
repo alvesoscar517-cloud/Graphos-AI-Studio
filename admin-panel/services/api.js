@@ -1,5 +1,16 @@
 import { CONFIG } from '../utils/config'
 import { isDevMode, getDefaultTestUser, devLog } from '../utils/devConfig'
+import { getAuthHeader } from './authService'
+
+/**
+ * Get auth headers for API requests
+ */
+function getApiHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    ...getAuthHeader()
+  }
+}
 
 // Get user info helper
 export async function getUserInfo() {
@@ -66,7 +77,9 @@ export async function loadProfiles() {
     const url = `${CONFIG.API_BASE_URL}/get_profiles?user_id=${userInfo.userId}`
     console.log('[LINK] API URL:', url)
     
-    const response = await fetch(url)
+    const response = await fetch(url, {
+      headers: getApiHeaders()
+    })
     const data = await response.json()
     
     console.log('[PACKAGE] API Response:', data)
@@ -87,9 +100,7 @@ export async function deleteProfile(profileId) {
   try {
     const response = await fetch(`${CONFIG.API_BASE_URL}/delete_profile`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({ profile_id: profileId })
     })
     
@@ -107,9 +118,7 @@ export async function analyzeText(profileId, text) {
     const userInfo = await getUserInfo()
     const response = await fetch(`${CONFIG.API_BASE_URL}/analyze`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         profile_id: profileId,
         text: text,
@@ -130,9 +139,7 @@ export async function detectAI(text) {
     const userInfo = await getUserInfo()
     const response = await fetch(`${CONFIG.API_BASE_URL}/authenticate`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         text: text,
         user_id: userInfo.userId
@@ -166,9 +173,7 @@ export async function rewriteText(profileId, text) {
     const userInfo = await getUserInfo()
     const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         profile_id: profileId,
         text: text,
@@ -190,9 +195,7 @@ export async function rewriteTextStream(profileId, text, model, onChunk) {
     const userInfo = await getUserInfo()
     const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite_stream`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         profile_id: profileId,
         text: text,
@@ -245,9 +248,7 @@ export async function createProfile(profileName, theme = 'work') {
     const userInfo = await getUserInfo()
     const response = await fetch(`${CONFIG.API_BASE_URL}/create_profile`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         user_id: userInfo.userId,
         profile_name: profileName,
@@ -272,9 +273,7 @@ export async function addSample(profileId, text) {
   try {
     const response = await fetch(`${CONFIG.API_BASE_URL}/add_sample`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         profile_id: profileId,
         text: text
@@ -297,9 +296,7 @@ export async function addSamplesBatch(profileId, samples) {
     console.log(`[PACKAGE] Uploading ${samples.length} samples in batch...`)
     const response = await fetch(`${CONFIG.API_BASE_URL}/add_samples_batch`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         profile_id: profileId,
         samples: samples
@@ -322,9 +319,7 @@ export async function finalizeProfile(profileId) {
   try {
     const response = await fetch(`${CONFIG.API_BASE_URL}/finalize_profile`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         profile_id: profileId
       })
@@ -348,7 +343,9 @@ export async function getProfileDetails(profileId) {
     const url = `${CONFIG.API_BASE_URL}/get_profile?profile_id=${profileId}`
     console.log('[LINK] API URL:', url)
     
-    const response = await fetch(url)
+    const response = await fetch(url, {
+      headers: getApiHeaders()
+    })
     const data = await response.json()
     
     console.log('[PACKAGE] Profile Details Response:', data)
@@ -371,9 +368,7 @@ export async function getSuggestions(profileId, sentence, sentenceScore, context
     
     const response = await fetch(`${CONFIG.API_BASE_URL}/suggest_improvements`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         profile_id: profileId,
         sentence: sentence,
@@ -450,9 +445,7 @@ export async function analyzeTextOptimized(profileId, text) {
     const userInfo = await getUserInfo()
     const response = await fetch(`${CONFIG.API_BASE_URL}/analyze`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         profile_id: profileId,
         text: text,
@@ -502,9 +495,7 @@ export async function getSuggestionsOptimized(profileId, sentence, sentenceScore
     
     const response = await fetch(`${CONFIG.API_BASE_URL}/suggest_improvements`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         profile_id: profileId,
         sentence: sentence,
@@ -534,9 +525,7 @@ export async function analyzeTextBatch(profileId, texts) {
     const userInfo = await getUserInfo()
     const response = await fetch(`${CONFIG.API_BASE_URL}/analyze_batch`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         profile_id: profileId,
         texts: texts,

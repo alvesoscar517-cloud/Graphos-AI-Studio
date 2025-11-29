@@ -11,6 +11,7 @@
   justify-content: center;
   background: #f5f7fa;
   animation: fadeIn 0.3s ease;
+  overflow: hidden;
 }
 
 .login-overlay.hidden {

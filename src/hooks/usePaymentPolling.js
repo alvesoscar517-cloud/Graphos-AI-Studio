@@ -4,8 +4,8 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { CONFIG } from '../utils/config';
 import { getUserInfo } from '../services/api';
+import apiClient from '../services/api/client';
 
 const POLL_INTERVAL = 3000; // 3 seconds
 const MAX_POLL_DURATION = 10 * 60 * 1000; // 10 minutes max polling
@@ -51,11 +51,9 @@ export function usePaymentPolling() {
       const userInfo = await getUserInfo();
       const since = checkoutTimestamp.current || Date.now() - 5 * 60 * 1000;
       
-      const response = await fetch(
-        `${CONFIG.API_BASE_URL}/api/payment/check-status?user_id=${userInfo.userId}&since=${since}`
+      const { data } = await apiClient.get(
+        `/api/payment/check-status?user_id=${userInfo.userId}&since=${since}`
       );
-      
-      const data = await response.json();
       
       if (data.success && data.hasPurchase) {
         console.log('[SUCCESS] Payment detected!', data.order);

@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import * as lottie from 'lottie-web'
+import CLOUDS from 'vanta/dist/vanta.clouds.min'
+import * as THREE from 'three'
 import EmailLoginForm from './EmailLoginForm'
 import EmailRegisterForm from './EmailRegisterForm'
 import OTPVerification from './OTPVerification'
@@ -28,6 +30,10 @@ const LoginOverlay = () => {
   const [pendingEmail, setPendingEmail] = useState('')
   const animationContainer = useRef(null)
   const animationInstance = useRef(null)
+  
+  // Vanta background refs
+  const vantaRef = useRef(null)
+  const vantaEffect = useRef(null)
 
   useEffect(() => {
     // Show overlay when loading OR not authenticated
@@ -49,6 +55,37 @@ const LoginOverlay = () => {
     return () => {
       if (animationInstance.current) {
         animationInstance.current.destroy()
+      }
+    }
+  }, [shouldShow])
+
+  // Vanta CLOUDS background effect
+  useEffect(() => {
+    if (!shouldShow || !vantaRef.current) return
+
+    if (!vantaEffect.current) {
+      vantaEffect.current = CLOUDS({
+        el: vantaRef.current,
+        THREE: THREE,
+        mouseControls: false,
+        touchControls: false,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        skyColor: 0x68b8d7,
+        cloudColor: 0xadc1de,
+        cloudShadowColor: 0x183550,
+        sunColor: 0xff9919,
+        sunGlareColor: 0xff6633,
+        sunlightColor: 0xff9933,
+        speed: 1.00
+      })
+    }
+
+    return () => {
+      if (vantaEffect.current) {
+        vantaEffect.current.destroy()
+        vantaEffect.current = null
       }
     }
   }, [shouldShow])
@@ -234,7 +271,8 @@ const LoginOverlay = () => {
   }
 
   return (
-    <div className="login-overlay">
+    <div className="login-overlay" ref={vantaRef}>
+      
       <div className="login-container">
         {authMode === 'select' && (
           <div className="login-animation" ref={animationContainer}>

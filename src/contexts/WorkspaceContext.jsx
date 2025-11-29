@@ -1,7 +1,7 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from './AuthContext'
 import { useProfiles } from './ProfileContext'
-import { CONFIG } from '../utils/config'
+import apiClient from '../services/api/client'
 
 const WorkspaceContext = createContext()
 
@@ -49,10 +49,29 @@ export const WorkspaceProvider = ({ children }) => {
     }
   })
 
-  // Load conversations from localStorage
+  // Track previous user to detect account changes
+  const prevUserRef = useRef(null)
+
+  // Load conversations from localStorage and clear on user change
   useEffect(() => {
+    const prevUser = prevUserRef.current
+    const currentUserEmail = user?.email || user?.id
+    const prevUserEmail = prevUser?.email || prevUser?.id
+
+    // Detect user change (logout or switch account)
+    if (prevUserEmail && prevUserEmail !== currentUserEmail) {
+      console.log('[SECURITY] User changed, clearing workspace data...')
+      setConversations([])
+      setCurrentConversation(null)
+      setError(null)
+    }
+
+    // Update ref
+    prevUserRef.current = user
+
     if (user) {
-      const saved = localStorage.getItem(`workspace_conversations_${user.email}`)
+      const userKey = user.email || user.id
+      const saved = localStorage.getItem(`workspace_conversations_${userKey}`)
       if (saved) {
         try {
           const parsed = JSON.parse(saved)
@@ -64,8 +83,17 @@ export const WorkspaceProvider = ({ children }) => {
           }
         } catch (err) {
           console.error('Failed to load conversations:', err)
+          setConversations([])
         }
+      } else {
+        // No saved data for this user, ensure clean state
+        setConversations([])
       }
+    } else {
+      // User logged out, clear everything
+      console.log('[INFO] User logged out, clearing workspace state')
+      setConversations([])
+      setCurrentConversation(null)
     }
   }, [user])
 
@@ -197,25 +225,18 @@ export const WorkspaceProvider = ({ children }) => {
     try {
       const truncatedMessage = firstMessage.substring(0, 150)
       
-      const response = await fetch(`${CONFIG.API_BASE_URL}/api/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages: [{
-            role: 'user',
-            content: `Create a short title (maximum 7 words) for the following content. ONLY return the title, no explanation: "${truncatedMessage}"`
-          }],
-          systemPrompt: 'You are a title generation assistant. Only return a short title of maximum 7 words, no explanation, no quotes.',
-          model: 'gemini-2.0-flash-lite',
-          temperature: 0.2,
-          maxTokens: 30
-        })
+      const { data } = await apiClient.post('/api/chat', {
+        messages: [{
+          role: 'user',
+          content: `Create a short title (maximum 7 words) for the following content. ONLY return the title, no explanation: "${truncatedMessage}"`
+        }],
+        systemPrompt: 'You are a title generation assistant. Only return a short title of maximum 7 words, no explanation, no quotes.',
+        model: 'gemini-2.0-flash-lite',
+        temperature: 0.2,
+        maxTokens: 30
       })
 
-      if (response.ok) {
-        const data = await response.json()
+      if (data.message) {
         let title = data.message.trim().replace(/^["']|["']$/g, '')
         return truncateTitleToWords(title, 7)
       }

@@ -7,7 +7,7 @@ import { safeGetJSON, safeSetJSON } from './storageCleanup'
 
 export const DEV_CONFIG = {
   // Enable development mode (use default test profile)
-  ENABLE_DEV_MODE: true,
+  ENABLE_DEV_MODE: false,
   
   // Default test user - simulating Google OAuth login
   DEFAULT_TEST_USER: {

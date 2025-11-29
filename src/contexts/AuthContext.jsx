@@ -38,13 +38,39 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const clearAuthStorage = () => {
+    // Get current user email before clearing to clean user-specific data
+    const storedUser = localStorage.getItem('user')
+    let userEmail = null
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser)
+        userEmail = userData.email || userData.id
+      } catch (e) {
+        // Ignore parse error
+      }
+    }
+
+    // Clear auth data
     localStorage.removeItem('userId')
     localStorage.removeItem('authToken')
     localStorage.removeItem('authMethod')
     localStorage.removeItem('user')
     localStorage.removeItem('sessionId')
+    
     // Clear notifications to prevent showing old account's notifications
     localStorage.removeItem('user_notifications')
+    
+    // Clear profile selection
+    localStorage.removeItem('activeProfileId')
+    localStorage.removeItem('activeProfileName')
+    localStorage.removeItem('profileCacheInvalidated')
+    
+    // Clear user-specific workspace conversations
+    if (userEmail) {
+      localStorage.removeItem(`workspace_conversations_${userEmail}`)
+    }
+    
+    console.log('[SECURITY] Auth storage cleared')
   }
 
   const checkAuthentication = async () => {

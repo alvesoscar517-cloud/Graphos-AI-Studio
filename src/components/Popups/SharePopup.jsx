@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CONFIG } from '../../utils/config'
+import apiClient from '../../services/api/client'
 import modal from '../../utils/modal'
 import './SharePopup.css'
 
@@ -53,19 +53,7 @@ const SharePopup = ({ item, onClose }) => {
         }
       }
 
-      const response = await fetch(`${CONFIG.API_BASE_URL}/api/share`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(shareData)
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to create share')
-      }
-
-      const data = await response.json()
+      const { data } = await apiClient.post('/api/share', shareData)
       setShareId(data.shareId)
       setShareUrl(data.shareUrl)
     } catch (error) {

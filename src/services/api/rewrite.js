@@ -1,6 +1,7 @@
 import { CONFIG } from '../../utils/config'
 import { getUserInfo } from './auth'
 import { validateTextBeforeAI } from './validation'
+import apiClient from './client'
 
 /**
  * Rewrite text using AI
@@ -25,25 +26,16 @@ export async function rewriteText(profileId, text, model = 'gemini-2.5-flash', w
     
     console.log('[CHART] Rewrite text stats:', validation.stats.display)
     
-    const userInfo = await getUserInfo()
-    const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        profile_id: profileId,
-        text: text,
-        user_id: userInfo.userId,
-        model: model,
-        writing_preferences: writingPreferences,
-        text_stats: validation.stats
-      })
+    const { data } = await apiClient.post('/rewrite', {
+      profile_id: profileId,
+      text: text,
+      model: model,
+      writing_preferences: writingPreferences,
+      text_stats: validation.stats
     })
     
-    const data = await response.json()
     return { 
-      success: response.ok && data.success, 
+      success: data.success, 
       data, 
       error: data.error,
       textStats: validation.stats
@@ -52,6 +44,22 @@ export async function rewriteText(profileId, text, model = 'gemini-2.5-flash', w
     console.error('Error rewriting text:', error)
     return { success: false, error: error.message }
   }
+}
+
+/**
+ * Get auth headers for streaming requests
+ */
+async function getAuthHeaders() {
+  const headers = {
+    'Content-Type': 'application/json'
+  }
+  
+  const authToken = await apiClient.getAuthToken()
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`
+  }
+  
+  return headers
 }
 
 /**
@@ -74,19 +82,18 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
     console.log('[CHART] Stream rewrite text stats:', validation.stats.display)
     
     const userInfo = await getUserInfo()
+    const headers = await getAuthHeaders()
     console.log('📡 Sending rewrite_stream request...')
     
     const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite_stream`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify({
         profile_id: profileId,
         text: text,
         model: model,
         writing_preferences: writingPreferences,
-        user_id: userInfo.userId
+        user_id: userInfo?.userId
       })
     })
     
@@ -153,17 +160,10 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
  */
 export async function checkHumanization(text) {
   try {
-    const response = await fetch(`${CONFIG.API_BASE_URL}/check-humanization`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ text })
-    })
+    const { data } = await apiClient.post('/check-humanization', { text })
     
-    const data = await response.json()
     return { 
-      success: response.ok && data.success, 
+      success: data.success, 
       data, 
       error: data.error 
     }
@@ -191,25 +191,16 @@ export async function iterativeHumanize(profileId, text, options = {}) {
       }
     }
     
-    const userInfo = await getUserInfo()
-    const response = await fetch(`${CONFIG.API_BASE_URL}/iterative-humanize`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        profile_id: profileId,
-        text: text,
-        user_id: userInfo.userId,
-        max_iterations: options.maxIterations || 3,
-        target_probability: options.targetProbability || 35,
-        model: options.model || 'gemini-2.0-flash-exp'
-      })
+    const { data } = await apiClient.post('/iterative-humanize', {
+      profile_id: profileId,
+      text: text,
+      max_iterations: options.maxIterations || 3,
+      target_probability: options.targetProbability || 35,
+      model: options.model || 'gemini-2.0-flash-exp'
     })
     
-    const data = await response.json()
     return { 
-      success: response.ok && data.success, 
+      success: data.success, 
       data, 
       error: data.error 
     }

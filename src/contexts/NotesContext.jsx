@@ -5,8 +5,10 @@ import {
   getNotesFromDB, 
   saveNotesToDB, 
   saveNoteToDB, 
-  deleteNoteFromDB 
+  deleteNoteFromDB,
+  clearNotesDB
 } from '../services/indexedDB'
+import { useAuth } from './AuthContext'
 
 const NotesContext = createContext()
 
@@ -21,14 +23,47 @@ export const useNotes = () => {
 const MAX_VISIBLE_NOTES = 5
 
 export const NotesProvider = ({ children }) => {
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
   const [notes, setNotes] = useState([])
   const [currentNote, setCurrentNote] = useState(null)
   const [loading, setLoading] = useState(true)
   const [needsReauth, setNeedsReauth] = useState(false)
   const saveTimeoutRef = useRef(null)
+  const prevUserRef = useRef(null)
 
-  // Load notes on mount
+  // Clear notes when user changes or logs out
   useEffect(() => {
+    if (authLoading) return
+
+    const prevUser = prevUserRef.current
+    const currentUserId = user?.email || user?.id
+    const prevUserId = prevUser?.email || prevUser?.id
+
+    // Detect user change
+    if (prevUserId && prevUserId !== currentUserId) {
+      console.log('[SECURITY] User changed, clearing notes data...')
+      setNotes([])
+      setCurrentNote(null)
+      setNeedsReauth(false)
+    }
+
+    // User logged out
+    if (!isAuthenticated && prevUser) {
+      console.log('[INFO] User logged out, clearing notes')
+      setNotes([])
+      setCurrentNote(null)
+      setNeedsReauth(false)
+    }
+
+    prevUserRef.current = user
+  }, [user, isAuthenticated, authLoading])
+
+  // Load notes on mount or when user changes
+  useEffect(() => {
+    if (authLoading || !isAuthenticated) {
+      setLoading(false)
+      return
+    }
     const loadNotes = async () => {
       try {
         // Initialize IndexedDB

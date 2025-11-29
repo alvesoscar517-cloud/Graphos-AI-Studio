@@ -30,9 +30,22 @@ class RealtimeService {
   }
 
   /**
-   * Get auth token from Chrome extension or storage
+   * Get auth token from localStorage or Chrome extension
    */
   async getAuthToken() {
+    // First check localStorage for email auth token (web app mode)
+    try {
+      const authToken = localStorage.getItem('authToken');
+      const authMethod = localStorage.getItem('authMethod');
+      
+      if (authToken && authMethod === 'email') {
+        return authToken;
+      }
+    } catch {
+      // localStorage not available
+    }
+    
+    // Then try Chrome extension
     try {
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
         const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' });

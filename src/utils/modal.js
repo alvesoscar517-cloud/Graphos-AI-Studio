@@ -101,7 +101,7 @@ class ModalSystem {
           transform: translateX(-50%) translateY(20px);
           padding: 10px 16px;
           background: var(--bg-primary, #1a1a1a);
-          border: 1px solid var(--border-primary, #333);
+
           border-radius: 8px;
           font-size: 13px;
           color: var(--text-primary, #fff);
@@ -114,9 +114,7 @@ class ModalSystem {
           opacity: 1;
           transform: translateX(-50%) translateY(0);
         }
-        .simple-toast.warning { border-color: var(--text-warning, #b45309); }
-        .simple-toast.error { border-color: var(--color-error, #dc2626); }
-        .simple-toast.success { border-color: var(--color-success, #16a34a); }
+
         body:not(.dark-theme) .simple-toast {
           background: #fff;
           color: #333;

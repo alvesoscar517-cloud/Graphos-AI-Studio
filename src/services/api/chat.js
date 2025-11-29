@@ -1,4 +1,23 @@
 import { CONFIG } from '../../utils/config'
+import apiClient from './client'
+import { getUserInfo } from './auth'
+
+/**
+ * Get auth headers for streaming requests
+ */
+async function getAuthHeaders() {
+  const headers = {
+    'Content-Type': 'application/json'
+  }
+  
+  // Get auth token
+  const authToken = await apiClient.getAuthToken()
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`
+  }
+  
+  return headers
+}
 
 /**
  * Error codes and messages mapping
@@ -59,11 +78,12 @@ export async function sendChatMessageStream(
   try {
     console.log('📡 Sending chat stream request...')
     
+    const headers = await getAuthHeaders()
+    const userInfo = await getUserInfo()
+    
     const response = await fetch(`${CONFIG.API_BASE_URL}/api/chat/stream`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify({
         messages,
         systemPrompt,
@@ -71,7 +91,8 @@ export async function sendChatMessageStream(
         temperature,
         profileId,
         writingPreferences,
-        conversationSummary
+        conversationSummary,
+        user_id: userInfo?.userId
       })
     })
     
@@ -176,31 +197,17 @@ export async function sendChatMessage(
   conversationSummary = null
 ) {
   try {
-    const response = await fetch(`${CONFIG.API_BASE_URL}/api/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        messages,
-        systemPrompt,
-        model,
-        temperature,
-        profileId,
-        writingPreferences,
-        conversationSummary
-      })
+    const { data } = await apiClient.post('/api/chat', {
+      messages,
+      systemPrompt,
+      model,
+      temperature,
+      profileId,
+      writingPreferences,
+      conversationSummary
     })
     
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw {
-        code: errorData.code || 'INTERNAL_ERROR',
-        message: errorData.error || `HTTP error! status: ${response.status}`
-      }
-    }
-    
-    return await response.json()
+    return data
   } catch (error) {
     console.error('[FAIL] Error sending chat:', error)
     throw new Error(formatErrorMessage(error))
@@ -216,27 +223,13 @@ export async function sendChatMessage(
  */
 export async function uploadChatFile(base64Data, mimeType, fileName) {
   try {
-    const response = await fetch(`${CONFIG.API_BASE_URL}/api/chat/upload`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        file: base64Data,
-        mimeType,
-        fileName
-      })
+    const { data } = await apiClient.post('/api/chat/upload', {
+      file: base64Data,
+      mimeType,
+      fileName
     })
     
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw {
-        code: errorData.code || 'INTERNAL_ERROR',
-        message: errorData.error || 'Upload failed'
-      }
-    }
-    
-    return await response.json()
+    return data
   } catch (error) {
     console.error('[FAIL] Error uploading file:', error)
     throw new Error(formatErrorMessage(error))
@@ -250,23 +243,8 @@ export async function uploadChatFile(base64Data, mimeType, fileName) {
  */
 export async function summarizeConversation(messages) {
   try {
-    const response = await fetch(`${CONFIG.API_BASE_URL}/api/chat/summarize`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ messages })
-    })
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw {
-        code: errorData.code || 'INTERNAL_ERROR',
-        message: errorData.error || 'Summarization failed'
-      }
-    }
-    
-    return await response.json()
+    const { data } = await apiClient.post('/api/chat/summarize', { messages })
+    return data
   } catch (error) {
     console.error('[FAIL] Error summarizing:', error)
     throw new Error(formatErrorMessage(error))
@@ -317,11 +295,12 @@ export async function sendHumanizedChatStream(
   try {
     console.log('📡 Sending humanized chat stream request...')
     
+    const headers = await getAuthHeaders()
+    const userInfo = await getUserInfo()
+    
     const response = await fetch(`${CONFIG.API_BASE_URL}/api/chat/humanized/stream`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify({
         messages,
         systemPrompt,
@@ -330,7 +309,8 @@ export async function sendHumanizedChatStream(
         profileId,
         writingPreferences,
         chatSettings,
-        conversationSummary
+        conversationSummary,
+        user_id: userInfo?.userId
       })
     })
     

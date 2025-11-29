@@ -5,7 +5,7 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CONFIG } from '../utils/config';
+import apiClient from '../services/api/client';
 import realtimeService from '../services/realtimeService';
 import { useAuth } from '../contexts/AuthContext';
 import './CreditBalance.css';
@@ -47,13 +47,10 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
     }
   }, [userId]);
 
-  // Fetch from API
+  // Fetch from API with auth
   const fetchCredits = useCallback(async () => {
     try {
-      const response = await fetch(
-        `${CONFIG.API_BASE_URL}/api/credits/balance?user_id=${userId}`
-      );
-      const data = await response.json();
+      const { data } = await apiClient.get(`/api/credits/balance?user_id=${userId}`);
       if (data.success) {
         updateCredits(data.credits);
       }
