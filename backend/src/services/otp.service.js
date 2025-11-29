@@ -162,6 +162,12 @@ async function verifyOTP(email, code, type = 'verification') {
     }
   }
   
+  // Check if already verified (allow retry for account creation)
+  if (data.verified) {
+    logger.info('OTP already verified, allowing retry', { email: normalizedEmail, type });
+    return { success: true, docId, alreadyVerified: true };
+  }
+  
   // Check expiration
   const expiresAt = data.expiresAt.toDate();
   if (expiresAt < now) {
@@ -202,12 +208,17 @@ async function verifyOTP(email, code, type = 'verification') {
     };
   }
   
-  // Success - delete the OTP record
-  await docRef.delete();
+  // Success - mark as verified but DON'T delete yet
+  // The caller should call invalidateOTP after successful account creation
+  await docRef.update({
+    verified: true,
+    verifiedAt: now,
+    updatedAt: now
+  });
   
   logger.info('OTP verified successfully', { email: normalizedEmail, type });
   
-  return { success: true };
+  return { success: true, docId };
 }
 
 /**

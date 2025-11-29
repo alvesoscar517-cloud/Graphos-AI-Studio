@@ -135,7 +135,11 @@ exports.verifyEmail = async (req, res) => {
     });
     
   } catch (error) {
-    logger.error('Email verification error', { error: error.message });
+    logger.error('Email verification error', { 
+      error: error.message,
+      stack: error.stack,
+      code: error.code 
+    });
     
     const errorCode = error.message.split(':')[0];
     const errorMessage = error.message.split(': ')[1] || error.message;
@@ -147,12 +151,16 @@ exports.verifyEmail = async (req, res) => {
       statusCode = 410;
     } else if (errorCode === 'AUTH_EMAIL_EXISTS') {
       statusCode = 409;
+    } else if (errorCode === 'AUTH_SERVICE_UNAVAILABLE' || errorCode === 'AUTH_SERVICE_ERROR') {
+      statusCode = 503;
     }
     
     res.status(statusCode).json({
       success: false,
       error: errorMessage,
-      code: errorCode
+      code: errorCode,
+      // Include debug info in non-production for troubleshooting
+      ...(process.env.NODE_ENV !== 'production' && { debug: error.message })
     });
   }
 };

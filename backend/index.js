@@ -133,6 +133,25 @@ app.get('/ready', async (req, res) => {
   });
 });
 
+// Debug endpoint to check Firebase Admin status (remove in production)
+app.get('/debug/firebase-admin', async (req, res) => {
+  try {
+    const admin = require('firebase-admin');
+    const app = admin.apps.length ? admin.app() : null;
+    
+    res.json({
+      initialized: !!app,
+      projectId: app?.options?.projectId || 'not set',
+      appsCount: admin.apps.length
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+      stack: error.stack
+    });
+  }
+});
+
 // ============================================================================
 // ROUTES
 // ============================================================================

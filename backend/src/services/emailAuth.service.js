@@ -153,6 +153,8 @@ async function register({ email, password, displayName, locale = 'en' }) {
 async function verifyEmail(email, otp) {
   const normalizedEmail = normalizeEmail(email);
   
+  logger.info('Starting email verification', { email: normalizedEmail });
+  
   // Verify OTP
   const otpResult = await otpService.verifyOTP(normalizedEmail, otp, 'verification');
   
@@ -181,21 +183,33 @@ async function verifyEmail(email, otp) {
     // Ensure Firebase Admin is initialized
     getFirebaseAdmin();
     
+    logger.info('Creating Firebase Auth user', { email: normalizedEmail });
+    
     firebaseUser = await admin.auth().createUser({
       email: normalizedEmail,
       emailVerified: true,
       displayName: pendingData.displayName,
       disabled: false
     });
+    
+    logger.info('Firebase Auth user created', { email: normalizedEmail, uid: firebaseUser.uid });
   } catch (error) {
-    logger.error('Firebase Auth createUser failed', { email: normalizedEmail, error: error.message, code: error.code });
+    logger.error('Firebase Auth createUser failed', { 
+      email: normalizedEmail, 
+      error: error.message, 
+      code: error.code,
+      stack: error.stack 
+    });
     
     if (error.code === 'auth/email-already-exists') {
+      // Clean up OTP since email already exists
+      await otpService.invalidateOTP(normalizedEmail, 'verification');
       throw new Error('AUTH_EMAIL_EXISTS: This email is already registered');
     }
     if (error.message?.includes('Firebase') || error.message?.includes('initializeApp') || error.code?.startsWith('app/')) {
       throw new Error('AUTH_SERVICE_UNAVAILABLE: Authentication service is temporarily unavailable. Please try again later.');
     }
+    // Don't clean up OTP on other errors so user can retry
     throw new Error('AUTH_SERVICE_ERROR: Unable to create account. Please try again later.');
   }
   
@@ -228,8 +242,9 @@ async function verifyEmail(email, otp) {
   
   await db.collection(USERS_COLLECTION).doc(userId).set(userData);
   
-  // Delete pending registration
+  // Delete pending registration and OTP (cleanup after successful user creation)
   await db.collection(PENDING_REGISTRATIONS_COLLECTION).doc(normalizedEmail).delete();
+  await otpService.invalidateOTP(normalizedEmail, 'verification');
   
   // Generate custom token for client
   let token;
