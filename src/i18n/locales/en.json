@@ -219,6 +219,12 @@
       "deleteAccountFailed": "Failed to delete account",
       "accountTab": "Account",
       "securityTab": "Security"
+    },
+    "errors": {
+      "accountDeleted": "This account has been deleted. Please contact support if you believe this is an error.",
+      "accountSuspended": "Your account has been suspended. Please contact support for assistance.",
+      "accountLocked": "Account temporarily locked due to too many failed attempts. Please try again later.",
+      "emailNotVerified": "Please verify your email before logging in."
     }
   },
   "nav": {

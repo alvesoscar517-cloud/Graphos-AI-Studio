@@ -21,9 +21,17 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
     try {
       await onLogin(email, password)
     } catch (err) {
-      // Handle network error with i18n
+      // Handle specific error codes with i18n
       if (err.isNetworkError || err.message === 'NETWORK_ERROR') {
         setError(t('errors.networkError'))
+      } else if (err.code === 'AUTH_ACCOUNT_DELETED') {
+        setError(t('auth.errors.accountDeleted', 'This account has been deleted. Please contact support.'))
+      } else if (err.code === 'AUTH_ACCOUNT_SUSPENDED') {
+        setError(t('auth.errors.accountSuspended', 'Your account has been suspended. Please contact support.'))
+      } else if (err.code === 'AUTH_ACCOUNT_LOCKED') {
+        setError(t('auth.errors.accountLocked', 'Account temporarily locked. Please try again later.'))
+      } else if (err.code === 'AUTH_EMAIL_NOT_VERIFIED') {
+        setError(t('auth.errors.emailNotVerified', 'Please verify your email before logging in.'))
       } else {
         setError(err.message || t('auth.email.loginFailed'))
       }

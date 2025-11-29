@@ -236,7 +236,11 @@ exports.login = async (req, res) => {
     if (errorCode === 'AUTH_INVALID_CREDENTIALS') {
       statusCode = 401;
     } else if (errorCode === 'AUTH_ACCOUNT_LOCKED') {
-      statusCode = 423;
+      statusCode = 423; // Locked (temporary - too many failed attempts)
+    } else if (errorCode === 'AUTH_ACCOUNT_SUSPENDED') {
+      statusCode = 403; // Forbidden (locked by admin)
+    } else if (errorCode === 'AUTH_ACCOUNT_DELETED') {
+      statusCode = 410; // Gone (account deleted)
     } else if (errorCode === 'AUTH_EMAIL_NOT_VERIFIED') {
       statusCode = 403;
     }

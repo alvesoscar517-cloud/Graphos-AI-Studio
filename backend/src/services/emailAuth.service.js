@@ -8,7 +8,8 @@
  * - Google account linking
  */
 
-const admin = require('firebase-admin');
+const { getAdmin } = require('../config/firebaseAdmin');
+const admin = getAdmin();
 const bcrypt = require('bcryptjs');
 const { db, FieldValue } = require('../config/firebase');
 const otpService = require('./otp.service');
@@ -16,25 +17,6 @@ const { validatePassword, validateEmail, validateDisplayName, normalizeEmail } =
 const logger = require('../utils/logger');
 const { FREE_CREDITS } = require('../config/pricing');
 const config = require('../config');
-
-// Initialize Firebase Admin if not already initialized
-function getFirebaseAdmin() {
-  if (admin.apps.length === 0) {
-    try {
-      admin.initializeApp({
-        projectId: config.PROJECT_ID
-      });
-      logger.info('Firebase Admin initialized in emailAuth service');
-    } catch (error) {
-      logger.error('Firebase Admin initialization failed', { error: error.message });
-      throw new Error('AUTH_SERVICE_UNAVAILABLE: Authentication service is temporarily unavailable');
-    }
-  }
-  return admin;
-}
-
-// Ensure Firebase Admin is initialized on module load
-getFirebaseAdmin();
 
 // Collections
 const USERS_COLLECTION = 'users';
@@ -180,10 +162,11 @@ async function verifyEmail(email, otp) {
   // Create user in Firebase Auth
   let firebaseUser;
   try {
-    // Ensure Firebase Admin is initialized
-    getFirebaseAdmin();
-    
-    logger.info('Creating Firebase Auth user', { email: normalizedEmail });
+    logger.info('Creating Firebase Auth user', { 
+      email: normalizedEmail,
+      adminAppsCount: admin.apps.length,
+      projectId: config.PROJECT_ID
+    });
     
     firebaseUser = await admin.auth().createUser({
       email: normalizedEmail,
@@ -198,6 +181,8 @@ async function verifyEmail(email, otp) {
       email: normalizedEmail, 
       error: error.message, 
       code: error.code,
+      errorName: error.name,
+      errorDetails: error.errorInfo || null,
       stack: error.stack 
     });
     
@@ -206,11 +191,24 @@ async function verifyEmail(email, otp) {
       await otpService.invalidateOTP(normalizedEmail, 'verification');
       throw new Error('AUTH_EMAIL_EXISTS: This email is already registered');
     }
+    
+    // Check for permission/credential errors
+    if (error.code === 'auth/insufficient-permission' || 
+        error.code === 'auth/invalid-credential' ||
+        error.message?.includes('PERMISSION_DENIED') ||
+        error.message?.includes('credential')) {
+      logger.error('Firebase Auth permission error - check service account roles', {
+        email: normalizedEmail,
+        code: error.code
+      });
+      throw new Error('AUTH_SERVICE_ERROR: Service configuration error. Please contact support.');
+    }
+    
     if (error.message?.includes('Firebase') || error.message?.includes('initializeApp') || error.code?.startsWith('app/')) {
       throw new Error('AUTH_SERVICE_UNAVAILABLE: Authentication service is temporarily unavailable. Please try again later.');
     }
     // Don't clean up OTP on other errors so user can retry
-    throw new Error('AUTH_SERVICE_ERROR: Unable to create account. Please try again later.');
+    throw new Error(`AUTH_SERVICE_ERROR: Unable to create account. Please try again later. [${error.code || 'UNKNOWN'}]`);
   }
   
   // Create user document in Firestore
@@ -297,12 +295,24 @@ async function login(email, password) {
   const userData = userDoc.data();
   const userId = userDoc.id;
   
-  // Check if account is locked
+  // Check if account is deleted (soft delete by admin)
+  if (userData.deleted === true) {
+    logger.warn('Login attempt on deleted account', { userId, email: normalizedEmail });
+    throw new Error('AUTH_ACCOUNT_DELETED: This account has been deleted. Please contact support if you believe this is an error.');
+  }
+  
+  // Check if account is locked by admin
+  if (userData.locked === true) {
+    logger.warn('Login attempt on admin-locked account', { userId, email: normalizedEmail, reason: userData.lockReason });
+    throw new Error(`AUTH_ACCOUNT_SUSPENDED: Your account has been suspended.${userData.lockReason ? ` Reason: ${userData.lockReason}` : ''} Please contact support.`);
+  }
+  
+  // Check if account is temporarily locked (due to failed login attempts)
   if (userData.lockedUntil) {
     const lockedUntil = userData.lockedUntil.toDate();
     if (lockedUntil > new Date()) {
       const waitMinutes = Math.ceil((lockedUntil.getTime() - Date.now()) / 60000);
-      throw new Error(`AUTH_ACCOUNT_LOCKED: Account is locked. Please try again in ${waitMinutes} minutes.`);
+      throw new Error(`AUTH_ACCOUNT_LOCKED: Account is temporarily locked. Please try again in ${waitMinutes} minutes.`);
     }
   }
   
@@ -361,7 +371,6 @@ async function login(email, password) {
   // Generate custom token
   let token;
   try {
-    getFirebaseAdmin();
     token = await admin.auth().createCustomToken(userId);
   } catch (error) {
     logger.error('Failed to create custom token on login', { userId, error: error.message });

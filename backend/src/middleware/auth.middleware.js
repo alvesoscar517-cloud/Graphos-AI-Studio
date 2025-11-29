@@ -3,28 +3,12 @@
  * Supports Firebase Auth token verification and API key authentication
  */
 
-const admin = require('firebase-admin');
+const { getAdmin } = require('../config/firebaseAdmin');
+const admin = getAdmin();
 const config = require('../config');
 const logger = require('../utils/logger');
 const localization = require('../services/localization.service');
 const { getLanguage } = require('./language.middleware');
-
-// Initialize Firebase Admin if not already initialized
-let firebaseAdmin = null;
-
-function getFirebaseAdmin() {
-  if (!firebaseAdmin) {
-    try {
-      // Check if already initialized
-      firebaseAdmin = admin.apps.length ? admin.app() : admin.initializeApp({
-        projectId: config.PROJECT_ID
-      });
-    } catch (error) {
-      logger.error('Firebase Admin initialization failed', { error: error.message });
-    }
-  }
-  return firebaseAdmin;
-}
 
 /**
  * Verify Firebase ID Token
@@ -33,9 +17,6 @@ function getFirebaseAdmin() {
  */
 async function verifyFirebaseToken(idToken) {
   try {
-    const app = getFirebaseAdmin();
-    if (!app) return null;
-    
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     return {
       userId: decodedToken.uid,

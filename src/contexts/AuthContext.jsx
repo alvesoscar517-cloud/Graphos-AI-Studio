@@ -167,7 +167,10 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json()
       
       if (!response.ok) {
-        throw new AuthError(data.error || 'Login failed')
+        const error = new AuthError(data.error || 'Login failed')
+        error.code = data.code || 'LOGIN_FAILED'
+        error.statusCode = response.status
+        throw error
       }
       
       // Store auth data

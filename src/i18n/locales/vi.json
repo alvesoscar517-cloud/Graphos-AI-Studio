@@ -219,6 +219,12 @@
       "deleteAccountFailed": "Không thể xóa tài khoản",
       "accountTab": "Tài khoản",
       "securityTab": "Bảo mật"
+    },
+    "errors": {
+      "accountDeleted": "Tài khoản này đã bị xóa. Vui lòng liên hệ hỗ trợ nếu bạn cho rằng đây là lỗi.",
+      "accountSuspended": "Tài khoản của bạn đã bị tạm ngưng. Vui lòng liên hệ hỗ trợ để được hỗ trợ.",
+      "accountLocked": "Tài khoản tạm thời bị khóa do đăng nhập sai quá nhiều lần. Vui lòng thử lại sau.",
+      "emailNotVerified": "Vui lòng xác minh email trước khi đăng nhập."
     }
   },
   "nav": {
