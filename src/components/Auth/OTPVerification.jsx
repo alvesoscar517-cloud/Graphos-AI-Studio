@@ -9,6 +9,9 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
   const [countdown, setCountdown] = useState(600) // 10 minutes
   const [resendCooldown, setResendCooldown] = useState(0)
   const inputRefs = useRef([])
+  
+  // Debug: log email prop
+  console.log('[DEBUG] OTPVerification rendered with email:', email)
 
   // Countdown timer
   useEffect(() => {
@@ -109,6 +112,40 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
     }
   }
 
+  // Map backend error codes to user-friendly messages
+  const getErrorMessage = (err) => {
+    const errorCode = err.code || ''
+    const errorMessage = err.message || ''
+    
+    // Network errors
+    if (err.isNetworkError || errorMessage === 'NETWORK_ERROR' || errorMessage === 'Failed to fetch') {
+      return t('errors.networkError')
+    }
+    
+    // Map specific error codes to i18n keys
+    if (errorCode === 'AUTH_INVALID_OTP' || errorMessage.includes('Invalid code')) {
+      return t('auth.email.otpInvalid')
+    }
+    if (errorCode === 'AUTH_REGISTRATION_EXPIRED' || errorMessage.includes('expired')) {
+      return t('auth.email.codeExpired')
+    }
+    if (errorCode === 'AUTH_SERVICE_UNAVAILABLE' || errorMessage.includes('service')) {
+      return t('errors.serviceUnavailable', { defaultValue: t('errors.generic') })
+    }
+    
+    // Firebase/internal errors - show generic message
+    if (errorMessage.includes('Firebase') || errorMessage.includes('initializeApp')) {
+      return t('errors.serviceUnavailable', { defaultValue: t('errors.generic') })
+    }
+    
+    // Default: show generic error for technical messages, or the message if it's user-friendly
+    if (errorMessage.includes(':') || errorMessage.includes('Error') || errorMessage.length > 100) {
+      return t('errors.generic')
+    }
+    
+    return errorMessage || t('auth.email.otpInvalid')
+  }
+
   const handleSubmit = async (code) => {
     if (code.length !== 6) {
       setError(t('auth.email.otpIncomplete'))
@@ -118,12 +155,8 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
     try {
       await onVerify(code)
     } catch (err) {
-      // Handle network error with i18n
-      if (err.isNetworkError || err.message === 'NETWORK_ERROR') {
-        setError(t('errors.networkError'))
-      } else {
-        setError(err.message || t('auth.email.otpInvalid'))
-      }
+      console.error('[OTP] Verification error:', err)
+      setError(getErrorMessage(err))
       setOtp(['', '', '', '', '', ''])
       inputRefs.current[0]?.focus()
     }
@@ -140,20 +173,26 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
       setError('')
       inputRefs.current[0]?.focus()
     } catch (err) {
-      // Handle network error with i18n
-      if (err.isNetworkError || err.message === 'NETWORK_ERROR') {
-        setError(t('errors.networkError'))
-      } else {
-        setError(err.message || t('auth.email.resendFailed'))
-      }
+      console.error('[OTP] Resend error:', err)
+      setError(getErrorMessage(err))
     }
   }
 
   return (
     <div className="otp-verification">
       <div className="otp-header">
+        <div className="otp-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M22 7l-10 6L2 7"/>
+          </svg>
+        </div>
         <h3>{t('auth.email.verifyTitle')}</h3>
-        <p>{t('auth.email.verifySubtitle', { email })}</p>
+        <p>
+          {t('auth.email.verifySubtitle', { email: '' })}
+          <br />
+          <strong>{email}</strong>
+        </p>
       </div>
       
       <div className="otp-inputs">
@@ -170,6 +209,7 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
             onPaste={handlePaste}
             disabled={isLoading || countdown <= 0}
             className={error ? 'error' : ''}
+            placeholder="•"
           />
         ))}
       </div>
@@ -178,7 +218,13 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
       
       <div className="otp-timer">
         {countdown > 0 ? (
-          <span>{t('auth.email.codeExpires', { time: formatTime(countdown) })}</span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ verticalAlign: 'middle', marginRight: '6px' }}>
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            {t('auth.email.codeExpires', { time: formatTime(countdown) })}
+          </span>
         ) : (
           <span className="expired">{t('auth.email.codeExpired')}</span>
         )}

@@ -15,6 +15,26 @@ const otpService = require('./otp.service');
 const { validatePassword, validateEmail, validateDisplayName, normalizeEmail } = require('../utils/authValidation');
 const logger = require('../utils/logger');
 const { FREE_CREDITS } = require('../config/pricing');
+const config = require('../config');
+
+// Initialize Firebase Admin if not already initialized
+function getFirebaseAdmin() {
+  if (admin.apps.length === 0) {
+    try {
+      admin.initializeApp({
+        projectId: config.PROJECT_ID
+      });
+      logger.info('Firebase Admin initialized in emailAuth service');
+    } catch (error) {
+      logger.error('Firebase Admin initialization failed', { error: error.message });
+      throw new Error('AUTH_SERVICE_UNAVAILABLE: Authentication service is temporarily unavailable');
+    }
+  }
+  return admin;
+}
+
+// Ensure Firebase Admin is initialized on module load
+getFirebaseAdmin();
 
 // Collections
 const USERS_COLLECTION = 'users';
@@ -73,7 +93,7 @@ async function register({ email, password, displayName, locale = 'en' }) {
     throw new Error(`AUTH_INVALID_NAME: ${nameValidation.error}`);
   }
   
-  // Check if email already exists in users collection
+  // Check if email already exists in users collection (fully registered)
   const existingUser = await db.collection(USERS_COLLECTION)
     .where('email', '==', normalizedEmail)
     .limit(1)
@@ -83,10 +103,16 @@ async function register({ email, password, displayName, locale = 'en' }) {
     throw new Error('AUTH_EMAIL_EXISTS: This email is already registered');
   }
   
+  // Check if there's a pending registration - allow re-registration with new OTP
+  const existingPending = await db.collection(PENDING_REGISTRATIONS_COLLECTION).doc(normalizedEmail).get();
+  if (existingPending.exists) {
+    logger.info('Re-registration for pending email, updating registration', { email: normalizedEmail });
+  }
+  
   // Hash password
   const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
   
-  // Create pending registration
+  // Create/update pending registration
   const now = new Date();
   const expiresAt = new Date(now.getTime() + PENDING_REGISTRATION_EXPIRY_HOURS * 60 * 60 * 1000);
   
@@ -95,13 +121,15 @@ async function register({ email, password, displayName, locale = 'en' }) {
     passwordHash,
     displayName: displayName.trim(),
     locale,
-    createdAt: now,
+    createdAt: existingPending.exists ? existingPending.data().createdAt : now,
+    updatedAt: now,
     expiresAt
   };
   
   await db.collection(PENDING_REGISTRATIONS_COLLECTION).doc(normalizedEmail).set(pendingData);
   
-  // Generate and send OTP
+  // Invalidate old OTP if exists, then generate new one
+  await otpService.invalidateOTP(normalizedEmail, 'verification');
   const { code, expiresAt: otpExpiresAt } = await otpService.generateOTP(normalizedEmail, 'verification');
   
   logger.info('Registration pending', { email: normalizedEmail });
@@ -150,6 +178,9 @@ async function verifyEmail(email, otp) {
   // Create user in Firebase Auth
   let firebaseUser;
   try {
+    // Ensure Firebase Admin is initialized
+    getFirebaseAdmin();
+    
     firebaseUser = await admin.auth().createUser({
       email: normalizedEmail,
       emailVerified: true,
@@ -157,10 +188,15 @@ async function verifyEmail(email, otp) {
       disabled: false
     });
   } catch (error) {
+    logger.error('Firebase Auth createUser failed', { email: normalizedEmail, error: error.message, code: error.code });
+    
     if (error.code === 'auth/email-already-exists') {
       throw new Error('AUTH_EMAIL_EXISTS: This email is already registered');
     }
-    throw error;
+    if (error.message?.includes('Firebase') || error.message?.includes('initializeApp') || error.code?.startsWith('app/')) {
+      throw new Error('AUTH_SERVICE_UNAVAILABLE: Authentication service is temporarily unavailable. Please try again later.');
+    }
+    throw new Error('AUTH_SERVICE_ERROR: Unable to create account. Please try again later.');
   }
   
   // Create user document in Firestore
@@ -196,7 +232,13 @@ async function verifyEmail(email, otp) {
   await db.collection(PENDING_REGISTRATIONS_COLLECTION).doc(normalizedEmail).delete();
   
   // Generate custom token for client
-  const token = await admin.auth().createCustomToken(userId);
+  let token;
+  try {
+    token = await admin.auth().createCustomToken(userId);
+  } catch (error) {
+    logger.error('Failed to create custom token', { userId, error: error.message });
+    throw new Error('AUTH_SERVICE_ERROR: Account created but unable to generate login token. Please try logging in.');
+  }
   
   logger.info('User registered and verified', { userId, email: normalizedEmail });
   
@@ -302,7 +344,14 @@ async function login(email, password) {
   });
   
   // Generate custom token
-  const token = await admin.auth().createCustomToken(userId);
+  let token;
+  try {
+    getFirebaseAdmin();
+    token = await admin.auth().createCustomToken(userId);
+  } catch (error) {
+    logger.error('Failed to create custom token on login', { userId, error: error.message });
+    throw new Error('AUTH_SERVICE_ERROR: Unable to complete login. Please try again later.');
+  }
   
   logger.info('User logged in', { userId, email: normalizedEmail });
   

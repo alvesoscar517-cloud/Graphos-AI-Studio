@@ -73,6 +73,9 @@ const EmailRegisterForm = ({ onRegister, onSwitchToLogin, isLoading }) => {
       // Handle network error with i18n
       if (err.isNetworkError || err.message === 'NETWORK_ERROR') {
         setError(t('errors.networkError'))
+      } else if (err.message?.includes('already registered') || err.message?.includes('AUTH_EMAIL_EXISTS')) {
+        // Email already exists - suggest login instead
+        setError(t('auth.email.emailAlreadyExists', 'This email is already registered. Please login instead.'))
       } else {
         setError(err.message || t('auth.email.registerFailed'))
       }

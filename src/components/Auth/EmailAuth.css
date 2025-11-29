@@ -315,58 +315,90 @@
 /* OTP Verification */
 .otp-verification {
   text-align: center;
+  padding: 10px 0;
 }
 
 .otp-header {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+}
+
+.otp-icon {
+  margin-bottom: 16px;
+}
+
+.otp-icon svg {
+  width: 56px;
+  height: 56px;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 16px;
 }
 
 .otp-header h3 {
-  margin: 0 0 8px;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.3px;
 }
 
 .otp-header p {
   margin: 0;
   font-size: 14px;
-  color: var(--text-secondary, #666);
+  color: #555;
   word-break: break-all;
+  line-height: 1.6;
+}
+
+.otp-header p strong {
+  color: #1a1a1a;
+  font-weight: 600;
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
 }
 
 .otp-inputs {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .otp-inputs input {
-  width: 48px;
-  height: 56px;
+  width: 50px;
+  height: 58px;
   text-align: center;
   font-size: 24px;
-  font-weight: 600;
-  border: 2px solid var(--border-color, #e0e0e0);
-  border-radius: 8px;
-  background: var(--bg-primary, #fff);
-  color: var(--text-primary, #1a1a1a);
-  transition: border-color 0.2s;
+  font-weight: 700;
+  border: 1.5px solid #d0d0d0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #1a1a1a;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .otp-inputs input:focus {
   outline: none;
-  border-color: var(--primary-color, #1a1a1a);
+  border-color: #1a1a1a;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
 }
 
 .otp-inputs input.error {
   border-color: #ef4444;
+  background: #fef2f2;
   animation: shake 0.3s;
 }
 
 .otp-inputs input:disabled {
-  background: var(--bg-secondary, #f5f5f5);
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.otp-inputs input::placeholder {
+  color: #ccc;
 }
 
 @keyframes shake {
@@ -376,19 +408,30 @@
 }
 
 .otp-timer {
-  margin-bottom: 20px;
-  font-size: 13px;
-  color: var(--text-secondary, #666);
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
 }
 
 .otp-timer .expired {
   color: #ef4444;
+  font-weight: 600;
 }
 
 .otp-actions {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.otp-actions .link-btn {
+  font-size: 14px;
+  color: #555;
+}
+
+.otp-actions .link-btn:hover:not(:disabled) {
+  color: #1a1a1a;
 }
 
 /* Link Google Section */

@@ -55,6 +55,8 @@ async function generateOTP(email, type = 'verification') {
   const normalizedEmail = email.toLowerCase().trim();
   const docId = `${normalizedEmail}_${type}`;
   
+  logger.info('Generating OTP', { email: normalizedEmail, docId, type });
+  
   // Check rate limit for resends
   const existingDoc = await db.collection(OTP_COLLECTION).doc(docId).get();
   
@@ -134,10 +136,13 @@ async function verifyOTP(email, code, type = 'verification') {
   const normalizedEmail = email.toLowerCase().trim();
   const docId = `${normalizedEmail}_${type}`;
   
+  logger.info('Verifying OTP', { email: normalizedEmail, docId, codeLength: code?.length });
+  
   const docRef = db.collection(OTP_COLLECTION).doc(docId);
   const doc = await docRef.get();
   
   if (!doc.exists) {
+    logger.warn('OTP document not found', { email: normalizedEmail, docId });
     return { success: false, error: 'No verification code found. Please request a new one.' };
   }
   

@@ -130,6 +130,7 @@
       "nameTooShort": "Name must be at least 2 characters",
       "loginFailed": "Login failed",
       "registerFailed": "Registration failed",
+      "emailAlreadyExists": "This email is already registered. Please login instead.",
       "pwdMin8": "At least 8 characters",
       "pwdLowercase": "Add lowercase letters",
       "pwdUppercase": "Add uppercase letters",
@@ -142,7 +143,7 @@
         "strong": "Strong"
       },
       "verifyTitle": "Verify Your Email",
-      "verifySubtitle": "We sent a code to {{email}}",
+      "verifySubtitle": "We sent a verification code to",
       "otpIncomplete": "Please enter the complete code",
       "otpInvalid": "Invalid verification code",
       "codeExpires": "Code expires in {{time}}",
@@ -374,7 +375,10 @@
     "fileTooLarge": "File too large: {{size}} (max 10MB)",
     "maxAttachments": "Maximum 3 attachments allowed",
     "fileSizeLimit": "File size must not exceed 5MB",
-    "fillAllRequired": "Please fill in all required information"
+    "fillAllRequired": "Please fill in all required information",
+    "serviceUnavailable": "Service is temporarily unavailable. Please try again later.",
+    "verificationFailed": "Verification failed. Please try again.",
+    "serverError": "Server error. Please try again later."
   },
   "profile": {
     "selectProfile": "Select Profile",

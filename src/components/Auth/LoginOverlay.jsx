@@ -104,7 +104,9 @@ const LoginOverlay = () => {
   const handleEmailRegister = async (email, password, displayName) => {
     setIsLoading(true)
     try {
+      console.log('[DEBUG] Registering with email:', email)
       await registerWithEmail(email, password, displayName)
+      console.log('[DEBUG] Registration successful, setting pendingEmail:', email)
       setPendingEmail(email)
       setAuthMode('otp')
     } catch (error) {
@@ -118,9 +120,10 @@ const LoginOverlay = () => {
   const handleVerifyOTP = async (otp) => {
     setIsLoading(true)
     try {
+      console.log('[DEBUG] Verifying OTP for email:', pendingEmail, 'OTP:', otp)
       await verifyEmail(pendingEmail, otp)
     } catch (error) {
-      console.error('OTP verification error:', error)
+      console.error('OTP verification error:', error, 'Email:', pendingEmail)
       throw error
     } finally {
       setIsLoading(false)

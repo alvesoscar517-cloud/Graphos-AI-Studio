@@ -235,7 +235,9 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json()
       
       if (!response.ok) {
-        throw new AuthError(data.error || 'Verification failed')
+        const error = new AuthError(data.error || 'Verification failed')
+        error.code = data.code || 'VERIFICATION_FAILED'
+        throw error
       }
       
       // Store auth data
@@ -255,6 +257,7 @@ export const AuthProvider = ({ children }) => {
       if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
         const networkError = new AuthError('NETWORK_ERROR')
         networkError.isNetworkError = true
+        networkError.code = 'NETWORK_ERROR'
         throw networkError
       }
       throw error

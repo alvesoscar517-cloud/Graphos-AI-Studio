@@ -115,6 +115,8 @@ exports.verifyEmail = async (req, res) => {
   try {
     const { email, otp } = req.body;
     
+    logger.info('Verify email request', { email, otpLength: otp?.length });
+    
     if (!email || !otp) {
       return res.status(400).json({
         success: false,

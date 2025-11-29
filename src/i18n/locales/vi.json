@@ -130,6 +130,7 @@
       "nameTooShort": "Tên phải có ít nhất 2 ký tự",
       "loginFailed": "Đăng nhập thất bại",
       "registerFailed": "Đăng ký thất bại",
+      "emailAlreadyExists": "Email này đã được đăng ký. Vui lòng đăng nhập.",
       "pwdMin8": "Ít nhất 8 ký tự",
       "pwdLowercase": "Thêm chữ thường",
       "pwdUppercase": "Thêm chữ hoa",
@@ -142,7 +143,7 @@
         "strong": "Mạnh"
       },
       "verifyTitle": "Xác thực Email",
-      "verifySubtitle": "Chúng tôi đã gửi mã đến {{email}}",
+      "verifySubtitle": "Chúng tôi đã gửi mã xác thực đến",
       "otpIncomplete": "Vui lòng nhập đầy đủ mã",
       "otpInvalid": "Mã xác thực không hợp lệ",
       "codeExpires": "Mã hết hạn sau {{time}}",
@@ -374,7 +375,10 @@
     "fileTooLarge": "Tệp quá lớn: {{size}} (tối đa 10MB)",
     "maxAttachments": "Cho phép tối đa 3 tệp đính kèm",
     "fileSizeLimit": "Kích thước tệp không được vượt quá 5MB",
-    "fillAllRequired": "Vui lòng điền đầy đủ thông tin bắt buộc"
+    "fillAllRequired": "Vui lòng điền đầy đủ thông tin bắt buộc",
+    "serviceUnavailable": "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau.",
+    "verificationFailed": "Xác minh thất bại. Vui lòng thử lại.",
+    "serverError": "Lỗi máy chủ. Vui lòng thử lại sau."
   },
   "profile": {
     "selectProfile": "Chọn hồ sơ",
