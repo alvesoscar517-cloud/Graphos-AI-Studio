@@ -4,7 +4,7 @@
  */
 
 const emailAuthService = require('../services/emailAuth.service');
-const { otpVerificationEmail, passwordResetEmail } = require('../services/emailTemplate.service');
+const { otpVerificationEmail, passwordResetEmail, newDeviceLoginEmail, passwordChangedEmail } = require('../services/emailTemplate.service');
 const { createLocalizer } = require('../utils/localized-messages.util');
 const logger = require('../utils/logger');
 const nodemailer = require('nodemailer');
@@ -163,7 +163,7 @@ exports.login = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const { email, password } = req.body;
+    const { email, password, locale } = req.body;
     
     if (!email || !password) {
       return res.status(400).json({
@@ -173,12 +173,47 @@ exports.login = async (req, res) => {
       });
     }
     
-    const result = await emailAuthService.login(email, password);
+    // Get device info from request
+    const deviceInfo = {
+      userAgent: req.headers['user-agent'] || 'Unknown',
+      ipAddress: req.ip || req.headers['x-forwarded-for'] || 'Unknown',
+      platform: req.headers['sec-ch-ua-platform'] || 'Unknown',
+      language: req.headers['accept-language']?.split(',')[0] || 'en'
+    };
+    
+    const result = await emailAuthService.loginWithDeviceTracking(email, password, deviceInfo);
+    
+    // Send new device login notification if this is a new device
+    if (result.isNewDevice && result.user) {
+      try {
+        const html = newDeviceLoginEmail({
+          userName: result.user.name || email.split('@')[0],
+          deviceInfo: deviceInfo.userAgent,
+          ipAddress: deviceInfo.ipAddress,
+          location: 'Unknown', // Could integrate with IP geolocation service
+          loginTime: new Date(),
+          secureAccountUrl: process.env.APP_URL ? `${process.env.APP_URL}/settings/security` : null,
+          lang: locale || 'en'
+        });
+        
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: 'New Device Login - AI Content Authenticator',
+          html
+        });
+        
+        logger.info('New device login email sent', { email });
+      } catch (emailError) {
+        logger.error('Failed to send new device login email', { email, error: emailError.message });
+      }
+    }
     
     res.json({
       success: true,
       user: result.user,
-      token: result.token
+      token: result.token,
+      isNewDevice: result.isNewDevice
     });
     
   } catch (error) {
@@ -438,6 +473,233 @@ exports.unlinkGoogle = async (req, res) => {
       success: false,
       error: errorMessage,
       code: errorCode
+    });
+  }
+};
+
+/**
+ * Change password for authenticated user
+ * POST /auth/email/change-password
+ */
+exports.changePassword = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { currentPassword, newPassword, locale } = req.body;
+    
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: 'Current password and new password are required',
+        code: 'MISSING_FIELDS'
+      });
+    }
+    
+    const result = await emailAuthService.changePassword(userId, currentPassword, newPassword);
+    
+    // Send password changed notification email
+    if (result.success && req.user?.email) {
+      try {
+        const html = passwordChangedEmail({
+          userName: req.user.name || req.user.email.split('@')[0],
+          changedAt: new Date(),
+          lang: locale || 'en'
+        });
+        
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: req.user.email,
+          subject: 'Password Changed - AI Content Authenticator',
+          html
+        });
+        
+        logger.info('Password changed email sent', { userId });
+      } catch (emailError) {
+        logger.error('Failed to send password changed email', { userId, error: emailError.message });
+      }
+    }
+    
+    res.json(result);
+    
+  } catch (error) {
+    logger.error('Change password error', { error: error.message });
+    
+    const errorCode = error.message.split(':')[0];
+    const errorMessage = error.message.split(': ')[1] || error.message;
+    
+    let statusCode = 500;
+    if (errorCode === 'AUTH_INVALID_PASSWORD' || errorCode === 'AUTH_WEAK_PASSWORD' || 
+        errorCode === 'AUTH_PASSWORD_REUSED' || errorCode === 'AUTH_PASSWORD_SAME') {
+      statusCode = 400;
+    } else if (errorCode === 'AUTH_USER_NOT_FOUND') {
+      statusCode = 404;
+    } else if (errorCode === 'AUTH_INVALID_OPERATION') {
+      statusCode = 403;
+    }
+    
+    res.status(statusCode).json({
+      success: false,
+      error: errorMessage,
+      code: errorCode
+    });
+  }
+};
+
+/**
+ * Delete user account
+ * DELETE /auth/email/account
+ */
+exports.deleteAccount = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { password } = req.body;
+    
+    const result = await emailAuthService.deleteAccount(userId, password);
+    
+    res.json(result);
+    
+  } catch (error) {
+    logger.error('Delete account error', { error: error.message });
+    
+    const errorCode = error.message.split(':')[0];
+    const errorMessage = error.message.split(': ')[1] || error.message;
+    
+    let statusCode = 500;
+    if (errorCode === 'AUTH_INVALID_PASSWORD' || errorCode === 'AUTH_PASSWORD_REQUIRED') {
+      statusCode = 400;
+    } else if (errorCode === 'AUTH_USER_NOT_FOUND') {
+      statusCode = 404;
+    }
+    
+    res.status(statusCode).json({
+      success: false,
+      error: errorMessage,
+      code: errorCode
+    });
+  }
+};
+
+/**
+ * Get active sessions
+ * GET /auth/email/sessions
+ */
+exports.getSessions = async (req, res) => {
+  try {
+    const userId = req.userId;
+    
+    const sessions = await emailAuthService.getActiveSessions(userId);
+    
+    res.json({
+      success: true,
+      sessions
+    });
+    
+  } catch (error) {
+    logger.error('Get sessions error', { error: error.message });
+    
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get sessions',
+      code: 'GET_SESSIONS_ERROR'
+    });
+  }
+};
+
+/**
+ * Revoke a specific session
+ * DELETE /auth/email/sessions/:sessionId
+ */
+exports.revokeSession = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { sessionId } = req.params;
+    
+    if (!sessionId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Session ID is required',
+        code: 'MISSING_SESSION_ID'
+      });
+    }
+    
+    await emailAuthService.revokeSession(userId, sessionId);
+    
+    res.json({
+      success: true,
+      message: 'Session revoked successfully'
+    });
+    
+  } catch (error) {
+    logger.error('Revoke session error', { error: error.message });
+    
+    const errorCode = error.message.split(':')[0];
+    const errorMessage = error.message.split(': ')[1] || error.message;
+    
+    let statusCode = 500;
+    if (errorCode === 'AUTH_SESSION_NOT_FOUND') {
+      statusCode = 404;
+    } else if (errorCode === 'AUTH_UNAUTHORIZED') {
+      statusCode = 403;
+    }
+    
+    res.status(statusCode).json({
+      success: false,
+      error: errorMessage,
+      code: errorCode
+    });
+  }
+};
+
+/**
+ * Revoke all other sessions
+ * POST /auth/email/sessions/revoke-others
+ */
+exports.revokeOtherSessions = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { currentSessionId } = req.body;
+    
+    const result = await emailAuthService.revokeAllOtherSessions(userId, currentSessionId);
+    
+    res.json({
+      success: true,
+      message: `Revoked ${result.revokedCount} session(s)`,
+      revokedCount: result.revokedCount
+    });
+    
+  } catch (error) {
+    logger.error('Revoke other sessions error', { error: error.message });
+    
+    res.status(500).json({
+      success: false,
+      error: 'Failed to revoke sessions',
+      code: 'REVOKE_SESSIONS_ERROR'
+    });
+  }
+};
+
+/**
+ * Get login history
+ * GET /auth/email/login-history
+ */
+exports.getLoginHistory = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const limit = parseInt(req.query.limit) || 10;
+    
+    const history = await emailAuthService.getLoginHistory(userId, Math.min(limit, 50));
+    
+    res.json({
+      success: true,
+      history
+    });
+    
+  } catch (error) {
+    logger.error('Get login history error', { error: error.message });
+    
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get login history',
+      code: 'GET_HISTORY_ERROR'
     });
   }
 };

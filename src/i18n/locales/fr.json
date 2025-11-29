@@ -83,6 +83,8 @@
     "confirmPassword": "Confirmer le mot de passe",
     "rememberMe": "Se souvenir de moi",
     "loginWithGoogle": "Se connecter avec Google",
+    "signInWithAccount": "Se connecter avec un compte",
+    "continueWithGoogle": "Continuer avec Google",
     "loggingIn": "Connexion en cours...",
     "checking": "Vérification...",
     "pleaseWait": "Veuillez patienter un instant",

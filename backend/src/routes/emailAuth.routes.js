@@ -78,4 +78,50 @@ router.post('/link-google', authenticate, emailAuthController.linkGoogle);
  */
 router.post('/unlink-google', authenticate, emailAuthController.unlinkGoogle);
 
+/**
+ * Change password
+ * POST /auth/email/change-password
+ * Body: { currentPassword, newPassword }
+ * Requires: Bearer token
+ */
+router.post('/change-password', authenticate, emailAuthController.changePassword);
+
+/**
+ * Delete account
+ * DELETE /auth/email/account
+ * Body: { password } (required for email users)
+ * Requires: Bearer token
+ */
+router.delete('/account', authenticate, emailAuthController.deleteAccount);
+
+/**
+ * Get active sessions
+ * GET /auth/email/sessions
+ * Requires: Bearer token
+ */
+router.get('/sessions', authenticate, emailAuthController.getSessions);
+
+/**
+ * Revoke a specific session
+ * DELETE /auth/email/sessions/:sessionId
+ * Requires: Bearer token
+ */
+router.delete('/sessions/:sessionId', authenticate, emailAuthController.revokeSession);
+
+/**
+ * Revoke all other sessions
+ * POST /auth/email/sessions/revoke-others
+ * Body: { currentSessionId }
+ * Requires: Bearer token
+ */
+router.post('/sessions/revoke-others', authenticate, emailAuthController.revokeOtherSessions);
+
+/**
+ * Get login history
+ * GET /auth/email/login-history
+ * Query: { limit }
+ * Requires: Bearer token
+ */
+router.get('/login-history', authenticate, emailAuthController.getLoginHistory);
+
 module.exports = router;

@@ -83,6 +83,8 @@
     "confirmPassword": "Confirmar contraseña",
     "rememberMe": "Recordarme",
     "loginWithGoogle": "Iniciar con Google",
+    "signInWithAccount": "Iniciar con cuenta",
+    "continueWithGoogle": "Continuar con Google",
     "loggingIn": "Iniciando sesión...",
     "checking": "Verificando...",
     "pleaseWait": "Por favor espere un momento",

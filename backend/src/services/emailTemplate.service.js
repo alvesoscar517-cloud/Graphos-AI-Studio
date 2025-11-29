@@ -74,6 +74,33 @@ const translations = {
       securityNote: 'For security, this code can only be used once.',
       footerText: 'This is an automated password reset email',
       preheader: 'Your password reset code: {code}'
+    },
+    newDeviceLogin: {
+      title: 'New Device Login Detected',
+      subtitle: 'Your account was accessed from a new device',
+      greeting: 'Security Alert',
+      instruction: 'We detected a login to your account from a new device or location.',
+      deviceInfo: 'Device Information',
+      browser: 'Browser',
+      location: 'Location',
+      time: 'Time',
+      ipAddress: 'IP Address',
+      wasYou: 'Was this you?',
+      wasYouYes: "If this was you, you can safely ignore this email.",
+      wasYouNo: "If this wasn't you, please secure your account immediately by changing your password.",
+      secureAccount: 'Secure My Account',
+      footerText: 'This is an automated security notification',
+      preheader: 'New login detected on your account'
+    },
+    passwordChanged: {
+      title: 'Password Changed Successfully',
+      subtitle: 'Your password has been updated',
+      greeting: 'Password Updated',
+      instruction: 'Your password was successfully changed.',
+      time: 'Changed at',
+      notYou: "If you didn't make this change, please contact support immediately.",
+      footerText: 'This is an automated security notification',
+      preheader: 'Your password has been changed'
     }
   },
 
@@ -139,6 +166,33 @@ const translations = {
       securityNote: 'Vì lý do bảo mật, mã này chỉ có thể sử dụng một lần.',
       footerText: 'Đây là email đặt lại mật khẩu tự động',
       preheader: 'Mã đặt lại mật khẩu của bạn: {code}'
+    },
+    newDeviceLogin: {
+      title: 'Phát hiện đăng nhập từ thiết bị mới',
+      subtitle: 'Tài khoản của bạn được truy cập từ thiết bị mới',
+      greeting: 'Cảnh báo bảo mật',
+      instruction: 'Chúng tôi phát hiện đăng nhập vào tài khoản của bạn từ thiết bị hoặc vị trí mới.',
+      deviceInfo: 'Thông tin thiết bị',
+      browser: 'Trình duyệt',
+      location: 'Vị trí',
+      time: 'Thời gian',
+      ipAddress: 'Địa chỉ IP',
+      wasYou: 'Đây có phải là bạn?',
+      wasYouYes: 'Nếu đây là bạn, bạn có thể bỏ qua email này.',
+      wasYouNo: 'Nếu không phải bạn, vui lòng bảo mật tài khoản ngay bằng cách đổi mật khẩu.',
+      secureAccount: 'Bảo mật tài khoản',
+      footerText: 'Đây là thông báo bảo mật tự động',
+      preheader: 'Phát hiện đăng nhập mới vào tài khoản của bạn'
+    },
+    passwordChanged: {
+      title: 'Đổi mật khẩu thành công',
+      subtitle: 'Mật khẩu của bạn đã được cập nhật',
+      greeting: 'Mật khẩu đã cập nhật',
+      instruction: 'Mật khẩu của bạn đã được thay đổi thành công.',
+      time: 'Thay đổi lúc',
+      notYou: 'Nếu bạn không thực hiện thay đổi này, vui lòng liên hệ hỗ trợ ngay.',
+      footerText: 'Đây là thông báo bảo mật tự động',
+      preheader: 'Mật khẩu của bạn đã được thay đổi'
     }
   },
 
@@ -1138,10 +1192,160 @@ function passwordResetEmail({ code, userName, expiryMinutes = 10, lang = DEFAULT
   });
 }
 
+/**
+ * New Device Login Notification Email
+ * @param {Object} params
+ * @param {string} params.userName - User's display name
+ * @param {string} params.deviceInfo - Device/browser info
+ * @param {string} params.ipAddress - IP address
+ * @param {string} params.location - Approximate location
+ * @param {Date} params.loginTime - Login timestamp
+ * @param {string} params.secureAccountUrl - URL to secure account
+ * @param {string} [params.lang='en'] - Language code
+ */
+function newDeviceLoginEmail({ userName, deviceInfo, ipAddress, location, loginTime, secureAccountUrl, lang = DEFAULT_LANG }) {
+  const locale = getLocale(lang);
+  const formattedTime = loginTime.toLocaleString(locale, {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+
+  const content = `
+    ${headerSection({
+      icon: 'alertCircle',
+      iconColor: 'white',
+      bgColor: '#dc2626',
+      title: t('newDeviceLogin.title', lang),
+      subtitle: t('newDeviceLogin.subtitle', lang)
+    })}
+    ${contentSection(`
+      <p style="margin:0 0 24px;color:#1a1a1a;font-size:16px;">
+        ${getIcon('user', 'black', 18)} ${t('hi', lang)} <strong>${userName}</strong>,
+      </p>
+      <p style="margin:0 0 30px;color:#666666;font-size:15px;line-height:1.6;">
+        ${t('newDeviceLogin.instruction', lang)}
+      </p>
+      
+      <!-- Device Info Box -->
+      <div style="background-color:#fafafa;border-radius:8px;padding:20px;margin-bottom:24px;border-left:4px solid #dc2626;">
+        <p style="margin:0 0 16px;color:#666666;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">
+          ${getIcon('info', 'black', 14)} ${t('newDeviceLogin.deviceInfo', lang)}
+        </p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:8px 0;color:#999999;font-size:13px;width:100px;">${t('newDeviceLogin.browser', lang)}:</td>
+            <td style="padding:8px 0;color:#333333;font-size:13px;">${deviceInfo || 'Unknown'}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#999999;font-size:13px;">${t('newDeviceLogin.ipAddress', lang)}:</td>
+            <td style="padding:8px 0;color:#333333;font-size:13px;">${ipAddress || 'Unknown'}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#999999;font-size:13px;">${t('newDeviceLogin.location', lang)}:</td>
+            <td style="padding:8px 0;color:#333333;font-size:13px;">${location || 'Unknown'}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#999999;font-size:13px;">${t('newDeviceLogin.time', lang)}:</td>
+            <td style="padding:8px 0;color:#333333;font-size:13px;">${formattedTime}</td>
+          </tr>
+        </table>
+      </div>
+      
+      <!-- Was this you? -->
+      <div style="margin:24px 0;">
+        <p style="margin:0 0 12px;color:#1a1a1a;font-size:15px;font-weight:600;">${t('newDeviceLogin.wasYou', lang)}</p>
+        <p style="margin:0 0 8px;color:#666666;font-size:14px;line-height:1.6;">
+          ✓ ${t('newDeviceLogin.wasYouYes', lang)}
+        </p>
+        <p style="margin:0;color:#dc2626;font-size:14px;line-height:1.6;">
+          ✗ ${t('newDeviceLogin.wasYouNo', lang)}
+        </p>
+      </div>
+      
+      ${secureAccountUrl ? ctaButton({
+        text: t('newDeviceLogin.secureAccount', lang),
+        url: secureAccountUrl,
+        bgColor: '#dc2626'
+      }) : ''}
+    `)}
+  `;
+
+  return baseTemplate({
+    title: t('newDeviceLogin.title', lang),
+    preheader: t('newDeviceLogin.preheader', lang),
+    content,
+    footerText: t('newDeviceLogin.footerText', lang),
+    lang
+  });
+}
+
+/**
+ * Password Changed Notification Email
+ * @param {Object} params
+ * @param {string} params.userName - User's display name
+ * @param {Date} params.changedAt - When password was changed
+ * @param {string} [params.lang='en'] - Language code
+ */
+function passwordChangedEmail({ userName, changedAt, lang = DEFAULT_LANG }) {
+  const locale = getLocale(lang);
+  const formattedTime = changedAt.toLocaleString(locale, {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+
+  const content = `
+    ${headerSection({
+      icon: 'check',
+      iconColor: 'white',
+      bgColor: '#16a34a',
+      title: t('passwordChanged.title', lang),
+      subtitle: t('passwordChanged.subtitle', lang)
+    })}
+    ${contentSection(`
+      <p style="margin:0 0 24px;color:#1a1a1a;font-size:16px;">
+        ${getIcon('user', 'black', 18)} ${t('hi', lang)} <strong>${userName}</strong>,
+      </p>
+      <p style="margin:0 0 30px;color:#666666;font-size:15px;line-height:1.6;">
+        ${t('passwordChanged.instruction', lang)}
+      </p>
+      
+      <!-- Time Info -->
+      <div style="background-color:#f0fdf4;border-radius:8px;padding:20px;margin-bottom:24px;border-left:4px solid #16a34a;">
+        <p style="margin:0;color:#333333;font-size:14px;">
+          <strong>${t('passwordChanged.time', lang)}:</strong> ${formattedTime}
+        </p>
+      </div>
+      
+      ${divider()}
+      
+      <!-- Warning -->
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:20px;">
+        <tr>
+          <td width="26" style="vertical-align:top;padding-top:3px;">
+            ${getIcon('alertCircle', 'black', 16)}
+          </td>
+          <td style="color:#dc2626;font-size:13px;line-height:1.6;font-weight:500;">
+            ${t('passwordChanged.notYou', lang)}
+          </td>
+        </tr>
+      </table>
+    `)}
+  `;
+
+  return baseTemplate({
+    title: t('passwordChanged.title', lang),
+    preheader: t('passwordChanged.preheader', lang),
+    content,
+    footerText: t('passwordChanged.footerText', lang),
+    lang
+  });
+}
+
 module.exports = {
   baseTemplate, headerSection, contentSection, infoBox, ctaButton, divider,
   getIcon, getIconUrl, getAppLogo, t, getLocale,
   ICON_FILES, ICON_BASE_URL, SUPPORTED_LANGS, DEFAULT_LANG, translations,
   supportReplyEmail, newTicketEmail, backupCompletedEmail,
-  otpVerificationEmail, passwordResetEmail
+  otpVerificationEmail, passwordResetEmail,
+  newDeviceLoginEmail, passwordChangedEmail
 };

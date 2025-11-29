@@ -26,6 +26,17 @@ const PENDING_REGISTRATION_EXPIRY_HOURS = 24;
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOGIN_LOCKOUT_MINUTES = 30;
 const LOGIN_ATTEMPT_WINDOW_MINUTES = 15;
+const PASSWORD_HISTORY_COUNT = 5; // Number of previous passwords to check
+const SESSION_COLLECTION = 'user_sessions';
+const LOGIN_HISTORY_COLLECTION = 'login_history';
+
+// Disposable email domains (common ones)
+const DISPOSABLE_EMAIL_DOMAINS = [
+  'tempmail.com', 'throwaway.email', 'guerrillamail.com', 'mailinator.com',
+  'temp-mail.org', '10minutemail.com', 'fakeinbox.com', 'trashmail.com',
+  'yopmail.com', 'getnada.com', 'tempail.com', 'dispostable.com',
+  'mailnesia.com', 'tempr.email', 'discard.email', 'spamgourmet.com'
+];
 
 /**
  * Register a new user with email and password
@@ -45,6 +56,13 @@ async function register({ email, password, displayName, locale = 'en' }) {
     throw new Error(`AUTH_INVALID_EMAIL: ${emailValidation.error}`);
   }
   
+  // Check for disposable email
+  const normalizedEmail = normalizeEmail(email);
+  const emailDomain = normalizedEmail.split('@')[1];
+  if (DISPOSABLE_EMAIL_DOMAINS.includes(emailDomain)) {
+    throw new Error('AUTH_DISPOSABLE_EMAIL: Disposable email addresses are not allowed');
+  }
+  
   const passwordValidation = validatePassword(password);
   if (!passwordValidation.valid) {
     throw new Error(`AUTH_WEAK_PASSWORD: ${passwordValidation.errors.join('. ')}`);
@@ -54,8 +72,6 @@ async function register({ email, password, displayName, locale = 'en' }) {
   if (!nameValidation.valid) {
     throw new Error(`AUTH_INVALID_NAME: ${nameValidation.error}`);
   }
-  
-  const normalizedEmail = normalizeEmail(email);
   
   // Check if email already exists in users collection
   const existingUser = await db.collection(USERS_COLLECTION)
@@ -277,11 +293,12 @@ async function login(email, password) {
   }
   
   // Successful login - reset failed attempts
+  const now = new Date();
   await db.collection(USERS_COLLECTION).doc(userId).update({
     failedLoginAttempts: 0,
     lastFailedLoginAt: null,
     lockedUntil: null,
-    lastLoginAt: new Date()
+    lastLoginAt: now
   });
   
   // Generate custom token
@@ -302,6 +319,76 @@ async function login(email, password) {
     },
     token
   };
+}
+
+/**
+ * Login with device info tracking for new device notifications
+ * 
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @param {Object} deviceInfo - Device information
+ * @returns {Promise<{success: boolean, user: Object, token: string, isNewDevice: boolean}>}
+ */
+async function loginWithDeviceTracking(email, password, deviceInfo = {}) {
+  const result = await login(email, password);
+  
+  if (result.success) {
+    const { userId } = result.user;
+    const now = new Date();
+    
+    // Create device fingerprint
+    const deviceFingerprint = createDeviceFingerprint(deviceInfo);
+    
+    // Check if this is a new device
+    const existingSession = await db.collection(SESSION_COLLECTION)
+      .where('userId', '==', userId)
+      .where('deviceFingerprint', '==', deviceFingerprint)
+      .limit(1)
+      .get();
+    
+    const isNewDevice = existingSession.empty;
+    
+    // Record login history
+    await db.collection(LOGIN_HISTORY_COLLECTION).add({
+      userId,
+      email: result.user.email,
+      deviceInfo: {
+        ...deviceInfo,
+        fingerprint: deviceFingerprint
+      },
+      ipAddress: deviceInfo.ipAddress || 'unknown',
+      userAgent: deviceInfo.userAgent || 'unknown',
+      loginAt: now,
+      isNewDevice
+    });
+    
+    // Create/update session
+    if (isNewDevice) {
+      await db.collection(SESSION_COLLECTION).add({
+        userId,
+        deviceFingerprint,
+        deviceInfo,
+        createdAt: now,
+        lastActiveAt: now
+      });
+    } else {
+      const sessionDoc = existingSession.docs[0];
+      await sessionDoc.ref.update({ lastActiveAt: now });
+    }
+    
+    return { ...result, isNewDevice };
+  }
+  
+  return result;
+}
+
+/**
+ * Create device fingerprint from device info
+ */
+function createDeviceFingerprint(deviceInfo) {
+  const crypto = require('crypto');
+  const data = `${deviceInfo.userAgent || ''}-${deviceInfo.platform || ''}-${deviceInfo.language || ''}`;
+  return crypto.createHash('md5').update(data).digest('hex');
 }
 
 /**
@@ -551,14 +638,312 @@ async function getUserByEmail(email) {
   };
 }
 
+/**
+ * Change password for authenticated user
+ * 
+ * @param {string} userId - User ID
+ * @param {string} currentPassword - Current password
+ * @param {string} newPassword - New password
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+async function changePassword(userId, currentPassword, newPassword) {
+  // Get user document
+  const userDoc = await db.collection(USERS_COLLECTION).doc(userId).get();
+  
+  if (!userDoc.exists) {
+    throw new Error('AUTH_USER_NOT_FOUND: User not found');
+  }
+  
+  const userData = userDoc.data();
+  
+  if (userData.authProvider !== 'email') {
+    throw new Error('AUTH_INVALID_OPERATION: Password change is only available for email users');
+  }
+  
+  // Verify current password
+  const isValidPassword = await bcrypt.compare(currentPassword, userData.passwordHash);
+  if (!isValidPassword) {
+    throw new Error('AUTH_INVALID_PASSWORD: Current password is incorrect');
+  }
+  
+  // Validate new password
+  const passwordValidation = validatePassword(newPassword);
+  if (!passwordValidation.valid) {
+    throw new Error(`AUTH_WEAK_PASSWORD: ${passwordValidation.errors.join('. ')}`);
+  }
+  
+  // Check password history
+  const passwordHistory = userData.passwordHistory || [];
+  for (const oldHash of passwordHistory) {
+    const isSameAsOld = await bcrypt.compare(newPassword, oldHash);
+    if (isSameAsOld) {
+      throw new Error(`AUTH_PASSWORD_REUSED: Cannot reuse one of your last ${PASSWORD_HISTORY_COUNT} passwords`);
+    }
+  }
+  
+  // Also check current password
+  const isSameAsCurrent = await bcrypt.compare(newPassword, userData.passwordHash);
+  if (isSameAsCurrent) {
+    throw new Error('AUTH_PASSWORD_SAME: New password must be different from current password');
+  }
+  
+  // Hash new password
+  const newPasswordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
+  
+  // Update password history (keep last N passwords)
+  const newHistory = [userData.passwordHash, ...passwordHistory].slice(0, PASSWORD_HISTORY_COUNT);
+  
+  // Update user document
+  await db.collection(USERS_COLLECTION).doc(userId).update({
+    passwordHash: newPasswordHash,
+    passwordHistory: newHistory,
+    passwordChangedAt: new Date()
+  });
+  
+  // Revoke all existing sessions
+  try {
+    await admin.auth().revokeRefreshTokens(userId);
+  } catch (error) {
+    logger.warn('Failed to revoke refresh tokens', { userId, error: error.message });
+  }
+  
+  logger.info('Password changed successfully', { userId });
+  
+  return {
+    success: true,
+    message: 'Password changed successfully. Please login again with your new password.'
+  };
+}
+
+/**
+ * Delete user account
+ * 
+ * @param {string} userId - User ID
+ * @param {string} password - User password for confirmation
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+async function deleteAccount(userId, password) {
+  // Get user document
+  const userDoc = await db.collection(USERS_COLLECTION).doc(userId).get();
+  
+  if (!userDoc.exists) {
+    throw new Error('AUTH_USER_NOT_FOUND: User not found');
+  }
+  
+  const userData = userDoc.data();
+  
+  // For email users, verify password
+  if (userData.authProvider === 'email') {
+    if (!password) {
+      throw new Error('AUTH_PASSWORD_REQUIRED: Password is required to delete account');
+    }
+    
+    const isValidPassword = await bcrypt.compare(password, userData.passwordHash);
+    if (!isValidPassword) {
+      throw new Error('AUTH_INVALID_PASSWORD: Password is incorrect');
+    }
+  }
+  
+  // Delete user sessions
+  const sessionsSnapshot = await db.collection(SESSION_COLLECTION)
+    .where('userId', '==', userId)
+    .get();
+  
+  const batch = db.batch();
+  sessionsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+  
+  // Delete login history
+  const historySnapshot = await db.collection(LOGIN_HISTORY_COLLECTION)
+    .where('userId', '==', userId)
+    .get();
+  
+  historySnapshot.docs.forEach(doc => batch.delete(doc.ref));
+  
+  // Delete user document
+  batch.delete(db.collection(USERS_COLLECTION).doc(userId));
+  
+  await batch.commit();
+  
+  // Delete from Firebase Auth
+  try {
+    await admin.auth().deleteUser(userId);
+  } catch (error) {
+    logger.warn('Failed to delete Firebase Auth user', { userId, error: error.message });
+  }
+  
+  logger.info('Account deleted', { userId, email: userData.email });
+  
+  return {
+    success: true,
+    message: 'Your account has been permanently deleted.'
+  };
+}
+
+/**
+ * Get user's active sessions
+ * 
+ * @param {string} userId - User ID
+ * @returns {Promise<Array>}
+ */
+async function getActiveSessions(userId) {
+  const sessionsSnapshot = await db.collection(SESSION_COLLECTION)
+    .where('userId', '==', userId)
+    .orderBy('lastActiveAt', 'desc')
+    .get();
+  
+  return sessionsSnapshot.docs.map(doc => ({
+    sessionId: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt?.toDate(),
+    lastActiveAt: doc.data().lastActiveAt?.toDate()
+  }));
+}
+
+/**
+ * Revoke a specific session
+ * 
+ * @param {string} userId - User ID
+ * @param {string} sessionId - Session ID to revoke
+ * @returns {Promise<{success: boolean}>}
+ */
+async function revokeSession(userId, sessionId) {
+  const sessionDoc = await db.collection(SESSION_COLLECTION).doc(sessionId).get();
+  
+  if (!sessionDoc.exists) {
+    throw new Error('AUTH_SESSION_NOT_FOUND: Session not found');
+  }
+  
+  if (sessionDoc.data().userId !== userId) {
+    throw new Error('AUTH_UNAUTHORIZED: Not authorized to revoke this session');
+  }
+  
+  await sessionDoc.ref.delete();
+  
+  logger.info('Session revoked', { userId, sessionId });
+  
+  return { success: true };
+}
+
+/**
+ * Revoke all sessions except current
+ * 
+ * @param {string} userId - User ID
+ * @param {string} currentSessionId - Current session ID to keep
+ * @returns {Promise<{success: boolean, revokedCount: number}>}
+ */
+async function revokeAllOtherSessions(userId, currentSessionId) {
+  const sessionsSnapshot = await db.collection(SESSION_COLLECTION)
+    .where('userId', '==', userId)
+    .get();
+  
+  const batch = db.batch();
+  let revokedCount = 0;
+  
+  sessionsSnapshot.docs.forEach(doc => {
+    if (doc.id !== currentSessionId) {
+      batch.delete(doc.ref);
+      revokedCount++;
+    }
+  });
+  
+  await batch.commit();
+  
+  logger.info('All other sessions revoked', { userId, revokedCount });
+  
+  return { success: true, revokedCount };
+}
+
+/**
+ * Get login history
+ * 
+ * @param {string} userId - User ID
+ * @param {number} limit - Number of records to return
+ * @returns {Promise<Array>}
+ */
+async function getLoginHistory(userId, limit = 10) {
+  const historySnapshot = await db.collection(LOGIN_HISTORY_COLLECTION)
+    .where('userId', '==', userId)
+    .orderBy('loginAt', 'desc')
+    .limit(limit)
+    .get();
+  
+  return historySnapshot.docs.map(doc => ({
+    ...doc.data(),
+    loginAt: doc.data().loginAt?.toDate()
+  }));
+}
+
+/**
+ * Cleanup expired pending registrations
+ * Should be called by a scheduled job
+ * 
+ * @returns {Promise<{deletedCount: number}>}
+ */
+async function cleanupExpiredRegistrations() {
+  const now = new Date();
+  
+  const expiredSnapshot = await db.collection(PENDING_REGISTRATIONS_COLLECTION)
+    .where('expiresAt', '<', now)
+    .get();
+  
+  if (expiredSnapshot.empty) {
+    return { deletedCount: 0 };
+  }
+  
+  const batch = db.batch();
+  expiredSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+  await batch.commit();
+  
+  logger.info('Cleaned up expired registrations', { deletedCount: expiredSnapshot.size });
+  
+  return { deletedCount: expiredSnapshot.size };
+}
+
+/**
+ * Cleanup old login history (older than 90 days)
+ * Should be called by a scheduled job
+ * 
+ * @returns {Promise<{deletedCount: number}>}
+ */
+async function cleanupOldLoginHistory() {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - 90);
+  
+  const oldHistorySnapshot = await db.collection(LOGIN_HISTORY_COLLECTION)
+    .where('loginAt', '<', cutoffDate)
+    .limit(500) // Process in batches
+    .get();
+  
+  if (oldHistorySnapshot.empty) {
+    return { deletedCount: 0 };
+  }
+  
+  const batch = db.batch();
+  oldHistorySnapshot.docs.forEach(doc => batch.delete(doc.ref));
+  await batch.commit();
+  
+  logger.info('Cleaned up old login history', { deletedCount: oldHistorySnapshot.size });
+  
+  return { deletedCount: oldHistorySnapshot.size };
+}
+
 module.exports = {
   register,
   verifyEmail,
   login,
+  loginWithDeviceTracking,
   requestPasswordReset,
   resetPassword,
+  changePassword,
+  deleteAccount,
   linkGoogle,
   unlinkGoogle,
   resendVerificationOTP,
-  getUserByEmail
+  getUserByEmail,
+  getActiveSessions,
+  revokeSession,
+  revokeAllOtherSessions,
+  getLoginHistory,
+  cleanupExpiredRegistrations,
+  cleanupOldLoginHistory
 };

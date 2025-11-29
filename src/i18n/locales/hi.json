@@ -83,6 +83,8 @@
     "confirmPassword": "पासवर्ड की पुष्टि करें",
     "rememberMe": "मुझे याद रखें",
     "loginWithGoogle": "Google के साथ लॉगिन करें",
+    "signInWithAccount": "खाते से लॉगिन करें",
+    "continueWithGoogle": "Google के साथ जारी रखें",
     "loggingIn": "लॉगिन हो रहा है...",
     "checking": "जाँच हो रही है...",
     "pleaseWait": "कृपया एक क्षण प्रतीक्षा करें",

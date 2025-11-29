@@ -5,12 +5,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(10px);
   z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #f5f7fa;
   animation: fadeIn 0.3s ease;
 }
 
@@ -28,13 +27,16 @@
 }
 
 .login-container {
-  max-width: 400px;
+  position: relative;
+  z-index: 10;
+  max-width: 380px;
   width: 90%;
   text-align: center;
-  padding: 40px;
-  background: #fff;
+  padding: 32px 36px 24px;
+  background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: none;
   animation: slideUp 0.4s ease;
 }
 
@@ -50,9 +52,9 @@
 }
 
 .login-animation {
-  width: 260px;
-  height: 260px;
-  margin: 0 auto 24px;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -74,15 +76,16 @@
 }
 
 .login-title {
-  font-size: 24px;
-  font-weight: 400;
-  color: #202124;
-  margin-bottom: 12px;
+  font-size: 26px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
 }
 
 .login-subtitle {
-  font-size: 14px;
-  color: #5f6368;
+  font-size: 15px;
+  color: #6b7280;
   line-height: 1.6;
   margin-bottom: 32px;
 }
@@ -93,27 +96,24 @@
   justify-content: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 24px;
-  background: #fff;
-  border: 1px solid #dadce0;
-  border-radius: 8px;
+  padding: 14px 24px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
   font-size: 15px;
   font-weight: 500;
-  color: #202124;
+  color: #333;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.15s ease;
 }
 
-.google-signin-btn:hover {
-  background: #f8f9fa;
-  border-color: #c6c6c6;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+.google-signin-btn:hover:not(:disabled) {
+  background: #fafafa;
+  border-color: #d0d0d0;
 }
 
-.google-signin-btn:active {
-  background: #f1f3f4;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+.google-signin-btn:active:not(:disabled) {
+  background: #f5f5f5;
 }
 
 .google-signin-btn svg {
@@ -121,18 +121,21 @@
 }
 
 .login-footer {
-  margin-top: 24px;
+  margin-top: 28px;
   font-size: 12px;
-  color: #5f6368;
-  line-height: 1.6;
+  color: #9ca3af;
+  line-height: 1.7;
 }
 
 .login-link {
-  color: #1967d2;
+  color: #3b82f6;
   text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .login-link:hover {
+  color: #2563eb;
   text-decoration: underline;
 }
 
@@ -159,14 +162,11 @@
   }
 }
 
-/* Force light mode for login overlay - override any dark theme */
-body.dark-theme .login-overlay {
-  background: rgba(255, 255, 255, 0.98) !important;
-}
-
+/* Force light mode for login modal - override any dark theme */
+/* The background is always dark, modal is always light */
 body.dark-theme .login-container {
   background: #fff !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
 }
 
 body.dark-theme .login-title {
@@ -202,55 +202,98 @@ body.dark-theme .login-link {
 
 
 
-/* Email Sign In Button */
-.email-signin-btn {
+/* Primary Account Sign In Button */
+.account-signin-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 24px;
-  background: #1a1a1a;
-  border: none;
-  border-radius: 8px;
+  padding: 14px 24px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
   font-size: 15px;
   font-weight: 500;
-  color: #fff;
+  color: #333;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
-.email-signin-btn:hover:not(:disabled) {
-  background: #333;
+.account-signin-btn:hover:not(:disabled) {
+  background: #fafafa;
+  border-color: #d0d0d0;
 }
 
-.email-signin-btn:disabled {
+.account-signin-btn:active:not(:disabled) {
+  background: #f5f5f5;
+}
+
+.account-signin-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.email-signin-btn svg {
+.account-signin-btn svg {
   flex-shrink: 0;
+}
+
+/* Auth Divider - improved */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  gap: 16px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
+}
+
+.auth-divider span {
+  font-size: 12px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+/* Secondary Auth Button (Google) */
+.secondary-auth-btn {
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+}
+
+.secondary-auth-btn:hover:not(:disabled) {
+  background: #fafafa !important;
+  border-color: #d0d0d0 !important;
 }
 
 /* Back Button */
 .back-btn {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 32px;
+  left: 36px;
   background: none;
   border: none;
   font-size: 14px;
-  color: #666;
+  color: #888;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition: all 0.2s;
+  padding: 0;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .back-btn:hover:not(:disabled) {
-  background: #f5f5f5;
-  color: #1a1a1a;
+  color: #333;
 }
 
 .back-btn:disabled {
@@ -263,13 +306,13 @@ body.dark-theme .login-link {
   position: relative;
 }
 
-body.dark-theme .email-signin-btn {
-  background: #fff !important;
+body.dark-theme .account-signin-btn {
+  background: linear-gradient(135deg, #fff 0%, #f5f5f5 100%) !important;
   color: #1a1a1a !important;
 }
 
-body.dark-theme .email-signin-btn:hover:not(:disabled) {
-  background: #f5f5f5 !important;
+body.dark-theme .account-signin-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%) !important;
 }
 
 body.dark-theme .back-btn {
@@ -279,4 +322,13 @@ body.dark-theme .back-btn {
 body.dark-theme .back-btn:hover:not(:disabled) {
   background: #f5f5f5 !important;
   color: #1a1a1a !important;
+}
+
+body.dark-theme .auth-divider span {
+  color: #9ca3af !important;
+}
+
+body.dark-theme .auth-divider::before,
+body.dark-theme .auth-divider::after {
+  background: linear-gradient(90deg, transparent, #e5e7eb, transparent) !important;
 }

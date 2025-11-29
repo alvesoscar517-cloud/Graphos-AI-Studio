@@ -13,6 +13,14 @@ export async function loadProfiles() {
   
   try {
     const userInfo = await getUserInfo()
+    
+    // Don't make API call if user is not authenticated
+    if (!userInfo || !userInfo.userId) {
+      console.log('[INFO] No authenticated user, skipping profile load')
+      perfMonitor.end(endpoint)
+      return []
+    }
+    
     console.log('📋 Loading profiles for user:', userInfo.userId)
     
     const url = `${CONFIG.API_BASE_URL}/get_profiles?user_id=${userInfo.userId}`
@@ -102,6 +110,11 @@ export async function getProfileDetails(profileId) {
 export async function createProfile(profileName, theme = 'work') {
   try {
     const userInfo = await getUserInfo()
+    
+    if (!userInfo || !userInfo.userId) {
+      throw new Error('User not authenticated')
+    }
+    
     const response = await fetch(`${CONFIG.API_BASE_URL}/create_profile`, {
       method: 'POST',
       headers: {
@@ -228,6 +241,11 @@ export async function finalizeProfile(profileId) {
 export async function createProfileComplete(profileName, theme, samples, options = {}) {
   try {
     const userInfo = await getUserInfo()
+    
+    if (!userInfo || !userInfo.userId) {
+      throw new Error('User not authenticated')
+    }
+    
     console.log(`[PACKAGE] Creating complete profile with ${samples.length} samples...`)
     
     const fetchOptions = {

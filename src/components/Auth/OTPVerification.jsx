@@ -118,7 +118,12 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
     try {
       await onVerify(code)
     } catch (err) {
-      setError(err.message || t('auth.email.otpInvalid'))
+      // Handle network error with i18n
+      if (err.isNetworkError || err.message === 'NETWORK_ERROR') {
+        setError(t('errors.networkError'))
+      } else {
+        setError(err.message || t('auth.email.otpInvalid'))
+      }
       setOtp(['', '', '', '', '', ''])
       inputRefs.current[0]?.focus()
     }
@@ -135,7 +140,12 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
       setError('')
       inputRefs.current[0]?.focus()
     } catch (err) {
-      setError(err.message || t('auth.email.resendFailed'))
+      // Handle network error with i18n
+      if (err.isNetworkError || err.message === 'NETWORK_ERROR') {
+        setError(t('errors.networkError'))
+      } else {
+        setError(err.message || t('auth.email.resendFailed'))
+      }
     }
   }
 

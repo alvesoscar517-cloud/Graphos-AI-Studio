@@ -83,6 +83,8 @@
     "confirmPassword": "ยืนยันรหัสผ่าน",
     "rememberMe": "จดจำฉัน",
     "loginWithGoogle": "เข้าสู่ระบบด้วย Google",
+    "signInWithAccount": "เข้าสู่ระบบด้วยบัญชี",
+    "continueWithGoogle": "ดำเนินการต่อด้วย Google",
     "loggingIn": "กำลังเข้าสู่ระบบ...",
     "checking": "กำลังตรวจสอบ...",
     "pleaseWait": "กรุณารอสักครู่",

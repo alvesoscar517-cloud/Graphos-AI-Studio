@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CONFIG } from '../utils/config';
 import realtimeService from '../services/realtimeService';
+import { useAuth } from '../contexts/AuthContext';
 import './CreditBalance.css';
 
 const CACHE_KEY = 'cached_credits';
@@ -32,6 +33,7 @@ const setCachedCredits = (userId, credits) => {
 
 const CreditBalance = ({ userId, onUpgradeClick }) => {
   const { t } = useTranslation();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   // Initialize with cached value to avoid flicker
   const [credits, setCredits] = useState(() => getCachedCredits(userId));
   const [loading, setLoading] = useState(!getCachedCredits(userId));
@@ -62,7 +64,10 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
   }, [userId, updateCredits]);
 
   useEffect(() => {
-    if (!userId) return;
+    // Don't fetch if not authenticated or no userId
+    if (authLoading || !isAuthenticated || !userId) {
+      return;
+    }
 
     // Fetch fresh data (will update cache)
     fetchCredits();
@@ -93,7 +98,7 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
       unsubStatus();
       window.removeEventListener('payment-success', handlePaymentSuccess);
     };
-  }, [userId, fetchCredits, updateCredits]);
+  }, [userId, fetchCredits, updateCredits, isAuthenticated, authLoading]);
 
   const balance = credits?.balance != null ? credits.balance.toFixed(2) : '0';
   const used = credits?.used != null ? credits.used.toFixed(2) : '0';

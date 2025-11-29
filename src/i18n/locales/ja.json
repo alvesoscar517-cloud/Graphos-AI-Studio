@@ -83,6 +83,8 @@
     "confirmPassword": "パスワード（確認）",
     "rememberMe": "ログイン状態を保持する",
     "loginWithGoogle": "Googleでログイン",
+    "signInWithAccount": "アカウントでログイン",
+    "continueWithGoogle": "Googleで続行",
     "loggingIn": "ログイン中...",
     "checking": "確認中...",
     "pleaseWait": "少々お待ちください",

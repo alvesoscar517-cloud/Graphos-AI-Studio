@@ -83,6 +83,8 @@
     "confirmPassword": "Подтвердите пароль",
     "rememberMe": "Запомнить меня",
     "loginWithGoogle": "Войти через Google",
+    "signInWithAccount": "Войти с аккаунтом",
+    "continueWithGoogle": "Продолжить с Google",
     "loggingIn": "Вход в систему...",
     "checking": "Проверка...",
     "pleaseWait": "Пожалуйста, подождите",

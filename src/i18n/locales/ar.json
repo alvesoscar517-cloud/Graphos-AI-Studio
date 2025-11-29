@@ -83,6 +83,8 @@
     "confirmPassword": "تأكيد كلمة المرور",
     "rememberMe": "تذكرني",
     "loginWithGoogle": "الدخول عبر Google",
+    "signInWithAccount": "تسجيل الدخول بالحساب",
+    "continueWithGoogle": "المتابعة مع Google",
     "loggingIn": "جاري تسجيل الدخول...",
     "checking": "جاري التحقق...",
     "pleaseWait": "يرجى الانتظار لحظة",

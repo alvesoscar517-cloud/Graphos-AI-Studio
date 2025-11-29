@@ -25,16 +25,19 @@ const DISPLAY_NAME_MAX_LENGTH = 50;
  * - At least one uppercase letter
  * - At least one lowercase letter
  * - At least one number
+ * - At least one special character (recommended)
  * 
  * @param {string} password - Password to validate
- * @returns {{valid: boolean, errors: string[]}} Validation result with specific errors
+ * @param {boolean} requireSpecialChar - Whether to require special character (default: false)
+ * @returns {{valid: boolean, errors: string[], warnings: string[]}} Validation result with specific errors
  */
-function validatePassword(password) {
+function validatePassword(password, requireSpecialChar = false) {
   const errors = [];
+  const warnings = [];
   
   // Check if password is provided
   if (!password || typeof password !== 'string') {
-    return { valid: false, errors: ['Password is required'] };
+    return { valid: false, errors: ['Password is required'], warnings: [] };
   }
   
   // Check minimum length
@@ -62,9 +65,29 @@ function validatePassword(password) {
     errors.push('Password must contain at least one number');
   }
   
+  // Check for special character
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    if (requireSpecialChar) {
+      errors.push('Password must contain at least one special character');
+    } else {
+      warnings.push('Adding a special character would make your password stronger');
+    }
+  }
+  
+  // Check for common weak patterns
+  const commonPatterns = ['password', '123456', 'qwerty', 'abc123', 'letmein', 'welcome'];
+  const lowerPassword = password.toLowerCase();
+  for (const pattern of commonPatterns) {
+    if (lowerPassword.includes(pattern)) {
+      errors.push('Password contains a common weak pattern');
+      break;
+    }
+  }
+  
   return {
     valid: errors.length === 0,
-    errors
+    errors,
+    warnings
   };
 }
 

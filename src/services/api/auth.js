@@ -3,7 +3,8 @@ import { isDevMode, getDefaultTestUser, devLog } from '../../utils/devConfig'
 
 /**
  * Get user info helper
- * @returns {Promise<{userId: string, email: string, name: string}>}
+ * Returns null if user is not authenticated
+ * @returns {Promise<{userId: string, email: string, name: string} | null>}
  */
 export async function getUserInfo() {
   // DEV MODE: Use test user
@@ -15,7 +16,25 @@ export async function getUserInfo() {
     }
   }
   
-  // PRODUCTION: Get real user
+  // Check for email auth token first (web app mode)
+  try {
+    const authToken = localStorage.getItem('authToken')
+    const authMethod = localStorage.getItem('authMethod')
+    const storedUser = localStorage.getItem('user')
+    
+    if (authToken && authMethod === 'email' && storedUser) {
+      const user = JSON.parse(storedUser)
+      return {
+        userId: user.userId || user.email,
+        email: user.email,
+        name: user.displayName || user.name || 'User'
+      }
+    }
+  } catch (e) {
+    // Continue to check Chrome extension
+  }
+  
+  // PRODUCTION: Get real user from Chrome extension
   try {
     // Check if running in Chrome extension context
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
@@ -29,35 +48,32 @@ export async function getUserInfo() {
           }
         }
       } catch (chromeError) {
-        console.log('Chrome extension context not available, using localStorage')
+        console.log('Chrome extension context not available')
       }
     }
   } catch (error) {
     console.error('Error getting user info:', error)
   }
   
-  // Fallback to localStorage (for web app mode)
+  // Check localStorage userId (legacy support)
   try {
-    let userId = localStorage.getItem('userId')
-    if (!userId) {
-      userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9)
-      localStorage.setItem('userId', userId)
-    }
-    // Use valid email for dev/local mode
-    const isDevUser = userId.startsWith('dev_user')
-    return {
-      userId: userId,
-      email: isDevUser ? 'dev.test@example.com' : `${userId}@localhost.dev`,
-      name: 'Local User'
+    const userId = localStorage.getItem('userId')
+    if (userId) {
+      // Only return if it looks like a real user ID (not auto-generated)
+      const isRealUser = !userId.startsWith('user_') && !userId.startsWith('temp_')
+      if (isRealUser) {
+        return {
+          userId: userId,
+          email: `${userId}@localhost.dev`,
+          name: 'Local User'
+        }
+      }
     }
   } catch (storageError) {
-    // If localStorage also fails, generate temporary ID
-    console.warn('localStorage not available, using temporary ID')
-    const tempId = 'temp_' + Date.now()
-    return {
-      userId: tempId,
-      email: 'temp.user@localhost.dev',
-      name: 'Temporary User'
-    }
+    console.warn('localStorage not available')
   }
+  
+  // No authenticated user found
+  console.log('[INFO] No authenticated user found')
+  return null
 }

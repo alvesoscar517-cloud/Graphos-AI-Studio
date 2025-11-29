@@ -83,6 +83,8 @@
     "confirmPassword": "确认密码",
     "rememberMe": "记住我",
     "loginWithGoogle": "通过 Google 登录",
+    "signInWithAccount": "使用账户登录",
+    "continueWithGoogle": "使用 Google 继续",
     "loggingIn": "登录中...",
     "checking": "检查中...",
     "pleaseWait": "请稍候",

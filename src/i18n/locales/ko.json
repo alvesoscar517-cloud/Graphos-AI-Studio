@@ -83,6 +83,8 @@
     "confirmPassword": "비밀번호 확인",
     "rememberMe": "로그인 상태 유지",
     "loginWithGoogle": "Google로 로그인",
+    "signInWithAccount": "계정으로 로그인",
+    "continueWithGoogle": "Google로 계속",
     "loggingIn": "로그인 중...",
     "checking": "확인 중...",
     "pleaseWait": "잠시만 기다려 주세요",

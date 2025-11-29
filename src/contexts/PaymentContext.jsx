@@ -6,6 +6,7 @@
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { getUserInfo } from '../services/api';
 import realtimeService from '../services/realtimeService';
+import { useAuth } from './AuthContext';
 
 const PaymentContext = createContext();
 
@@ -43,7 +44,8 @@ export const usePayment = () => {
 };
 
 export const PaymentProvider = ({ children }) => {
-  const [isPolling, setIsPolling] = useState(() => !!getPersistedState());
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [isPolling, setIsPolling] = useState(false);
   const [purchaseResult, setPurchaseResult] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
 
@@ -120,15 +122,28 @@ export const PaymentProvider = ({ children }) => {
   }, [isPolling, handlePaymentSuccess, stopListening]);
 
 
-  // Resume from persisted state
+  // Resume from persisted state - only when authenticated
   useEffect(() => {
+    // Don't resume if not authenticated
+    if (authLoading || !isAuthenticated) {
+      return;
+    }
+    
     const state = getPersistedState();
     if (state) {
       startTimeRef.current = state.startTime;
       console.log('[PACKAGE] Resuming payment listener from persisted state');
       startPolling();
     }
-  }, []);
+  }, [isAuthenticated, authLoading]);
+  
+  // Clear state when logged out
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      stopListening();
+      clearPersistedState();
+    }
+  }, [isAuthenticated, authLoading, stopListening]);
 
   // Cleanup on unmount
   useEffect(() => {

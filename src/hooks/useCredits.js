@@ -8,6 +8,7 @@ import { debugLog } from '../utils/config';
 import { getUserInfo } from '../services/api/auth';
 import apiClient from '../services/api/client';
 import realtimeService from '../services/realtimeService';
+import { useAuth } from '../contexts/AuthContext';
 
 const CACHE_KEY = 'user_credits';
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -48,6 +49,7 @@ function cacheCredits(credits) {
  * Hook for managing user credits
  */
 export function useCredits() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [credits, setCredits] = useState(() => getCachedCredits());
   const [isLoading, setIsLoading] = useState(!credits);
   const [error, setError] = useState(null);
@@ -116,8 +118,18 @@ export function useCredits() {
     return credits?.balance >= required;
   }, [credits]);
   
-  // Initial fetch and subscription
+  // Initial fetch and subscription - only when authenticated
   useEffect(() => {
+    // Don't fetch if not authenticated
+    if (authLoading || !isAuthenticated) {
+      // Clear credits when logged out
+      if (!authLoading && !isAuthenticated) {
+        setCredits(null);
+        setError(null);
+      }
+      return;
+    }
+    
     fetchCredits();
     subscribeToUpdates();
     
@@ -126,7 +138,7 @@ export function useCredits() {
         unsubscribeRef.current();
       }
     };
-  }, [fetchCredits, subscribeToUpdates]);
+  }, [fetchCredits, subscribeToUpdates, isAuthenticated, authLoading]);
   
   return {
     credits,

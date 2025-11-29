@@ -1,7 +1,8 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { loadProfiles as loadProfilesAPI, getUserInfo } from '../services/api'
 import { isDevMode, getOrCreateTestProfile, shouldUseTestProfile, devLog } from '../utils/devConfig'
 import realtimeService from '../services/realtimeService'
+import { useAuth } from './AuthContext'
 
 const ProfileContext = createContext()
 
@@ -14,19 +15,40 @@ export const useProfiles = () => {
 }
 
 export const ProfileProvider = ({ children }) => {
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
   const [profiles, setProfiles] = useState([])
   const [currentProfile, setCurrentProfile] = useState(null)
   const [loading, setLoading] = useState(false)
   const [lastLoaded, setLastLoaded] = useState(null)
+  const realtimeUnsubscribeRef = useRef(null)
 
-  // Load profiles on mount
+  // Load profiles only when authenticated
   useEffect(() => {
-    loadProfiles()
-  }, [])
+    if (!authLoading && isAuthenticated) {
+      console.log('[SYNC] User authenticated, loading profiles...')
+      loadProfiles()
+    } else if (!authLoading && !isAuthenticated) {
+      // Clear profiles when logged out
+      console.log('[INFO] User not authenticated, clearing profiles')
+      setProfiles([])
+      setCurrentProfile(null)
+      setLastLoaded(null)
+      // Disconnect realtime service
+      realtimeService.disconnect()
+    }
+  }, [isAuthenticated, authLoading])
 
-  // Subscribe to real-time profile updates via SSE
+  // Subscribe to real-time profile updates via SSE - only when authenticated
   useEffect(() => {
-    let unsubscribe = null;
+    // Don't setup realtime if not authenticated
+    if (authLoading || !isAuthenticated) {
+      // Cleanup existing subscription
+      if (realtimeUnsubscribeRef.current) {
+        realtimeUnsubscribeRef.current()
+        realtimeUnsubscribeRef.current = null
+      }
+      return
+    }
     
     const setupRealtimeUpdates = async () => {
       try {
@@ -39,7 +61,7 @@ export const ProfileProvider = ({ children }) => {
         realtimeService.connect(userInfo.userId);
         
         // Subscribe to profile updates
-        unsubscribe = realtimeService.subscribe('profile', (data) => {
+        realtimeUnsubscribeRef.current = realtimeService.subscribe('profile', (data) => {
           console.log('[USER] Profile update via SSE:', data);
           if (data.type === 'created' || data.type === 'updated' || data.type === 'deleted') {
             loadProfiles(true); // Force reload
@@ -68,9 +90,12 @@ export const ProfileProvider = ({ children }) => {
     checkInvalidation()
     
     return () => {
-      if (unsubscribe) unsubscribe();
+      if (realtimeUnsubscribeRef.current) {
+        realtimeUnsubscribeRef.current()
+        realtimeUnsubscribeRef.current = null
+      }
     }
-  }, [])
+  }, [isAuthenticated, authLoading])
 
   const loadProfiles = async (force = false) => {
     // Don't reload if already loaded recently (unless forced)
