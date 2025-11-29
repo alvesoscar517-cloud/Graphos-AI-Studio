@@ -47,12 +47,76 @@ function extractBearerToken(authHeader) {
 }
 
 /**
+ * Verify email auth token (direct_ prefix or custom token)
+ * For email users who don't have Firebase ID token
+ */
+async function verifyEmailAuthToken(token) {
+  try {
+    // Handle direct auth token (direct_{userId})
+    if (token.startsWith('direct_')) {
+      const userId = token.replace('direct_', '');
+      
+      // Verify user exists in database
+      const { db } = require('../config/firebase');
+      const userDoc = await db.collection('users').doc(userId).get();
+      
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        if (userData.authProvider === 'email') {
+          return {
+            userId: userId,
+            email: userData.email,
+            emailVerified: userData.emailVerified,
+            name: userData.name || userData.email?.split('@')[0],
+            picture: userData.picture || ''
+          };
+        }
+      }
+      return null;
+    }
+    
+    // Try to verify as custom token by checking if it's a valid userId
+    // Custom tokens are JWT but we can't verify them server-side without Firebase client SDK
+    // So we check if the token looks like a Firebase custom token and extract userId
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+        if (payload.uid) {
+          const { db } = require('../config/firebase');
+          const userDoc = await db.collection('users').doc(payload.uid).get();
+          
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            return {
+              userId: payload.uid,
+              email: userData.email,
+              emailVerified: userData.emailVerified,
+              name: userData.name || userData.email?.split('@')[0],
+              picture: userData.picture || ''
+            };
+          }
+        }
+      }
+    } catch {
+      // Not a valid JWT
+    }
+    
+    return null;
+  } catch (error) {
+    logger.warn('Email auth token verification failed', { error: error.message });
+    return null;
+  }
+}
+
+/**
  * Authentication middleware - verifies user identity
  * Checks in order:
  * 1. Firebase ID token in Authorization header
  * 2. Firebase ID token in query param (for SSE/EventSource which doesn't support headers)
- * 3. API key in X-API-Key header (for service-to-service)
- * 4. Legacy user_id in body/query (deprecated, will be removed)
+ * 3. Email auth token (direct_ prefix or custom token)
+ * 4. API key in X-API-Key header (for service-to-service)
+ * 5. Legacy user_id in body/query (deprecated, will be removed)
  */
 async function authenticate(req, res, next) {
   try {
@@ -66,6 +130,7 @@ async function authenticate(req, res, next) {
     }
     
     if (idToken) {
+      // First try Firebase ID token verification
       const user = await verifyFirebaseToken(idToken);
       if (user) {
         req.user = user;
@@ -73,9 +138,18 @@ async function authenticate(req, res, next) {
         req.authMethod = 'firebase';
         return next();
       }
+      
+      // Then try email auth token verification
+      const emailUser = await verifyEmailAuthToken(idToken);
+      if (emailUser) {
+        req.user = emailUser;
+        req.userId = emailUser.userId;
+        req.authMethod = 'email';
+        return next();
+      }
     }
     
-    // 2. Try API key authentication (for service-to-service calls)
+    // 3. Try API key authentication (for service-to-service calls)
     const apiKey = req.headers['x-api-key'];
     if (apiKey && config.API_KEYS && config.API_KEYS.includes(apiKey)) {
       req.user = { userId: 'service', isService: true };
@@ -84,7 +158,7 @@ async function authenticate(req, res, next) {
       return next();
     }
     
-    // 3. Legacy: user_id in body/query (deprecated)
+    // 4. Legacy: user_id in body/query (deprecated)
     // This is for backward compatibility during migration
     const legacyUserId = req.body.user_id || req.query.user_id;
     if (legacyUserId && config.IS_DEVELOPMENT) {

@@ -145,29 +145,24 @@ const ChangePassword = ({ onChangePassword, onCancel, isLoading }) => {
           />
         </div>
         
-        {newPassword && (
-          <div className="password-strength">
-            <div className="strength-bar">
-              <div 
-                className={`strength-fill ${passwordStrength.level}`}
-                style={{ width: `${passwordStrength.score}%` }}
-              />
+        {/* Always show strength bar container to prevent modal jumping */}
+        <div className="password-strength-container">
+          {newPassword && (
+            <div className="password-strength">
+              <div className="strength-bar">
+                <div
+                  className={`strength-fill ${passwordStrength.level}`}
+                  style={{ width: `${passwordStrength.score}%` }}
+                />
+              </div>
+              <span className={`strength-label ${passwordStrength.level}`}>
+                {t(`auth.email.strength.${passwordStrength.level}`)}
+              </span>
             </div>
-            <span className={`strength-label ${passwordStrength.level}`}>
-              {t(`auth.email.strength.${passwordStrength.level}`)}
-            </span>
-          </div>
-        )}
-        
-        {passwordStrength.feedback.length > 0 && (
-          <ul className="password-feedback">
-            {passwordStrength.feedback.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
-        )}
+          )}
+        </div>
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="confirmNewPassword">{t('auth.email.confirmPasswordLabel')}</label>
         <input
@@ -179,19 +174,29 @@ const ChangePassword = ({ onChangePassword, onCancel, isLoading }) => {
           disabled={isLoading || localLoading}
           autoComplete="new-password"
         />
-        {confirmPassword && newPassword !== confirmPassword && (
-          <span className="field-error">{t('auth.email.passwordMismatch')}</span>
-        )}
+        {/* Fixed height container to prevent modal jumping */}
+        <div className="field-error-container">
+          <span className={`field-error ${confirmPassword && newPassword !== confirmPassword ? 'visible' : ''}`}>
+            {t('auth.email.passwordMismatch')}
+          </span>
+        </div>
       </div>
-      
+
       {error && <div className="form-error">{error}</div>}
-      
-      <button 
-        type="submit" 
+
+      <button
+        type="submit"
         className="email-auth-btn primary"
         disabled={isLoading || localLoading || passwordStrength.score < 50}
       >
-        {localLoading ? t('auth.email.changing') : t('auth.email.changePasswordBtn')}
+        {localLoading ? (
+          <>
+            <span className="btn-spinner" />
+            {t('auth.email.changing')}
+          </>
+        ) : (
+          t('auth.email.changePasswordBtn')
+        )}
       </button>
       
       <button 

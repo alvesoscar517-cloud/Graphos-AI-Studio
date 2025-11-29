@@ -1,0 +1,134 @@
+.link-google-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.link-google-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.link-google-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #5f6368;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.link-google-close:hover {
+  background: #f1f3f4;
+}
+
+.link-google-icon {
+  margin-bottom: 16px;
+}
+
+.link-google-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #202124;
+  margin: 0 0 8px;
+}
+
+.link-google-desc {
+  font-size: 14px;
+  color: #5f6368;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.link-google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 24px;
+  background: #4285F4;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.link-google-btn:hover {
+  background: #3367d6;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+}
+
+.link-google-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.link-google-btn svg {
+  background: #fff;
+  border-radius: 2px;
+  padding: 2px;
+}
+
+.link-google-cancel {
+  background: none;
+  border: none;
+  color: #5f6368;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 16px;
+  padding: 8px 16px;
+}
+
+.link-google-cancel:hover {
+  color: #202124;
+}
+
+/* Dark mode */
+body.dark-theme .link-google-modal {
+  background: #2d2d2d;
+}
+
+body.dark-theme .link-google-close {
+  color: #9aa0a6;
+}
+
+body.dark-theme .link-google-close:hover {
+  background: #3c4043;
+}
+
+body.dark-theme .link-google-title {
+  color: #e8eaed;
+}
+
+body.dark-theme .link-google-desc {
+  color: #9aa0a6;
+}
+
+body.dark-theme .link-google-cancel {
+  color: #9aa0a6;
+}
+
+body.dark-theme .link-google-cancel:hover {
+  color: #e8eaed;
+}

@@ -126,7 +126,17 @@ exports.verifyEmail = async (req, res) => {
     }
     
     const result = await emailAuthService.verifyEmail(email, otp);
-    
+
+    // If token generation failed, tell user to login manually
+    if (result.needsLogin) {
+      return res.json({
+        success: true,
+        needsLogin: true,
+        user: result.user,
+        message: 'Account verified successfully! Please login with your email and password.'
+      });
+    }
+
     res.json({
       success: true,
       user: result.user,
@@ -223,7 +233,8 @@ exports.login = async (req, res) => {
       success: true,
       user: result.user,
       token: result.token,
-      isNewDevice: result.isNewDevice
+      isNewDevice: result.isNewDevice,
+      useDirectAuth: result.useDirectAuth
     });
     
   } catch (error) {
@@ -410,28 +421,33 @@ exports.resetPassword = async (req, res) => {
 /**
  * Link Google account
  * POST /auth/email/link-google
+ * Now accepts OAuth access token instead of Firebase ID token
  */
 exports.linkGoogle = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const { googleIdToken } = req.body;
+    const { googleAccessToken, googleEmail, googleName } = req.body;
     const userId = req.userId; // From auth middleware
     
-    if (!googleIdToken) {
+    if (!googleAccessToken || !googleEmail) {
       return res.status(400).json({
         success: false,
-        error: 'Google ID token is required',
+        error: 'Google access token and email are required',
         code: 'MISSING_FIELDS'
       });
     }
     
-    const result = await emailAuthService.linkGoogle(userId, googleIdToken);
+    const result = await emailAuthService.linkGoogleWithOAuth(userId, {
+      accessToken: googleAccessToken,
+      email: googleEmail,
+      name: googleName
+    });
     
     res.json({
       success: true,
       googleEmail: result.googleEmail,
-      message: 'Google account linked successfully'
+      message: 'Google account linked successfully. Drive sync is now enabled.'
     });
     
   } catch (error) {
@@ -445,6 +461,8 @@ exports.linkGoogle = async (req, res) => {
       statusCode = 409;
     } else if (errorCode === 'AUTH_USER_NOT_FOUND' || errorCode === 'AUTH_INVALID_OPERATION') {
       statusCode = 400;
+    } else if (errorCode === 'AUTH_INVALID_TOKEN') {
+      statusCode = 401;
     }
     
     res.status(statusCode).json({

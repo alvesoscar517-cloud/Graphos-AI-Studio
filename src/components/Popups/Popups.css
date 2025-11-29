@@ -42,6 +42,10 @@
   font-size: 12px;
   color: #5f6368;
   margin-bottom: 0;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .profile-credits-section {
@@ -562,4 +566,64 @@ body.dark-theme .theme-option input[type="radio"]:checked {
 
 body.dark-theme .theme-option input[type="radio"]:checked::after {
   background: #8ab4f8;
+}
+
+
+/* Google Link Button in Profile - same style as Upgrade Plan */
+.profile-action-btn.google-link-btn-profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 20px;
+  width: calc(100% - 40px);
+  border-radius: 24px;
+  background: #fff;
+  border: 1px solid #dadce0;
+  color: #202124;
+  font-weight: 500;
+  padding: 8px 16px;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+.profile-action-btn.google-link-btn-profile:hover {
+  background: #f8f9fa;
+}
+
+.profile-action-btn.google-link-btn-profile:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.profile-action-btn.google-link-btn-profile svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Dark mode */
+body.dark-theme .profile-action-btn.google-link-btn-profile {
+  background: #2d2d2d;
+  border: 1px solid #5f6368;
+  color: #e3e3e3;
+}
+
+body.dark-theme .profile-action-btn.google-link-btn-profile:hover {
+  background: #3c4043;
+}
+
+/* Google Linked Status */
+.google-linked-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  font-size: 12px;
+  color: #34A853;
+  font-weight: 500;
+}
+
+body.dark-theme .google-linked-status {
+  color: #34A853;
 }

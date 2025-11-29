@@ -5,6 +5,12 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useNotes } from '../../contexts/NotesContext'
 import { truncateTitleByWords } from '../../utils/titleUtils'
 import './Sidebar.css'
+
+// Truncate email to max characters
+const truncateEmail = (email, maxLength = 18) => {
+  if (!email || email.length <= maxLength) return email
+  return email.substring(0, maxLength) + '...'
+}
 import NotificationPopup from '../Popups/NotificationPopup'
 import SettingsPopup from '../Popups/SettingsPopup'
 import UserProfilePopup from '../Popups/UserProfilePopup'
@@ -279,7 +285,7 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
               alt="User"
               style={user?.picture ? { borderRadius: '50%', width: '20px', height: '20px' } : {}}
             />
-            <span>{user?.email || t('common.notLoggedIn')}</span>
+            <span title={user?.email}>{truncateEmail(user?.email, 18) || t('common.notLoggedIn')}</span>
           </button>
         </div>
       </div>

@@ -147,27 +147,22 @@ const EmailRegisterForm = ({ onRegister, onSwitchToLogin, isLoading }) => {
           </button>
         </div>
         
-        {password && (
-          <div className="password-strength">
-            <div className="strength-bar">
-              <div 
-                className={`strength-fill ${passwordStrength.level}`}
-                style={{ width: `${passwordStrength.score}%` }}
-              />
+        {/* Always show strength bar container to prevent modal jumping */}
+        <div className="password-strength-container">
+          {password && (
+            <div className="password-strength">
+              <div className="strength-bar">
+                <div
+                  className={`strength-fill ${passwordStrength.level}`}
+                  style={{ width: `${passwordStrength.score}%` }}
+                />
+              </div>
+              <span className={`strength-label ${passwordStrength.level}`}>
+                {t(`auth.email.strength.${passwordStrength.level}`)}
+              </span>
             </div>
-            <span className={`strength-label ${passwordStrength.level}`}>
-              {t(`auth.email.strength.${passwordStrength.level}`)}
-            </span>
-          </div>
-        )}
-        
-        {passwordStrength.feedback.length > 0 && (
-          <ul className="password-feedback">
-            {passwordStrength.feedback.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
-        )}
+          )}
+        </div>
       </div>
       
       <div className="form-group">
@@ -181,27 +176,37 @@ const EmailRegisterForm = ({ onRegister, onSwitchToLogin, isLoading }) => {
           disabled={isLoading}
           autoComplete="new-password"
         />
-        {confirmPassword && password !== confirmPassword && (
-          <span className="field-error">{t('auth.email.passwordMismatch')}</span>
-        )}
+        {/* Fixed height container to prevent modal jumping */}
+        <div className="field-error-container">
+          <span className={`field-error ${confirmPassword && password !== confirmPassword ? 'visible' : ''}`}>
+            {t('auth.email.passwordMismatch')}
+          </span>
+        </div>
       </div>
-      
+
       {error && <div className="form-error">{error}</div>}
-      
-      <button 
-        type="submit" 
+
+      <button
+        type="submit"
         className="email-auth-btn primary"
         disabled={isLoading || passwordStrength.score < 50}
       >
-        {isLoading ? t('auth.email.registering') : t('auth.email.registerBtn')}
+        {isLoading ? (
+          <>
+            <span className="btn-spinner" />
+            {t('auth.email.registering')}
+          </>
+        ) : (
+          t('auth.email.registerBtn')
+        )}
       </button>
-      
+
       <div className="form-divider">
         <span>{t('auth.email.or')}</span>
       </div>
-      
-      <button 
-        type="button" 
+
+      <button
+        type="button"
         className="email-auth-btn secondary"
         onClick={onSwitchToLogin}
         disabled={isLoading}

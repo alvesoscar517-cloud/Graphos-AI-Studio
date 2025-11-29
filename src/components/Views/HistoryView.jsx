@@ -7,6 +7,7 @@ import { openDriveFolder } from '../../services/drive'
 import { truncateTitleByWords } from '../../utils/titleUtils'
 import modal from '../../utils/modal'
 import SharePopup from '../Popups/SharePopup'
+import LinkGooglePrompt from '../Auth/LinkGooglePrompt'
 import './HistoryView.css'
 
 // Helper function to highlight search text
@@ -32,7 +33,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const { t } = useTranslation()
   const { notes, loadNote, loading, syncNotes, needsReauth, deleteNote } = useNotes()
   const { conversations, loadConversation, deleteConversation } = useWorkspace()
-  const { user, signOut } = useAuth()
+  const { user, signOut, authMethod, hasGoogleLinked, linkGoogleAccount } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('all') // 'all', 'text', 'chat'
   const [filterSource, setFilterSource] = useState('all') // 'all', 'drive', 'local'
@@ -47,6 +48,8 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [isMobile, setIsMobile] = useState(false)
   const [isSourceDropdownOpen, setIsSourceDropdownOpen] = useState(false)
+  const [showLinkGooglePrompt, setShowLinkGooglePrompt] = useState(false)
+  const [linkGoogleAction, setLinkGoogleAction] = useState(null) // 'sync' or 'open'
   const itemsPerPage = 50
   const searchInputRef = useRef(null)
   const sourceDropdownRef = useRef(null)
@@ -337,10 +340,20 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     setShareItem(item)
   }
 
+  // Check if email user needs to link Google first
+  const needsGoogleLink = authMethod === 'email' && !hasGoogleLinked
+
   const handleOpenInDrive = async () => {
     try {
       if (!user) {
         modal.alert(t('auth.pleaseSignIn'), t('auth.notSignedIn'))
+        return
+      }
+
+      // Email user without Google linked - show prompt
+      if (needsGoogleLink) {
+        setLinkGoogleAction('open')
+        setShowLinkGooglePrompt(true)
         return
       }
 
@@ -363,6 +376,43 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       } else {
         modal.error(t('history.unableToOpenDrive') + ': ' + error.message)
       }
+    }
+  }
+
+  const handleSyncNotes = async () => {
+    // Email user without Google linked - show prompt
+    if (needsGoogleLink) {
+      setLinkGoogleAction('sync')
+      setShowLinkGooglePrompt(true)
+      return
+    }
+
+    try {
+      setIsSyncing(true)
+      await syncNotes()
+      modal.toast(t('history.synced'), t('history.notesSynced'), 'success')
+    } catch (error) {
+      modal.error(t('history.unableToSync') + ': ' + error.message)
+    } finally {
+      setIsSyncing(false)
+    }
+  }
+
+  const handleLinkGoogleAndContinue = async () => {
+    try {
+      await linkGoogleAccount()
+      setShowLinkGooglePrompt(false)
+      modal.toast(t('auth.email.googleLinked') || 'Google account linked!', '', 'success')
+      
+      // Continue with the original action
+      if (linkGoogleAction === 'sync') {
+        await handleSyncNotes()
+      } else if (linkGoogleAction === 'open') {
+        await openDriveFolder(notes)
+        modal.toast(t('history.driveFolderOpened'), '', 'success')
+      }
+    } catch (error) {
+      modal.error(error.message || t('auth.email.linkFailed'))
     }
   }
 
@@ -581,6 +631,12 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           onClose={() => setShareItem(null)}
         />
       )}
+      {showLinkGooglePrompt && (
+        <LinkGooglePrompt
+          onLink={handleLinkGoogleAndContinue}
+          onClose={() => setShowLinkGooglePrompt(false)}
+        />
+      )}
       <div className="history-view">
         <div className="history-topbar">
           <button 
@@ -627,17 +683,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                   </button>
                   <button 
                     className={`history-action-btn ${isSyncing ? 'syncing' : ''}`}
-                    onClick={async () => {
-                      try {
-                        setIsSyncing(true)
-                        await syncNotes()
-                        modal.toast(t('history.synced'), t('history.notesSynced'), 'success')
-                      } catch (error) {
-                        modal.error(t('history.unableToSync') + ': ' + error.message)
-                      } finally {
-                        setIsSyncing(false)
-                      }
-                    }}
+                    onClick={handleSyncNotes}
                     disabled={isSyncing}
                   >
                     <img src="/icon/refresh-cw.svg" alt={t('history.sync')} />

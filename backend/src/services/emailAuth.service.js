@@ -17,6 +17,7 @@ const { validatePassword, validateEmail, validateDisplayName, normalizeEmail } =
 const logger = require('../utils/logger');
 const { FREE_CREDITS } = require('../config/pricing');
 const config = require('../config');
+const { sendWelcomeNotification } = require('./autoNotification.service');
 
 // Collections
 const USERS_COLLECTION = 'users';
@@ -240,23 +241,33 @@ async function verifyEmail(email, otp) {
   
   await db.collection(USERS_COLLECTION).doc(userId).set(userData);
   
+  // Send welcome notification for new user
+  try {
+    await sendWelcomeNotification(userId, FREE_CREDITS);
+    logger.info('Welcome notification sent', { userId, email: normalizedEmail });
+  } catch (notifError) {
+    logger.warn('Failed to send welcome notification', { userId, error: notifError.message });
+  }
+  
   // Delete pending registration and OTP (cleanup after successful user creation)
   await db.collection(PENDING_REGISTRATIONS_COLLECTION).doc(normalizedEmail).delete();
   await otpService.invalidateOTP(normalizedEmail, 'verification');
   
   // Generate custom token for client
-  let token;
+  let token = null;
   try {
     token = await admin.auth().createCustomToken(userId);
   } catch (error) {
-    logger.error('Failed to create custom token', { userId, error: error.message });
-    throw new Error('AUTH_SERVICE_ERROR: Account created but unable to generate login token. Please try logging in.');
+    logger.error('Failed to create custom token', { userId, error: error.message, code: error.code });
+    // Don't throw - account is created, user can login manually
+    // This happens when service account doesn't have "Service Account Token Creator" role
   }
-  
-  logger.info('User registered and verified', { userId, email: normalizedEmail });
-  
+
+  logger.info('User registered and verified', { userId, email: normalizedEmail, hasToken: !!token });
+
   return {
     success: true,
+    needsLogin: !token, // Flag to tell frontend user needs to login manually
     user: {
       userId,
       email: normalizedEmail,
@@ -369,16 +380,20 @@ async function login(email, password) {
   });
   
   // Generate custom token
-  let token;
+  let token = null;
   try {
     token = await admin.auth().createCustomToken(userId);
   } catch (error) {
-    logger.error('Failed to create custom token on login', { userId, error: error.message });
-    throw new Error('AUTH_SERVICE_ERROR: Unable to complete login. Please try again later.');
+    logger.error('Failed to create custom token on login', {
+      userId,
+      error: error.message,
+      code: error.code
+    });
+    // Don't throw - we'll use a workaround with user data
   }
-  
-  logger.info('User logged in', { userId, email: normalizedEmail });
-  
+
+  logger.info('User logged in', { userId, email: normalizedEmail, hasToken: !!token });
+
   return {
     success: true,
     user: {
@@ -390,7 +405,9 @@ async function login(email, password) {
       authProvider: 'email',
       hasGoogleLinked: !!userData.googleLinked
     },
-    token
+    token,
+    // If no token, frontend will use userId + passwordHash verification
+    useDirectAuth: !token
   };
 }
 
@@ -1000,6 +1017,87 @@ async function cleanupOldLoginHistory() {
   return { deletedCount: oldHistorySnapshot.size };
 }
 
+/**
+ * Link Google account using OAuth access token (for Chrome extension)
+ * This allows email users to link Google for Drive sync
+ * 
+ * @param {string} userId - User ID
+ * @param {Object} googleData - Google OAuth data
+ * @param {string} googleData.accessToken - OAuth access token
+ * @param {string} googleData.email - Google email
+ * @param {string} googleData.name - Google display name
+ * @returns {Promise<{success: boolean, googleEmail: string}>}
+ */
+async function linkGoogleWithOAuth(userId, googleData) {
+  const { accessToken, email, name } = googleData;
+  
+  // Verify the access token by calling Google API
+  try {
+    const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('AUTH_INVALID_TOKEN: Invalid or expired Google access token');
+    }
+    
+    const googleUserInfo = await response.json();
+    
+    // Verify email matches
+    if (googleUserInfo.email !== email) {
+      throw new Error('AUTH_INVALID_TOKEN: Email mismatch');
+    }
+  } catch (error) {
+    if (error.message.startsWith('AUTH_')) {
+      throw error;
+    }
+    logger.error('Google token verification failed', { error: error.message });
+    throw new Error('AUTH_INVALID_TOKEN: Failed to verify Google token');
+  }
+  
+  // Check if Google email is already linked to another user
+  const existingLink = await db.collection(USERS_COLLECTION)
+    .where('googleLinked.googleEmail', '==', email)
+    .limit(1)
+    .get();
+  
+  if (!existingLink.empty && existingLink.docs[0].id !== userId) {
+    throw new Error('AUTH_GOOGLE_ALREADY_LINKED: This Google account is already linked to another user');
+  }
+  
+  // Get user document
+  const userDoc = await db.collection(USERS_COLLECTION).doc(userId).get();
+  
+  if (!userDoc.exists) {
+    throw new Error('AUTH_USER_NOT_FOUND: User not found');
+  }
+  
+  const userData = userDoc.data();
+  
+  if (userData.authProvider !== 'email') {
+    throw new Error('AUTH_INVALID_OPERATION: Only email users can link Google accounts');
+  }
+  
+  // Link Google account
+  await db.collection(USERS_COLLECTION).doc(userId).update({
+    googleLinked: {
+      googleEmail: email,
+      googleName: name || email.split('@')[0],
+      linkedAt: new Date(),
+      driveEnabled: true // Flag to indicate Drive sync is available
+    }
+  });
+  
+  logger.info('Google account linked via OAuth', { userId, googleEmail: email });
+  
+  return {
+    success: true,
+    googleEmail: email
+  };
+}
+
 module.exports = {
   register,
   verifyEmail,
@@ -1010,6 +1108,7 @@ module.exports = {
   changePassword,
   deleteAccount,
   linkGoogle,
+  linkGoogleWithOAuth,
   unlinkGoogle,
   resendVerificationOTP,
   getUserByEmail,

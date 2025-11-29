@@ -114,12 +114,16 @@
   height: 18px;
 }
 
-/* Password Strength */
+/* Password Strength - Fixed height to prevent modal jumping */
+.password-strength-container {
+  min-height: 24px;
+  margin-top: 10px;
+}
+
 .password-strength {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 10px;
 }
 
 .strength-bar {
@@ -136,6 +140,7 @@
   border-radius: 3px;
 }
 
+.strength-fill.none { width: 0; }
 .strength-fill.weak { background: linear-gradient(90deg, #ef4444, #f87171); }
 .strength-fill.fair { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
 .strength-fill.good { background: linear-gradient(90deg, #10b981, #34d399); }
@@ -150,10 +155,24 @@
   text-align: right;
 }
 
+.strength-label.none { color: transparent; }
 .strength-label.weak { color: #ef4444; }
 .strength-label.fair { color: #f59e0b; }
 .strength-label.good { color: #10b981; }
 .strength-label.strong { color: #059669; }
+
+/* Password feedback - smooth height transition */
+.password-feedback-container {
+  overflow: hidden;
+  transition: max-height 0.2s ease-out, opacity 0.2s ease-out;
+  max-height: 0;
+  opacity: 0;
+}
+
+.password-feedback-container.visible {
+  max-height: 100px;
+  opacity: 1;
+}
 
 .password-feedback {
   margin: 10px 0 0;
@@ -167,12 +186,23 @@
   margin-bottom: 4px;
 }
 
+/* Fixed height container for field errors to prevent modal jumping */
+.field-error-container {
+  min-height: 24px;
+  margin-top: 6px;
+}
+
 .field-error {
   display: block;
-  margin-top: 6px;
   font-size: 13px;
   color: #ef4444;
   font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.field-error.visible {
+  opacity: 1;
 }
 
 /* Form Error */
@@ -248,6 +278,25 @@
 .email-auth-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Button loading spinner */
+.btn-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Links */
@@ -1104,4 +1153,32 @@
 .login-terms .login-link:hover {
   color: #2563eb;
   text-decoration: underline;
+}
+
+
+/* Drive Sync Enabled Indicator */
+.drive-sync-enabled {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #166534;
+  font-weight: 500;
+}
+
+.drive-sync-enabled svg {
+  flex-shrink: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .drive-sync-enabled {
+    background: #052e16;
+    border-color: #166534;
+    color: #86efac;
+  }
 }

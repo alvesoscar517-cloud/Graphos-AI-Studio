@@ -43,6 +43,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('authMethod')
     localStorage.removeItem('user')
     localStorage.removeItem('sessionId')
+    // Clear notifications to prevent showing old account's notifications
+    localStorage.removeItem('user_notifications')
   }
 
   const checkAuthentication = async () => {
@@ -61,17 +63,45 @@ export const AuthProvider = ({ children }) => {
           if (response.ok) {
             const storedUser = localStorage.getItem('user')
             if (storedUser) {
-              setUser(JSON.parse(storedUser))
+              const userData = JSON.parse(storedUser)
+              setUser(userData)
               setIsAuthenticated(true)
               setAuthMethod('email')
+              setHasGoogleLinked(userData.hasGoogleLinked || false)
+              setIsLoading(false)
+              return
+            }
+          }
+          
+          // Only clear auth on 401 (unauthorized), not on rate limit (429) or other errors
+          if (response.status === 401) {
+            clearAuthStorage()
+          } else if (response.status === 429 || response.status >= 500) {
+            // Rate limited or server error - keep user logged in with stored data
+            const storedUser = localStorage.getItem('user')
+            if (storedUser) {
+              const userData = JSON.parse(storedUser)
+              setUser(userData)
+              setIsAuthenticated(true)
+              setAuthMethod('email')
+              setHasGoogleLinked(userData.hasGoogleLinked || false)
               setIsLoading(false)
               return
             }
           }
         } catch {
-          // Token invalid, continue to check Chrome extension
+          // Network error - keep user logged in with stored data
+          const storedUser = localStorage.getItem('user')
+          if (storedUser) {
+            const userData = JSON.parse(storedUser)
+            setUser(userData)
+            setIsAuthenticated(true)
+            setAuthMethod('email')
+            setHasGoogleLinked(userData.hasGoogleLinked || false)
+            setIsLoading(false)
+            return
+          }
         }
-        clearAuthStorage()
       }
 
       // Check Chrome extension authentication
@@ -163,28 +193,28 @@ export const AuthProvider = ({ children }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       })
-      
+
       const data = await response.json()
-      
+
       if (!response.ok) {
         const error = new AuthError(data.error || 'Login failed')
         error.code = data.code || 'LOGIN_FAILED'
         error.statusCode = response.status
         throw error
       }
-      
-      // Store auth data
+
+      // Store auth data - use token if available, otherwise use direct auth
       localStorage.setItem('userId', data.user.userId)
-      localStorage.setItem('authToken', data.token)
+      localStorage.setItem('authToken', data.token || `direct_${data.user.userId}`)
       localStorage.setItem('authMethod', 'email')
       localStorage.setItem('user', JSON.stringify(data.user))
-      
+
       setUser(data.user)
       setIsAuthenticated(true)
       setAuthMethod('email')
       setHasGoogleLinked(data.user.hasGoogleLinked || false)
       setError(null)
-      
+
       return true
     } catch (error) {
       logError(error, { context: 'signInWithEmail' })
@@ -234,27 +264,32 @@ export const AuthProvider = ({ children }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp })
       })
-      
+
       const data = await response.json()
-      
+
       if (!response.ok) {
         const error = new AuthError(data.error || 'Verification failed')
         error.code = data.code || 'VERIFICATION_FAILED'
         throw error
       }
-      
+
+      // If server couldn't generate token, user needs to login manually
+      if (data.needsLogin) {
+        return { needsLogin: true, message: data.message }
+      }
+
       // Store auth data
       localStorage.setItem('userId', data.user.userId)
       localStorage.setItem('authToken', data.token)
       localStorage.setItem('authMethod', 'email')
       localStorage.setItem('user', JSON.stringify(data.user))
-      
+
       setUser(data.user)
       setIsAuthenticated(true)
       setAuthMethod('email')
       setError(null)
-      
-      return true
+
+      return { success: true }
     } catch (error) {
       logError(error, { context: 'verifyEmail' })
       if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
@@ -519,13 +554,21 @@ export const AuthProvider = ({ children }) => {
 
       const authToken = localStorage.getItem('authToken')
       
+      // Get the OAuth access token from chrome.storage for Drive sync
+      const storageResult = await chrome.storage.local.get(['accessToken'])
+      const googleAccessToken = storageResult.accessToken
+      
       const response = await fetch(`${API_BASE_URL}/auth/email/link-google`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${authToken}`
         },
-        body: JSON.stringify({ googleIdToken: googleResponse.token })
+        body: JSON.stringify({ 
+          googleAccessToken: googleAccessToken,
+          googleEmail: googleResponse.userInfo?.email,
+          googleName: googleResponse.userInfo?.name
+        })
       })
       
       const data = await response.json()
@@ -534,7 +577,26 @@ export const AuthProvider = ({ children }) => {
         throw new AuthError(data.error || 'Failed to link Google account')
       }
       
+      // accessToken is already saved in chrome.storage.local by signIn action
+      // This enables Drive sync for email users who link Google
       setHasGoogleLinked(true)
+      
+      // Update user info with Google linked data including avatar
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        const userData = JSON.parse(storedUser)
+        userData.hasGoogleLinked = true
+        userData.googleLinked = {
+          googleEmail: googleResponse.userInfo?.email
+        }
+        // Update avatar from Google if available
+        if (googleResponse.userInfo?.picture) {
+          userData.picture = googleResponse.userInfo.picture
+        }
+        localStorage.setItem('user', JSON.stringify(userData))
+        setUser(userData)
+      }
+      
       return true
     } catch (error) {
       logError(error, { context: 'linkGoogleAccount' })
@@ -560,7 +622,23 @@ export const AuthProvider = ({ children }) => {
         throw new AuthError(data.error || 'Failed to unlink Google account')
       }
       
+      // Clear Google OAuth token from chrome.storage to disable Drive sync
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        await chrome.storage.local.remove(['accessToken', 'userInfo', 'driveFolderId'])
+      }
+      
       setHasGoogleLinked(false)
+      
+      // Update user info
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        const userData = JSON.parse(storedUser)
+        userData.hasGoogleLinked = false
+        delete userData.googleLinked
+        localStorage.setItem('user', JSON.stringify(userData))
+        setUser(userData)
+      }
+      
       return true
     } catch (error) {
       logError(error, { context: 'unlinkGoogleAccount' })

@@ -97,12 +97,19 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
       
       {error && <div className="form-error">{error}</div>}
       
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         className="email-auth-btn primary"
         disabled={isLoading}
       >
-        {isLoading ? t('auth.email.loggingIn') : t('auth.email.loginBtn')}
+        {isLoading ? (
+          <>
+            <span className="btn-spinner" />
+            {t('auth.email.loggingIn')}
+          </>
+        ) : (
+          t('auth.email.loginBtn')
+        )}
       </button>
       
       <div className="form-links">

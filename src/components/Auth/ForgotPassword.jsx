@@ -155,17 +155,24 @@ const ForgotPassword = ({ onResetPassword, onCancel, isLoading }) => {
         </div>
         
         {error && <div className="form-error">{error}</div>}
-        
-        <button 
-          type="submit" 
+
+        <button
+          type="submit"
           className="email-auth-btn primary"
           disabled={isLoading || localLoading}
         >
-          {localLoading ? t('auth.email.resetting') : t('auth.email.resetPasswordBtn')}
+          {localLoading ? (
+            <>
+              <span className="btn-spinner" />
+              {t('auth.email.resetting')}
+            </>
+          ) : (
+            t('auth.email.resetPasswordBtn')
+          )}
         </button>
-        
-        <button 
-          type="button" 
+
+        <button
+          type="button"
           className="link-btn cancel"
           onClick={onCancel}
           disabled={isLoading || localLoading}
@@ -183,7 +190,7 @@ const ForgotPassword = ({ onResetPassword, onCancel, isLoading }) => {
         <h3>{t('auth.email.forgotPasswordTitle')}</h3>
         <p>{t('auth.email.forgotPasswordSubtitle')}</p>
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="resetEmail">{t('auth.email.emailLabel')}</label>
         <input
@@ -196,15 +203,22 @@ const ForgotPassword = ({ onResetPassword, onCancel, isLoading }) => {
           autoComplete="email"
         />
       </div>
-      
+
       {error && <div className="form-error">{error}</div>}
-      
-      <button 
-        type="submit" 
+
+      <button
+        type="submit"
         className="email-auth-btn primary"
         disabled={isLoading || localLoading}
       >
-        {localLoading ? t('auth.email.sending') : t('auth.email.sendResetCode')}
+        {localLoading ? (
+          <>
+            <span className="btn-spinner" />
+            {t('auth.email.sending')}
+          </>
+        ) : (
+          t('auth.email.sendResetCode')
+        )}
       </button>
       
       <button 

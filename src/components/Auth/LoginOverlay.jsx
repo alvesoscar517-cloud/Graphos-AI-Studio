@@ -121,7 +121,15 @@ const LoginOverlay = () => {
     setIsLoading(true)
     try {
       console.log('[DEBUG] Verifying OTP for email:', pendingEmail, 'OTP:', otp)
-      await verifyEmail(pendingEmail, otp)
+      const result = await verifyEmail(pendingEmail, otp)
+
+      // If server couldn't generate token, redirect to login
+      if (result?.needsLogin) {
+        console.log('[INFO] Account verified but needs manual login')
+        setAuthMode('email-login')
+        // Show success message - user needs to login
+        return
+      }
     } catch (error) {
       console.error('OTP verification error:', error, 'Email:', pendingEmail)
       throw error

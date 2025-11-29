@@ -237,7 +237,14 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
           onClick={() => handleSubmit(otp.join(''))}
           disabled={isLoading || otp.join('').length !== 6 || countdown <= 0}
         >
-          {isLoading ? t('auth.email.verifying') : t('auth.email.verifyBtn')}
+          {isLoading ? (
+            <>
+              <span className="btn-spinner" />
+              {t('auth.email.verifying')}
+            </>
+          ) : (
+            t('auth.email.verifyBtn')
+          )}
         </button>
         
         <button

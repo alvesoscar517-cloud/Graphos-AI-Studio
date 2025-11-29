@@ -329,6 +329,13 @@
 .footer-link img {
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
+}
+
+.footer-link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Notification Icon Wrapper */
