@@ -1,4 +1,4 @@
-import './TextShimmer.css'
+// CSS migrated to Tailwind
 
 const TextShimmer = ({ children, className = '', duration = 2 }) => {
   return (

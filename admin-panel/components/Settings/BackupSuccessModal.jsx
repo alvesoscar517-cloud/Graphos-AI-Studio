@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import './BackupSuccessModal.css';
+import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
 
 export default function BackupSuccessModal({ backupInfo, onClose }) {
   const [copying, setCopying] = useState(false);
@@ -19,105 +20,103 @@ export default function BackupSuccessModal({ backupInfo, onClose }) {
   };
 
   const handleSaveToDrive = () => {
-    const driveUrl = `https://drive.google.com/drive/u/0/my-drive`;
-    window.open(driveUrl, '_blank');
+    window.open('https://drive.google.com/drive/u/0/my-drive', '_blank');
     handleDownload();
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="backup-success-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <div className="success-icon">
-            <img src="/icon/check-circle.svg" alt="Success" />
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-surface rounded-xl w-full max-w-lg shadow-xl" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="p-6 border-b border-border text-center relative">
+          <div className="w-16 h-16 mx-auto rounded-full bg-success/10 flex items-center justify-center mb-4">
+            <img src="/icon/check-circle.svg" alt="" className="w-8 h-8" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
           </div>
-          <h2>Backup Completed Successfully</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <h2 className="text-xl font-semibold text-primary">Backup Completed</h2>
+          <button className="absolute top-4 right-4 text-2xl text-muted hover:text-primary" onClick={onClose}>×</button>
         </div>
 
-        <div className="modal-body">
-          <div className="backup-details">
-            <div className="detail-row">
-              <img src="/icon/file.svg" alt="File" className="row-icon" />
-              <span className="label">File:</span>
-              <span className="value">{backupInfo.fileName}</span>
+        {/* Body */}
+        <div className="p-6 space-y-6">
+          {/* Details */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-sm">
+              <img src="/icon/file.svg" alt="" className="w-4 h-4 icon-gray" />
+              <span className="text-muted">File:</span>
+              <span className="text-primary font-medium truncate">{backupInfo.fileName}</span>
             </div>
-            <div className="detail-row">
-              <img src="/icon/clock.svg" alt="Time" className="row-icon" />
-              <span className="label">Time:</span>
-              <span className="value">{new Date(backupInfo.timestamp).toLocaleString('en-US')}</span>
+            <div className="flex items-center gap-3 text-sm">
+              <img src="/icon/clock.svg" alt="" className="w-4 h-4 icon-gray" />
+              <span className="text-muted">Time:</span>
+              <span className="text-primary">{new Date(backupInfo.timestamp).toLocaleString()}</span>
             </div>
-            <div className="detail-row">
-              <img src="/icon/database.svg" alt="Bucket" className="row-icon" />
-              <span className="label">Bucket:</span>
-              <span className="value">{backupInfo.bucket}</span>
+            <div className="flex items-center gap-3 text-sm">
+              <img src="/icon/database.svg" alt="" className="w-4 h-4 icon-gray" />
+              <span className="text-muted">Bucket:</span>
+              <span className="text-primary">{backupInfo.bucket}</span>
             </div>
           </div>
 
-          <div className="backup-stats">
-            <h3>
-              <img src="/icon/bar-chart.svg" alt="Stats" className="section-icon" />
+          {/* Stats */}
+          <div>
+            <h3 className="text-sm font-semibold text-primary mb-3 flex items-center gap-2">
+              <img src="/icon/bar-chart.svg" alt="" className="w-4 h-4 icon-dark" />
               Statistics
             </h3>
-            <div className="stats-grid">
+            <div className="grid grid-cols-2 gap-2">
               {Object.entries(backupInfo.stats).map(([collection, count]) => (
-                <div key={collection} className="stat-item">
-                  <span className="stat-label">{collection}</span>
-                  <span className="stat-value">{count} docs</span>
+                <div key={collection} className="flex items-center justify-between p-2 bg-surface-secondary rounded-lg text-sm">
+                  <span className="text-muted capitalize">{collection}</span>
+                  <span className="font-medium text-primary">{count}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="download-section">
-            <h3>
-              <img src="/icon/download.svg" alt="Download" className="section-icon" />
+          {/* Download */}
+          <div>
+            <h3 className="text-sm font-semibold text-primary mb-2 flex items-center gap-2">
+              <img src="/icon/download.svg" alt="" className="w-4 h-4 icon-dark" />
               Download Backup
             </h3>
-            <p className="download-hint">
-              Public URL - No expiration. Save to your personal Google Drive for safekeeping.
-            </p>
+            <p className="text-xs text-muted mb-3">Public URL - No expiration. Save to your Drive.</p>
 
-            <div className="action-buttons">
-              <button className="btn-primary" onClick={handleDownload}>
-                <img src="/icon/download.svg" alt="Download" />
-                Download Now
-              </button>
-
-              <button className="btn-secondary" onClick={handleSaveToDrive}>
-                <img src="/icon/upload.svg" alt="Drive" />
-                Open Drive
-              </button>
-
-              <button 
-                className={`btn-copy ${copying ? 'copied' : ''}`} 
-                onClick={handleCopyLink}
-              >
-                <img src="/icon/copy.svg" alt="Copy" />
-                {copying ? 'Copied!' : 'Copy Link'}
-              </button>
+            <div className="flex gap-2 mb-3">
+              <Button onClick={handleDownload} className="flex-1">
+                <img src="/icon/download.svg" alt="" className="w-4 h-4 icon-white" />
+                Download
+              </Button>
+              <Button variant="secondary" onClick={handleSaveToDrive}>
+                <img src="/icon/upload.svg" alt="" className="w-4 h-4 icon-dark" />
+                Drive
+              </Button>
+              <Button variant={copying ? "success" : "secondary"} onClick={handleCopyLink}>
+                <img src="/icon/copy.svg" alt="" className={cn("w-4 h-4", copying ? "icon-white" : "icon-dark")} />
+                {copying ? 'Copied!' : 'Copy'}
+              </Button>
             </div>
 
-            <div className="download-link">
-              <input 
-                type="text" 
-                value={backupInfo.downloadUrl} 
-                readOnly 
-                onClick={(e) => e.target.select()}
-              />
-            </div>
+            <input 
+              type="text" 
+              value={backupInfo.downloadUrl} 
+              readOnly 
+              onClick={(e) => e.target.select()}
+              className="w-full px-3 py-2 text-xs bg-surface-secondary border border-border rounded-lg text-muted"
+            />
           </div>
 
-          <div className="email-notice">
-            <img src="/icon/mail.svg" alt="Email" />
-            <p>Download link has been sent to your email</p>
+          {/* Email Notice */}
+          <div className="flex items-center gap-2 p-3 bg-info/10 rounded-lg text-sm text-info">
+            <img src="/icon/mail.svg" alt="" className="w-4 h-4" />
+            <p>Download link sent to your email</p>
           </div>
         </div>
 
-        <div className="modal-footer">
-          <button className="btn-close" onClick={onClose}>
+        {/* Footer */}
+        <div className="p-4 border-t border-border">
+          <Button variant="secondary" className="w-full" onClick={onClose}>
             Close
-          </button>
+          </Button>
         </div>
       </div>
     </div>

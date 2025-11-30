@@ -1,5 +1,5 @@
 import React from 'react';
-import './ErrorBoundary.css';
+// CSS migrated to Tailwind
 
 class ErrorBoundary extends React.Component {
   constructor(props) {

@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRealtime } from '../../contexts/RealtimeContext';
 import { ordersApi, supportApi } from '../../services/adminApi';
+import { Card } from '../ui/card';
+import { SkeletonStatsCard, SkeletonCard, SkeletonListItem } from '../ui/skeleton';
 import PageHeader from '../Common/PageHeader';
 import StatsCard from './StatsCard';
 import ActivityStatsWidget from './ActivityStatsWidget';
-import LoadingScreen from '../Common/LoadingScreen';
-import './DashboardView.css';
+import { Button } from '../ui/button';
 
 export default function DashboardView() {
   const { overview: stats, loading: realtimeLoading, loadOverview, setActiveTab } = useRealtime();
@@ -17,21 +18,17 @@ export default function DashboardView() {
   const loading = realtimeLoading.overview;
 
   useEffect(() => {
-    // Reset error state when component mounts
     setError('');
     setActiveTab('dashboard');
     loadStats();
     loadExtraStats();
     
-    // Cleanup function
-    return () => {
-      // Optional: cleanup if needed
-    };
+    return () => {};
   }, []);
 
   const loadStats = async () => {
     try {
-      setError(''); // Clear any previous errors
+      setError('');
       await loadOverview();
     } catch (err) {
       console.error('Dashboard load error:', err);
@@ -49,7 +46,6 @@ export default function DashboardView() {
       if (support?.statistics) setSupportStats(support.statistics);
     } catch (err) {
       console.error('Extra stats load error:', err);
-      // Silent fail for extra stats
     }
   };
 
@@ -84,7 +80,7 @@ export default function DashboardView() {
     
     const now = new Date();
     const time = new Date(timestamp);
-    const diff = Math.floor((now - time) / 1000); // seconds
+    const diff = Math.floor((now - time) / 1000);
     
     if (diff < 60) return 'Just now';
     if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
@@ -93,31 +89,76 @@ export default function DashboardView() {
   };
 
   if (loading) {
-    return <LoadingScreen />;
-  }
-
-  if (error && !stats) {
     return (
-      <div className="dashboard-error">
-        <img src="/icon/alert-circle.svg" alt="Error" />
-        <p>{error}</p>
-        <button onClick={() => loadOverview(true)}>
-          <img src="/icon/refresh-cw.svg" alt="Retry" />
-          Retry
-        </button>
+      <div className="p-6">
+        <PageHeader
+          icon="layout-dashboard.svg"
+          title="Dashboard"
+          subtitle="Loading..."
+        />
+        {/* Stats Grid Skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+          <SkeletonStatsCard />
+          <SkeletonStatsCard />
+          <SkeletonStatsCard />
+          <SkeletonStatsCard />
+        </div>
+        {/* Sections Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <SkeletonCard className="p-6">
+            <div className="space-y-3">
+              <SkeletonListItem />
+              <SkeletonListItem />
+              <SkeletonListItem />
+              <SkeletonListItem />
+              <SkeletonListItem />
+            </div>
+          </SkeletonCard>
+          <SkeletonCard className="p-6">
+            <div className="space-y-3">
+              <SkeletonListItem />
+              <SkeletonListItem />
+              <SkeletonListItem />
+            </div>
+          </SkeletonCard>
+        </div>
       </div>
     );
   }
 
+  if (error && !stats) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-4">
+        <img src="/icon/alert-circle.svg" alt="Error" className="w-12 h-12 icon-gray" />
+        <p className="text-muted">{error}</p>
+        <Button variant="secondary" onClick={() => loadOverview(true)}>
+          <img src="/icon/refresh-cw.svg" alt="Retry" className="w-4 h-4 icon-dark" />
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  const defaultActivities = [
+    { action: 'user_registered', timestamp: null },
+    { action: 'profile_created', timestamp: null },
+    { action: 'notification_sent', timestamp: null }
+  ];
+
+  const activities = stats?.recentActivities?.length > 0 
+    ? stats.recentActivities.slice(0, 5) 
+    : defaultActivities;
+
   return (
-    <div className="dashboard-view">
+    <div className="p-6">
       <PageHeader
         icon="layout-dashboard.svg"
         title="Dashboard"
         subtitle="System overview and recent activities"
       />
 
-      <div className="dashboard-stats-grid">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         <StatsCard
           icon="users.svg"
           title="Total Users"
@@ -129,7 +170,7 @@ export default function DashboardView() {
         <StatsCard
           icon="dollar-sign.svg"
           title="Revenue (30d)"
-          value={`$${revenueStats?.totalRevenue?.toFixed(2) || '0.00'}`}
+          value={`${revenueStats?.totalRevenue?.toFixed(2) || '0.00'}`}
           subtitle={`${revenueStats?.orderCount || 0} orders`}
           onClick={() => navigate('/orders')}
         />
@@ -150,64 +191,31 @@ export default function DashboardView() {
         />
       </div>
 
-      <div className="dashboard-sections">
-        <div className="section">
-          <div className="section-header">
-            <img src="/icon/clock.svg" alt="Activity" />
-            <h2>Recent Activities</h2>
+      {/* Sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        {/* Recent Activities */}
+        <Card className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <img src="/icon/clock.svg" alt="Activity" className="w-5 h-5 icon-dark" />
+            <h2 className="text-lg font-semibold text-primary">Recent Activities</h2>
           </div>
-          <div className="activity-list">
-            {stats?.recentActivities && stats.recentActivities.length > 0 ? (
-              stats.recentActivities.slice(0, 5).map((activity, index) => (
-                <div key={activity.id || index} className="activity-item">
-                  <div className="activity-icon">
-                    <img src={`/icon/${getActivityIcon(activity.action)}`} alt={activity.action} />
-                  </div>
-                  <div className="activity-content">
-                    <p className="activity-title">{getActivityTitle(activity)}</p>
-                    <p className="activity-time">{formatTimeAgo(activity.timestamp)}</p>
-                  </div>
+          <div className="flex flex-col gap-3">
+            {activities.map((activity, index) => (
+              <div key={activity.id || index} className="flex items-center gap-3 p-3 rounded-lg bg-surface-secondary">
+                <div className="w-9 h-9 rounded-full bg-surface flex items-center justify-center flex-shrink-0">
+                  <img src={`/icon/${getActivityIcon(activity.action)}`} alt={activity.action} className="w-4 h-4 icon-dark" />
                 </div>
-              ))
-            ) : (
-              <>
-                <div className="activity-item">
-                  <div className="activity-icon">
-                    <img src="/icon/user-plus.svg" alt="User" />
-                  </div>
-                  <div className="activity-content">
-                    <p className="activity-title">New user registered</p>
-                    <p className="activity-time">5 minutes ago</p>
-                  </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-primary">{getActivityTitle(activity)}</p>
+                  <p className="text-xs text-muted">{formatTimeAgo(activity.timestamp)}</p>
                 </div>
-                
-                <div className="activity-item">
-                  <div className="activity-icon">
-                    <img src="/icon/folder-plus.svg" alt="Folder" />
-                  </div>
-                  <div className="activity-content">
-                    <p className="activity-title">New profile created</p>
-                    <p className="activity-time">15 minutes ago</p>
-                  </div>
-                </div>
-                
-                <div className="activity-item">
-                  <div className="activity-icon">
-                    <img src="/icon/send.svg" alt="Send" />
-                  </div>
-                  <div className="activity-content">
-                    <p className="activity-title">Notification sent</p>
-                    <p className="activity-time">1 hour ago</p>
-                  </div>
-                </div>
-              </>
-            )}
+              </div>
+            ))}
           </div>
-        </div>
+        </Card>
 
-        <div className="section activity-stats-section">
-          <ActivityStatsWidget />
-        </div>
+        {/* Activity Stats Widget */}
+        <ActivityStatsWidget />
       </div>
     </div>
   );

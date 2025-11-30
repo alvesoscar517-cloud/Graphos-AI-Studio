@@ -7,8 +7,9 @@ import UserGrowthChart from './UserGrowthChart';
 import TierDistributionChart from './TierDistributionChart';
 import UsageStatsChart from './UsageStatsChart';
 import LoadingScreen from '../Common/LoadingScreen';
-import CustomSelect from '../Common/CustomSelect';
-import './AnalyticsView.css';
+import { Select } from '../ui/select';
+import { Button } from '../ui/button';
+import { Card } from '../ui/card';
 
 export default function AnalyticsView() {
   const { 
@@ -41,125 +42,105 @@ export default function AnalyticsView() {
     return <LoadingScreen />;
   }
 
-  // Ensure data objects exist
   const safeOverview = overview || {};
   const safeUserAnalytics = userAnalytics || {};
   const safeUsageAnalytics = usageAnalytics || {};
 
   return (
-    <div className="analytics-container">
+    <div className="p-6">
       {/* Header */}
       <PageHeader
         icon="bar-chart.svg"
         title="Analytics Dashboard"
         subtitle="Comprehensive insights and performance metrics"
         actions={
-          <CustomSelect
-            value={timeRange}
+          <Select
+            value={String(timeRange)}
             onChange={(e) => setTimeRange(Number(e.target.value))}
             options={[
-              { value: 7, label: 'Last 7 days' },
-              { value: 30, label: 'Last 30 days' },
-              { value: 90, label: 'Last 90 days' },
-              { value: 365, label: 'Last year' }
+              { value: '7', label: 'Last 7 days' },
+              { value: '30', label: 'Last 30 days' },
+              { value: '90', label: 'Last 90 days' },
+              { value: '365', label: 'Last year' }
             ]}
-            className="analytics-select"
+            className="w-36"
           />
         }
       />
 
       {/* Key Metrics */}
-      <section className="analytics-metrics-grid">
-        <div className="analytics-metric-card">
-          <div className="analytics-metric-icon">
-            <img src="/icon/users.svg" alt="Users" />
-          </div>
-          <div className="analytics-metric-content">
-            <div className="analytics-metric-label">Total Users</div>
-            <div className="analytics-metric-value">{(safeOverview.totalUsers || 0).toLocaleString()}</div>
-            <div className="analytics-metric-change positive">+{safeOverview.newUsers || 0} new</div>
-          </div>
-        </div>
-
-        <div className="analytics-metric-card">
-          <div className="analytics-metric-icon">
-            <img src="/icon/folder.svg" alt="Profiles" />
-          </div>
-          <div className="analytics-metric-content">
-            <div className="analytics-metric-label">Profiles</div>
-            <div className="analytics-metric-value">{(safeUsageAnalytics.totalProfiles || 0).toLocaleString()}</div>
-            <div className="analytics-metric-subtitle">{Number(safeUsageAnalytics.avgProfilesPerUser || 0).toFixed(1)} avg/user</div>
-          </div>
-        </div>
-
-        <div className="analytics-metric-card">
-          <div className="analytics-metric-icon">
-            <img src="/icon/search.svg" alt="Analyses" />
-          </div>
-          <div className="analytics-metric-content">
-            <div className="analytics-metric-label">Analyses</div>
-            <div className="analytics-metric-value">{(safeUsageAnalytics.totalAnalyses || 0).toLocaleString()}</div>
-            <div className="analytics-metric-subtitle">{Number(safeUsageAnalytics.avgAnalysesPerUser || 0).toFixed(1)} avg/user</div>
-          </div>
-        </div>
-
-        <div className="analytics-metric-card">
-          <div className="analytics-metric-icon">
-            <img src="/icon/edit.svg" alt="Rewrites" />
-          </div>
-          <div className="analytics-metric-content">
-            <div className="analytics-metric-label">Rewrites</div>
-            <div className="analytics-metric-value">{(safeUsageAnalytics.totalRewrites || 0).toLocaleString()}</div>
-            <div className="analytics-metric-subtitle">Total operations</div>
-          </div>
-        </div>
-      </section>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        <MetricCard
+          icon="users.svg"
+          label="Total Users"
+          value={(safeOverview.totalUsers || 0).toLocaleString()}
+          change={`+${safeOverview.newUsers || 0} new`}
+          positive
+        />
+        <MetricCard
+          icon="folder.svg"
+          label="Profiles"
+          value={(safeUsageAnalytics.totalProfiles || 0).toLocaleString()}
+          subtitle={`${Number(safeUsageAnalytics.avgProfilesPerUser || 0).toFixed(1)} avg/user`}
+        />
+        <MetricCard
+          icon="search.svg"
+          label="Analyses"
+          value={(safeUsageAnalytics.totalAnalyses || 0).toLocaleString()}
+          subtitle={`${Number(safeUsageAnalytics.avgAnalysesPerUser || 0).toFixed(1)} avg/user`}
+        />
+        <MetricCard
+          icon="edit.svg"
+          label="Rewrites"
+          value={(safeUsageAnalytics.totalRewrites || 0).toLocaleString()}
+          subtitle="Total operations"
+        />
+      </div>
 
       {/* Charts */}
-      <section className="analytics-charts-grid">
-        <div className="analytics-chart-card">
-          <div className="analytics-chart-header">
-            <div className="analytics-chart-title-group">
-              <img src="/icon/trending-up.svg" alt="Growth" className="analytics-chart-icon" />
-              <h3 className="analytics-chart-title">User Growth</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <img src="/icon/trending-up.svg" alt="Growth" className="w-5 h-5 icon-dark" />
+              <h3 className="text-lg font-semibold text-primary">User Growth</h3>
             </div>
-            <span className="analytics-chart-subtitle">{timeRange} days trend</span>
+            <span className="text-xs text-muted">{timeRange} days trend</span>
           </div>
           <UserGrowthChart data={safeUserAnalytics.userGrowth || []} />
-        </div>
+        </Card>
 
-        <div className="analytics-chart-card">
-          <div className="analytics-chart-header">
-            <div className="analytics-chart-title-group">
-              <img src="/icon/pie-chart.svg" alt="Distribution" className="analytics-chart-icon" />
-              <h3 className="analytics-chart-title">Credit Distribution</h3>
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <img src="/icon/pie-chart.svg" alt="Distribution" className="w-5 h-5 icon-dark" />
+              <h3 className="text-lg font-semibold text-primary">Credit Distribution</h3>
             </div>
-            <span className="analytics-chart-subtitle">{(safeOverview.totalUsers || 0).toLocaleString()} total users</span>
+            <span className="text-xs text-muted">{(safeOverview.totalUsers || 0).toLocaleString()} total users</span>
           </div>
           <TierDistributionChart data={safeUserAnalytics.creditDistribution || safeUserAnalytics.tierDistribution || {}} />
-        </div>
+        </Card>
 
-        <div className="analytics-chart-card analytics-chart-full">
-          <div className="analytics-chart-header">
-            <div className="analytics-chart-title-group">
-              <img src="/icon/bar-chart.svg" alt="Usage" className="analytics-chart-icon" />
-              <h3 className="analytics-chart-title">Usage Statistics</h3>
+        <Card className="p-6 lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <img src="/icon/bar-chart.svg" alt="Usage" className="w-5 h-5 icon-dark" />
+              <h3 className="text-lg font-semibold text-primary">Usage Statistics</h3>
             </div>
-            <span className="analytics-chart-subtitle">Profiles, Analyses & Rewrites</span>
+            <span className="text-xs text-muted">Profiles, Analyses & Rewrites</span>
           </div>
           <UsageStatsChart 
             profiles={safeUsageAnalytics.totalProfiles || 0}
             analyses={safeUsageAnalytics.totalAnalyses || 0}
             rewrites={safeUsageAnalytics.totalRewrites || 0}
           />
-        </div>
-      </section>
+        </Card>
+      </div>
 
       {/* Actions */}
-      <footer className="analytics-actions">
-        <div className="actions-group">
-          <button 
-            className="analytics-btn analytics-btn-primary"
+      <div className="flex items-center justify-between mt-6 pt-6 border-t border-border">
+        <div className="flex gap-3">
+          <Button
             onClick={() => {
               try {
                 exportAnalyticsToCSV(safeUserAnalytics);
@@ -169,11 +150,10 @@ export default function AnalyticsView() {
               }
             }}
           >
-            <img src="/icon/download.svg" alt="Export" />
+            <img src="/icon/download.svg" alt="Export" className="w-4 h-4 icon-white" />
             Export CSV
-          </button>
-          <button 
-            className="analytics-btn analytics-btn-primary"
+          </Button>
+          <Button
             onClick={() => {
               try {
                 generateAnalyticsReport(safeOverview, safeUserAnalytics, safeUsageAnalytics);
@@ -183,15 +163,35 @@ export default function AnalyticsView() {
               }
             }}
           >
-            <img src="/icon/file-text.svg" alt="PDF" />
+            <img src="/icon/file-text.svg" alt="PDF" className="w-4 h-4 icon-white" />
             Generate PDF
-          </button>
+          </Button>
         </div>
-        <button className="analytics-btn analytics-btn-secondary" onClick={() => loadAnalytics(timeRange, true)}>
-          <img src="/icon/refresh-cw.svg" alt="Refresh" />
+        <Button variant="secondary" onClick={() => loadAnalytics(timeRange, true)}>
+          <img src="/icon/refresh-cw.svg" alt="Refresh" className="w-4 h-4 icon-dark" />
           Refresh Data
-        </button>
-      </footer>
+        </Button>
+      </div>
     </div>
+  );
+}
+
+function MetricCard({ icon, label, value, subtitle, change, positive }) {
+  return (
+    <Card className="p-5 flex items-start gap-4">
+      <div className="w-12 h-12 rounded-lg bg-surface-secondary flex items-center justify-center shrink-0">
+        <img src={`/icon/${icon}`} alt={label} className="w-6 h-6 icon-dark" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-medium text-muted uppercase tracking-wide">{label}</div>
+        <div className="text-2xl font-bold text-primary mt-1">{value}</div>
+        {change && (
+          <div className={`text-xs mt-1 ${positive ? 'text-success' : 'text-destructive'}`}>
+            {change}
+          </div>
+        )}
+        {subtitle && <div className="text-xs text-muted mt-0.5">{subtitle}</div>}
+      </div>
+    </Card>
   );
 }

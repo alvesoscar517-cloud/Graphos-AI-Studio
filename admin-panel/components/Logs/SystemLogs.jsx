@@ -3,7 +3,10 @@ import { useRealtime } from '../../contexts/RealtimeContext';
 import { logsApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
-import './SystemLogs.css';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
+import { cn } from '@/lib/utils';
 
 export default function SystemLogs() {
   const { systemLogs: logs, loading: realtimeLoading, loadLogs, setActiveTab } = useRealtime();
@@ -35,7 +38,7 @@ export default function SystemLogs() {
 
     try {
       await logsApi.clear();
-      await loadLogs({}, true); // Force refresh
+      await loadLogs({}, true);
       notify.success('All logs cleared!');
     } catch (err) {
       notify.error('Error: ' + err.message);
@@ -43,116 +46,92 @@ export default function SystemLogs() {
   };
 
   const getLevelIcon = (level) => {
-    const icons = {
-      info: 'info.svg',
-      success: 'check-circle.svg',
-      warning: 'alert-triangle.svg',
-      error: 'x-circle.svg'
-    };
+    const icons = { info: 'info.svg', success: 'check-circle.svg', warning: 'alert-triangle.svg', error: 'x-circle.svg' };
     return icons[level] || icons.info;
   };
 
-  const getLevelColor = () => {
-    return '#1a1a1a'; // Minimalist black
+  const getLevelColor = (level) => {
+    const colors = { info: 'text-info', success: 'text-success', warning: 'text-warning', error: 'text-destructive' };
+    return colors[level] || 'text-muted';
   };
 
-  const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString('en-US');
-  };
+  const formatTimestamp = (timestamp) => new Date(timestamp).toLocaleString('en-US');
 
-  const filteredLogs = filter === 'all' 
-    ? logs 
-    : logs.filter(log => log.level === filter);
+  const filteredLogs = filter === 'all' ? logs : logs.filter(log => log.level === filter);
 
   return (
-    <div className="system-logs">
+    <div className="p-6">
       <PageHeader
         icon="file-text.svg"
         title="System Logs"
         subtitle="Monitor system activities and events"
         actions={
-          <button className="btn-clear" onClick={handleClearLogs}>
-            <img src="/icon/trash-2.svg" alt="Clear" />
+          <Button variant="destructive" size="sm" onClick={handleClearLogs}>
+            <img src="/icon/trash-2.svg" alt="" className="w-4 h-4 icon-white" />
             Clear all logs
-          </button>
+          </Button>
         }
       />
 
-      <div className="logs-filters">
-        <button 
-          className={filter === 'all' ? 'active' : ''}
-          onClick={() => setFilter('all')}
-        >
-          All
-        </button>
-        <button 
-          className={filter === 'info' ? 'active' : ''}
-          onClick={() => setFilter('info')}
-        >
-          <img src="/icon/info.svg" alt="Info" />
-          Info
-        </button>
-        <button 
-          className={filter === 'success' ? 'active' : ''}
-          onClick={() => setFilter('success')}
-        >
-          <img src="/icon/check-circle.svg" alt="Success" />
-          Success
-        </button>
-        <button 
-          className={filter === 'warning' ? 'active' : ''}
-          onClick={() => setFilter('warning')}
-        >
-          <img src="/icon/alert-triangle.svg" alt="Warning" />
-          Warning
-        </button>
-        <button 
-          className={filter === 'error' ? 'active' : ''}
-          onClick={() => setFilter('error')}
-        >
-          <img src="/icon/x-circle.svg" alt="Error" />
-          Error
-        </button>
-      </div>
+      {/* Filters */}
+      <Tabs value={filter} onValueChange={setFilter} className="mt-6">
+        <TabsList>
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="info" className="gap-1.5">
+            <img src="/icon/info.svg" alt="" className="w-3.5 h-3.5" /> Info
+          </TabsTrigger>
+          <TabsTrigger value="success" className="gap-1.5">
+            <img src="/icon/check-circle.svg" alt="" className="w-3.5 h-3.5" /> Success
+          </TabsTrigger>
+          <TabsTrigger value="warning" className="gap-1.5">
+            <img src="/icon/alert-triangle.svg" alt="" className="w-3.5 h-3.5" /> Warning
+          </TabsTrigger>
+          <TabsTrigger value="error" className="gap-1.5">
+            <img src="/icon/x-circle.svg" alt="" className="w-3.5 h-3.5" /> Error
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
-      <div className="logs-container">
+      {/* Logs List */}
+      <Card className={cn("mt-4 overflow-hidden transition-opacity duration-200", realtimeLoading.logs && "opacity-60")}>
         {filteredLogs.length === 0 ? (
-          <div className="empty-state">
-            <img src="/icon/inbox.svg" alt="Empty" />
-            <p>No logs</p>
+          <div className="flex flex-col items-center justify-center py-16">
+            <img src="/icon/inbox.svg" alt="" className="w-12 h-12 icon-gray mb-4" />
+            <p className="text-sm text-muted">No logs</p>
           </div>
         ) : (
-          <div className="logs-list">
+          <div className="divide-y divide-border">
             {filteredLogs.map(log => (
-              <div key={log.id} className="log-item">
-                <div className="log-icon" style={{ background: getLevelColor() }}>
-                  <img src={`/icon/${getLevelIcon(log.level)}`} alt={log.level} />
+              <div key={log.id} className="flex items-start gap-4 p-4 hover:bg-surface-secondary transition-colors">
+                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                  <img src={`/icon/${getLevelIcon(log.level)}`} alt={log.level} className="w-5 h-5 icon-white" />
                 </div>
                 
-                <div className="log-content">
-                  <div className="log-message">{log.message}</div>
-                  <div className="log-meta">
-                    <span className="log-level-badge">
-                      {log.level.toUpperCase()}
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm text-primary">{log.message}</div>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-muted">
+                    <span className={cn("font-semibold uppercase", getLevelColor(log.level))}>
+                      {log.level}
                     </span>
-                    <span className="log-user">
-                      <img src="/icon/user.svg" alt="User" />
+                    <span className="flex items-center gap-1">
+                      <img src="/icon/user.svg" alt="" className="w-3 h-3" />
                       {log.user}
                     </span>
-                    <span className="log-ip">
-                      <img src="/icon/globe.svg" alt="IP" />
+                    <span className="flex items-center gap-1">
+                      <img src="/icon/globe.svg" alt="" className="w-3 h-3" />
                       {log.ip}
                     </span>
                   </div>
                 </div>
                 
-                <div className="log-timestamp">{formatTimestamp(log.timestamp)}</div>
+                <div className="text-xs text-muted shrink-0">
+                  {formatTimestamp(log.timestamp)}
+                </div>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

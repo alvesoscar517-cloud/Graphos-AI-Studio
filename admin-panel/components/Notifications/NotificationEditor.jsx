@@ -2,15 +2,17 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { notificationsApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
-import CustomSelect from '../Common/CustomSelect';
-import './NotificationEditor.css';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Select } from '../ui/select';
+import { cn } from '@/lib/utils';
 
-// Supported languages for translation (matches main app's 15 languages)
 const SUPPORTED_LANGUAGES = [
   { code: 'vi', name: 'Vietnamese', flag: '🇻🇳' },
   { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
   { code: 'ko', name: 'Korean', flag: '🇰🇷' },
-  { code: 'zh-CN', name: 'Chinese (Simplified)', flag: '🇨🇳' },
+  { code: 'zh-CN', name: 'Chinese', flag: '🇨🇳' },
   { code: 'es', name: 'Spanish', flag: '🇪🇸' },
   { code: 'fr', name: 'French', flag: '🇫🇷' },
   { code: 'de', name: 'German', flag: '🇩🇪' },
@@ -37,7 +39,8 @@ export default function NotificationEditor() {
     translations: {},
     target: { type: 'all', userIds: [], segments: [] },
     scheduledAt: '',
-    expiresAt: ''
+    expiresAt: '',
+    ctaAction: null
   });
 
   const [loading, setLoading] = useState(false);
@@ -55,9 +58,9 @@ export default function NotificationEditor() {
       const notif = response.notifications.find(n => n.id === id);
       if (notif) {
         const content = notif.content || notif.translations?.en || {
-          title: notif.translations?.en?.title || notif.translations?.vi?.title || '',
-          message: notif.translations?.en?.message || notif.translations?.vi?.message || '',
-          cta: notif.translations?.en?.cta || notif.translations?.vi?.cta || ''
+          title: notif.translations?.en?.title || '',
+          message: notif.translations?.en?.message || '',
+          cta: notif.translations?.en?.cta || ''
         };
         const existingLangs = Object.keys(notif.translations || {}).filter(l => l !== 'en');
         setNotification({
@@ -99,10 +102,6 @@ export default function NotificationEditor() {
       notify.error('Please enter title and content');
       return;
     }
-    if (notification.target.type === 'segment' && (!notification.target.segments || notification.target.segments.length === 0)) {
-      notify.error('Please select at least one user group');
-      return;
-    }
 
     try {
       setSaving(true);
@@ -132,12 +131,12 @@ export default function NotificationEditor() {
                 message: messageRes.translations?.[lang] || notification.content.message,
                 cta: ctaTranslation
               };
-            } catch (langErr) {
+            } catch {
               translations[lang] = translations.en;
             }
           }
-        } catch (err) {
-          notify.warning('Translation failed, using English for all languages');
+        } catch {
+          notify.warning('Translation failed, using English');
         } finally {
           setTranslating(false);
         }
@@ -154,18 +153,15 @@ export default function NotificationEditor() {
         ctaAction: notification.ctaAction || null
       };
 
-      const isScheduled = notification.scheduledAt && new Date(notification.scheduledAt) > new Date();
-
       if (isEditMode) {
         await notificationsApi.update(id, notificationData);
         if (sendNow) await notificationsApi.send(id);
-        else if (isScheduled) await notificationsApi.schedule(id, notification.scheduledAt);
       } else {
         const response = await notificationsApi.create(notificationData);
         if (sendNow && response.notificationId) await notificationsApi.send(response.notificationId);
       }
 
-      notify.success(sendNow ? 'Notification sent!' : isScheduled ? 'Notification scheduled!' : 'Notification saved!');
+      notify.success(sendNow ? 'Notification sent!' : 'Notification saved!');
       navigate('/notifications');
     } catch (err) {
       notify.error('Error: ' + err.message);
@@ -175,91 +171,90 @@ export default function NotificationEditor() {
     }
   };
 
-  if (loading) return <div className="editor-loading">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 border-2 border-surface-secondary border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div className="notification-editor">
+    <div className="p-6">
       {/* Header */}
-      <div className="editor-header">
-        <div className="header-left">
-          <div className="header-icon-wrapper">
-            <img src={`/icon/${isEditMode ? 'edit' : 'bell'}.svg`} alt="" />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-surface-secondary rounded-xl flex items-center justify-center">
+            <img src={`/icon/${isEditMode ? 'edit' : 'bell'}.svg`} alt="" className="w-6 h-6 icon-dark" />
           </div>
           <div>
-            <h1>{isEditMode ? 'Edit Notification' : 'New Notification'}</h1>
-            <p>Write in English, auto-translate to selected languages</p>
+            <h1 className="text-2xl font-semibold text-primary">
+              {isEditMode ? 'Edit Notification' : 'New Notification'}
+            </h1>
+            <p className="text-sm text-muted mt-1">Write in English, auto-translate to selected languages</p>
           </div>
         </div>
-        <button className="btn-back" onClick={() => navigate('/notifications')}>
-          <img src="/icon/arrow-left.svg" alt="Back" /> Back
-        </button>
+        <Button variant="ghost" onClick={() => navigate('/notifications')}>
+          <img src="/icon/arrow-left.svg" alt="" className="w-4 h-4" /> Back
+        </Button>
       </div>
 
       {/* Two Column Layout */}
-      <div className="editor-grid">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Content */}
-        <div className="editor-col-left">
-          <div className="editor-card">
-            <h3>🇬🇧 Content (English)</h3>
-            <div className="form-group">
-              <label>Title <span className="required">*</span></label>
-              <input
-                type="text"
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="p-6">
+            <h3 className="text-base font-semibold text-primary mb-4">🇬🇧 Content (English)</h3>
+            <div className="space-y-4">
+              <Input
+                label="Title"
                 value={notification.content.title}
                 onChange={(e) => handleContentChange('title', e.target.value)}
                 placeholder="Notification title"
               />
-            </div>
-            <div className="form-group">
-              <label>Message <span className="required">*</span></label>
-              <textarea
-                value={notification.content.message}
-                onChange={(e) => handleContentChange('message', e.target.value)}
-                placeholder="Notification message"
-                rows={10}
-              />
-            </div>
-            <div className="form-group">
-              <label>CTA Button (Optional)</label>
-              <input
-                type="text"
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-medium uppercase tracking-wide text-primary">Message</label>
+                <textarea
+                  value={notification.content.message}
+                  onChange={(e) => handleContentChange('message', e.target.value)}
+                  placeholder="Notification message"
+                  rows={8}
+                  className="w-full px-4 py-3 rounded-lg border-2 border-border bg-surface text-primary placeholder:text-muted focus:outline-none focus:border-primary resize-y"
+                />
+              </div>
+              <Input
+                label="CTA Button (Optional)"
                 value={notification.content.cta}
                 onChange={(e) => handleContentChange('cta', e.target.value)}
                 placeholder="E.g.: View Details"
               />
             </div>
-          </div>
+          </Card>
 
-          <div className="editor-card">
-            <h3>Target Audience</h3>
-            <div className="target-options-horizontal">
-              <label className={`target-option-h ${notification.target.type === 'all' ? 'active' : ''}`}>
-                <input
-                  type="radio"
-                  name="target-type"
-                  checked={notification.target.type === 'all'}
-                  onChange={() => setNotification({ ...notification, target: { type: 'all', segments: [] } })}
-                />
-                <div className="option-content">
-                  <img src="/icon/users.svg" alt="" />
-                  <span>All Users</span>
-                </div>
-              </label>
-              <label className={`target-option-h ${notification.target.type === 'segment' ? 'active' : ''}`}>
-                <input
-                  type="radio"
-                  name="target-type"
-                  checked={notification.target.type === 'segment'}
-                  onChange={() => setNotification({ ...notification, target: { type: 'segment', segments: [] } })}
-                />
-                <div className="option-content">
-                  <img src="/icon/target.svg" alt="" />
-                  <span>Segments</span>
-                </div>
-              </label>
+          <Card className="p-6">
+            <h3 className="text-base font-semibold text-primary mb-4">Target Audience</h3>
+            <div className="flex gap-3 mb-4">
+              {[
+                { type: 'all', icon: 'users.svg', label: 'All Users' },
+                { type: 'segment', icon: 'target.svg', label: 'Segments' }
+              ].map(opt => (
+                <button
+                  key={opt.type}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-2 p-4 rounded-lg border-2 transition-all",
+                    notification.target.type === opt.type
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary"
+                  )}
+                  onClick={() => setNotification({ ...notification, target: { type: opt.type, segments: [] } })}
+                >
+                  <img src={`/icon/${opt.icon}`} alt="" className="w-5 h-5 icon-dark" />
+                  <span className="font-medium">{opt.label}</span>
+                </button>
+              ))}
             </div>
             {notification.target.type === 'segment' && (
-              <div className="segment-list">
+              <div className="grid grid-cols-2 gap-2">
                 {[
                   { value: 'new', label: 'New users (< 7 days)' },
                   { value: 'active', label: 'Active (7 days)' },
@@ -268,7 +263,7 @@ export default function NotificationEditor() {
                   { value: 'has_profile', label: 'Has voice profile' },
                   { value: 'no_profile', label: 'No voice profile' }
                 ].map(seg => (
-                  <label key={seg.value} className="segment-item">
+                  <label key={seg.value} className="flex items-center gap-2 p-3 rounded-lg bg-surface-secondary cursor-pointer hover:bg-border transition-colors">
                     <input
                       type="checkbox"
                       checked={notification.target.segments?.includes(seg.value) || false}
@@ -282,155 +277,151 @@ export default function NotificationEditor() {
                           }
                         });
                       }}
+                      className="w-4 h-4"
                     />
-                    <span>{seg.label}</span>
+                    <span className="text-sm">{seg.label}</span>
                   </label>
                 ))}
               </div>
             )}
-          </div>
+          </Card>
 
-          <div className="editor-card">
-            <h3>Auto-Translate To</h3>
-            <div className="language-grid">
+          <Card className="p-6">
+            <h3 className="text-base font-semibold text-primary mb-4">Auto-Translate To</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
               {SUPPORTED_LANGUAGES.map(lang => (
                 <label 
                   key={lang.code} 
-                  className={`lang-item ${notification.targetLanguages?.includes(lang.code) ? 'selected' : ''}`}
+                  className={cn(
+                    "flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-all",
+                    notification.targetLanguages?.includes(lang.code)
+                      ? "bg-primary/10 border-2 border-primary"
+                      : "bg-surface-secondary border-2 border-transparent hover:border-border"
+                  )}
                 >
                   <input
                     type="checkbox"
                     checked={notification.targetLanguages?.includes(lang.code) || false}
                     onChange={() => toggleLanguage(lang.code)}
+                    className="sr-only"
                   />
-                  <span className="lang-flag">{lang.flag}</span>
-                  <span>{lang.name}</span>
+                  <span className="text-lg">{lang.flag}</span>
+                  <span className="text-sm font-medium">{lang.name}</span>
                 </label>
               ))}
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Right Column - Settings */}
-        <div className="editor-col-right">
-          <div className="editor-card">
-            <h3>Type & Priority</h3>
-            <div className="form-group">
-              <label>Type</label>
-              <div className="type-grid">
-                {[
-                  { value: 'info', icon: 'info.svg', label: 'Info' },
-                  { value: 'success', icon: 'check-circle.svg', label: 'Success' },
-                  { value: 'warning', icon: 'alert-triangle.svg', label: 'Warning' },
-                  { value: 'error', icon: 'x-circle.svg', label: 'Error' },
-                  { value: 'announcement', icon: 'megaphone.svg', label: 'Announce' }
-                ].map(type => (
-                  <button
-                    key={type.value}
-                    className={`type-btn ${notification.type === type.value ? 'active' : ''}`}
-                    onClick={() => setNotification({ ...notification, type: type.value })}
-                  >
-                    <img src={`/icon/${type.icon}`} alt="" />
-                    <span>{type.label}</span>
-                  </button>
-                ))}
+        <div className="space-y-6">
+          <Card className="p-6">
+            <h3 className="text-base font-semibold text-primary mb-4">Type & Priority</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wide text-muted mb-2 block">Type</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { value: 'info', icon: 'info.svg' },
+                    { value: 'success', icon: 'check-circle.svg' },
+                    { value: 'warning', icon: 'alert-triangle.svg' },
+                    { value: 'error', icon: 'x-circle.svg' },
+                    { value: 'announcement', icon: 'megaphone.svg' }
+                  ].map(type => (
+                    <button
+                      key={type.value}
+                      className={cn(
+                        "flex flex-col items-center gap-1 p-3 rounded-lg border-2 transition-all",
+                        notification.type === type.value
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary"
+                      )}
+                      onClick={() => setNotification({ ...notification, type: type.value })}
+                    >
+                      <img src={`/icon/${type.icon}`} alt="" className="w-5 h-5 icon-dark" />
+                      <span className="text-xs capitalize">{type.value}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wide text-muted mb-2 block">Priority</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {['low', 'medium', 'high', 'urgent'].map(p => (
+                    <button
+                      key={p}
+                      className={cn(
+                        "py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all",
+                        notification.priority === p
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border hover:border-primary"
+                      )}
+                      onClick={() => setNotification({ ...notification, priority: p })}
+                    >
+                      {p.charAt(0).toUpperCase() + p.slice(1)}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className="form-group">
-              <label>Priority</label>
-              <div className="priority-grid">
-                {['low', 'medium', 'high', 'urgent'].map(p => (
-                  <button
-                    key={p}
-                    className={`priority-btn ${notification.priority === p ? 'active' : ''}`}
-                    onClick={() => setNotification({ ...notification, priority: p })}
-                  >
-                    {p.charAt(0).toUpperCase() + p.slice(1)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+          </Card>
 
-          <div className="editor-card">
-            <h3>CTA Action</h3>
-            <div className="form-group">
-              <CustomSelect
-                value={notification.ctaAction?.type || 'none'}
+          <Card className="p-6">
+            <h3 className="text-base font-semibold text-primary mb-4">CTA Action</h3>
+            <Select
+              value={notification.ctaAction?.type || 'none'}
+              onChange={(e) => setNotification({
+                ...notification,
+                ctaAction: e.target.value === 'none' ? null : { type: e.target.value, url: '', action: '' }
+              })}
+              options={[
+                { value: 'none', label: 'No action' },
+                { value: 'url', label: 'Open URL' },
+                { value: 'view', label: 'Navigate to view' }
+              ]}
+            />
+            {notification.ctaAction?.type === 'url' && (
+              <Input
+                type="url"
+                value={notification.ctaAction.url || ''}
                 onChange={(e) => setNotification({
                   ...notification,
-                  ctaAction: e.target.value === 'none' ? null : { type: e.target.value, url: '', action: '' }
+                  ctaAction: { ...notification.ctaAction, url: e.target.value }
                 })}
-                options={[
-                  { value: 'none', label: 'No action' },
-                  { value: 'url', label: 'Open URL' },
-                  { value: 'view', label: 'Navigate to view' }
-                ]}
+                placeholder="https://..."
+                containerClassName="mt-3"
               />
-            </div>
-            {notification.ctaAction?.type === 'url' && (
-              <div className="form-group">
-                <input
-                  type="url"
-                  value={notification.ctaAction.url || ''}
-                  onChange={(e) => setNotification({
-                    ...notification,
-                    ctaAction: { ...notification.ctaAction, url: e.target.value }
-                  })}
-                  placeholder="https://..."
-                />
-              </div>
             )}
-            {notification.ctaAction?.type === 'view' && (
-              <div className="form-group">
-                <CustomSelect
-                  value={notification.ctaAction.action || ''}
-                  onChange={(e) => setNotification({
-                    ...notification,
-                    ctaAction: { ...notification.ctaAction, action: e.target.value }
-                  })}
-                  options={[
-                    { value: '', label: 'Select view...' },
-                    { value: 'home', label: 'Home' },
-                    { value: 'workspace', label: 'AI Workspace' },
-                    { value: 'settings', label: 'Settings' },
-                    { value: 'upgrade', label: 'Upgrade' }
-                  ]}
-                />
-              </div>
-            )}
-          </div>
+          </Card>
 
-          <div className="editor-card">
-            <h3>Schedule (Optional)</h3>
-            <div className="form-group">
-              <label>Send Time</label>
-              <input
+          <Card className="p-6">
+            <h3 className="text-base font-semibold text-primary mb-4">Schedule</h3>
+            <div className="space-y-4">
+              <Input
+                label="Send Time"
                 type="datetime-local"
                 value={notification.scheduledAt}
                 onChange={(e) => setNotification({ ...notification, scheduledAt: e.target.value })}
               />
-            </div>
-            <div className="form-group">
-              <label>Expires At</label>
-              <input
+              <Input
+                label="Expires At"
                 type="datetime-local"
                 value={notification.expiresAt}
                 onChange={(e) => setNotification({ ...notification, expiresAt: e.target.value })}
               />
             </div>
-          </div>
+          </Card>
         </div>
       </div>
 
       {/* Footer Actions */}
-      <div className="editor-footer">
-        <button className="btn-draft" onClick={() => handleSave(false)} disabled={saving}>
+      <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-border">
+        <Button variant="secondary" onClick={() => handleSave(false)} disabled={saving}>
           {saving ? 'Saving...' : 'Save Draft'}
-        </button>
-        <button className="btn-send" onClick={() => handleSave(true)} disabled={saving || translating}>
+        </Button>
+        <Button onClick={() => handleSave(true)} disabled={saving || translating}>
           {translating ? 'Translating...' : saving ? 'Sending...' : `Send Now${notification.targetLanguages?.length > 0 ? ` (+${notification.targetLanguages.length})` : ''}`}
-        </button>
+        </Button>
       </div>
     </div>
   );

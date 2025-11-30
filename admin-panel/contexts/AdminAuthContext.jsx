@@ -96,28 +96,6 @@ export function AdminAuthProvider({ children }) {
     }
   }, []);
 
-  // Legacy login with admin key
-  const loginWithKey = useCallback(async (adminKey) => {
-    try {
-      setError(null);
-      const result = await authApi.legacyLogin(adminKey);
-      
-      if (result.success) {
-        setAuthData(result.accessToken, result.admin, result.expiresIn);
-        setAdmin(result.admin);
-        setIsAdminAuthenticated(true);
-        startTokenRefresh();
-        return { success: true };
-      } else {
-        setError(result.error?.message || 'Invalid admin key');
-        return { success: false, error: result.error };
-      }
-    } catch (err) {
-      setError('Unable to connect to server');
-      return { success: false, error: { message: 'Unable to connect to server' } };
-    }
-  }, []);
-
   // Initial setup
   const setupAdmin = useCallback(async (email, password, name) => {
     try {
@@ -178,7 +156,6 @@ export function AdminAuthProvider({ children }) {
         needsSetup,
         error,
         loginAdmin,
-        loginWithKey,
         setupAdmin,
         logoutAdmin,
         changePassword,

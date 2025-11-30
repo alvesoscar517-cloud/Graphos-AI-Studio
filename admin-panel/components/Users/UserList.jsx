@@ -2,10 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usersApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge, StatusBadge } from '../ui/badge';
+import { SimpleTooltip } from '../ui/tooltip';
+import { SkeletonTable } from '../ui/skeleton';
 import PageHeader from '../Common/PageHeader';
-import LoadingScreen from '../Common/LoadingScreen';
-import CustomSelect from '../Common/CustomSelect';
-import './UserList.css';
+import { cn } from '@/lib/utils';
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
@@ -13,7 +16,6 @@ export default function UserList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({ status: 'all' });
   const [pagination, setPagination] = useState({ total: 0, limit: 20, offset: 0 });
-  const [selectedUsers, setSelectedUsers] = useState([]);
   const [sortConfig, setSortConfig] = useState({ sortBy: 'createdAt', sortOrder: 'desc' });
   const navigate = useNavigate();
   const notify = useNotify();
@@ -32,11 +34,7 @@ export default function UserList() {
       });
       
       setUsers(response.users);
-      setPagination(prev => ({
-        ...prev,
-        ...response.pagination,
-        offset
-      }));
+      setPagination(prev => ({ ...prev, ...response.pagination, offset }));
     } catch (err) {
       notify.error('Failed to load users: ' + err.message);
     } finally {
@@ -45,9 +43,7 @@ export default function UserList() {
   }, [searchTerm, filters, pagination.limit, pagination.offset, sortConfig]);
 
   useEffect(() => {
-    const debounce = setTimeout(() => {
-      loadUsers(true);
-    }, 300);
+    const debounce = setTimeout(() => loadUsers(true), 300);
     return () => clearTimeout(debounce);
   }, [searchTerm, filters, sortConfig]);
 
@@ -56,89 +52,10 @@ export default function UserList() {
     loadUsers();
   };
 
-  const handleSelectAll = (e) => {
-    if (e.target.checked) {
-      setSelectedUsers(users.map(u => u.id));
-    } else {
-      setSelectedUsers([]);
-    }
-  };
-
-  const handleSelectUser = (userId) => {
-    setSelectedUsers(prev => 
-      prev.includes(userId) 
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
-    );
-  };
-
-  const handleBulkLock = async (locked) => {
-    if (selectedUsers.length === 0) {
-      notify.warning('Please select users first');
-      return;
-    }
-
-    const confirmed = await notify.confirm({
-      title: locked ? 'Lock Users' : 'Unlock Users',
-      message: `Are you sure you want to ${locked ? 'lock' : 'unlock'} ${selectedUsers.length} users?`,
-      confirmText: locked ? 'Lock' : 'Unlock',
-      type: 'warning'
-    });
-
-    if (!confirmed) return;
-
-    try {
-      await usersApi.bulkLock(selectedUsers, locked, 'Bulk action by admin');
-      notify.success(`Successfully ${locked ? 'locked' : 'unlocked'} ${selectedUsers.length} users`);
-      setSelectedUsers([]);
-      loadUsers();
-    } catch (err) {
-      notify.error('Error: ' + err.message);
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    if (selectedUsers.length === 0) {
-      notify.warning('Please select users first');
-      return;
-    }
-
-    const confirmed = await notify.confirm({
-      title: 'Delete Users',
-      message: `Are you sure you want to DELETE ${selectedUsers.length} users?\n\nThis action cannot be undone!`,
-      confirmText: 'Delete',
-      type: 'danger'
-    });
-
-    if (!confirmed) return;
-
-    const confirmation = await notify.prompt({
-      title: 'Confirm Deletion',
-      message: 'Type "DELETE" to confirm:',
-      placeholder: 'DELETE',
-      confirmText: 'Delete'
-    });
-
-    if (confirmation !== 'DELETE') {
-      notify.warning('Incorrect confirmation');
-      return;
-    }
-
-    try {
-      await usersApi.bulkDelete(selectedUsers);
-      notify.success(`Successfully deleted ${selectedUsers.length} users`);
-      setSelectedUsers([]);
-      loadUsers(true);
-    } catch (err) {
-      notify.error('Error: ' + err.message);
-    }
-  };
-
   const handleExport = async (format) => {
     try {
       if (format === 'csv') {
         const response = await usersApi.export('csv');
-        // Download CSV
         const blob = new Blob([response], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -169,215 +86,177 @@ export default function UserList() {
     }));
   };
 
-  const getCreditsBadge = (credits) => {
-    const balance = credits?.balance || 0;
-    let color, bgColor;
-    if (balance === 0) {
-      color = '#dc2626';
-      bgColor = '#fef2f2';
-    } else if (balance <= 50) {
-      color = '#d97706';
-      bgColor = '#fffbeb';
-    } else if (balance <= 200) {
-      color = '#2563eb';
-      bgColor = '#eff6ff';
-    } else {
-      color = '#16a34a';
-      bgColor = '#f0fdf4';
-    }
-    return (
-      <span className="credits-badge" style={{ background: bgColor, color }}>
-        {balance}
-      </span>
-    );
+  const getCreditsBadgeVariant = (balance) => {
+    if (balance === 0) return 'error';
+    if (balance <= 50) return 'warning';
+    if (balance <= 200) return 'info';
+    return 'success';
   };
 
   const totalPages = Math.ceil(pagination.total / pagination.limit);
   const currentPage = Math.floor(pagination.offset / pagination.limit) + 1;
 
   if (loading && users.length === 0) {
-    return <LoadingScreen />;
+    return (
+      <div className="p-6">
+        <PageHeader
+          icon="users.svg"
+          title="User Management"
+          subtitle="Loading..."
+        />
+        <div className="mt-6">
+          <SkeletonTable rows={10} columns={7} />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="user-list">
+    <div className="p-6">
       <PageHeader
         icon="users.svg"
         title="User Management"
         subtitle={`${pagination.total} total users`}
         actions={
-          <div className="header-actions">
-            <button className="btn-export" onClick={() => handleExport('csv')}>
-              <img src="/icon/download.svg" alt="Export" />
-              Export CSV
-            </button>
-          </div>
+          <Button variant="secondary" size="sm" onClick={() => handleExport('csv')}>
+            <img src="/icon/download.svg" alt="Export" className="w-4 h-4 icon-dark" />
+            Export CSV
+          </Button>
         }
       />
 
-      <div className="list-controls">
-        <div className="search-box">
-          <img src="/icon/search.svg" alt="Search" className="search-icon" />
+      {/* Controls */}
+      <div className="flex flex-col sm:flex-row gap-4 mt-6">
+        <div className="relative flex-1">
+          <img src="/icon/search.svg" alt="Search" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 icon-gray" />
           <input
             type="text"
             placeholder="Search by email, name, or ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border/50 bg-surface-secondary text-primary placeholder:text-muted focus:outline-none focus:bg-surface transition-colors"
           />
         </div>
-
-        <div className="filters">
-          <CustomSelect
-            value={filters.status}
-            onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-            options={[
-              { value: 'all', label: 'All Status' },
-              { value: 'active', label: 'Active' },
-              { value: 'locked', label: 'Locked' }
-            ]}
-          />
+        {/* Status Filter Tabs */}
+        <div className="flex items-center bg-surface-secondary rounded-lg p-1">
+          {[
+            { value: 'all', label: 'All' },
+            { value: 'active', label: 'Active' },
+            { value: 'locked', label: 'Locked' }
+          ].map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setFilters(prev => ({ ...prev, status: option.value }))}
+              className={cn(
+                'px-4 py-1.5 text-sm font-medium rounded-md transition-colors',
+                filters.status === option.value
+                  ? 'bg-surface text-primary shadow-sm'
+                  : 'text-muted hover:text-primary'
+              )}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {selectedUsers.length > 0 && (
-        <div className="bulk-actions">
-          <span className="selected-count">{selectedUsers.length} selected</span>
-          <button className="btn-bulk" onClick={() => handleBulkLock(true)}>
-            <img src="/icon/lock.svg" alt="Lock" /> Lock
-          </button>
-          <button className="btn-bulk" onClick={() => handleBulkLock(false)}>
-            <img src="/icon/unlock.svg" alt="Unlock" /> Unlock
-          </button>
-          <button className="btn-bulk danger" onClick={handleBulkDelete}>
-            <img src="/icon/trash-2.svg" alt="Delete" /> Delete
-          </button>
-          <button className="btn-bulk-clear" onClick={() => setSelectedUsers([])}>
-            Clear
-          </button>
-        </div>
-      )}
-
-      <div className="users-table-container">
-        <table className="users-table">
-          <thead>
-            <tr>
-              <th className="checkbox-col">
-                <input
-                  type="checkbox"
-                  checked={selectedUsers.length === users.length && users.length > 0}
-                  onChange={handleSelectAll}
-                />
-              </th>
-              <th onClick={() => handleSort('name')} className="sortable">
-                User {sortConfig.sortBy === 'name' && (sortConfig.sortOrder === 'asc' ? '↑' : '↓')}
-              </th>
-              <th>Email</th>
-              <th>Credits</th>
-              <th className="stat-col">Profiles</th>
-              <th className="stat-col">Analyses</th>
-              <th onClick={() => handleSort('createdAt')} className="sortable">
-                Created {sortConfig.sortBy === 'createdAt' && (sortConfig.sortOrder === 'asc' ? '↑' : '↓')}
-              </th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.length === 0 ? (
-              <tr>
-                <td colSpan="9" className="empty-row">
-                  {searchTerm || filters.status !== 'all' 
-                    ? 'No users found matching filters' 
-                    : 'No users yet'}
-                </td>
+      {/* Table */}
+      <Card className="mt-4 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border bg-surface-secondary">
+                <th className="p-3 text-left text-xs font-medium text-muted uppercase cursor-pointer" onClick={() => handleSort('name')}>
+                  User {sortConfig.sortBy === 'name' && (sortConfig.sortOrder === 'asc' ? '↑' : '↓')}
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-muted uppercase">Email</th>
+                <th className="p-3 text-left text-xs font-medium text-muted uppercase">Credits</th>
+                <th className="p-3 text-center text-xs font-medium text-muted uppercase">Profiles</th>
+                <th className="p-3 text-center text-xs font-medium text-muted uppercase">Analyses</th>
+                <th className="p-3 text-left text-xs font-medium text-muted uppercase cursor-pointer" onClick={() => handleSort('createdAt')}>
+                  Created {sortConfig.sortBy === 'createdAt' && (sortConfig.sortOrder === 'asc' ? '↑' : '↓')}
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-muted uppercase">Status</th>
               </tr>
-            ) : (
-              users.map(user => (
-                <tr key={user.id} className={user.locked ? 'locked-row' : ''}>
-                  <td className="checkbox-col">
-                    <input
-                      type="checkbox"
-                      checked={selectedUsers.includes(user.id)}
-                      onChange={() => handleSelectUser(user.id)}
-                    />
-                  </td>
-                  <td>
-                    <div className="user-cell">
-                      <div className="user-cell-avatar">
-                        {user.name?.charAt(0).toUpperCase() || '?'}
-                      </div>
-                      <div className="user-cell-details">
-                        <div className="user-cell-name">{user.name || 'Unnamed'}</div>
-                        <div className="user-cell-id">{user.id.substring(0, 12)}...</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="email-cell">{user.email || 'N/A'}</td>
-                  <td className="credits-cell">
-                    {getCreditsBadge(user.credits)}
-                  </td>
-                  <td className="stat-cell">{user.usage?.profilesCount || 0}</td>
-                  <td className="stat-cell">{user.usage?.analysesCount || 0}</td>
-                  <td className="date-cell">
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US') : 'N/A'}
-                  </td>
-                  <td>
-                    {user.locked ? (
-                      <span className="status-badge locked">
-                        <img src="/icon/lock.svg" alt="Locked" /> Locked
-                      </span>
-                    ) : (
-                      <span className="status-badge active">Active</span>
-                    )}
-                  </td>
-                  <td className="actions-col">
-                    <button
-                      className="btn-view"
-                      onClick={() => navigate(`/users/${user.id}`)}
-                    >
-                      <img src="/icon/eye.svg" alt="View" />
-                    </button>
+            </thead>
+            <tbody>
+              {users.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-muted">
+                    {searchTerm || filters.status !== 'all' ? 'No users found matching filters' : 'No users yet'}
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                users.map(user => (
+                  <tr 
+                    key={user.id} 
+                    className={cn("border-b border-border hover:bg-surface-secondary transition-colors cursor-pointer", user.locked && "opacity-60")} 
+                    onClick={() => navigate(`/users/${user.id}`)}
+                  >
+                    <td className="p-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold flex-shrink-0">
+                          {user.name?.charAt(0).toUpperCase() || '?'}
+                        </div>
+                        <div>
+                          <div className="font-medium text-primary">{user.name || 'Unnamed'}</div>
+                          <div className="text-xs text-muted">{user.id.substring(0, 12)}...</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-3 text-sm text-primary">{user.email || 'N/A'}</td>
+                    <td className="p-3">
+                      <SimpleTooltip content={`Balance: ${user.credits?.balance || 0} credits`}>
+                        <span>
+                          <Badge variant={getCreditsBadgeVariant(user.credits?.balance || 0)}>
+                            {user.credits?.balance || 0}
+                          </Badge>
+                        </span>
+                      </SimpleTooltip>
+                    </td>
+                    <td className="p-3 text-center text-sm text-muted">
+                      <SimpleTooltip content={`${user.usage?.profilesCount || 0} profiles created`}>
+                        <span>{user.usage?.profilesCount || 0}</span>
+                      </SimpleTooltip>
+                    </td>
+                    <td className="p-3 text-center text-sm text-muted">
+                      <SimpleTooltip content={`${user.usage?.analysesCount || 0} analyses`}>
+                        <span>{user.usage?.analysesCount || 0}</span>
+                      </SimpleTooltip>
+                    </td>
+                    <td className="p-3 text-sm text-muted">
+                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US') : 'N/A'}
+                    </td>
+                    <td className="p-3">
+                      <StatusBadge status={user.locked ? 'suspended' : 'active'}>
+                        {user.locked ? 'Locked' : 'Active'}
+                      </StatusBadge>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
 
+
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="pagination">
-          <button
-            className="page-btn"
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(0)}
-          >
+        <div className="flex items-center justify-center gap-2 mt-4">
+          <Button variant="secondary" size="sm" disabled={currentPage === 1} onClick={() => handlePageChange(0)}>
             First
-          </button>
-          <button
-            className="page-btn"
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(pagination.offset - pagination.limit)}
-          >
+          </Button>
+          <Button variant="secondary" size="sm" disabled={currentPage === 1} onClick={() => handlePageChange(pagination.offset - pagination.limit)}>
             Previous
-          </button>
-          <span className="page-info">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            className="page-btn"
-            disabled={currentPage === totalPages}
-            onClick={() => handlePageChange(pagination.offset + pagination.limit)}
-          >
+          </Button>
+          <span className="px-4 text-sm text-muted">Page {currentPage} of {totalPages}</span>
+          <Button variant="secondary" size="sm" disabled={currentPage === totalPages} onClick={() => handlePageChange(pagination.offset + pagination.limit)}>
             Next
-          </button>
-          <button
-            className="page-btn"
-            disabled={currentPage === totalPages}
-            onClick={() => handlePageChange((totalPages - 1) * pagination.limit)}
-          >
+          </Button>
+          <Button variant="secondary" size="sm" disabled={currentPage === totalPages} onClick={() => handlePageChange((totalPages - 1) * pagination.limit)}>
             Last
-          </button>
+          </Button>
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
-import './AdminLayout.css';
+// CSS migrated to Tailwind
 
 export default function AdminLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);

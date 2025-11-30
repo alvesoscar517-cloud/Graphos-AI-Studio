@@ -4,7 +4,13 @@ import { useRealtime } from '../../contexts/RealtimeContext';
 import { notificationsApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
 import LoadingScreen from '../Common/LoadingScreen';
-import './NotificationList.css';
+import PageHeader from '../Common/PageHeader';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
+import ActionsDropdown from '../Common/ActionsDropdown';
+import { cn } from '@/lib/utils';
 
 export default function NotificationList() {
   const { 
@@ -82,178 +88,162 @@ export default function NotificationList() {
     });
   };
 
-  if (loading && (!notifications || notifications.length === 0)) {
-    return <LoadingScreen />;
-  }
+  const getStatusVariant = (status) => {
+    const map = { draft: 'default', scheduled: 'warning', sent: 'success', archived: 'default' };
+    return map[status] || 'default';
+  };
 
-  // Filter notifications locally
+  const getTypeIcon = (type) => {
+    const icons = {
+      info: 'info.svg', success: 'check-circle.svg', warning: 'alert-triangle.svg',
+      error: 'x-circle.svg', announcement: 'megaphone.svg'
+    };
+    return icons[type] || 'info.svg';
+  };
+
+  const getNotificationActions = (notif) => [
+    ...(notif.status === 'draft' ? [{
+      label: 'Send Now',
+      icon: <img src="/icon/send.svg" alt="" className="w-4 h-4 icon-gray" />,
+      onClick: () => handleSend(notif.id),
+    }] : []),
+    {
+      label: 'Edit',
+      icon: <img src="/icon/edit.svg" alt="" className="w-4 h-4 icon-gray" />,
+      onClick: () => navigate(`/notifications/${notif.id}`),
+    },
+    { separator: true },
+    {
+      label: 'Delete',
+      icon: <img src="/icon/trash-2.svg" alt="" className="w-4 h-4" />,
+      onClick: () => handleDelete(notif.id),
+      variant: 'destructive',
+    },
+  ];
+
+  const isInitialLoading = loading && (!notifications || notifications.length === 0);
+
   const filteredNotifications = (notifications || []).filter(n => {
     if (filter === 'all') return true;
     return n.status === filter;
   });
 
-  const getStatusClass = (status) => {
-    const classes = {
-      draft: 'status-draft',
-      scheduled: 'status-scheduled',
-      sent: 'status-sent',
-      archived: 'status-archived'
-    };
-    return classes[status] || 'status-draft';
-  };
-
-  const getTypeIcon = (type) => {
-    const icons = {
-      info: 'info.svg',
-      success: 'check-circle.svg',
-      warning: 'alert-triangle.svg',
-      error: 'x-circle.svg',
-      announcement: 'megaphone.svg'
-    };
-    return icons[type] || 'info.svg';
-  };
-
   return (
-    <div className="notification-list">
-      <div className="list-header">
-        <div className="header-left">
-          <div className="header-icon-wrapper">
-            <img src="/icon/bell.svg" alt="Notifications" />
-          </div>
-          <div>
-            <h1>Notifications</h1>
-            <p>Manage notifications sent to users</p>
-          </div>
-        </div>
-        
-        <button 
-          className="btn-create"
-          onClick={() => navigate('/notifications/new')}
-        >
-          <img src="/icon/plus.svg" alt="Add" />
-          New Notification
-        </button>
-      </div>
+    <div className="p-6">
+      <PageHeader
+        icon="bell.svg"
+        title="Notifications"
+        subtitle="Manage notifications sent to users"
+        actions={
+          <Button onClick={() => navigate('/notifications/new')}>
+            <img src="/icon/plus.svg" alt="" className="w-4 h-4 icon-white" />
+            New Notification
+          </Button>
+        }
+      />
 
-      <div className="list-toolbar">
-        <div className="filter-tabs">
-          {[
-            { key: 'all', label: 'All' },
-            { key: 'draft', label: 'Draft' },
-            { key: 'scheduled', label: 'Scheduled' },
-            { key: 'sent', label: 'Sent' }
-          ].map(tab => (
-            <button 
-              key={tab.key}
-              className={filter === tab.key ? 'active' : ''}
-              onClick={() => setFilter(tab.key)}
-            >
-              {tab.label}
-            </button>
-          ))}
+      {/* Filter Tabs */}
+      <Tabs value={filter} onValueChange={setFilter} className="mt-6">
+        <div className="flex items-center justify-between">
+          <TabsList>
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="draft">Draft</TabsTrigger>
+            <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
+            <TabsTrigger value="sent">Sent</TabsTrigger>
+          </TabsList>
+          <span className="text-sm text-muted">
+            {filteredNotifications.length} notification{filteredNotifications.length !== 1 ? 's' : ''}
+          </span>
         </div>
-        <div className="list-count">
-          {filteredNotifications.length} notification{filteredNotifications.length !== 1 ? 's' : ''}
-        </div>
-      </div>
+      </Tabs>
 
-      {filteredNotifications.length === 0 ? (
-        <div className="empty-state">
-          <img src="/icon/inbox.svg" alt="Empty" />
-          <p>No notifications yet</p>
-          <button onClick={() => navigate('/notifications/new')}>
+      {/* Content */}
+      {isInitialLoading ? (
+        <div className="flex items-center justify-center py-16 mt-4">
+          <div className="w-8 h-8 border-2 border-surface-secondary border-t-primary rounded-full animate-spin" />
+        </div>
+      ) : filteredNotifications.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 bg-surface rounded-xl border border-border mt-4">
+          <img src="/icon/inbox.svg" alt="" className="w-12 h-12 icon-gray mb-4" />
+          <p className="text-sm text-muted mb-4">No notifications yet</p>
+          <Button onClick={() => navigate('/notifications/new')}>
             Create First Notification
-          </button>
+          </Button>
         </div>
       ) : (
-        <div className="notifications-table">
-          <table>
-            <thead>
-              <tr>
-                <th className="col-type">Type</th>
-                <th className="col-content">Content</th>
-                <th className="col-languages">Languages</th>
-                <th className="col-status">Status</th>
-                <th className="col-stats">Stats</th>
-                <th className="col-date">Created</th>
-                <th className="col-actions">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredNotifications.map(notif => (
-                <tr key={notif.id}>
-                  <td className="col-type">
-                    <div className="type-icon">
-                      <img src={`/icon/${getTypeIcon(notif.type)}`} alt={notif.type} />
-                    </div>
-                  </td>
-                  <td className="col-content">
-                    <div className="content-cell">
-                      <span className="content-title">
-                        {notif.translations?.en?.title || notif.content?.title || 'No Title'}
-                      </span>
-                      <span className="content-message">
-                        {notif.translations?.en?.message || notif.content?.message || 'No Content'}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="col-languages">
-                    <div className="lang-tags">
-                      <span className="lang-tag primary">EN</span>
-                      {notif.targetLanguages?.slice(0, 3).map(lang => (
-                        <span key={lang} className="lang-tag">{lang.toUpperCase()}</span>
-                      ))}
-                      {notif.targetLanguages?.length > 3 && (
-                        <span className="lang-tag more">+{notif.targetLanguages.length - 3}</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="col-status">
-                    <span className={`status-badge ${getStatusClass(notif.status)}`}>
-                      {notif.status || 'draft'}
-                    </span>
-                  </td>
-                  <td className="col-stats">
-                    <div className="stats-cell">
-                      <span>{notif.stats?.sent || 0} sent</span>
-                      <span>{notif.stats?.read || 0} read</span>
-                    </div>
-                  </td>
-                  <td className="col-date">
-                    {formatDate(notif.createdAt)}
-                  </td>
-                  <td className="col-actions">
-                    <div className="action-buttons">
-                      {notif.status === 'draft' && (
-                        <button 
-                          className="btn-action btn-send"
-                          onClick={() => handleSend(notif.id)}
-                          title="Send"
-                        >
-                          <img src="/icon/send.svg" alt="Send" />
-                        </button>
-                      )}
-                      <button 
-                        className="btn-action btn-edit"
-                        onClick={() => navigate(`/notifications/${notif.id}`)}
-                        title="Edit"
-                      >
-                        <img src="/icon/edit.svg" alt="Edit" />
-                      </button>
-                      <button 
-                        className="btn-action btn-delete"
-                        onClick={() => handleDelete(notif.id)}
-                        title="Delete"
-                      >
-                        <img src="/icon/trash-2.svg" alt="Delete" />
-                      </button>
-                    </div>
-                  </td>
+        <Card className={cn("mt-4 overflow-hidden transition-opacity duration-200", loading && "opacity-60")}>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border bg-surface-secondary">
+                  <th className="p-3 text-left text-xs font-medium text-muted uppercase w-12">Type</th>
+                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Content</th>
+                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Languages</th>
+                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Status</th>
+                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Stats</th>
+                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Created</th>
+                  <th className="p-3 w-16"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filteredNotifications.map(notif => (
+                  <tr key={notif.id} className="border-b border-border hover:bg-surface-secondary transition-colors">
+                    <td className="p-3">
+                      <div className="w-9 h-9 bg-surface-secondary rounded-lg flex items-center justify-center">
+                        <img src={`/icon/${getTypeIcon(notif.type)}`} alt={notif.type} className="w-4 h-4 icon-gray" />
+                      </div>
+                    </td>
+                    <td className="p-3">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm font-medium text-primary">
+                          {notif.translations?.en?.title || notif.content?.title || 'No Title'}
+                        </span>
+                        <span className="text-xs text-muted max-w-[300px] truncate">
+                          {notif.translations?.en?.message || notif.content?.message || 'No Content'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-3">
+                      <div className="flex gap-1 flex-wrap">
+                        <span className="px-2 py-0.5 bg-primary text-primary-foreground rounded text-xxs font-medium">EN</span>
+                        {notif.targetLanguages?.slice(0, 3).map(lang => (
+                          <span key={lang} className="px-2 py-0.5 bg-surface-secondary rounded text-xxs font-medium text-muted">
+                            {lang.toUpperCase()}
+                          </span>
+                        ))}
+                        {notif.targetLanguages?.length > 3 && (
+                          <span className="px-2 py-0.5 bg-surface-secondary rounded text-xxs font-medium text-muted">
+                            +{notif.targetLanguages.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="p-3">
+                      <Badge variant={getStatusVariant(notif.status)}>
+                        {notif.status || 'draft'}
+                      </Badge>
+                    </td>
+                    <td className="p-3">
+                      <div className="flex flex-col gap-0.5 text-xs text-muted">
+                        <span>{notif.stats?.sent || 0} sent</span>
+                        <span>{notif.stats?.read || 0} read</span>
+                      </div>
+                    </td>
+                    <td className="p-3 text-sm text-muted">
+                      {formatDate(notif.createdAt)}
+                    </td>
+                    <td className="p-3">
+                      <ActionsDropdown 
+                        onRowClick={() => navigate(`/notifications/${notif.id}`)}
+                        showMenu={false}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
     </div>
   );

@@ -1,77 +1,77 @@
-import './UserGrowthChart.css';
+/**
+ * User Growth Chart using Recharts
+ * Shows user registration trend over time
+ */
 
-// Group data by week to reduce number of bars
+import { useMemo } from 'react'
+import { AreaChart } from '../ui/charts'
+import { formatDate } from '@/lib/dateUtils'
+
+// Group data by week to reduce number of data points
 function groupByWeek(data) {
-  if (!data || data.length === 0) return [];
+  if (!data || data.length === 0) return []
   
-  const weeks = {};
+  const weeks = {}
   data.forEach(item => {
-    const date = new Date(item.date);
-    // Get week number
-    const weekStart = new Date(date);
-    weekStart.setDate(date.getDate() - date.getDay()); // Start of week (Sunday)
-    const weekKey = weekStart.toISOString().split('T')[0];
+    const date = new Date(item.date)
+    const weekStart = new Date(date)
+    weekStart.setDate(date.getDate() - date.getDay())
+    const weekKey = weekStart.toISOString().split('T')[0]
     
     if (!weeks[weekKey]) {
       weeks[weekKey] = {
         date: weekKey,
         count: 0,
-        items: []
-      };
+        label: formatDate(weekStart, 'dd/MM'),
+      }
     }
-    weeks[weekKey].count += item.count;
-    weeks[weekKey].items.push(item);
-  });
+    weeks[weekKey].count += item.count
+  })
   
   return Object.values(weeks).sort((a, b) => 
     new Date(a.date) - new Date(b.date)
-  );
+  )
 }
 
 export default function UserGrowthChart({ data }) {
-  if (!data || data.length === 0) {
+  const chartData = useMemo(() => {
+    if (!data || data.length === 0) return []
+    
+    // Group by week if more than 14 data points
+    const processedData = data.length > 14 ? groupByWeek(data) : data
+    
+    return processedData.map(item => ({
+      name: item.label || formatDate(item.date, 'dd/MM'),
+      users: item.count,
+    }))
+  }, [data])
+
+  if (chartData.length === 0) {
     return (
-      <div className="chart-empty">
-        <img src="/icon/inbox.svg" alt="Empty" className="chart-empty-icon" />
-        <p className="chart-empty-text">No growth data available</p>
+      <div className="flex flex-col items-center justify-center py-12 text-muted">
+        <img src="/icon/inbox.svg" alt="Empty" className="w-12 h-12 mb-3 icon-gray" />
+        <p className="text-sm">Không có dữ liệu tăng trưởng</p>
       </div>
-    );
+    )
   }
 
-  // Group by week if more than 14 data points
-  const displayData = data.length > 14 ? groupByWeek(data) : data;
-  const maxCount = Math.max(...displayData.map(d => d.count), 1);
-
   return (
-    <div className="user-growth-container">
-      <div className="user-growth-chart">
-        <div className="user-growth-y-axis" />
-        
-        {displayData.map((item, index) => {
-          const height = (item.count / maxCount) * 100;
-          const date = new Date(item.date);
-          const isWeekly = item.items && item.items.length > 1;
-          
-          return (
-            <div key={index} className="user-growth-bar-wrapper">
-              <div 
-                className="user-growth-bar"
-                style={{ height: `${height}%` }}
-                title={isWeekly 
-                  ? `Week of ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}: ${item.count} users`
-                  : `${item.date}: ${item.count} users`
-                }
-              >
-                <span className="user-growth-bar-label">{item.count}</span>
-              </div>
-              <div className="user-growth-date">
-                {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                {isWeekly && <div className="week-indicator">Week</div>}
-              </div>
-            </div>
-          );
-        })}
+    <div className="w-full">
+      <AreaChart
+        data={chartData}
+        dataKey="users"
+        xAxisKey="name"
+        height={280}
+        color="#3b82f6"
+      />
+      <div className="flex items-center justify-center gap-4 mt-4 text-xs text-muted">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-info" />
+          <span>Người dùng mới</span>
+        </div>
+        <span>•</span>
+        <span>Tổng: {chartData.reduce((sum, d) => sum + d.users, 0).toLocaleString()} người dùng</span>
       </div>
     </div>
-  );
+  )
 }

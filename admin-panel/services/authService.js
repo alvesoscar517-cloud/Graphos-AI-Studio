@@ -50,18 +50,6 @@ export const authApi = {
   },
 
   /**
-   * Legacy login with admin key
-   */
-  legacyLogin: async (adminKey) => {
-    const response = await fetch(`${API_BASE_URL}/api/auth/legacy-login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminKey })
-    });
-    return response.json();
-  },
-
-  /**
    * Refresh access token
    */
   refresh: async () => {
@@ -122,9 +110,6 @@ export function setAuthData(accessToken, admin, expiresIn) {
   localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
   localStorage.setItem(ADMIN_INFO_KEY, JSON.stringify(admin));
   localStorage.setItem(TOKEN_EXPIRY_KEY, String(Date.now() + expiresIn));
-  
-  // Also set legacy key for backward compatibility with existing API calls
-  localStorage.setItem('adminKey', 'jwt-auth');
 }
 
 export function getAccessToken() {
@@ -148,7 +133,6 @@ export function clearAuthData() {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(ADMIN_INFO_KEY);
   localStorage.removeItem(TOKEN_EXPIRY_KEY);
-  localStorage.removeItem('adminKey');
 }
 
 export function isAuthenticated() {
@@ -208,13 +192,6 @@ export function getAuthHeader() {
   if (token) {
     return { 'Authorization': `Bearer ${token}` };
   }
-  
-  // Fallback to legacy key
-  const legacyKey = localStorage.getItem('adminKey');
-  if (legacyKey && legacyKey !== 'jwt-auth') {
-    return { 'X-Admin-Key': legacyKey };
-  }
-  
   return {};
 }
 

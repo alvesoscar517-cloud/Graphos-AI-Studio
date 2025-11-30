@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { cache } from '../utils/cache';
 import { getApiBaseUrl } from '../utils/config';
+import { getAccessToken, getAuthHeader } from '../services/authService';
 
 const API_BASE_URL = getApiBaseUrl();
 const RECONNECT_DELAY = 5000;
@@ -21,20 +22,16 @@ export function useRealtimeStats(enabled = true) {
   const reconnectAttemptsRef = useRef(0);
   const pollIntervalRef = useRef(null);
 
-  const getAdminKey = useCallback(() => {
-    return localStorage.getItem('adminKey') || '';
-  }, []);
-
   const connect = useCallback(() => {
-    const adminKey = getAdminKey();
-    if (!adminKey || !enabled) return;
+    const token = getAccessToken();
+    if (!token || !enabled) return;
 
     // Close existing connection
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
     }
 
-    const url = `${API_BASE_URL}/api/admin/realtime/stats?adminKey=${encodeURIComponent(adminKey)}`;
+    const url = `${API_BASE_URL}/api/admin/realtime/stats?token=${encodeURIComponent(token)}`;
     
     try {
       const eventSource = new EventSource(url);
@@ -87,7 +84,7 @@ export function useRealtimeStats(enabled = true) {
       setError(err.message);
       startFallbackPolling();
     }
-  }, [enabled, getAdminKey]);
+  }, [enabled]);
 
   const startFallbackPolling = useCallback(() => {
     if (pollIntervalRef.current) return;
@@ -95,11 +92,10 @@ export function useRealtimeStats(enabled = true) {
     console.log('Starting fallback polling');
     pollIntervalRef.current = setInterval(async () => {
       try {
-        const adminKey = getAdminKey();
         const response = await fetch(`${API_BASE_URL}/api/admin/analytics/overview`, {
           headers: {
             'Content-Type': 'application/json',
-            'X-Admin-Key': adminKey
+            ...getAuthHeader()
           }
         });
         
@@ -112,7 +108,7 @@ export function useRealtimeStats(enabled = true) {
         console.error('Fallback polling error:', err);
       }
     }, FALLBACK_POLL_INTERVAL);
-  }, [getAdminKey]);
+  }, []);
 
   const disconnect = useCallback(() => {
     if (eventSourceRef.current) {
@@ -127,12 +123,11 @@ export function useRealtimeStats(enabled = true) {
   }, []);
 
   const refresh = useCallback(async () => {
-    const adminKey = getAdminKey();
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/analytics/overview`, {
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Key': adminKey
+          ...getAuthHeader()
         }
       });
       
@@ -146,7 +141,7 @@ export function useRealtimeStats(enabled = true) {
       console.error('Manual refresh error:', err);
       throw err;
     }
-  }, [getAdminKey]);
+  }, []);
 
   useEffect(() => {
     if (enabled) {

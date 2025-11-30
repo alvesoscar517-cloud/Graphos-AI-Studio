@@ -4,36 +4,23 @@ import { usersApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
 import LoadingScreen from '../Common/LoadingScreen';
 import PageHeader from '../Common/PageHeader';
-import CustomSelect from '../Common/CustomSelect';
-import './UserLogs.css';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
+import { cn } from '@/lib/utils';
 
-const getLogIcon = (type) => {
-  const icons = {
-    'account_status': 'shield.svg',
-    'notification': 'bell.svg',
-    'profile': 'folder.svg',
-    'analysis': 'search.svg',
-    'rewrite': 'edit.svg',
-    'login': 'log-in.svg',
-    'logout': 'log-out.svg',
-    'credits': 'dollar-sign.svg'
-  };
-  return icons[type] || 'activity.svg';
+const LOG_CONFIG = {
+  account_status: { icon: 'shield.svg', color: 'bg-destructive' },
+  notification: { icon: 'bell.svg', color: 'bg-info' },
+  profile: { icon: 'folder.svg', color: 'bg-success' },
+  analysis: { icon: 'search.svg', color: 'bg-warning' },
+  rewrite: { icon: 'edit.svg', color: 'bg-purple-500' },
+  login: { icon: 'log-in.svg', color: 'bg-cyan-500' },
+  logout: { icon: 'log-out.svg', color: 'bg-muted' },
+  credits: { icon: 'dollar-sign.svg', color: 'bg-amber-500' }
 };
 
-const getLogColor = (type) => {
-  const colors = {
-    'account_status': '#f44336',
-    'notification': '#2196f3',
-    'profile': '#4caf50',
-    'analysis': '#ff9800',
-    'rewrite': '#9c27b0',
-    'login': '#00bcd4',
-    'logout': '#607d8b',
-    'credits': '#ffc107'
-  };
-  return colors[type] || '#666';
-};
+const getLogConfig = (type) => LOG_CONFIG[type] || { icon: 'activity.svg', color: 'bg-muted' };
 
 export default function UserLogs() {
   const { userId } = useParams();
@@ -43,12 +30,9 @@ export default function UserLogs() {
   const [user, setUser] = useState(null);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [logsLoading, setLogsLoading] = useState(false);
   const [filter, setFilter] = useState('all');
 
-  useEffect(() => {
-    loadData();
-  }, [userId]);
+  useEffect(() => { loadData(); }, [userId]);
 
   const loadData = async () => {
     try {
@@ -60,128 +44,100 @@ export default function UserLogs() {
       setUser(userResponse.user);
       setLogs(logsResponse.logs);
     } catch (err) {
-      notify.error('Error loading data: ' + err.message);
+      notify.error('Error: ' + err.message);
       navigate(`/users/${userId}`);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredLogs = filter === 'all' 
-    ? logs 
-    : logs.filter(log => log.type === filter);
-
+  const filteredLogs = filter === 'all' ? logs : logs.filter(log => log.type === filter);
   const logTypes = ['all', ...new Set(logs.map(log => log.type))];
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
 
   return (
-    <div className="user-logs-page">
+    <div className="p-6">
       <PageHeader
         icon="activity.svg"
-        title={`Activity Logs - ${user?.name || user?.email || userId}`}
-        subtitle="User activity history and logs"
+        title={`Activity - ${user?.name || user?.email || userId}`}
+        subtitle="User activity history"
         actions={
-          <button className="btn-back" onClick={() => navigate(`/users/${userId}`)}>
-            <img src="/icon/arrow-left.svg" alt="Back" />
-            Back
-          </button>
+          <Button variant="ghost" onClick={() => navigate(`/users/${userId}`)}>
+            <img src="/icon/arrow-left.svg" alt="" className="w-4 h-4" /> Back
+          </Button>
         }
       />
 
-      {/* User Quick Info */}
-      <div className="user-quick-info">
-        <div className="info-item">
-          <span className="label">Email:</span>
-          <span className="value">{user?.email}</span>
-        </div>
-        <div className="info-item">
-          <span className="label">Total Logs:</span>
-          <span className="value">{filteredLogs.length}</span>
-        </div>
+      {/* Quick Info */}
+      <div className="flex gap-6 mt-4 text-sm">
+        <div><span className="text-muted">Email:</span> <span className="text-primary font-medium">{user?.email}</span></div>
+        <div><span className="text-muted">Total:</span> <span className="text-primary font-medium">{filteredLogs.length} logs</span></div>
       </div>
 
       {/* Filters */}
       {logs.length > 0 && (
-        <div className="logs-filters">
-          {logTypes.map(type => (
-            <button
-              key={type}
-              className={`filter-btn ${filter === type ? 'active' : ''}`}
-              onClick={() => setFilter(type)}
-            >
-              {type === 'all' ? 'All' : type.replace('_', ' ')}
-            </button>
-          ))}
-        </div>
+        <Tabs value={filter} onValueChange={setFilter} className="mt-6">
+          <TabsList>
+            {logTypes.map(type => (
+              <TabsTrigger key={type} value={type}>
+                {type === 'all' ? 'All' : type.replace('_', ' ')}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       )}
 
-      {/* Logs Content */}
-      <div className="logs-content">
-        {filteredLogs.length > 0 ? (
-          <div className="logs-list">
-            {filteredLogs.map(log => (
-              <div key={log.id} className="log-card">
-                <div 
-                  className="log-card-icon" 
-                  style={{ background: getLogColor(log.type) }}
-                >
-                  <img src={`/icon/${getLogIcon(log.type)}`} alt={log.type} />
-                </div>
-                
-                <div className="log-card-content">
-                  <div className="log-card-header">
-                    <span className="log-card-type">{log.type}</span>
-                    <span className="log-card-action">{log.action}</span>
+      {/* Logs */}
+      {filteredLogs.length > 0 ? (
+        <Card className="mt-4 overflow-hidden">
+          <div className="divide-y divide-border">
+            {filteredLogs.map(log => {
+              const config = getLogConfig(log.type);
+              return (
+                <div key={log.id} className="flex items-start gap-4 p-4 hover:bg-surface-secondary transition-colors">
+                  <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center shrink-0", config.color)}>
+                    <img src={`/icon/${config.icon}`} alt="" className="w-5 h-5 icon-white" />
                   </div>
-                  
-                  {log.reason && (
-                    <div className="log-card-reason">
-                      <img src="/icon/info.svg" alt="Reason" />
-                      <span>{log.reason}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm font-medium text-primary capitalize">{log.type.replace('_', ' ')}</span>
+                      <span className="text-xs text-muted">{log.action}</span>
                     </div>
-                  )}
-                  
-                  {log.details && (
-                    <div className="log-card-details">
-                      {Object.entries(log.details).map(([key, value]) => (
-                        <div key={key} className="log-detail-item">
-                          <span className="log-detail-key">{key}:</span>
-                          <span className="log-detail-value">{String(value)}</span>
-                        </div>
-                      ))}
+                    {log.reason && (
+                      <div className="flex items-center gap-1 text-xs text-muted mb-1">
+                        <img src="/icon/info.svg" alt="" className="w-3 h-3" />
+                        {log.reason}
+                      </div>
+                    )}
+                    {log.details && (
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {Object.entries(log.details).map(([key, value]) => (
+                          <span key={key} className="text-xs px-2 py-0.5 bg-surface-secondary rounded">
+                            {key}: {String(value)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1 text-xs text-muted mt-2">
+                      <img src="/icon/clock.svg" alt="" className="w-3 h-3" />
+                      {new Date(log.timestamp).toLocaleString()}
                     </div>
-                  )}
-                  
-                  <div className="log-card-time">
-                    <img src="/icon/clock.svg" alt="Time" />
-                    <span>{new Date(log.timestamp).toLocaleString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}</span>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        ) : (
-          <div className="empty-state">
-            <img src="/icon/inbox.svg" alt="Empty" />
-            <h3>No activity logs found</h3>
-            <p>
-              {filter === 'all' 
-                ? "This user doesn't have any activity logs yet"
-                : `No logs found for type: ${filter}`
-              }
-            </p>
-          </div>
-        )}
-      </div>
+        </Card>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-16 mt-6 bg-surface rounded-xl border border-border">
+          <img src="/icon/inbox.svg" alt="" className="w-12 h-12 icon-gray mb-4" />
+          <h3 className="font-semibold text-primary mb-1">No logs found</h3>
+          <p className="text-sm text-muted">
+            {filter === 'all' ? "No activity logs yet" : `No ${filter} logs`}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import './Spinner.css';
+// CSS migrated to Tailwind
 
 export default function Spinner({ size = 'medium', color = 'primary' }) {
   return (

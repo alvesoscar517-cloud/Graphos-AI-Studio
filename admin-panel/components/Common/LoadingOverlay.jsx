@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import './LoadingOverlay.css';
+// CSS migrated to Tailwind
 
 export default function LoadingOverlay({ message = 'Loading...' }) {
   return createPortal(

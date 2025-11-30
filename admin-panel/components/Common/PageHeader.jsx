@@ -1,18 +1,16 @@
-import './PageHeader.css';
-
 export default function PageHeader({ icon, title, subtitle, actions }) {
   return (
-    <header className="page-header">
-      <div className="page-header-title">
-        <div className="page-header-icon">
-          <img src={`/icon/${icon}`} alt={title} />
+    <header className="flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 bg-surface-secondary rounded-xl flex items-center justify-center">
+          <img src={`/icon/${icon}`} alt={title} className="w-6 h-6 icon-dark" />
         </div>
-        <div className="page-header-content">
-          <h1 className="page-header-h1">{title}</h1>
-          <p className="page-header-subtitle">{subtitle}</p>
+        <div>
+          <h1 className="text-2xl font-semibold text-primary">{title}</h1>
+          {subtitle && <p className="text-sm text-muted mt-1">{subtitle}</p>}
         </div>
       </div>
-      {actions && <div className="page-header-actions">{actions}</div>}
+      {actions && <div className="flex items-center gap-3">{actions}</div>}
     </header>
   );
 }

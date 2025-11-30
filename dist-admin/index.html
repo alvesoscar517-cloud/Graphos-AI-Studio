@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/icon/content.png">
   <title>Admin Panel</title>
   <style>
     /* Prevent any external CSS from affecting admin */
@@ -12,14 +13,24 @@
       width: 100%;
       height: 100%;
       overflow-x: hidden;
+      /* Hide scrollbar */
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none; /* Chrome/Safari/Opera */
     }
     /* Ensure only admin CSS is loaded */
     body > *:not(#admin-root):not(script) {
       display: none !important;
     }
   </style>
-  <script type="module" crossorigin src="./assets/main-JZg2MjHR.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/main-INBguumL.css">
+  <script type="module" crossorigin src="/assets/js/main-Bx4vi2lF.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/js/vendor-react-H-zM0aKf.js">
+  <link rel="modulepreload" crossorigin href="/assets/js/vendor-query-DUA5sh8I.js">
+  <link rel="modulepreload" crossorigin href="/assets/js/vendor-form-CHEAVPz2.js">
+  <link rel="stylesheet" crossorigin href="/assets/css/main-CDrDmAfl.css">
 </head>
 <body>
   <div id="admin-root"></div>

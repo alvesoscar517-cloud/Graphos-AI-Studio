@@ -5,55 +5,25 @@ import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
 import LoadingScreen from '../Common/LoadingScreen';
 import BackupSuccessModal from './BackupSuccessModal';
-import './SettingsView.css';
-import './SettingsIcons.css';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Switch } from '../ui/switch';
+import { cn } from '@/lib/utils';
 
 export default function SettingsView() {
   const { admin, changePassword, logoutAdmin } = useAdminAuth();
   
-  // Password change state
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
+  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [changingPassword, setChangingPassword] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   
-  // Default settings - always available
   const defaultSettings = {
-    system: {
-      siteName: 'AI Authenticator',
-      maintenanceMode: false,
-      allowRegistration: true,
-      requireEmailVerification: false,
-    },
-    limits: {
-      maxProfilesPerUser: 10,
-      maxAnalysesPerDay: 100,
-      maxRewritesPerDay: 50,
-      maxFileSize: 5,
-    },
-    features: {
-      enableAnalytics: true,
-      enableNotifications: true,
-      enableSupport: true,
-      enableAutoBackup: false,
-    },
-    email: {
-      smtpHost: '',
-      smtpPort: 587,
-      smtpUser: '',
-      smtpPassword: '',
-      fromEmail: 'noreply@example.com',
-      fromName: 'AI Authenticator',
-    },
-    security: {
-      sessionTimeout: 24,
-      maxLoginAttempts: 5,
-      requireStrongPassword: true,
-      enableTwoFactor: false,
-    },
+    system: { siteName: 'AI Authenticator', maintenanceMode: false, allowRegistration: true, requireEmailVerification: false },
+    limits: { maxProfilesPerUser: 10, maxAnalysesPerDay: 100, maxRewritesPerDay: 50, maxFileSize: 5 },
+    features: { enableAnalytics: true, enableNotifications: true, enableSupport: true, enableAutoBackup: false },
+    email: { smtpHost: '', smtpPort: 587, smtpUser: '', smtpPassword: '', fromEmail: 'noreply@example.com', fromName: 'AI Authenticator' },
+    security: { sessionTimeout: 24, maxLoginAttempts: 5, requireStrongPassword: true, enableTwoFactor: false },
   };
 
   const [settings, setSettings] = useState(defaultSettings);
@@ -66,24 +36,14 @@ export default function SettingsView() {
   const [backupResult, setBackupResult] = useState(null);
   const notify = useNotify();
 
-  // Load settings only once on mount
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  // Load backup list when switching to backup tab
-  useEffect(() => {
-    if (activeTab === 'backup') {
-      loadBackupList();
-    }
-  }, [activeTab]);
+  useEffect(() => { loadSettings(); }, []);
+  useEffect(() => { if (activeTab === 'backup') loadBackupList(); }, [activeTab]);
 
   const loadSettings = async () => {
     try {
       setLoading(true);
       const response = await settingsApi.get();
-      if (response && response.settings) {
-        // Merge with default settings to ensure all fields exist
+      if (response?.settings) {
         setSettings({
           system: { ...defaultSettings.system, ...response.settings.system },
           limits: { ...defaultSettings.limits, ...response.settings.limits },
@@ -94,7 +54,6 @@ export default function SettingsView() {
       }
     } catch (err) {
       console.error('Load settings error:', err);
-      // Keep using default settings
     } finally {
       setLoading(false);
     }
@@ -113,21 +72,13 @@ export default function SettingsView() {
   };
 
   const updateSetting = (category, key, value) => {
-    setSettings(prev => ({
-      ...prev,
-      [category]: {
-        ...(prev[category] || {}),
-        [key]: value,
-      },
-    }));
+    setSettings(prev => ({ ...prev, [category]: { ...(prev[category] || {}), [key]: value } }));
   };
 
   const loadBackupList = async () => {
     try {
       const response = await backupApi.list();
-      if (response && response.data) {
-        setBackupList(response.data);
-      }
+      if (response?.data) setBackupList(response.data);
     } catch (err) {
       console.error('Load backup list error:', err);
     }
@@ -137,15 +88,12 @@ export default function SettingsView() {
     try {
       setBackingUp(true);
       notify.info('Creating backup...');
-      
       const response = await backupApi.create();
-      
-      if (response && response.success && response.data) {
-        // Show modal with backup information
+      if (response?.success && response.data) {
         setBackupResult(response.data);
         setShowBackupModal(true);
         notify.success('Backup completed successfully!');
-        loadBackupList(); // Refresh list
+        loadBackupList();
       } else {
         notify.error('Backup failed: ' + (response.message || 'Unknown error'));
       }
@@ -159,14 +107,10 @@ export default function SettingsView() {
   const handleDownloadBackup = async (filename) => {
     try {
       notify.info('Preparing download...');
-      
-      // Get download URL from backend
       const response = await backupApi.getDownloadUrl(filename);
-      
-      if (response && response.success && response.data.downloadUrl) {
-        // Open download URL in new tab
+      if (response?.success && response.data.downloadUrl) {
         window.open(response.data.downloadUrl, '_blank');
-        notify.success('Download started! Save the file to your Drive.');
+        notify.success('Download started!');
       } else {
         notify.error('Failed to get download URL');
       }
@@ -177,34 +121,30 @@ export default function SettingsView() {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    
     if (!passwordData.currentPassword || !passwordData.newPassword) {
       notify.error('Please fill in all password fields');
       return;
     }
-    
     if (passwordData.newPassword.length < 8) {
       notify.error('New password must be at least 8 characters');
       return;
     }
-    
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       notify.error('New passwords do not match');
       return;
     }
-    
     try {
       setChangingPassword(true);
       const result = await changePassword(passwordData.currentPassword, passwordData.newPassword);
-      
       if (result.success) {
-        notify.success('Password changed successfully! Please login again.');
+        notify.success('Password changed successfully!');
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        setShowPasswordForm(false);
       } else {
         notify.error(result.error?.message || 'Failed to change password');
       }
     } catch (err) {
-      notify.error('Error changing password: ' + err.message);
+      notify.error('Error: ' + err.message);
     } finally {
       setChangingPassword(false);
     }
@@ -220,565 +160,353 @@ export default function SettingsView() {
     { id: 'backup', label: 'Backup', icon: 'database.svg' },
   ];
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
 
   return (
-    <div className="settings-view">
+    <div className="p-6">
       <PageHeader
         icon="settings.svg"
         title="System Settings"
-        subtitle="Manage system configuration and customization"
+        subtitle="Manage system configuration"
         actions={
-          <button 
-            className="btn-save"
-            onClick={handleSave}
-            disabled={saving}
-          >
-            <img src="/icon/save.svg" alt="Save" />
+          <Button onClick={handleSave} loading={saving}>
+            <img src="/icon/save.svg" alt="" className="w-4 h-4 icon-white" />
             {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+          </Button>
         }
       />
 
-      <div className="settings-container">
-        <div className="settings-tabs">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              className={`tab-item ${activeTab === tab.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <img src={`/icon/${tab.icon}`} alt={tab.label} />
-              <span>{tab.label}</span>
-            </button>
-          ))}
+      <div className="flex gap-6 mt-6">
+        {/* Sidebar Tabs */}
+        <div className="w-48 shrink-0">
+          <div className="flex flex-col gap-1">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-left",
+                  activeTab === tab.id
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted hover:bg-surface-secondary hover:text-primary"
+                )}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <img src={`/icon/${tab.icon}`} alt="" className={cn("w-4 h-4", activeTab === tab.id ? "icon-white" : "icon-gray")} />
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="settings-content">
-          {/* Account Settings */}
+        {/* Content */}
+        <div className="flex-1">
+          {/* Account */}
           {activeTab === 'account' && (
-            <div className="settings-section">
-              <h2>Account Settings</h2>
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-primary mb-6">Account Settings</h2>
               
-              <div className="account-info">
-                <div className="account-avatar">
+              <div className="flex items-center gap-4 p-4 bg-surface-secondary rounded-xl mb-6">
+                <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold">
                   {admin?.name?.charAt(0).toUpperCase() || 'A'}
                 </div>
-                <div className="account-details">
-                  <h3>{admin?.name || 'Admin'}</h3>
-                  <p>{admin?.email || 'admin@example.com'}</p>
-                  <span className="account-role">{admin?.role || 'admin'}</span>
+                <div>
+                  <h3 className="text-lg font-semibold text-primary">{admin?.name || 'Admin'}</h3>
+                  <p className="text-sm text-muted">{admin?.email || 'admin@example.com'}</p>
+                  <span className="inline-block mt-1 px-2 py-0.5 bg-primary/10 text-primary text-xs font-medium rounded">
+                    {admin?.role || 'admin'}
+                  </span>
                 </div>
               </div>
 
-              <div className="account-actions">
-                <div className="action-card" onClick={() => setShowPasswordForm(!showPasswordForm)}>
-                  <div className="action-icon">
-                    <img src="/icon/lock.svg" alt="Password" />
+              <div className="space-y-3">
+                <button
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border border-border hover:border-primary transition-colors text-left"
+                  onClick={() => setShowPasswordForm(!showPasswordForm)}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-surface-secondary flex items-center justify-center">
+                    <img src="/icon/lock.svg" alt="" className="w-5 h-5 icon-dark" />
                   </div>
-                  <div className="action-content">
-                    <h4>Change Password</h4>
-                    <p>Update your account password</p>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-primary">Change Password</h4>
+                    <p className="text-xs text-muted">Update your account password</p>
                   </div>
-                  <img 
-                    src="/icon/chevron-down.svg" 
-                    alt="Toggle" 
-                    className={`action-chevron ${showPasswordForm ? 'expanded' : ''}`}
-                  />
-                </div>
+                  <img src="/icon/chevron-down.svg" alt="" className={cn("w-5 h-5 transition-transform", showPasswordForm && "rotate-180")} />
+                </button>
 
                 {showPasswordForm && (
-                  <div className="password-form-container">
-                    <form onSubmit={handleChangePassword}>
-                      <div className="setting-group">
-                        <label>Current Password</label>
-                        <input
-                          type="password"
-                          value={passwordData.currentPassword}
-                          onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                          placeholder="Enter current password"
-                          required
-                        />
-                      </div>
-
-                      <div className="setting-group">
-                        <label>New Password</label>
-                        <input
-                          type="password"
-                          value={passwordData.newPassword}
-                          onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                          placeholder="Minimum 8 characters"
-                          required
-                        />
-                      </div>
-
-                      <div className="setting-group">
-                        <label>Confirm New Password</label>
-                        <input
-                          type="password"
-                          value={passwordData.confirmPassword}
-                          onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                          placeholder="Confirm new password"
-                          required
-                        />
-                      </div>
-
-                      <div className="password-form-actions">
-                        <button 
-                          type="button" 
-                          className="btn-secondary"
-                          onClick={() => {
-                            setShowPasswordForm(false);
-                            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-                          }}
-                        >
-                          Cancel
-                        </button>
-                        <button 
-                          type="submit" 
-                          className="btn-primary"
-                          disabled={changingPassword}
-                        >
-                          <img src="/icon/lock.svg" alt="Change" />
-                          {changingPassword ? 'Changing...' : 'Update Password'}
-                        </button>
-                      </div>
-                    </form>
-                  </div>
+                  <form onSubmit={handleChangePassword} className="p-4 bg-surface-secondary rounded-xl space-y-4">
+                    <Input
+                      label="Current Password"
+                      type="password"
+                      value={passwordData.currentPassword}
+                      onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                      required
+                    />
+                    <Input
+                      label="New Password"
+                      type="password"
+                      value={passwordData.newPassword}
+                      onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                      hint="Minimum 8 characters"
+                      required
+                    />
+                    <Input
+                      label="Confirm Password"
+                      type="password"
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      required
+                    />
+                    <div className="flex justify-end gap-3">
+                      <Button type="button" variant="secondary" onClick={() => setShowPasswordForm(false)}>Cancel</Button>
+                      <Button type="submit" loading={changingPassword}>Update Password</Button>
+                    </div>
+                  </form>
                 )}
 
-                <div className="action-card logout-card" onClick={logoutAdmin}>
-                  <div className="action-icon logout-icon">
-                    <img src="/icon/log-out.svg" alt="Logout" />
+                <button
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border border-destructive/30 hover:border-destructive hover:bg-destructive/5 transition-colors text-left"
+                  onClick={logoutAdmin}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
+                    <img src="/icon/log-out.svg" alt="" className="w-5 h-5" style={{ filter: 'invert(36%) sepia(76%) saturate(2696%) hue-rotate(338deg)' }} />
                   </div>
-                  <div className="action-content">
-                    <h4>Logout</h4>
-                    <p>End your current session</p>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-destructive">Logout</h4>
+                    <p className="text-xs text-muted">End your current session</p>
                   </div>
-                </div>
+                </button>
               </div>
-            </div>
+            </Card>
           )}
 
-          {/* System Settings */}
+          {/* System */}
           {activeTab === 'system' && (
-            <div className="settings-section">
-              <h2>System Settings</h2>
-              
-              <div className="setting-group">
-                <label>Website Name</label>
-                <input
-                  type="text"
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-primary mb-6">System Settings</h2>
+              <div className="space-y-6">
+                <Input
+                  label="Website Name"
                   value={settings?.system?.siteName || ''}
                   onChange={(e) => updateSetting('system', 'siteName', e.target.value)}
-                  placeholder="AI Authenticator"
+                />
+                <SettingToggle
+                  label="Maintenance Mode"
+                  description="Temporarily block user access"
+                  checked={settings?.system?.maintenanceMode || false}
+                  onChange={(checked) => updateSetting('system', 'maintenanceMode', checked)}
+                />
+                <SettingToggle
+                  label="Allow Registration"
+                  description="New users can create accounts"
+                  checked={settings?.system?.allowRegistration || false}
+                  onChange={(checked) => updateSetting('system', 'allowRegistration', checked)}
+                />
+                <SettingToggle
+                  label="Require Email Verification"
+                  description="Users must verify email before using"
+                  checked={settings?.system?.requireEmailVerification || false}
+                  onChange={(checked) => updateSetting('system', 'requireEmailVerification', checked)}
                 />
               </div>
-
-              <div className="setting-group">
-                <label className="toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={settings?.system?.maintenanceMode || false}
-                    onChange={(e) => updateSetting('system', 'maintenanceMode', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span className="toggle-text">
-                    Maintenance Mode
-                    <small>Temporarily block user access</small>
-                  </span>
-                </label>
-              </div>
-
-              <div className="setting-group">
-                <label className="toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={settings?.system?.allowRegistration || false}
-                    onChange={(e) => updateSetting('system', 'allowRegistration', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span className="toggle-text">
-                    Allow Registration
-                    <small>New users can create accounts</small>
-                  </span>
-                </label>
-              </div>
-
-              <div className="setting-group">
-                <label className="toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={settings?.system?.requireEmailVerification || false}
-                    onChange={(e) => updateSetting('system', 'requireEmailVerification', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span className="toggle-text">
-                    Require Email Verification
-                    <small>Users must verify email before using</small>
-                  </span>
-                </label>
-              </div>
-            </div>
+            </Card>
           )}
 
-          {/* Limits Settings */}
+          {/* Limits */}
           {activeTab === 'limits' && (
-            <div className="settings-section">
-              <h2>Usage Limits</h2>
-              
-              <div className="setting-group">
-                <label>Max Profiles per User</label>
-                <input
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-primary mb-6">Usage Limits</h2>
+              <div className="space-y-6">
+                <Input
+                  label="Max Profiles per User"
                   type="number"
                   value={settings?.limits?.maxProfilesPerUser || 10}
                   onChange={(e) => updateSetting('limits', 'maxProfilesPerUser', parseInt(e.target.value) || 10)}
-                  min="1"
-                  max="100"
+                  hint="Maximum writing profiles each user can create"
                 />
-                <small>Maximum number of writing profiles each user can create</small>
-              </div>
-
-              <div className="setting-group">
-                <label>Max Analyses per Day</label>
-                <input
+                <Input
+                  label="Max Analyses per Day"
                   type="number"
                   value={settings?.limits?.maxAnalysesPerDay || 100}
                   onChange={(e) => updateSetting('limits', 'maxAnalysesPerDay', parseInt(e.target.value) || 100)}
-                  min="1"
-                  max="1000"
                 />
-                <small>Maximum text analyses per day</small>
-              </div>
-
-              <div className="setting-group">
-                <label>Max Rewrites per Day</label>
-                <input
+                <Input
+                  label="Max Rewrites per Day"
                   type="number"
                   value={settings?.limits?.maxRewritesPerDay || 50}
                   onChange={(e) => updateSetting('limits', 'maxRewritesPerDay', parseInt(e.target.value) || 50)}
-                  min="1"
-                  max="1000"
                 />
-                <small>Maximum text rewrites per day</small>
-              </div>
-
-              <div className="setting-group">
-                <label>Max File Size (MB)</label>
-                <input
+                <Input
+                  label="Max File Size (MB)"
                   type="number"
                   value={settings?.limits?.maxFileSize || 5}
                   onChange={(e) => updateSetting('limits', 'maxFileSize', parseInt(e.target.value) || 5)}
-                  min="1"
-                  max="50"
                 />
-                <small>Maximum file upload size</small>
               </div>
-            </div>
+            </Card>
           )}
 
-          {/* Features Settings */}
+          {/* Features */}
           {activeTab === 'features' && (
-            <div className="settings-section">
-              <h2>Features</h2>
-              
-              <div className="setting-group">
-                <label className="toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={settings?.features?.enableAnalytics || false}
-                    onChange={(e) => updateSetting('features', 'enableAnalytics', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span className="toggle-text">
-                    Enable Analytics
-                    <small>Collect and display usage statistics</small>
-                  </span>
-                </label>
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-primary mb-6">Features</h2>
+              <div className="space-y-6">
+                <SettingToggle
+                  label="Enable Analytics"
+                  description="Collect and display usage statistics"
+                  checked={settings?.features?.enableAnalytics || false}
+                  onChange={(checked) => updateSetting('features', 'enableAnalytics', checked)}
+                />
+                <SettingToggle
+                  label="Enable Notifications"
+                  description="Allow sending notifications to users"
+                  checked={settings?.features?.enableNotifications || false}
+                  onChange={(checked) => updateSetting('features', 'enableNotifications', checked)}
+                />
+                <SettingToggle
+                  label="Enable Support"
+                  description="Users can send support requests"
+                  checked={settings?.features?.enableSupport || false}
+                  onChange={(checked) => updateSetting('features', 'enableSupport', checked)}
+                />
+                <SettingToggle
+                  label="Auto Backup"
+                  description="Automatically backup data daily"
+                  checked={settings?.features?.enableAutoBackup || false}
+                  onChange={(checked) => updateSetting('features', 'enableAutoBackup', checked)}
+                />
               </div>
-
-              <div className="setting-group">
-                <label className="toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={settings?.features?.enableNotifications || false}
-                    onChange={(e) => updateSetting('features', 'enableNotifications', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span className="toggle-text">
-                    Enable Notifications
-                    <small>Allow sending notifications to users</small>
-                  </span>
-                </label>
-              </div>
-
-              <div className="setting-group">
-                <label className="toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={settings?.features?.enableSupport || false}
-                    onChange={(e) => updateSetting('features', 'enableSupport', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span className="toggle-text">
-                    Enable Support
-                    <small>Users can send support requests</small>
-                  </span>
-                </label>
-              </div>
-
-              <div className="setting-group">
-                <label className="toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={settings?.features?.enableAutoBackup || false}
-                    onChange={(e) => updateSetting('features', 'enableAutoBackup', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span className="toggle-text">
-                    Auto Backup
-                    <small>Automatically backup data daily</small>
-                  </span>
-                </label>
-              </div>
-            </div>
+            </Card>
           )}
 
-          {/* Email Settings */}
+          {/* Email */}
           {activeTab === 'email' && (
-            <div className="settings-section">
-              <h2>Email Configuration</h2>
-              
-              <div className="setting-group">
-                <label>SMTP Host</label>
-                <input
-                  type="text"
-                  value={settings?.email?.smtpHost || ''}
-                  onChange={(e) => updateSetting('email', 'smtpHost', e.target.value)}
-                  placeholder="smtp.gmail.com"
-                />
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-primary mb-6">Email Configuration</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <Input label="SMTP Host" value={settings?.email?.smtpHost || ''} onChange={(e) => updateSetting('email', 'smtpHost', e.target.value)} placeholder="smtp.gmail.com" />
+                <Input label="SMTP Port" type="number" value={settings?.email?.smtpPort || 587} onChange={(e) => updateSetting('email', 'smtpPort', parseInt(e.target.value) || 587)} />
+                <Input label="SMTP Username" value={settings?.email?.smtpUser || ''} onChange={(e) => updateSetting('email', 'smtpUser', e.target.value)} />
+                <Input label="SMTP Password" type="password" value={settings?.email?.smtpPassword || ''} onChange={(e) => updateSetting('email', 'smtpPassword', e.target.value)} />
+                <Input label="From Email" type="email" value={settings?.email?.fromEmail || ''} onChange={(e) => updateSetting('email', 'fromEmail', e.target.value)} />
+                <Input label="From Name" value={settings?.email?.fromName || ''} onChange={(e) => updateSetting('email', 'fromName', e.target.value)} />
               </div>
-
-              <div className="setting-group">
-                <label>SMTP Port</label>
-                <input
-                  type="number"
-                  value={settings?.email?.smtpPort || 587}
-                  onChange={(e) => updateSetting('email', 'smtpPort', parseInt(e.target.value) || 587)}
-                  placeholder="587"
-                />
-              </div>
-
-              <div className="setting-group">
-                <label>SMTP Username</label>
-                <input
-                  type="text"
-                  value={settings?.email?.smtpUser || ''}
-                  onChange={(e) => updateSetting('email', 'smtpUser', e.target.value)}
-                  placeholder="your-email@gmail.com"
-                />
-              </div>
-
-              <div className="setting-group">
-                <label>SMTP Password</label>
-                <input
-                  type="password"
-                  value={settings?.email?.smtpPassword || ''}
-                  onChange={(e) => updateSetting('email', 'smtpPassword', e.target.value)}
-                  placeholder="••••••••"
-                />
-              </div>
-
-              <div className="setting-group">
-                <label>From Email</label>
-                <input
-                  type="email"
-                  value={settings?.email?.fromEmail || ''}
-                  onChange={(e) => updateSetting('email', 'fromEmail', e.target.value)}
-                  placeholder="noreply@example.com"
-                />
-              </div>
-
-              <div className="setting-group">
-                <label>From Name</label>
-                <input
-                  type="text"
-                  value={settings?.email?.fromName || ''}
-                  onChange={(e) => updateSetting('email', 'fromName', e.target.value)}
-                  placeholder="AI Authenticator"
-                />
-              </div>
-
-              <button className="btn-test">
-                <img src="/icon/send.svg" alt="Test" />
+              <Button variant="secondary" className="mt-4">
+                <img src="/icon/send.svg" alt="" className="w-4 h-4 icon-dark" />
                 Send Test Email
-              </button>
-            </div>
+              </Button>
+            </Card>
           )}
 
-          {/* Security Settings */}
+          {/* Security */}
           {activeTab === 'security' && (
-            <div className="settings-section">
-              <h2>Security</h2>
-              
-              <div className="setting-group">
-                <label>Session Timeout (hours)</label>
-                <input
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-primary mb-6">Security</h2>
+              <div className="space-y-6">
+                <Input
+                  label="Session Timeout (hours)"
                   type="number"
                   value={settings?.security?.sessionTimeout || 24}
                   onChange={(e) => updateSetting('security', 'sessionTimeout', parseInt(e.target.value) || 24)}
-                  min="1"
-                  max="168"
+                  hint="Auto logout time when inactive"
                 />
-                <small>Auto logout time when inactive</small>
-              </div>
-
-              <div className="setting-group">
-                <label>Max Login Attempts</label>
-                <input
+                <Input
+                  label="Max Login Attempts"
                   type="number"
                   value={settings?.security?.maxLoginAttempts || 5}
                   onChange={(e) => updateSetting('security', 'maxLoginAttempts', parseInt(e.target.value) || 5)}
-                  min="3"
-                  max="10"
+                  hint="Lock account after failed attempts"
                 />
-                <small>Lock account after failed login attempts</small>
+                <SettingToggle
+                  label="Require Strong Password"
+                  description="Must have uppercase, numbers and special characters"
+                  checked={settings?.security?.requireStrongPassword || false}
+                  onChange={(checked) => updateSetting('security', 'requireStrongPassword', checked)}
+                />
+                <SettingToggle
+                  label="Two-Factor Authentication"
+                  description="Require OTP code when logging in"
+                  checked={settings?.security?.enableTwoFactor || false}
+                  onChange={(checked) => updateSetting('security', 'enableTwoFactor', checked)}
+                />
               </div>
-
-              <div className="setting-group">
-                <label className="toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={settings?.security?.requireStrongPassword || false}
-                    onChange={(e) => updateSetting('security', 'requireStrongPassword', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span className="toggle-text">
-                    Require Strong Password
-                    <small>Password must have uppercase, numbers and special characters</small>
-                  </span>
-                </label>
-              </div>
-
-              <div className="setting-group">
-                <label className="toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={settings?.security?.enableTwoFactor || false}
-                    onChange={(e) => updateSetting('security', 'enableTwoFactor', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span className="toggle-text">
-                    Two-Factor Authentication
-                    <small>Require OTP code when logging in</small>
-                  </span>
-                </label>
-              </div>
-            </div>
+            </Card>
           )}
 
-          {/* Backup Settings */}
+          {/* Backup */}
           {activeTab === 'backup' && (
-            <div className="settings-section">
-              <h2>Backup & Restore</h2>
-              
-              <div className="backup-actions">
-                <div className="backup-card">
-                  <img src="/icon/database.svg" alt="Backup" />
-                  <h3>Firestore Backup to Cloud Storage</h3>
-                  <p>Backup all Firestore data to Google Cloud Storage</p>
-                  <button 
-                    className="btn-primary"
-                    onClick={handleBackupNow}
-                    disabled={backingUp}
-                  >
-                    <img src="/icon/download.svg" alt="Backup" />
-                    {backingUp ? 'Creating Backup...' : 'Create Backup Now'}
-                  </button>
+            <div className="space-y-6">
+              <Card className="p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-surface-secondary flex items-center justify-center">
+                    <img src="/icon/database.svg" alt="" className="w-6 h-6 icon-dark" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-primary">Firestore Backup</h3>
+                    <p className="text-sm text-muted">Backup all data to Cloud Storage</p>
+                  </div>
+                  <Button onClick={handleBackupNow} loading={backingUp}>
+                    <img src="/icon/download.svg" alt="" className="w-4 h-4 icon-white" />
+                    {backingUp ? 'Creating...' : 'Create Backup'}
+                  </Button>
                 </div>
-              </div>
+              </Card>
 
-              <div className="backup-history">
-                <h3>Recent Backups (Cloud Storage)</h3>
+              <Card className="p-6">
+                <h3 className="font-semibold text-primary mb-4">Recent Backups</h3>
                 {backupList.length === 0 ? (
-                  <p className="no-data">No backups found. Click "Create Backup Now" to start.</p>
+                  <p className="text-sm text-muted text-center py-8">No backups found</p>
                 ) : (
-                  <div className="history-list">
+                  <div className="space-y-2">
                     {backupList.slice(0, 10).map((backup, index) => (
-                      <div key={index} className="history-item">
-                        <img src="/icon/check-circle.svg" alt="Success" />
-                        <div className="history-info">
-                          <span className="history-name">{backup.name}</span>
-                          <span className="history-date">
-                            {new Date(backup.created).toLocaleString()}
-                          </span>
+                      <div key={index} className="flex items-center gap-3 p-3 bg-surface-secondary rounded-lg">
+                        <img src="/icon/check-circle.svg" alt="" className="w-5 h-5 text-success" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-primary truncate">{backup.name}</div>
+                          <div className="text-xs text-muted">{new Date(backup.created).toLocaleString()}</div>
                         </div>
-                        <span className="history-size">
-                          {(parseInt(backup.size) / 1024 / 1024).toFixed(2)} MB
-                        </span>
-                        <button 
-                          className="btn-icon"
-                          title="Download backup directly"
-                          onClick={() => handleDownloadBackup(backup.name)}
-                        >
-                          <img src="/icon/download.svg" alt="Download" />
-                        </button>
+                        <span className="text-xs text-muted">{(parseInt(backup.size) / 1024 / 1024).toFixed(2)} MB</span>
+                        <Button variant="ghost" size="sm" onClick={() => handleDownloadBackup(backup.name)}>
+                          <img src="/icon/download.svg" alt="" className="w-4 h-4" />
+                        </Button>
                       </div>
                     ))}
                   </div>
                 )}
-              </div>
+              </Card>
 
-              <div className="backup-info">
-                <h3>
-                  <img src="/icon/info.svg" alt="Info" />
+              <Card className="p-6 bg-surface-secondary">
+                <h3 className="font-semibold text-primary mb-3 flex items-center gap-2">
+                  <img src="/icon/info.svg" alt="" className="w-5 h-5" />
                   Backup Information
                 </h3>
-                <ul>
-                  <li>
-                    <img src="/icon/check-circle.svg" alt="" />
-                    Backups stored in Google Cloud Storage bucket
-                  </li>
-                  <li>
-                    <img src="/icon/refresh-cw.svg" alt="" />
-                    Automatic backup runs every 24 hours
-                  </li>
-                  <li>
-                    <img src="/icon/mail.svg" alt="" />
-                    Download link sent to your email after each backup
-                  </li>
-                  <li>
-                    <img src="/icon/trash-2.svg" alt="" />
-                    Old backups automatically cleaned up (keeps 30 most recent)
-                  </li>
-                  <li>
-                    <img src="/icon/database.svg" alt="" />
-                    Backup includes: users, notifications, support tickets, voice profiles
-                  </li>
-                  <li>
-                    <img src="/icon/dollar-sign.svg" alt="" />
-                    Storage cost: ~$0.02/GB/month (very cheap!)
-                  </li>
-                  <li>
-                    <img src="/icon/lightbulb.svg" alt="" />
-                    <strong>Tip:</strong> Public URL never expires - Save to your personal Google Drive
-                  </li>
+                <ul className="space-y-2 text-sm text-muted">
+                  <li className="flex items-center gap-2"><img src="/icon/check-circle.svg" alt="" className="w-4 h-4" /> Stored in Google Cloud Storage</li>
+                  <li className="flex items-center gap-2"><img src="/icon/refresh-cw.svg" alt="" className="w-4 h-4" /> Auto backup every 24 hours</li>
+                  <li className="flex items-center gap-2"><img src="/icon/trash-2.svg" alt="" className="w-4 h-4" /> Keeps 30 most recent backups</li>
+                  <li className="flex items-center gap-2"><img src="/icon/dollar-sign.svg" alt="" className="w-4 h-4" /> ~$0.02/GB/month</li>
                 </ul>
-              </div>
+              </Card>
             </div>
           )}
         </div>
       </div>
 
-      {/* Backup Success Modal */}
       {showBackupModal && backupResult && (
-        <BackupSuccessModal 
-          backupInfo={backupResult}
-          onClose={() => setShowBackupModal(false)}
-        />
+        <BackupSuccessModal backupInfo={backupResult} onClose={() => setShowBackupModal(false)} />
       )}
+    </div>
+  );
+}
+
+function SettingToggle({ label, description, checked, onChange }) {
+  return (
+    <div className="flex items-center justify-between py-3 border-b border-border last:border-b-0">
+      <div>
+        <div className="font-medium text-primary">{label}</div>
+        {description && <div className="text-xs text-muted mt-0.5">{description}</div>}
+      </div>
+      <Switch checked={checked} onCheckedChange={onChange} />
     </div>
   );
 }

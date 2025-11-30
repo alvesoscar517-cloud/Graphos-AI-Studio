@@ -17,8 +17,7 @@ function validateConfig() {
   
   if (IS_PRODUCTION) {
     const required = [
-      'GOOGLE_CLOUD_PROJECT',
-      'ADMIN_KEY'
+      'GOOGLE_CLOUD_PROJECT'
     ]
     
     const missing = required.filter(key => !process.env[key])
@@ -26,12 +25,6 @@ function validateConfig() {
     if (missing.length > 0) {
       warnings.push(`Missing environment variables: ${missing.join(', ')}`);
       console.error(`[CONFIG WARNING] Missing required environment variables: ${missing.join(', ')}`);
-    }
-    
-    // Validate admin key is not default
-    if (process.env.ADMIN_KEY === 'your-secure-admin-key-here') {
-      warnings.push('ADMIN_KEY is set to default value');
-      console.error('[CONFIG WARNING] ADMIN_KEY must be changed from default value in production');
     }
   }
   
@@ -82,7 +75,6 @@ module.exports = {
   MAX_TEXT_LENGTH: 20000,
   
   // Admin
-  ADMIN_KEY: process.env.ADMIN_KEY || (IS_PRODUCTION ? null : 'dev-admin-key-123'),
   ADMIN_PANEL_URL: process.env.ADMIN_PANEL_URL || 'https://your-domain.com/admin',
   
   // Email (if using)

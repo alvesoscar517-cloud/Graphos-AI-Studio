@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { isDevMode, DEV_CONFIG, resetDevEnvironment, devLog } from '../../utils/devConfig'
-import './DevModeToggle.css'
+// CSS migrated to Tailwind
 
 /**
  * Dev Mode Toggle Component

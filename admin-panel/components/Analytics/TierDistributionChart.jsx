@@ -1,128 +1,122 @@
-import './TierDistributionChart.css';
+/**
+ * Tier/Credit Distribution Chart using Recharts
+ * Shows user distribution by credit balance
+ */
+
+import { useMemo } from 'react'
+import { PieChart, BarChart } from '../ui/charts'
+
+const CREDIT_TIERS = [
+  { 
+    key: 'noCredits',
+    name: 'Hết credits', 
+    color: '#ef4444',
+    icon: 'alert-circle'
+  },
+  { 
+    key: 'low',
+    name: 'Thấp (1-50)', 
+    color: '#f59e0b',
+    icon: 'trending-down'
+  },
+  { 
+    key: 'medium',
+    name: 'Trung bình (51-200)', 
+    color: '#3b82f6',
+    icon: 'minus'
+  },
+  { 
+    key: 'high',
+    name: 'Cao (200+)', 
+    color: '#22c55e',
+    icon: 'trending-up'
+  }
+]
 
 export default function TierDistributionChart({ data }) {
-  // Support both old tierDistribution and new creditDistribution format
-  const isCreditsData = data.noCredits !== undefined || data.low !== undefined;
-  
-  if (isCreditsData) {
-    const total = (data.noCredits || 0) + (data.low || 0) + (data.medium || 0) + (data.high || 0);
-
-    if (total === 0) {
-      return (
-        <div className="chart-empty">
-          <img src="/icon/inbox.svg" alt="Empty" className="chart-empty-icon" />
-          <p className="chart-empty-text">No user data available</p>
-        </div>
-      );
-    }
-
-    const segments = [
-      { 
-        name: 'No Credits', 
-        count: data.noCredits || 0, 
-        gradient: 'linear-gradient(135deg, #ef9a9a 0%, #e57373 100%)',
-        icon: 'alert-circle'
-      },
-      { 
-        name: 'Low (1-50)', 
-        count: data.low || 0, 
-        gradient: 'linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%)',
-        icon: 'trending-down'
-      },
-      { 
-        name: 'Medium (51-200)', 
-        count: data.medium || 0, 
-        gradient: 'linear-gradient(135deg, #b3e5fc 0%, #81d4fa 100%)',
-        icon: 'minus'
-      },
-      { 
-        name: 'High (200+)', 
-        count: data.high || 0, 
-        gradient: 'linear-gradient(135deg, #a5d6a7 0%, #81c784 100%)',
-        icon: 'trending-up'
+  const { chartData, total, isCreditsData } = useMemo(() => {
+    // Support both old tierDistribution and new creditDistribution format
+    const isCredits = data.noCredits !== undefined || data.low !== undefined
+    
+    if (isCredits) {
+      const items = CREDIT_TIERS.map(tier => ({
+        name: tier.name,
+        value: data[tier.key] || 0,
+        color: tier.color,
+        icon: tier.icon,
+      })).filter(item => item.value > 0)
+      
+      return {
+        chartData: items,
+        total: items.reduce((sum, item) => sum + item.value, 0),
+        isCreditsData: true,
       }
-    ];
-
-    return (
-      <div className="tier-distribution-container">
-        <div className="tier-bars-container">
-          {segments.map((segment, index) => {
-            const percentage = ((segment.count / total) * 100).toFixed(1);
-            return (
-              <div key={index} className="tier-row">
-                <div className="tier-info">
-                  <img 
-                    src={`/icon/${segment.icon}.svg`} 
-                    alt={segment.name}
-                    className="tier-icon"
-                  />
-                  <span className="tier-name">{segment.name}</span>
-                  <span className="tier-count">{segment.count.toLocaleString()}</span>
-                </div>
-                <div className="tier-bar-track">
-                  <div 
-                    className="tier-bar-fill"
-                    style={{
-                      width: `${percentage}%`,
-                      background: segment.gradient
-                    }}
-                  >
-                    <span className="tier-percentage">{percentage}%</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="tier-summary">
-          <span className="tier-summary-label">Total Users</span>
-          <span className="tier-summary-value">{total.toLocaleString()}</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Fallback for old tier data format (free/premium/enterprise)
-  const total = (data.free || 0) + (data.premium || 0) + (data.enterprise || 0);
+    }
+    
+    // Fallback for old tier data format
+    const items = [
+      { name: 'Free', value: data.free || 0, color: '#3b82f6' },
+      { name: 'Premium', value: data.premium || 0, color: '#22c55e' },
+      { name: 'Enterprise', value: data.enterprise || 0, color: '#8b5cf6' },
+    ].filter(item => item.value > 0)
+    
+    return {
+      chartData: items,
+      total: items.reduce((sum, item) => sum + item.value, 0),
+      isCreditsData: false,
+    }
+  }, [data])
 
   if (total === 0) {
     return (
-      <div className="chart-empty">
-        <img src="/icon/inbox.svg" alt="Empty" className="chart-empty-icon" />
-        <p className="chart-empty-text">No user data available</p>
+      <div className="flex flex-col items-center justify-center py-12 text-muted">
+        <img src="/icon/inbox.svg" alt="Empty" className="w-12 h-12 mb-3 icon-gray" />
+        <p className="text-sm">Không có dữ liệu người dùng</p>
       </div>
-    );
+    )
   }
 
-  // Show all users as single category since system only has credits-based users
   return (
-    <div className="tier-distribution-container">
-      <div className="tier-bars-container">
-        <div className="tier-row">
-          <div className="tier-info">
-            <img src="/icon/users.svg" alt="Users" className="tier-icon" />
-            <span className="tier-name">All Users</span>
-            <span className="tier-count">{total.toLocaleString()}</span>
-          </div>
-          <div className="tier-bar-track">
-            <div 
-              className="tier-bar-fill"
-              style={{
-                width: '100%',
-                background: 'linear-gradient(135deg, #b3e5fc 0%, #81d4fa 100%)'
-              }}
-            >
-              <span className="tier-percentage">100%</span>
+    <div className="w-full">
+      {/* Pie Chart */}
+      <PieChart
+        data={chartData}
+        dataKey="value"
+        nameKey="name"
+        height={240}
+        colors={chartData.map(d => d.color)}
+        donut
+        showLabel={false}
+        showLegend={false}
+      />
+
+      {/* Legend with details */}
+      <div className="mt-4 space-y-2">
+        {chartData.map((item, index) => {
+          const percentage = ((item.value / total) * 100).toFixed(1)
+          return (
+            <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-surface-secondary">
+              <div className="flex items-center gap-2">
+                <div 
+                  className="w-3 h-3 rounded-full" 
+                  style={{ backgroundColor: item.color }}
+                />
+                <span className="text-sm font-medium text-primary">{item.name}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted">{item.value.toLocaleString()}</span>
+                <span className="text-xs font-medium text-primary w-12 text-right">{percentage}%</span>
+              </div>
             </div>
-          </div>
-        </div>
+          )
+        })}
       </div>
 
-      <div className="tier-summary">
-        <span className="tier-summary-label">Total Users</span>
-        <span className="tier-summary-value">{total.toLocaleString()}</span>
+      {/* Total */}
+      <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+        <span className="text-sm text-muted">Tổng người dùng</span>
+        <span className="text-lg font-semibold text-primary">{total.toLocaleString()}</span>
       </div>
     </div>
-  );
+  )
 }

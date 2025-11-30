@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usersApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Select } from '../ui/select';
+import { StatusBadge, Badge } from '../ui/badge';
 import LoadingScreen from '../Common/LoadingScreen';
-import CustomSelect from '../Common/CustomSelect';
-import './UserDetail.css';
+import PageHeader from '../Common/PageHeader';
 
 export default function UserDetail() {
   const { id } = useParams();
@@ -46,8 +49,6 @@ export default function UserDetail() {
     }
   };
 
-
-
   const handleEditUser = async () => {
     try {
       await usersApi.update(id, editData);
@@ -85,11 +86,7 @@ export default function UserDetail() {
     }
   };
 
-
-
   const handleLockUser = async () => {
-    console.log('[UserDetail] handleLockUser called', { userId: id, currentLocked: user.locked });
-    
     const confirmed = await notify.confirm({
       title: user.locked ? 'Unlock Account' : 'Lock Account',
       message: `Are you sure you want to ${user.locked ? 'unlock' : 'lock'} this account?`,
@@ -97,7 +94,6 @@ export default function UserDetail() {
       type: 'warning'
     });
 
-    console.log('[UserDetail] Lock confirmation result:', confirmed);
     if (!confirmed) return;
 
     let reason = null;
@@ -108,25 +104,19 @@ export default function UserDetail() {
         placeholder: 'E.g., Terms of service violation',
         confirmText: 'Lock'
       });
-      console.log('[UserDetail] Lock reason:', reason);
       if (!reason) return;
     }
 
     try {
-      console.log('[UserDetail] Calling toggleLock API...', { id, locked: !user.locked, reason });
-      const result = await usersApi.toggleLock(id, !user.locked, reason);
-      console.log('[UserDetail] toggleLock API result:', result);
+      await usersApi.toggleLock(id, !user.locked, reason);
       notify.success(`Account ${user.locked ? 'unlocked' : 'locked'} successfully!`);
       loadUser();
     } catch (err) {
-      console.error('[UserDetail] toggleLock error:', err);
       notify.error('Error: ' + err.message);
     }
   };
 
   const handleDeleteUser = async () => {
-    console.log('[UserDetail] handleDeleteUser called', { userId: id });
-    
     const confirmed = await notify.confirm({
       title: 'Delete User',
       message: 'Are you sure you want to DELETE this user?\n\nThis action cannot be undone!',
@@ -134,7 +124,6 @@ export default function UserDetail() {
       type: 'danger'
     });
 
-    console.log('[UserDetail] Delete confirmation result:', confirmed);
     if (!confirmed) return;
 
     const confirmation = await notify.prompt({
@@ -144,20 +133,16 @@ export default function UserDetail() {
       confirmText: 'Delete'
     });
 
-    console.log('[UserDetail] Delete confirmation text:', confirmation);
     if (confirmation !== 'DELETE') {
       notify.warning('Incorrect confirmation. Action cancelled.');
       return;
     }
 
     try {
-      console.log('[UserDetail] Calling delete API...', { id });
-      const result = await usersApi.delete(id);
-      console.log('[UserDetail] Delete API result:', result);
+      await usersApi.delete(id);
       notify.success('User deleted successfully!');
       navigate('/users');
     } catch (err) {
-      console.error('[UserDetail] Delete error:', err);
       notify.error('Error: ' + err.message);
     }
   };
@@ -170,24 +155,15 @@ export default function UserDetail() {
 
     try {
       setSendingNotification(true);
-      
-      // Send with English content, backend will auto-translate based on user's language
-      const payload = {
+      await usersApi.sendNotification(id, {
         type: notificationData.type,
         priority: notificationData.priority,
         title: notificationData.title,
         message: notificationData.message
-      };
-      
-      await usersApi.sendNotification(id, payload);
+      });
       notify.success('Notification sent successfully!');
       setShowNotificationModal(false);
-      setNotificationData({
-        type: 'info',
-        priority: 'medium',
-        title: '',
-        message: ''
-      });
+      setNotificationData({ type: 'info', priority: 'medium', title: '', message: '' });
     } catch (err) {
       notify.error('Error: ' + err.message);
     } finally {
@@ -195,301 +171,227 @@ export default function UserDetail() {
     }
   };
 
-
-
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  if (!user) {
-    return <div className="error">User not found</div>;
-  }
+  if (loading) return <LoadingScreen />;
+  if (!user) return <div className="p-6 text-destructive">User not found</div>;
 
   return (
-    <div className="user-detail">
-      <div className="detail-header">
-        <button className="btn-back" onClick={() => navigate('/users')}>
-          <img src="/icon/arrow-left.svg" alt="Back" />
-          Back
-        </button>
-        <div className="header-title">
-          <img src="/icon/user.svg" alt="User" />
-          <h1>User Details</h1>
-        </div>
-      </div>
+    <div className="p-6">
+      <PageHeader
+        icon="user.svg"
+        title="User Details"
+        actions={
+          <button
+            onClick={() => navigate('/users')}
+            className="flex items-center gap-2 px-3 py-2 text-muted hover:text-primary hover:bg-surface-secondary rounded-lg transition-colors"
+          >
+            <img src="/icon/arrow-left.svg" alt="" className="w-4 h-4 icon-gray" />
+            <span className="text-sm">Back to Users</span>
+          </button>
+        }
+      />
 
-      <div className="detail-grid">
-        {/* User Info Card */}
-        <div className="detail-card">
-          <h2>Basic Information</h2>
-          <div className="user-avatar-large">
-            {user.name?.charAt(0).toUpperCase() || '?'}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        {/* Basic Information */}
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <img src="/icon/user.svg" alt="" className="w-5 h-5 icon-dark" />
+            Basic Information
+          </h2>
+          <div className="flex flex-col items-center mb-6">
+            <div className="w-20 h-20 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-3xl font-bold">
+              {user.name?.charAt(0).toUpperCase() || '?'}
+            </div>
           </div>
-          <div className="info-list">
-            <div className="info-item">
-              <span className="info-label">Name:</span>
-              <span className="info-value">{user.name || 'N/A'}</span>
+          <div className="space-y-3">
+            <div className="flex justify-between py-2 border-b border-border">
+              <span className="text-muted">Name</span>
+              <span className="font-medium">{user.name || 'N/A'}</span>
             </div>
-            <div className="info-item">
-              <span className="info-label">Email:</span>
-              <span className="info-value">{user.email || 'N/A'}</span>
+            <div className="flex justify-between py-2 border-b border-border">
+              <span className="text-muted">Email</span>
+              <span className="font-medium">{user.email || 'N/A'}</span>
             </div>
-            <div className="info-item">
-              <span className="info-label">ID:</span>
-              <span className="info-value user-id">{user.id}</span>
+            <div className="flex justify-between py-2 border-b border-border">
+              <span className="text-muted">ID</span>
+              <span className="font-mono text-xs bg-surface-secondary px-2 py-1 rounded">{user.id}</span>
             </div>
-            <div className="info-item">
-              <span className="info-label">Created:</span>
-              <span className="info-value">
-                {new Date(user.createdAt).toLocaleString('en-US')}
-              </span>
+            <div className="flex justify-between py-2 border-b border-border">
+              <span className="text-muted">Created</span>
+              <span className="font-medium">{new Date(user.createdAt).toLocaleString('en-US')}</span>
             </div>
-            <div className="info-item">
-              <span className="info-label">Status:</span>
-              <span className={`status-indicator ${user.locked ? 'locked' : 'active'}`}>
+            <div className="flex justify-between py-2">
+              <span className="text-muted">Status</span>
+              <StatusBadge status={user.locked ? 'suspended' : 'active'}>
                 {user.locked ? 'Locked' : 'Active'}
-              </span>
+              </StatusBadge>
             </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Right Column: Credits + Usage Stats */}
-        <div className="detail-card">
-          <h2>
-            <img src="/icon/dollar-sign.svg" alt="Credits" />
+        {/* Credits */}
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <img src="/icon/dollar-sign.svg" alt="" className="w-5 h-5 icon-dark" />
             Credits
           </h2>
-          <div className="credits-display">
-            <div className="credits-balance">
-              <span className="credits-number">{user.credits?.balance || 0}</span>
-              <span className="credits-label">Available</span>
+          <div className="text-center mb-6">
+            <div className="text-4xl font-bold text-primary">{user.credits?.balance || 0}</div>
+            <div className="text-muted text-sm">Available Credits</div>
+          </div>
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="text-center p-3 bg-surface-secondary rounded-lg">
+              <div className="text-xl font-semibold text-success">{user.credits?.purchased || 0}</div>
+              <div className="text-xs text-muted">Purchased</div>
             </div>
-            <div className="credits-stats">
-              <div className="credit-stat">
-                <span className="stat-value">{user.credits?.purchased || 0}</span>
-                <span className="stat-label">Purchased</span>
-              </div>
-              <div className="credit-stat">
-                <span className="stat-value">{user.credits?.bonus || 0}</span>
-                <span className="stat-label">Bonus</span>
-              </div>
-              <div className="credit-stat">
-                <span className="stat-value">{user.credits?.used || 0}</span>
-                <span className="stat-label">Used</span>
-              </div>
+            <div className="text-center p-3 bg-surface-secondary rounded-lg">
+              <div className="text-xl font-semibold text-info">{user.credits?.bonus || 0}</div>
+              <div className="text-xs text-muted">Bonus</div>
+            </div>
+            <div className="text-center p-3 bg-surface-secondary rounded-lg">
+              <div className="text-xl font-semibold text-muted">{user.credits?.used || 0}</div>
+              <div className="text-xs text-muted">Used</div>
             </div>
           </div>
-          <button className="btn-adjust-credits" onClick={() => setShowCreditsModal(true)}>
-            <img src="/icon/plus-circle.svg" alt="Adjust" />
+          <Button variant="secondary" className="w-full" onClick={() => setShowCreditsModal(true)}>
+            <img src="/icon/plus-circle.svg" alt="" className="w-4 h-4 icon-dark" />
             Adjust Credits
-          </button>
-        </div>
+          </Button>
+        </Card>
 
-        {/* Usage Stats Card */}
-        <div className="detail-card full-width">
-          <h2>
-            <img src="/icon/chart-bar.svg" alt="Stats" />
+        {/* Usage Statistics */}
+        <Card className="p-6 lg:col-span-2">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <img src="/icon/bar-chart-2.svg" alt="" className="w-5 h-5 icon-dark" />
             Usage Statistics
           </h2>
-          <div className="stats-grid">
-            <div className="stat-box">
-              <img src="/icon/folder.svg" alt="Profiles" className="stat-icon" />
-              <div className="stat-content">
-                <div className="stat-value">{user.usage?.profilesCount || 0}</div>
-                <div className="stat-label">Profiles</div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="flex items-center gap-4 p-4 bg-surface-secondary rounded-lg">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <img src="/icon/folder.svg" alt="" className="w-6 h-6 icon-dark" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{user.usage?.profilesCount || 0}</div>
+                <div className="text-sm text-muted">Profiles</div>
               </div>
             </div>
-            <div className="stat-box">
-              <img src="/icon/search.svg" alt="Analyses" className="stat-icon" />
-              <div className="stat-content">
-                <div className="stat-value">{user.usage?.analysesCount || 0}</div>
-                <div className="stat-label">Analyses</div>
+            <div className="flex items-center gap-4 p-4 bg-surface-secondary rounded-lg">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <img src="/icon/search.svg" alt="" className="w-6 h-6 icon-dark" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{user.usage?.analysesCount || 0}</div>
+                <div className="text-sm text-muted">Analyses</div>
               </div>
             </div>
-            <div className="stat-box">
-              <img src="/icon/edit.svg" alt="Rewrites" className="stat-icon" />
-              <div className="stat-content">
-                <div className="stat-value">{user.usage?.rewritesCount || 0}</div>
-                <div className="stat-label">Rewrites</div>
+            <div className="flex items-center gap-4 p-4 bg-surface-secondary rounded-lg">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <img src="/icon/edit.svg" alt="" className="w-6 h-6 icon-dark" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{user.usage?.rewritesCount || 0}</div>
+                <div className="text-sm text-muted">Rewrites</div>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Profiles Card */}
-        <div className="detail-card full-width">
-          <h2>
-            <img src="/icon/folder.svg" alt="Profiles" />
+        {/* Writing Profiles */}
+        <Card className="p-6 lg:col-span-2">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <img src="/icon/folder.svg" alt="" className="w-5 h-5 icon-dark" />
             Writing Profiles ({user.profiles?.length || 0})
           </h2>
           {user.profiles && user.profiles.length > 0 ? (
-            <div className="profiles-list">
+            <div className="space-y-3">
               {user.profiles.map(profile => (
-                <div key={profile.id} className="profile-item">
-                  <img src="/icon/file-text.svg" alt="Profile" className="profile-icon" />
-                  <div className="profile-info">
-                    <div className="profile-name">{profile.name}</div>
-                    <div className="profile-meta">
-                      <span className={`status-badge ${profile.status}`}>
-                        <img src={`/icon/${profile.status === 'ready' ? 'check-circle' : 'clock'}.svg`} alt="Status" />
+                <div key={profile.id} className="flex items-center gap-3 p-3 bg-surface-secondary rounded-lg">
+                  <img src="/icon/file-text.svg" alt="" className="w-5 h-5 icon-gray" />
+                  <div className="flex-1">
+                    <div className="font-medium">{profile.name}</div>
+                    <div className="flex items-center gap-2 text-xs text-muted">
+                      <Badge variant={profile.status === 'ready' ? 'success' : 'warning'}>
                         {profile.status === 'ready' ? 'Ready' : 'Processing'}
-                      </span>
-                      <span className="profile-samples">
-                        {profile.samplesCount} samples
-                      </span>
+                      </Badge>
+                      <span>{profile.samplesCount} samples</span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="empty-state">
-              <img src="/icon/inbox.svg" alt="Empty" />
+            <div className="text-center py-8 text-muted">
+              <img src="/icon/inbox.svg" alt="" className="w-12 h-12 mx-auto mb-2 icon-gray" />
               <p>User has not created any profiles yet</p>
             </div>
           )}
-        </div>
+        </Card>
 
-        {/* Actions Card */}
-        <div className="detail-card full-width">
-          <h2>
-            <img src="/icon/zap.svg" alt="Actions" />
+        {/* Actions */}
+        <Card className="p-6 lg:col-span-2">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <img src="/icon/zap.svg" alt="" className="w-5 h-5 icon-dark" />
             Actions
           </h2>
-          <div className="actions-grid">
-            <button 
-              className="action-btn primary" 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('[UserDetail] Edit User button clicked');
-                setShowEditModal(true);
-              }}
-              type="button"
-            >
-              <img src="/icon/edit.svg" alt="Edit" className="action-icon" />
-              <span className="action-label">Edit User</span>
-            </button>
-            <button 
-              className="action-btn success" 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('[UserDetail] Adjust Credits button clicked');
-                setShowCreditsModal(true);
-              }}
-              type="button"
-            >
-              <img src="/icon/dollar-sign.svg" alt="Credits" className="action-icon" />
-              <span className="action-label">Adjust Credits</span>
-            </button>
-            <button 
-              className="action-btn" 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('[UserDetail] Send notification button clicked');
-                setShowNotificationModal(true);
-              }}
-              type="button"
-            >
-              <img src="/icon/bell.svg" alt="Notification" className="action-icon" />
-              <span className="action-label">Send notification</span>
-            </button>
-            <button 
-              className="action-btn" 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('[UserDetail] Manage Profiles button clicked');
-                navigate(`/users/${id}/profiles`);
-              }}
-              type="button"
-            >
-              <img src="/icon/folder.svg" alt="Profiles" className="action-icon" />
-              <span className="action-label">Manage Profiles</span>
-            </button>
-            <button 
-              className="action-btn" 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('[UserDetail] View logs button clicked');
-                navigate(`/users/${id}/logs`);
-              }}
-              type="button"
-            >
-              <img src="/icon/activity.svg" alt="Logs" className="action-icon" />
-              <span className="action-label">View logs</span>
-            </button>
-            <button 
-              className="action-btn" 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('[UserDetail] Activity Details button clicked');
-                navigate(`/users/${id}/activity`);
-              }}
-              type="button"
-            >
-              <img src="/icon/bar-chart-2.svg" alt="Activity" className="action-icon" />
-              <span className="action-label">Activity Details</span>
-            </button>
-            <button 
-              className="action-btn" 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('[UserDetail] Lock/Unlock button clicked');
-                handleLockUser();
-              }}
-              type="button"
-            >
-              <img src={`/icon/${user.locked ? 'unlock' : 'lock'}.svg`} alt="Lock" className="action-icon" />
-              <span className="action-label">{user.locked ? 'Unlock' : 'Lock'} account</span>
-            </button>
-            <button 
-              className="action-btn danger" 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('[UserDetail] Delete user button clicked');
-                handleDeleteUser();
-              }}
-              type="button"
-            >
-              <img src="/icon/trash-2.svg" alt="Delete" className="action-icon" />
-              <span className="action-label">Delete user</span>
-            </button>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Button variant="secondary" onClick={() => setShowEditModal(true)}>
+              <img src="/icon/edit.svg" alt="" className="w-4 h-4 icon-dark" />
+              Edit User
+            </Button>
+            <Button variant="success" onClick={() => setShowCreditsModal(true)}>
+              <img src="/icon/dollar-sign.svg" alt="" className="w-4 h-4 icon-white" />
+              Adjust Credits
+            </Button>
+            <Button variant="secondary" onClick={() => setShowNotificationModal(true)}>
+              <img src="/icon/bell.svg" alt="" className="w-4 h-4 icon-dark" />
+              Send Notification
+            </Button>
+            <Button variant="secondary" onClick={() => navigate(`/users/${id}/profiles`)}>
+              <img src="/icon/folder.svg" alt="" className="w-4 h-4 icon-dark" />
+              Manage Profiles
+            </Button>
+            <Button variant="secondary" onClick={() => navigate(`/users/${id}/logs`)}>
+              <img src="/icon/activity.svg" alt="" className="w-4 h-4 icon-dark" />
+              View Logs
+            </Button>
+            <Button variant="secondary" onClick={() => navigate(`/users/${id}/activity`)}>
+              <img src="/icon/bar-chart-2.svg" alt="" className="w-4 h-4 icon-dark" />
+              Activity Details
+            </Button>
+            <Button variant="secondary" onClick={handleLockUser}>
+              <img src={`/icon/${user.locked ? 'unlock' : 'lock'}.svg`} alt="" className="w-4 h-4 icon-dark" />
+              {user.locked ? 'Unlock' : 'Lock'} Account
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteUser}>
+              <img src="/icon/trash-2.svg" alt="" className="w-4 h-4 icon-white" />
+              Delete User
+            </Button>
           </div>
-        </div>
-
-
+        </Card>
       </div>
+
 
       {/* Notification Modal */}
       {showNotificationModal && (
-        <div className="modal-overlay" onClick={() => setShowNotificationModal(false)}>
-          <div className="modal-content notification-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>
-                <img src="/icon/bell.svg" alt="Notification" />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowNotificationModal(false)}>
+          <div className="bg-surface rounded-xl shadow-xl w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <img src="/icon/bell.svg" alt="" className="w-5 h-5 icon-dark" />
                 Send Notification
               </h2>
-              <button className="btn-close" onClick={() => setShowNotificationModal(false)}>
-                <img src="/icon/x.svg" alt="Close" />
+              <button className="p-1 hover:bg-surface-secondary rounded" onClick={() => setShowNotificationModal(false)}>
+                <img src="/icon/x.svg" alt="Close" className="w-5 h-5 icon-gray" />
               </button>
             </div>
-            <div className="modal-body">
-              <div className="notification-info-banner">
-                <img src="/icon/info.svg" alt="Info" />
-                <span>Write in English. The notification will be automatically translated to the user's language.</span>
+            <div className="p-4 space-y-4">
+              <div className="flex items-center gap-2 p-3 bg-info/10 text-info rounded-lg text-sm">
+                <img src="/icon/info.svg" alt="" className="w-4 h-4" />
+                Write in English. Auto-translated to user's language.
               </div>
-              
-              <div className="form-row">
-                <div className="form-group half">
-                  <CustomSelect
-                    label="Type"
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Type</label>
+                  <Select
                     value={notificationData.type}
                     onChange={(e) => setNotificationData({...notificationData, type: e.target.value})}
                     options={[
@@ -500,9 +402,9 @@ export default function UserDetail() {
                     ]}
                   />
                 </div>
-                <div className="form-group half">
-                  <CustomSelect
-                    label="Priority"
+                <div>
+                  <label className="block text-sm font-medium mb-1">Priority</label>
+                  <Select
                     value={notificationData.priority}
                     onChange={(e) => setNotificationData({...notificationData, priority: e.target.value})}
                     options={[
@@ -513,47 +415,37 @@ export default function UserDetail() {
                   />
                 </div>
               </div>
-              
-              <div className="form-group">
-                <label>Title *</label>
+              <div>
+                <label className="block text-sm font-medium mb-1">Title *</label>
                 <input
                   type="text"
                   value={notificationData.title}
                   onChange={(e) => setNotificationData({...notificationData, title: e.target.value})}
                   placeholder="E.g.: Account Update, Special Offer..."
                   maxLength={100}
+                  className="w-full px-3 py-2 rounded-lg border border-border/50 bg-surface-secondary focus:outline-none focus:bg-surface transition-colors"
                 />
               </div>
-              
-              <div className="form-group">
-                <label>Message *</label>
+              <div>
+                <label className="block text-sm font-medium mb-1">Message *</label>
                 <textarea
                   value={notificationData.message}
                   onChange={(e) => setNotificationData({...notificationData, message: e.target.value})}
-                  placeholder="Enter your notification message here..."
-                  rows="4"
+                  placeholder="Enter your notification message..."
+                  rows="3"
                   maxLength={500}
+                  className="w-full px-3 py-2 rounded-lg border border-border/50 bg-surface-secondary focus:outline-none focus:bg-surface transition-colors resize-none"
                 />
-                <div className="char-count">{notificationData.message.length}/500</div>
+                <div className="text-xs text-muted text-right mt-1">{notificationData.message.length}/500</div>
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="btn-cancel" onClick={() => setShowNotificationModal(false)} disabled={sendingNotification}>
+            <div className="flex justify-end gap-3 p-4 border-t border-border">
+              <Button variant="secondary" onClick={() => setShowNotificationModal(false)} disabled={sendingNotification}>
                 Cancel
-              </button>
-              <button className="btn-primary" onClick={handleSendNotification} disabled={sendingNotification}>
-                {sendingNotification ? (
-                  <>
-                    <span className="spinner-small"></span>
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <img src="/icon/send.svg" alt="Send" />
-                    Send Notification
-                  </>
-                )}
-              </button>
+              </Button>
+              <Button onClick={handleSendNotification} disabled={sendingNotification}>
+                {sendingNotification ? 'Sending...' : 'Send Notification'}
+              </Button>
             </div>
           </div>
         </div>
@@ -561,42 +453,39 @@ export default function UserDetail() {
 
       {/* Edit User Modal */}
       {showEditModal && (
-        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Edit User Information</h2>
-              <button className="btn-close" onClick={() => setShowEditModal(false)}>
-                <img src="/icon/x.svg" alt="Close" />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowEditModal(false)}>
+          <div className="bg-surface rounded-xl shadow-xl w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-lg font-semibold">Edit User Information</h2>
+              <button className="p-1 hover:bg-surface-secondary rounded" onClick={() => setShowEditModal(false)}>
+                <img src="/icon/x.svg" alt="Close" className="w-5 h-5 icon-gray" />
               </button>
             </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label>Name</label>
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Name</label>
                 <input
                   type="text"
                   value={editData.name}
                   onChange={(e) => setEditData({...editData, name: e.target.value})}
                   placeholder="User name"
+                  className="w-full px-3 py-2 rounded-lg border border-border/50 bg-surface-secondary focus:outline-none focus:bg-surface transition-colors"
                 />
               </div>
-              <div className="form-group">
-                <label>Email</label>
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
                 <input
                   type="email"
                   value={editData.email}
                   onChange={(e) => setEditData({...editData, email: e.target.value})}
                   placeholder="user@example.com"
+                  className="w-full px-3 py-2 rounded-lg border border-border/50 bg-surface-secondary focus:outline-none focus:bg-surface transition-colors"
                 />
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="btn-cancel" onClick={() => setShowEditModal(false)}>
-                Cancel
-              </button>
-              <button className="btn-primary" onClick={handleEditUser}>
-                <img src="/icon/save.svg" alt="Save" />
-                Save Changes
-              </button>
+            <div className="flex justify-end gap-3 p-4 border-t border-border">
+              <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancel</Button>
+              <Button onClick={handleEditUser}>Save Changes</Button>
             </div>
           </div>
         </div>
@@ -604,94 +493,86 @@ export default function UserDetail() {
 
       {/* Adjust Credits Modal */}
       {showCreditsModal && (
-        <div className="modal-overlay" onClick={() => setShowCreditsModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Adjust User Credits</h2>
-              <button className="btn-close" onClick={() => setShowCreditsModal(false)}>
-                <img src="/icon/x.svg" alt="Close" />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowCreditsModal(false)}>
+          <div className="bg-surface rounded-xl shadow-xl w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-lg font-semibold">Adjust User Credits</h2>
+              <button className="p-1 hover:bg-surface-secondary rounded" onClick={() => setShowCreditsModal(false)}>
+                <img src="/icon/x.svg" alt="Close" className="w-5 h-5 icon-gray" />
               </button>
             </div>
-            <div className="modal-body">
-              <div className="current-credits-info">
-                <span>Current Balance:</span>
-                <strong>{user.credits?.balance || 0} credits</strong>
+            <div className="p-4 space-y-4">
+              <div className="flex justify-between items-center p-3 bg-surface-secondary rounded-lg">
+                <span className="text-muted">Current Balance:</span>
+                <span className="text-xl font-bold">{user.credits?.balance || 0} credits</span>
               </div>
-              <div className="form-group">
-                <label>Action Type</label>
-                <div className="radio-group">
-                  <label className="radio-option">
+              <div>
+                <label className="block text-sm font-medium mb-2">Action Type</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className={`flex items-center justify-center gap-2 p-3 rounded-lg cursor-pointer transition-colors ${creditsData.type === 'add' ? 'bg-success/15 text-success' : 'bg-surface-secondary hover:bg-surface-tertiary'}`}>
                     <input
                       type="radio"
                       name="creditType"
                       value="add"
                       checked={creditsData.type === 'add'}
                       onChange={(e) => setCreditsData({...creditsData, type: e.target.value})}
+                      className="hidden"
                     />
-                    <span className="radio-label add">
-                      <img src="/icon/plus.svg" alt="Add" />
-                      Add Credits
-                    </span>
+                    <img src="/icon/plus.svg" alt="" className="w-4 h-4" />
+                    <span className="font-medium">Add</span>
                   </label>
-                  <label className="radio-option">
+                  <label className={`flex items-center justify-center gap-2 p-3 rounded-lg cursor-pointer transition-colors ${creditsData.type === 'deduct' ? 'bg-destructive/15 text-destructive' : 'bg-surface-secondary hover:bg-surface-tertiary'}`}>
                     <input
                       type="radio"
                       name="creditType"
                       value="deduct"
                       checked={creditsData.type === 'deduct'}
                       onChange={(e) => setCreditsData({...creditsData, type: e.target.value})}
+                      className="hidden"
                     />
-                    <span className="radio-label deduct">
-                      <img src="/icon/minus.svg" alt="Deduct" />
-                      Deduct Credits
-                    </span>
+                    <img src="/icon/minus.svg" alt="" className="w-4 h-4" />
+                    <span className="font-medium">Deduct</span>
                   </label>
                 </div>
               </div>
-              <div className="form-group">
-                <label>Amount</label>
+              <div>
+                <label className="block text-sm font-medium mb-1">Amount</label>
                 <input
                   type="text"
-                  className="credits-amount-input"
                   value={creditsData.amount || ''}
                   onChange={(e) => {
                     const value = e.target.value.replace(/[^0-9]/g, '');
                     setCreditsData({...creditsData, amount: value ? parseInt(value) : 0});
                   }}
                   placeholder="Enter amount"
+                  className="w-full px-3 py-2 rounded-lg border border-border/50 bg-surface-secondary focus:outline-none focus:bg-surface transition-colors"
                 />
               </div>
-              <div className="form-group">
-                <label>Reason *</label>
+              <div>
+                <label className="block text-sm font-medium mb-1">Reason *</label>
                 <textarea
-                  className="credits-reason-input"
                   value={creditsData.reason}
                   onChange={(e) => setCreditsData({...creditsData, reason: e.target.value})}
                   placeholder="Enter reason for adjustment (required)"
                   rows="2"
+                  className="w-full px-3 py-2 rounded-lg border border-border/50 bg-surface-secondary focus:outline-none focus:bg-surface transition-colors resize-none"
                 />
               </div>
-              <div className="preview-adjustment">
-                <span>New Balance:</span>
-                <strong className={creditsData.type === 'add' ? 'positive' : 'negative'}>
+              <div className="flex justify-between items-center p-3 bg-surface-secondary rounded-lg">
+                <span className="text-muted">New Balance:</span>
+                <span className={`text-xl font-bold ${creditsData.type === 'add' ? 'text-success' : 'text-destructive'}`}>
                   {creditsData.type === 'add' 
                     ? (user.credits?.balance || 0) + (creditsData.amount || 0)
                     : Math.max(0, (user.credits?.balance || 0) - (creditsData.amount || 0))
                   } credits
-                </strong>
+                </span>
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="btn-cancel" onClick={() => setShowCreditsModal(false)}>
-                Cancel
-              </button>
-              <button 
-                className={`btn-primary ${creditsData.type === 'deduct' ? 'danger' : 'success'}`}
-                onClick={handleAdjustCredits}
-              >
-                <img src={`/icon/${creditsData.type === 'add' ? 'plus' : 'minus'}.svg`} alt={creditsData.type} />
+            <div className="flex justify-end gap-3 p-4 border-t border-border">
+              <Button variant="secondary" onClick={() => setShowCreditsModal(false)}>Cancel</Button>
+              <Button variant={creditsData.type === 'add' ? 'success' : 'destructive'} onClick={handleAdjustCredits}>
                 {creditsData.type === 'add' ? 'Add' : 'Deduct'} Credits
-              </button>
+              </Button>
             </div>
           </div>
         </div>

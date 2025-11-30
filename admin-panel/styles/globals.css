@@ -1,0 +1,327 @@
+@import "tailwindcss";
+
+/* Tell Tailwind v4 where to scan for classes */
+@source "../**/*.{js,jsx}";
+@source "../index.html";
+
+/* ============================================
+   CSS CUSTOM PROPERTIES (for reference in components)
+   ============================================ */
+:root {
+  --color-primary: #000000;
+  --color-primary-hover: #1a1a1a;
+  --color-primary-foreground: #ffffff;
+  
+  --color-secondary: #666666;
+  --color-secondary-foreground: #000000;
+  
+  --color-muted: #999999;
+  --color-muted-foreground: #666666;
+  
+  --color-border: #e5e5e5;
+  --color-border-dark: #333333;
+  --color-border-light: #f0f0f0;
+  
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f5f5f5;
+  --color-surface-tertiary: #fafafa;
+  --color-surface-dark: #1a1a1a;
+  
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  
+  --color-success: #22c55e;
+  --color-success-foreground: #ffffff;
+  
+  --color-warning: #f59e0b;
+  --color-warning-foreground: #000000;
+  
+  --color-info: #3b82f6;
+  --color-info-foreground: #ffffff;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-pill: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================
+   TAILWIND V4 THEME CONFIGURATION
+   ============================================ */
+@theme {
+  /* Colors */
+  --color-primary: #000000;
+  --color-primary-hover: #1a1a1a;
+  --color-primary-foreground: #ffffff;
+  
+  --color-secondary: #666666;
+  --color-secondary-foreground: #000000;
+  
+  --color-muted: #999999;
+  --color-muted-foreground: #666666;
+  
+  --color-border: #e5e5e5;
+  --color-border-dark: #333333;
+  --color-border-light: #f0f0f0;
+  
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f5f5f5;
+  --color-surface-tertiary: #fafafa;
+  --color-surface-dark: #1a1a1a;
+  
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  
+  --color-success: #22c55e;
+  --color-success-foreground: #ffffff;
+  
+  --color-warning: #f59e0b;
+  --color-warning-foreground: #000000;
+  
+  --color-info: #3b82f6;
+  --color-info-foreground: #ffffff;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-pill: 9999px;
+
+  /* Font Sizes */
+  --font-size-xxs: 11px;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 24px;
+
+  /* Box Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 4px 24px rgba(0, 0, 0, 0.12);
+
+  /* Animations */
+  --animate-spin-slow: spin 0.8s linear infinite;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--color-surface-tertiary);
+    color: var(--color-primary);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  button, input, textarea, select {
+    font-family: inherit;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ul, ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+@utility icon-white {
+  filter: brightness(0) invert(1);
+}
+
+@utility icon-gray {
+  filter: brightness(0) invert(0.5);
+}
+
+@utility icon-dark {
+  filter: brightness(0);
+}
+
+@utility text-xxs {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+@utility border-3 {
+  border-width: 3px;
+}
+
+@utility animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@utility line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ============================================
+   ADMIN LAYOUT
+   ============================================ */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-surface-tertiary);
+}
+
+.admin-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left 0.2s ease;
+}
+
+.admin-main.admin-sidebar-open {
+  margin-left: 240px;
+}
+
+.admin-main.admin-sidebar-closed {
+  margin-left: 64px;
+}
+
+.admin-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+.admin-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.admin-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f5f5f5;
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: var(--animate-spin-slow);
+}
+
+.admin-loading p {
+  font-size: 14px;
+  color: var(--color-muted);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   RADIX UI OVERRIDES
+   ============================================ */
+[data-radix-popper-content-wrapper] {
+  z-index: 1000 !important;
+}
+
+[data-state="open"] {
+  animation: fadeIn 150ms ease-out, zoomIn 150ms ease-out;
+}
+
+[data-state="closed"] {
+  animation: fadeOut 100ms ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================
+   RECHARTS OVERRIDES
+   ============================================ */
+.recharts-wrapper {
+  font-family: inherit;
+}
+
+.recharts-cartesian-axis-tick-value {
+  font-size: 12px;
+  fill: #666;
+}
+
+.recharts-legend-item-text {
+  font-size: 12px;
+  color: #666;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+.recharts-default-tooltip {
+  background: #fff !important;
+  border: 1px solid #e5e5e5 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}

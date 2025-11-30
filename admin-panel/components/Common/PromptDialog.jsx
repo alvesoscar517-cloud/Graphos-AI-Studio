@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom';
 import { useState, useEffect, useRef } from 'react';
-import './PromptDialog.css';
+// CSS migrated to Tailwind
 
 export default function PromptDialog({ 
   title, 
