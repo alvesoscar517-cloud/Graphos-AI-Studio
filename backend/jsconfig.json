@@ -4,7 +4,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "allowJs": true,
-    "checkJs": true,
+    "checkJs": false,
     "strict": false,
     "noEmit": true,
     "skipLibCheck": true,

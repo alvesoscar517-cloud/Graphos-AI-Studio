@@ -41,21 +41,34 @@ const REDACT_PATHS = [
 /**
  * Create Pino logger with appropriate configuration
  */
+let transportConfig = undefined;
+
+// Only use pino-pretty in development and if it's available
+if (!IS_PRODUCTION) {
+  try {
+    require.resolve('pino-pretty');
+    transportConfig = {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        translateTime: 'SYS:standard',
+        ignore: 'pid,hostname'
+      }
+    };
+  } catch (e) {
+    // pino-pretty not available, use default JSON output
+    console.log('[LOGGER] pino-pretty not available, using JSON output');
+  }
+}
+
 const logger = pino({
   level: LOG_LEVEL,
   redact: {
     paths: REDACT_PATHS,
     censor: '[REDACTED]'
   },
-  // Use pino-pretty in development
-  transport: !IS_PRODUCTION ? {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      translateTime: 'SYS:standard',
-      ignore: 'pid,hostname'
-    }
-  } : undefined,
+  // Use pino-pretty in development if available
+  transport: transportConfig,
   // Production: JSON format
   formatters: IS_PRODUCTION ? {
     level: (label) => ({ level: label }),

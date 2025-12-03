@@ -12,29 +12,118 @@ process.on('uncaughtException', (error) => {
 });
 
 console.log('[STARTUP] Loading dependencies...');
+console.log('[STARTUP] Node version:', process.version);
+console.log('[STARTUP] NODE_ENV:', process.env.NODE_ENV);
+console.log('[STARTUP] PORT:', process.env.PORT);
 
-const express = require('express');
-console.log('[STARTUP] Express loaded');
+let express, config, corsMiddleware, errorHandler, notFoundHandler, requestTimeout;
+let rateLimitMiddleware, activityLoggerMiddleware, languageMiddleware;
+let responseLocalizationMiddleware, correlationMiddleware, requestLogger;
+let compressionMiddleware, routes, logger, redisService, activityLogService;
+let setupHealthCheck, queueService, startEmailWorker, stopEmailWorker;
+let startAnalysisWorker, stopAnalysisWorker, getCircuitBreakerStates;
 
-const config = require('./src/config');
-console.log('[STARTUP] Config loaded');
-const corsMiddleware = require('./src/middleware/cors');
-const { errorHandler, notFoundHandler, requestTimeout } = require('./src/middleware/errorHandler.middleware');
-const rateLimitMiddleware = require('./src/middleware/rateLimit');
-const { activityLoggerMiddleware } = require('./src/middleware/activityLogger.middleware');
-const { languageMiddleware } = require('./src/middleware/language.middleware');
-const { responseLocalizationMiddleware } = require('./src/utils/response.util');
-const { correlationMiddleware, requestLogger } = require('./src/utils/logger');
-const compressionMiddleware = require('./src/middleware/compression');
-const routes = require('./src/routes');
-const logger = require('./src/utils/logger');
-const redisService = require('./src/services/redis.service');
-const activityLogService = require('./src/services/activityLog.service');
-const { setupHealthCheck } = require('./src/utils/health');
-const queueService = require('./src/services/queue.service');
-const { startEmailWorker, stopEmailWorker } = require('./src/workers/email.worker');
-const { startAnalysisWorker, stopAnalysisWorker } = require('./src/workers/analysis.worker');
-const { getAllStates: getCircuitBreakerStates } = require('./src/utils/circuitBreaker');
+try {
+  express = require('express');
+  console.log('[STARTUP] ✓ express');
+} catch (e) { console.error('[STARTUP] ✗ express:', e.message); process.exit(1); }
+
+try {
+  config = require('./src/config');
+  console.log('[STARTUP] ✓ config');
+} catch (e) { console.error('[STARTUP] ✗ config:', e.message); process.exit(1); }
+
+try {
+  corsMiddleware = require('./src/middleware/cors');
+  console.log('[STARTUP] ✓ cors middleware');
+} catch (e) { console.error('[STARTUP] ✗ cors middleware:', e.message); process.exit(1); }
+
+try {
+  const errorHandlerModule = require('./src/middleware/errorHandler.middleware');
+  errorHandler = errorHandlerModule.errorHandler;
+  notFoundHandler = errorHandlerModule.notFoundHandler;
+  requestTimeout = errorHandlerModule.requestTimeout;
+  console.log('[STARTUP] ✓ errorHandler middleware');
+} catch (e) { console.error('[STARTUP] ✗ errorHandler middleware:', e.message); process.exit(1); }
+
+try {
+  rateLimitMiddleware = require('./src/middleware/rateLimit');
+  console.log('[STARTUP] ✓ rateLimit middleware');
+} catch (e) { console.error('[STARTUP] ✗ rateLimit middleware:', e.message); process.exit(1); }
+
+try {
+  activityLoggerMiddleware = require('./src/middleware/activityLogger.middleware').activityLoggerMiddleware;
+  console.log('[STARTUP] ✓ activityLogger middleware');
+} catch (e) { console.error('[STARTUP] ✗ activityLogger middleware:', e.message); process.exit(1); }
+
+try {
+  languageMiddleware = require('./src/middleware/language.middleware').languageMiddleware;
+  console.log('[STARTUP] ✓ language middleware');
+} catch (e) { console.error('[STARTUP] ✗ language middleware:', e.message); process.exit(1); }
+
+try {
+  responseLocalizationMiddleware = require('./src/utils/response.util').responseLocalizationMiddleware;
+  console.log('[STARTUP] ✓ response.util');
+} catch (e) { console.error('[STARTUP] ✗ response.util:', e.message); process.exit(1); }
+
+try {
+  const loggerModule = require('./src/utils/logger');
+  correlationMiddleware = loggerModule.correlationMiddleware;
+  requestLogger = loggerModule.requestLogger;
+  logger = loggerModule;
+  console.log('[STARTUP] ✓ logger');
+} catch (e) { console.error('[STARTUP] ✗ logger:', e.message); process.exit(1); }
+
+try {
+  compressionMiddleware = require('./src/middleware/compression');
+  console.log('[STARTUP] ✓ compression middleware');
+} catch (e) { console.error('[STARTUP] ✗ compression middleware:', e.message); process.exit(1); }
+
+try {
+  routes = require('./src/routes');
+  console.log('[STARTUP] ✓ routes');
+} catch (e) { console.error('[STARTUP] ✗ routes:', e.message); process.exit(1); }
+
+try {
+  redisService = require('./src/services/redis.service');
+  console.log('[STARTUP] ✓ redis.service');
+} catch (e) { console.error('[STARTUP] ✗ redis.service:', e.message); process.exit(1); }
+
+try {
+  activityLogService = require('./src/services/activityLog.service');
+  console.log('[STARTUP] ✓ activityLog.service');
+} catch (e) { console.error('[STARTUP] ✗ activityLog.service:', e.message); process.exit(1); }
+
+try {
+  setupHealthCheck = require('./src/utils/health').setupHealthCheck;
+  console.log('[STARTUP] ✓ health util');
+} catch (e) { console.error('[STARTUP] ✗ health util:', e.message); process.exit(1); }
+
+try {
+  queueService = require('./src/services/queue.service');
+  console.log('[STARTUP] ✓ queue.service');
+} catch (e) { console.error('[STARTUP] ✗ queue.service:', e.message); process.exit(1); }
+
+try {
+  const emailWorker = require('./src/workers/email.worker');
+  startEmailWorker = emailWorker.startEmailWorker;
+  stopEmailWorker = emailWorker.stopEmailWorker;
+  console.log('[STARTUP] ✓ email.worker');
+} catch (e) { console.error('[STARTUP] ✗ email.worker:', e.message); process.exit(1); }
+
+try {
+  const analysisWorker = require('./src/workers/analysis.worker');
+  startAnalysisWorker = analysisWorker.startAnalysisWorker;
+  stopAnalysisWorker = analysisWorker.stopAnalysisWorker;
+  console.log('[STARTUP] ✓ analysis.worker');
+} catch (e) { console.error('[STARTUP] ✗ analysis.worker:', e.message); process.exit(1); }
+
+try {
+  getCircuitBreakerStates = require('./src/utils/circuitBreaker').getAllStates;
+  console.log('[STARTUP] ✓ circuitBreaker');
+} catch (e) { console.error('[STARTUP] ✗ circuitBreaker:', e.message); process.exit(1); }
+
+console.log('[STARTUP] All dependencies loaded successfully!');
 
 // ============================================================================
 // INITIALIZE APP
