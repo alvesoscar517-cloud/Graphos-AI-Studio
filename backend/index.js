@@ -241,12 +241,14 @@ app.use(errorHandler);
 // START SERVER
 // ============================================================================
 
-const PORT = config.PORT;
+const PORT = process.env.PORT || config.PORT || 8080;
 
 async function startServer() {
   try {
+    console.log(`[STARTUP] Attempting to start server on port ${PORT}...`);
+    
     // Start server FIRST to respond to health checks immediately
-    const server = app.listen(PORT, async () => {
+    const server = app.listen(PORT, '0.0.0.0', async () => {
       // Setup terminus health checks with graceful shutdown
       setupHealthCheck(server, {
         redisClient: redisService.getClient?.(),
