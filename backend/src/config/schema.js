@@ -330,6 +330,17 @@ const config = convict({
       default: '',
       env: 'ADMIN_PANEL_URL'
     }
+  },
+  
+  // Internal API (for backend-to-backend communication)
+  internal: {
+    apiKey: {
+      doc: 'Internal API key for backend-to-backend communication',
+      format: String,
+      default: '',
+      env: 'INTERNAL_API_KEY',
+      sensitive: true
+    }
   }
 });
 

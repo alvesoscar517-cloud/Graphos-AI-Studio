@@ -57,3 +57,9 @@ export {
   useCurrentNoteId,
   useNotesActions,
 } from './notesStore'
+export {
+  useNotificationStore,
+  useNotifications,
+  useUnreadCount,
+  useNotificationActions,
+} from './notificationStore'

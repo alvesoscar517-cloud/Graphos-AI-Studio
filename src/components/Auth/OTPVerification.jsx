@@ -92,9 +92,11 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
     <div className="text-center py-2.5">
       <div className="mb-7">
         <div className="mb-4">
-          <svg className="w-14 h-14 p-3 bg-gray-100 rounded-2xl mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/>
-          </svg>
+          <div className="w-14 h-14 bg-gray-100 rounded-2xl mx-auto flex items-center justify-center overflow-hidden">
+            <svg className="w-7 h-7 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/>
+            </svg>
+          </div>
         </div>
         <h3 className="m-0 mb-2.5 text-xl font-bold text-gray-900">{t('auth.email.verifyTitle')}</h3>
         <p className="m-0 text-sm text-gray-600 leading-relaxed">{t('auth.email.verifySubtitle', { email: '' })}<br/><strong className="text-gray-900 font-semibold block mt-1 text-md">{email}</strong></p>

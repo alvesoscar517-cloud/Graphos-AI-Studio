@@ -40,7 +40,7 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
   const isLoading = externalLoading || formLoading
 
   const inputClass = cn(
-    "w-full pl-11 pr-3.5 py-3 text-sm border rounded-xl",
+    "w-full pl-11 pr-3.5 py-3 text-sm border border-gray-200 rounded-xl",
     "bg-white text-gray-900 transition-all duration-200",
     "focus:outline-none focus:border-system-blue focus:ring-2 focus:ring-system-blue/20",
     "disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed",

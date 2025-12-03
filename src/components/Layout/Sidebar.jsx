@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { useUser } from '../../stores/authStore'
 import { useNotes } from '../../contexts/NotesContext'
+import { useUnreadCount } from '../../stores/notificationStore'
 import { truncateTitleByWords } from '../../utils/titleUtils'
 import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
@@ -17,64 +18,13 @@ const truncateEmail = (email, maxLength = 18) => {
 }
 
 const NotificationBadge = () => {
-  const [unreadCount, setUnreadCount] = useState(0);
+  const unreadCount = useUnreadCount()
 
-  useEffect(() => {
-    const loadUnreadCount = async () => {
-      try {
-        const { getUserNotifications } = await import('../../services/notificationService');
-        let { unreadCount: apiUnread } = await getUserNotifications(true);
-        try {
-          const stored = localStorage.getItem('user_notifications');
-          if (stored) {
-            const localNotifs = JSON.parse(stored);
-            apiUnread = Math.max(apiUnread, localNotifs.filter(n => !n.read).length);
-          }
-        } catch (e) {}
-        setUnreadCount(apiUnread);
-      } catch (err) {
-        try {
-          const stored = localStorage.getItem('user_notifications');
-          if (stored) setUnreadCount(JSON.parse(stored).filter(n => !n.read).length);
-        } catch (e) {}
-      }
-    };
-    loadUnreadCount();
-    const handleNewNotification = () => loadUnreadCount();
-    window.addEventListener('new-notification', handleNewNotification);
-    let unsubscribeRealtime = null;
-    (async () => {
-      try {
-        const realtimeService = (await import('../../services/realtimeService')).default;
-        unsubscribeRealtime = realtimeService.subscribe('notification', (data) => {
-          if (data?.notification) {
-            try {
-              const stored = localStorage.getItem('user_notifications');
-              const notifications = stored ? JSON.parse(stored) : [];
-              if (!notifications.some(n => n.id === data.notification.id)) {
-                notifications.unshift(data.notification);
-                localStorage.setItem('user_notifications', JSON.stringify(notifications));
-              }
-            } catch (e) {}
-          }
-          window.dispatchEvent(new CustomEvent('new-notification', { detail: data }));
-          loadUnreadCount();
-        });
-      } catch (err) {}
-    })();
-    const interval = setInterval(loadUnreadCount, 30000);
-    return () => {
-      window.removeEventListener('new-notification', handleNewNotification);
-      if (unsubscribeRealtime) unsubscribeRealtime();
-      clearInterval(interval);
-    };
-  }, []);
-
-  if (unreadCount === 0) return null;
+  if (unreadCount === 0) return null
   return (
     <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-error shadow-ring-2 shadow-bg-secondary z-10" />
-  );
-};
+  )
+}
 
 
 const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {

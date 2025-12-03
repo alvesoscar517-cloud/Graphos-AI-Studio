@@ -1,53 +1,32 @@
-import { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import Portal from '../Common/Portal';
-// CSS migrated to inline styles
+import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import Portal from '../Common/Portal'
+import { useNotifications, useNotificationActions } from '../../stores/notificationStore'
 
 export default function NotificationPopup({ onClose, onViewChange }) {
-  const { t, i18n } = useTranslation();
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation()
+  const { notifications, unreadCount, loading } = useNotifications()
+  const { markAsRead, markAllAsRead, deleteNotification, handleCtaAction, refresh } = useNotificationActions()
+  
   const [selectedNotif, setSelectedNotif] = useState(null);
   const [selectedItemRect, setSelectedItemRect] = useState(null);
   const popupRef = useRef(null);
   const detailPopupRef = useRef(null);
 
   useEffect(() => {
-    loadNotifications();
-    
-    const interval = setInterval(loadNotifications, 30000);
-    
-    const handleNewNotification = (event) => {
-      if (event?.detail?.notification) {
-        const newNotif = event.detail.notification;
-        setNotifications(prev => {
-          const exists = prev.some(n => n.id === newNotif.id);
-          if (exists) return prev;
-          const updated = [newNotif, ...prev];
-          setUnreadCount(updated.filter(n => !n.read).length);
-          return updated;
-        });
-      } else {
-        loadNotifications();
-      }
-    };
-    window.addEventListener('new-notification', handleNewNotification);
+    // Don't force refresh on open - store handles caching
+    // Only refresh if explicitly needed (cache is managed by store)
     
     const handleClickOutside = (e) => {
-      // Don't close if clicking inside notification popup
       if (popupRef.current && popupRef.current.contains(e.target)) {
         return;
       }
-      // Don't close if clicking notification button
       if (e.target.closest('.notification-btn')) {
         return;
       }
-      // Don't close if clicking inside detail popup
       if (e.target.closest('.notif-detail-popup')) {
         return;
       }
-      // Don't close if detail popup is open
       if (detailPopupRef.current && detailPopupRef.current.contains(e.target)) {
         return;
       }
@@ -60,127 +39,36 @@ export default function NotificationPopup({ onClose, onViewChange }) {
     
     return () => {
       clearTimeout(timeoutId);
-      clearInterval(interval);
-      window.removeEventListener('new-notification', handleNewNotification);
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [onClose]);
 
-  const loadNotifications = async () => {
-    try {
-      setLoading(true);
-      const { getUserNotifications } = await import('../../services/notificationService');
-      let { notifications: notifs, unreadCount: unread } = await getUserNotifications();
-      
-      try {
-        const stored = localStorage.getItem('user_notifications');
-        if (stored) {
-          const localNotifs = JSON.parse(stored);
-          localNotifs.forEach(localNotif => {
-            const exists = notifs.some(n => n.id === localNotif.id);
-            if (!exists) notifs.push(localNotif);
-          });
-          notifs.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-          unread = notifs.filter(n => !n.read).length;
-        }
-      } catch (e) {}
-      
-      setNotifications(notifs);
-      setUnreadCount(unread);
-    } catch (err) {
-      try {
-        const stored = localStorage.getItem('user_notifications');
-        if (stored) {
-          const localNotifs = JSON.parse(stored);
-          setNotifications(localNotifs);
-          setUnreadCount(localNotifs.filter(n => !n.read).length);
-        }
-      } catch (e) {}
-    } finally {
-      setLoading(false);
-    }
+  const handleMarkAsRead = async (notificationId) => {
+    await markAsRead(notificationId);
   };
 
-  const markAsRead = async (notificationId) => {
-    try {
-      const { markNotificationAsRead } = await import('../../services/notificationService');
-      
-      const updated = notifications.map(n => 
-        n.id === notificationId ? { ...n, read: true, readAt: new Date().toISOString() } : n
-      );
-      setNotifications(updated);
-      setUnreadCount(updated.filter(n => !n.read).length);
-      
-      try {
-        const stored = localStorage.getItem('user_notifications');
-        if (stored) {
-          const localNotifs = JSON.parse(stored);
-          const updatedLocal = localNotifs.map(n => 
-            n.id === notificationId ? { ...n, read: true, readAt: new Date().toISOString() } : n
-          );
-          localStorage.setItem('user_notifications', JSON.stringify(updatedLocal));
-        }
-      } catch (e) {}
-      
-      await markNotificationAsRead(notificationId);
-    } catch (err) {}
-  };
-
-  const markAllAsRead = async () => {
-    try {
-      const { markAllNotificationsAsRead } = await import('../../services/notificationService');
-      
-      const now = new Date().toISOString();
-      const updated = notifications.map(n => ({ ...n, read: true, readAt: now }));
-      setNotifications(updated);
-      setUnreadCount(0);
-      
-      try {
-        const stored = localStorage.getItem('user_notifications');
-        if (stored) {
-          const localNotifs = JSON.parse(stored);
-          const updatedLocal = localNotifs.map(n => ({ ...n, read: true, readAt: now }));
-          localStorage.setItem('user_notifications', JSON.stringify(updatedLocal));
-        }
-      } catch (e) {}
-      
-      await markAllNotificationsAsRead();
-    } catch (err) {}
+  const handleMarkAllAsRead = async () => {
+    await markAllAsRead();
   };
 
   const handleDelete = async (e, notificationId) => {
     e.stopPropagation();
-    try {
-      const { deleteNotification } = await import('../../services/notificationService');
-      
-      const updated = notifications.filter(n => n.id !== notificationId);
-      setNotifications(updated);
-      setUnreadCount(updated.filter(n => !n.read).length);
-      
-      try {
-        const stored = localStorage.getItem('user_notifications');
-        if (stored) {
-          const localNotifs = JSON.parse(stored);
-          const updatedLocal = localNotifs.filter(n => n.id !== notificationId);
-          localStorage.setItem('user_notifications', JSON.stringify(updatedLocal));
-        }
-      } catch (e) {}
-      
-      await deleteNotification(notificationId);
-    } catch (err) {}
+    await deleteNotification(notificationId);
+    if (selectedNotif?.id === notificationId) {
+      setSelectedNotif(null);
+      setSelectedItemRect(null);
+    }
   };
 
   const handleItemClick = (notif, event) => {
-    if (!notif.read) markAsRead(notif.id);
+    if (!notif.read) handleMarkAsRead(notif.id);
     
-    // Get the clicked item's position for popup placement
     const itemElement = event.currentTarget;
     const rect = itemElement.getBoundingClientRect();
     setSelectedItemRect(rect);
     setSelectedNotif(notif);
   };
 
-  // Close detail popup when clicking outside
   useEffect(() => {
     if (!selectedNotif) return;
     
@@ -197,15 +85,12 @@ export default function NotificationPopup({ onClose, onViewChange }) {
     return () => document.removeEventListener('mousedown', handleClickOutsideDetail);
   }, [selectedNotif]);
 
-  const handleCtaClick = async (notif) => {
-    try {
-      const { handleCtaAction } = await import('../../services/notificationService');
-      setSelectedNotif(null);
-      handleCtaAction(notif, (view) => {
-        onClose?.();
-        onViewChange?.(view);
-      });
-    } catch (err) {}
+  const handleCtaClick = (notif) => {
+    setSelectedNotif(null);
+    handleCtaAction(notif, (view) => {
+      onClose?.();
+      onViewChange?.(view);
+    });
   };
 
   const getNotificationIcon = (type) => {
@@ -222,7 +107,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
   const formatTime = (timestamp) => {
     const now = new Date();
     const notifTime = new Date(timestamp);
-    const diffMs = now - notifTime;
+    const diffMs = now.getTime() - notifTime.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
@@ -293,7 +178,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
           {notifications.length > 0 && (
             <button 
               className="notif-mark-all" 
-              onClick={markAllAsRead}
+              onClick={handleMarkAllAsRead}
               style={{
                 background: 'none',
                 border: 'none',
@@ -377,7 +262,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
         </div>
       </div>
 
-      {/* Detail Popup - positioned next to notification popup, aligned bottom */}
+      {/* Detail Popup */}
       {selectedNotif && selectedItemRect && (
         <div 
           ref={detailPopupRef}
@@ -395,7 +280,6 @@ export default function NotificationPopup({ onClose, onViewChange }) {
             animation: 'notifDetailSlideIn 0.2s ease-out'
           }}
         >
-          {/* Header with Title, Time and Close */}
           <div style={{
             padding: '14px 18px',
             display: 'flex',
@@ -405,7 +289,6 @@ export default function NotificationPopup({ onClose, onViewChange }) {
             flexShrink: 0,
             borderBottom: '1px solid var(--color-border-light)'
           }}>
-            {/* Title and Time */}
             <div style={{ flex: 1, minWidth: 0 }}>
               <h3 style={{
                 fontSize: '15px',
@@ -426,7 +309,6 @@ export default function NotificationPopup({ onClose, onViewChange }) {
               </span>
             </div>
             
-            {/* Close Button */}
             <button 
               onClick={() => { setSelectedNotif(null); setSelectedItemRect(null); }}
               style={{
@@ -454,7 +336,6 @@ export default function NotificationPopup({ onClose, onViewChange }) {
             </button>
           </div>
 
-          {/* Message Body - scrollable with hidden scrollbar */}
           <div 
             className="notif-detail-body-scroll"
             style={{
@@ -477,7 +358,6 @@ export default function NotificationPopup({ onClose, onViewChange }) {
             </p>
           </div>
 
-          {/* Footer with CTA */}
           {selectedNotif.translations?.[userLang]?.cta && selectedNotif.ctaAction && (
             <div style={{
               padding: '14px 18px',

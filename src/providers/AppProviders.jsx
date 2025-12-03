@@ -7,6 +7,7 @@
 
 import { QueryProvider } from './QueryProvider'
 import { AuthProvider } from '../contexts/AuthContext'
+import { NotificationProvider } from '../contexts/NotificationContext'
 import { PaymentProvider } from '../contexts/PaymentContext'
 import { NotesProvider } from '../contexts/NotesContext'
 import { ProfileProvider } from '../contexts/ProfileContext'
@@ -40,6 +41,7 @@ function composeProviders(providers) {
 const providers = [
   QueryProvider,
   AuthProvider,
+  NotificationProvider, // Must be after Auth to access user state
   PaymentProvider,
   NotesProvider,
   ProfileProvider,
@@ -59,15 +61,17 @@ export const AppProviders = composeProviders(providers)
 export const AppProvidersManual = ({ children }) => (
   <QueryProvider>
     <AuthProvider>
-      <PaymentProvider>
-        <NotesProvider>
-          <ProfileProvider>
-            <WorkspaceProvider>
-              {children}
-            </WorkspaceProvider>
-          </ProfileProvider>
-        </NotesProvider>
-      </PaymentProvider>
+      <NotificationProvider>
+        <PaymentProvider>
+          <NotesProvider>
+            <ProfileProvider>
+              <WorkspaceProvider>
+                {children}
+              </WorkspaceProvider>
+            </ProfileProvider>
+          </NotesProvider>
+        </PaymentProvider>
+      </NotificationProvider>
     </AuthProvider>
   </QueryProvider>
 )
