@@ -69,11 +69,8 @@ exports.getUserNotifications = async (req, res) => {
         };
       })
       .filter(notif => {
-        // Filter expired notifications
-        if (notif.expiresAt) {
-          if (new Date(notif.expiresAt) <= now) return false;
-        }
-        // Filter by read status if needed (fallback case)
+        // NOTE: Notifications are now PERMANENT - no expiry filtering
+        // Only filter by read status if needed (fallback case)
         if (unread_only === 'true' && notif.read) return false;
         return true;
       });

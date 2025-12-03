@@ -138,9 +138,9 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
         minWidth: isDragging ? 220 : undefined
       }}
     >
-      <div className="py-5 px-4">
-        <h1 className="text-title3 font-semibold text-text-primary tracking-tight">
-          {t('sidebar.appTitle')}
+      <div className="py-4">
+        <h1 className="text-[26px] text-text-primary tracking-tighter leading-tight text-center whitespace-nowrap">
+          <span className="font-bold">Graphos</span> <span className="font-normal">AI Studio</span>
         </h1>
       </div>
 

@@ -40,18 +40,18 @@ const EmptyProfileCard = () => {
             <div className="mb-6">
               <h3 className="text-2xl font-normal text-text-primary leading-tight">
                 {t('home.welcomeTo')}<br />
-                <span className="font-medium text-accent">{t('home.appName')}</span>
+                <span className="bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-400 bg-clip-text text-transparent"><span className="font-bold">Graphos</span> AI Studio</span>
               </h3>
             </div>
 
-            <div className="empty-profile-text-container flex items-center gap-3 mb-6 py-3 px-5 bg-fill-tertiary rounded-xl max-w-full">
+            <div className="empty-profile-text-container flex items-center gap-3 mb-6 py-3 px-5 bg-fill-tertiary rounded-xl">
               <div className="card-icon !w-11 !h-11 shrink-0">
                 <img src="/icon/fingerprint.svg" alt="Fingerprint" className="w-5 h-5 opacity-70 icon-invert" />
               </div>
-              <p className="text-base text-text-muted m-0 min-h-[24px] flex-1">
+              <p className="text-lg text-text-muted m-0 min-h-[24px] flex-1">
                 <TextScramble 
                   key={currentPhraseIndex} 
-                  className="inline-block !bg-transparent"
+                  className="inline-block !bg-transparent text-lg"
                 >
                   {phrases[currentPhraseIndex]}
                 </TextScramble>
@@ -74,17 +74,15 @@ const EmptyProfileCard = () => {
             </button>
           </div>
 
-          {/* Right Animation */}
+          {/* Right Animation - shifted left via CSS */}
           <div className={cn(
             "empty-profile-animation",
-            "w-48 h-48 shrink-0 max-md:w-36 max-md:h-36",
+            "shrink-0",
             "flex items-center justify-center",
             "bg-fill-tertiary rounded-3xl p-6"
           )}>
             <LottieAnimation 
               animationPath="/animation/FaceID.json"
-              width="100%"
-              height="100%"
               loop={true}
             />
           </div>

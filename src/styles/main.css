@@ -2099,18 +2099,21 @@
    Empty Profile Card Styles
    ============================================ */
 .empty-profile-text-container {
-  min-width: 520px !important;
+  min-width: 580px !important;
   width: fit-content !important;
-  padding-right: 4rem !important;
+  padding-right: 6rem !important;
 }
 
 .empty-profile-animation {
-  margin-left: -5rem !important;
+  transform: translateX(-3rem) !important;
+  width: 13rem !important;
+  height: 13rem !important;
 }
 
-/* Dark mode: chỉ tăng nhẹ độ sáng cho animation */
-.dark .empty-profile-animation {
-  filter: brightness(1.1) !important;
+/* Dark mode: invert animation to white on dark background */
+.dark .empty-profile-animation svg,
+.dark .empty-profile-animation canvas {
+  filter: invert(1) brightness(1.5) !important;
 }
 
 @media (max-width: 768px) {
@@ -2121,6 +2124,8 @@
   }
   
   .empty-profile-animation {
-    margin-left: 0 !important;
+    transform: translateX(0) !important;
+    width: 9rem !important;
+    height: 9rem !important;
   }
 }

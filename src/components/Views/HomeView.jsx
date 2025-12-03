@@ -110,7 +110,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
           "max-lg:w-[90%] max-md:w-[95%] max-md:px-4"
         )}>
           <h2 className="text-4xl font-normal text-text-primary mb-0">
-            {t('home.heroTitle')}
+            <span className="font-bold">Graphos</span> AI Studio
           </h2>
           <p className="text-sm text-text-muted font-normal mb-0 flex items-center justify-between gap-4 leading-relaxed">
             <span>{t('home.heroSubtitle')}</span>

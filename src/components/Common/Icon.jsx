@@ -1,15 +1,21 @@
 import { cn } from '../../lib/utils'
 
 /**
+ * @typedef {Object} IconProps
+ * @property {string} name - Icon name (without .svg extension)
+ * @property {string} [alt] - Alt text for accessibility
+ * @property {string} [className] - Additional CSS classes
+ * @property {'xs' | 'sm' | 'md' | 'lg' | 'xl'} [size] - Size preset
+ * @property {'default' | 'primary' | 'muted' | 'success' | 'warning' | 'error'} [color] - Color preset
+ * @property {boolean} [themed] - Auto invert in dark mode (default: true)
+ */
+
+/**
  * Icon component - Renders SVG icons with proper theming support
  * Replaces filter hacks with clean CSS approach
  * 
- * @param {string} name - Icon name (without .svg extension)
- * @param {string} alt - Alt text for accessibility
- * @param {string} className - Additional CSS classes
- * @param {string} size - Size preset: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
- * @param {string} color - Color preset: 'default' | 'primary' | 'muted' | 'success' | 'warning' | 'error'
- * @param {boolean} themed - Auto invert in dark mode (default: true)
+ * @param {IconProps} props
+ * @returns {JSX.Element}
  */
 const Icon = ({ 
   name, 
