@@ -375,13 +375,21 @@ export const useAuthStore = create(
 
         requestPasswordReset: async (email) => {
           try {
+            const requestBody = JSON.stringify({ email })
+            console.log('[AUTH] requestPasswordReset - email:', email)
+            console.log('[AUTH] requestPasswordReset - body:', requestBody)
+            console.log('[AUTH] requestPasswordReset - URL:', `${API_BASE_URL}/auth/email/forgot-password`)
+            
             const response = await fetch(`${API_BASE_URL}/auth/email/forgot-password`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email })
+              body: requestBody
             })
             
+            console.log('[AUTH] requestPasswordReset - response status:', response.status)
+            
             const data = await response.json()
+            console.log('[AUTH] requestPasswordReset - response data:', data)
             
             if (!response.ok) {
               throw new Error(data.error || 'Failed to request reset')

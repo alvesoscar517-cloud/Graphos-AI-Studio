@@ -39,8 +39,34 @@ exports.createCheckout = async (req, res) => {
   try {
     const { variantId, packageId, userId, email } = req.body;
 
+    logger.info('Checkout request received', { 
+      variantId, 
+      packageId, 
+      userId, 
+      email,
+      hasApiKey: !!process.env.LEMON_SQUEEZY_API_KEY,
+      hasStoreId: !!process.env.LEMON_SQUEEZY_STORE_ID
+    });
+
     if (!variantId || !userId) {
-      return res.status(400).json({ success: false, ...l.error('invalid_input') });
+      return res.status(400).json({ 
+        success: false, 
+        ...l.error('invalid_input'),
+        details: 'variantId and userId are required'
+      });
+    }
+
+    // Check if LemonSqueezy is configured
+    if (!process.env.LEMON_SQUEEZY_API_KEY || !process.env.LEMON_SQUEEZY_STORE_ID) {
+      logger.error('LemonSqueezy not configured', {
+        hasApiKey: !!process.env.LEMON_SQUEEZY_API_KEY,
+        hasStoreId: !!process.env.LEMON_SQUEEZY_STORE_ID
+      });
+      return res.status(503).json({ 
+        success: false, 
+        error: 'Payment service not configured',
+        code: 'PAYMENT_SERVICE_UNAVAILABLE'
+      });
     }
 
     const checkoutUrl = await lemonSqueezy.createCheckout(variantId, {
@@ -49,12 +75,22 @@ exports.createCheckout = async (req, res) => {
       customData: { package_id: packageId }
     });
 
-    logger.info('Checkout created', { variantId, userId, packageId });
+    logger.info('Checkout created', { variantId, userId, packageId, checkoutUrl: checkoutUrl?.substring(0, 50) });
 
     res.json({ success: true, checkoutUrl });
   } catch (error) {
-    logger.error('Create checkout failed', { error: error.message });
-    res.status(500).json({ success: false, ...l.error('server_error'), details: error.message });
+    logger.error('Create checkout failed', { 
+      error: error.message, 
+      stack: error.stack,
+      variantId: req.body?.variantId,
+      userId: req.body?.userId
+    });
+    res.status(500).json({ 
+      success: false, 
+      ...l.error('server_error'), 
+      details: error.message,
+      code: 'CHECKOUT_FAILED'
+    });
   }
 };
 

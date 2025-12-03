@@ -89,8 +89,11 @@ export const PaymentProvider = ({ children }) => {
     try {
       const userInfo = await getUserInfo();
       
-      // Connect to realtime service
-      realtimeService.connect(userInfo.userId);
+      // Connect to realtime service only if not already connected
+      // This is the ONLY place that should initiate connection for payment flow
+      if (!realtimeService.isConnected() && !realtimeService.authFailed) {
+        realtimeService.connect(userInfo.userId);
+      }
       
       // Subscribe to payment events
       unsubscribeRef.current = realtimeService.subscribe('payment', handlePaymentSuccess);

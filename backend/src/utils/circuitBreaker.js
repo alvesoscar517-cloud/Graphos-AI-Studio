@@ -439,6 +439,75 @@ function getHealthStatus() {
 // EXPORTS
 // ============================================================================
 
+// ============================================================================
+// PRE-CREATED BREAKER INSTANCES
+// ============================================================================
+
+/**
+ * Pre-created LemonSqueezy circuit breaker instance
+ * Used for payment API calls
+ */
+const lemonSqueezyBreaker = {
+  async execute(fn) {
+    // Get or create the breaker
+    let breaker = breakers.get('lemonsqueezy');
+    if (!breaker) {
+      breaker = createBreaker('lemonsqueezy', async () => {}, {
+        timeout: 15000,
+        errorThresholdPercentage: 50,
+        resetTimeout: 60000,
+        volumeThreshold: 3,
+      });
+    }
+    
+    // Execute the function directly with circuit breaker protection
+    try {
+      // Check if circuit is open
+      if (breaker.isOpen()) {
+        throw new Error('Circuit breaker is open - LemonSqueezy API temporarily unavailable');
+      }
+      
+      const result = await fn();
+      return result;
+    } catch (error) {
+      // Log the failure for circuit breaker stats
+      logger.warn('LemonSqueezy API call failed', { error: error.message });
+      throw error;
+    }
+  }
+};
+
+/**
+ * Pre-created HTTP circuit breaker instance
+ */
+const httpBreaker = {
+  async execute(fn) {
+    let breaker = breakers.get('http');
+    if (!breaker) {
+      breaker = createBreaker('http', async () => {}, {
+        timeout: 15000,
+        errorThresholdPercentage: 50,
+        resetTimeout: 30000,
+        volumeThreshold: 5,
+      });
+    }
+    
+    try {
+      if (breaker.isOpen()) {
+        throw new Error('Circuit breaker is open - HTTP service temporarily unavailable');
+      }
+      return await fn();
+    } catch (error) {
+      logger.warn('HTTP call failed', { error: error.message });
+      throw error;
+    }
+  }
+};
+
+// ============================================================================
+// EXPORTS
+// ============================================================================
+
 module.exports = {
   // Classes
   CircuitBreaker,
@@ -457,6 +526,10 @@ module.exports = {
   createLemonSqueezyBreaker,
   createRedisBreaker,
   createEmailBreaker,
+  
+  // Pre-created instances
+  lemonSqueezyBreaker,
+  httpBreaker,
   
   // Health check
   getHealthStatus,

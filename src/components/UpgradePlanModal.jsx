@@ -27,6 +27,11 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
   }, [onPurchaseSuccess]);
 
   const handlePurchasePackage = async (pkg) => {
+    // Prevent double-clicks while processing
+    if (createCheckout.isPending || loadingPackageId) {
+      return;
+    }
+    
     setLoadingPackageId(pkg.id);
     
     try {
@@ -44,7 +49,9 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
       }
     } catch (err) {
       console.error('Error creating checkout:', err);
-      showError(t('errors.networkError'));
+      // Show more specific error message if available
+      const errorMessage = err?.message || t('errors.networkError');
+      showError(errorMessage);
     } finally {
       setLoadingPackageId(null);
     }

@@ -27,9 +27,9 @@ const OTP_EXPIRY_MINUTES = 10;
 const OTP_STEP = OTP_EXPIRY_MINUTES * 60; // Step in seconds for TOTP
 
 // Rate Limiting
-const MAX_VERIFICATION_ATTEMPTS = 5;
-const LOCKOUT_MINUTES = 30;
-const MAX_RESENDS_PER_HOUR = 3;
+const MAX_VERIFICATION_ATTEMPTS = 10;  // Increased from 5
+const LOCKOUT_MINUTES = 15;            // Reduced from 30
+const MAX_RESENDS_PER_HOUR = 10;       // Increased from 3
 const RESEND_WINDOW_MINUTES = 60;
 
 // Collection name

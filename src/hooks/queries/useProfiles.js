@@ -22,8 +22,9 @@ export function useProfilesQuery(options = {}) {
       const profiles = await loadProfilesAPI()
       return profiles || []
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchOnWindowFocus: true,
+    staleTime: 5 * 60 * 1000, // 5 minutes - profiles don't change often
+    refetchOnWindowFocus: false, // Disable to reduce API calls, realtime handles updates
+    refetchOnReconnect: true,
     ...options,
   })
 

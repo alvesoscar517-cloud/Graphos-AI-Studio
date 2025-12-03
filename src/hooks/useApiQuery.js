@@ -13,32 +13,34 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../services/api/client';
 import { getUserInfo } from '../services/api/auth';
+import { queryKeys as centralQueryKeys } from '@/lib/queryKeys';
 
 // ============================================================================
-// QUERY KEYS
+// QUERY KEYS (Legacy - use centralQueryKeys from lib/queryKeys.js)
+// These are kept for backward compatibility but should migrate to centralQueryKeys
 // ============================================================================
 
 export const queryKeys = {
-  // User
+  // User - maps to centralQueryKeys.user
   user: ['user'],
   userInfo: () => [...queryKeys.user, 'info'],
   
-  // Profiles
+  // Profiles - maps to centralQueryKeys.profiles
   profiles: ['profiles'],
   profileList: () => [...queryKeys.profiles, 'list'],
   profileDetail: (id) => [...queryKeys.profiles, 'detail', id],
   
-  // Analysis
+  // Analysis - maps to centralQueryKeys.analysis
   analysis: ['analysis'],
   analyzeText: (profileId, textHash) => [...queryKeys.analysis, 'text', profileId, textHash],
   detectAI: (textHash) => [...queryKeys.analysis, 'detect', textHash],
   
-  // Credits
+  // Credits - USE centralQueryKeys.user.credits() for consistency
   credits: ['credits'],
-  creditBalance: () => [...queryKeys.credits, 'balance'],
+  creditBalance: () => centralQueryKeys.user.credits(), // Unified with useCredits hook
   creditHistory: () => [...queryKeys.credits, 'history'],
   
-  // Notifications
+  // Notifications - maps to centralQueryKeys.notifications
   notifications: ['notifications'],
   notificationList: () => [...queryKeys.notifications, 'list'],
   unreadCount: () => [...queryKeys.notifications, 'unread'],

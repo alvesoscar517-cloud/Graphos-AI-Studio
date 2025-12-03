@@ -11,19 +11,47 @@ const nodemailer = require('nodemailer');
 const config = require('../config');
 
 // Email configuration
-const smtpUser = config.SMTP_USER || process.env.SMTP_USER || process.env.EMAIL_USER;
-const smtpPass = config.SMTP_PASS || process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
-const fromEmail = config.EMAIL_FROM || process.env.EMAIL_FROM || 'no-reply@graphosai.com';
-const fromName = config.EMAIL_FROM_NAME || process.env.EMAIL_FROM_NAME || 'Graphos AI Studio';
+// Note: Check for env vars with potential leading space (Cloud Run config issue)
+const smtpHost = config.SMTP_HOST || process.env.SMTP_HOST || process.env[' SMTP_HOST'] || 'smtp.gmail.com';
+const smtpPort = config.SMTP_PORT || process.env.SMTP_PORT || process.env[' SMTP_PORT'] || 587;
+const smtpUser = config.SMTP_USER || process.env.SMTP_USER || process.env[' SMTP_USER'] || process.env.EMAIL_USER;
+const smtpPass = config.SMTP_PASS || process.env.SMTP_PASS || process.env[' SMTP_PASS'] || process.env.EMAIL_PASSWORD;
+const fromEmail = config.EMAIL_FROM || process.env.EMAIL_FROM || process.env[' EMAIL_FROM'] || 'no-reply@graphosai.com';
+const fromName = config.EMAIL_FROM_NAME || process.env.EMAIL_FROM_NAME || process.env[' EMAIL_FROM_NAME'] || 'Graphos AI Studio';
+
+// Log SMTP configuration (without sensitive data)
+logger.info('Email configuration loaded', {
+  smtpHost,
+  smtpPort,
+  smtpUser: smtpUser ? `${smtpUser.substring(0, 3)}***` : 'NOT SET',
+  smtpPassSet: !!smtpPass,
+  fromEmail,
+  fromName
+});
 
 // Email transporter
 const transporter = nodemailer.createTransport({
-  host: config.SMTP_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: config.SMTP_PORT || process.env.SMTP_PORT || 587,
-  secure: (config.SMTP_PORT || process.env.SMTP_PORT) === 465,
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpPort === 465,
   auth: {
     user: smtpUser,
     pass: smtpPass
+  }
+});
+
+// Verify transporter on startup
+transporter.verify((error, success) => {
+  if (error) {
+    logger.error('SMTP transporter verification failed', { 
+      error: error.message,
+      code: error.code,
+      smtpHost,
+      smtpPort,
+      smtpUser: smtpUser ? `${smtpUser.substring(0, 3)}***` : 'NOT SET'
+    });
+  } else {
+    logger.info('SMTP transporter verified successfully');
   }
 });
 
@@ -31,6 +59,17 @@ const transporter = nodemailer.createTransport({
  * Send OTP email
  */
 async function sendOTPEmail(email, code, type, userName, locale) {
+  // Check if SMTP is configured
+  if (!smtpUser || !smtpPass) {
+    logger.error('SMTP not configured - cannot send email', {
+      smtpUserSet: !!smtpUser,
+      smtpPassSet: !!smtpPass,
+      email,
+      type
+    });
+    throw new Error('Email service not configured');
+  }
+
   const templateFn = type === 'verification' ? otpVerificationEmail : passwordResetEmail;
   const subject = type === 'verification' 
     ? 'Verify Your Email - Graphos AI Studio'
@@ -43,14 +82,31 @@ async function sendOTPEmail(email, code, type, userName, locale) {
     lang: locale
   });
   
-  await transporter.sendMail({
-    from: `"${fromName}" <${fromEmail}>`,
-    to: email,
-    subject,
-    html
-  });
-  
-  logger.info('OTP email sent', { email, type });
+  try {
+    const result = await transporter.sendMail({
+      from: `"${fromName}" <${fromEmail}>`,
+      to: email,
+      subject,
+      html
+    });
+    
+    logger.info('OTP email sent successfully', { 
+      email, 
+      type,
+      messageId: result.messageId,
+      response: result.response
+    });
+  } catch (error) {
+    logger.error('Failed to send OTP email', {
+      email,
+      type,
+      error: error.message,
+      code: error.code,
+      command: error.command,
+      responseCode: error.responseCode
+    });
+    throw error;
+  }
 }
 
 /**
@@ -334,13 +390,26 @@ exports.resendOTP = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   const l = createLocalizer(req);
   
+  // Skip OPTIONS requests (CORS preflight)
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  
   try {
-    // Debug logging
+    // Debug logging - more detailed
     logger.info('Forgot password request received', { 
       body: req.body,
+      rawBody: req.rawBody ? req.rawBody.toString().substring(0, 200) : 'no rawBody',
       contentType: req.headers['content-type'],
+      contentLength: req.headers['content-length'],
       hasBody: !!req.body,
-      bodyKeys: req.body ? Object.keys(req.body) : []
+      bodyKeys: req.body ? Object.keys(req.body) : [],
+      bodyType: typeof req.body,
+      bodyStringified: JSON.stringify(req.body),
+      method: req.method,
+      url: req.url,
+      origin: req.headers['origin'],
+      userAgent: req.headers['user-agent']?.substring(0, 50)
     });
     
     const { email, locale } = req.body || {};
@@ -636,6 +705,14 @@ exports.getSessions = async (req, res) => {
   try {
     const userId = req.userId;
     
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required',
+        code: 'AUTH_REQUIRED'
+      });
+    }
+    
     const sessions = await emailAuthService.getActiveSessions(userId);
     
     res.json({
@@ -644,12 +721,17 @@ exports.getSessions = async (req, res) => {
     });
     
   } catch (error) {
-    logger.error('Get sessions error', { error: error.message });
+    logger.error('Get sessions error', { 
+      error: error.message, 
+      stack: error.stack,
+      userId: req.userId 
+    });
     
     res.status(500).json({
       success: false,
       error: 'Failed to get sessions',
-      code: 'GET_SESSIONS_ERROR'
+      code: 'GET_SESSIONS_ERROR',
+      details: process.env.NODE_ENV !== 'production' ? error.message : undefined
     });
   }
 };

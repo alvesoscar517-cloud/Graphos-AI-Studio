@@ -11,9 +11,9 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
   const [otp, setOtp] = useState('')
 
   // Email step form
-  const emailForm = useForgotPasswordForm(async (data) => {
-    await onResetPassword.request(data.email)
-    setEmail(data.email)
+  const emailForm = useForgotPasswordForm(async (email) => {
+    await onResetPassword.request(email)
+    setEmail(email)
     setStep('otp')
   })
 

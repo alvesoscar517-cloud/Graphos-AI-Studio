@@ -1,7 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from './AuthContext'
-import { useProfiles } from './ProfileContext'
-import apiClient from '../services/api/client'
 import { logError } from '../utils/errors'
 
 const WorkspaceContext = createContext()
@@ -25,9 +23,20 @@ const ERROR_MESSAGES = {
   DEFAULT: 'Something went wrong. Please try again.'
 }
 
+// Safe hook to get current profile - doesn't throw if context missing
+const useSafeProfiles = () => {
+  try {
+    // Dynamic import to avoid circular dependency issues
+    const { useProfiles } = require('./ProfileContext')
+    return useProfiles()
+  } catch {
+    return { currentProfile: null, profiles: [], loading: false }
+  }
+}
+
 export const WorkspaceProvider = ({ children }) => {
   const { user } = useAuth()
-  const { currentProfile } = useProfiles()
+  const { currentProfile } = useSafeProfiles()
   
   // Configuration
   const MAX_CONVERSATIONS = 100

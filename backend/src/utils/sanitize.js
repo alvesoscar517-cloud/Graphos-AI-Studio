@@ -326,6 +326,11 @@ function sanitizeMiddleware(options = {}) {
   
   return (req, res, next) => {
     try {
+      // Debug: log body before sanitization for auth routes
+      if (req.path.includes('/auth/')) {
+        console.log('[SANITIZE] Auth route body before:', JSON.stringify(req.body));
+      }
+      
       if (sanitizeBody && req.body) {
         for (const field of textFields) {
           if (req.body[field] && typeof req.body[field] === 'string') {
@@ -333,6 +338,11 @@ function sanitizeMiddleware(options = {}) {
           }
         }
         req.body = sanitizeObject(req.body, { stripTags: true });
+      }
+      
+      // Debug: log body after sanitization for auth routes
+      if (req.path.includes('/auth/')) {
+        console.log('[SANITIZE] Auth route body after:', JSON.stringify(req.body));
       }
       
       if (sanitizeQuery && req.query) {
@@ -345,7 +355,7 @@ function sanitizeMiddleware(options = {}) {
       
       next();
     } catch (error) {
-      console.error('[SANITIZE] Error:', error.message);
+      console.error('[SANITIZE] Error:', error.message, 'Body was:', JSON.stringify(req.body));
       res.status(400).json({
         success: false,
         error: 'Invalid input',

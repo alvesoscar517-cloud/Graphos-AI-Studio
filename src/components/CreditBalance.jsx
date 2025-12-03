@@ -26,12 +26,9 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
     queryClient.setQueryData(queryKeys.user.credits(), newCredits)
   }, [queryClient])
 
-  // Additional real-time updates for payment success
+  // Listen for payment success events (SSE connection handled centrally)
   useEffect(() => {
     if (!userId || !isAuthenticated) return
-
-    // Connect to realtime service
-    realtimeService.connect(userId)
 
     // Listen for payment success
     const handlePaymentSuccess = (e) => {

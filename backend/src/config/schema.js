@@ -199,25 +199,28 @@ const config = convict({
     smtpHost: {
       doc: 'SMTP server host',
       format: String,
-      default: '',
+      // Fallback to space-prefixed env var (Cloud Run config issue workaround)
+      default: process.env[' SMTP_HOST'] || '',
       env: 'SMTP_HOST'
     },
     smtpPort: {
       doc: 'SMTP server port',
       format: 'int',
-      default: 587,
+      default: parseInt(process.env[' SMTP_PORT']) || 587,
       env: 'SMTP_PORT'
     },
     smtpUser: {
       doc: 'SMTP username',
       format: String,
-      default: '',
+      // Fallback to space-prefixed env var (Cloud Run config issue workaround)
+      default: process.env[' SMTP_USER'] || '',
       env: 'SMTP_USER'
     },
     smtpPass: {
       doc: 'SMTP password',
       format: String,
-      default: '',
+      // Fallback to space-prefixed env var (Cloud Run config issue workaround)
+      default: process.env[' SMTP_PASS'] || '',
       env: 'SMTP_PASS',
       sensitive: true
     },

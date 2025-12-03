@@ -13,14 +13,11 @@ const NotificationBadgeV2 = ({ userId, className }) => {
   const queryClient = useQueryClient()
   const { data: unreadCount = 0 } = useUnreadNotifications()
 
-  // Subscribe to real-time notification updates
+  // Subscribe to real-time notification updates (SSE connection handled centrally)
   useEffect(() => {
     if (!userId) return
 
-    // Connect to realtime service
-    realtimeService.connect(userId)
-
-    // Subscribe to notification events
+    // Subscribe to notification events (connection managed by NotificationStore)
     const unsubscribe = realtimeService.subscribe('notification', (data) => {
       // Invalidate unread count to refetch
       queryClient.invalidateQueries({ queryKey: queryKeys.notifications.unread() })

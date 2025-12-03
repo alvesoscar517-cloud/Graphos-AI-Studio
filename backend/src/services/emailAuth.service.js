@@ -882,17 +882,27 @@ async function deleteAccount(userId, password) {
  * @returns {Promise<Array>}
  */
 async function getActiveSessions(userId) {
+  // Query without orderBy to avoid requiring composite index
+  // Sort in memory instead
   const sessionsSnapshot = await db.collection(SESSION_COLLECTION)
     .where('userId', '==', userId)
-    .orderBy('lastActiveAt', 'desc')
     .get();
   
-  return sessionsSnapshot.docs.map(doc => ({
+  const sessions = sessionsSnapshot.docs.map(doc => ({
     sessionId: doc.id,
     ...doc.data(),
     createdAt: doc.data().createdAt?.toDate(),
     lastActiveAt: doc.data().lastActiveAt?.toDate()
   }));
+  
+  // Sort by lastActiveAt descending in memory
+  sessions.sort((a, b) => {
+    const aTime = a.lastActiveAt?.getTime() || 0;
+    const bTime = b.lastActiveAt?.getTime() || 0;
+    return bTime - aTime;
+  });
+  
+  return sessions;
 }
 
 /**
@@ -957,16 +967,27 @@ async function revokeAllOtherSessions(userId, currentSessionId) {
  * @returns {Promise<Array>}
  */
 async function getLoginHistory(userId, limit = 10) {
+  // Query without orderBy to avoid requiring composite index
+  // Fetch more than needed, sort in memory, then limit
   const historySnapshot = await db.collection(LOGIN_HISTORY_COLLECTION)
     .where('userId', '==', userId)
-    .orderBy('loginAt', 'desc')
-    .limit(limit)
+    .limit(Math.min(limit * 2, 100)) // Fetch extra to ensure we have enough after sorting
     .get();
   
-  return historySnapshot.docs.map(doc => ({
+  const history = historySnapshot.docs.map(doc => ({
     ...doc.data(),
     loginAt: doc.data().loginAt?.toDate()
   }));
+  
+  // Sort by loginAt descending in memory
+  history.sort((a, b) => {
+    const aTime = a.loginAt?.getTime() || 0;
+    const bTime = b.loginAt?.getTime() || 0;
+    return bTime - aTime;
+  });
+  
+  // Return only the requested limit
+  return history.slice(0, limit);
 }
 
 /**

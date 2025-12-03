@@ -1,6 +1,6 @@
 /**
  * Unified Real-time Service using Server-Sent Events (SSE)
- * Enhanced with reconnecting-eventsource for automatic reconnection
+ * Uses native EventSource with manual reconnection control
  * 
  * Single connection handles all real-time updates:
  * - Credits balance changes
@@ -13,25 +13,20 @@
  * - Instant updates (< 100ms vs 30s polling)
  * - Reduced API costs by ~95%
  * - Better UX with real-time feedback
- * - Automatic reconnection with exponential backoff
+ * - Controlled reconnection with auth failure detection
  */
 
-import ReconnectingEventSource from 'reconnecting-eventsource';
 import { CONFIG } from '../utils/config';
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
 
-const RECONNECT_OPTIONS = {
-  // Initial delay before reconnecting (ms)
-  initialDelay: 1000,
-  // Maximum delay between reconnection attempts (ms)
-  maxDelay: 30000,
-  // Multiplier for exponential backoff
-  backoffMultiplier: 1.5,
-  // Maximum number of reconnection attempts (0 = infinite)
-  maxRetries: 0,
+const RECONNECT_CONFIG = {
+  initialDelay: 2000,      // 2 seconds initial delay
+  maxDelay: 60000,         // Max 1 minute between retries
+  maxRetries: 3,           // Only 3 retries before giving up
+  backoffMultiplier: 2,    // Double delay each retry
 };
 
 // ============================================================================
@@ -46,17 +41,19 @@ class RealtimeService {
     this.connectionStatus = 'disconnected';
     this.reconnectAttempts = 0;
     this.lastEventId = null;
+    this.authFailed = false;
+    this.reconnectTimeout = null;
+    this.isConnecting = false;
+    this.lastConnectTime = 0;
   }
 
   /**
    * Get auth token from localStorage or Chrome extension
    */
   async getAuthToken() {
-    // First check localStorage for email auth token (web app mode)
     try {
       const authToken = localStorage.getItem('authToken');
       const authMethod = localStorage.getItem('authMethod');
-      
       if (authToken && authMethod === 'email') {
         return authToken;
       }
@@ -64,7 +61,6 @@ class RealtimeService {
       // localStorage not available
     }
     
-    // Then try Chrome extension
     try {
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
         const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' });
@@ -77,7 +73,7 @@ class RealtimeService {
   }
 
   /**
-   * Connect to SSE endpoint with automatic reconnection
+   * Connect to SSE endpoint
    */
   async connect(userId) {
     if (!userId) {
@@ -85,22 +81,51 @@ class RealtimeService {
       return;
     }
 
+    // Prevent multiple simultaneous connections
+    if (this.isConnecting) {
+      console.log('[RealtimeService] Already connecting, skipping');
+      return;
+    }
+
     // Already connected with same user
-    if (this.eventSource && this.userId === userId && this.connectionStatus === 'connected') {
+    if (this.eventSource && this.userId === userId && 
+        this.eventSource.readyState === EventSource.OPEN) {
       console.log('[RealtimeService] Already connected');
       return;
     }
 
-    // Disconnect existing connection
-    if (this.eventSource) {
-      this.disconnect();
+    // Debounce - minimum 3 seconds between connection attempts
+    const now = Date.now();
+    if (now - this.lastConnectTime < 3000) {
+      console.log('[RealtimeService] Debouncing connection attempt');
+      return;
     }
+
+    // Don't reconnect if auth has failed
+    if (this.authFailed) {
+      console.log('[RealtimeService] Auth failed, skipping connection');
+      return;
+    }
+
+    // Check max retries
+    if (this.reconnectAttempts >= RECONNECT_CONFIG.maxRetries) {
+      console.warn('[RealtimeService] Max retries reached, stopping');
+      this.connectionStatus = 'failed';
+      this._notifyStatusChange();
+      return;
+    }
+
+    this.isConnecting = true;
+    this.lastConnectTime = now;
+
+    // Disconnect existing connection
+    this._closeConnection();
 
     this.userId = userId;
     this.connectionStatus = 'connecting';
     this._notifyStatusChange();
 
-    console.log('[RealtimeService] Connecting...', { userId });
+    console.log('[RealtimeService] Connecting...', { userId, attempt: this.reconnectAttempts + 1 });
 
     // Build URL with auth token
     let url = `${CONFIG.API_BASE_URL}/api/realtime/events/${userId}`;
@@ -109,104 +134,147 @@ class RealtimeService {
       url += `?token=${encodeURIComponent(authToken)}`;
     }
     
-    // Add last event ID for resuming
     if (this.lastEventId) {
       url += `${authToken ? '&' : '?'}lastEventId=${this.lastEventId}`;
     }
 
-    // Create ReconnectingEventSource with options
-    this.eventSource = new ReconnectingEventSource(url, {
-      // Custom headers not supported by EventSource, but we pass token in URL
-      withCredentials: false,
-      
-      // Reconnection options
-      max_retry_time: RECONNECT_OPTIONS.maxDelay,
-    });
+    try {
+      // Use native EventSource (no auto-reconnect library)
+      this.eventSource = new EventSource(url);
 
-    // Connection opened
-    this.eventSource.onopen = () => {
-      console.log('[RealtimeService] Connected');
-      this.reconnectAttempts = 0;
-      this.connectionStatus = 'connected';
-      this._notifyStatusChange();
-    };
-
-    // Handle different event types
-    this.eventSource.addEventListener('connected', (e) => {
-      console.log('[RealtimeService] Confirmed', JSON.parse(e.data));
-      if (e.lastEventId) {
-        this.lastEventId = e.lastEventId;
-      }
-    });
-
-    this.eventSource.addEventListener('credits', (e) => {
-      const data = JSON.parse(e.data);
-      console.log('[RealtimeService] Credits update:', data);
-      this._notify('credits', data);
-      if (e.lastEventId) this.lastEventId = e.lastEventId;
-    });
-
-    this.eventSource.addEventListener('payment', (e) => {
-      const data = JSON.parse(e.data);
-      console.log('[RealtimeService] Payment update:', data);
-      this._notify('payment', data);
-      if (e.lastEventId) this.lastEventId = e.lastEventId;
-    });
-
-    this.eventSource.addEventListener('notification', (e) => {
-      const data = JSON.parse(e.data);
-      console.log('[RealtimeService] Notification:', data);
-      this._notify('notification', data);
-      if (e.lastEventId) this.lastEventId = e.lastEventId;
-    });
-
-    this.eventSource.addEventListener('profile', (e) => {
-      const data = JSON.parse(e.data);
-      console.log('[RealtimeService] Profile update:', data);
-      this._notify('profile', data);
-      if (e.lastEventId) this.lastEventId = e.lastEventId;
-    });
-
-    this.eventSource.addEventListener('heartbeat', () => {
-      // Connection alive - reset reconnect attempts
-      this.reconnectAttempts = 0;
-    });
-
-    // Error handling
-    this.eventSource.onerror = (error) => {
-      console.error('[RealtimeService] Error', error);
-      this.reconnectAttempts++;
-      
-      if (this.connectionStatus !== 'reconnecting') {
-        this.connectionStatus = 'reconnecting';
+      // Connection opened
+      this.eventSource.onopen = () => {
+        console.log('[RealtimeService] Connected');
+        this.reconnectAttempts = 0;
+        this.connectionStatus = 'connected';
+        this.isConnecting = false;
         this._notifyStatusChange();
-      }
-      
-      // Log reconnection attempt
-      console.log(`[RealtimeService] Reconnecting... (attempt ${this.reconnectAttempts})`);
-    };
+      };
+
+      // Handle events
+      this.eventSource.addEventListener('connected', (e) => {
+        console.log('[RealtimeService] Confirmed');
+        if (e.lastEventId) this.lastEventId = e.lastEventId;
+      });
+
+      this.eventSource.addEventListener('credits', (e) => {
+        const data = JSON.parse(e.data);
+        this._notify('credits', data);
+        if (e.lastEventId) this.lastEventId = e.lastEventId;
+      });
+
+      this.eventSource.addEventListener('payment', (e) => {
+        const data = JSON.parse(e.data);
+        this._notify('payment', data);
+        if (e.lastEventId) this.lastEventId = e.lastEventId;
+      });
+
+      this.eventSource.addEventListener('notification', (e) => {
+        const data = JSON.parse(e.data);
+        this._notify('notification', data);
+        if (e.lastEventId) this.lastEventId = e.lastEventId;
+      });
+
+      this.eventSource.addEventListener('profile', (e) => {
+        const data = JSON.parse(e.data);
+        this._notify('profile', data);
+        if (e.lastEventId) this.lastEventId = e.lastEventId;
+      });
+
+      this.eventSource.addEventListener('heartbeat', () => {
+        this.reconnectAttempts = 0;
+      });
+
+      // Error handling - this is where we control reconnection
+      this.eventSource.onerror = () => {
+        this.isConnecting = false;
+        
+        // Check if connection was immediately rejected (likely auth error)
+        if (this.eventSource?.readyState === EventSource.CLOSED) {
+          if (this.connectionStatus === 'connecting') {
+            console.warn('[RealtimeService] Connection rejected - likely auth error');
+            this.authFailed = true;
+            this._closeConnection();
+            this.connectionStatus = 'auth_failed';
+            this._notifyStatusChange();
+            this._notify('authError', { message: 'Authentication failed' });
+            return;
+          }
+        }
+
+        this.reconnectAttempts++;
+        console.log(`[RealtimeService] Error, attempt ${this.reconnectAttempts}/${RECONNECT_CONFIG.maxRetries}`);
+
+        // Close current connection
+        this._closeConnection();
+
+        // Schedule reconnect with exponential backoff
+        if (this.reconnectAttempts < RECONNECT_CONFIG.maxRetries && !this.authFailed) {
+          const delay = Math.min(
+            RECONNECT_CONFIG.initialDelay * Math.pow(RECONNECT_CONFIG.backoffMultiplier, this.reconnectAttempts - 1),
+            RECONNECT_CONFIG.maxDelay
+          );
+          
+          console.log(`[RealtimeService] Reconnecting in ${delay}ms...`);
+          this.connectionStatus = 'reconnecting';
+          this._notifyStatusChange();
+          
+          this.reconnectTimeout = setTimeout(() => {
+            this.connect(this.userId);
+          }, delay);
+        } else {
+          console.warn('[RealtimeService] Giving up on reconnection');
+          this.connectionStatus = 'failed';
+          this._notifyStatusChange();
+        }
+      };
+    } catch (error) {
+      console.error('[RealtimeService] Connection error:', error);
+      this.isConnecting = false;
+      this.connectionStatus = 'failed';
+      this._notifyStatusChange();
+    }
+  }
+
+  /**
+   * Close connection without triggering reconnect
+   */
+  _closeConnection() {
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+    
+    if (this.eventSource) {
+      this.eventSource.onopen = null;
+      this.eventSource.onerror = null;
+      this.eventSource.close();
+      this.eventSource = null;
+    }
   }
 
   /**
    * Disconnect from SSE
    */
   disconnect() {
-    if (this.eventSource) {
-      this.eventSource.close();
-      this.eventSource = null;
-    }
-
+    this._closeConnection();
     this.connectionStatus = 'disconnected';
-    this.reconnectAttempts = 0;
+    this.isConnecting = false;
     this._notifyStatusChange();
     console.log('[RealtimeService] Disconnected');
   }
 
   /**
+   * Reset auth failure state
+   */
+  resetAuthState() {
+    this.authFailed = false;
+    this.reconnectAttempts = 0;
+    console.log('[RealtimeService] Auth state reset');
+  }
+
+  /**
    * Subscribe to event type
-   * @param {string} eventType - Event type to subscribe to
-   * @param {Function} callback - Callback function
-   * @returns {Function} Unsubscribe function
    */
   subscribe(eventType, callback) {
     if (!this.listeners.has(eventType)) {
@@ -214,7 +282,6 @@ class RealtimeService {
     }
     this.listeners.get(eventType).add(callback);
 
-    // Return unsubscribe function
     return () => {
       const callbacks = this.listeners.get(eventType);
       if (callbacks) {
@@ -225,8 +292,6 @@ class RealtimeService {
 
   /**
    * Subscribe to connection status changes
-   * @param {Function} callback - Callback function
-   * @returns {Function} Unsubscribe function
    */
   onStatusChange(callback) {
     return this.subscribe('_status', callback);
@@ -234,7 +299,6 @@ class RealtimeService {
 
   /**
    * Get current connection status
-   * @returns {string} 'connected' | 'connecting' | 'reconnecting' | 'disconnected'
    */
   getStatus() {
     return this.connectionStatus;
@@ -242,25 +306,23 @@ class RealtimeService {
 
   /**
    * Check if connected
-   * @returns {boolean}
    */
   isConnected() {
-    return this.connectionStatus === 'connected';
+    return this.connectionStatus === 'connected' && 
+           this.eventSource?.readyState === EventSource.OPEN;
   }
 
   /**
-   * Force reconnect
+   * Force reconnect (resets auth failure state)
    */
   async reconnect() {
     if (this.userId) {
+      this.authFailed = false;
+      this.reconnectAttempts = 0;
       this.disconnect();
       await this.connect(this.userId);
     }
   }
-
-  // ============================================================================
-  // PRIVATE METHODS
-  // ============================================================================
 
   /**
    * Notify listeners of an event
@@ -293,24 +355,50 @@ class RealtimeService {
 const realtimeService = new RealtimeService();
 
 // ============================================================================
-// AUTO-RECONNECT ON VISIBILITY CHANGE
+// AUTO-RECONNECT ON VISIBILITY CHANGE (with strict guards)
 // ============================================================================
 
 if (typeof document !== 'undefined') {
+  let lastVisibilityChange = 0;
+  
   document.addEventListener('visibilitychange', async () => {
+    // Debounce visibility changes
+    const now = Date.now();
+    if (now - lastVisibilityChange < 5000) return;
+    lastVisibilityChange = now;
+    
     if (document.visibilityState === 'visible' && realtimeService.userId) {
-      if (realtimeService.connectionStatus !== 'connected') {
-        console.log('[RealtimeService] Tab visible, reconnecting...');
-        await realtimeService.reconnect();
+      // Only reconnect if truly disconnected and auth hasn't failed
+      if (realtimeService.authFailed) {
+        console.log('[RealtimeService] Tab visible but auth failed');
+        return;
+      }
+      if (realtimeService.isConnecting) {
+        console.log('[RealtimeService] Tab visible but already connecting');
+        return;
+      }
+      if (!realtimeService.isConnected() && 
+          realtimeService.connectionStatus !== 'connecting' &&
+          realtimeService.connectionStatus !== 'reconnecting') {
+        console.log('[RealtimeService] Tab visible, attempting reconnect');
+        await realtimeService.connect(realtimeService.userId);
       }
     }
   });
   
-  // Also reconnect on online event
+  // Reconnect on network online (with debounce)
+  let lastOnline = 0;
   window.addEventListener('online', async () => {
-    if (realtimeService.userId && realtimeService.connectionStatus !== 'connected') {
-      console.log('[RealtimeService] Network online, reconnecting...');
-      await realtimeService.reconnect();
+    const now = Date.now();
+    if (now - lastOnline < 10000) return;
+    lastOnline = now;
+    
+    if (realtimeService.userId && !realtimeService.authFailed && !realtimeService.isConnecting) {
+      if (!realtimeService.isConnected()) {
+        console.log('[RealtimeService] Network online, attempting reconnect');
+        realtimeService.reconnectAttempts = 0; // Reset on network change
+        await realtimeService.connect(realtimeService.userId);
+      }
     }
   });
 }

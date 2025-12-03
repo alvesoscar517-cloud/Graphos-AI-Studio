@@ -257,9 +257,9 @@ export const useNotificationStore = create(
          * 
          * Cost optimization:
          * - SSE is primary source for real-time updates (no polling needed when connected)
-         * - Fallback polling only when SSE disconnected (every 30 min)
+         * - Fallback polling disabled - rely on SSE only
          * - Cache TTL 10 minutes to reduce redundant fetches
-         * - Only fetch on visibility change if cache expired
+         * - Only fetch on visibility change if cache expired AND SSE disconnected
          */
         init: (userId) => {
           if (get()._initialized) return
@@ -279,31 +279,30 @@ export const useNotificationStore = create(
             }
           })
           
-          // Connect to SSE if not already connected
-          if (!realtimeService.isConnected() && userId) {
+          // CENTRALIZED SSE CONNECTION - NotificationStore is the primary initializer
+          // Other components should only subscribe, not connect
+          if (!realtimeService.isConnected() && !realtimeService.authFailed && userId) {
+            console.log('[NotificationStore] Initializing SSE connection')
             realtimeService.connect(userId)
           }
           
-          // Setup FALLBACK polling - only when SSE might be disconnected
-          // This is a safety net, not the primary update mechanism
-          const interval = setInterval(() => {
-            // Only poll if SSE is disconnected AND cache is expired
-            if (!realtimeService.isConnected() && !get()._isCacheValid()) {
-              console.log('[NotificationStore] Fallback polling (SSE disconnected)')
-              get().fetchNotifications(true)
-            }
-          }, FALLBACK_POLLING_INTERVAL)
+          // NO POLLING - rely entirely on SSE for real-time updates
+          // This saves significant API costs
           
           set({ 
             _sseUnsubscribe: unsubscribe, 
-            _refreshInterval: interval,
+            _refreshInterval: null, // No polling
             _initialized: true 
           })
           
-          // Listen for visibility change - only fetch if cache expired
+          // Listen for visibility change - only fetch if cache expired AND SSE not connected
           const handleVisibility = () => {
-            if (document.visibilityState === 'visible' && !get()._isCacheValid()) {
-              get().fetchNotifications(true)
+            if (document.visibilityState === 'visible') {
+              // Only fetch if both: cache expired AND SSE disconnected
+              if (!get()._isCacheValid() && !realtimeService.isConnected()) {
+                console.log('[NotificationStore] Visibility fetch (cache expired, SSE down)')
+                get().fetchNotifications(true)
+              }
             }
           }
           document.addEventListener('visibilitychange', handleVisibility)

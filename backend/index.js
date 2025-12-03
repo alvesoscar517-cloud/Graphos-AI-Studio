@@ -189,6 +189,10 @@ app.use(express.json({
   verify: (req, res, buf) => {
     // Store raw body for signature verification if needed
     req.rawBody = buf;
+    // Debug: log raw body for auth routes
+    if (req.url.includes('/auth/')) {
+      console.log('[BODY-PARSER] Auth route raw body:', buf ? buf.toString().substring(0, 200) : 'empty');
+    }
   }
 }));
 app.use(express.urlencoded({ extended: true, limit: config.MAX_REQUEST_SIZE }));

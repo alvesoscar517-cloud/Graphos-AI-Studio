@@ -29,9 +29,11 @@ export function useCredits(options = {}) {
       }
       return data?.credits || data
     },
-    staleTime: 30 * 1000, // 30 seconds
-    refetchInterval: 60 * 1000, // Refetch every minute as fallback
-    refetchOnWindowFocus: true,
+    staleTime: 2 * 60 * 1000, // 2 minutes - realtime handles updates
+    // Disable polling when realtime is connected - only fetch on demand
+    refetchInterval: false, // Realtime SSE handles updates, no need for polling
+    refetchOnWindowFocus: false, // Avoid unnecessary refetch, realtime handles this
+    refetchOnReconnect: true, // Refetch when network reconnects
     ...options,
   })
 

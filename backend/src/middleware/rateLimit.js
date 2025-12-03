@@ -19,16 +19,16 @@ const logger = require('../utils/logger');
 const RATE_LIMITS = {
   // Default limits for unauthenticated users
   default: {
-    points: 100,      // Number of requests
+    points: 200,      // Number of requests (increased from 100)
     duration: 60,     // Per 60 seconds
-    blockDuration: 60 // Block for 60 seconds if exceeded
+    blockDuration: 30 // Block for 30 seconds if exceeded (reduced from 60)
   },
   
   // Auth routes (login, register, etc.)
   auth: {
-    points: 20,
+    points: 50,       // Increased from 20
     duration: 60,
-    blockDuration: 120
+    blockDuration: 60 // Reduced from 120
   },
   
   // API routes for authenticated users

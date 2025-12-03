@@ -37,6 +37,7 @@ export function usePackages() {
 
 /**
  * Create checkout session for package purchase
+ * Note: No retry for payment endpoints to prevent duplicate charges
  */
 export function useCreateCheckout() {
   const queryClient = useQueryClient()
@@ -44,17 +45,20 @@ export function useCreateCheckout() {
   return useMutation({
     mutationFn: async ({ packageId, variantId }) => {
       const userInfo = await getUserInfo()
+      // Disable retry for payment to prevent duplicate charges
       const { data } = await apiClient.post('/api/payment/checkout', {
         packageId,
         variantId,
         userId: userInfo.userId,
         email: userInfo.email
-      })
+      }, { retry: false })
       return data
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.user.credits() })
     },
+    // Don't retry on error - payment endpoints should not be retried automatically
+    retry: false,
   })
 }
 
