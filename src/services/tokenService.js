@@ -21,7 +21,7 @@ import {
   getAuthMethod,
 } from '../utils/authStorage'
 
-const API_BASE_URL = CONFIG.API_BASE_URL || 'https://ai-authenticator-472729326429.us-central1.run.app'
+const API_BASE_URL = CONFIG.API_BASE_URL || 'https://graphosai-472729326429.us-central1.run.app'
 
 // Refresh token 5 minutes before expiry
 const REFRESH_THRESHOLD_MS = 5 * 60 * 1000

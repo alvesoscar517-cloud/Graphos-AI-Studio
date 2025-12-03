@@ -53,7 +53,7 @@ export const CONFIG = {
   MODE,
   
   // API Configuration
-  API_BASE_URL: getEnvVar('VITE_API_BASE_URL', 'https://ai-authenticator-472729326429.us-central1.run.app'),
+  API_BASE_URL: getEnvVar('VITE_API_BASE_URL', 'https://graphosai-472729326429.us-central1.run.app'),
   REQUEST_TIMEOUT: getEnvNumber('VITE_REQUEST_TIMEOUT', 30000),
   MAX_RETRIES: getEnvNumber('VITE_MAX_RETRIES', 2),
   

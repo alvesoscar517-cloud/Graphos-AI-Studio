@@ -31,7 +31,7 @@ import {
 import { logError } from '../utils/errors'
 import { saveCredentials, preventAutoSignIn } from '../utils/credentialManager'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://ai-authenticator-472729326429.us-central1.run.app'
+const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://graphosai-472729326429.us-central1.run.app'
 
 export const useAuthStore = create(
   subscribeWithSelector(

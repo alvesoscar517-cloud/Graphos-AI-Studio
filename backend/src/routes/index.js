@@ -88,7 +88,7 @@ router.get('/api/docs', (_req, res) => {
 // Swagger UI redirect
 router.get('/api/docs/ui', (_req, res) => {
   const swaggerUrl = `https://petstore.swagger.io/?url=${encodeURIComponent(
-    'https://ai-authenticator-472729326429.us-central1.run.app/api/docs'
+    'https://graphosai-472729326429.us-central1.run.app/api/docs'
   )}`;
   res.redirect(swaggerUrl);
 });

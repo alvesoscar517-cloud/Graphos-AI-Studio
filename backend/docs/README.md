@@ -7,7 +7,7 @@ This is the backend API for Graphos AI Studio, a service for detecting AI-genera
 ## Quick Start
 
 ### Base URL
-- **Production**: `https://ai-authenticator-472729326429.us-central1.run.app`
+- **Production**: `https://graphosai-472729326429.us-central1.run.app`
 - **Development**: `http://localhost:3000`
 
 ### Authentication

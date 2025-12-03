@@ -22,12 +22,12 @@ export default defineConfig({
     port: 5174,
     proxy: {
       '/api': {
-        target: 'https://ai-authenticator-472729326429.us-central1.run.app',
+        target: 'https://graphosai-472729326429.us-central1.run.app',
         changeOrigin: true,
         secure: false,
       },
       '/send-feedback': {
-        target: 'https://ai-authenticator-472729326429.us-central1.run.app',
+        target: 'https://graphosai-472729326429.us-central1.run.app',
         changeOrigin: true,
         secure: false,
       }

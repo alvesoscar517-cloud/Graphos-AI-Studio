@@ -16,7 +16,7 @@ import {
 const API_BASE_URL = import.meta.env?.VITE_API_URL || 
   // @ts-ignore - Vite env
   import.meta.env?.VITE_API_BASE_URL || 
-  'https://ai-authenticator-472729326429.us-central1.run.app';
+  'https://graphosai-472729326429.us-central1.run.app';
 
 // ============================================================================
 // REQUEST HELPERS

@@ -5,7 +5,7 @@
 
 import { useMutation } from '@tanstack/react-query'
 
-const FEEDBACK_API_URL = 'https://ai-authenticator-472729326429.us-central1.run.app/send-feedback'
+const FEEDBACK_API_URL = 'https://graphosai-472729326429.us-central1.run.app/send-feedback'
 
 /**
  * Send general feedback

@@ -23,7 +23,7 @@ info:
     name: Proprietary
 
 servers:
-  - url: https://ai-authenticator-472729326429.us-central1.run.app
+  - url: https://graphosai-472729326429.us-central1.run.app
     description: Production server
   - url: http://localhost:3000
     description: Development server
