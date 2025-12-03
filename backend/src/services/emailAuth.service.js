@@ -19,6 +19,22 @@ const { FREE_CREDITS } = require('../config/pricing');
 const config = require('../config');
 const { sendWelcomeNotification } = require('./autoNotification.service');
 const { get: httpGet } = require('../utils/httpClient');
+const jwt = require('jsonwebtoken');
+
+/**
+ * Generate JWT token for email auth users
+ * More efficient than Firebase custom token - no API calls needed
+ * @param {string} userId - User ID
+ * @returns {string} JWT token
+ */
+function generateEmailAuthToken(userId) {
+  const JWT_SECRET = config.JWT_SECRET;
+  return jwt.sign(
+    { userId, type: 'email_auth' },
+    JWT_SECRET,
+    { expiresIn: '7d', issuer: 'graphosai' }
+  );
+}
 
 // Collections
 const USERS_COLLECTION = 'users';
@@ -253,21 +269,13 @@ async function verifyEmail(email, otp) {
   await db.collection(PENDING_REGISTRATIONS_COLLECTION).doc(normalizedEmail).delete();
   await otpService.invalidateOTP(normalizedEmail, 'verification');
   
-  // Generate custom token for client
-  let token = null;
-  try {
-    token = await admin.auth().createCustomToken(userId);
-  } catch (error) {
-    logger.error('Failed to create custom token', { userId, error: error.message, code: error.code });
-    // Don't throw - account is created, user can login manually
-    // This happens when service account doesn't have "Service Account Token Creator" role
-  }
+  // Generate tokens (access + refresh) for proper token rotation
+  const tokens = await generateTokens(userId);
 
-  logger.info('User registered and verified', { userId, email: normalizedEmail, hasToken: !!token });
+  logger.info('User registered and verified', { userId, email: normalizedEmail });
 
   return {
     success: true,
-    needsLogin: !token, // Flag to tell frontend user needs to login manually
     user: {
       userId,
       email: normalizedEmail,
@@ -276,7 +284,9 @@ async function verifyEmail(email, otp) {
       tier: 'free',
       authProvider: 'email'
     },
-    token
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
+    expiresIn: tokens.expiresIn
   };
 }
 
@@ -385,20 +395,10 @@ async function login(email, password) {
     lastLoginAt: now
   });
   
-  // Generate custom token
-  let token = null;
-  try {
-    token = await admin.auth().createCustomToken(userId);
-  } catch (error) {
-    logger.error('Failed to create custom token on login', {
-      userId,
-      error: error.message,
-      code: error.code
-    });
-    // Don't throw - we'll use a workaround with user data
-  }
+  // Generate tokens (access + refresh) for proper token rotation
+  const tokens = await generateTokens(userId);
 
-  logger.info('User logged in', { userId, email: normalizedEmail, hasToken: !!token });
+  logger.info('User logged in', { userId, email: normalizedEmail });
 
   return {
     success: true,
@@ -411,9 +411,9 @@ async function login(email, password) {
       authProvider: 'email',
       hasGoogleLinked: !!userData.googleLinked
     },
-    token,
-    // If no token, frontend will use userId + passwordHash verification
-    useDirectAuth: !token
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
+    expiresIn: tokens.expiresIn
   };
 }
 
@@ -1128,22 +1128,34 @@ const refreshTokens = new Map();
 const REFRESH_TOKEN_EXPIRY_DAYS = 30;
 const ACCESS_TOKEN_EXPIRY_SECONDS = 3600; // 1 hour
 
+// JWT secret for email auth tokens
+const JWT_SECRET = config.JWT_SECRET;
+
 /**
  * Generate tokens for user
+ * Uses JWT instead of Firebase custom token for better compatibility
  * @param {string} userId - User ID
  * @returns {Promise<{accessToken: string, refreshToken: string, expiresIn: number}>}
  */
 async function generateTokens(userId) {
   const crypto = require('crypto');
+  const jwt = require('jsonwebtoken');
   
-  // Generate access token (custom token from Firebase)
-  let accessToken;
-  try {
-    accessToken = await admin.auth().createCustomToken(userId);
-  } catch (error) {
-    logger.error('Failed to create access token', { userId, error: error.message });
-    throw new Error('AUTH_TOKEN_GENERATION_FAILED: Unable to generate access token');
-  }
+  // Generate access token as JWT (not Firebase custom token)
+  // This allows server-side verification without Firebase client SDK
+  const accessToken = jwt.sign(
+    { 
+      userId,
+      type: 'email_auth',
+      iat: Math.floor(Date.now() / 1000)
+    },
+    JWT_SECRET,
+    { 
+      expiresIn: ACCESS_TOKEN_EXPIRY_SECONDS,
+      issuer: 'graphosai',
+      subject: userId
+    }
+  );
   
   // Generate refresh token (random secure token)
   const refreshToken = crypto.randomBytes(64).toString('hex');

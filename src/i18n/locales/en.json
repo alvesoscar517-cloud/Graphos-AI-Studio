@@ -230,7 +230,23 @@
       "accountDeleted": "This account has been deleted. Please contact support if you believe this is an error.",
       "accountSuspended": "Your account has been suspended. Please contact support for assistance.",
       "accountLocked": "Account temporarily locked due to too many failed attempts. Please try again later.",
-      "emailNotVerified": "Please verify your email before logging in."
+      "accountLockedWithTime": "Account temporarily locked. Please try again in {{minutes}} minutes.",
+      "emailNotVerified": "Please verify your email before logging in.",
+      "invalidCredentials": "Invalid email or password.",
+      "invalidCredentialsWithAttempts": "Invalid email or password. {{count}} attempts remaining.",
+      "weakPassword": "Password does not meet requirements. Please use a stronger password.",
+      "invalidEmail": "Invalid email format. Please check your email address.",
+      "invalidName": "Invalid display name. Please use only letters, numbers, and spaces.",
+      "disposableEmail": "Disposable email addresses are not allowed. Please use a permanent email.",
+      "otpExpired": "Verification code has expired. Please request a new one.",
+      "otpInvalidWithAttempts": "Invalid code. {{count}} attempts remaining.",
+      "registrationExpired": "Registration has expired. Please register again.",
+      "tooManyOtpAttempts": "Too many failed attempts. Please request a new code.",
+      "otpRateLimited": "Please wait before requesting another code.",
+      "resetEmailSent": "If this email exists, a reset code has been sent.",
+      "invalidResetCode": "Invalid reset code. Please check and try again.",
+      "passwordReused": "Cannot reuse recent passwords. Please choose a different password.",
+      "tooManyResetAttempts": "Too many attempts. Please try again later."
     }
   },
   "nav": {

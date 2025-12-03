@@ -3,10 +3,13 @@
  * TanStack Query hook for user credits management with real-time updates
  */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queryKeys'
 import apiClient from '@/services/api/client'
+
+// Minimum time between visibility refetches (30 seconds)
+const VISIBILITY_REFETCH_COOLDOWN = 30 * 1000
 
 /**
  * Fetch user credits with real-time updates via SSE
@@ -14,6 +17,7 @@ import apiClient from '@/services/api/client'
 export function useCredits(options = {}) {
   const queryClient = useQueryClient()
   const unsubscribeRef = useRef(null)
+  const lastVisibilityRefetchRef = useRef(0)
 
   const query = useQuery({
     queryKey: queryKeys.user.credits(),
@@ -29,15 +33,24 @@ export function useCredits(options = {}) {
       }
       return data?.credits || data
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes - realtime handles updates
-    // Disable polling when realtime is connected - only fetch on demand
+    staleTime: 30 * 1000, // 30 seconds - shorter to catch missed SSE updates
     refetchInterval: false, // Realtime SSE handles updates, no need for polling
-    refetchOnWindowFocus: false, // Avoid unnecessary refetch, realtime handles this
+    refetchOnWindowFocus: false, // We handle this manually below with smarter logic
     refetchOnReconnect: true, // Refetch when network reconnects
     ...options,
   })
 
-  // Subscribe to real-time credit updates
+  // Refetch credits - used for visibility change and payment success
+  const refetchCredits = useCallback(() => {
+    const now = Date.now()
+    if (now - lastVisibilityRefetchRef.current > VISIBILITY_REFETCH_COOLDOWN) {
+      lastVisibilityRefetchRef.current = now
+      console.log('[Credits] Refetching credits...')
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.credits() })
+    }
+  }, [queryClient])
+
+  // Subscribe to real-time credit updates + visibility change handler
   useEffect(() => {
     const setupRealtime = async () => {
       try {
@@ -56,13 +69,47 @@ export function useCredits(options = {}) {
 
     setupRealtime()
 
+    // Handle visibility change - refetch when tab becomes visible
+    // This catches cases where SSE missed the update (e.g., user was on payment page)
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible') {
+        try {
+          const { default: realtimeService } = await import('@/services/realtimeService')
+          // Only refetch if SSE is not connected (missed updates likely)
+          // OR if data is stale (> 30 seconds old)
+          const isStale = query.dataUpdatedAt && (Date.now() - query.dataUpdatedAt > 30000)
+          
+          if (!realtimeService.isConnected() || isStale) {
+            console.log('[Credits] Tab visible, SSE status:', realtimeService.connectionStatus, 'isStale:', isStale)
+            refetchCredits()
+          }
+        } catch (err) {
+          // Fallback: always refetch on visibility if we can't check SSE
+          refetchCredits()
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    // Also listen for payment success event to immediately refetch
+    const handlePaymentSuccess = () => {
+      console.log('[Credits] Payment success detected, refetching...')
+      lastVisibilityRefetchRef.current = 0 // Reset cooldown
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.credits() })
+    }
+    
+    window.addEventListener('payment-success', handlePaymentSuccess)
+
     return () => {
       if (unsubscribeRef.current) {
         unsubscribeRef.current()
         unsubscribeRef.current = null
       }
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('payment-success', handlePaymentSuccess)
     }
-  }, [queryClient])
+  }, [queryClient, refetchCredits, query.dataUpdatedAt])
 
   return {
     ...query,

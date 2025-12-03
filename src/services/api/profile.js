@@ -9,7 +9,7 @@ import apiClient from './client'
  * @returns {Promise<Array>}
  */
 export async function loadProfiles() {
-  const endpoint = 'get_profiles'
+  const endpoint = 'profiles'
   perfMonitor.start(endpoint)
   
   try {
@@ -24,7 +24,8 @@ export async function loadProfiles() {
     
     console.log('📋 Loading profiles for user:', userInfo.userId)
     
-    const { data } = await apiClient.get(`/get_profiles?user_id=${userInfo.userId}`)
+    // Use new endpoint instead of deprecated /get_profiles
+    const { data } = await apiClient.get(`/profiles?user_id=${userInfo.userId}`)
     
     if (!data.success) {
       throw new ProfileError(data.error || 'Failed to load profiles')

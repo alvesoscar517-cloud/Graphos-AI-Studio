@@ -150,7 +150,13 @@ const LoginOverlay = () => {
   const handleEmailLogin = async (email, password) => {
     setIsLoading(true)
     try {
-      await signInWithEmail(email, password)
+      const result = await signInWithEmail(email, password)
+      if (!result.success) {
+        // Create error with code for proper handling in form
+        const error = new Error(result.error || 'Login failed')
+        error.code = result.code
+        throw error
+      }
     } catch (error) {
       console.error('Email login error:', error)
       throw error
@@ -163,7 +169,12 @@ const LoginOverlay = () => {
     setIsLoading(true)
     try {
       console.log('[DEBUG] Registering with email:', email)
-      await registerWithEmail(email, password, displayName)
+      const result = await registerWithEmail(email, password, displayName)
+      if (!result.success) {
+        const error = new Error(result.error || 'Registration failed')
+        error.code = result.code
+        throw error
+      }
       console.log('[DEBUG] Registration successful, setting pendingEmail:', email)
       setPendingEmail(email)
       setAuthMode('otp')
@@ -180,6 +191,12 @@ const LoginOverlay = () => {
     try {
       console.log('[DEBUG] Verifying OTP for email:', pendingEmail, 'OTP:', otp)
       const result = await verifyEmail(pendingEmail, otp)
+
+      if (!result.success && !result.needsLogin) {
+        const error = new Error(result.error || 'Verification failed')
+        error.code = result.code
+        throw error
+      }
 
       // If server couldn't generate token, redirect to login
       if (result?.needsLogin) {
@@ -198,7 +215,12 @@ const LoginOverlay = () => {
 
   const handleResendOTP = async () => {
     try {
-      await resendVerificationOTP(pendingEmail)
+      const result = await resendVerificationOTP(pendingEmail)
+      if (!result.success) {
+        const error = new Error(result.error || 'Failed to resend code')
+        error.code = result.code
+        throw error
+      }
     } catch (error) {
       console.error('Resend OTP error:', error)
       throw error
@@ -207,11 +229,21 @@ const LoginOverlay = () => {
 
   const handlePasswordReset = {
     request: async (email) => {
-      await requestPasswordReset(email)
+      const result = await requestPasswordReset(email)
+      if (!result.success) {
+        const error = new Error(result.error || 'Failed to request reset')
+        error.code = result.code
+        throw error
+      }
       setPendingEmail(email)
     },
     complete: async (email, otp, newPassword) => {
-      await resetPassword(email, otp, newPassword)
+      const result = await resetPassword(email, otp, newPassword)
+      if (!result.success) {
+        const error = new Error(result.error || 'Failed to reset password')
+        error.code = result.code
+        throw error
+      }
       setAuthMode('email-login')
     }
   }

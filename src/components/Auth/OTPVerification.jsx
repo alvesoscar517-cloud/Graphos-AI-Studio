@@ -70,10 +70,47 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
   }
 
   const getErrorMessage = (err) => {
-    if (err.isNetworkError || err.message === 'NETWORK_ERROR') return t('errors.networkError')
-    if (err.code === 'AUTH_INVALID_OTP') return t('auth.email.otpInvalid')
-    if (err.code === 'AUTH_REGISTRATION_EXPIRED') return t('auth.email.codeExpired')
-    return err.message || t('auth.email.otpInvalid')
+    const message = err.message || ''
+    const errorCode = err.code || message.split(':')[0]?.trim()
+    
+    if (err.isNetworkError || message === 'NETWORK_ERROR') {
+      return t('errors.networkError', 'Connection error. Please check your network.')
+    }
+    
+    switch (errorCode) {
+      case 'AUTH_INVALID_OTP':
+        // Check if message contains specific details
+        if (message.toLowerCase().includes('expired')) {
+          return t('auth.errors.otpExpired', 'Verification code has expired. Please request a new one.')
+        }
+        if (message.toLowerCase().includes('attempts')) {
+          const attemptsMatch = message.match(/(\d+)\s*attempts?\s*remaining/i)
+          if (attemptsMatch) {
+            return t('auth.errors.otpInvalidWithAttempts', {
+              defaultValue: 'Invalid code. {{count}} attempts remaining.',
+              count: parseInt(attemptsMatch[1])
+            })
+          }
+        }
+        return t('auth.email.otpInvalid', 'Invalid verification code. Please try again.')
+        
+      case 'AUTH_REGISTRATION_EXPIRED':
+        return t('auth.errors.registrationExpired', 'Registration has expired. Please register again.')
+        
+      case 'AUTH_TOO_MANY_ATTEMPTS':
+        return t('auth.errors.tooManyOtpAttempts', 'Too many failed attempts. Please request a new code.')
+        
+      case 'AUTH_OTP_RATE_LIMITED':
+        return t('auth.errors.otpRateLimited', 'Please wait before requesting another code.')
+        
+      default:
+        // Extract meaningful message after error code
+        const colonIndex = message.indexOf(':')
+        if (colonIndex > 0) {
+          return message.substring(colonIndex + 1).trim()
+        }
+        return message || t('auth.email.otpInvalid', 'Invalid verification code.')
+    }
   }
 
   const handleSubmit = async (code) => {

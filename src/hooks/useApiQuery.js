@@ -87,7 +87,8 @@ export function useProfiles() {
       const userInfo = await getUserInfo();
       if (!userInfo?.userId) return [];
       
-      const { data } = await apiClient.get(`/get_profiles?user_id=${userInfo.userId}`);
+      // Use new endpoint instead of deprecated /get_profiles
+      const { data } = await apiClient.get(`/profiles?user_id=${userInfo.userId}`);
       return data.profiles || [];
     },
     ...defaultOptions,
@@ -315,7 +316,8 @@ export function usePrefetchProfiles() {
         const userInfo = await getUserInfo();
         if (!userInfo?.userId) return [];
         
-        const { data } = await apiClient.get(`/get_profiles?user_id=${userInfo.userId}`);
+        // Use new endpoint instead of deprecated /get_profiles
+        const { data } = await apiClient.get(`/profiles?user_id=${userInfo.userId}`);
         return data.profiles || [];
       },
     });

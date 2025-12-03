@@ -205,7 +205,11 @@ exports.verifyEmail = async (req, res) => {
     res.json({
       success: true,
       user: result.user,
-      token: result.token,
+      // Support both old format (token) and new format (accessToken + refreshToken)
+      token: result.accessToken,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      expiresIn: result.expiresIn,
       message: 'Email verified successfully'
     });
     
@@ -297,9 +301,13 @@ exports.login = async (req, res) => {
     res.json({
       success: true,
       user: result.user,
-      token: result.token,
+      // Support both old format (token) and new format (accessToken + refreshToken)
+      token: result.accessToken,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      expiresIn: result.expiresIn,
       isNewDevice: result.isNewDevice,
-      useDirectAuth: result.useDirectAuth
+      hasToken: !!result.accessToken
     });
     
   } catch (error) {

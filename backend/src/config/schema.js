@@ -311,6 +311,13 @@ const config = convict({
       env: 'SESSION_SECRET',
       sensitive: true
     },
+    jwtSecret: {
+      doc: 'JWT secret for email auth tokens',
+      format: String,
+      default: 'graphosai-email-auth-secret',
+      env: 'JWT_SECRET',
+      sensitive: true
+    },
     sessionMaxAge: {
       doc: 'Session max age in milliseconds',
       format: 'int',

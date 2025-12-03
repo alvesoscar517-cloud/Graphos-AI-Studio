@@ -10,11 +10,60 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
 
+  // Helper to parse and translate password reset errors
+  const getResetErrorMessage = (err) => {
+    const message = err.message || ''
+    const errorCode = err.code || message.split(':')[0]?.trim()
+    
+    switch (errorCode) {
+      case 'AUTH_USER_NOT_FOUND':
+        // Don't reveal if email exists for security
+        return t('auth.errors.resetEmailSent', 'If this email exists, a reset code has been sent.')
+        
+      case 'AUTH_INVALID_OTP':
+        if (message.toLowerCase().includes('expired')) {
+          return t('auth.errors.otpExpired', 'Reset code has expired. Please request a new one.')
+        }
+        return t('auth.errors.invalidResetCode', 'Invalid reset code. Please check and try again.')
+        
+      case 'AUTH_WEAK_PASSWORD':
+        return t('auth.errors.weakPassword', 'Password does not meet requirements. Please use a stronger password.')
+        
+      case 'AUTH_PASSWORD_SAME':
+        return t('auth.email.passwordSameAsCurrent', 'New password must be different from current password.')
+        
+      case 'AUTH_PASSWORD_REUSED':
+        return t('auth.errors.passwordReused', 'Cannot reuse recent passwords. Please choose a different password.')
+        
+      case 'AUTH_TOO_MANY_ATTEMPTS':
+        return t('auth.errors.tooManyResetAttempts', 'Too many attempts. Please try again later.')
+        
+      case 'AUTH_SERVICE_UNAVAILABLE':
+      case 'AUTH_SERVICE_ERROR':
+        return t('errors.serviceUnavailable', 'Service is temporarily unavailable. Please try again later.')
+        
+      case 'NETWORK_ERROR':
+        return t('errors.networkError', 'Connection error. Please check your network.')
+        
+      default:
+        const colonIndex = message.indexOf(':')
+        if (colonIndex > 0) {
+          return message.substring(colonIndex + 1).trim()
+        }
+        return message || t('auth.email.resetFailed', 'Failed to reset password. Please try again.')
+    }
+  }
+
   // Email step form
   const emailForm = useForgotPasswordForm(async (email) => {
-    await onResetPassword.request(email)
-    setEmail(email)
-    setStep('otp')
+    try {
+      await onResetPassword.request(email)
+      setEmail(email)
+      setStep('otp')
+    } catch (err) {
+      const errorMessage = getResetErrorMessage(err)
+      throw new Error(errorMessage)
+    }
   })
 
   // New password step form
@@ -22,10 +71,15 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
     try {
       await onResetPassword.complete(email, otp, data.newPassword)
     } catch (err) {
-      if (err.message?.includes('OTP') || err.message?.includes('code')) {
+      const errorCode = err.code || err.message?.split(':')[0]?.trim()
+      
+      // If OTP error, go back to OTP step
+      if (errorCode === 'AUTH_INVALID_OTP' || err.message?.includes('OTP') || err.message?.includes('code')) {
         setStep('otp')
       }
-      throw err
+      
+      const errorMessage = getResetErrorMessage(err)
+      throw new Error(errorMessage)
     }
   })
 

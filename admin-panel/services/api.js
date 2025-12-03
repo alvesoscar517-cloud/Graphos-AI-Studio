@@ -74,15 +74,13 @@ export async function loadProfiles() {
     const userInfo = await getUserInfo()
     console.log('📋 Loading profiles for user:', userInfo.userId)
     
-    const url = `${CONFIG.API_BASE_URL}/get_profiles?user_id=${userInfo.userId}`
-    console.log('[LINK] API URL:', url)
+    // Use new endpoint instead of deprecated /get_profiles
+    const url = `${CONFIG.API_BASE_URL}/profiles?user_id=${userInfo.userId}`
     
     const response = await fetch(url, {
       headers: getApiHeaders()
     })
     const data = await response.json()
-    
-    console.log('[PACKAGE] API Response:', data)
     
     if (response.ok && data.success) {
       console.log('[SUCCESS] Loaded profiles:', data.profiles?.length || 0)

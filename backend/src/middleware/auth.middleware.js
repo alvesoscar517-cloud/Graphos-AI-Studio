@@ -26,7 +26,8 @@ async function verifyFirebaseToken(idToken) {
       picture: decodedToken.picture
     };
   } catch (error) {
-    logger.warn('Firebase token verification failed', { error: error.message });
+    // Don't log for expected failures (custom tokens, email JWT tokens)
+    // These will be handled by verifyEmailAuthToken fallback
     return null;
   }
 }
@@ -47,10 +48,13 @@ function extractBearerToken(authHeader) {
 }
 
 /**
- * Verify email auth token (direct_ prefix or custom token)
+ * Verify email auth token (JWT or direct_ prefix)
  * For email users who don't have Firebase ID token
  */
 async function verifyEmailAuthToken(token) {
+  const jwt = require('jsonwebtoken');
+  const JWT_SECRET = config.JWT_SECRET;
+  
   try {
     // Handle direct auth token (direct_{userId})
     if (token.startsWith('direct_')) {
@@ -75,21 +79,43 @@ async function verifyEmailAuthToken(token) {
       return null;
     }
     
-    // Try to verify as custom token by checking if it's a valid userId
-    // Custom tokens are JWT but we can't verify them server-side without Firebase client SDK
-    // So we check if the token looks like a Firebase custom token and extract userId
+    // Try to verify as our JWT token first (new format)
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET, { issuer: 'graphosai' });
+      if (decoded.userId && decoded.type === 'email_auth') {
+        const { db } = require('../config/firebase');
+        const userDoc = await db.collection('users').doc(decoded.userId).get();
+        
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          return {
+            userId: decoded.userId,
+            email: userData.email,
+            emailVerified: userData.emailVerified,
+            name: userData.name || userData.email?.split('@')[0],
+            picture: userData.picture || ''
+          };
+        }
+      }
+    } catch (jwtError) {
+      // Not our JWT, try legacy format
+    }
+    
+    // Legacy: Try to verify as Firebase custom token by extracting userId from payload
+    // This handles tokens created before the JWT migration
     try {
       const parts = token.split('.');
       if (parts.length === 3) {
         const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-        if (payload.uid) {
+        const userId = payload.uid || payload.userId || payload.sub;
+        if (userId) {
           const { db } = require('../config/firebase');
-          const userDoc = await db.collection('users').doc(payload.uid).get();
+          const userDoc = await db.collection('users').doc(userId).get();
           
           if (userDoc.exists) {
             const userData = userDoc.data();
             return {
-              userId: payload.uid,
+              userId: userId,
               email: userData.email,
               emailVerified: userData.emailVerified,
               name: userData.name || userData.email?.split('@')[0],

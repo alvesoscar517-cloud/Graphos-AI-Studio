@@ -228,7 +228,23 @@
       "accountDeleted": "Tài khoản này đã bị xóa. Vui lòng liên hệ hỗ trợ nếu bạn cho rằng đây là lỗi.",
       "accountSuspended": "Tài khoản của bạn đã bị tạm ngưng. Vui lòng liên hệ hỗ trợ để được hỗ trợ.",
       "accountLocked": "Tài khoản tạm thời bị khóa do đăng nhập sai quá nhiều lần. Vui lòng thử lại sau.",
-      "emailNotVerified": "Vui lòng xác minh email trước khi đăng nhập."
+      "accountLockedWithTime": "Tài khoản tạm thời bị khóa. Vui lòng thử lại sau {{minutes}} phút.",
+      "emailNotVerified": "Vui lòng xác minh email trước khi đăng nhập.",
+      "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+      "invalidCredentialsWithAttempts": "Email hoặc mật khẩu không đúng. Còn {{count}} lần thử.",
+      "weakPassword": "Mật khẩu không đủ mạnh. Vui lòng sử dụng mật khẩu mạnh hơn.",
+      "invalidEmail": "Định dạng email không hợp lệ. Vui lòng kiểm tra lại.",
+      "invalidName": "Tên hiển thị không hợp lệ. Chỉ sử dụng chữ cái, số và khoảng trắng.",
+      "disposableEmail": "Không chấp nhận email tạm thời. Vui lòng sử dụng email chính thức.",
+      "otpExpired": "Mã xác minh đã hết hạn. Vui lòng yêu cầu mã mới.",
+      "otpInvalidWithAttempts": "Mã không đúng. Còn {{count}} lần thử.",
+      "registrationExpired": "Đăng ký đã hết hạn. Vui lòng đăng ký lại.",
+      "tooManyOtpAttempts": "Nhập sai quá nhiều lần. Vui lòng yêu cầu mã mới.",
+      "otpRateLimited": "Vui lòng đợi trước khi yêu cầu mã mới.",
+      "resetEmailSent": "Nếu email tồn tại, mã đặt lại đã được gửi.",
+      "invalidResetCode": "Mã đặt lại không đúng. Vui lòng kiểm tra và thử lại.",
+      "passwordReused": "Không thể sử dụng lại mật khẩu gần đây. Vui lòng chọn mật khẩu khác.",
+      "tooManyResetAttempts": "Thử quá nhiều lần. Vui lòng thử lại sau."
     }
   },
   "nav": {

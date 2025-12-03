@@ -11,6 +11,36 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
   const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
 
+  // Helper to parse error message and extract details
+  const parseAuthError = (err) => {
+    const message = err.message || ''
+    
+    // Check for network errors
+    if (err.isNetworkError || message === 'NETWORK_ERROR') {
+      return { errorCode: 'NETWORK_ERROR' }
+    }
+    
+    // Get error code - prefer err.code, fallback to parsing from message
+    let errorCode = err.code
+    if (!errorCode && message.includes(':')) {
+      // Parse from message format: "ERROR_CODE: message" or just the code
+      const possibleCode = message.split(':')[0]?.trim()
+      if (possibleCode && possibleCode.startsWith('AUTH_')) {
+        errorCode = possibleCode
+      }
+    }
+    
+    // Extract remaining attempts from message
+    const attemptsMatch = message.match(/(\d+)\s*attempts?\s*remaining/i)
+    const remainingAttempts = attemptsMatch ? parseInt(attemptsMatch[1]) : null
+    
+    // Extract lock time from message
+    const lockTimeMatch = message.match(/(\d+)\s*minutes?/i)
+    const lockMinutes = lockTimeMatch ? parseInt(lockTimeMatch[1]) : null
+    
+    return { errorCode, remainingAttempts, lockMinutes, originalMessage: message }
+  }
+
   const {
     register,
     handleSubmit,
@@ -21,19 +51,55 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
     try {
       await onLogin(data.email, data.password, data.rememberMe)
     } catch (err) {
-      if (err.isNetworkError || err.message === 'NETWORK_ERROR') {
-        setError('root', { message: t('errors.networkError') })
-      } else if (err.code === 'AUTH_ACCOUNT_DELETED') {
-        setError('root', { message: t('auth.errors.accountDeleted', 'This account has been deleted.') })
-      } else if (err.code === 'AUTH_ACCOUNT_SUSPENDED') {
-        setError('root', { message: t('auth.errors.accountSuspended', 'Your account has been suspended.') })
-      } else if (err.code === 'AUTH_ACCOUNT_LOCKED') {
-        setError('root', { message: t('auth.errors.accountLocked', 'Account temporarily locked.') })
-      } else if (err.code === 'AUTH_EMAIL_NOT_VERIFIED') {
-        setError('root', { message: t('auth.errors.emailNotVerified', 'Please verify your email.') })
-      } else {
-        throw err // Re-throw to let useLoginForm handle it
+      const { errorCode, remainingAttempts, lockMinutes, originalMessage } = parseAuthError(err)
+      
+      let errorMessage
+      
+      switch (errorCode) {
+        case 'AUTH_INVALID_CREDENTIALS':
+          if (remainingAttempts !== null) {
+            errorMessage = t('auth.errors.invalidCredentialsWithAttempts', {
+              defaultValue: 'Invalid email or password. {{count}} attempts remaining.',
+              count: remainingAttempts
+            })
+          } else {
+            errorMessage = t('auth.errors.invalidCredentials', 'Invalid email or password.')
+          }
+          break
+          
+        case 'AUTH_ACCOUNT_LOCKED':
+          if (lockMinutes !== null) {
+            errorMessage = t('auth.errors.accountLockedWithTime', {
+              defaultValue: 'Account temporarily locked. Please try again in {{minutes}} minutes.',
+              minutes: lockMinutes
+            })
+          } else {
+            errorMessage = t('auth.errors.accountLocked', 'Account temporarily locked due to too many failed attempts.')
+          }
+          break
+          
+        case 'AUTH_ACCOUNT_DELETED':
+          errorMessage = t('auth.errors.accountDeleted', 'This account has been deleted.')
+          break
+          
+        case 'AUTH_ACCOUNT_SUSPENDED':
+          errorMessage = t('auth.errors.accountSuspended', 'Your account has been suspended. Please contact support.')
+          break
+          
+        case 'AUTH_EMAIL_NOT_VERIFIED':
+          errorMessage = t('auth.errors.emailNotVerified', 'Please verify your email before logging in.')
+          break
+          
+        case 'NETWORK_ERROR':
+          errorMessage = t('errors.networkError', 'Connection error. Please check your network.')
+          break
+          
+        default:
+          // Use original message if no specific translation
+          errorMessage = originalMessage || t('auth.email.loginFailed', 'Login failed. Please try again.')
       }
+      
+      setError('root', { message: errorMessage })
     }
   })
 

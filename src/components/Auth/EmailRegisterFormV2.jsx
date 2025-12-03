@@ -6,6 +6,43 @@ import { useRegisterForm } from '../../hooks/forms'
 const EmailRegisterFormV2 = ({ onRegister, onSwitchToLogin, isLoading: externalLoading }) => {
   const { t } = useTranslation()
   
+  // Helper to parse and translate registration errors
+  const getRegisterErrorMessage = (err) => {
+    const message = err.message || ''
+    const errorCode = err.code || message.split(':')[0]?.trim()
+    
+    switch (errorCode) {
+      case 'AUTH_EMAIL_EXISTS':
+        return t('auth.email.emailAlreadyExists', 'This email is already registered. Please login instead.')
+        
+      case 'AUTH_WEAK_PASSWORD':
+        return t('auth.errors.weakPassword', 'Password does not meet requirements. Please use a stronger password.')
+        
+      case 'AUTH_INVALID_EMAIL':
+        return t('auth.errors.invalidEmail', 'Invalid email format. Please check your email address.')
+        
+      case 'AUTH_INVALID_NAME':
+        return t('auth.errors.invalidName', 'Invalid display name. Please use only letters, numbers, and spaces.')
+        
+      case 'AUTH_DISPOSABLE_EMAIL':
+        return t('auth.errors.disposableEmail', 'Disposable email addresses are not allowed. Please use a permanent email.')
+        
+      case 'AUTH_SERVICE_UNAVAILABLE':
+      case 'AUTH_SERVICE_ERROR':
+        return t('errors.serviceUnavailable', 'Service is temporarily unavailable. Please try again later.')
+        
+      case 'NETWORK_ERROR':
+        return t('errors.networkError', 'Connection error. Please check your network.')
+        
+      default:
+        const colonIndex = message.indexOf(':')
+        if (colonIndex > 0) {
+          return message.substring(colonIndex + 1).trim()
+        }
+        return message || t('auth.email.registerFailed', 'Registration failed. Please try again.')
+    }
+  }
+
   const {
     register,
     handleSubmit,
@@ -16,7 +53,13 @@ const EmailRegisterFormV2 = ({ onRegister, onSwitchToLogin, isLoading: externalL
     showPassword,
     togglePassword
   } = useRegisterForm(async (data) => {
-    await onRegister(data.email, data.password, data.displayName.trim())
+    try {
+      await onRegister(data.email, data.password, data.displayName.trim())
+    } catch (err) {
+      // Re-throw with translated message so the hook can display it
+      const errorMessage = getRegisterErrorMessage(err)
+      throw new Error(errorMessage)
+    }
   })
 
   const password = watch('password')

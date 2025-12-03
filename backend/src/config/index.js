@@ -192,6 +192,9 @@ module.exports = {
     SANITIZE_INPUT: convictConfig.get('security.sanitizeInput')
   },
   
+  // JWT Secret for email auth
+  JWT_SECRET: convictConfig.get('security.jwtSecret'),
+  
   // Helper methods
   get: (path) => convictConfig.get(path),
   has: (path) => convictConfig.has(path),

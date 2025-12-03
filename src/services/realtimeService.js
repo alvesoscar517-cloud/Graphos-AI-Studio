@@ -48,19 +48,24 @@ class RealtimeService {
   }
 
   /**
-   * Get auth token from localStorage or Chrome extension
+   * Get auth token from tokenService (properly decrypted)
    */
   async getAuthToken() {
     try {
-      const authToken = localStorage.getItem('authToken');
-      const authMethod = localStorage.getItem('authMethod');
-      if (authToken && authMethod === 'email') {
-        return authToken;
+      // Use tokenService for proper token handling (decryption + auto-refresh)
+      const { tokenService } = await import('./tokenService');
+      const { getAuthMethod } = await import('../utils/authStorage');
+      
+      const authMethod = getAuthMethod();
+      if (authMethod === 'email') {
+        const token = await tokenService.getValidToken();
+        if (token) return token;
       }
-    } catch {
-      // localStorage not available
+    } catch (err) {
+      console.warn('[RealtimeService] Failed to get token from tokenService:', err.message);
     }
     
+    // Fallback to Chrome extension
     try {
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
         const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' });
