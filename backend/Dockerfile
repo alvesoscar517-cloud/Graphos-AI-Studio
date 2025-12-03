@@ -18,6 +18,11 @@ FROM node:18-slim
 
 WORKDIR /app
 
+# Install runtime dependencies for argon2 native module
+RUN apt-get update && apt-get install -y \
+    libstdc++6 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy built node_modules and app
 COPY --from=builder /app/node_modules ./node_modules
 COPY . .

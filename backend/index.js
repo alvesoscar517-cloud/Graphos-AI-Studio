@@ -4,8 +4,20 @@
  * Version: 2.1 - Enhanced Security & Monitoring
  */
 
+// Early error catching for debugging startup issues
+process.on('uncaughtException', (error) => {
+  console.error('[FATAL] Uncaught Exception during startup:', error.message);
+  console.error(error.stack);
+  process.exit(1);
+});
+
+console.log('[STARTUP] Loading dependencies...');
+
 const express = require('express');
+console.log('[STARTUP] Express loaded');
+
 const config = require('./src/config');
+console.log('[STARTUP] Config loaded');
 const corsMiddleware = require('./src/middleware/cors');
 const { errorHandler, notFoundHandler, requestTimeout } = require('./src/middleware/errorHandler.middleware');
 const rateLimitMiddleware = require('./src/middleware/rateLimit');
