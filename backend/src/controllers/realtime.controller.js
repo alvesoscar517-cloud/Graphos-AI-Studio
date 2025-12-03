@@ -191,4 +191,38 @@ exports.getStats = (req, res) => {
   res.json({ success: true, stats });
 };
 
+/**
+ * API endpoint to broadcast notification (called by admin backend)
+ * POST /api/realtime/broadcast-notification
+ */
+exports.broadcastNotificationApi = (req, res) => {
+  try {
+    const { userId, notification } = req.body;
+    
+    if (!userId || !notification) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'userId and notification are required' 
+      });
+    }
+    
+    const sent = broadcastToUser(userId, 'notification', {
+      type: 'new',
+      notification,
+      timestamp: Date.now()
+    });
+    
+    logger.info('Broadcast notification via API', { userId, sent });
+    
+    res.json({ 
+      success: true, 
+      sent,
+      message: sent ? 'Notification broadcasted' : 'User not connected'
+    });
+  } catch (error) {
+    logger.error('Broadcast notification API error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 module.exports = exports;

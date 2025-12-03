@@ -335,9 +335,18 @@ exports.forgotPassword = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const { email, locale } = req.body;
+    // Debug logging
+    logger.info('Forgot password request received', { 
+      body: req.body,
+      contentType: req.headers['content-type'],
+      hasBody: !!req.body,
+      bodyKeys: req.body ? Object.keys(req.body) : []
+    });
+    
+    const { email, locale } = req.body || {};
     
     if (!email) {
+      logger.warn('Forgot password missing email', { body: req.body });
       return res.status(400).json({
         success: false,
         error: 'Email is required',

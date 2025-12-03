@@ -1,27 +1,52 @@
 /**
  * Feedback Query Hook
  * TanStack Query hook for feedback and billing support
+ * 
+ * User info is fetched from server (Firestore) via authenticated request
  */
 
 import { useMutation } from '@tanstack/react-query'
+import { getValidToken } from '@/services/tokenService'
 
-const FEEDBACK_API_URL = 'https://graphosai-472729326429.us-central1.run.app/send-feedback'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://graphosai-472729326429.us-central1.run.app'
+
+/**
+ * @typedef {Object} FeedbackData
+ * @property {string} title
+ * @property {string} content
+ * @property {string[]} [images]
+ */
+
+/**
+ * @typedef {Object} BillingSupportData
+ * @property {string} category
+ * @property {string} subject
+ * @property {string} description
+ * @property {string[]} [attachments]
+ */
 
 /**
  * Send general feedback
+ * Server will get user info from auth token
  */
 export function useSendFeedback() {
   return useMutation({
-    mutationFn: async ({ title, content, images = [] }) => {
-      const response = await fetch(FEEDBACK_API_URL, {
+    /** @param {FeedbackData} data */
+    mutationFn: async (data) => {
+      const { title, content, images = [] } = data
+      // Get auth token for server to identify user
+      const token = await getValidToken()
+      
+      const response = await fetch(`${API_BASE_URL}/send-feedback`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
         body: JSON.stringify({
           title,
           content,
-          images,
-          userEmail: localStorage.getItem('userEmail') || 'anonymous@user.com',
-          userName: localStorage.getItem('userName') || 'Anonymous User'
+          images
         })
       })
 
@@ -38,22 +63,29 @@ export function useSendFeedback() {
 
 /**
  * Send billing support request
+ * Server will get user info from auth token
  */
 export function useSendBillingSupport() {
   return useMutation({
-    mutationFn: async ({ category, subject, description, attachments = [] }) => {
-      const response = await fetch(FEEDBACK_API_URL, {
+    /** @param {BillingSupportData} data */
+    mutationFn: async (data) => {
+      const { category, subject, description, attachments = [] } = data
+      // Get auth token for server to identify user
+      const token = await getValidToken()
+      
+      const response = await fetch(`${API_BASE_URL}/send-feedback`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
         body: JSON.stringify({
           type: 'billing_support',
           category,
           priority: 'high',
           title: subject,
           content: description,
-          images: attachments,
-          userEmail: localStorage.getItem('userEmail') || 'anonymous@user.com',
-          userName: localStorage.getItem('userName') || 'Anonymous User'
+          images: attachments
         })
       })
 

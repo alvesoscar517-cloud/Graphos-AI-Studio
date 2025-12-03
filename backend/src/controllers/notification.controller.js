@@ -11,7 +11,9 @@ exports.getUserNotifications = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const { user_id, unread_only = false, limit = 50 } = req.query;
+    const { unread_only = false, limit = 50 } = req.query;
+    // Use user_id from query OR from auth middleware (req.userId)
+    const user_id = req.query.user_id || req.userId;
     
     if (!user_id) {
       return res.status(400).json({ success: false, ...l.error('invalid_input') });
@@ -84,14 +86,18 @@ exports.getUserNotifications = async (req, res) => {
     const unreadCount = notifications.filter(n => !n.read).length;
     
     // Localize notifications based on user language
+    // Keep translations object for frontend compatibility
     const localizedNotifications = notifications.map(notif => {
       // If notification has translations, use the appropriate language
       if (notif.translations && notif.translations[l.lang]) {
         return {
           ...notif,
+          // Set top-level title/message for backward compatibility
           title: notif.translations[l.lang].title || notif.title,
           message: notif.translations[l.lang].message || notif.message,
-          cta: notif.translations[l.lang].cta || notif.cta
+          cta: notif.translations[l.lang].cta || notif.cta,
+          // Keep translations object for frontend that reads from it
+          translations: notif.translations
         };
       }
       return notif;
@@ -121,7 +127,8 @@ exports.markAsRead = async (req, res) => {
   
   try {
     const { id } = req.params;
-    const { user_id } = req.body;
+    // Use user_id from body OR from auth middleware (req.userId)
+    const user_id = req.body.user_id || req.userId;
     
     if (!user_id) {
       return res.status(400).json({ success: false, ...l.error('invalid_input') });
@@ -165,7 +172,8 @@ exports.markAsClicked = async (req, res) => {
   
   try {
     const { id } = req.params;
-    const { user_id } = req.body;
+    // Use user_id from body OR from auth middleware (req.userId)
+    const user_id = req.body.user_id || req.userId;
     
     if (!user_id) {
       return res.status(400).json({ success: false, ...l.error('invalid_input') });
@@ -210,7 +218,8 @@ exports.deleteNotification = async (req, res) => {
   
   try {
     const { id } = req.params;
-    const { user_id } = req.body;
+    // Use user_id from body, query OR from auth middleware (req.userId)
+    const user_id = req.body.user_id || req.query.user_id || req.userId;
     
     if (!user_id) {
       return res.status(400).json({ success: false, ...l.error('invalid_input') });
@@ -244,7 +253,8 @@ exports.markAllAsRead = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const { user_id } = req.body;
+    // Use user_id from body OR from auth middleware (req.userId)
+    const user_id = req.body.user_id || req.userId;
     
     if (!user_id) {
       return res.status(400).json({ success: false, ...l.error('invalid_input') });
@@ -297,6 +307,34 @@ exports.markAllAsRead = async (req, res) => {
     });
   } catch (error) {
     console.error('[ERROR] Mark all as read error:', error);
+    res.status(500).json({ success: false, ...l.error('server_error') });
+  }
+};
+
+// Get unread notification count
+exports.getUnreadCount = async (req, res) => {
+  const l = createLocalizer(req);
+  
+  try {
+    // Use user_id from query OR from auth middleware (req.userId)
+    const user_id = req.query.user_id || req.userId;
+    
+    if (!user_id) {
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
+    }
+    
+    // Query all user notifications and count unread
+    const snapshot = await db.collection('user_notifications')
+      .where('userId', '==', user_id)
+      .where('read', '==', false)
+      .get();
+    
+    res.json({
+      success: true,
+      count: snapshot.size
+    });
+  } catch (error) {
+    console.error('[ERROR] Get unread count error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };

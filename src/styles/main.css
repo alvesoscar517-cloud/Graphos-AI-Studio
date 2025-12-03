@@ -1517,6 +1517,15 @@
   background-color: var(--color-fill-secondary);
 }
 
+/* Card icon when parent card is hovered - slightly lighter background */
+.dark .group:hover .card-icon {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .group:hover .card-icon:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
 
 /* ============================================
    Light Mode Only - Override dark mode for specific sections

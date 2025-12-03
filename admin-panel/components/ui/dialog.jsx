@@ -98,10 +98,10 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 function ConfirmDialog({
   open,
   onOpenChange,
-  title = 'Xác nhận',
+  title = 'Confirm',
   description,
-  confirmText = 'Xác nhận',
-  cancelText = 'Hủy',
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
   variant = 'default',
   loading = false,
   onConfirm,

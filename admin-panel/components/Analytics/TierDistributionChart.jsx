@@ -9,7 +9,7 @@ import { PieChart, BarChart } from '../ui/charts'
 const CREDIT_TIERS = [
   { 
     key: 'noCredits',
-    name: 'Hết credits', 
+    name: 'Out of credits', 
     color: '#ef4444',
     icon: 'alert-circle'
   },
@@ -21,13 +21,13 @@ const CREDIT_TIERS = [
   },
   { 
     key: 'medium',
-    name: 'Trung bình (51-200)', 
+    name: 'Medium (51-200)', 
     color: '#3b82f6',
     icon: 'minus'
   },
   { 
     key: 'high',
-    name: 'Cao (200+)', 
+    name: 'High (200+)', 
     color: '#22c55e',
     icon: 'trending-up'
   }
@@ -71,7 +71,7 @@ export default function TierDistributionChart({ data }) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-muted">
         <img src="/icon/inbox.svg" alt="Empty" className="w-12 h-12 mb-3 icon-gray" />
-        <p className="text-sm">Không có dữ liệu người dùng</p>
+        <p className="text-sm">No user data available</p>
       </div>
     )
   }
@@ -114,7 +114,7 @@ export default function TierDistributionChart({ data }) {
 
       {/* Total */}
       <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
-        <span className="text-sm text-muted">Tổng người dùng</span>
+        <span className="text-sm text-muted">Total users</span>
         <span className="text-lg font-semibold text-primary">{total.toLocaleString()}</span>
       </div>
     </div>

@@ -138,6 +138,19 @@ router.use('/api/payment', authenticate, paymentRoutes);
 // Realtime routes (SSE)
 router.use('/api/realtime', protectedMiddleware, realtimeRoutes);
 
+// Internal API for backend-to-backend communication (broadcast notifications)
+const realtimeController = require('../controllers/realtime.controller');
+const internalApiKeyAuth = (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  const validKey = process.env.INTERNAL_API_KEY;
+  if (validKey && apiKey === validKey) {
+    return next();
+  }
+  // Also allow authenticated users
+  return authenticate(req, res, next);
+};
+router.post('/api/internal/broadcast-notification', internalApiKeyAuth, realtimeController.broadcastNotificationApi);
+
 // ============================================================================
 // LEGACY ROUTES (Deprecated - will be removed in v3.0)
 // Use new routes under /profiles/*, /analysis/* instead

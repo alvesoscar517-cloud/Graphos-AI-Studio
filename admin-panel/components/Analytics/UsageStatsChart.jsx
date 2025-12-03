@@ -80,7 +80,7 @@ export default function UsageStatsChart({ profiles = 0, analyses = 0, rewrites =
               {stat.value.toLocaleString()}
             </div>
             <div className="text-xs text-muted mt-1">
-              {stat.percentage}% tổng số
+              {stat.percentage}% of total
             </div>
           </div>
         ))}
@@ -104,7 +104,7 @@ export default function UsageStatsChart({ profiles = 0, analyses = 0, rewrites =
             <img src="/icon/activity.svg" alt="Total" className="w-5 h-5 icon-white" />
           </div>
           <div>
-            <div className="text-sm text-muted">Tổng thao tác</div>
+            <div className="text-sm text-muted">Total operations</div>
             <div className="text-xl font-bold text-primary">{total.toLocaleString()}</div>
           </div>
         </div>

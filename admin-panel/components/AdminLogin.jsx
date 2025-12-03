@@ -45,7 +45,7 @@ export default function AdminLogin() {
           await new Promise(resolve => { vantaScript.onload = resolve; });
         }
 
-        // Initialize Vanta FOG effect with monochrome colors for admin
+        // Initialize Vanta FOG effect with Apple System Blue colors (same as main app)
         if (window.VANTA && vantaRef.current && !vantaEffect.current) {
           vantaEffect.current = window.VANTA.FOG({
             el: vantaRef.current,
@@ -54,12 +54,12 @@ export default function AdminLogin() {
             gyroControls: false,
             minHeight: 200.00,
             minWidth: 200.00,
-            highlightColor: 0x6e6e73,   // Apple gray
-            midtoneColor: 0x1d1d1f,     // Apple dark
-            lowlightColor: 0x000000,    // Black
-            baseColor: 0x1d1d1f,        // Apple dark
+            highlightColor: 0x5AC8FA,  // Apple System Teal
+            midtoneColor: 0x007AFF,    // Apple System Blue
+            lowlightColor: 0x5856D6,   // Apple System Indigo
+            baseColor: 0x0051D5,       // Apple Blue Hover (darker)
             blurFactor: 0.6,
-            speed: 1.0,
+            speed: 1.2,
             zoom: 1.0
           });
         }
@@ -157,7 +157,7 @@ export default function AdminLogin() {
       <div 
         ref={vantaRef} 
         className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #1d1d1f 0%, #000000 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #0071E3 0%, #5856D6 100%)' }}
       >
         
         <Card className="w-full max-w-[440px] p-10 relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">
@@ -241,7 +241,7 @@ export default function AdminLogin() {
     <div 
       ref={vantaRef} 
       className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #1d1d1f 0%, #000000 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #0071E3 0%, #5856D6 100%)' }}
     >
       
       <Card className="w-full max-w-[440px] p-10 relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">

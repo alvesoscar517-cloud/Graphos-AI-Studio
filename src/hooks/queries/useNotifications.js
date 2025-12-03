@@ -21,18 +21,34 @@ export function useNotifications(userId) {
       const { data } = await apiClient.get('/api/notifications')
       return data.notifications || []
     },
-    staleTime: 60 * 1000, // 1 minute
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes - rely on SSE for real-time updates
+    // No polling - SSE handles real-time updates, saves API costs
+    refetchOnWindowFocus: true, // Refetch when user returns to tab
   })
 
-  // Subscribe to real-time notification updates
+  // Subscribe to real-time notification updates via SSE
   useEffect(() => {
     if (!userId) return
 
     const unsubscribe = realtimeService.subscribe('notification', (data) => {
       console.log('[REALTIME] Notification update:', data)
-      // Invalidate to refetch
-      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all })
+      
+      // If we received a new notification, add it directly to cache
+      if (data.type === 'new' && data.notification) {
+        queryClient.setQueryData(queryKeys.notifications.list(), (old) => {
+          const oldList = Array.isArray(old) ? old : []
+          // Check if notification already exists
+          const exists = oldList.some(n => n.id === data.notification.id)
+          if (exists) return oldList
+          // Add new notification at the beginning
+          return [data.notification, ...oldList]
+        })
+        // Also invalidate unread count
+        queryClient.invalidateQueries({ queryKey: queryKeys.notifications.unread() })
+      } else {
+        // Fallback: invalidate to refetch
+        queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all })
+      }
     })
 
     return () => unsubscribe()
@@ -51,8 +67,9 @@ export function useUnreadNotifications() {
       const { data } = await apiClient.get('/api/notifications/unread')
       return data.count || 0
     },
-    staleTime: 30 * 1000, // 30 seconds
-    refetchInterval: 60 * 1000, // Refetch every minute
+    staleTime: 5 * 60 * 1000, // 5 minutes - rely on SSE for real-time updates
+    // No polling - SSE handles real-time updates
+    refetchOnWindowFocus: true,
   })
 }
 
@@ -75,8 +92,9 @@ export function useMarkAsRead() {
       const previousNotifications = queryClient.getQueryData(queryKeys.notifications.list())
       
       // Optimistically update
-      queryClient.setQueryData(queryKeys.notifications.list(), (old = []) => {
-        return old.map(n => n.id === notificationId ? { ...n, read: true } : n)
+      queryClient.setQueryData(queryKeys.notifications.list(), (old) => {
+        const oldList = Array.isArray(old) ? old : []
+        return oldList.map(n => n.id === notificationId ? { ...n, read: true } : n)
       })
       
       return { previousNotifications }
@@ -108,8 +126,9 @@ export function useMarkAllAsRead() {
       const previousNotifications = queryClient.getQueryData(queryKeys.notifications.list())
       
       // Mark all as read optimistically
-      queryClient.setQueryData(queryKeys.notifications.list(), (old = []) => {
-        return old.map(n => ({ ...n, read: true }))
+      queryClient.setQueryData(queryKeys.notifications.list(), (old) => {
+        const oldList = Array.isArray(old) ? old : []
+        return oldList.map(n => ({ ...n, read: true }))
       })
       
       // Set unread count to 0
@@ -140,8 +159,9 @@ export function useDismissNotification() {
       const previousNotifications = queryClient.getQueryData(queryKeys.notifications.list())
       
       // Remove optimistically
-      queryClient.setQueryData(queryKeys.notifications.list(), (old = []) => {
-        return old.filter(n => n.id !== notificationId)
+      queryClient.setQueryData(queryKeys.notifications.list(), (old) => {
+        const oldList = Array.isArray(old) ? old : []
+        return oldList.filter(n => n.id !== notificationId)
       })
       
       return { previousNotifications }

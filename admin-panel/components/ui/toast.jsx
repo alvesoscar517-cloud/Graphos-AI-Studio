@@ -68,9 +68,9 @@ export const showToast = {
 
   promise: (promise, messages, options = {}) => {
     return toast.promise(promise, {
-      loading: messages.loading || 'Đang xử lý...',
-      success: messages.success || 'Thành công!',
-      error: messages.error || 'Có lỗi xảy ra',
+      loading: messages.loading || 'Processing...',
+      success: messages.success || 'Success!',
+      error: messages.error || 'An error occurred',
       ...options,
     })
   },

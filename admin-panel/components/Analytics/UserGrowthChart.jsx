@@ -67,10 +67,10 @@ export default function UserGrowthChart({ data }) {
       <div className="flex items-center justify-center gap-4 mt-4 text-xs text-muted">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-info" />
-          <span>Người dùng mới</span>
+          <span>New users</span>
         </div>
         <span>•</span>
-        <span>Tổng: {chartData.reduce((sum, d) => sum + d.users, 0).toLocaleString()} người dùng</span>
+        <span>Total: {chartData.reduce((sum, d) => sum + d.users, 0).toLocaleString()} users</span>
       </div>
     </div>
   )

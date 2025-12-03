@@ -1689,6 +1689,110 @@ function supportReplyEmail({ ticketId, ticketType, userName, ticketTitle, replyM
 }
 
 // ============================================================================
+// NEW TICKET EMAIL (Admin Notification)
+// ============================================================================
+
+/**
+ * New Ticket Email - Notify admin when user submits feedback/support
+ * Apple Style - Same design as other emails
+ */
+function newTicketEmail({ ticketId, ticketType, userName, userEmail, title, content: ticketContent, priority, category, adminPanelUrl }) {
+  const isBilling = ticketType === 'billing_support';
+  const typeText = isBilling ? 'Support Request' : 'Feedback';
+  const now = new Date();
+  const formattedDate = now.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+
+  const emailContent = `
+    <!-- Header -->
+    <tr>
+      <td style="padding:48px 40px 32px;text-align:center;">
+        <div style="width:80px;height:80px;background-color:#f5f5f7;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;">
+          ${icon(isBilling ? 'creditCard' : 'file', 'black', 32)}
+        </div>
+        <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">New ${typeText}</h1>
+        <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">Ticket #${ticketId.substring(0, 8).toUpperCase()}</p>
+      </td>
+    </tr>
+    <!-- Content -->
+    <tr>
+      <td style="padding:0 40px 40px;">
+        <!-- Ticket Info -->
+        <div style="background-color:#f5f5f7;border-radius:20px;padding:24px;margin-bottom:24px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.06);">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="28">${icon('user', 'black', 16)}</td>
+                    <td style="color:#86868b;font-size:13px;">From</td>
+                    <td style="text-align:right;">
+                      <span style="color:#1d1d1f;font-size:14px;font-weight:500;">${userName || 'Anonymous User'}</span><br/>
+                      <span style="color:#86868b;font-size:13px;">${userEmail || 'No email provided'}</span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.06);">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="28">${icon('calendar', 'black', 16)}</td>
+                    <td style="color:#86868b;font-size:13px;">Date</td>
+                    <td style="text-align:right;color:#1d1d1f;font-size:14px;">${formattedDate}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            ${priority ? `
+            <tr>
+              <td style="padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.06);">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="28">${icon('alertCircle', 'black', 16)}</td>
+                    <td style="color:#86868b;font-size:13px;">Priority</td>
+                    <td style="text-align:right;"><span style="display:inline-block;padding:4px 12px;background-color:${priority === 'high' || priority === 'urgent' ? '#1d1d1f' : '#86868b'};color:#fff;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;border-radius:980px;">${priority}</span></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>` : ''}
+            ${category ? `
+            <tr>
+              <td style="padding:14px 0;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="28">${icon('file', 'black', 16)}</td>
+                    <td style="color:#86868b;font-size:13px;">Category</td>
+                    <td style="text-align:right;color:#1d1d1f;font-size:14px;font-weight:500;">${category}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>` : ''}
+          </table>
+        </div>
+        
+        <!-- Title & Content -->
+        <p style="margin:0 0 16px;color:#1d1d1f;font-size:17px;font-weight:600;">${title}</p>
+        
+        <div style="background-color:#f5f5f7;border-radius:20px;padding:24px;margin-bottom:24px;">
+          <p style="margin:0;color:#1d1d1f;font-size:15px;line-height:1.7;white-space:pre-wrap;">${ticketContent}</p>
+        </div>
+        
+        <!-- CTA -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center" style="padding:16px 0;">
+              <a href="${adminPanelUrl || 'https://admin.graphosai.com'}/support/${ticketId}" style="display:inline-block;padding:16px 40px;background-color:#1d1d1f;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;border-radius:980px;">View in Admin Panel</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>`;
+
+  return appleBase({ content: emailContent, footerText: 'Automated notification from Graphos AI Studio Support System', lang: 'en' });
+}
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 module.exports = {
@@ -1699,6 +1803,7 @@ module.exports = {
   newDeviceLoginEmail,
   passwordChangedEmail,
   supportReplyEmail,
+  newTicketEmail,
   
   // Helpers
   t,

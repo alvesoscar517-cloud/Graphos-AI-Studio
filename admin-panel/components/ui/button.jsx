@@ -40,7 +40,7 @@ const Button = forwardRef(({
     <button
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center font-medium rounded-[10px]',
+        'inline-flex items-center justify-center font-medium rounded-xl',
         'transition-all duration-[250ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]',
         'focus:outline-none focus-visible:ring-[3px] focus-visible:ring-info/25',
         'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none',

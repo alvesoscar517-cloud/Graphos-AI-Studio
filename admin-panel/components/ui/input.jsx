@@ -44,9 +44,9 @@ const Input = forwardRef(({
           'transition-all duration-[250ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]',
           'placeholder:text-muted/70',
           'hover:bg-surface hover:border-border/60',
-          'focus:outline-none focus:bg-surface focus:border-border focus:shadow-[0_0_0_3px_rgba(0,122,255,0.12)]',
+          'focus:outline-none focus:bg-surface focus:border-[rgba(0,122,255,0.4)]',
           'disabled:opacity-50 disabled:cursor-not-allowed',
-          error && 'border-destructive/50 bg-destructive/5 focus:shadow-[0_0_0_3px_rgba(255,59,48,0.12)]',
+          error && 'border-destructive/50 bg-destructive/5 focus:border-destructive/60',
           className
         )}
         aria-invalid={error ? 'true' : 'false'}

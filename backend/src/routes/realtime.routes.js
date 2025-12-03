@@ -13,4 +13,7 @@ router.get('/events/:userId', realtimeController.events);
 // Stats endpoint (for monitoring)
 router.get('/stats', realtimeController.getStats);
 
+// Broadcast notification (called by admin backend via internal API)
+router.post('/broadcast-notification', realtimeController.broadcastNotificationApi);
+
 module.exports = router;

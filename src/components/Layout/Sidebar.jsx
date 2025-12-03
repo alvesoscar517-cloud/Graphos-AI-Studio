@@ -189,8 +189,9 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
           <span>{t('nav.aiWorkspace')}</span>
         </a>
 
-        <div className="flex items-center gap-2 py-2 px-3 pt-3 mt-3 text-footnote text-label-secondary font-semibold uppercase tracking-wider">
-          <span>{t('nav.history')}</span>
+        <div className="flex items-center gap-3 py-2.5 px-3 mt-1 text-text-secondary text-body">
+          <Icon name="clock" alt="History" size="lg" color="muted" />
+          <span>History</span>
         </div>
 
         <div className="mb-0.5 pl-0 bg-transparent" id="notesList">

@@ -187,7 +187,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                   <img 
                     src="/icon for background/monster-chibi.svg" 
                     alt="No profiles" 
-                    className="w-32 h-32 mb-4 opacity-60"
+                    className="w-32 h-32 mb-4 opacity-60 icon-invert"
                   />
                   <p className="text-sm text-text-secondary mb-4">
                     {searchTerm ? t('profile.noProfilesFound') : t('profile.noProfilesYet')}

@@ -535,10 +535,15 @@
    APPLE-STYLE COMPONENT ENHANCEMENTS
    ============================================ */
 
-/* Smooth focus states */
+/* Smooth focus states - minimal for inputs */
 *:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.25);
+}
+
+/* Only apply ring to buttons and interactive elements, not inputs */
+button:focus-visible,
+[role="button"]:focus-visible {
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
 }
 
 /* Interactive element hover lift */
