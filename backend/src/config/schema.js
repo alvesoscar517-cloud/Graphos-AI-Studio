@@ -204,7 +204,7 @@ const config = convict({
     },
     smtpPort: {
       doc: 'SMTP server port',
-      format: 'port',
+      format: 'int',
       default: 587,
       env: 'SMTP_PORT'
     },

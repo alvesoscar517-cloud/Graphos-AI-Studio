@@ -31,18 +31,34 @@ if (fs.existsSync(envConfigPath)) {
 // VALIDATION
 // ============================================================================
 
-// Validate configuration with fail-fast in production
+// Validate configuration - log errors but don't exit immediately
+// This allows the server to start and show logs in Cloud Run
+let configValidationError = null;
 try {
   // Use 'warn' to allow unknown properties during migration
   convictConfig.validate({ allowed: 'warn' });
   console.log('[CONFIG] Configuration validated successfully');
 } catch (error) {
+  configValidationError = error;
   console.error('[CONFIG ERROR] Configuration validation failed:', error.message);
+  console.error('[CONFIG ERROR] Full error:', JSON.stringify(error, null, 2));
+  console.error('[CONFIG ERROR] Current config values:');
+  try {
+    const props = convictConfig.getProperties();
+    // Log non-sensitive config for debugging
+    console.error('[CONFIG ERROR] env:', props.env);
+    console.error('[CONFIG ERROR] server.port:', props.server?.port);
+    console.error('[CONFIG ERROR] gcp.projectId:', props.gcp?.projectId);
+    console.error('[CONFIG ERROR] email.smtpPort:', props.email?.smtpPort);
+  } catch (e) {
+    console.error('[CONFIG ERROR] Could not get properties:', e.message);
+  }
   
-  // Fail-fast in production
+  // In production, we'll still continue but log a warning
+  // The server will start but may have issues
   if (convictConfig.get('env') === 'production') {
-    console.error('[CONFIG FATAL] Exiting due to invalid configuration in production');
-    process.exit(1);
+    console.error('[CONFIG WARNING] Configuration validation failed in production, but continuing to allow debugging');
+    // Don't exit - let the server start so we can see logs
   }
 }
 

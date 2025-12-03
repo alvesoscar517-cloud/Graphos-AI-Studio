@@ -105,10 +105,8 @@ const DEFAULT_TIMEOUT = 30000;
  * @returns {Promise<*>} Result or timeout error
  */
 async function withTimeout(promise, ms = DEFAULT_TIMEOUT, message) {
-  return pTimeout(promise, {
-    milliseconds: ms,
-    message: message || `Operation timed out after ${ms}ms`
-  });
+  // p-timeout v4 API: pTimeout(promise, milliseconds, message)
+  return pTimeout(promise, ms, message || `Operation timed out after ${ms}ms`);
 }
 
 /**
