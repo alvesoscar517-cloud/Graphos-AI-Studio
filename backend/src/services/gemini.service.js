@@ -14,12 +14,14 @@ const PROJECT_ID = config.PROJECT_ID;
 const LOCATION = config.LOCATION;
 
 // ============================================================================
-// EMBEDDING CACHE
+// EMBEDDING CACHE WITH PERIODIC CLEANUP
 // ============================================================================
 
 const embeddingCache = new Map();
-const EMBEDDING_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
-const MAX_EMBEDDING_CACHE_SIZE = 1000;
+const mainConfig = require('../config');
+const EMBEDDING_CACHE_TTL = mainConfig.CACHE_TTL?.EMBEDDING || 30 * 60 * 1000; // 30 minutes default
+const MAX_EMBEDDING_CACHE_SIZE = mainConfig.CACHE_MAX_SIZE?.EMBEDDING || 1000;
+const CACHE_CLEANUP_INTERVAL = 5 * 60 * 1000; // Run cleanup every 5 minutes
 
 const crypto = require('crypto');
 const redisService = require('./redis.service');
@@ -27,6 +29,85 @@ const redisService = require('./redis.service');
 function hashText(text) {
   // Use SHA256 for better collision resistance
   return crypto.createHash('sha256').update(text).digest('hex').substring(0, 16);
+}
+
+/**
+ * Periodic cache cleanup to prevent memory leaks
+ * Removes expired entries and enforces size limits
+ */
+function cleanupEmbeddingCache() {
+  const now = Date.now();
+  let expiredCount = 0;
+  let evictedCount = 0;
+  
+  // Remove expired entries
+  for (const [key, value] of embeddingCache.entries()) {
+    if (now - value.timestamp > EMBEDDING_CACHE_TTL) {
+      embeddingCache.delete(key);
+      expiredCount++;
+    }
+  }
+  
+  // If still over size limit, remove oldest entries
+  if (embeddingCache.size > MAX_EMBEDDING_CACHE_SIZE) {
+    const entries = Array.from(embeddingCache.entries())
+      .sort((a, b) => a[1].timestamp - b[1].timestamp);
+    
+    const toRemove = entries.slice(0, embeddingCache.size - MAX_EMBEDDING_CACHE_SIZE);
+    for (const [key] of toRemove) {
+      embeddingCache.delete(key);
+      evictedCount++;
+    }
+  }
+  
+  if (expiredCount > 0 || evictedCount > 0) {
+    console.log(`[CACHE CLEANUP] Removed ${expiredCount} expired, ${evictedCount} evicted. Size: ${embeddingCache.size}`);
+  }
+}
+
+// Start periodic cleanup
+let cleanupInterval = null;
+function startCacheCleanup() {
+  if (cleanupInterval) return;
+  cleanupInterval = setInterval(cleanupEmbeddingCache, CACHE_CLEANUP_INTERVAL);
+  console.log('[CACHE] Periodic cleanup started');
+}
+
+function stopCacheCleanup() {
+  if (cleanupInterval) {
+    clearInterval(cleanupInterval);
+    cleanupInterval = null;
+    console.log('[CACHE] Periodic cleanup stopped');
+  }
+}
+
+// Start cleanup on module load
+startCacheCleanup();
+
+/**
+ * Get cache statistics
+ */
+function getCacheStats() {
+  const now = Date.now();
+  let expiredCount = 0;
+  let totalSize = 0;
+  
+  for (const [, value] of embeddingCache.entries()) {
+    if (now - value.timestamp > EMBEDDING_CACHE_TTL) {
+      expiredCount++;
+    }
+    // Estimate size (rough approximation)
+    totalSize += value.embedding?.length * 4 || 0; // 4 bytes per float
+  }
+  
+  return {
+    entries: embeddingCache.size,
+    expiredEntries: expiredCount,
+    estimatedSizeBytes: totalSize,
+    estimatedSizeMB: (totalSize / 1024 / 1024).toFixed(2),
+    maxSize: MAX_EMBEDDING_CACHE_SIZE,
+    ttlMs: EMBEDDING_CACHE_TTL,
+  };
 }
 
 async function getCachedEmbedding(text, taskType) {
@@ -61,9 +142,22 @@ async function setCachedEmbedding(text, taskType, embedding) {
   await redisService.embeddingCache.set(textHash, taskType, embedding);
   
   // Also save to local memory cache for faster access
+  // Use LRU-style eviction if at capacity
   if (embeddingCache.size >= MAX_EMBEDDING_CACHE_SIZE) {
-    const firstKey = embeddingCache.keys().next().value;
-    embeddingCache.delete(firstKey);
+    // Find and remove oldest entry
+    let oldestKey = null;
+    let oldestTime = Infinity;
+    
+    for (const [key, value] of embeddingCache.entries()) {
+      if (value.timestamp < oldestTime) {
+        oldestTime = value.timestamp;
+        oldestKey = key;
+      }
+    }
+    
+    if (oldestKey) {
+      embeddingCache.delete(oldestKey);
+    }
   }
   
   const key = `${textHash}_${taskType}`;
@@ -237,7 +331,8 @@ function preprocessTextForDetection(text) {
     .trim();
   
   // For long texts, analyze multiple sections
-  const MAX_CHUNK_SIZE = 3000;
+  // Use configurable chunk size from config
+  const MAX_CHUNK_SIZE = mainConfig.AI_DETECTION?.MAX_CHUNK_SIZE || 3000;
   if (cleaned.length > MAX_CHUNK_SIZE * 1.5) {
     const chunks = [];
     // Beginning
@@ -504,17 +599,26 @@ function combineDetectionResults(results) {
 
 /**
  * Enhanced AI detection with multi-pass for uncertain results
+ * Thresholds are configurable via environment variables
  */
 async function detectAIContentEnhanced(text) {
+  // Get configurable thresholds
+  const UNCERTAIN_LOW = mainConfig.AI_DETECTION?.UNCERTAIN_RANGE_LOW || 35;
+  const UNCERTAIN_HIGH = mainConfig.AI_DETECTION?.UNCERTAIN_RANGE_HIGH || 65;
+  const DEEP_CONFIDENCE_THRESHOLD = mainConfig.AI_DETECTION?.DEEP_ANALYSIS_CONFIDENCE_THRESHOLD || 75;
+  
   try {
     // Pass 1: Standard detection
     const quickResult = await detectAIContent(text);
     
     console.log(`[AI-DETECT] Pass 1 result: ${quickResult.aiProbability}% (confidence: ${quickResult.confidence}%)`);
     
-    // If result is uncertain (35-65%) AND confidence is low, run deep analysis
-    if (quickResult.aiProbability >= 35 && quickResult.aiProbability <= 65 && quickResult.confidence < 75) {
-      console.log('[AI-DETECT] Result uncertain, running deep analysis...');
+    // If result is uncertain AND confidence is low, run deep analysis
+    const isUncertain = quickResult.aiProbability >= UNCERTAIN_LOW && quickResult.aiProbability <= UNCERTAIN_HIGH;
+    const isLowConfidence = quickResult.confidence < DEEP_CONFIDENCE_THRESHOLD;
+    
+    if (isUncertain && isLowConfidence) {
+      console.log(`[AI-DETECT] Result uncertain (${UNCERTAIN_LOW}-${UNCERTAIN_HIGH}%), running deep analysis...`);
       
       try {
         const deepResult = await detectAIContentDeep(text);
@@ -1153,13 +1257,25 @@ function generateFallbackSuggestions(issues) {
 }
 
 module.exports = {
+  // Embedding functions
   createEmbedding,
   createBatchEmbeddings,
+  
+  // AI Detection
   detectAIContent,
   detectAIContentEnhanced,
   detectAIContentHeuristic,
+  
+  // Voice profile
   generateVoiceSummary,
   rewriteWithVoice,
   generateImprovementSuggestions,
+  
+  // Cache utilities
+  getCacheStats,
+  cleanupEmbeddingCache,
+  stopCacheCleanup,
+  
+  // Vertex AI instance
   vertexAI
 };

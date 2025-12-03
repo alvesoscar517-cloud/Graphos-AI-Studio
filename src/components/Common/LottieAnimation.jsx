@@ -29,6 +29,7 @@ const LottieAnimation = ({ animationPath, width = 100, height = 100, loop = true
         loop={loop}
         autoplay={autoplay}
         style={{ width: '100%', height: '100%' }}
+        className={className}
       />
     </div>
   )

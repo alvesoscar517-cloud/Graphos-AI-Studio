@@ -16,9 +16,14 @@ export function ToastProvider() {
       richColors
       closeButton
       duration={4000}
+      gap={10}
       toastOptions={{
         style: {
-          fontFamily: 'inherit',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
+          borderRadius: '14px',
+          padding: '14px 16px',
+          fontSize: '14px',
+          boxShadow: '0 8px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08)',
         },
         className: 'admin-toast',
       }}

@@ -1,8 +1,21 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react'
-import { loadProfiles as loadProfilesAPI, getUserInfo } from '../services/api'
-import { isDevMode, getOrCreateTestProfile, shouldUseTestProfile, devLog } from '../utils/devConfig'
-import realtimeService from '../services/realtimeService'
-import { useAuth } from './AuthContext'
+/**
+ * Profile Context (Refactored to use TanStack Query)
+ * 
+ * This context now uses TanStack Query hooks internally for better caching
+ * and real-time updates while maintaining backward compatibility.
+ * 
+ * New code should import directly from '@/hooks/queries/useProfiles'
+ */
+
+import { createContext, useContext, useCallback, useMemo } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useProfilesQuery, useCreateProfile, useUpdateProfile, useDeleteProfile } from '../hooks/queries/useProfiles'
+import { queryKeys } from '../lib/queryKeys'
+import { 
+  setActiveProfile as setStorageActiveProfile, 
+  getActiveProfile as getStorageActiveProfile,
+  clearActiveProfile 
+} from '../utils/authStorage'
 
 const ProfileContext = createContext()
 
@@ -15,187 +28,94 @@ export const useProfiles = () => {
 }
 
 export const ProfileProvider = ({ children }) => {
-  const { isAuthenticated, isLoading: authLoading } = useAuth()
-  const [profiles, setProfiles] = useState([])
-  const [currentProfile, setCurrentProfile] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [lastLoaded, setLastLoaded] = useState(null)
-  const realtimeUnsubscribeRef = useRef(null)
+  const queryClient = useQueryClient()
+  
+  // Use TanStack Query for profiles
+  const { 
+    data: profiles = [], 
+    isLoading: loading, 
+    refetch 
+  } = useProfilesQuery()
+  
+  // Mutations
+  const createProfileMutation = useCreateProfile()
+  const updateProfileMutation = useUpdateProfile()
+  const deleteProfileMutation = useDeleteProfile()
 
-  // Load profiles only when authenticated
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      console.log('[SYNC] User authenticated, loading profiles...')
-      loadProfiles()
-    } else if (!authLoading && !isAuthenticated) {
-      // Clear profiles when logged out
-      console.log('[INFO] User not authenticated, clearing profiles')
-      setProfiles([])
-      setCurrentProfile(null)
-      setLastLoaded(null)
-      // Disconnect realtime service
-      realtimeService.disconnect()
-    }
-  }, [isAuthenticated, authLoading])
+  // Get current profile from secure storage
+  const currentProfile = useMemo(() => {
+    const { id: activeProfileId } = getStorageActiveProfile()
+    if (!activeProfileId || profiles.length === 0) return null
+    return profiles.find(p => p.profile_id === activeProfileId) || null
+  }, [profiles])
 
-  // Subscribe to real-time profile updates via SSE - only when authenticated
-  useEffect(() => {
-    // Don't setup realtime if not authenticated
-    if (authLoading || !isAuthenticated) {
-      // Cleanup existing subscription
-      if (realtimeUnsubscribeRef.current) {
-        realtimeUnsubscribeRef.current()
-        realtimeUnsubscribeRef.current = null
-      }
-      return
-    }
-    
-    const setupRealtimeUpdates = async () => {
-      try {
-        const userInfo = await getUserInfo();
-        if (!userInfo || !userInfo.userId) {
-          console.warn('No user info available for realtime updates');
-          return;
-        }
-        
-        realtimeService.connect(userInfo.userId);
-        
-        // Subscribe to profile updates
-        realtimeUnsubscribeRef.current = realtimeService.subscribe('profile', (data) => {
-          console.log('[USER] Profile update via SSE:', data);
-          if (data.type === 'created' || data.type === 'updated' || data.type === 'deleted') {
-            loadProfiles(true); // Force reload
-          }
-        });
-      } catch (e) {
-        console.warn('Could not setup realtime profile updates:', e.message);
-      }
-    };
-    
-    setupRealtimeUpdates();
-    
-    // Fallback: Check localStorage invalidation (for legacy support)
-    const checkInvalidation = () => {
-      try {
-        const invalidated = localStorage.getItem('profileCacheInvalidated')
-        if (invalidated === 'true') {
-          console.log('[SYNC] Profile cache invalidated, reloading...')
-          loadProfiles(true)
-          localStorage.removeItem('profileCacheInvalidated')
-        }
-      } catch (e) {
-        console.error('Error checking cache invalidation:', e.message)
-      }
-    }
-    checkInvalidation()
-    
-    return () => {
-      if (realtimeUnsubscribeRef.current) {
-        realtimeUnsubscribeRef.current()
-        realtimeUnsubscribeRef.current = null
-      }
-    }
-  }, [isAuthenticated, authLoading])
-
-  const loadProfiles = async (force = false) => {
-    // Don't reload if already loaded recently (unless forced)
-    if (!force && lastLoaded && Date.now() - lastLoaded < 30000) {
-      console.log('[PACKAGE] Using cached profiles (loaded', Math.round((Date.now() - lastLoaded) / 1000), 's ago)')
-      return
-    }
-
-    setLoading(true)
-    try {
-      console.log('[SYNC] Loading profiles from API...')
-      
-      // DEV MODE: Use test profile if enabled
-      if (isDevMode() && shouldUseTestProfile()) {
-        devLog('🧪 Dev mode enabled - using test profile')
-        try {
-          const testProfile = await getOrCreateTestProfile()
-          
-          if (testProfile) {
-            setProfiles([testProfile])
-            setLastLoaded(Date.now())
-            
-            // Auto-select test profile
-            devLog('Auto-selecting test profile:', testProfile.profile_name)
-            setCurrentProfile(testProfile)
-            localStorage.setItem('activeProfileId', testProfile.profile_id)
-            localStorage.setItem('activeProfileName', testProfile.profile_name)
-            
-            setLoading(false)
-            return
-          }
-        } catch (testError) {
-          console.error('[FAIL] Error loading test profile:', testError)
-          // Continue to production mode if test profile fails
-        }
-      }
-      
-      // PRODUCTION: Load from API as normal
-      const data = await loadProfilesAPI()
-      setProfiles(data)
-      setLastLoaded(Date.now())
-      
-      // Verify current profile still exists
-      const activeProfileId = localStorage.getItem('activeProfileId')
-      if (activeProfileId) {
-        const profile = data.find(p => p.profile_id === activeProfileId)
-        if (profile) {
-          console.log('[SUCCESS] Current profile verified:', profile.profile_name)
-          setCurrentProfile(profile)
-        } else {
-          console.warn('[WARNING] Current profile not found, clearing...')
-          setCurrentProfile(null)
-          localStorage.removeItem('activeProfileId')
-          localStorage.removeItem('activeProfileName')
-        }
-      }
-      
-      console.log(`[SUCCESS] Loaded ${data.length} profiles`)
-    } catch (error) {
-      console.error('[FAIL] Error loading profiles:', error)
-      // Set empty profiles array to prevent undefined errors
-      setProfiles([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const selectProfile = (profile) => {
+  // Select profile
+  const selectProfile = useCallback((profile) => {
     console.log('📌 Selecting profile:', profile?.profile_name || 'None')
-    setCurrentProfile(profile)
     
     if (profile) {
-      localStorage.setItem('activeProfileId', profile.profile_id)
-      localStorage.setItem('activeProfileName', profile.profile_name)
+      setStorageActiveProfile(profile.profile_id, profile.profile_name)
     } else {
-      localStorage.removeItem('activeProfileId')
-      localStorage.removeItem('activeProfileName')
+      clearActiveProfile()
     }
-  }
+    
+    // Force re-render by invalidating query
+    queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })
+  }, [queryClient])
 
-  const invalidateCache = () => {
+  // Load profiles (backward compatible - now just refetches)
+  const loadProfiles = useCallback((force = false) => {
+    if (force) {
+      queryClient.invalidateQueries({ queryKey: queryKeys.profiles.all })
+    }
+    return refetch()
+  }, [queryClient, refetch])
+
+  // Invalidate cache
+  const invalidateCache = useCallback(() => {
     console.log('[SYNC] Invalidating profile cache...')
-    setLastLoaded(null)
-    loadProfiles(true)
-  }
+    queryClient.invalidateQueries({ queryKey: queryKeys.profiles.all })
+  }, [queryClient])
 
-  const addProfile = (profile) => {
-    setProfiles(prev => [profile, ...prev])
-  }
-
-  const removeProfile = (profileId) => {
-    setProfiles(prev => prev.filter(p => p.profile_id !== profileId))
-    if (currentProfile?.profile_id === profileId) {
-      setCurrentProfile(null)
-      localStorage.removeItem('activeProfileId')
-      localStorage.removeItem('activeProfileName')
+  // Add profile (backward compatible)
+  const addProfile = useCallback(async (profileData) => {
+    try {
+      const result = await createProfileMutation.mutateAsync(profileData)
+      return result
+    } catch (error) {
+      console.error('[FAIL] Error creating profile:', error)
+      throw error
     }
-  }
+  }, [createProfileMutation])
 
-  const value = {
+  // Remove profile (backward compatible)
+  const removeProfile = useCallback(async (profileId) => {
+    try {
+      await deleteProfileMutation.mutateAsync(profileId)
+      
+      // Clear selection if deleted profile was active
+      const { id: activeId } = getStorageActiveProfile()
+      if (activeId === profileId) {
+        clearActiveProfile()
+      }
+    } catch (error) {
+      console.error('[FAIL] Error deleting profile:', error)
+      throw error
+    }
+  }, [deleteProfileMutation])
+
+  // Update profile
+  const updateProfile = useCallback(async (profileId, data) => {
+    try {
+      const result = await updateProfileMutation.mutateAsync({ profileId, data })
+      return result
+    } catch (error) {
+      console.error('[FAIL] Error updating profile:', error)
+      throw error
+    }
+  }, [updateProfileMutation])
+
+  const value = useMemo(() => ({
     profiles,
     currentProfile,
     loading,
@@ -203,8 +123,26 @@ export const ProfileProvider = ({ children }) => {
     selectProfile,
     invalidateCache,
     addProfile,
-    removeProfile
-  }
+    removeProfile,
+    updateProfile,
+    // Expose mutation states for UI feedback
+    isCreating: createProfileMutation.isPending,
+    isUpdating: updateProfileMutation.isPending,
+    isDeleting: deleteProfileMutation.isPending,
+  }), [
+    profiles,
+    currentProfile,
+    loading,
+    loadProfiles,
+    selectProfile,
+    invalidateCache,
+    addProfile,
+    removeProfile,
+    updateProfile,
+    createProfileMutation.isPending,
+    updateProfileMutation.isPending,
+    deleteProfileMutation.isPending,
+  ])
 
   return (
     <ProfileContext.Provider value={value}>

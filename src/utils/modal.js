@@ -1,5 +1,5 @@
 // Modal notification system for React
-import '../components/Popups/NotificationModal.css'
+// NotificationModal styles in main.css
 
 class ModalSystem {
   constructor() {
@@ -100,12 +100,8 @@ class ModalSystem {
           left: 50%;
           transform: translateX(-50%) translateY(20px);
           padding: 10px 16px;
-          background: var(--bg-primary, #1a1a1a);
-
           border-radius: 8px;
           font-size: 13px;
-          color: var(--text-primary, #fff);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
           z-index: 10001;
           opacity: 0;
           transition: all 0.2s ease;
@@ -114,8 +110,7 @@ class ModalSystem {
           opacity: 1;
           transform: translateX(-50%) translateY(0);
         }
-
-        body:not(.dark-theme) .simple-toast {
+        .simple-toast {
           background: #fff;
           color: #333;
           box-shadow: 0 4px 12px rgba(0,0,0,0.1);

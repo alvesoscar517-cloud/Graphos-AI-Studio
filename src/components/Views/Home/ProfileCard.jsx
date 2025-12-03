@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next'
-import './ProfileCard.css'
+import { cn } from '../../../lib/utils'
+import { Icon } from '../../Common'
 
 const ProfileCard = ({ profile, onSelect, onUse }) => {
   const { t } = useTranslation()
   
-  // Theme icon mapping
   const getThemeIcon = (theme) => {
     const themeIcons = {
       'work': 'briefcase',
@@ -20,9 +20,7 @@ const ProfileCard = ({ profile, onSelect, onUse }) => {
   }
   
   const formatNumber = (num) => {
-    if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'k'
-    }
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
     return num.toString()
   }
 
@@ -43,72 +41,100 @@ const ProfileCard = ({ profile, onSelect, onUse }) => {
 
   return (
     <div 
-      className="profile-card" 
+      className={cn(
+        "flex-[0_0_calc(33.333%-14px)] min-w-0 p-5 cursor-pointer relative overflow-hidden",
+        "bg-bg-secondary rounded-md shadow-card",
+        "transition-all duration-200",
+        "hover:shadow-md hover:bg-bg-hover",
+        "group"
+      )}
       onClick={() => onSelect(profile)}
     >
-      <div className="profile-card-header">
-        <div className={`profile-card-icon theme-icon-${profile.theme || 'work'}`}>
-          <img src={`/icon/${getThemeIcon(profile.theme)}.svg`} alt={profile.profile_name} />
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div className={cn(
+          "w-12 h-12 rounded-md flex items-center justify-center shrink-0",
+          "bg-fill-tertiary",
+          "transition-all duration-200",
+          "group-hover:bg-fill-secondary group-hover:scale-105"
+        )}>
+          <Icon 
+            name={getThemeIcon(profile.theme)} 
+            size="lg" 
+            color="primary"
+            className="group-hover:opacity-90 group-hover:scale-105 transition-all duration-200"
+          />
         </div>
       </div>
       
-      <h4 className="profile-card-title">{profile.profile_name}</h4>
+      {/* Title */}
+      <h4 className="text-callout font-semibold text-text-primary mb-2 leading-tight">
+        {profile.profile_name}
+      </h4>
       
-      <div className="profile-card-meta">
-        <div className="profile-card-meta-item">
-          <img src="/icon/file-text.svg" alt={t('common.samples')} />
+      {/* Meta */}
+      <div className="flex items-center gap-3 mb-4 text-caption1 text-label-secondary">
+        <div className="flex items-center gap-1.5">
+          <Icon name="file-text" size="sm" color="muted" />
           <span>{profile.sample_count || 0} {t('common.samples')}</span>
         </div>
-        <div className="profile-card-meta-item">
-          <img src="/icon/type.svg" alt={t('common.words')} />
+        <div className="flex items-center gap-1.5">
+          <Icon name="type" size="sm" color="muted" />
           <span>{formatNumber(profile.total_words || 0)} {t('common.words')}</span>
         </div>
       </div>
 
-      <div className="profile-card-stats">
-        <div className="profile-stat">
-          <span className="profile-stat-label">{t('profile.score')}</span>
-          <span className={`profile-stat-value quality-score-${profile.quality_rating || 'ok'}`}>
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="flex flex-col gap-0.5 p-3 bg-fill-quaternary rounded-sm">
+          <span className="text-caption2 text-label-tertiary uppercase tracking-wider font-semibold">
+            {t('profile.score')}
+          </span>
+          <span className="text-title3 font-semibold text-text-primary">
             {profile.quality_score || profile.qualityScore || 'N/A'}
           </span>
         </div>
-        <div className="profile-stat">
-          <span className="profile-stat-label">{t('analysis.avgSentence')}</span>
-          <span className="profile-stat-value">
+        <div className="flex flex-col gap-0.5 p-3 bg-fill-quaternary rounded-sm">
+          <span className="text-caption2 text-label-tertiary uppercase tracking-wider font-semibold">
+            {t('analysis.avgSentence')}
+          </span>
+          <span className="text-title3 font-semibold text-text-primary">
             {profile.statistics?.avg_sentence_length?.toFixed(0) || 
              profile.avg_sentence_length?.toFixed(0) || '0'}
           </span>
         </div>
       </div>
 
-      <div className="profile-card-tags">
-        <span className="profile-tag">
-          <img src="/icon/briefcase.svg" alt={t('profile.office')} />
+      {/* Tags */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <span className="badge badge-info">
+          <Icon name="briefcase" size="xs" color="muted" />
           {t('profile.office')}
         </span>
-        <span className="profile-tag">
-          <img src="/icon/user.svg" alt={t('profile.personal')} />
+        <span className="badge badge-success">
+          <Icon name="user" size="xs" color="muted" />
           {t('profile.personal')}
         </span>
       </div>
 
-      <div className="profile-card-footer">
-        <span className="profile-card-updated">
-          <img src="/icon/clock.svg" alt="" />
+      {/* Footer */}
+      <div className="flex items-center justify-between pt-4 border-t border-separator">
+        <span className="text-caption1 text-label-secondary flex items-center gap-1.5">
+          <Icon name="clock" size="sm" color="muted" />
           {formatDate(profile.created_at)}
         </span>
         <button 
-          className="profile-card-action"
+          className={cn(
+            "btn btn-primary py-1.5 px-4 text-caption1",
+            "flex items-center gap-1.5"
+          )}
           onClick={(e) => {
             e.stopPropagation()
-            if (onUse) {
-              onUse(profile)
-            } else {
-              onSelect(profile)
-            }
+            if (onUse) onUse(profile)
+            else onSelect(profile)
           }}
         >
-          <img src="/icon/play.svg" alt={t('common.use')} />
+          <Icon name="play" size="sm" />
           {t('common.use')}
         </button>
       </div>

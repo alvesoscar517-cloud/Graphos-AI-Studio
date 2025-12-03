@@ -89,7 +89,7 @@
     "checking": "Vérification...",
     "pleaseWait": "Veuillez patienter un instant",
     "signInToContinue": "Connectez-vous pour continuer",
-    "signInSubtitle": "Veuillez vous connecter avec votre compte Google pour utiliser AI Content Authenticator",
+    "signInSubtitle": "Veuillez vous connecter avec votre compte Google pour utiliser Graphos AI Studio",
     "signInFailed": "Échec de la connexion. Veuillez réessayer.",
     "loginFailed": "Échec de la connexion",
     "termsAgreement": "En vous connectant, vous acceptez nos",
@@ -118,7 +118,7 @@
     "sidebar": "Barre latérale"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "Supprimer",
     "confirmDeleteNote": "Êtes-vous sûr de vouloir supprimer la note « {{title}} » ?",
     "confirmDelete": "Confirmer la suppression",
@@ -129,7 +129,7 @@
     "rewrite": "Réécriture"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "Outil professionnel pour l'analyse et le raffinement du style de contenu",
     "newProfile": "Nouveau profil",
     "createStyleProfile": "Créer un profil de style",
@@ -149,7 +149,7 @@
     "unableToLoadProfileDetails": "Impossible de charger les détails du profil",
     "yourProfiles": "Vos profils de style d'écriture",
     "welcomeTo": "Bienvenue sur",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "Créer un premier profil",
     "createUniqueStyle": "Créez votre profil de style d'écriture unique",
     "analyzeRefine": "Analysez et affinez le contenu intelligemment",
@@ -459,7 +459,7 @@
   },
   "model": {
     "selectAIModel": "Sélectionner le modèle IA",
-    "inUse": "[UTILISÉ]",
+    "inUse": "UTILISÉ",
     "geminiFlashExp": "Dernier modèle expérimental, traitement rapide avec prise en charge de plusieurs types de contenu comme le texte et les images",
     "geminiFlashLite": "Modèle compact, le plus économique, adapté aux tâches simples et au traitement à haut volume",
     "geminiFlash": "Modèle équilibré entre vitesse et qualité, bonne capacité de raisonnement, adapté à la plupart des tâches",

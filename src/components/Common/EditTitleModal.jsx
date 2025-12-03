@@ -1,15 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import './EditTitleModal.css'
+import { cn } from '../../lib/utils'
 
 /**
  * EditTitleModal - Compact modal for editing title
- * 
- * @param {boolean} isOpen - Modal display status
- * @param {string} currentTitle - Current title
- * @param {function} onSave - Callback when saving new title
- * @param {function} onClose - Callback when closing modal
- * @param {number} maxLength - Maximum title length (default: 100)
  */
 const EditTitleModal = ({ isOpen, currentTitle, onSave, onClose, maxLength = 100 }) => {
   const { t } = useTranslation()
@@ -19,7 +13,6 @@ const EditTitleModal = ({ isOpen, currentTitle, onSave, onClose, maxLength = 100
   useEffect(() => {
     if (isOpen) {
       setTitle(currentTitle || '')
-      // Focus and select all text when opening modal
       setTimeout(() => {
         if (inputRef.current) {
           inputRef.current.focus()
@@ -55,35 +48,76 @@ const EditTitleModal = ({ isOpen, currentTitle, onSave, onClose, maxLength = 100
   if (!isOpen) return null
 
   return (
-    <div className="edit-title-modal-overlay" onClick={handleOverlayClick}>
-      <div className="edit-title-modal">
-        <div className="edit-title-modal-header">
-          <img src="/icon/pencil.svg" alt={t('common.edit')} className="edit-title-modal-icon" />
+    <div 
+      className={cn(
+        "modal-overlay",
+        "flex items-center justify-center z-menu",
+        "animate-fade-in-fast"
+      )}
+      onClick={handleOverlayClick}
+    >
+      <div className={cn(
+        "modal-content rounded-3xl",
+        "w-full max-w-modal-sm m-4 overflow-hidden p-6",
+        "animate-slide-up-fast"
+      )}>
+        {/* Header */}
+        <div className="flex items-center gap-2.5 text-md font-medium text-text-primary mb-4">
+          <img 
+            src="/icon/pencil.svg" 
+            alt={t('common.edit')} 
+            className="w-icon-md h-icon-md opacity-70 icon-invert" 
+          />
           <span>{t('editor.editTitle')}</span>
         </div>
 
-        <div className="edit-title-modal-body">
+        {/* Body */}
+        <div className="mb-4">
           <input
             ref={inputRef}
             type="text"
-            className="edit-title-modal-input"
+            className={cn(
+              "w-full py-3 px-3.5 text-sm rounded-xl outline-none box-border",
+              "border-2 border-border",
+              "bg-bg-secondary",
+              "text-text-primary",
+              "placeholder:text-text-muted",
+              "focus:border-accent"
+            )}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t('editor.enterTitle')}
             maxLength={maxLength}
           />
-          <div className="edit-title-modal-counter">
+          <div className="text-right text-2xs text-text-muted mt-1.5">
             {title.length}/{maxLength}
           </div>
         </div>
 
-        <div className="edit-title-modal-footer">
-          <button className="edit-title-modal-btn cancel" onClick={onClose}>
+        {/* Footer */}
+        <div className="flex justify-end gap-2">
+          <button 
+            className={cn(
+              "py-2 px-5 text-sm font-medium rounded-pill cursor-pointer border-none",
+              "bg-transparent text-text-secondary",
+              "transition-colors duration-150",
+              "hover:bg-bg-tertiary hover:text-text-primary"
+            )}
+            onClick={onClose}
+          >
             {t('common.cancel')}
           </button>
           <button 
-            className="edit-title-modal-btn save" 
+            className={cn(
+              "py-2 px-5 text-sm font-medium rounded-pill cursor-pointer border-none",
+              "bg-accent text-white",
+              "transition-colors duration-150",
+              "hover:bg-accent-hover",
+              "disabled:bg-border-hover",
+              "disabled:text-text-muted",
+              "disabled:cursor-not-allowed"
+            )}
             onClick={handleSave}
             disabled={!title.trim()}
           >

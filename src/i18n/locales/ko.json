@@ -89,7 +89,7 @@
     "checking": "확인 중...",
     "pleaseWait": "잠시만 기다려 주세요",
     "signInToContinue": "계속하려면 로그인하세요",
-    "signInSubtitle": "AI Content Authenticator를 사용하려면 Google 계정으로 로그인해 주세요",
+    "signInSubtitle": "Graphos AI Studio를 사용하려면 Google 계정으로 로그인해 주세요",
     "signInFailed": "로그인에 실패했습니다. 다시 시도해 주세요.",
     "loginFailed": "로그인 실패",
     "termsAgreement": "로그인 시 다음 약관에 동의하는 것으로 간주됩니다:",
@@ -118,7 +118,7 @@
     "sidebar": "사이드바"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "삭제",
     "confirmDeleteNote": "정말 \"{{title}}\" 노트를 삭제하시겠습니까?",
     "confirmDelete": "삭제 확인",
@@ -129,7 +129,7 @@
     "rewrite": "다시 쓰기"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "콘텐츠 스타일 분석 및 개선을 위한 전문가용 도구",
     "newProfile": "새 프로필",
     "createStyleProfile": "스타일 프로필 생성",
@@ -149,7 +149,7 @@
     "unableToLoadProfileDetails": "프로필 상세 정보를 불러올 수 없습니다",
     "yourProfiles": "나의 글쓰기 스타일 프로필",
     "welcomeTo": "환영합니다",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "첫 프로필 생성",
     "createUniqueStyle": "나만의 고유한 글쓰기 스타일 프로필 만들기",
     "analyzeRefine": "지능적인 콘텐츠 분석 및 정제",
@@ -459,7 +459,7 @@
   },
   "model": {
     "selectAIModel": "AI 모델 선택",
-    "inUse": "[사용 중]",
+    "inUse": "사용 중",
     "geminiFlashExp": "최신 실험 모델, 텍스트 및 이미지 등 다양한 콘텐츠 유형을 지원하는 빠른 처리",
     "geminiFlashLite": "경량 모델, 가장 비용 효율적이며 간단한 작업과 대량 처리에 적합",
     "geminiFlash": "속도와 품질의 균형이 잡힌 모델, 우수한 추론 능력, 대부분의 작업에 적합",

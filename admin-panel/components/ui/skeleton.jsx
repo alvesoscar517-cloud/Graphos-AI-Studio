@@ -12,7 +12,7 @@ function Skeleton({ className, ...props }) {
   return (
     <div
       className={cn(
-        'animate-pulse rounded-md bg-surface-secondary',
+        'animate-pulse rounded-xl bg-surface-secondary/80',
         className
       )}
       {...props}
@@ -60,7 +60,7 @@ function SkeletonAvatar({ size = 'md', className }) {
  */
 function SkeletonCard({ className }) {
   return (
-    <div className={cn('rounded-xl border border-border p-4 space-y-4', className)}>
+    <div className={cn('rounded-2xl border border-border/40 p-5 space-y-4', className)}>
       <div className="flex items-center gap-3">
         <SkeletonAvatar size="md" />
         <div className="flex-1 space-y-2">
@@ -97,9 +97,9 @@ function SkeletonTableRow({ columns = 4, className }) {
  */
 function SkeletonTable({ rows = 5, columns = 4, className }) {
   return (
-    <div className={cn('rounded-lg border border-border overflow-hidden', className)}>
+    <div className={cn('rounded-2xl border border-border/40 overflow-hidden', className)}>
       {/* Header */}
-      <div className="flex items-center gap-4 py-3 px-4 bg-surface-secondary border-b border-border">
+      <div className="flex items-center gap-4 py-3.5 px-4 bg-surface-secondary/50 border-b border-border/40">
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={i} className="h-3 w-20" />
         ))}
@@ -118,10 +118,10 @@ function SkeletonTable({ rows = 5, columns = 4, className }) {
  */
 function SkeletonStatsCard({ className }) {
   return (
-    <div className={cn('rounded-xl border border-border p-4', className)}>
-      <div className="flex items-center justify-between mb-3">
+    <div className={cn('rounded-2xl border border-border/40 p-5', className)}>
+      <div className="flex items-center justify-between mb-4">
         <Skeleton className="h-3 w-20" />
-        <Skeleton className="h-8 w-8 rounded-lg" />
+        <Skeleton className="h-9 w-9 rounded-xl" />
       </div>
       <Skeleton className="h-8 w-24 mb-2" />
       <Skeleton className="h-3 w-16" />
@@ -134,12 +134,12 @@ function SkeletonStatsCard({ className }) {
  */
 function SkeletonChart({ height = 300, className }) {
   return (
-    <div className={cn('rounded-xl border border-border p-4', className)}>
-      <div className="flex items-center justify-between mb-4">
+    <div className={cn('rounded-2xl border border-border/40 p-5', className)}>
+      <div className="flex items-center justify-between mb-5">
         <Skeleton className="h-5 w-32" />
-        <Skeleton className="h-8 w-24 rounded-lg" />
+        <Skeleton className="h-9 w-24 rounded-xl" />
       </div>
-      <Skeleton className="w-full rounded-lg" style={{ height: height - 80 }} />
+      <Skeleton className="w-full rounded-xl" style={{ height: height - 80 }} />
     </div>
   )
 }

@@ -88,9 +88,13 @@ router.post('/send-feedback', async (req, res) => {
       }
 
       const subjectPrefix = isBillingSupport ? `[${priority?.toUpperCase() || 'SUPPORT'}]` : '[Feedback]';
+      const fromEmail = config.EMAIL_FROM || process.env.EMAIL_FROM || process.env.EMAIL_USER;
+      const fromName = config.EMAIL_FROM_NAME || process.env.EMAIL_FROM_NAME || 'Graphos AI Studio';
+      const adminEmail = config.SMTP_USER || process.env.SMTP_USER || process.env.EMAIL_USER;
+      
       await transporter.sendMail({
-        from: process.env.EMAIL_USER || 'alvesoscar517@gmail.com',
-        to: 'alvesoscar517@gmail.com',
+        from: `"${fromName}" <${fromEmail}>`,
+        to: adminEmail,
         subject: `${subjectPrefix} ${title} - #${ticketId.substring(0, 8)}`,
         html: htmlContent,
         attachments,

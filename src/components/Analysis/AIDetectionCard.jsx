@@ -5,9 +5,9 @@ import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
+import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
-import './Analysis.css'
-import './AIDetectionCard.css'
+import { cn } from '../../lib/utils'
 
 const AIDetectionCard = ({ disabled, text }) => {
   const { t } = useTranslation()
@@ -24,9 +24,7 @@ const AIDetectionCard = ({ disabled, text }) => {
   const [analysisDetails, setAnalysisDetails] = useState(null)
   const { currentNote } = useNotes()
 
-  // Reset state and load cached result when note changes
   useEffect(() => {
-    // Always reset state first when note changes
     setResult(null)
     setConfidence(null)
     setEvidence([])
@@ -36,15 +34,11 @@ const AIDetectionCard = ({ disabled, text }) => {
     setAnalysisDetails(null)
     setTextChanged(true)
 
-    if (!currentNote) {
-      return
-    }
+    if (!currentNote) return
 
-    // Only load cache if we have text and exact match exists
     if (text) {
       const cached = getCachedAnalysis(currentNote.id, text, 'detect')
       if (cached) {
-        // Capitalize first letter of verdict when loading from cache
         const verdictText = cached.verdict ? cached.verdict.charAt(0).toUpperCase() + cached.verdict.slice(1) : cached.verdict
         setResult(cached.aiScore)
         setConfidence(cached.confidence || null)
@@ -54,19 +48,16 @@ const AIDetectionCard = ({ disabled, text }) => {
         setAiIndicators(cached.aiIndicators || [])
         setAnalysisDetails(cached.analysisDetails || null)
         setTextChanged(false)
-        console.log('[PACKAGE] Loaded cached AI detection result for note:', currentNote.id)
       }
     }
   }, [currentNote?.id])
 
-  // Check if text has changed and load cache if available
   useEffect(() => {
     if (!currentNote || !text) {
       setTextChanged(true)
       return
     }
 
-    // Check if we have cached result for this exact text
     const cached = getCachedAnalysis(currentNote.id, text, 'detect')
     if (cached) {
       const verdictText = cached.verdict ? cached.verdict.charAt(0).toUpperCase() + cached.verdict.slice(1) : cached.verdict
@@ -78,9 +69,7 @@ const AIDetectionCard = ({ disabled, text }) => {
       setAiIndicators(cached.aiIndicators || [])
       setAnalysisDetails(cached.analysisDetails || null)
       setTextChanged(false)
-      console.log('[PACKAGE] Loaded cached AI detection result for text change')
     } else {
-      // Text changed but no cache - reset result and enable button
       setResult(null)
       setConfidence(null)
       setEvidence([])
@@ -105,19 +94,14 @@ const AIDetectionCard = ({ disabled, text }) => {
     
     setIsLoading(true)
     try {
-      console.log('[SEARCH] Detecting AI for text:', text.substring(0, 50) + '...')
       const apiResult = await detectAIAPI(text)
-      
-      console.log('[CHART] API Result:', apiResult)
       
       if (apiResult.success && apiResult.data) {
         const aiScore = Math.round(apiResult.data.ai_probability || 0)
         const confidenceScore = Math.round(apiResult.data.confidence || 70)
         
-        // Shorten verdict and capitalize first letter
         let verdictText = apiResult.data.verdict || (aiScore < 50 ? 'Appears to be human-written' : 'Likely AI-generated')
         verdictText = verdictText.replace('Content ', '').replace('content ', '')
-        // Capitalize first letter
         verdictText = verdictText.charAt(0).toUpperCase() + verdictText.slice(1)
         
         const resultData = {
@@ -138,7 +122,6 @@ const AIDetectionCard = ({ disabled, text }) => {
         setAiIndicators(apiResult.data.ai_indicators || [])
         setAnalysisDetails(apiResult.data.analysis_details || null)
         
-        // Save to cache
         setCachedAnalysis(currentNote.id, text, 'detect', resultData)
         setTextChanged(false)
         
@@ -161,260 +144,277 @@ const AIDetectionCard = ({ disabled, text }) => {
     }
   }
 
-  const isHumanWritten = result !== null && result < 50
-
-  const getAIScoreColor = (score) => {
-    if (score < 20) return '#34a853' // Green - Human
-    if (score < 40) return '#4285f4' // Blue - Likely Human
-    if (score < 60) return '#fbbc04' // Yellow - Uncertain
-    if (score < 80) return '#ff9800' // Orange - Likely AI
-    return '#ea4335' // Red - AI
-  }
-
   return (
     <>
-      <div className="feature-card ai-card">
-        <div className="feature-card-header">
-          <div className="feature-icon ai-icon">
-            <img src="/icon/shield-check.svg" alt={t('analysis.aiDetection')} />
+      {/* Main Card */}
+      <div className={cn(
+        "p-4 border border-border-light rounded-xl",
+        "bg-bg-secondary transition-all duration-200",
+        "hover:shadow-md"
+      )}>
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-3 relative">
+          <div className="card-icon">
+            <Icon name="shield-check" size="lg" color="primary" />
           </div>
-          <div className="feature-info">
-            <h4>{t('analysis.aiDetection')}</h4>
-            <p>{t('analysis.content')}</p>
+          <div className="flex-1">
+            <h4 className="text-sm font-medium text-text-primary m-0 mb-0.5">
+              {t('analysis.aiDetection')}
+            </h4>
+            <p className="text-xs text-text-secondary m-0">
+              {t('analysis.content')}
+            </p>
           </div>
           {result !== null && (
             <button 
-              className={`toggle-result-btn ${showResult ? 'expanded' : 'collapsed'}`}
+              className={cn(
+                "bg-transparent border-none p-1.5 cursor-pointer rounded-md",
+                "flex items-center justify-center transition-colors duration-200",
+                "hover:bg-bg-tertiary ml-auto"
+              )}
               onClick={() => setShowResult(!showResult)}
-              data-tooltip={showResult ? t('common.hide') : t('common.show')}
-              data-tooltip-position="left"
             >
               <img 
                 src="/icon/chevron-down.svg"
-                alt="toggle" 
+                alt="toggle"
+                className={cn(
+                  "w-icon-md h-icon-md opacity-60 transition-all duration-300",
+                  "hover:opacity-100 icon-invert",
+                  showResult ? "rotate-180" : "rotate-0"
+                )}
               />
             </button>
           )}
         </div>
+
+        {/* Action Button */}
         <button 
-          className={`feature-btn ${isLoading ? 'loading' : ''}`}
+          className={cn(
+            "w-full flex items-center justify-between py-2.5 px-3.5",
+            "bg-bg-secondary border border-border-light rounded-xl",
+            "text-sm font-medium text-text-primary cursor-pointer",
+            "transition-all duration-200 relative overflow-hidden",
+            "hover:border-border-hover hover:shadow-md",
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+            isLoading && "pointer-events-none opacity-70"
+          )}
           onClick={detectAI}
           disabled={disabled || isLoading || !textChanged}
-          title={!textChanged ? t('analysis.detected') : ''}
         >
           {isLoading ? (
-            <Lottie 
-              animationData={threeDotsAnimation} 
-              loop={true}
-              style={{ width: 50, height: 16 }}
-            />
+            <Lottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
           ) : (
             <>
               <span>{!textChanged ? t('analysis.detected') : t('analysis.detect')}</span>
-              <img src="/icon/arrow-right.svg" alt="" className="btn-arrow" />
+              <Icon name="arrow-right" size="md" color="muted" />
             </>
           )}
         </button>
+
+        {/* Result Section */}
         {result !== null && showResult && (
-          <div className="feature-result" style={{ display: 'block' }}>
-            <div className="ai-score-display">
-              <div className="ai-score-circle">
-                <svg className="ai-score-svg" viewBox="0 0 100 100">
-                  <defs>
-                    <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#4facfe" />
-                      <stop offset="100%" stopColor="#00d4ff" />
-                    </linearGradient>
-                  </defs>
-                  <circle className="ai-score-bg" cx="50" cy="50" r="45"></circle>
+          <div className="mt-2 block animate-slide-down">
+            <div className="flex flex-col items-center gap-2 p-0">
+              {/* Score Circle */}
+              <div className="relative w-score-circle h-score-circle flex items-center justify-center my-1">
+                <svg className="absolute top-0 left-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+                  <circle className="fill-none stroke-bg-tertiary stroke-[8]" cx="50" cy="50" r="45" />
                   <circle 
-                    className="ai-score-progress" 
-                    cx="50" 
-                    cy="50" 
-                    r="45"
+                    className="fill-none stroke-text-link stroke-[8]"
+                    cx="50" cy="50" r="45"
                     style={{
-                      strokeDashoffset: 282.74 - (result / 100) * 282.74
+                      strokeDasharray: 282.74,
+                      strokeDashoffset: 282.74 - (result / 100) * 282.74,
+                      strokeLinecap: 'round'
                     }}
-                  ></circle>
-                  <circle className="ai-score-inner" cx="50" cy="50" r="40"></circle>
+                  />
+                  <circle className="fill-bg-primary" cx="50" cy="50" r="40" />
                 </svg>
-                <div className="ai-score-text">
-                  <div className="ai-score-number">{result}</div>
-                  <div className="ai-score-symbol">%</div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-baseline justify-center gap-0.5 z-10">
+                  <div className="text-3xl font-semibold leading-none tracking-tight text-text-primary">{result}</div>
+                  <div className="text-sm font-medium leading-none text-text-secondary opacity-50">%</div>
                 </div>
               </div>
               
-              <div className="ai-verdict-full">
-                <img 
-                  src={
-                    result < 30 ? "/icon/shield-check.svg" : 
-                    result < 50 ? "/icon/check-circle.svg" : 
-                    result < 70 ? "/icon/alert-circle.svg" : 
-                    "/icon/alert-triangle.svg"
-                  } 
-                  alt="verdict" 
-                  className="verdict-icon"
+              {/* Verdict */}
+              <div className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-bg-secondary rounded-lg text-xs font-medium text-text-primary">
+                <Icon 
+                  name={result < 30 ? "shield-check" : result < 50 ? "check-circle" : result < 70 ? "alert-circle" : "alert-triangle"} 
+                  size="sm" color="primary" className="flex-shrink-0 -mt-px"
                 />
-                <span>{verdict}</span>
+                <span className="whitespace-nowrap flex-shrink-0 leading-none">{verdict}</span>
               </div>
               
+              {/* Confidence Indicator */}
               {confidence !== null && (
-                <div className="confidence-indicator">
-                  <div className="confidence-header">
-                    <span className="confidence-label">{t('analysis.confidence')}</span>
-                    <span className="confidence-value">{confidence}%</span>
+                <div className="w-full p-2 px-3 bg-bg-secondary rounded-lg mt-0">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-2xs font-medium text-text-secondary uppercase tracking-wide">{t('analysis.confidence')}</span>
+                    <span className="text-sm font-semibold text-text-primary">{confidence}%</span>
                   </div>
-                  <div className="confidence-bar">
+                  <div className="w-full h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
                     <div 
-                      className={`confidence-fill ${confidence < 60 ? 'low' : confidence < 80 ? 'medium' : 'high'}`}
+                      className={cn(
+                        "h-full rounded-sm transition-all duration-500",
+                        confidence < 60 && "bg-gradient-to-r from-orange-500 to-red-400",
+                        confidence >= 60 && confidence < 80 && "bg-gradient-to-r from-blue-500 to-cyan-400",
+                        confidence >= 80 && "bg-gradient-to-r from-green-500 to-emerald-400"
+                      )}
                       style={{ width: `${confidence}%` }}
                     />
                   </div>
                 </div>
               )}
               
+              {/* Low Confidence Warning */}
               {confidence !== null && confidence < 60 && (
-                <div className="low-confidence-warning">
-                  <img src="/icon/alert-circle.svg" alt="warning" />
+                <div className="w-full flex items-center gap-2 py-2 px-3 bg-warning/10 border border-warning/30 rounded-lg text-2xs text-warning leading-relaxed">
+                  <Icon name="alert-circle" size="sm" color="warning" className="flex-shrink-0" />
                   <span>{t('analysis.lowConfidenceWarning')}</span>
                 </div>
               )}
               
-              {analysisDetails?.multi_pass && (
-                <div className="analysis-badge">
-                  <img src="/icon/layers.svg" alt="multi-pass" />
-                  <span>{t('analysis.multiLayerAnalysis')}</span>
-                </div>
-              )}
-              
+              {/* View Details Button */}
               <button 
-                className="detail-btn-full"
+                className={cn(
+                  "w-full py-2 px-3 mt-0",
+                  "bg-bg-secondary border-none rounded-lg",
+                  "flex items-center justify-between cursor-pointer",
+                  "transition-all duration-200 text-xs font-medium text-text-primary",
+                  "hover:bg-bg-tertiary"
+                )}
                 onClick={() => setShowModal(true)}
               >
                 <span>{t('common.viewDetails')}</span>
-                <img src="/icon/chevron-right.svg" alt="detail" />
+                <Icon name="chevron-right" size="sm" color="muted" />
               </button>
             </div>
           </div>
         )}
       </div>
 
+
+      {/* Detail Modal */}
       {showModal && (
-        <div className="ai-detail-overlay" onClick={() => setShowModal(false)}>
-          <div className="ai-detail-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="ai-detail-header">
-              <h3>{t('analysis.detailedAnalysis')}</h3>
-              <button className="close-detail-btn" onClick={() => setShowModal(false)}>
-                <img src="/icon/x.svg" alt={t('common.close')} />
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="flex items-center justify-between py-5 px-6 border-b border-border-light">
+              <h3 className="text-lg font-medium text-text-primary m-0">{t('analysis.detailedAnalysis')}</h3>
+              <button 
+                className="bg-transparent border-none p-2 cursor-pointer rounded-full flex items-center justify-center hover:bg-bg-tertiary"
+                onClick={() => setShowModal(false)}
+              >
+                <Icon name="x" alt={t('common.close')} size="lg" color="muted" />
               </button>
             </div>
-            <div className="ai-detail-body">
-              <div className="ai-detail-score">
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {/* Score Section */}
+              <div className="flex items-center justify-between p-4 bg-bg-secondary rounded-xl mb-5">
                 <div>
-                  <div className="ai-detail-label">
-                    {t('analysis.aiGenerationProbability')}
-                  </div>
-                  <div className="ai-detail-value">
-                    {result}%
-                  </div>
+                  <div className="text-sm text-text-secondary mb-1">{t('analysis.aiGenerationProbability')}</div>
+                  <div className="text-3xl font-semibold text-text-secondary">{result}%</div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div className="ai-detail-label">
-                    {t('analysis.confidence')}
-                  </div>
-                  <div className="ai-detail-value" style={{ 
-                    color: confidence < 60 ? '#ff9800' : confidence < 80 ? '#4285f4' : '#34a853' 
-                  }}>
+                <div className="text-right">
+                  <div className="text-sm text-text-secondary mb-1">{t('analysis.confidence')}</div>
+                  <div 
+                    className="text-3xl font-semibold"
+                    style={{ color: confidence < 60 ? '#ff9800' : confidence < 80 ? '#4285f4' : '#34a853' }}
+                  >
                     {confidence}%
                   </div>
                 </div>
               </div>
 
-              <div className="ai-detail-verdict-section">
-                <div className="ai-detail-label">{t('analysis.conclusion')}</div>
-                <div className="ai-detail-verdict">{verdict}</div>
+              {/* Verdict Section */}
+              <div className="p-3 bg-bg-secondary rounded-lg mb-4">
+                <div className="text-sm text-text-secondary mb-1">{t('analysis.conclusion')}</div>
+                <div className="text-sm font-medium text-text-primary">{verdict}</div>
               </div>
 
+              {/* Analysis Stats */}
               {analysisDetails && (
-                <div className="ai-detail-stats">
-                  <div className="stat-item">
-                    <span className="stat-label">{t('analysis.wordCount')}</span>
-                    <span className="stat-value">{analysisDetails.word_count}</span>
+                <div className="flex gap-3 flex-wrap p-3 bg-bg-secondary rounded-lg mb-4">
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="text-text-secondary font-medium">{t('analysis.wordCount')}</span>
+                    <span className="text-text-primary font-semibold">{analysisDetails.word_count}</span>
                   </div>
-                  <div className="stat-item">
-                    <span className="stat-label">{t('analysis.length')}</span>
-                    <span className="stat-value">{analysisDetails.text_length} {t('common.characters')}</span>
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="text-text-secondary font-medium">{t('analysis.length')}</span>
+                    <span className="text-text-primary font-semibold">{analysisDetails.text_length} {t('common.characters')}</span>
                   </div>
                   {analysisDetails.multi_pass && (
-                    <div className="stat-item">
-                      <span className="stat-badge">
-                        <img src="/icon/layers.svg" alt="multi" />
-                        {t('analysis.multiLayerAnalysis')}
-                      </span>
+                    <div className="flex items-center gap-1 py-1 px-2 bg-primary/10 rounded text-primary text-2xs font-medium">
+                      <Icon name="layers" size="xs" color="primary" />
+                      {t('analysis.multiLayerAnalysis')}
                     </div>
                   )}
                 </div>
               )}
 
+              {/* Human Indicators */}
               {humanIndicators && humanIndicators.length > 0 && (
-                <div className="ai-detail-section">
-                  <h4 className="ai-detail-section-title">
-                    <img src="/icon/user-check.svg" alt="human" />
+                <div className="mb-5">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2.5">
+                    <Icon name="user-check" size="sm" color="primary" />
                     {t('analysis.humanIndicators')} ({humanIndicators.length})
                   </h4>
-                  <div className="indicator-list human-indicators">
+                  <div className="flex flex-col gap-2">
                     {humanIndicators.map((item, index) => (
-                      <div key={index} className="indicator-item">
-                        <span className="indicator-bullet">[OK]</span>
-                        <span>{item}</span>
+                      <div key={index} className="flex items-start gap-2 py-2 px-2.5 bg-bg-secondary rounded-md text-xs leading-relaxed">
+                        <span className="flex-shrink-0 font-semibold mt-px text-success">[OK]</span>
+                        <span className="text-text-primary">{item}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
+              {/* AI Indicators */}
               {aiIndicators && aiIndicators.length > 0 && (
-                <div className="ai-detail-section">
-                  <h4 className="ai-detail-section-title">
-                    <img src="/icon/cpu.svg" alt="ai" />
+                <div className="mb-5">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2.5">
+                    <Icon name="cpu" size="sm" color="primary" />
                     {t('analysis.aiIndicators')} ({aiIndicators.length})
                   </h4>
-                  <div className="indicator-list ai-indicators">
+                  <div className="flex flex-col gap-2">
                     {aiIndicators.map((item, index) => (
-                      <div key={index} className="indicator-item">
-                        <span className="indicator-bullet">⚠</span>
-                        <span>{item}</span>
+                      <div key={index} className="flex items-start gap-2 py-2 px-2.5 bg-bg-secondary rounded-md text-xs leading-relaxed">
+                        <span className="flex-shrink-0 font-semibold mt-px text-warning">⚠</span>
+                        <span className="text-text-primary">{item}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div className="ai-detail-section">
-                <h4 className="ai-detail-section-title">
-                  <img src="/icon/file-text.svg" alt="evidence" />
+              {/* Evidence Section */}
+              <div className="mb-5">
+                <h4 className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2.5">
+                  <Icon name="file-text" size="sm" color="primary" />
                   {t('analysis.analysisEvidence')}
                 </h4>
                 {evidence && evidence.length > 0 ? (
-                  <div className="evidence-paragraphs">
+                  <div className="flex flex-col gap-3 p-4 bg-bg-secondary rounded-xl">
                     {evidence.map((item, index) => (
-                      <p key={index} className="evidence-paragraph">{item}</p>
+                      <p key={index} className="text-sm text-text-primary leading-relaxed m-0">{item}</p>
                     ))}
                   </div>
                 ) : (
-                  <div className="no-evidence">
-                    {t('analysis.noDetailedEvidence')}
-                  </div>
+                  <div className="text-center py-6 text-text-secondary text-sm">{t('analysis.noDetailedEvidence')}</div>
                 )}
               </div>
 
+              {/* Key Factor */}
               {analysisDetails?.key_factor && (
-                <div className="ai-detail-section key-factor">
-                  <h4 className="ai-detail-section-title">
-                    <img src="/icon/key.svg" alt="key" />
+                <div className="p-3 bg-primary/5 border-l-4 border-primary rounded-md mb-5">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2.5">
+                    <Icon name="key" size="sm" color="primary" />
                     {t('analysis.determiningFactors')}
                   </h4>
-                  <p className="key-factor-text">{analysisDetails.key_factor}</p>
+                  <p className="text-xs leading-relaxed text-text-primary m-0 italic">{analysisDetails.key_factor}</p>
                 </div>
               )}
             </div>

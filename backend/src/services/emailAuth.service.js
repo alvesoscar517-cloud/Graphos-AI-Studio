@@ -10,7 +10,7 @@
 
 const { getAdmin } = require('../config/firebaseAdmin');
 const admin = getAdmin();
-const bcrypt = require('bcryptjs');
+const { hashPassword, verifyPassword, verifyAndRehash } = require('../utils/password');
 const { db, FieldValue } = require('../config/firebase');
 const otpService = require('./otp.service');
 const { validatePassword, validateEmail, validateDisplayName, normalizeEmail } = require('../utils/authValidation');
@@ -18,13 +18,13 @@ const logger = require('../utils/logger');
 const { FREE_CREDITS } = require('../config/pricing');
 const config = require('../config');
 const { sendWelcomeNotification } = require('./autoNotification.service');
+const { get: httpGet } = require('../utils/httpClient');
 
 // Collections
 const USERS_COLLECTION = 'users';
 const PENDING_REGISTRATIONS_COLLECTION = 'pending_registrations';
 
 // Constants
-const BCRYPT_SALT_ROUNDS = 12;
 const PENDING_REGISTRATION_EXPIRY_HOURS = 24;
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOGIN_LOCKOUT_MINUTES = 30;
@@ -92,8 +92,8 @@ async function register({ email, password, displayName, locale = 'en' }) {
     logger.info('Re-registration for pending email, updating registration', { email: normalizedEmail });
   }
   
-  // Hash password
-  const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+  // Hash password with argon2 (OWASP recommended)
+  const passwordHash = await hashPassword(password);
   
   // Create/update pending registration
   const now = new Date();
@@ -332,8 +332,14 @@ async function login(email, password) {
     throw new Error('AUTH_EMAIL_NOT_VERIFIED: Please verify your email before logging in');
   }
   
-  // Verify password
-  const isValidPassword = await bcrypt.compare(password, userData.passwordHash);
+  // Verify password (supports both argon2 and legacy bcrypt hashes)
+  const { valid: isValidPassword, newHash } = await verifyAndRehash(userData.passwordHash, password);
+  
+  // If password was verified with old bcrypt hash, upgrade to argon2
+  if (isValidPassword && newHash) {
+    await db.collection(USERS_COLLECTION).doc(userId).update({ passwordHash: newHash });
+    logger.info('Password hash upgraded to argon2', { userId });
+  }
   
   if (!isValidPassword) {
     // Track failed attempts
@@ -567,8 +573,8 @@ async function resetPassword(email, otp, newPassword) {
   const userDoc = usersSnapshot.docs[0];
   const userId = userDoc.id;
   
-  // Hash new password
-  const passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
+  // Hash new password with argon2
+  const passwordHash = await hashPassword(newPassword);
   
   // Update password and reset security fields
   await db.collection(USERS_COLLECTION).doc(userId).update({
@@ -750,8 +756,8 @@ async function changePassword(userId, currentPassword, newPassword) {
     throw new Error('AUTH_INVALID_OPERATION: Password change is only available for email users');
   }
   
-  // Verify current password
-  const isValidPassword = await bcrypt.compare(currentPassword, userData.passwordHash);
+  // Verify current password (supports both argon2 and legacy bcrypt)
+  const isValidPassword = await verifyPassword(userData.passwordHash, currentPassword);
   if (!isValidPassword) {
     throw new Error('AUTH_INVALID_PASSWORD: Current password is incorrect');
   }
@@ -762,23 +768,23 @@ async function changePassword(userId, currentPassword, newPassword) {
     throw new Error(`AUTH_WEAK_PASSWORD: ${passwordValidation.errors.join('. ')}`);
   }
   
-  // Check password history
+  // Check password history (supports both argon2 and legacy bcrypt)
   const passwordHistory = userData.passwordHistory || [];
   for (const oldHash of passwordHistory) {
-    const isSameAsOld = await bcrypt.compare(newPassword, oldHash);
+    const isSameAsOld = await verifyPassword(oldHash, newPassword);
     if (isSameAsOld) {
       throw new Error(`AUTH_PASSWORD_REUSED: Cannot reuse one of your last ${PASSWORD_HISTORY_COUNT} passwords`);
     }
   }
   
   // Also check current password
-  const isSameAsCurrent = await bcrypt.compare(newPassword, userData.passwordHash);
+  const isSameAsCurrent = await verifyPassword(userData.passwordHash, newPassword);
   if (isSameAsCurrent) {
     throw new Error('AUTH_PASSWORD_SAME: New password must be different from current password');
   }
   
-  // Hash new password
-  const newPasswordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
+  // Hash new password with argon2
+  const newPasswordHash = await hashPassword(newPassword);
   
   // Update password history (keep last N passwords)
   const newHistory = [userData.passwordHash, ...passwordHistory].slice(0, PASSWORD_HISTORY_COUNT);
@@ -828,7 +834,7 @@ async function deleteAccount(userId, password) {
       throw new Error('AUTH_PASSWORD_REQUIRED: Password is required to delete account');
     }
     
-    const isValidPassword = await bcrypt.compare(password, userData.passwordHash);
+    const isValidPassword = await verifyPassword(userData.passwordHash, password);
     if (!isValidPassword) {
       throw new Error('AUTH_INVALID_PASSWORD: Password is incorrect');
     }
@@ -1033,17 +1039,11 @@ async function linkGoogleWithOAuth(userId, googleData) {
   
   // Verify the access token by calling Google API
   try {
-    const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+    const googleUserInfo = await httpGet('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: {
         'Authorization': `Bearer ${accessToken}`
       }
     });
-    
-    if (!response.ok) {
-      throw new Error('AUTH_INVALID_TOKEN: Invalid or expired Google access token');
-    }
-    
-    const googleUserInfo = await response.json();
     
     // Verify email matches
     if (googleUserInfo.email !== email) {
@@ -1098,6 +1098,185 @@ async function linkGoogleWithOAuth(userId, googleData) {
   };
 }
 
+// ============================================================================
+// TOKEN REFRESH
+// ============================================================================
+
+// Refresh token storage (in production, use Redis or database)
+const refreshTokens = new Map();
+const REFRESH_TOKEN_EXPIRY_DAYS = 30;
+const ACCESS_TOKEN_EXPIRY_SECONDS = 3600; // 1 hour
+
+/**
+ * Generate tokens for user
+ * @param {string} userId - User ID
+ * @returns {Promise<{accessToken: string, refreshToken: string, expiresIn: number}>}
+ */
+async function generateTokens(userId) {
+  const crypto = require('crypto');
+  
+  // Generate access token (custom token from Firebase)
+  let accessToken;
+  try {
+    accessToken = await admin.auth().createCustomToken(userId);
+  } catch (error) {
+    logger.error('Failed to create access token', { userId, error: error.message });
+    throw new Error('AUTH_TOKEN_GENERATION_FAILED: Unable to generate access token');
+  }
+  
+  // Generate refresh token (random secure token)
+  const refreshToken = crypto.randomBytes(64).toString('hex');
+  const expiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+  
+  // Store refresh token
+  refreshTokens.set(refreshToken, {
+    userId,
+    expiresAt,
+    createdAt: new Date()
+  });
+  
+  // Also store in Firestore for persistence across restarts
+  await db.collection('refresh_tokens').doc(refreshToken.substring(0, 32)).set({
+    tokenHash: crypto.createHash('sha256').update(refreshToken).digest('hex'),
+    userId,
+    expiresAt,
+    createdAt: new Date()
+  });
+  
+  logger.info('Tokens generated', { userId });
+  
+  return {
+    accessToken,
+    refreshToken,
+    expiresIn: ACCESS_TOKEN_EXPIRY_SECONDS
+  };
+}
+
+/**
+ * Refresh access token using refresh token
+ * @param {string} refreshToken - Refresh token
+ * @returns {Promise<{accessToken: string, refreshToken: string, expiresIn: number}>}
+ */
+async function refreshAccessToken(refreshToken) {
+  const crypto = require('crypto');
+  
+  if (!refreshToken) {
+    throw new Error('AUTH_INVALID_REFRESH_TOKEN: Refresh token is required');
+  }
+  
+  // Check in-memory cache first
+  let tokenData = refreshTokens.get(refreshToken);
+  
+  // If not in memory, check Firestore
+  if (!tokenData) {
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    const tokenDocs = await db.collection('refresh_tokens')
+      .where('tokenHash', '==', tokenHash)
+      .limit(1)
+      .get();
+    
+    if (!tokenDocs.empty) {
+      const doc = tokenDocs.docs[0];
+      tokenData = {
+        userId: doc.data().userId,
+        expiresAt: doc.data().expiresAt.toDate(),
+        docId: doc.id
+      };
+    }
+  }
+  
+  if (!tokenData) {
+    throw new Error('AUTH_INVALID_REFRESH_TOKEN: Invalid refresh token');
+  }
+  
+  // Check if expired
+  if (tokenData.expiresAt < new Date()) {
+    // Clean up expired token
+    refreshTokens.delete(refreshToken);
+    if (tokenData.docId) {
+      await db.collection('refresh_tokens').doc(tokenData.docId).delete();
+    }
+    throw new Error('AUTH_REFRESH_TOKEN_EXPIRED: Refresh token has expired');
+  }
+  
+  const { userId } = tokenData;
+  
+  // Verify user still exists and is not locked
+  const userDoc = await db.collection(USERS_COLLECTION).doc(userId).get();
+  if (!userDoc.exists) {
+    throw new Error('AUTH_USER_NOT_FOUND: User not found');
+  }
+  
+  const userData = userDoc.data();
+  if (userData.locked || userData.deleted) {
+    throw new Error('AUTH_ACCOUNT_SUSPENDED: Account is suspended');
+  }
+  
+  // Invalidate old refresh token (token rotation for security)
+  refreshTokens.delete(refreshToken);
+  if (tokenData.docId) {
+    await db.collection('refresh_tokens').doc(tokenData.docId).delete();
+  }
+  
+  // Generate new tokens
+  const newTokens = await generateTokens(userId);
+  
+  logger.info('Access token refreshed', { userId });
+  
+  return newTokens;
+}
+
+/**
+ * Invalidate all refresh tokens for a user
+ * @param {string} userId - User ID
+ */
+async function invalidateAllRefreshTokens(userId) {
+  // Clear from memory
+  for (const [token, data] of refreshTokens.entries()) {
+    if (data.userId === userId) {
+      refreshTokens.delete(token);
+    }
+  }
+  
+  // Clear from Firestore
+  const tokenDocs = await db.collection('refresh_tokens')
+    .where('userId', '==', userId)
+    .get();
+  
+  const batch = db.batch();
+  tokenDocs.docs.forEach(doc => batch.delete(doc.ref));
+  await batch.commit();
+  
+  logger.info('All refresh tokens invalidated', { userId });
+}
+
+/**
+ * Cleanup expired refresh tokens (run periodically)
+ */
+async function cleanupExpiredRefreshTokens() {
+  const now = new Date();
+  
+  // Clear from memory
+  for (const [token, data] of refreshTokens.entries()) {
+    if (data.expiresAt < now) {
+      refreshTokens.delete(token);
+    }
+  }
+  
+  // Clear from Firestore
+  const expiredDocs = await db.collection('refresh_tokens')
+    .where('expiresAt', '<', now)
+    .limit(100)
+    .get();
+  
+  if (!expiredDocs.empty) {
+    const batch = db.batch();
+    expiredDocs.docs.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+    logger.info('Cleaned up expired refresh tokens', { count: expiredDocs.size });
+  }
+}
+
 module.exports = {
   register,
   verifyEmail,
@@ -1117,5 +1296,10 @@ module.exports = {
   revokeAllOtherSessions,
   getLoginHistory,
   cleanupExpiredRegistrations,
-  cleanupOldLoginHistory
+  cleanupOldLoginHistory,
+  // Token management
+  generateTokens,
+  refreshAccessToken,
+  invalidateAllRefreshTokens,
+  cleanupExpiredRefreshTokens
 };

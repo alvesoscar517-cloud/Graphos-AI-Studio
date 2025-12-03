@@ -1,6 +1,7 @@
 /**
  * Analysis Controller
  * Handles text analysis, AI detection, rewriting
+ * Uses standardized error handling via apiResponse utility
  */
 
 const { db, FieldValue } = require('../config/firebase');
@@ -12,6 +13,7 @@ const { validateText, validateProfileId, validateModel } = require('../utils/val
 const activityLogService = require('../services/activityLog.service');
 const { createLocalizer } = require('../utils/localized-messages.util');
 const localization = require('../services/localization.service');
+const { sendSuccess, sendError, handleError } = require('../utils/apiResponse');
 
 // ============================================================================
 // AUTHENTICATE CONTENT (AI DETECTION)
@@ -95,15 +97,10 @@ exports.authenticateContent = async (req, res) => {
       wordCount: textFeatures.totalWords 
     });
 
-    res.json(result);
+    sendSuccess(res, result);
   } catch (error) {
-    logger.error('Authentication error', { error: error.message });
     const l = createLocalizer(req);
-    res.status(500).json({ 
-      success: false,
-      ...l.error('analysis_failed'),
-      details: String(error)
-    });
+    handleError(res, error, { context: 'authenticateContent', localizer: l });
   }
 };
 

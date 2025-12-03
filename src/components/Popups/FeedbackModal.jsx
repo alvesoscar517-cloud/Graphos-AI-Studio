@@ -1,33 +1,69 @@
-import { useState, useRef, useEffect } from 'react'
+/**
+ * FeedbackModal Component
+ * Uses React Hook Form + Zod + TanStack Query
+ */
+import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useNotification } from '../../hooks/useNotification'
-import './FeedbackModal.css'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useToasts } from '../../stores/uiStore'
+import { useSendFeedback } from '@/hooks/queries'
+import { cn } from '../../lib/utils'
+import Icon from '../Common/Icon'
+
+// Validation schema
+const feedbackFormSchema = z.object({
+  title: z
+    .string()
+    .min(1, 'Title is required')
+    .max(100, 'Title must be at most 100 characters'),
+  content: z
+    .string()
+    .min(10, 'Content must be at least 10 characters')
+    .max(2000, 'Content must be at most 2000 characters'),
+})
 
 const FeedbackModal = ({ onClose }) => {
   const { t } = useTranslation()
-  const { success, error: showError } = useNotification()
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
+  const { showSuccess, showError } = useToasts()
   const [images, setImages] = useState([])
-  const [sending, setSending] = useState(false)
-  const [error, setError] = useState('')
   const fileInputRef = useRef(null)
   const modalRef = useRef(null)
 
-  // No need for useEffect anymore since onClick is handled directly on overlay
+  // TanStack Query mutation
+  const sendFeedback = useSendFeedback()
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    setError,
+  } = useForm({
+    resolver: zodResolver(feedbackFormSchema),
+    defaultValues: {
+      title: '',
+      content: '',
+    },
+    mode: 'onBlur',
+  })
+
+  const content = watch('content', '')
+  const isSubmitting = sendFeedback.isPending
 
   const handleImageSelect = (e) => {
     const files = Array.from(e.target.files)
     if (images.length + files.length > 3) {
-      setError(t('feedback.maxImages'))
+      showError(t('feedback.maxImages'))
       return
     }
 
     const newImages = []
     files.forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
-        setError(t('feedback.imageSizeLimit'))
+        showError(t('feedback.imageSizeLimit'))
         return
       }
       const reader = new FileReader()
@@ -37,7 +73,7 @@ const FeedbackModal = ({ onClose }) => {
           data: e.target.result
         })
         if (newImages.length === files.length) {
-          setImages([...images, ...newImages])
+          setImages(prev => [...prev, ...newImages])
         }
       }
       reader.readAsDataURL(file)
@@ -48,88 +84,101 @@ const FeedbackModal = ({ onClose }) => {
     setImages(images.filter((_, i) => i !== index))
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    if (!title.trim() || !content.trim()) {
-      setError(t('feedback.enterTitleAndContent'))
-      return
-    }
-
-    setSending(true)
-    setError('')
-
+  const onSubmit = async (data) => {
     try {
-      const response = await fetch('https://ai-authenticator-472729326429.us-central1.run.app/send-feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          title,
-          content,
-          images: images.map(img => img.data),
-          userEmail: localStorage.getItem('userEmail') || 'anonymous@user.com',
-          userName: localStorage.getItem('userName') || 'Anonymous User'
-        })
+      await sendFeedback.mutateAsync({
+        title: data.title,
+        content: data.content,
+        images: images.map(img => img.data),
       })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        success(t('feedback.thankYou'))
-        onClose()
-      } else {
-        setError(data.error || t('feedback.errorOccurred'))
-      }
+      showSuccess(t('feedback.thankYou'))
+      onClose()
     } catch (err) {
-      setError(t('feedback.unableToConnect'))
-    } finally {
-      setSending(false)
+      setError('root', { message: err.message || t('feedback.unableToConnect') })
     }
   }
 
   return createPortal(
-    <div className="feedback-modal-overlay" onClick={(e) => {
-      if (e.target.classList.contains('feedback-modal-overlay')) {
-        onClose()
-      }
-    }}>
-      <div className="feedback-modal" ref={modalRef} onClick={(e) => e.stopPropagation()}>
-        <div className="feedback-modal-header">
-          <h2>{t('feedback.sendFeedback')}</h2>
-          <button className="feedback-close-btn" onClick={onClose}>
-            <img src="/icon/x.svg" alt={t('common.close')} />
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-toast animate-fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
+      <div 
+        ref={modalRef} 
+        className={cn(
+          "bg-bg-primary rounded-2xl w-[90%] max-w-[550px] max-h-[90vh]",
+          "flex flex-col overflow-hidden shadow-modal",
+          "animate-slide-up"
+        )}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between py-5 px-6 shrink-0">
+          <h2 className="m-0 text-xl font-semibold text-text-primary">{t('feedback.sendFeedback')}</h2>
+          <button 
+            className="bg-transparent border-none cursor-pointer p-2 rounded-lg flex items-center justify-center transition-colors duration-200 hover:bg-bg-hover"
+            onClick={onClose}
+          >
+            <Icon name="x" alt={t('common.close')} size="lg" color="muted" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="feedback-form">
-          <div className="feedback-field">
-            <label>{t('feedback.title')}</label>
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-none">
+          <div className="mb-5">
+            <label className="block mb-2.5 text-sm font-semibold text-text-primary tracking-tight">
+              {t('feedback.title')}
+            </label>
             <input
               type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              {...register('title')}
               placeholder={t('feedback.titlePlaceholder')}
               maxLength={100}
+              className={cn(
+                "w-full box-border py-3 px-4 border rounded-xl",
+                "bg-bg-primary text-text-primary text-sm font-sans",
+                "placeholder:text-text-muted focus:outline-none focus:border-primary",
+                errors.title ? "border-error" : "border-border"
+              )}
             />
+            {errors.title && (
+              <p className="mt-1.5 text-xs text-error">{errors.title.message}</p>
+            )}
           </div>
 
-          <div className="feedback-field">
-            <label>{t('feedback.content')}</label>
+          <div className="mb-5">
+            <label className="block mb-2.5 text-sm font-semibold text-text-primary tracking-tight">
+              {t('feedback.content')}
+            </label>
             <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+              {...register('content')}
               placeholder={t('feedback.contentPlaceholder')}
               rows={6}
               maxLength={2000}
+              className={cn(
+                "w-full box-border py-3 px-4 border rounded-xl",
+                "bg-bg-primary text-text-primary text-sm font-sans leading-relaxed",
+                "placeholder:text-text-muted focus:outline-none focus:border-primary",
+                "resize-none h-40 min-h-40 max-h-40 overflow-y-auto scrollbar-none",
+                "whitespace-pre-wrap break-words",
+                errors.content ? "border-error" : "border-border"
+              )}
             />
-            <div className="char-count">{content.length}/2000</div>
+            <div className="flex justify-between mt-1.5">
+              {errors.content && (
+                <p className="text-xs text-error">{errors.content.message}</p>
+              )}
+              <div className="text-right text-xs text-text-muted font-medium ml-auto">
+                {content.length}/2000
+              </div>
+            </div>
           </div>
 
-          <div className="feedback-field">
-            <label>{t('feedback.imagesLabel')}</label>
-            <div className="image-upload-area">
+          <div className="mb-5">
+            <label className="block mb-2.5 text-sm font-semibold text-text-primary tracking-tight">
+              {t('feedback.imagesLabel')}
+            </label>
+            <div className="mt-2">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -140,25 +189,31 @@ const FeedbackModal = ({ onClose }) => {
               />
               <button
                 type="button"
-                className="upload-btn"
+                className={cn(
+                  "inline-flex items-center gap-2 py-2.5 px-4",
+                  "bg-bg-secondary border-2 border-dashed border-border rounded-xl",
+                  "text-text-primary text-sm font-medium cursor-pointer transition-all duration-200",
+                  "hover:not-disabled:bg-bg-hover hover:not-disabled:border-accent hover:not-disabled:-translate-y-px hover:not-disabled:shadow-popup",
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                )}
                 onClick={() => fileInputRef.current?.click()}
                 disabled={images.length >= 3}
               >
-                <img src="/icon/image-plus.svg" alt={t('feedback.addImage')} />
+                <Icon name="image-plus" alt={t('feedback.addImage')} size="lg" color="muted" />
                 <span>{t('feedback.addImage')}</span>
               </button>
 
               {images.length > 0 && (
-                <div className="image-preview-list">
+                <div className="flex gap-3 mt-3 flex-wrap">
                   {images.map((img, index) => (
-                    <div key={index} className="image-preview-item">
-                      <img src={img.data} alt={img.name} />
+                    <div key={index} className="relative w-thumbnail-sm h-thumbnail-sm rounded-lg overflow-hidden border border-border">
+                      <img src={img.data} alt={img.name} className="w-full h-full object-cover" />
                       <button
                         type="button"
-                        className="remove-image-btn"
+                        className="absolute top-1 right-1 bg-black/70 border-none rounded-full w-6 h-6 flex items-center justify-center cursor-pointer transition-colors duration-200 hover:bg-black/90"
                         onClick={() => removeImage(index)}
                       >
-                        <img src="/icon/x.svg" alt={t('common.remove')} />
+                        <Icon name="x" alt={t('common.remove')} size="sm" themed={false} className="invert" />
                       </button>
                     </div>
                   ))}
@@ -167,14 +222,35 @@ const FeedbackModal = ({ onClose }) => {
             </div>
           </div>
 
-          {error && <div className="feedback-error">{error}</div>}
+          {errors.root && (
+            <div className="p-3 bg-error/10 border border-error/30 rounded-lg text-error text-sm mb-4">
+              {errors.root.message}
+            </div>
+          )}
 
-          <div className="feedback-actions">
-            <button type="button" className="btn-cancel" onClick={onClose}>
+          <div className="flex gap-3 justify-end mt-6 flex-col sm:flex-row">
+            <button 
+              type="button" 
+              className={cn(
+                "py-3 px-6 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200",
+                "border border-border bg-bg-secondary text-text-primary",
+                "hover:bg-bg-hover hover:border-accent hover:-translate-y-px"
+              )}
+              onClick={onClose}
+            >
               {t('common.cancel')}
             </button>
-            <button type="submit" className="btn-submit" disabled={sending}>
-              {sending ? t('feedback.sending') : t('feedback.sendFeedback')}
+            <button 
+              type="submit" 
+              className={cn(
+                "py-3 px-6 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200",
+                "border border-primary bg-primary text-white",
+                "hover:not-disabled:bg-primary-hover hover:not-disabled:-translate-y-px",
+                "disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+              )}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? t('feedback.sending') : t('feedback.sendFeedback')}
             </button>
           </div>
         </form>

@@ -76,7 +76,7 @@
     "signIn": "Đăng nhập",
     "signUp": "Đăng ký",
     "getStarted": "Bắt đầu",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "signInTagline": "Đăng nhập để bảo vệ nội dung của bạn",
     "signOut": "Đăng xuất",
     "signInAgain": "Đăng nhập lại",
@@ -91,7 +91,7 @@
     "checking": "Đang kiểm tra...",
     "pleaseWait": "Vui lòng đợi giây lát",
     "signInToContinue": "Đăng nhập để tiếp tục",
-    "signInSubtitle": "Vui lòng đăng nhập bằng tài khoản Google để sử dụng AI Content Authenticator",
+    "signInSubtitle": "Vui lòng đăng nhập bằng tài khoản Google để sử dụng Graphos AI Studio",
     "signInFailed": "Đăng nhập thất bại. Vui lòng thử lại.",
     "loginFailed": "Lỗi đăng nhập",
     "termsAgreement": "Bằng việc đăng nhập, bạn đồng ý với",
@@ -120,6 +120,7 @@
       "loggingIn": "Đang đăng nhập...",
       "registering": "Đang tạo tài khoản...",
       "forgotPassword": "Quên mật khẩu?",
+      "rememberMe": "Ghi nhớ đăng nhập",
       "createAccount": "Tạo tài khoản mới",
       "alreadyHaveAccount": "Đã có tài khoản? Đăng nhập",
       "dontHaveAccount": "Chưa có tài khoản?",
@@ -244,7 +245,7 @@
     "sidebar": "Thanh bên"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "Xóa",
     "confirmDeleteNote": "Bạn có chắc muốn xóa ghi chú \"{{title}}\"?",
     "confirmDelete": "Xác nhận xóa",
@@ -255,7 +256,7 @@
     "rewrite": "Viết lại"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "Công cụ chuyên nghiệp để phân tích và tinh chỉnh phong cách nội dung",
     "newProfile": "Hồ sơ mới",
     "createStyleProfile": "Tạo hồ sơ phong cách",
@@ -275,7 +276,7 @@
     "unableToLoadProfileDetails": "Không thể tải chi tiết hồ sơ",
     "yourProfiles": "Hồ sơ phong cách viết của bạn",
     "welcomeTo": "Chào mừng đến với",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "Tạo hồ sơ đầu tiên",
     "createUniqueStyle": "Tạo hồ sơ phong cách viết độc đáo của bạn",
     "analyzeRefine": "Phân tích và tinh chỉnh nội dung thông minh",
@@ -588,7 +589,7 @@
   },
   "model": {
     "selectAIModel": "Chọn mô hình AI",
-    "inUse": "[ĐANG DÙNG]",
+    "inUse": "ĐANG DÙNG",
     "geminiFlashExp": "Mô hình thử nghiệm mới nhất, xử lý nhanh với hỗ trợ đa dạng nội dung như văn bản và hình ảnh",
     "geminiFlashLite": "Mô hình nhỏ gọn, tiết kiệm chi phí nhất, phù hợp cho các tác vụ đơn giản và xử lý khối lượng lớn",
     "geminiFlash": "Mô hình cân bằng giữa tốc độ và chất lượng, khả năng suy luận tốt, phù hợp cho hầu hết các tác vụ",
@@ -713,6 +714,7 @@
     "light": "Sáng",
     "dark": "Tối",
     "system": "Hệ thống",
+    "darkMode": "Chế độ tối",
     "submitPromptKey": "Gửi khóa Prompt",
     "viewStatus": "Xem trạng thái",
     "termsOfService": "Điều khoản dịch vụ",
@@ -960,6 +962,16 @@
     "errorLoadingPage": "Đã xảy ra lỗi khi tải trang tạo hồ sơ. Vui lòng thử lại.",
     "retry": "Thử lại",
     "backToHome": "Về trang chủ"
+  },
+  "errorPage": {
+    "title": "Ối! Đã xảy ra lỗi",
+    "message": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
+    "tryAgain": "Thử lại",
+    "reload": "Tải lại trang",
+    "goBack": "Quay lại",
+    "backToHome": "Về trang chủ",
+    "technicalDetails": "Chi tiết kỹ thuật",
+    "helpText": "Nếu vấn đề vẫn tiếp diễn, vui lòng liên hệ hỗ trợ."
   },
   "profileSetupErrors": {
     "atLeast3Samples": "Cần ít nhất 3 mẫu văn bản để tạo hồ sơ",

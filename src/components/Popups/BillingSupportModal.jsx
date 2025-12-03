@@ -1,20 +1,62 @@
-import { useState, useRef, useEffect } from 'react'
+/**
+ * BillingSupportModal Component
+ * Uses React Hook Form + Zod + TanStack Query
+ */
+import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useNotification } from '../../hooks/useNotification'
-import './BillingSupportModal.css'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useToasts } from '../../stores/uiStore'
+import { useSendBillingSupport } from '@/hooks/queries'
+import Icon from '../Common/Icon'
+import { cn } from '../../lib/utils'
+
+// Validation schema
+const billingSupportSchema = z.object({
+  category: z.string().min(1, 'Please select a category'),
+  subject: z
+    .string()
+    .min(5, 'Subject must be at least 5 characters')
+    .max(100, 'Subject must be at most 100 characters'),
+  description: z
+    .string()
+    .min(20, 'Description must be at least 20 characters')
+    .max(2000, 'Description must be at most 2000 characters'),
+})
 
 const BillingSupportModal = ({ onClose }) => {
   const { t } = useTranslation()
-  const { success, error: showError } = useNotification()
-  const [category, setCategory] = useState('')
-  const [subject, setSubject] = useState('')
-  const [description, setDescription] = useState('')
+  const { showSuccess, showError } = useToasts()
   const [attachments, setAttachments] = useState([])
-  const [sending, setSending] = useState(false)
-  const [error, setError] = useState('')
   const fileInputRef = useRef(null)
   const modalRef = useRef(null)
+
+  // TanStack Query mutation
+  const sendBillingSupport = useSendBillingSupport()
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+    setError,
+  } = useForm({
+    resolver: zodResolver(billingSupportSchema),
+    defaultValues: {
+      category: '',
+      subject: '',
+      description: '',
+    },
+    mode: 'onBlur',
+  })
+
+  const isSubmitting = sendBillingSupport.isPending
+
+  const category = watch('category')
+  const description = watch('description', '')
 
   const categories = [
     { key: 'billingIssue', label: t('billing.billingIssue') },
@@ -28,14 +70,14 @@ const BillingSupportModal = ({ onClose }) => {
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files)
     if (attachments.length + files.length > 3) {
-      setError(t('errors.maxAttachments'))
+      showError(t('errors.maxAttachments'))
       return
     }
 
     const newAttachments = []
     files.forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
-        setError(t('errors.fileSizeLimit'))
+        showError(t('errors.fileSizeLimit'))
         return
       }
       const reader = new FileReader()
@@ -45,7 +87,7 @@ const BillingSupportModal = ({ onClose }) => {
           data: e.target.result
         })
         if (newAttachments.length === files.length) {
-          setAttachments([...attachments, ...newAttachments])
+          setAttachments(prev => [...prev, ...newAttachments])
         }
       }
       reader.readAsDataURL(file)
@@ -56,134 +98,148 @@ const BillingSupportModal = ({ onClose }) => {
     setAttachments(attachments.filter((_, i) => i !== index))
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    if (!category || !subject.trim() || !description.trim()) {
-      setError(t('errors.fillAllRequired'))
-      return
-    }
-
-    setSending(true)
-    setError('')
-
+  const onSubmit = async (data) => {
     try {
-      const response = await fetch('https://ai-authenticator-472729326429.us-central1.run.app/send-feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          type: 'billing_support',
-          category,
-          priority: 'high',
-          title: subject,
-          content: description,
-          images: attachments.map(att => att.data),
-          userEmail: localStorage.getItem('userEmail') || 'anonymous@user.com',
-          userName: localStorage.getItem('userName') || 'Anonymous User'
-        })
+      await sendBillingSupport.mutateAsync({
+        category: data.category,
+        subject: data.subject,
+        description: data.description,
+        attachments: attachments.map(att => att.data),
       })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        success(t('billing.supportRequestSent'))
-        onClose()
-      } else {
-        setError(data.error || t('feedback.errorOccurred'))
-      }
+      showSuccess(t('billing.supportRequestSent'))
+      onClose()
     } catch (err) {
-      setError(t('feedback.unableToConnect'))
-    } finally {
-      setSending(false)
+      setError('root', { message: err.message || t('feedback.unableToConnect') })
     }
   }
 
   return createPortal(
-    <div className="billing-modal-overlay" onClick={(e) => {
-      if (e.target.classList.contains('billing-modal-overlay')) {
-        onClose()
-      }
-    }}>
-      <div className="billing-modal" ref={modalRef} onClick={(e) => e.stopPropagation()}>
-        <div className="billing-modal-header">
-          <div className="billing-header-content">
-            <img src="/icon/dollar-sign.svg" alt={t('settings.billingSupport')} className="billing-icon" />
-            <div className="billing-header-text">
-              <h2>{t('settings.billingSupport')}</h2>
-              <p>{t('billing.readyToSupport')}</p>
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-toast animate-fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
+      <div 
+        ref={modalRef} 
+        className={cn(
+          "bg-bg-primary rounded-2xl w-[90%] max-w-[600px] max-h-[90vh]",
+          "flex flex-col overflow-hidden shadow-modal",
+          "animate-slide-up"
+        )}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between py-5 px-6 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 p-2 bg-bg-secondary rounded-xl flex items-center justify-center">
+              <Icon name="dollar-sign" alt={t('settings.billingSupport')} size="lg" color="muted" />
+            </div>
+            <div>
+              <h2 className="m-0 text-xl font-semibold text-text-primary">{t('settings.billingSupport')}</h2>
+              <p className="m-0 mt-0.5 text-sm text-text-secondary">{t('billing.readyToSupport')}</p>
             </div>
           </div>
-          <button className="billing-close-btn" onClick={onClose}>
-            <img src="/icon/x.svg" alt={t('common.close')} />
+          <button className="bg-transparent border-none cursor-pointer p-2 rounded-lg flex items-center justify-center transition-colors duration-200 hover:bg-bg-hover" onClick={onClose}>
+            <Icon name="x" alt={t('common.close')} size="lg" color="muted" />
           </button>
         </div>
 
-        <div className="billing-content">
+        <div className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-none">
           {/* Info Cards */}
-          <div className="billing-info-cards">
-            <div className="billing-info-card">
-              <img src="/icon/clock.svg" alt={t('billing.responseTime')} />
-              <h4>{t('billing.responseTime')}</h4>
-              <p>{'< 24h'}</p>
-            </div>
-            <div className="billing-info-card">
-              <img src="/icon/users.svg" alt={t('billing.supportTeam')} />
-              <h4>{t('billing.supportTeam')}</h4>
-              <p>{t('billing.available')}</p>
-            </div>
-            <div className="billing-info-card">
-              <img src="/icon/shield-check.svg" alt={t('billing.secure')} />
-              <h4>{t('billing.secure')}</h4>
-              <p>{t('billing.encrypted')}</p>
-            </div>
+          <div className="grid grid-cols-3 gap-2 mb-6">
+            {[
+              { icon: '/icon/clock.svg', title: t('billing.responseTime'), value: '< 24h' },
+              { icon: '/icon/users.svg', title: t('billing.supportTeam'), value: t('billing.available') },
+              { icon: '/icon/shield-check.svg', title: t('billing.secure'), value: t('billing.encrypted') }
+            ].map((card, idx) => (
+              <div key={idx} className="p-3 bg-bg-secondary rounded-xl text-center">
+                <img src={card.icon} alt={card.title} className="w-5 h-5 mx-auto mb-1.5 opacity-60 icon-invert" />
+                <p className="m-0 text-xs text-text-muted">{card.title}</p>
+                <p className="m-0 text-sm font-semibold text-text-primary">{card.value}</p>
+              </div>
+            ))}
           </div>
 
           {/* Support Categories */}
-          <div className="support-categories">
-            <h3>{t('billing.selectIssueType')}</h3>
-            <div className="category-chips">
+          <div className="mb-6">
+            <h3 className="m-0 mb-3 text-md font-semibold text-text-primary">{t('billing.selectIssueType')}</h3>
+            <div className="flex flex-wrap gap-2">
               {categories.map((cat) => (
                 <div
                   key={cat.key}
-                  className={`category-chip ${category === cat.key ? 'selected' : ''}`}
-                  onClick={() => setCategory(cat.key)}
+                  className={cn(
+                    "py-2 px-4 bg-bg-secondary border border-border rounded-pill",
+                    "text-sm text-text-primary cursor-pointer transition-all duration-200 select-none",
+                    "hover:border-accent hover:bg-bg-hover",
+                    category === cat.key && "bg-primary text-white border-accent"
+                  )}
+                  onClick={() => setValue('category', cat.key, { shouldValidate: true })}
                 >
                   {cat.label}
                 </div>
               ))}
             </div>
+            {errors.category && (
+              <p className="mt-2 text-xs text-error">{errors.category.message}</p>
+            )}
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="billing-form">
-            <div className="billing-field">
-              <label>{t('feedback.title')}</label>
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
+            <div className="mb-5">
+              <label className="block mb-2.5 text-sm font-semibold text-text-primary tracking-tight">
+                {t('feedback.title')}
+              </label>
               <input
                 type="text"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
+                {...register('subject')}
                 placeholder={t('billing.briefDescription')}
                 maxLength={100}
+                className={cn(
+                  "w-full box-border py-3 px-4 border rounded-xl",
+                  "bg-bg-primary text-text-primary text-sm font-sans",
+                  "placeholder:text-text-muted focus:outline-none focus:border-primary",
+                  errors.subject ? "border-error" : "border-border"
+                )}
               />
+              {errors.subject && (
+                <p className="mt-1.5 text-xs text-error">{errors.subject.message}</p>
+              )}
             </div>
 
-            <div className="billing-field">
-              <label>{t('billing.detailedDescription')}</label>
+            <div className="mb-5">
+              <label className="block mb-2.5 text-sm font-semibold text-text-primary tracking-tight">
+                {t('billing.detailedDescription')}
+              </label>
               <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                {...register('description')}
                 placeholder={t('billing.descriptionPlaceholder')}
                 rows={6}
                 maxLength={2000}
+                className={cn(
+                  "w-full box-border py-3 px-4 border rounded-xl",
+                  "bg-bg-primary text-text-primary text-sm font-sans leading-relaxed",
+                  "placeholder:text-text-muted focus:outline-none focus:border-primary",
+                  "resize-none h-[140px] min-h-[140px] max-h-[140px] overflow-y-auto scrollbar-none",
+                  "whitespace-pre-wrap break-words",
+                  errors.description ? "border-error" : "border-border"
+                )}
               />
-              <div className="char-count">{description.length}/2000</div>
+              <div className="flex justify-between mt-1.5">
+                {errors.description && (
+                  <p className="text-xs text-error">{errors.description.message}</p>
+                )}
+                <div className="text-right text-xs text-text-muted font-medium ml-auto">
+                  {description.length}/2000
+                </div>
+              </div>
             </div>
 
-            <div className="billing-field">
-              <label>{t('billing.attachments')}</label>
-              <div className="attachment-area">
+            <div className="mb-5">
+              <label className="block mb-2.5 text-sm font-semibold text-text-primary tracking-tight">
+                {t('billing.attachments')}
+              </label>
+              <div className="mt-2">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -194,25 +250,31 @@ const BillingSupportModal = ({ onClose }) => {
                 />
                 <button
                   type="button"
-                  className="attach-btn"
+                  className={cn(
+                    "inline-flex items-center gap-2 py-2.5 px-4",
+                    "bg-bg-secondary border-2 border-dashed border-border rounded-xl",
+                    "text-text-primary text-sm font-medium cursor-pointer transition-all duration-200",
+                    "hover:not-disabled:bg-bg-hover hover:not-disabled:border-accent hover:not-disabled:-translate-y-px hover:not-disabled:shadow-popup",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )}
                   onClick={() => fileInputRef.current?.click()}
                   disabled={attachments.length >= 3}
                 >
-                  <img src="/icon/paperclip.svg" alt={t('billing.attachFile')} />
+                  <Icon name="paperclip" alt={t('billing.attachFile')} size="lg" color="muted" />
                   <span>{t('billing.attachFile')}</span>
                 </button>
 
                 {attachments.length > 0 && (
-                  <div className="attachment-list">
+                  <div className="flex gap-3 mt-3 flex-wrap">
                     {attachments.map((att, index) => (
-                      <div key={index} className="attachment-item">
-                        <img src={att.data} alt={att.name} />
+                      <div key={index} className="relative w-thumbnail-sm h-thumbnail-sm rounded-lg overflow-hidden border border-border">
+                        <img src={att.data} alt={att.name} className="w-full h-full object-cover" />
                         <button
                           type="button"
-                          className="remove-attachment-btn"
+                          className="absolute top-1 right-1 bg-black/70 border-none rounded-full w-6 h-6 flex items-center justify-center cursor-pointer transition-colors duration-200 hover:bg-black/90"
                           onClick={() => removeAttachment(index)}
                         >
-                          <img src="/icon/x.svg" alt={t('common.remove')} />
+                          <Icon name="x" alt={t('common.remove')} size="sm" themed={false} className="invert" />
                         </button>
                       </div>
                     ))}
@@ -221,19 +283,32 @@ const BillingSupportModal = ({ onClose }) => {
               </div>
             </div>
 
-            {error && (
-              <div className="billing-error">
-                <img src="/icon/alert-circle.svg" alt={t('common.error')} />
-                {error}
+            {errors.root && (
+              <div className="p-3 bg-error/10 border border-error/30 rounded-lg text-error text-sm mb-4 flex items-center gap-2">
+                <Icon name="alert-circle" alt={t('common.error')} size="lg" color="error" themed={false} />
+                {errors.root.message}
               </div>
             )}
 
-            <div className="billing-actions">
-              <button type="button" className="btn-cancel" onClick={onClose}>
+            <div className="flex gap-3 justify-end mt-6">
+              <button 
+                type="button" 
+                className="py-3 px-6 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200 border border-border bg-bg-secondary text-text-primary hover:bg-bg-hover hover:border-accent hover:-translate-y-px"
+                onClick={onClose}
+              >
                 {t('common.cancel')}
               </button>
-              <button type="submit" className="btn-submit" disabled={sending}>
-                {sending ? t('feedback.sending') : t('billing.sendRequest')}
+              <button 
+                type="submit" 
+                className={cn(
+                  "py-3 px-6 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200",
+                  "border border-primary bg-primary text-white",
+                  "hover:not-disabled:bg-primary-hover hover:not-disabled:-translate-y-px",
+                  "disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                )}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? t('feedback.sending') : t('billing.sendRequest')}
               </button>
             </div>
           </form>

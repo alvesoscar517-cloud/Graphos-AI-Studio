@@ -1,6 +1,6 @@
 import { useNotes } from '../../contexts/NotesContext'
 import AIStudioEditorEnhanced from './AIStudio/AIStudioEditorEnhanced'
-import './AIStudioView.css'
+import { cn } from '../../lib/utils'
 
 const AIStudioView = ({ 
   onToggleLeftSidebar, 
@@ -17,7 +17,10 @@ const AIStudioView = ({
   }
 
   return (
-    <div className="aistudio-view">
+    <div className={cn(
+      "flex flex-col flex-1 bg-bg-tertiary",
+      "h-screen w-full overflow-hidden box-border"
+    )}>
       <AIStudioEditorEnhanced 
         onToggleLeftSidebar={onToggleLeftSidebar}
         onToggleRightSidebar={onToggleRightSidebar}

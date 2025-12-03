@@ -1,0 +1,313 @@
+/**
+ * ProfileSelector V2
+ * Uses TanStack Query for data fetching
+ */
+
+import { useState, useMemo } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { useProfilesQuery, useDeleteProfile, useActiveProfile } from '@/hooks/queries'
+import { useToasts } from '@/stores/uiStore'
+import { invalidateProfileDetailCache } from '@/utils/profileDetailCache'
+import Icon from '../Common/Icon'
+import { cn } from '@/lib/utils'
+
+const ProfileSelectorV2 = ({ currentProfile, onProfileSelect }) => {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { showSuccess, showError } = useToasts()
+
+  // TanStack Query
+  const { data: profiles = [], isLoading } = useProfilesQuery()
+  const deleteProfile = useDeleteProfile()
+
+  const [showModal, setShowModal] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const filteredProfiles = useMemo(() => {
+    if (!searchTerm) return profiles
+    const term = searchTerm.toLowerCase()
+    return profiles.filter(
+      (p) =>
+        p.profile_name.toLowerCase().includes(term) ||
+        p.profile_id.toLowerCase().includes(term)
+    )
+  }, [profiles, searchTerm])
+
+  const handleClick = () => {
+    setShowModal(true)
+  }
+
+  const handleSelectProfile = (profile) => {
+    onProfileSelect(profile)
+    setShowModal(false)
+    showSuccess(`${t('profile.profileSelected')}: ${profile.profile_name}`)
+  }
+
+  const handleDeleteProfile = async (e, profileId) => {
+    e.stopPropagation()
+
+    if (!confirm(t('profile.confirmDeleteProfile'))) return
+
+    try {
+      await deleteProfile.mutateAsync(profileId)
+      showSuccess(t('profile.profileDeleted'))
+      invalidateProfileDetailCache(profileId)
+      if (currentProfile?.profile_id === profileId) {
+        onProfileSelect(null)
+      }
+    } catch (error) {
+      showError(error.message || t('profile.unableToDelete'))
+    }
+  }
+
+  const getThemeIcon = (theme) => {
+    const themeIcons = {
+      work: 'briefcase',
+      personal: 'user',
+      academic: 'graduation-cap',
+      creative: 'palette',
+      business: 'trending-up',
+      social: 'message-circle',
+      technical: 'code',
+      other: 'more-horizontal',
+    }
+    return themeIcons[theme] || 'user-round'
+  }
+
+  return (
+    <>
+      {/* Selector Card */}
+      <div
+        className={cn(
+          'bg-bg-secondary border border-border-light rounded-xl',
+          'py-4 px-[18px] pb-3 cursor-pointer transition-all duration-200',
+          'flex flex-col items-center text-center gap-1',
+          'hover:border-border-hover hover:shadow-md'
+        )}
+        onClick={handleClick}
+      >
+        <div className="flex flex-col items-center gap-2 w-full">
+          <div className="card-icon !w-14 !h-14">
+            <img
+              src={`/icon/${getThemeIcon(currentProfile?.theme)}.svg`}
+              alt="Profile"
+              className="w-7 h-7 opacity-80 icon-invert"
+            />
+          </div>
+          <div className="flex flex-col gap-1 w-full">
+            <h3 className="text-sm font-medium text-text-primary m-0 leading-tight">
+              {currentProfile?.profile_name || t('profile.noProfile')}
+            </h3>
+            <p className="text-xs text-text-secondary m-0">
+              {currentProfile
+                ? t('profile.textSamples', { count: currentProfile.sample_count || 0 })
+                : t('profile.clickToSelect')}
+            </p>
+          </div>
+        </div>
+        <Icon name="chevron-down" size="md" color="muted" />
+      </div>
+
+      {/* Modal */}
+      {showModal &&
+        createPortal(
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-modal-nested animate-fade-in"
+            onClick={() => setShowModal(false)}
+          >
+            <div
+              className={cn(
+                'bg-bg-primary rounded-3xl w-full max-w-md h-[520px]',
+                'flex flex-col shadow-modal animate-slide-up'
+              )}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header with Search */}
+              <div className="px-6 pt-5 pb-3">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-medium text-text-primary m-0">
+                    {t('profile.selectWritingStyleProfile')}
+                  </h2>
+                  <button
+                    className="bg-transparent border-none p-2 cursor-pointer rounded-full flex items-center justify-center hover:bg-bg-tertiary"
+                    onClick={() => setShowModal(false)}
+                  >
+                    <Icon name="x" alt={t('common.close')} size="lg" color="muted" />
+                  </button>
+                </div>
+
+                {/* Search */}
+                <div className="relative">
+                  <Icon
+                    name="search"
+                    alt={t('common.search')}
+                    size="md"
+                    color="muted"
+                    className="absolute left-3 top-1/2 -translate-y-1/2"
+                  />
+                  <input
+                    type="text"
+                    className={cn(
+                      'w-full py-2.5 pl-10 pr-10 text-sm',
+                      'bg-bg-secondary border border-border-light rounded-lg',
+                      'text-text-primary placeholder:text-text-muted',
+                      'outline-none transition-all duration-200',
+                      'focus:border-accent focus:ring-2 focus:ring-primary/20'
+                    )}
+                    placeholder={t('profile.searchProfiles')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  {searchTerm && (
+                    <button
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none cursor-pointer rounded hover:bg-bg-hover"
+                      onClick={() => setSearchTerm('')}
+                    >
+                      <Icon name="x" alt={t('common.close')} size="md" color="muted" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Profiles List */}
+              <div className="flex-1 overflow-y-auto px-4 pb-4">
+                {isLoading ? (
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <div className="w-8 h-8 border-2 border-border-light border-t-primary rounded-full animate-spin" />
+                    <p className="mt-4 text-sm text-text-secondary">{t('common.loading')}</p>
+                  </div>
+                ) : filteredProfiles.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <p className="text-sm text-text-secondary mb-4">
+                      {searchTerm ? t('profile.noProfilesFound') : t('profile.noProfilesYet')}
+                    </p>
+                    {!searchTerm && (
+                      <button
+                        className={cn(
+                          'inline-flex items-center gap-2 py-2.5 px-4',
+                          'bg-primary text-white text-sm font-medium rounded-lg',
+                          'border-none cursor-pointer transition-all duration-200',
+                          'hover:bg-primary-hover'
+                        )}
+                        onClick={() => navigate('/profile-setup')}
+                      >
+                        <Icon
+                          name="plus"
+                          alt={t('profile.createNewProfile')}
+                          size="md"
+                          themed={false}
+                          className="invert"
+                        />
+                        <span>{t('profile.createNewProfile')}</span>
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {filteredProfiles.map((profile) => (
+                      <ProfileCard
+                        key={profile.profile_id}
+                        profile={profile}
+                        isSelected={currentProfile?.profile_id === profile.profile_id}
+                        onSelect={() => handleSelectProfile(profile)}
+                        onDelete={(e) => handleDeleteProfile(e, profile.profile_id)}
+                        getThemeIcon={getThemeIcon}
+                        t={t}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+    </>
+  )
+}
+
+// Extracted ProfileCard component for better performance
+function ProfileCard({ profile, isSelected, onSelect, onDelete, getThemeIcon, t }) {
+  return (
+    <div
+      className={cn(
+        'bg-bg-primary border border-border-light rounded-xl',
+        'p-4 cursor-pointer transition-all duration-200',
+        'hover:border-border-hover hover:shadow-sm',
+        isSelected && 'border-accent bg-primary/5'
+      )}
+      onClick={onSelect}
+    >
+      <div className="flex items-start gap-3">
+        <div className="card-icon !w-10 !h-10">
+          <img
+            src={`/icon/${getThemeIcon(profile.theme)}.svg`}
+            alt={profile.profile_name}
+            className="w-5 h-5 opacity-80 icon-invert"
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <h3 className="text-sm font-medium text-text-primary m-0">
+              {profile.profile_name}
+            </h3>
+            {isSelected ? (
+              <span className="text-2xs py-0.5 px-2 bg-primary text-white rounded font-medium">
+                {t('profile.selected')}
+              </span>
+            ) : profile.status === 'ready' ? (
+              <span className="text-2xs py-0.5 px-2 bg-success/15 text-success rounded font-medium">
+                {t('profile.ready').toUpperCase()}
+              </span>
+            ) : (
+              <span className="text-2xs py-0.5 px-2 bg-warning/15 text-warning rounded font-medium">
+                {t('profile.processing').toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 flex-wrap text-xs text-text-secondary">
+            <span className="flex items-center gap-1">
+              <Icon name="file-text" alt={t('common.samples')} size="sm" color="muted" />
+              {profile.sample_count || 0} {t('common.samples')}
+            </span>
+            {profile.statistics?.totalWords && (
+              <>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <Icon name="type" alt={t('common.words')} size="sm" color="muted" />
+                  {profile.statistics.totalWords.toLocaleString()} {t('common.words')}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+        <button
+          className={cn(
+            'p-2 bg-transparent border-none rounded-lg cursor-pointer',
+            'opacity-40 transition-all duration-200',
+            'hover:opacity-100 hover:bg-error/10'
+          )}
+          onClick={onDelete}
+        >
+          <Icon name="trash-2" alt={t('common.delete')} size="md" />
+        </button>
+      </div>
+
+      {/* Tags */}
+      <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border-light">
+        <span className="flex items-center gap-1.5 text-2xs py-1 px-2 bg-bg-secondary rounded text-text-secondary">
+          <Icon name="mic" alt={t('profile.tone')} size="xs" color="muted" />
+          {profile.voice_profile?.tone || 'N/A'}
+        </span>
+        <span className="flex items-center gap-1.5 text-2xs py-1 px-2 bg-bg-secondary rounded text-text-secondary">
+          <Icon name="award" alt={t('profile.formalityLevel')} size="xs" color="muted" />
+          {t('profile.formalityLevel')}: {profile.voice_profile?.formality_level || 'N/A'}/10
+        </span>
+      </div>
+    </div>
+  )
+}
+
+export default ProfileSelectorV2

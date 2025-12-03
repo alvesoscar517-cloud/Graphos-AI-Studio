@@ -1,22 +1,21 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
-import { useAuth } from '../../contexts/AuthContext'
+import { useUser } from '../../stores/authStore'
 import { useNotes } from '../../contexts/NotesContext'
 import { truncateTitleByWords } from '../../utils/titleUtils'
-import './Sidebar.css'
-
-// Truncate email to max characters
-const truncateEmail = (email, maxLength = 18) => {
-  if (!email || email.length <= maxLength) return email
-  return email.substring(0, maxLength) + '...'
-}
+import { cn } from '../../lib/utils'
+import Icon from '../Common/Icon'
 import NotificationPopup from '../Popups/NotificationPopup'
 import SettingsPopup from '../Popups/SettingsPopup'
 import UserProfilePopup from '../Popups/UserProfilePopup'
 import modal from '../../utils/modal'
 
-// Notification Badge Component - Simple Dot
+const truncateEmail = (email, maxLength = 18) => {
+  if (!email || email.length <= maxLength) return email
+  return email.substring(0, maxLength) + '...'
+}
+
 const NotificationBadge = () => {
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -25,72 +24,45 @@ const NotificationBadge = () => {
       try {
         const { getUserNotifications } = await import('../../services/notificationService');
         let { unreadCount: apiUnread } = await getUserNotifications(true);
-        
-        // Also count unread from localStorage (for realtime notifications)
         try {
           const stored = localStorage.getItem('user_notifications');
           if (stored) {
             const localNotifs = JSON.parse(stored);
-            const localUnread = localNotifs.filter(n => !n.read).length;
-            apiUnread = Math.max(apiUnread, localUnread);
+            apiUnread = Math.max(apiUnread, localNotifs.filter(n => !n.read).length);
           }
-        } catch (e) {
-          // Ignore localStorage errors
-        }
-        
+        } catch (e) {}
         setUnreadCount(apiUnread);
       } catch (err) {
-        console.error('Load unread count error:', err);
         try {
           const stored = localStorage.getItem('user_notifications');
-          if (stored) {
-            const localNotifs = JSON.parse(stored);
-            setUnreadCount(localNotifs.filter(n => !n.read).length);
-          }
-        } catch (e) {
-          // Ignore
-        }
+          if (stored) setUnreadCount(JSON.parse(stored).filter(n => !n.read).length);
+        } catch (e) {}
       }
     };
-
     loadUnreadCount();
-
     const handleNewNotification = () => loadUnreadCount();
     window.addEventListener('new-notification', handleNewNotification);
-
-    // Subscribe to realtime notifications from SSE
     let unsubscribeRealtime = null;
-    const setupRealtimeListener = async () => {
+    (async () => {
       try {
         const realtimeService = (await import('../../services/realtimeService')).default;
         unsubscribeRealtime = realtimeService.subscribe('notification', (data) => {
-          console.log('[BELL] Realtime notification received:', data);
-          
           if (data?.notification) {
             try {
               const stored = localStorage.getItem('user_notifications');
               const notifications = stored ? JSON.parse(stored) : [];
-              const exists = notifications.some(n => n.id === data.notification.id);
-              if (!exists) {
+              if (!notifications.some(n => n.id === data.notification.id)) {
                 notifications.unshift(data.notification);
                 localStorage.setItem('user_notifications', JSON.stringify(notifications));
               }
-            } catch (e) {
-              console.error('[BELL] Failed to save notification to localStorage:', e);
-            }
+            } catch (e) {}
           }
-          
           window.dispatchEvent(new CustomEvent('new-notification', { detail: data }));
           loadUnreadCount();
         });
-      } catch (err) {
-        console.error('Setup realtime notification listener error:', err);
-      }
-    };
-    setupRealtimeListener();
-
+      } catch (err) {}
+    })();
     const interval = setInterval(loadUnreadCount, 30000);
-
     return () => {
       window.removeEventListener('new-notification', handleNewNotification);
       if (unsubscribeRealtime) unsubscribeRealtime();
@@ -99,24 +71,23 @@ const NotificationBadge = () => {
   }, []);
 
   if (unreadCount === 0) return null;
-
-  return <span className="notification-badge" />;
+  return (
+    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-error shadow-ring-2 shadow-bg-secondary z-10" />
+  );
 };
 
-const Sidebar = ({ hidden, currentView, onViewChange }) => {
+
+const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
   const { t } = useTranslation()
-  const { user } = useAuth()
+  const user = useUser() // Use Zustand store directly
   const { getVisibleNotes, loadNote, deleteNote, currentNote } = useNotes()
   const [showNotifications, setShowNotifications] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showUserProfile, setShowUserProfile] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
 
   const visibleNotes = getVisibleNotes()
-
-  // Truncate title to max 7 words for display
-  const truncateTitle = (title) => {
-    return truncateTitleByWords(title, 7)
-  }
+  const truncateTitle = (title) => truncateTitleByWords(title, 7)
 
   const handleNoteClick = (note) => {
     loadNote(note.id)
@@ -139,153 +110,156 @@ const Sidebar = ({ hidden, currentView, onViewChange }) => {
 
   return (
     <motion.aside 
-      className="sidebar"
+      className={cn(
+        "bg-bg-tertiary",
+        "border-r border-separator",
+        "flex flex-col overflow-y-auto overflow-x-hidden scrollbar-thin",
+        "h-screen touch-pan-y shrink-0",
+        isDragging ? "z-[100] shadow-xl" : "z-sidebar"
+      )}
       initial={false}
-      animate={{
-        x: hidden ? -238 : 0,
-        opacity: hidden ? 0 : 1
+      animate={{ 
+        width: hidden ? 0 : 220,
+        opacity: hidden ? 0 : 1,
+        x: 0
       }}
-      transition={{
-        type: "spring",
-        stiffness: 300,
-        damping: 30,
-        mass: 0.8
-      }}
-      drag="x"
-      dragConstraints={{ left: -238, right: 0 }}
-      dragElastic={0.2}
+      transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.8 }}
+      drag={hidden ? false : "x"}
+      dragConstraints={{ left: -220, right: 0 }}
+      dragElastic={0.15}
       dragMomentum={false}
-      onDragEnd={(event, info) => {
-        // If dragged over 40% width then toggle
-        const threshold = 238 * 0.4
-        if (info.offset.x < -threshold && !hidden) {
-          // Close sidebar if open
-          // Note: Need to add callback from parent to toggle
-        } else if (info.offset.x > threshold && hidden) {
-          // Open sidebar if closed
-        }
+      onDragStart={() => setIsDragging(true)}
+      onDragEnd={(_, info) => {
+        setIsDragging(false)
+        if (info.offset.x < -80 && !hidden && onToggle) onToggle()
       }}
-      style={{
-        pointerEvents: hidden ? 'none' : 'auto'
+      style={{ 
+        pointerEvents: hidden ? 'none' : 'auto',
+        minWidth: isDragging ? 220 : undefined
       }}
     >
-      <div className="sidebar-header">
-        <h1 className="logo-title">{t('sidebar.appTitle')}</h1>
+      <div className="py-5 px-4">
+        <h1 className="text-title3 font-semibold text-text-primary tracking-tight">
+          {t('sidebar.appTitle')}
+        </h1>
       </div>
 
-      <nav className="nav">
-        <a 
-          href="#" 
-          className={`nav-item ${currentView === 'home' ? 'active' : ''}`}
-          onClick={(e) => { e.preventDefault(); onViewChange('home') }}
-        >
-          <img src="/icon/home.svg" alt={t('nav.home')} />
+      <nav className="py-3 px-2 flex-1">
+        <a href="#" className={cn(
+          "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
+          "text-text-primary text-body cursor-pointer relative my-0.5",
+          "transition-all duration-200",
+          "focus:outline-none", 
+          currentView === 'home' 
+            ? "bg-system-blue text-white font-medium" 
+            : "hover:bg-fill-tertiary"
+        )} onClick={(e) => { e.preventDefault(); onViewChange('home') }}>
+          <Icon name="home" alt={t('nav.home')} size="lg" className={currentView === 'home' ? 'brightness-0 invert' : ''} />
           <span>{t('nav.home')}</span>
         </a>
 
-        <a 
-          href="#" 
-          className={`nav-item ${currentView === 'aistudio-editor' && (!currentNote || !visibleNotes.some(n => n.id === currentNote?.id)) ? 'active' : ''}`}
-          onClick={(e) => { e.preventDefault(); onViewChange('aistudio-editor', { createNew: true }) }}
-        >
-          <img src="/icon/play.svg" alt={t('nav.aiStudio')} />
-          <span>{t('nav.aiStudio')}</span>
-        </a>
+        {(() => {
+          const isAIStudioActive = currentView === 'aistudio-editor' && (!currentNote || !visibleNotes.some(n => n.id === currentNote?.id));
+          return (
+            <a href="#" className={cn(
+              "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
+              "text-text-primary text-body cursor-pointer relative my-0.5",
+              "transition-all duration-200",
+              "focus:outline-none",
+              isAIStudioActive 
+                ? "bg-system-blue text-white font-medium" 
+                : "hover:bg-fill-tertiary"
+            )} onClick={(e) => { e.preventDefault(); onViewChange('aistudio-editor', { createNew: true }) }}>
+              <Icon name="play" alt={t('nav.aiStudio')} size="lg" className={isAIStudioActive ? 'brightness-0 invert' : ''} />
+              <span>{t('nav.aiStudio')}</span>
+            </a>
+          );
+        })()}
 
-        <a 
-          href="#" 
-          className={`nav-item ${currentView === 'workspace' ? 'active' : ''}`}
-          onClick={(e) => { e.preventDefault(); onViewChange('workspace') }}
-        >
-          <img src="/icon/message-square.svg" alt={t('nav.aiWorkspace')} />
+        <a href="#" className={cn(
+          "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
+          "text-text-primary text-body cursor-pointer relative my-0.5",
+          "transition-all duration-200",
+          "focus:outline-none", 
+          currentView === 'workspace' 
+            ? "bg-system-blue text-white font-medium" 
+            : "hover:bg-fill-tertiary"
+        )} onClick={(e) => { e.preventDefault(); onViewChange('workspace') }}>
+          <Icon name="message-square" alt={t('nav.aiWorkspace')} size="lg" className={currentView === 'workspace' ? 'brightness-0 invert' : ''} />
           <span>{t('nav.aiWorkspace')}</span>
         </a>
 
-        <div className="nav-label">
-          <img src="/icon/clock.svg" alt={t('nav.history')} />
+        <div className="flex items-center gap-2 py-2 px-3 pt-3 mt-3 text-footnote text-label-secondary font-semibold uppercase tracking-wider">
           <span>{t('nav.history')}</span>
         </div>
 
-        <div className="nav-section" id="notesList">
+        <div className="mb-0.5 pl-0 bg-transparent" id="notesList">
           {visibleNotes.map(note => (
-            <div 
-              key={note.id}
-              className={`nav-subitem note-item ${currentNote?.id === note.id && currentView === 'aistudio-editor' ? 'active' : ''}`}
-              onClick={() => handleNoteClick(note)}
-            >
-              <span className="note-item-text">
+            <div key={note.id} className={cn(
+              "cursor-pointer relative flex items-center justify-between gap-2",
+              "py-2.5 px-3 my-0.5 rounded-2xl bg-transparent transition-all duration-200",
+              "text-body leading-snug group hover:bg-fill-tertiary",
+              currentNote?.id === note.id && currentView === 'aistudio-editor' && "bg-fill-tertiary"
+            )} onClick={() => handleNoteClick(note)}>
+              <span className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis text-body text-text-secondary leading-tight font-normal">
                 {truncateTitle(note.title)}
               </span>
-              <button 
-                className="delete-note-btn"
-                onClick={(e) => handleDeleteNote(e, note.id)}
-                data-tooltip={t('common.delete')}
-                data-tooltip-position="left"
-              >
-                <img src="/icon/trash.svg" alt={t('common.delete')} />
+              <button className={cn(
+                "bg-transparent border-none p-1 cursor-pointer rounded-sm",
+                "opacity-0 invisible shrink-0 transition-all duration-150",
+                "group-hover:opacity-60 group-hover:visible hover:!opacity-100 hover:bg-fill-secondary"
+              )} onClick={(e) => handleDeleteNote(e, note.id)}>
+                <Icon name="trash" alt={t('common.delete')} size="sm" />
               </button>
             </div>
           ))}
         </div>
 
-        <a 
-          href="#" 
-          className={`view-all ${currentView === 'history' ? 'active' : ''}`}
-          onClick={(e) => { e.preventDefault(); onViewChange('history') }}
-        >
+        <a href="#" className={cn(
+          "block py-2.5 px-3 text-system-blue text-body no-underline rounded-2xl m-0 font-medium",
+          "hover:bg-fill-tertiary focus:outline-none transition-all duration-200",
+          currentView === 'history' && "bg-fill-tertiary"
+        )} onClick={(e) => { e.preventDefault(); onViewChange('history') }}>
           {t('nav.viewAllHistory')} →
         </a>
       </nav>
 
-      <div className="sidebar-bottom">
-        <div className="footer-info">
-          <button 
-            className="footer-link notification-btn"
-            onClick={(e) => { 
-              e.preventDefault();
-              e.stopPropagation();
-              setShowSettings(false);
-              setShowUserProfile(false);
-              setShowNotifications(!showNotifications);
-            }}
-          >
-            <div className="notification-icon-wrapper">
-              <img src="/icon/bell.svg" alt={t('nav.notification')} />
+      <div className="p-2 overflow-visible">
+        <div className="p-0 relative overflow-visible">
+          <button className={cn(
+            "flex items-center gap-3 py-2.5 px-3 text-text-primary",
+            "text-body rounded-2xl relative my-0.5 border-none bg-transparent w-full cursor-pointer",
+            "hover:bg-fill-tertiary focus:outline-none transition-all duration-200"
+          )} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowSettings(false); setShowUserProfile(false); setShowNotifications(!showNotifications); }}>
+            <div className="relative flex items-center justify-center">
+              <Icon name="bell" alt={t('nav.notification')} size="lg" />
               <NotificationBadge />
             </div>
             {t('nav.notification')}
           </button>
 
-          <button 
-            className="footer-link"
-            onClick={(e) => { 
-              e.preventDefault()
-              e.stopPropagation()
-              setShowNotifications(false)
-              setShowUserProfile(false)
-              setShowSettings(!showSettings)
-            }}
-          >
-            <img src="/icon/settings.svg" alt={t('nav.settings')} />
+          <button className={cn(
+            "flex items-center gap-3 py-2.5 px-3 text-text-primary",
+            "text-body rounded-2xl relative my-0.5 border-none bg-transparent w-full cursor-pointer",
+            "hover:bg-fill-tertiary focus:outline-none transition-all duration-200"
+          )} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowNotifications(false); setShowUserProfile(false); setShowSettings(!showSettings); }}>
+            <Icon name="settings" alt={t('nav.settings')} size="lg" />
             {t('nav.settings')}
           </button>
 
-          <button 
-            className="footer-link"
-            onClick={(e) => { 
-              e.preventDefault()
-              e.stopPropagation()
-              setShowNotifications(false)
-              setShowSettings(false)
-              setShowUserProfile(!showUserProfile)
-            }}
-          >
-            <img 
-              src={user?.picture || "/icon/user-circle.svg"} 
-              alt="User"
-              style={user?.picture ? { borderRadius: '50%', width: '20px', height: '20px' } : {}}
-            />
-            <span title={user?.email}>{truncateEmail(user?.email, 18) || t('common.notLoggedIn')}</span>
+          <button className={cn(
+            "flex items-center gap-3 py-2.5 px-3 text-text-primary",
+            "text-body rounded-2xl relative my-0.5 border-none bg-transparent w-full cursor-pointer",
+            "hover:bg-fill-tertiary focus:outline-none transition-all duration-200"
+          )} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowNotifications(false); setShowSettings(false); setShowUserProfile(!showUserProfile); }}>
+            {user?.picture ? (
+              <img src={user.picture} alt="User" className="w-6 h-6 shrink-0 rounded-full" />
+            ) : (
+              <Icon name="user-circle" alt="User" size="lg" />
+            )}
+            <span className="overflow-hidden text-ellipsis whitespace-nowrap" title={user?.email}>
+              {truncateEmail(user?.email, 18) || t('common.notLoggedIn')}
+            </span>
           </button>
         </div>
       </div>

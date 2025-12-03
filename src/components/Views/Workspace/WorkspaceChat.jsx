@@ -132,67 +132,67 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
         />
       )}
       <div 
-        className="workspace-chat-container"
+        className="flex flex-col flex-1 h-full bg-bg-tertiary overflow-hidden"
         style={{
           marginRight: rightSidebarHidden ? 0 : '300px',
           transition: 'margin-right 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
         }}
       >
         {/* Header */}
-        <div className="workspace-header">
+        <div className="flex items-center gap-2 py-2 px-4 border-b border-border-light bg-bg-tertiary h-14 shrink-0">
           <button 
-            className="menu-btn icon-btn" 
+            className="p-1.5 bg-transparent border-none cursor-pointer rounded-full w-8 h-8 shrink-0 flex items-center justify-center transition-colors duration-200 hover:bg-bg-hover" 
             onClick={onToggleLeftSidebar}
             data-tooltip={t('common.menu')} 
             data-tooltip-position="right"
           >
-            <img src="/icon/panel-left.svg" alt={t('common.menu')} />
+            <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
           </button>
 
-          <div className="workspace-title-container">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
             <div 
-              className={`workspace-title-display ${isTypingTitle ? 'typing' : ''}`}
+              className={`text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-xl shrink-0 ${isTypingTitle ? 'animate-pulse' : ''}`}
               title={currentConversation?.title || ''}
             >
               {displayTitle}
             </div>
             <button 
-              className="title-edit-btn"
+              className="bg-transparent border-none p-1.5 cursor-pointer rounded-md shrink-0 flex items-center justify-center opacity-50 transition-all duration-200 hover:opacity-100 hover:bg-bg-hover hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed"
               onClick={handleEditClick}
               data-tooltip={t('common.edit')}
               data-tooltip-position="bottom"
               disabled={isTypingTitle}
             >
-              <img src="/icon/pencil.svg" alt={t('common.edit')} />
+              <img src="/icon/pencil.svg" alt={t('common.edit')} className="w-3.5 h-3.5 icon-invert" />
             </button>
           </div>
 
-          <div className="workspace-header-actions">
+          <div className="flex items-center gap-1">
             <button 
-              className="icon-btn"
+              className="p-1.5 bg-transparent border-none cursor-pointer rounded-full w-8 h-8 flex items-center justify-center transition-colors duration-200 hover:bg-bg-hover"
               onClick={clearConversation}
               data-tooltip={t('common.new')} 
               data-tooltip-position="left"
             >
-              <img src="/icon/plus.svg" alt={t('workspace.newChat')} />
+              <img src="/icon/plus.svg" alt={t('workspace.newChat')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
             </button>
             <button 
-              className="icon-btn"
+              className="p-1.5 bg-transparent border-none cursor-pointer rounded-full w-8 h-8 flex items-center justify-center transition-colors duration-200 hover:bg-bg-hover disabled:opacity-30"
               onClick={handleShareClick}
               data-tooltip={t('common.share')} 
               data-tooltip-position="left"
               disabled={!currentConversation || currentConversation.messages.length === 0}
             >
-              <img src="/icon/share-2.svg" alt={t('common.share')} />
+              <img src="/icon/share-2.svg" alt={t('common.share')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
             </button>
             {rightSidebarHidden && (
               <button 
-                className="icon-btn"
+                className="p-1.5 bg-transparent border-none cursor-pointer rounded-full w-8 h-8 flex items-center justify-center transition-colors duration-200 hover:bg-bg-hover"
                 onClick={onToggleRightSidebar}
                 data-tooltip={t('nav.sidebar')} 
                 data-tooltip-position="left"
               >
-                <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} />
+                <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
               </button>
             )}
           </div>

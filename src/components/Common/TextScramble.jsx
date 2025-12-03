@@ -22,12 +22,11 @@ const TextScramble = ({ children, className = '' }) => {
 
     queueRef.current = []
     
-    // Scramble words left to right
     for (let i = 0; i < length; i++) {
       const from = oldText[i] || ''
       const to = newText[i] || ''
-      const start = i * 3 // Each character starts 3 frames after previous
-      const end = start + 15 // Scramble trong 15 frame
+      const start = i * 3
+      const end = start + 15
       queueRef.current.push({ from, to, start, end })
     }
 
@@ -48,12 +47,11 @@ const TextScramble = ({ children, className = '' }) => {
         complete++
         output += to
       } else if (frameRef.current >= start) {
-        // Scramble
         if (!char || Math.random() < 0.28) {
           char = randomChar()
           queueRef.current[i].char = char
         }
-        output += `<span class="scramble-char">${char}</span>`
+        output += `<span class="text-primary opacity-70 animate-pulse">${char}</span>`
       } else {
         output += from
       }
@@ -72,7 +70,6 @@ const TextScramble = ({ children, className = '' }) => {
   }
 
   useEffect(() => {
-    // Start scramble effect after a short delay
     const timer = setTimeout(() => {
       setText(targetText)
     }, 100)
@@ -85,7 +82,7 @@ const TextScramble = ({ children, className = '' }) => {
 
   return (
     <span 
-      className={className}
+      className={`inline-block font-sans ${className}`}
       dangerouslySetInnerHTML={{ __html: displayText }}
     />
   )

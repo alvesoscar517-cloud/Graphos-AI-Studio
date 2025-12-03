@@ -195,19 +195,19 @@ export default function DashboardView() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         {/* Recent Activities */}
         <Card className="p-6">
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2.5 mb-5">
             <img src="/icon/clock.svg" alt="Activity" className="w-5 h-5 icon-dark" />
-            <h2 className="text-lg font-semibold text-primary">Recent Activities</h2>
+            <h2 className="text-[17px] font-semibold text-primary tracking-[-0.015em]">Recent Activities</h2>
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2.5">
             {activities.map((activity, index) => (
-              <div key={activity.id || index} className="flex items-center gap-3 p-3 rounded-lg bg-surface-secondary">
-                <div className="w-9 h-9 rounded-full bg-surface flex items-center justify-center flex-shrink-0">
+              <div key={activity.id || index} className="flex items-center gap-3.5 p-3.5 rounded-xl bg-surface-secondary/60 transition-colors duration-150 hover:bg-surface-secondary">
+                <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center flex-shrink-0 shadow-xs">
                   <img src={`/icon/${getActivityIcon(activity.action)}`} alt={activity.action} className="w-4 h-4 icon-dark" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-primary">{getActivityTitle(activity)}</p>
-                  <p className="text-xs text-muted">{formatTimeAgo(activity.timestamp)}</p>
+                  <p className="text-[14px] font-medium text-primary">{getActivityTitle(activity)}</p>
+                  <p className="text-[12px] text-muted mt-0.5">{formatTimeAgo(activity.timestamp)}</p>
                 </div>
               </div>
             ))}

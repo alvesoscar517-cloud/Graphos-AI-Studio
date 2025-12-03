@@ -23,77 +23,77 @@ const NOTIFICATION_TEMPLATES = {
     priority: 'high',
     translations: {
       en: {
-        title: 'Welcome to AI Content Auth!',
+        title: 'Welcome to Graphos AI Studio!',
         message: 'You have received {credits} free credits to get started. Explore our AI analysis features!',
         cta: 'Get Started'
       },
       vi: {
-        title: 'Chào mừng đến với AI Content Auth!',
+        title: 'Chào mừng đến với Graphos AI Studio!',
         message: 'Bạn đã nhận được {credits} credits miễn phí để bắt đầu. Khám phá các tính năng phân tích AI của chúng tôi!',
         cta: 'Bắt đầu'
       },
       zh: {
-        title: '欢迎使用 AI Content Auth！',
+        title: '欢迎使用 Graphos AI Studio！',
         message: '您已获得 {credits} 免费积分。立即探索我们的 AI 分析功能！',
         cta: '开始使用'
       },
       ja: {
-        title: 'AI Content Auth へようこそ！',
+        title: 'Graphos AI Studio へようこそ！',
         message: '{credits} 無料クレジットを獲得しました。AI分析機能をお試しください！',
         cta: '始める'
       },
       ko: {
-        title: 'AI Content Auth에 오신 것을 환영합니다!',
+        title: 'Graphos AI Studio에 오신 것을 환영합니다!',
         message: '{credits} 무료 크레딧을 받으셨습니다. AI 분석 기능을 탐색해 보세요!',
         cta: '시작하기'
       },
       fr: {
-        title: 'Bienvenue sur AI Content Auth !',
+        title: 'Bienvenue sur Graphos AI Studio !',
         message: 'Vous avez reçu {credits} crédits gratuits pour commencer. Explorez nos fonctionnalités d\'analyse IA !',
         cta: 'Commencer'
       },
       de: {
-        title: 'Willkommen bei AI Content Auth!',
+        title: 'Willkommen bei Graphos AI Studio!',
         message: 'Sie haben {credits} kostenlose Credits erhalten. Entdecken Sie unsere KI-Analysefunktionen!',
         cta: 'Loslegen'
       },
       es: {
-        title: '¡Bienvenido a AI Content Auth!',
+        title: '¡Bienvenido a Graphos AI Studio!',
         message: 'Has recibido {credits} créditos gratis para comenzar. ¡Explora nuestras funciones de análisis de IA!',
         cta: 'Comenzar'
       },
       pt: {
-        title: 'Bem-vindo ao AI Content Auth!',
+        title: 'Bem-vindo ao Graphos AI Studio!',
         message: 'Você recebeu {credits} créditos grátis para começar. Explore nossos recursos de análise de IA!',
         cta: 'Começar'
       },
       it: {
-        title: 'Benvenuto su AI Content Auth!',
+        title: 'Benvenuto su Graphos AI Studio!',
         message: 'Hai ricevuto {credits} crediti gratuiti per iniziare. Esplora le nostre funzionalità di analisi IA!',
         cta: 'Inizia'
       },
       ru: {
-        title: 'Добро пожаловать в AI Content Auth!',
+        title: 'Добро пожаловать в Graphos AI Studio!',
         message: 'Вы получили {credits} бесплатных кредитов для начала. Изучите наши функции анализа ИИ!',
         cta: 'Начать'
       },
       ar: {
-        title: 'مرحباً بك في AI Content Auth!',
+        title: 'مرحباً بك في Graphos AI Studio!',
         message: 'لقد حصلت على {credits} رصيد مجاني للبدء. استكشف ميزات تحليل الذكاء الاصطناعي!',
         cta: 'ابدأ الآن'
       },
       th: {
-        title: 'ยินดีต้อนรับสู่ AI Content Auth!',
+        title: 'ยินดีต้อนรับสู่ Graphos AI Studio!',
         message: 'คุณได้รับ {credits} เครดิตฟรีเพื่อเริ่มต้น สำรวจฟีเจอร์วิเคราะห์ AI ของเรา!',
         cta: 'เริ่มต้น'
       },
       id: {
-        title: 'Selamat datang di AI Content Auth!',
+        title: 'Selamat datang di Graphos AI Studio!',
         message: 'Anda telah menerima {credits} kredit gratis untuk memulai. Jelajahi fitur analisis AI kami!',
         cta: 'Mulai'
       },
       ms: {
-        title: 'Selamat datang ke AI Content Auth!',
+        title: 'Selamat datang ke Graphos AI Studio!',
         message: 'Anda telah menerima {credits} kredit percuma untuk bermula. Terokai ciri analisis AI kami!',
         cta: 'Mula'
       }

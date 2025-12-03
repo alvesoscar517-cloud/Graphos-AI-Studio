@@ -3,15 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useTextStats } from '../../hooks/useTextStats'
 import { splitTextForModel, MODEL_LIMITS } from '../../utils/tokenUtils'
 import modal from '../../utils/modal'
-import './LongTextHandler.css'
+import { cn } from '../../lib/utils'
 
 /**
  * LongTextHandler - Handle long text with options
- * 
- * When text exceeds limit, allow user to:
- * 1. Continue with original text (may be slow/costly)
- * 2. Split and process each part
- * 3. Choose a more suitable model
  */
 const LongTextHandler = ({
   text,
@@ -38,11 +33,9 @@ const LongTextHandler = ({
 
   const limits = MODEL_LIMITS[model] || MODEL_LIMITS['gemini-2.5-flash']
 
-  // Handle text normally
   const handleProcess = useCallback(async () => {
     if (disabled || processing) return
 
-    // If text too long, show confirmation dialog
     if (isTooLong) {
       const chunks = getChunks()
       
@@ -57,14 +50,11 @@ const LongTextHandler = ({
       )
 
       if (result === false) {
-        // User chose to split
         await handleProcessChunks(chunks)
         return
       } else if (result === null) {
-        // User cancel
         return
       }
-      // result === true: continue processing all
     }
 
     setProcessing(true)
@@ -75,7 +65,6 @@ const LongTextHandler = ({
     }
   }, [text, isTooLong, stats, getChunks, onProcess, disabled, processing])
 
-  // Process each chunk
   const handleProcessChunks = useCallback(async (chunks) => {
     if (!chunks || chunks.length === 0) return
 
@@ -105,26 +94,33 @@ const LongTextHandler = ({
     }
   }, [onProcess, onProcessChunks])
 
-  // Render warning banner if text long
   const renderWarning = () => {
     if (!isTooLong || stats.chars === 0) return null
 
     return (
-      <div className="long-text-warning">
-        <div className="warning-icon">[{t('common.warning').toUpperCase()}]</div>
-        <div className="warning-content">
-          <div className="warning-title">{t('longText.textQuiteLong')}</div>
-          <div className="warning-desc">
+      <div className={cn(
+        "flex items-start gap-3 py-3 px-4",
+        "bg-amber-500/10 border border-amber-500/30 rounded-lg",
+        "animate-slide-up-fast"
+      )}>
+        <div className="text-xl shrink-0">[{t('common.warning').toUpperCase()}]</div>
+        <div className="flex-1 min-w-0">
+          <div className="font-semibold text-amber-400 mb-1">{t('longText.textQuiteLong')}</div>
+          <div className="text-sm text-text-muted">
             {stats.pages} {t('tokens.pages')} • ~{stats.tokens.toLocaleString()} {t('tokens.tokens')}
           </div>
           {warnings.map((w, i) => (
-            <div key={i} className="warning-item">{w}</div>
+            <div key={i} className="text-xs text-text-muted mt-1">{w}</div>
           ))}
         </div>
         
         {modelRecommendation.model !== model && onChangeModel && (
           <button 
-            className="change-model-btn"
+            className={cn(
+              "py-1.5 px-3 text-xs bg-amber-400 text-black border-none rounded-md",
+              "cursor-pointer whitespace-nowrap transition-all duration-200",
+              "hover:bg-amber-500 hover:-translate-y-0.5"
+            )}
             onClick={() => onChangeModel(modelRecommendation.model)}
           >
             {t('longText.switchTo', { model: modelRecommendation.model })}
@@ -134,21 +130,20 @@ const LongTextHandler = ({
     )
   }
 
-  // Render progress when processing chunks
   const renderProgress = () => {
     if (!processing || totalChunks === 0) return null
 
     const progress = (currentChunk / totalChunks) * 100
 
     return (
-      <div className="chunk-progress">
-        <div className="progress-bar">
+      <div className="py-3 px-4 bg-bg-secondary rounded-lg">
+        <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden mb-2">
           <div 
-            className="progress-fill" 
+            className="h-full bg-gradient-to-r from-blue-400 to-green-400 rounded-full transition-[width] duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="progress-text">
+        <div className="text-xs text-text-muted text-center">
           {t('longText.processingPart', { current: currentChunk, total: totalChunks })}
         </div>
       </div>
@@ -156,11 +151,10 @@ const LongTextHandler = ({
   }
 
   return (
-    <div className="long-text-handler">
+    <div className="flex flex-col gap-2">
       {renderWarning()}
       {renderProgress()}
       
-      {/* Render children with additional props */}
       {typeof children === 'function' 
         ? children({
             onProcess: handleProcess,

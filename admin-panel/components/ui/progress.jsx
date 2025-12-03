@@ -27,8 +27,8 @@ const Progress = React.forwardRef(({
   
   const sizeClasses = {
     sm: 'h-1',
-    md: 'h-2',
-    lg: 'h-3',
+    md: 'h-[6px]',
+    lg: 'h-2.5',
   }
 
   return (
@@ -36,7 +36,7 @@ const Progress = React.forwardRef(({
       <ProgressPrimitive.Root
         ref={ref}
         className={cn(
-          'relative w-full overflow-hidden rounded-full bg-surface-secondary',
+          'relative w-full overflow-hidden rounded-full bg-surface-secondary/80',
           sizeClasses[size],
           className
         )}
@@ -44,14 +44,15 @@ const Progress = React.forwardRef(({
       >
         <ProgressPrimitive.Indicator
           className={cn(
-            'h-full transition-all duration-300 ease-in-out rounded-full',
+            'h-full rounded-full',
+            'transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]',
             variantClasses[variant]
           )}
           style={{ width: `${percentage}%` }}
         />
       </ProgressPrimitive.Root>
       {showValue && (
-        <span className="text-xs text-muted-foreground mt-1">
+        <span className="text-[12px] text-muted-foreground mt-1.5">
           {Math.round(percentage)}%
         </span>
       )}

@@ -108,25 +108,25 @@ export function DataTable({
   return (
     <div className={cn('w-full', className)}>
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="overflow-x-auto rounded-2xl border border-border/40 bg-surface">
         <table className="w-full">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="border-b border-border bg-surface-secondary">
+              <tr key={headerGroup.id} className="border-b border-border/40 bg-surface-secondary/50">
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
                     className={cn(
-                      'p-3 text-left text-xs font-medium text-muted uppercase tracking-wider',
-                      header.column.getCanSort() && 'cursor-pointer select-none hover:text-primary'
+                      'px-4 py-3.5 text-left text-[12px] font-semibold text-secondary uppercase tracking-[0.02em]',
+                      header.column.getCanSort() && 'cursor-pointer select-none hover:text-primary transition-colors duration-150'
                     )}
                     style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
                     onClick={header.column.getToggleSortingHandler()}
                   >
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       {flexRender(header.column.columnDef.header, header.getContext())}
                       {header.column.getIsSorted() && (
-                        <span className="text-primary">
+                        <span className="text-info">
                           {header.column.getIsSorted() === 'asc' ? '↑' : '↓'}
                         </span>
                       )}
@@ -139,16 +139,16 @@ export function DataTable({
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={tableColumns.length} className="p-8 text-center">
-                  <div className="flex items-center justify-center gap-2 text-muted">
+                <td colSpan={tableColumns.length} className="p-10 text-center">
+                  <div className="flex items-center justify-center gap-2.5 text-muted">
                     <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                    Đang tải...
+                    <span className="text-[15px]">Đang tải...</span>
                   </div>
                 </td>
               </tr>
             ) : table.getRowModel().rows.length === 0 ? (
               <tr>
-                <td colSpan={tableColumns.length} className="p-8 text-center text-muted">
+                <td colSpan={tableColumns.length} className="p-10 text-center text-muted text-[15px]">
                   {emptyMessage}
                 </td>
               </tr>
@@ -157,14 +157,14 @@ export function DataTable({
                 <tr
                   key={row.id}
                   className={cn(
-                    'border-b border-border transition-colors',
-                    onRowClick && 'cursor-pointer hover:bg-surface-secondary',
-                    row.getIsSelected() && 'bg-primary/5'
+                    'border-b border-border/30 transition-all duration-150',
+                    onRowClick && 'cursor-pointer hover:bg-surface-secondary/60',
+                    row.getIsSelected() && 'bg-info/5'
                   )}
                   onClick={() => onRowClick?.(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="p-3 text-sm text-primary">
+                    <td key={cell.id} className="px-4 py-3.5 text-[14px] text-primary">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
@@ -177,8 +177,8 @@ export function DataTable({
 
       {/* Pagination */}
       {table.getPageCount() > 1 && (
-        <div className="flex items-center justify-between mt-4 px-2">
-          <div className="text-sm text-muted">
+        <div className="flex items-center justify-between mt-5 px-1">
+          <div className="text-[14px] text-muted">
             {selectable && selectedCount > 0 && (
               <span className="mr-4 font-medium text-primary">
                 Đã chọn {selectedCount} mục
@@ -186,7 +186,7 @@ export function DataTable({
             )}
             Trang {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <Button
               variant="secondary"
               size="sm"

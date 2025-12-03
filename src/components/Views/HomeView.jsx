@@ -7,7 +7,7 @@ import { getCachedProfileDetail, setCachedProfileDetail } from '../../utils/prof
 import ProfileCarousel from './Home/ProfileCarousel'
 import ProfileDetailPopup from '../Popups/ProfileDetailPopup'
 import modal from '../../utils/modal'
-import './HomeView.css'
+import { cn } from '../../lib/utils'
 
 const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
   const { t } = useTranslation()
@@ -23,18 +23,13 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
 
   const loadProfilesData = async () => {
     try {
-      // Check if cache should be invalidated
       checkCacheInvalidation()
-
-      // Try to get from cache first
       const cached = getCachedProfiles()
       if (cached) {
         setProfiles(cached)
         setLoading(false)
         return
       }
-
-      // Load from API
       setLoading(true)
       const data = await loadProfiles()
       setProfiles(data)
@@ -49,20 +44,14 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
 
   const handleSelectProfile = async (profile) => {
     try {
-      // Check cache first
       const cached = getCachedProfileDetail(profile.profile_id)
       if (cached) {
         setSelectedProfile(cached)
         setShowDetailPopup(true)
         return
       }
-
-      // Load full profile details from API
       const fullProfile = await getProfileDetails(profile.profile_id)
-      
-      // Cache the result
       setCachedProfileDetail(profile.profile_id, fullProfile)
-      
       setSelectedProfile(fullProfile)
       setShowDetailPopup(true)
     } catch (error) {
@@ -76,18 +65,13 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
     localStorage.setItem('activeProfileName', profile.profile_name)
     modal.toast(t('home.profileSelected'), profile.profile_name, 'success')
     setShowDetailPopup(false)
-    
-    // Switch to editor with new note
     onViewChange('aistudio-editor', { createNew: true })
   }
 
   const handleUseProfileFromCard = (profile) => {
-    // Set active profile
     localStorage.setItem('activeProfileId', profile.profile_id)
     localStorage.setItem('activeProfileName', profile.profile_name)
     modal.toast(t('home.profileSelected'), profile.profile_name, 'success')
-    
-    // Switch to editor with new note
     onViewChange('aistudio-editor', { createNew: true })
   }
   
@@ -96,94 +80,130 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
   }
 
   return (
-    <div className="home-view">
-      <header className="home-header">
+    <div className="flex flex-col flex-1 overflow-hidden h-screen bg-bg-tertiary">
+      {/* Header - same style as History (no border, only toggle button) */}
+      <header className={cn(
+        "flex items-center py-2 px-4",
+        "bg-bg-tertiary h-14 shrink-0"
+      )}>
         <button 
-          className="menu-btn icon-btn" 
+          className={cn(
+            "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+            "w-8 h-8 shrink-0 flex items-center justify-center",
+            "transition-colors duration-200",
+            "hover:bg-bg-hover"
+          )}
           onClick={onToggleLeftSidebar}
           data-tooltip={t('common.menu')} 
           data-tooltip-position="right"
         >
-          <img src="/icon/panel-left.svg" alt={t('common.menu')} />
+          <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
         </button>
       </header>
 
-      <div className="home-content">
-        <div className="home-hero">
-          <h2 className="hero-title">{t('home.heroTitle')}</h2>
-          <p className="hero-subtitle">
+      {/* Content */}
+      <div className="flex-1 p-0 w-full overflow-y-auto">
+        {/* Hero */}
+        <div className={cn(
+          "text-left mb-6 flex flex-col gap-0.5",
+          "w-[80%] mx-auto",
+          "max-lg:w-[90%] max-md:w-[95%] max-md:px-4"
+        )}>
+          <h2 className="text-4xl font-normal text-text-primary mb-0">
+            {t('home.heroTitle')}
+          </h2>
+          <p className="text-sm text-text-muted font-normal mb-0 flex items-center justify-between gap-4 leading-relaxed">
             <span>{t('home.heroSubtitle')}</span>
-            <button className="new-app-btn" onClick={handleCreateProfile}>
-              <img src="/icon/plus.svg" alt="Plus" />
+            <button 
+              className={cn(
+                "flex items-center gap-2 bg-transparent border border-border-light",
+                "py-1 px-4 rounded-pill cursor-pointer text-sm text-text-primary font-medium",
+                "ml-auto shrink-0 h-fit leading-relaxed transition-all duration-200",
+                "hover:bg-bg-secondary hover:shadow-sm"
+              )}
+              onClick={handleCreateProfile}
+            >
+              <img src="/icon/plus.svg" alt="Plus" className="w-icon-lg h-icon-lg opacity-80 icon-invert" />
               <span>{t('home.newProfile')}</span>
             </button>
           </p>
         </div>
 
-        <div className="quick-actions">
-          <div className="action-card" onClick={handleCreateProfile} style={{ cursor: 'pointer' }}>
-            <div className="action-icon-wrapper">
-              <img src="/icon/user-round.svg" alt={t('nav.profile')} className="action-icon" />
+        {/* Quick Actions */}
+        <div className={cn(
+          "grid grid-cols-3 gap-4 mb-14",
+          "w-[80%] mx-auto",
+          "max-lg:w-[90%] max-lg:grid-cols-2",
+          "max-md:w-[95%] max-md:px-4 max-md:grid-cols-1 max-md:gap-3"
+        )}>
+          {[
+            { icon: '/icon/user-round.svg', title: t('home.createStyleProfile'), onClick: handleCreateProfile },
+            { icon: '/icon/file-search.svg', title: t('home.analyzeContent'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) },
+            { icon: '/icon/bar-chart.svg', title: t('home.trackStatistics'), onClick: () => onViewChange('history') }
+          ].map((action, i) => (
+            <div 
+              key={i}
+              className={cn(
+                "flex items-center gap-4 py-3 px-6 cursor-pointer",
+                "bg-bg-secondary border border-border-light rounded-xl",
+                "transition-all duration-200",
+                "hover:shadow-md hover:border-border-hover hover:bg-bg-hover",
+                "group"
+              )}
+              onClick={action.onClick}
+            >
+              <div className="card-icon !w-12 !h-12 group-hover:scale-105">
+                <img src={action.icon} alt="" className="w-6 h-6 opacity-70 icon-invert group-hover:opacity-100" />
+              </div>
+              <h3 className="text-sm font-medium text-text-primary">{action.title}</h3>
             </div>
-            <h3>{t('home.createStyleProfile')}</h3>
-          </div>
-          <div className="action-card" onClick={() => onViewChange('aistudio-editor', { createNew: true })} style={{ cursor: 'pointer' }}>
-            <div className="action-icon-wrapper">
-              <img src="/icon/file-search.svg" alt={t('home.analyzeContent')} className="action-icon" />
-            </div>
-            <h3>{t('home.analyzeContent')}</h3>
-          </div>
-          <div className="action-card" onClick={() => onViewChange('history')} style={{ cursor: 'pointer' }}>
-            <div className="action-icon-wrapper">
-              <img src="/icon/bar-chart.svg" alt={t('home.trackStatistics')} className="action-icon" />
-            </div>
-            <h3>{t('home.trackStatistics')}</h3>
+          ))}
+        </div>
+
+        {/* What's New */}
+        <div className={cn(
+          "mb-14 w-[80%] mx-auto",
+          "max-lg:w-[90%] max-md:w-[95%] max-md:px-4"
+        )}>
+          <h3 className="text-xl font-normal text-text-primary mb-6">
+            {t('home.featuredFeatures')}
+          </h3>
+          <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
+            {[
+              { icon: '/icon/fingerprint.svg', title: t('home.styleRefinement'), desc: t('home.styleRefinementDesc'), onClick: handleCreateProfile },
+              { icon: '/icon/shield-check.svg', title: t('home.aiDetection'), desc: t('home.aiDetectionDesc'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) },
+              { icon: '/icon/wand-sparkles.svg', title: t('home.smartRewriting'), desc: t('home.smartRewritingDesc'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) },
+              { icon: '/icon/chart-line.svg', title: t('home.statisticalAnalysis'), desc: t('home.statisticalAnalysisDesc'), onClick: () => onViewChange('history') }
+            ].map((item, i) => (
+              <div 
+                key={i}
+                className={cn(
+                  "flex gap-4 py-3.5 px-6 items-center cursor-pointer",
+                  "bg-bg-secondary border border-border-light rounded-xl",
+                  "transition-all duration-200",
+                  "hover:shadow-md hover:border-border-hover hover:bg-bg-hover",
+                  "group"
+                )}
+                onClick={item.onClick}
+              >
+                <div className="card-icon !w-12 !h-12 shrink-0 group-hover:scale-105">
+                  <img src={item.icon} alt="" className="w-6 h-6 opacity-70 icon-invert group-hover:opacity-100" />
+                </div>
+                <div className="flex flex-col gap-1 flex-1 min-w-0">
+                  <h4 className="text-sm font-medium text-text-primary m-0">{item.title}</h4>
+                  <p className="text-sm text-text-muted leading-relaxed m-0">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="whats-new">
-          <h3 className="section-title">{t('home.featuredFeatures')}</h3>
-          <div className="news-grid">
-            <div className="news-card" onClick={handleCreateProfile} style={{ cursor: 'pointer' }}>
-              <div className="news-icon-wrapper">
-                <img src="/icon/fingerprint.svg" alt={t('home.styleRefinement')} className="news-icon" />
-              </div>
-              <div className="news-content">
-                <h4>{t('home.styleRefinement')}</h4>
-                <p>{t('home.styleRefinementDesc')}</p>
-              </div>
-            </div>
-            <div className="news-card" onClick={() => onViewChange('aistudio-editor', { createNew: true })} style={{ cursor: 'pointer' }}>
-              <div className="news-icon-wrapper">
-                <img src="/icon/shield-check.svg" alt={t('home.aiDetection')} className="news-icon" />
-              </div>
-              <div className="news-content">
-                <h4>{t('home.aiDetection')}</h4>
-                <p>{t('home.aiDetectionDesc')}</p>
-              </div>
-            </div>
-            <div className="news-card" onClick={() => onViewChange('aistudio-editor', { createNew: true })} style={{ cursor: 'pointer' }}>
-              <div className="news-icon-wrapper">
-                <img src="/icon/wand-sparkles.svg" alt={t('rightSidebar.rewrite')} className="news-icon" />
-              </div>
-              <div className="news-content">
-                <h4>{t('home.smartRewriting')}</h4>
-                <p>{t('home.smartRewritingDesc')}</p>
-              </div>
-            </div>
-            <div className="news-card" onClick={() => onViewChange('history')} style={{ cursor: 'pointer' }}>
-              <div className="news-icon-wrapper">
-                <img src="/icon/chart-line.svg" alt={t('home.statisticalAnalysis')} className="news-icon" />
-              </div>
-              <div className="news-content">
-                <h4>{t('home.statisticalAnalysis')}</h4>
-                <p>{t('home.statisticalAnalysisDesc')}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="profile-section">
+        {/* Profile Section */}
+        <div className={cn(
+          "min-h-52 mb-12",
+          "w-[80%] mx-auto",
+          "max-lg:w-[90%] max-md:w-[95%] max-md:px-4"
+        )}>
           <ProfileCarousel 
             profiles={profiles}
             onSelectProfile={handleSelectProfile}

@@ -1,119 +1,84 @@
 /**
  * CreditBalance Component
- * Real-time credit display using SSE with localStorage caching
- * Shows cached value instantly, updates when new data arrives
+ * Uses TanStack Query with real-time updates via useCredits hook
  */
-import { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import apiClient from '../services/api/client';
-import realtimeService from '../services/realtimeService';
-import { useAuth } from '../contexts/AuthContext';
-import './CreditBalance.css';
-
-const CACHE_KEY = 'cached_credits';
-
-// Get cached credits from localStorage
-const getCachedCredits = (userId) => {
-  try {
-    const cached = localStorage.getItem(`${CACHE_KEY}_${userId}`);
-    return cached ? JSON.parse(cached) : null;
-  } catch {
-    return null;
-  }
-};
-
-// Save credits to localStorage
-const setCachedCredits = (userId, credits) => {
-  try {
-    localStorage.setItem(`${CACHE_KEY}_${userId}`, JSON.stringify(credits));
-  } catch {
-    // Ignore storage errors
-  }
-};
+import { useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useQueryClient } from '@tanstack/react-query'
+import { useCredits } from '@/hooks/queries'
+import { queryKeys } from '@/lib/queryKeys'
+import realtimeService from '@/services/realtimeService'
+import { useIsAuthenticated } from '@/stores/authStore'
+import { cn } from '@/lib/utils'
 
 const CreditBalance = ({ userId, onUpgradeClick }) => {
-  const { t } = useTranslation();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
-  // Initialize with cached value to avoid flicker
-  const [credits, setCredits] = useState(() => getCachedCredits(userId));
-  const [loading, setLoading] = useState(!getCachedCredits(userId));
+  const { t } = useTranslation()
+  const isAuthenticated = useIsAuthenticated()
+  const queryClient = useQueryClient()
 
-  // Update credits and cache
-  const updateCredits = useCallback((newCredits) => {
-    setCredits(newCredits);
-    setLoading(false);
-    if (userId && newCredits) {
-      setCachedCredits(userId, newCredits);
-    }
-  }, [userId]);
+  // Use centralized credits hook with real-time updates
+  const { data: credits, isLoading } = useCredits({
+    enabled: !!userId && isAuthenticated,
+  })
 
-  // Fetch from API with auth
-  const fetchCredits = useCallback(async () => {
-    try {
-      const { data } = await apiClient.get(`/api/credits/balance?user_id=${userId}`);
-      if (data.success) {
-        updateCredits(data.credits);
-      }
-    } catch (error) {
-      console.error('Error fetching credits:', error);
-      setLoading(false);
-    }
-  }, [userId, updateCredits]);
+  // Update credits in cache
+  const updateCreditsCache = useCallback((newCredits) => {
+    queryClient.setQueryData(queryKeys.user.credits(), newCredits)
+  }, [queryClient])
 
+  // Additional real-time updates for payment success
   useEffect(() => {
-    // Don't fetch if not authenticated or no userId
-    if (authLoading || !isAuthenticated || !userId) {
-      return;
-    }
-
-    // Fetch fresh data (will update cache)
-    fetchCredits();
+    if (!userId || !isAuthenticated) return
 
     // Connect to realtime service
-    realtimeService.connect(userId);
+    realtimeService.connect(userId)
 
-    // Subscribe to credits updates for real-time changes
-    const unsubCredits = realtimeService.subscribe('credits', (data) => {
-      // Handle both formats: {credits: {...}} or direct {balance, used, purchased}
-      const creditsData = data.credits || data;
-      updateCredits(creditsData);
-    });
-
-    // Subscribe to connection status
-    const unsubStatus = realtimeService.onStatusChange(() => {});
-
-    // Listen for payment success (legacy support)
+    // Listen for payment success
     const handlePaymentSuccess = (e) => {
       if (e.detail?.credits) {
-        updateCredits(e.detail.credits);
+        updateCreditsCache(e.detail.credits)
       }
-    };
-    window.addEventListener('payment-success', handlePaymentSuccess);
+    }
+    window.addEventListener('payment-success', handlePaymentSuccess)
 
     return () => {
-      unsubCredits();
-      unsubStatus();
-      window.removeEventListener('payment-success', handlePaymentSuccess);
-    };
-  }, [userId, fetchCredits, updateCredits, isAuthenticated, authLoading]);
+      window.removeEventListener('payment-success', handlePaymentSuccess)
+    }
+  }, [userId, isAuthenticated, updateCreditsCache])
 
-  const balance = credits?.balance != null ? credits.balance.toFixed(2) : '0';
-  const used = credits?.used != null ? credits.used.toFixed(2) : '0';
-  const isLowCredit = parseFloat(balance) < 10;
-  const isOutOfCredit = parseFloat(balance) <= 0;
+  const balance = credits?.balance != null ? credits.balance.toFixed(2) : '0'
+  const used = credits?.used != null ? credits.used.toFixed(2) : '0'
+  const isLowCredit = parseFloat(balance) < 10
+  const isOutOfCredit = parseFloat(balance) <= 0
 
   return (
-    <div className="credit-balance-simple">
-      <div className="credit-display">
-        <span className={`credit-text ${isLowCredit ? 'low-credit' : ''} ${isOutOfCredit ? 'out-of-credit' : ''}`}>
-          {balance} {t('credits.credits')} / {used} {t('credits.used')}
-        </span>
+    <div className="px-5 pb-3.5 text-center">
+      <div className="mb-3 py-1.5 px-3.5 inline-block">
+        {isLoading ? (
+          <span className="text-sm text-text-secondary animate-pulse">Loading...</span>
+        ) : (
+          <span className={cn(
+            "text-sm tracking-wide text-text-secondary",
+            isLowCredit && !isOutOfCredit && "text-warning font-medium",
+            isOutOfCredit && "text-error font-semibold"
+          )}>
+            {balance} {t('credits.credits')} / {used} {t('credits.used')}
+          </span>
+        )}
       </div>
-      <button className="upgrade-button-simple" onClick={onUpgradeClick}>
+      <button 
+        className={cn(
+          "w-full py-2.5 px-4 rounded-3xl text-xs font-medium cursor-pointer",
+          "transition-colors duration-200",
+          "bg-fill-tertiary border-none text-text-primary",
+          "hover:bg-fill-secondary"
+        )}
+        onClick={onUpgradeClick}
+      >
         {t('credits.upgradePlan')}
       </button>
     </div>
-  );
-};
+  )
+}
 
-export default CreditBalance;
+export default CreditBalance

@@ -1,21 +1,32 @@
 /**
- * OTP Service
- * Handles OTP generation, verification, and rate limiting for email authentication
+ * OTP Service - Powered by otplib
+ * RFC 4226 (HOTP) and RFC 6238 (TOTP) compliant OTP generation
  * 
  * Features:
  * - 6-digit OTP generation with 10-minute expiration
  * - Attempt tracking with lockout after 5 failed attempts
  * - Rate limiting for resend requests (3 per hour)
  * - Secure OTP storage with hashing
+ * 
+ * @module services/otp
  */
 
+const { authenticator, totp } = require('otplib');
 const crypto = require('crypto');
-const { db, FieldValue } = require('../config/firebase');
+const { db } = require('../config/firebase');
 const logger = require('../utils/logger');
+const { addTime, isDateBefore, getMinutesDiff } = require('../utils/date');
 
-// Constants
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
+
+// OTP Settings
 const OTP_LENGTH = 6;
 const OTP_EXPIRY_MINUTES = 10;
+const OTP_STEP = OTP_EXPIRY_MINUTES * 60; // Step in seconds for TOTP
+
+// Rate Limiting
 const MAX_VERIFICATION_ATTEMPTS = 5;
 const LOCKOUT_MINUTES = 30;
 const MAX_RESENDS_PER_HOUR = 3;
@@ -24,26 +35,74 @@ const RESEND_WINDOW_MINUTES = 60;
 // Collection name
 const OTP_COLLECTION = 'otp_codes';
 
+// ============================================================================
+// OTPLIB CONFIGURATION
+// ============================================================================
+
+// Configure authenticator for our use case
+authenticator.options = {
+  digits: OTP_LENGTH,
+  step: OTP_STEP,
+  window: 1 // Allow 1 step before/after for clock drift
+};
+
+// Configure TOTP
+totp.options = {
+  digits: OTP_LENGTH,
+  step: OTP_STEP,
+  window: 1
+};
+
+// ============================================================================
+// CORE OTP FUNCTIONS
+// ============================================================================
+
 /**
- * Generate a cryptographically secure 6-digit OTP
+ * Generate a cryptographically secure secret
+ * @returns {string} Base32 encoded secret
+ */
+function generateSecret() {
+  return authenticator.generateSecret(20); // 20 bytes = 160 bits
+}
+
+/**
+ * Generate OTP code using otplib
+ * @param {string} secret - Base32 encoded secret
  * @returns {string} 6-digit OTP code
  */
-function generateOTPCode() {
-  // Generate random number between 0 and 999999
+function generateOTPCode(secret) {
+  if (secret) {
+    return authenticator.generate(secret);
+  }
+  // Fallback: generate random 6-digit code
   const randomBytes = crypto.randomBytes(4);
   const randomNumber = randomBytes.readUInt32BE(0) % 1000000;
-  // Pad with leading zeros to ensure 6 digits
   return randomNumber.toString().padStart(OTP_LENGTH, '0');
 }
 
 /**
- * Hash OTP for secure storage
+ * Verify OTP code using otplib
+ * @param {string} token - OTP code to verify
+ * @param {string} secret - Base32 encoded secret
+ * @returns {boolean} True if valid
+ */
+function verifyOTPCode(token, secret) {
+  if (!secret) return false;
+  return authenticator.verify({ token, secret });
+}
+
+/**
+ * Hash OTP for secure storage (fallback for non-TOTP mode)
  * @param {string} otp - Plain OTP code
  * @returns {string} Hashed OTP
  */
 function hashOTP(otp) {
   return crypto.createHash('sha256').update(otp).digest('hex');
 }
+
+// ============================================================================
+// DATABASE OPERATIONS
+// ============================================================================
 
 /**
  * Generate and store OTP for email verification or password reset
@@ -60,16 +119,17 @@ async function generateOTP(email, type = 'verification') {
   // Check rate limit for resends
   const existingDoc = await db.collection(OTP_COLLECTION).doc(docId).get();
   
+  const now = new Date();
+  
   if (existingDoc.exists) {
     const data = existingDoc.data();
-    const now = new Date();
     const lastResendAt = data.lastResendAt?.toDate();
     
     // Check resend rate limit
     if (lastResendAt) {
-      const windowStart = new Date(now.getTime() - RESEND_WINDOW_MINUTES * 60 * 1000);
-      if (lastResendAt > windowStart && data.resendCount >= MAX_RESENDS_PER_HOUR) {
-        const waitMinutes = Math.ceil((lastResendAt.getTime() + RESEND_WINDOW_MINUTES * 60 * 1000 - now.getTime()) / 60000);
+      const windowStart = addTime(now, -RESEND_WINDOW_MINUTES, 'minutes');
+      if (isDateBefore(windowStart, lastResendAt) && data.resendCount >= MAX_RESENDS_PER_HOUR) {
+        const waitMinutes = Math.ceil(getMinutesDiff(addTime(lastResendAt, RESEND_WINDOW_MINUTES, 'minutes'), now));
         throw new Error(`RATE_LIMITED: Please wait ${waitMinutes} minutes before requesting another code`);
       }
     }
@@ -77,34 +137,35 @@ async function generateOTP(email, type = 'verification') {
     // Check if locked out
     if (data.lockedUntil) {
       const lockedUntil = data.lockedUntil.toDate();
-      if (lockedUntil > now) {
-        const waitMinutes = Math.ceil((lockedUntil.getTime() - now.getTime()) / 60000);
+      if (isDateBefore(now, lockedUntil)) {
+        const waitMinutes = Math.ceil(getMinutesDiff(lockedUntil, now));
         throw new Error(`LOCKED: Too many failed attempts. Please wait ${waitMinutes} minutes`);
       }
     }
   }
   
-  // Generate new OTP
-  const code = generateOTPCode();
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + OTP_EXPIRY_MINUTES * 60 * 1000);
+  // Generate new secret and OTP using otplib
+  const secret = generateSecret();
+  const code = generateOTPCode(secret);
+  const expiresAt = addTime(now, OTP_EXPIRY_MINUTES, 'minutes');
   
   // Calculate resend count
   let resendCount = 1;
   if (existingDoc.exists) {
     const data = existingDoc.data();
     const lastResendAt = data.lastResendAt?.toDate();
-    const windowStart = new Date(now.getTime() - RESEND_WINDOW_MINUTES * 60 * 1000);
+    const windowStart = addTime(now, -RESEND_WINDOW_MINUTES, 'minutes');
     
-    if (lastResendAt && lastResendAt > windowStart) {
+    if (lastResendAt && isDateBefore(windowStart, lastResendAt)) {
       resendCount = (data.resendCount || 0) + 1;
     }
   }
   
-  // Store hashed OTP
+  // Store OTP data (hash the code for security)
   const otpData = {
     email: normalizedEmail,
-    codeHash: hashOTP(code),
+    secret, // Store secret for TOTP verification
+    codeHash: hashOTP(code), // Also store hash for fallback
     type,
     expiresAt,
     attempts: 0,
@@ -152,8 +213,8 @@ async function verifyOTP(email, code, type = 'verification') {
   // Check if locked out
   if (data.lockedUntil) {
     const lockedUntil = data.lockedUntil.toDate();
-    if (lockedUntil > now) {
-      const waitMinutes = Math.ceil((lockedUntil.getTime() - now.getTime()) / 60000);
+    if (isDateBefore(now, lockedUntil)) {
+      const waitMinutes = Math.ceil(getMinutesDiff(lockedUntil, now));
       return { 
         success: false, 
         error: `Too many failed attempts. Please wait ${waitMinutes} minutes.`,
@@ -162,7 +223,7 @@ async function verifyOTP(email, code, type = 'verification') {
     }
   }
   
-  // Check if already verified (allow retry for account creation)
+  // Check if already verified
   if (data.verified) {
     logger.info('OTP already verified, allowing retry', { email: normalizedEmail, type });
     return { success: true, docId, alreadyVerified: true };
@@ -170,13 +231,24 @@ async function verifyOTP(email, code, type = 'verification') {
   
   // Check expiration
   const expiresAt = data.expiresAt.toDate();
-  if (expiresAt < now) {
+  if (isDateBefore(expiresAt, now)) {
     return { success: false, error: 'Verification code has expired. Please request a new one.', expired: true };
   }
   
-  // Verify code
-  const codeHash = hashOTP(code);
-  if (codeHash !== data.codeHash) {
+  // Verify code - try otplib first, then hash fallback
+  let isValid = false;
+  
+  if (data.secret) {
+    // Use otplib TOTP verification
+    isValid = verifyOTPCode(code, data.secret);
+  }
+  
+  // Fallback to hash comparison
+  if (!isValid && data.codeHash) {
+    isValid = hashOTP(code) === data.codeHash;
+  }
+  
+  if (!isValid) {
     // Increment failed attempts
     const newAttempts = (data.attempts || 0) + 1;
     const updateData = {
@@ -186,7 +258,7 @@ async function verifyOTP(email, code, type = 'verification') {
     
     // Lock if too many attempts
     if (newAttempts >= MAX_VERIFICATION_ATTEMPTS) {
-      updateData.lockedUntil = new Date(now.getTime() + LOCKOUT_MINUTES * 60 * 1000);
+      updateData.lockedUntil = addTime(now, LOCKOUT_MINUTES, 'minutes');
       await docRef.update(updateData);
       
       logger.warn('OTP verification locked', { email: normalizedEmail, type, attempts: newAttempts });
@@ -208,8 +280,7 @@ async function verifyOTP(email, code, type = 'verification') {
     };
   }
   
-  // Success - mark as verified but DON'T delete yet
-  // The caller should call invalidateOTP after successful account creation
+  // Success - mark as verified
   await docRef.update({
     verified: true,
     verifiedAt: now,
@@ -222,7 +293,7 @@ async function verifyOTP(email, code, type = 'verification') {
 }
 
 /**
- * Invalidate existing OTP (used when generating new one)
+ * Invalidate existing OTP
  * @param {string} email - User email
  * @param {string} type - 'verification' or 'password_reset'
  */
@@ -234,7 +305,6 @@ async function invalidateOTP(email, type = 'verification') {
     await db.collection(OTP_COLLECTION).doc(docId).delete();
     logger.info('OTP invalidated', { email: normalizedEmail, type });
   } catch (error) {
-    // Ignore if doesn't exist
     logger.debug('OTP invalidation - no existing record', { email: normalizedEmail, type });
   }
 }
@@ -261,8 +331,8 @@ async function checkRateLimit(email, type = 'verification') {
   // Check lockout
   if (data.lockedUntil) {
     const lockedUntil = data.lockedUntil.toDate();
-    if (lockedUntil > now) {
-      const waitMinutes = Math.ceil((lockedUntil.getTime() - now.getTime()) / 60000);
+    if (isDateBefore(now, lockedUntil)) {
+      const waitMinutes = Math.ceil(getMinutesDiff(lockedUntil, now));
       return { allowed: false, waitMinutes, reason: 'locked' };
     }
   }
@@ -270,10 +340,10 @@ async function checkRateLimit(email, type = 'verification') {
   // Check resend rate limit
   const lastResendAt = data.lastResendAt?.toDate();
   if (lastResendAt) {
-    const windowStart = new Date(now.getTime() - RESEND_WINDOW_MINUTES * 60 * 1000);
+    const windowStart = addTime(now, -RESEND_WINDOW_MINUTES, 'minutes');
     
-    if (lastResendAt > windowStart && data.resendCount >= MAX_RESENDS_PER_HOUR) {
-      const waitMinutes = Math.ceil((windowStart.getTime() + RESEND_WINDOW_MINUTES * 60 * 1000 - now.getTime()) / 60000);
+    if (isDateBefore(windowStart, lastResendAt) && data.resendCount >= MAX_RESENDS_PER_HOUR) {
+      const waitMinutes = Math.ceil(getMinutesDiff(addTime(windowStart, RESEND_WINDOW_MINUTES, 'minutes'), now));
       return { 
         allowed: false, 
         waitMinutes, 
@@ -284,7 +354,7 @@ async function checkRateLimit(email, type = 'verification') {
     
     return { 
       allowed: true, 
-      resendCount: lastResendAt > windowStart ? data.resendCount : 0 
+      resendCount: isDateBefore(windowStart, lastResendAt) ? data.resendCount : 0 
     };
   }
   
@@ -309,18 +379,24 @@ async function getOTPStatus(email, type = 'verification') {
   
   const data = doc.data();
   const now = new Date();
+  const expiresAtDate = data.expiresAt.toDate();
+  const lockedUntilDate = data.lockedUntil?.toDate() || null;
   
   return {
     email: data.email,
     type: data.type,
-    expiresAt: data.expiresAt.toDate(),
-    isExpired: data.expiresAt.toDate() < now,
+    expiresAt: expiresAtDate,
+    isExpired: isDateBefore(expiresAtDate, now),
     attempts: data.attempts,
     resendCount: data.resendCount,
-    isLocked: data.lockedUntil ? data.lockedUntil.toDate() > now : false,
-    lockedUntil: data.lockedUntil?.toDate() || null
+    isLocked: lockedUntilDate ? isDateBefore(now, lockedUntilDate) : false,
+    lockedUntil: lockedUntilDate
   };
 }
+
+// ============================================================================
+// EXPORTS
+// ============================================================================
 
 // Export constants for testing
 const OTP_CONSTANTS = {
@@ -333,13 +409,19 @@ const OTP_CONSTANTS = {
 };
 
 module.exports = {
+  // Main functions
   generateOTP,
   verifyOTP,
   invalidateOTP,
   checkRateLimit,
   getOTPStatus,
-  // Export for testing
+  
+  // Low-level functions (for testing/advanced use)
+  generateSecret,
   generateOTPCode,
+  verifyOTPCode,
   hashOTP,
+  
+  // Constants
   OTP_CONSTANTS
 };

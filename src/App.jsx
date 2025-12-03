@@ -1,24 +1,33 @@
 import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useSearchParams } from 'react-router-dom'
-import { AuthProvider, useAuth } from './contexts/AuthContext'
-import { ThemeProvider } from './contexts/ThemeContext'
-import { NotesProvider } from './contexts/NotesContext'
-import { AIProcessingProvider } from './contexts/AIProcessingContext'
-import { ProfileProvider } from './contexts/ProfileContext'
-import { WorkspaceProvider } from './contexts/WorkspaceContext'
-import { RewriteProvider } from './contexts/RewriteContext'
-import { PaymentProvider } from './contexts/PaymentContext'
+import { AppProviders } from './providers/AppProviders'
+import { useAuth } from './contexts/AuthContext'
+import { useAuthStore } from './stores/authStore'
+import { useThemeStore } from './stores/themeStore'
 import LoginOverlay from './components/Auth/LoginOverlay'
 import MainLayout from './components/Layout/MainLayout'
 import ProfileSetupWrapper from './components/ProfileSetup/ProfileSetupWrapper'
 import SharedContentView from './components/Views/SharedContentView'
 import ErrorBoundary from './components/Common/ErrorBoundary'
+import ContextMenu from './components/Common/ContextMenu'
+import ToastContainer from './components/Common/ToastContainer'
+import SessionExpiredModal from './components/Auth/SessionExpiredModal'
 import modal from './utils/modal'
 import { initTooltips } from './utils/tooltips'
 import { initStorageCleanup } from './utils/storageCleanup'
+import { migrateToSecureStorage } from './utils/authStorage'
 
 function App() {
+  // Initialize theme from Zustand store
+  const initTheme = useThemeStore((state) => state.initTheme)
+
   useEffect(() => {
+    // Initialize theme
+    initTheme()
+    
+    // Migrate to secure storage (one-time migration)
+    migrateToSecureStorage()
+    
     // Clean corrupted localStorage data first
     initStorageCleanup()
     
@@ -43,28 +52,19 @@ function App() {
     
     // Run cleanup after a short delay to ensure DOM is ready
     setTimeout(cleanupOverlays, 500)
-  }, [])
+  }, [initTheme])
 
+  // Using composed providers for cleaner code
+  // Provider order is managed in AppProviders
   return (
     <ErrorBoundary>
       <Router>
-        <ThemeProvider>
-          <AuthProvider>
-            <PaymentProvider>
-              <NotesProvider>
-                <AIProcessingProvider>
-                  <ProfileProvider>
-                    <WorkspaceProvider>
-                      <RewriteProvider>
-                        <AppContent />
-                      </RewriteProvider>
-                    </WorkspaceProvider>
-                  </ProfileProvider>
-                </AIProcessingProvider>
-              </NotesProvider>
-            </PaymentProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <AppProviders>
+          <AppContent />
+          <ContextMenu />
+          <ToastContainer />
+          <SessionExpiredModal />
+        </AppProviders>
       </Router>
     </ErrorBoundary>
   )
@@ -72,7 +72,8 @@ function App() {
 
 // Separate component to access auth context
 function AppContent() {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isLoading } = useAuth()
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated) // Use Zustand store
   const [searchParams] = useSearchParams()
   const shareId = searchParams.get('share')
 

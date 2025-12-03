@@ -1,8 +1,20 @@
-// Handle when clicking on extension icon
-chrome.action.onClicked.addListener((tab) => {
-  chrome.tabs.create({
-    url: chrome.runtime.getURL('index.html')
-  });
+// Handle when clicking on extension icon - ensure only one window is open
+chrome.action.onClicked.addListener(async (tab) => {
+  const extensionUrl = chrome.runtime.getURL('index.html');
+  
+  // Find existing extension tab
+  const tabs = await chrome.tabs.query({});
+  const existingTab = tabs.find(t => t.url && t.url.startsWith(extensionUrl.split('?')[0]));
+  
+  if (existingTab) {
+    // Focus existing tab instead of creating new one
+    await chrome.tabs.update(existingTab.id, { active: true });
+    // Also focus the window containing the tab
+    await chrome.windows.update(existingTab.windowId, { focused: true });
+  } else {
+    // Create new tab only if no existing tab found
+    chrome.tabs.create({ url: extensionUrl });
+  }
 });
 
 // Handle when extension is installed or updated

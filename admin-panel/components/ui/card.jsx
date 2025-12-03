@@ -10,7 +10,8 @@ function Card({ className, children, ...props }) {
   return (
     <div
       className={cn(
-        'bg-surface rounded-xl border border-border shadow-sm',
+        'bg-surface rounded-2xl border border-border/40 shadow-sm',
+        'transition-shadow duration-[250ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]',
         className
       )}
       {...props}
@@ -26,7 +27,7 @@ function Card({ className, children, ...props }) {
 function CardHeader({ className, children, ...props }) {
   return (
     <div
-      className={cn('p-6 pb-4', className)}
+      className={cn('px-6 pt-6 pb-4', className)}
       {...props}
     >
       {children}
@@ -40,7 +41,7 @@ function CardHeader({ className, children, ...props }) {
 function CardTitle({ className, children, ...props }) {
   return (
     <h3
-      className={cn('text-lg font-semibold text-primary', className)}
+      className={cn('text-[17px] font-semibold text-primary tracking-[-0.015em]', className)}
       {...props}
     >
       {children}
@@ -54,7 +55,7 @@ function CardTitle({ className, children, ...props }) {
 function CardDescription({ className, children, ...props }) {
   return (
     <p
-      className={cn('text-sm text-muted mt-1', className)}
+      className={cn('text-[13px] text-muted mt-1.5 tracking-[-0.008em]', className)}
       {...props}
     >
       {children}
@@ -82,7 +83,7 @@ function CardContent({ className, children, ...props }) {
 function CardFooter({ className, children, ...props }) {
   return (
     <div
-      className={cn('p-6 pt-4 border-t border-border flex items-center gap-3', className)}
+      className={cn('px-6 py-5 border-t border-border/40 flex items-center gap-3', className)}
       {...props}
     >
       {children}

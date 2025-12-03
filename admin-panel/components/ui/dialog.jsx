@@ -16,9 +16,10 @@ const DialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'fixed inset-0 z-50 bg-black/50 backdrop-blur-sm',
+      'fixed inset-0 z-50 bg-black/40 backdrop-blur-[8px]',
       'data-[state=open]:animate-in data-[state=closed]:animate-out',
       'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      'duration-200',
       className
     )}
     {...props}
@@ -33,21 +34,21 @@ const DialogContent = React.forwardRef(({ className, children, ...props }, ref) 
       ref={ref}
       className={cn(
         'fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%]',
-        'bg-surface border border-border rounded-xl shadow-xl p-6',
+        'bg-surface/95 backdrop-blur-xl border border-border/30 rounded-2xl shadow-modal p-7',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-        'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+        'data-[state=closed]:zoom-out-[0.97] data-[state=open]:zoom-in-[0.97]',
         'data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]',
         'data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
-        'duration-200',
+        'duration-[250ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]',
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-muted hover:text-primary hover:bg-surface-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M12 4L4 12M4 4l8 8" />
+      <DialogPrimitive.Close className="absolute right-5 top-5 rounded-full p-1.5 text-muted hover:text-primary hover:bg-surface-secondary/80 transition-all duration-200 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-info/25">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d="M11 3L3 11M3 3l8 8" />
         </svg>
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
@@ -76,7 +77,7 @@ DialogFooter.displayName = 'DialogFooter'
 const DialogTitle = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-lg font-semibold text-primary', className)}
+    className={cn('text-[20px] font-semibold text-primary tracking-[-0.018em]', className)}
     {...props}
   />
 ))
@@ -85,7 +86,7 @@ DialogTitle.displayName = DialogPrimitive.Title.displayName
 const DialogDescription = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-muted', className)}
+    className={cn('text-[15px] text-muted leading-relaxed', className)}
     {...props}
   />
 ))
@@ -128,7 +129,7 @@ function ConfirmDialog({
             type="button"
             onClick={handleCancel}
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-primary bg-surface-secondary hover:bg-border rounded-lg transition-colors disabled:opacity-50"
+            className="px-5 py-2.5 text-[15px] font-medium text-primary bg-surface-secondary hover:bg-border/50 rounded-xl transition-all duration-200 disabled:opacity-50 active:scale-[0.97]"
           >
             {cancelText}
           </button>
@@ -137,7 +138,7 @@ function ConfirmDialog({
             onClick={handleConfirm}
             disabled={loading}
             className={cn(
-              'px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50',
+              'px-5 py-2.5 text-[15px] font-medium rounded-xl transition-all duration-200 disabled:opacity-50 active:scale-[0.97]',
               variant === 'destructive'
                 ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
                 : 'bg-primary text-primary-foreground hover:bg-primary-hover'

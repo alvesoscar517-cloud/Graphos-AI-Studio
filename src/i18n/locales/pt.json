@@ -89,7 +89,7 @@
     "checking": "Verificando...",
     "pleaseWait": "Por favor, aguarde um momento",
     "signInToContinue": "Faça login para continuar",
-    "signInSubtitle": "Por favor, faça login com sua conta Google para usar o AI Content Authenticator",
+    "signInSubtitle": "Por favor, faça login com sua conta Google para usar o Graphos AI Studio",
     "signInFailed": "Falha no login. Por favor, tente novamente.",
     "loginFailed": "Login falhou",
     "termsAgreement": "Ao entrar, você concorda com nossos",
@@ -118,7 +118,7 @@
     "sidebar": "Barra Lateral"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "Excluir",
     "confirmDeleteNote": "Tem certeza que deseja excluir a nota \"{{title}}\"?",
     "confirmDelete": "Confirmar Exclusão",
@@ -129,7 +129,7 @@
     "rewrite": "Reescrever"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "Ferramenta profissional para análise e refinamento de estilo de conteúdo",
     "newProfile": "Novo perfil",
     "createStyleProfile": "Criar Perfil de Estilo",
@@ -149,7 +149,7 @@
     "unableToLoadProfileDetails": "Não foi possível carregar os detalhes do perfil",
     "yourProfiles": "Seus Perfis de Estilo de Escrita",
     "welcomeTo": "Bem-vindo ao",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "Criar primeiro perfil",
     "createUniqueStyle": "Crie seu perfil de estilo de escrita único",
     "analyzeRefine": "Analise e refine o conteúdo de forma inteligente",
@@ -459,7 +459,7 @@
   },
   "model": {
     "selectAIModel": "Selecionar Modelo de IA",
-    "inUse": "[EM USO]",
+    "inUse": "EM USO",
     "geminiFlashExp": "Modelo experimental mais recente, processamento rápido com suporte para múltiplos tipos de conteúdo como texto e imagens",
     "geminiFlashLite": "Modelo compacto, mais econômico, adequado para tarefas simples e processamento de alto volume",
     "geminiFlash": "Modelo equilibrado entre velocidade e qualidade, boa capacidade de raciocínio, adequado para a maioria das tarefas",

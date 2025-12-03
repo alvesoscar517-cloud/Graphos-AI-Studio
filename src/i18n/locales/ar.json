@@ -89,7 +89,7 @@
     "checking": "جاري التحقق...",
     "pleaseWait": "يرجى الانتظار لحظة",
     "signInToContinue": "سجل الدخول للمتابعة",
-    "signInSubtitle": "يرجى تسجيل الدخول بحساب Google لاستخدام AI Content Authenticator",
+    "signInSubtitle": "يرجى تسجيل الدخول بحساب Google لاستخدام Graphos AI Studio",
     "signInFailed": "فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.",
     "loginFailed": "فشل الدخول",
     "termsAgreement": "بتسجيل الدخول، أنت توافق على",
@@ -118,7 +118,7 @@
     "sidebar": "القائمة الجانبية"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "حذف",
     "confirmDeleteNote": "هل أنت متأكد من حذف الملاحظة \"{{title}}\"؟",
     "confirmDelete": "تأكيد الحذف",
@@ -129,7 +129,7 @@
     "rewrite": "إعادة الصياغة"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "أداة احترافية لتحليل وتحسين أسلوب المحتوى",
     "newProfile": "ملف تعريف جديد",
     "createStyleProfile": "إنشاء ملف نمط الكتابة",
@@ -149,7 +149,7 @@
     "unableToLoadProfileDetails": "تعذر تحميل تفاصيل الملف",
     "yourProfiles": "ملفات أسلوب الكتابة الخاصة بك",
     "welcomeTo": "مرحباً بك في",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "أنشئ ملفك الأول",
     "createUniqueStyle": "أنشئ ملف تعريف فريد لأسلوب كتابتك",
     "analyzeRefine": "حلل وحسّن المحتوى بذكاء",
@@ -459,7 +459,7 @@
   },
   "model": {
     "selectAIModel": "اختر نموذج الذكاء الاصطناعي",
-    "inUse": "[قيد الاستخدام]",
+    "inUse": "قيد الاستخدام",
     "geminiFlashExp": "أحدث نموذج تجريبي، معالجة سريعة مع دعم لأنواع محتوى متعددة مثل النصوص والصور",
     "geminiFlashLite": "نموذج مدمج، الأكثر توفيراً للتكلفة، مناسب للمهام البسيطة والمعالجة بكميات كبيرة",
     "geminiFlash": "نموذج متوازن بين السرعة والجودة، قدرة استنتاج جيدة، مناسب لمعظم المهام",

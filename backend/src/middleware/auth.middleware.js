@@ -116,7 +116,10 @@ async function verifyEmailAuthToken(token) {
  * 2. Firebase ID token in query param (for SSE/EventSource which doesn't support headers)
  * 3. Email auth token (direct_ prefix or custom token)
  * 4. API key in X-API-Key header (for service-to-service)
- * 5. Legacy user_id in body/query (deprecated, will be removed)
+ * 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  */
 async function authenticate(req, res, next) {
   try {
@@ -153,22 +156,8 @@ async function authenticate(req, res, next) {
     const apiKey = req.headers['x-api-key'];
     if (apiKey && config.API_KEYS && config.API_KEYS.includes(apiKey)) {
       req.user = { userId: 'service', isService: true };
-      req.userId = req.body.user_id || req.query.user_id || 'service';
+      req.userId = 'service';
       req.authMethod = 'api_key';
-      return next();
-    }
-    
-    // 4. Legacy: user_id in body/query (deprecated)
-    // This is for backward compatibility during migration
-    const legacyUserId = req.body.user_id || req.query.user_id;
-    if (legacyUserId && config.IS_DEVELOPMENT) {
-      logger.warn('Using deprecated user_id authentication', { 
-        userId: legacyUserId,
-        path: req.path 
-      });
-      req.user = { userId: legacyUserId, isLegacy: true };
-      req.userId = legacyUserId;
-      req.authMethod = 'legacy';
       return next();
     }
     
@@ -193,6 +182,10 @@ async function authenticate(req, res, next) {
 /**
  * Optional authentication - doesn't fail if no auth provided
  * Useful for public endpoints that behave differently for authenticated users
+ * 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  */
 async function optionalAuth(req, res, next) {
   try {
@@ -200,20 +193,22 @@ async function optionalAuth(req, res, next) {
     const idToken = extractBearerToken(authHeader);
     
     if (idToken) {
+      // Try Firebase token first
       const user = await verifyFirebaseToken(idToken);
       if (user) {
         req.user = user;
         req.userId = user.userId;
         req.authMethod = 'firebase';
+        return next();
       }
-    }
-    
-    // Also check legacy user_id
-    if (!req.userId) {
-      const legacyUserId = req.body.user_id || req.query.user_id;
-      if (legacyUserId) {
-        req.userId = legacyUserId;
-        req.authMethod = 'legacy';
+      
+      // Try email auth token
+      const emailUser = await verifyEmailAuthToken(idToken);
+      if (emailUser) {
+        req.user = emailUser;
+        req.userId = emailUser.userId;
+        req.authMethod = 'email';
+        return next();
       }
     }
     

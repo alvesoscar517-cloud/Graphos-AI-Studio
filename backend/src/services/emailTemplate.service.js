@@ -15,9 +15,9 @@ const translations = {
   en: {
     hi: 'Hi',
     bestRegards: 'Best regards',
-    supportTeam: 'AI Content Authenticator Support Team',
+    supportTeam: 'Graphos AI Studio Support Team',
     allRightsReserved: 'All rights reserved',
-    automatedMessage: 'This is an automated message from AI Content Authenticator',
+    automatedMessage: 'This is an automated message from Graphos AI Studio',
     supportReply: {
       title: "We've Responded to Your {type}",
       typeFeedback: 'Feedback',
@@ -38,7 +38,7 @@ const translations = {
       priority: 'Priority',
       category: 'Category',
       viewInAdmin: 'View in Admin Panel',
-      footerText: 'This is an automated notification from AI Content Authenticator Support System',
+      footerText: 'This is an automated notification from Graphos AI Studio Support System',
       preheader: 'New ticket from {userName}'
     },
     backup: {
@@ -49,13 +49,13 @@ const translations = {
       docs: 'docs',
       download: 'Download Backup',
       publicUrlNote: 'Public URL - This link never expires. Save it to your personal Google Drive for safekeeping.',
-      footerText: 'AI Content Authenticator - Automated Backup System',
+      footerText: 'Graphos AI Studio - Automated Backup System',
       preheader: 'Backup completed: {fileName}'
     },
     otpVerification: {
       title: 'Verify Your Email',
       subtitle: 'Enter this code to complete your registration',
-      greeting: 'Welcome to AI Content Authenticator!',
+      greeting: 'Welcome to Graphos AI Studio!',
       instruction: 'Use the verification code below to complete your registration:',
       codeLabel: 'Your Verification Code',
       expiryNote: 'This code will expire in {minutes} minutes',
@@ -107,9 +107,9 @@ const translations = {
   vi: {
     hi: 'Xin chào',
     bestRegards: 'Trân trọng',
-    supportTeam: 'Đội ngũ hỗ trợ AI Content Authenticator',
+    supportTeam: 'Đội ngũ hỗ trợ Graphos AI Studio',
     allRightsReserved: 'Đã đăng ký bản quyền',
-    automatedMessage: 'Đây là tin nhắn tự động từ AI Content Authenticator',
+    automatedMessage: 'Đây là tin nhắn tự động từ Graphos AI Studio',
     supportReply: {
       title: 'Chúng tôi đã phản hồi {type} của bạn',
       typeFeedback: 'Góp ý',
@@ -130,7 +130,7 @@ const translations = {
       priority: 'Độ ưu tiên',
       category: 'Danh mục',
       viewInAdmin: 'Xem trong Admin Panel',
-      footerText: 'Đây là thông báo tự động từ hệ thống hỗ trợ AI Content Authenticator',
+      footerText: 'Đây là thông báo tự động từ hệ thống hỗ trợ Graphos AI Studio',
       preheader: 'Ticket mới từ {userName}'
     },
     backup: {
@@ -141,13 +141,13 @@ const translations = {
       docs: 'tài liệu',
       download: 'Tải xuống bản sao lưu',
       publicUrlNote: 'URL công khai - Liên kết này không bao giờ hết hạn. Lưu vào Google Drive cá nhân để bảo quản.',
-      footerText: 'AI Content Authenticator - Hệ thống sao lưu tự động',
+      footerText: 'Graphos AI Studio - Hệ thống sao lưu tự động',
       preheader: 'Sao lưu hoàn tất: {fileName}'
     },
     otpVerification: {
       title: 'Xác thực Email của bạn',
       subtitle: 'Nhập mã này để hoàn tất đăng ký',
-      greeting: 'Chào mừng đến với AI Content Authenticator!',
+      greeting: 'Chào mừng đến với Graphos AI Studio!',
       instruction: 'Sử dụng mã xác thực bên dưới để hoàn tất đăng ký:',
       codeLabel: 'Mã xác thực của bạn',
       expiryNote: 'Mã này sẽ hết hạn sau {minutes} phút',
@@ -199,9 +199,9 @@ const translations = {
   zh: {
     hi: '您好',
     bestRegards: '此致敬礼',
-    supportTeam: 'AI Content Authenticator 支持团队',
+    supportTeam: 'Graphos AI Studio 支持团队',
     allRightsReserved: '版权所有',
-    automatedMessage: '这是来自 AI Content Authenticator 的自动消息',
+    automatedMessage: '这是来自 Graphos AI Studio 的自动消息',
     supportReply: {
       title: '我们已回复您的{type}',
       typeFeedback: '反馈',
@@ -222,7 +222,7 @@ const translations = {
       priority: '优先级',
       category: '类别',
       viewInAdmin: '在管理面板中查看',
-      footerText: '这是来自 AI Content Authenticator 支持系统的自动通知',
+      footerText: '这是来自 Graphos AI Studio 支持系统的自动通知',
       preheader: '来自 {userName} 的新工单'
     },
     backup: {
@@ -233,7 +233,7 @@ const translations = {
       docs: '文档',
       download: '下载备份',
       publicUrlNote: '公共URL - 此链接永不过期。请保存到您的个人Google Drive以妥善保管。',
-      footerText: 'AI Content Authenticator - 自动备份系统',
+      footerText: 'Graphos AI Studio - 自动备份系统',
       preheader: '备份完成: {fileName}'
     }
   },
@@ -241,9 +241,9 @@ const translations = {
   ja: {
     hi: 'こんにちは',
     bestRegards: 'よろしくお願いいたします',
-    supportTeam: 'AI Content Authenticator サポートチーム',
+    supportTeam: 'Graphos AI Studio サポートチーム',
     allRightsReserved: '無断複写・転載を禁じます',
-    automatedMessage: 'これは AI Content Authenticator からの自動メッセージです',
+    automatedMessage: 'これは Graphos AI Studio からの自動メッセージです',
     supportReply: {
       title: '{type}に回答しました',
       typeFeedback: 'フィードバック',
@@ -264,7 +264,7 @@ const translations = {
       priority: '優先度',
       category: 'カテゴリ',
       viewInAdmin: '管理パネルで表示',
-      footerText: 'AI Content Authenticator サポートシステムからの自動通知です',
+      footerText: 'Graphos AI Studio サポートシステムからの自動通知です',
       preheader: '{userName} からの新しいチケット'
     },
     backup: {
@@ -275,7 +275,7 @@ const translations = {
       docs: 'ドキュメント',
       download: 'バックアップをダウンロード',
       publicUrlNote: '公開URL - このリンクは期限切れになりません。個人のGoogle Driveに保存してください。',
-      footerText: 'AI Content Authenticator - 自動バックアップシステム',
+      footerText: 'Graphos AI Studio - 自動バックアップシステム',
       preheader: 'バックアップ完了: {fileName}'
     }
   },
@@ -283,9 +283,9 @@ const translations = {
   ko: {
     hi: '안녕하세요',
     bestRegards: '감사합니다',
-    supportTeam: 'AI Content Authenticator 지원팀',
+    supportTeam: 'Graphos AI Studio 지원팀',
     allRightsReserved: '모든 권리 보유',
-    automatedMessage: 'AI Content Authenticator의 자동 메시지입니다',
+    automatedMessage: 'Graphos AI Studio의 자동 메시지입니다',
     supportReply: {
       title: '{type}에 답변했습니다',
       typeFeedback: '피드백',
@@ -306,7 +306,7 @@ const translations = {
       priority: '우선순위',
       category: '카테고리',
       viewInAdmin: '관리자 패널에서 보기',
-      footerText: 'AI Content Authenticator 지원 시스템의 자동 알림입니다',
+      footerText: 'Graphos AI Studio 지원 시스템의 자동 알림입니다',
       preheader: '{userName}의 새 티켓'
     },
     backup: {
@@ -317,7 +317,7 @@ const translations = {
       docs: '문서',
       download: '백업 다운로드',
       publicUrlNote: '공개 URL - 이 링크는 만료되지 않습니다. 개인 Google Drive에 저장하세요.',
-      footerText: 'AI Content Authenticator - 자동 백업 시스템',
+      footerText: 'Graphos AI Studio - 자동 백업 시스템',
       preheader: '백업 완료: {fileName}'
     }
   },
@@ -325,9 +325,9 @@ const translations = {
   fr: {
     hi: 'Bonjour',
     bestRegards: 'Cordialement',
-    supportTeam: "Équipe de support AI Content Authenticator",
+    supportTeam: "Équipe de support Graphos AI Studio",
     allRightsReserved: 'Tous droits réservés',
-    automatedMessage: "Ceci est un message automatique d'AI Content Authenticator",
+    automatedMessage: "Ceci est un message automatique d'Graphos AI Studio",
     supportReply: {
       title: 'Nous avons répondu à votre {type}',
       typeFeedback: 'commentaire',
@@ -348,7 +348,7 @@ const translations = {
       priority: 'Priorité',
       category: 'Catégorie',
       viewInAdmin: "Voir dans le panneau d'administration",
-      footerText: "Notification automatique du système de support AI Content Authenticator",
+      footerText: "Notification automatique du système de support Graphos AI Studio",
       preheader: 'Nouveau ticket de {userName}'
     },
     backup: {
@@ -359,7 +359,7 @@ const translations = {
       docs: 'documents',
       download: 'Télécharger la sauvegarde',
       publicUrlNote: "URL publique - Ce lien n'expire jamais. Enregistrez-le dans votre Google Drive personnel.",
-      footerText: 'AI Content Authenticator - Système de sauvegarde automatique',
+      footerText: 'Graphos AI Studio - Système de sauvegarde automatique',
       preheader: 'Sauvegarde terminée: {fileName}'
     }
   },
@@ -367,9 +367,9 @@ const translations = {
   de: {
     hi: 'Hallo',
     bestRegards: 'Mit freundlichen Grüßen',
-    supportTeam: 'AI Content Authenticator Support-Team',
+    supportTeam: 'Graphos AI Studio Support-Team',
     allRightsReserved: 'Alle Rechte vorbehalten',
-    automatedMessage: 'Dies ist eine automatische Nachricht von AI Content Authenticator',
+    automatedMessage: 'Dies ist eine automatische Nachricht von Graphos AI Studio',
     supportReply: {
       title: 'Wir haben auf Ihre {type} geantwortet',
       typeFeedback: 'Rückmeldung',
@@ -390,7 +390,7 @@ const translations = {
       priority: 'Priorität',
       category: 'Kategorie',
       viewInAdmin: 'Im Admin-Panel anzeigen',
-      footerText: 'Automatische Benachrichtigung vom AI Content Authenticator Support-System',
+      footerText: 'Automatische Benachrichtigung vom Graphos AI Studio Support-System',
       preheader: 'Neues Ticket von {userName}'
     },
     backup: {
@@ -401,7 +401,7 @@ const translations = {
       docs: 'Dokumente',
       download: 'Backup herunterladen',
       publicUrlNote: 'Öffentliche URL - Dieser Link läuft nie ab. Speichern Sie ihn in Ihrem persönlichen Google Drive.',
-      footerText: 'AI Content Authenticator - Automatisches Backup-System',
+      footerText: 'Graphos AI Studio - Automatisches Backup-System',
       preheader: 'Backup abgeschlossen: {fileName}'
     }
   },
@@ -409,9 +409,9 @@ const translations = {
   es: {
     hi: 'Hola',
     bestRegards: 'Saludos cordiales',
-    supportTeam: 'Equipo de soporte de AI Content Authenticator',
+    supportTeam: 'Equipo de soporte de Graphos AI Studio',
     allRightsReserved: 'Todos los derechos reservados',
-    automatedMessage: 'Este es un mensaje automático de AI Content Authenticator',
+    automatedMessage: 'Este es un mensaje automático de Graphos AI Studio',
     supportReply: {
       title: 'Hemos respondido a su {type}',
       typeFeedback: 'comentario',
@@ -432,7 +432,7 @@ const translations = {
       priority: 'Prioridad',
       category: 'Categoría',
       viewInAdmin: 'Ver en el panel de administración',
-      footerText: 'Notificación automática del sistema de soporte de AI Content Authenticator',
+      footerText: 'Notificación automática del sistema de soporte de Graphos AI Studio',
       preheader: 'Nuevo ticket de {userName}'
     },
     backup: {
@@ -443,7 +443,7 @@ const translations = {
       docs: 'documentos',
       download: 'Descargar copia de seguridad',
       publicUrlNote: 'URL pública - Este enlace nunca caduca. Guárdelo en su Google Drive personal.',
-      footerText: 'AI Content Authenticator - Sistema de copia de seguridad automática',
+      footerText: 'Graphos AI Studio - Sistema de copia de seguridad automática',
       preheader: 'Copia de seguridad completada: {fileName}'
     }
   },
@@ -451,9 +451,9 @@ const translations = {
   pt: {
     hi: 'Olá',
     bestRegards: 'Atenciosamente',
-    supportTeam: 'Equipe de suporte AI Content Authenticator',
+    supportTeam: 'Equipe de suporte Graphos AI Studio',
     allRightsReserved: 'Todos os direitos reservados',
-    automatedMessage: 'Esta é uma mensagem automática do AI Content Authenticator',
+    automatedMessage: 'Esta é uma mensagem automática do Graphos AI Studio',
     supportReply: {
       title: 'Respondemos ao seu {type}',
       typeFeedback: 'feedback',
@@ -474,7 +474,7 @@ const translations = {
       priority: 'Prioridade',
       category: 'Categoria',
       viewInAdmin: 'Ver no painel de administração',
-      footerText: 'Notificação automática do sistema de suporte AI Content Authenticator',
+      footerText: 'Notificação automática do sistema de suporte Graphos AI Studio',
       preheader: 'Novo ticket de {userName}'
     },
     backup: {
@@ -485,7 +485,7 @@ const translations = {
       docs: 'documentos',
       download: 'Baixar backup',
       publicUrlNote: 'URL pública - Este link nunca expira. Salve-o no seu Google Drive pessoal.',
-      footerText: 'AI Content Authenticator - Sistema de backup automático',
+      footerText: 'Graphos AI Studio - Sistema de backup automático',
       preheader: 'Backup concluído: {fileName}'
     }
   },
@@ -493,9 +493,9 @@ const translations = {
   it: {
     hi: 'Ciao',
     bestRegards: 'Cordiali saluti',
-    supportTeam: 'Team di supporto AI Content Authenticator',
+    supportTeam: 'Team di supporto Graphos AI Studio',
     allRightsReserved: 'Tutti i diritti riservati',
-    automatedMessage: 'Questo è un messaggio automatico da AI Content Authenticator',
+    automatedMessage: 'Questo è un messaggio automatico da Graphos AI Studio',
     supportReply: {
       title: 'Abbiamo risposto al tuo {type}',
       typeFeedback: 'feedback',
@@ -516,7 +516,7 @@ const translations = {
       priority: 'Priorità',
       category: 'Categoria',
       viewInAdmin: 'Visualizza nel pannello di amministrazione',
-      footerText: 'Notifica automatica dal sistema di supporto AI Content Authenticator',
+      footerText: 'Notifica automatica dal sistema di supporto Graphos AI Studio',
       preheader: 'Nuovo ticket da {userName}'
     },
     backup: {
@@ -527,7 +527,7 @@ const translations = {
       docs: 'documenti',
       download: 'Scarica backup',
       publicUrlNote: 'URL pubblico - Questo link non scade mai. Salvalo nel tuo Google Drive personale.',
-      footerText: 'AI Content Authenticator - Sistema di backup automatico',
+      footerText: 'Graphos AI Studio - Sistema di backup automatico',
       preheader: 'Backup completato: {fileName}'
     }
   },
@@ -535,9 +535,9 @@ const translations = {
   ru: {
     hi: 'Здравствуйте',
     bestRegards: 'С уважением',
-    supportTeam: 'Команда поддержки AI Content Authenticator',
+    supportTeam: 'Команда поддержки Graphos AI Studio',
     allRightsReserved: 'Все права защищены',
-    automatedMessage: 'Это автоматическое сообщение от AI Content Authenticator',
+    automatedMessage: 'Это автоматическое сообщение от Graphos AI Studio',
     supportReply: {
       title: 'Мы ответили на ваш {type}',
       typeFeedback: 'отзыв',
@@ -558,7 +558,7 @@ const translations = {
       priority: 'Приоритет',
       category: 'Категория',
       viewInAdmin: 'Просмотреть в панели администратора',
-      footerText: 'Автоматическое уведомление от системы поддержки AI Content Authenticator',
+      footerText: 'Автоматическое уведомление от системы поддержки Graphos AI Studio',
       preheader: 'Новый тикет от {userName}'
     },
     backup: {
@@ -569,7 +569,7 @@ const translations = {
       docs: 'документов',
       download: 'Скачать резервную копию',
       publicUrlNote: 'Публичная ссылка - Эта ссылка никогда не истекает. Сохраните её в личном Google Drive.',
-      footerText: 'AI Content Authenticator - Автоматическая система резервного копирования',
+      footerText: 'Graphos AI Studio - Автоматическая система резервного копирования',
       preheader: 'Резервное копирование завершено: {fileName}'
     }
   },
@@ -577,9 +577,9 @@ const translations = {
   ar: {
     hi: 'مرحباً',
     bestRegards: 'مع أطيب التحيات',
-    supportTeam: 'فريق دعم AI Content Authenticator',
+    supportTeam: 'فريق دعم Graphos AI Studio',
     allRightsReserved: 'جميع الحقوق محفوظة',
-    automatedMessage: 'هذه رسالة تلقائية من AI Content Authenticator',
+    automatedMessage: 'هذه رسالة تلقائية من Graphos AI Studio',
     supportReply: {
       title: 'لقد قمنا بالرد على {type} الخاص بك',
       typeFeedback: 'ملاحظاتك',
@@ -600,7 +600,7 @@ const translations = {
       priority: 'الأولوية',
       category: 'الفئة',
       viewInAdmin: 'عرض في لوحة الإدارة',
-      footerText: 'إشعار تلقائي من نظام دعم AI Content Authenticator',
+      footerText: 'إشعار تلقائي من نظام دعم Graphos AI Studio',
       preheader: 'تذكرة جديدة من {userName}'
     },
     backup: {
@@ -611,7 +611,7 @@ const translations = {
       docs: 'مستندات',
       download: 'تحميل النسخة الاحتياطية',
       publicUrlNote: 'رابط عام - هذا الرابط لا ينتهي أبداً. احفظه في Google Drive الشخصي.',
-      footerText: 'AI Content Authenticator - نظام النسخ الاحتياطي التلقائي',
+      footerText: 'Graphos AI Studio - نظام النسخ الاحتياطي التلقائي',
       preheader: 'اكتمل النسخ الاحتياطي: {fileName}'
     }
   },
@@ -619,9 +619,9 @@ const translations = {
   th: {
     hi: 'สวัสดี',
     bestRegards: 'ขอแสดงความนับถือ',
-    supportTeam: 'ทีมสนับสนุน AI Content Authenticator',
+    supportTeam: 'ทีมสนับสนุน Graphos AI Studio',
     allRightsReserved: 'สงวนลิขสิทธิ์',
-    automatedMessage: 'นี่คือข้อความอัตโนมัติจาก AI Content Authenticator',
+    automatedMessage: 'นี่คือข้อความอัตโนมัติจาก Graphos AI Studio',
     supportReply: {
       title: 'เราได้ตอบกลับ{type}ของคุณแล้ว',
       typeFeedback: 'ความคิดเห็น',
@@ -642,7 +642,7 @@ const translations = {
       priority: 'ความสำคัญ',
       category: 'หมวดหมู่',
       viewInAdmin: 'ดูในแผงผู้ดูแลระบบ',
-      footerText: 'การแจ้งเตือนอัตโนมัติจากระบบสนับสนุน AI Content Authenticator',
+      footerText: 'การแจ้งเตือนอัตโนมัติจากระบบสนับสนุน Graphos AI Studio',
       preheader: 'ตั๋วใหม่จาก {userName}'
     },
     backup: {
@@ -653,7 +653,7 @@ const translations = {
       docs: 'เอกสาร',
       download: 'ดาวน์โหลดข้อมูลสำรอง',
       publicUrlNote: 'URL สาธารณะ - ลิงก์นี้ไม่มีวันหมดอายุ บันทึกไว้ใน Google Drive ส่วนตัวของคุณ',
-      footerText: 'AI Content Authenticator - ระบบสำรองข้อมูลอัตโนมัติ',
+      footerText: 'Graphos AI Studio - ระบบสำรองข้อมูลอัตโนมัติ',
       preheader: 'สำรองข้อมูลเสร็จสิ้น: {fileName}'
     }
   },
@@ -661,9 +661,9 @@ const translations = {
   id: {
     hi: 'Halo',
     bestRegards: 'Salam hormat',
-    supportTeam: 'Tim Dukungan AI Content Authenticator',
+    supportTeam: 'Tim Dukungan Graphos AI Studio',
     allRightsReserved: 'Hak cipta dilindungi',
-    automatedMessage: 'Ini adalah pesan otomatis dari AI Content Authenticator',
+    automatedMessage: 'Ini adalah pesan otomatis dari Graphos AI Studio',
     supportReply: {
       title: 'Kami telah menanggapi {type} Anda',
       typeFeedback: 'umpan balik',
@@ -684,7 +684,7 @@ const translations = {
       priority: 'Prioritas',
       category: 'Kategori',
       viewInAdmin: 'Lihat di Panel Admin',
-      footerText: 'Notifikasi otomatis dari sistem dukungan AI Content Authenticator',
+      footerText: 'Notifikasi otomatis dari sistem dukungan Graphos AI Studio',
       preheader: 'Tiket baru dari {userName}'
     },
     backup: {
@@ -695,7 +695,7 @@ const translations = {
       docs: 'dokumen',
       download: 'Unduh cadangan',
       publicUrlNote: 'URL publik - Tautan ini tidak pernah kedaluwarsa. Simpan di Google Drive pribadi Anda.',
-      footerText: 'AI Content Authenticator - Sistem pencadangan otomatis',
+      footerText: 'Graphos AI Studio - Sistem pencadangan otomatis',
       preheader: 'Pencadangan selesai: {fileName}'
     }
   },
@@ -703,9 +703,9 @@ const translations = {
   ms: {
     hi: 'Hai',
     bestRegards: 'Yang benar',
-    supportTeam: 'Pasukan Sokongan AI Content Authenticator',
+    supportTeam: 'Pasukan Sokongan Graphos AI Studio',
     allRightsReserved: 'Hak cipta terpelihara',
-    automatedMessage: 'Ini adalah mesej automatik daripada AI Content Authenticator',
+    automatedMessage: 'Ini adalah mesej automatik daripada Graphos AI Studio',
     supportReply: {
       title: 'Kami telah membalas {type} anda',
       typeFeedback: 'maklum balas',
@@ -726,7 +726,7 @@ const translations = {
       priority: 'Keutamaan',
       category: 'Kategori',
       viewInAdmin: 'Lihat dalam Panel Admin',
-      footerText: 'Pemberitahuan automatik daripada sistem sokongan AI Content Authenticator',
+      footerText: 'Pemberitahuan automatik daripada sistem sokongan Graphos AI Studio',
       preheader: 'Tiket baharu daripada {userName}'
     },
     backup: {
@@ -737,7 +737,7 @@ const translations = {
       docs: 'dokumen',
       download: 'Muat turun sandaran',
       publicUrlNote: 'URL awam - Pautan ini tidak pernah tamat tempoh. Simpan dalam Google Drive peribadi anda.',
-      footerText: 'AI Content Authenticator - Sistem sandaran automatik',
+      footerText: 'Graphos AI Studio - Sistem sandaran automatik',
       preheader: 'Sandaran selesai: {fileName}'
     }
   }
@@ -803,7 +803,7 @@ function getIcon(name, color = 'black', size = 24) {
 }
 
 function getAppLogo(size = 40) {
-  if (ICON_BASE_URL) return `<img src="${ICON_BASE_URL}/icons/content.png" alt="AI Content Authenticator" width="${size}" height="${size}" style="display:block;border-radius:8px;"/>`;
+  if (ICON_BASE_URL) return `<img src="${ICON_BASE_URL}/icons/content.png" alt="Graphos AI Studio" width="${size}" height="${size}" style="display:block;border-radius:8px;"/>`;
   return `<div style="width:${size}px;height:${size}px;background:#1a1a1a;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;font-size:${Math.floor(size/2.5)}px;">A</div>`;
 }
 
@@ -835,7 +835,7 @@ function baseTemplate({ title, preheader, content, footerText, lang = DEFAULT_LA
                 <tr>
                   <td align="center">
                     <p style="margin:0 0 8px;color:#666666;font-size:13px;line-height:1.5;">${footerText || t('automatedMessage', lang)}</p>
-                    <p style="margin:0;color:#999999;font-size:12px;">© ${year} AI Content Authenticator. ${t('allRightsReserved', lang)}.</p>
+                    <p style="margin:0;color:#999999;font-size:12px;">© ${year} Graphos AI Studio. ${t('allRightsReserved', lang)}.</p>
                   </td>
                 </tr>
               </table>

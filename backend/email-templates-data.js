@@ -31,7 +31,7 @@ function getIcon(name, color = 'black', size = 24) {
 }
 
 function getAppLogo(size = 40) {
-  return `<img src="${ICON_BASE}/content.png" alt="AI Content Authenticator" width="${size}" height="${size}" style="display:block;border-radius:8px;"/>`;
+  return `<img src="${ICON_BASE}/content.png" alt="Graphos AI Studio" width="${size}" height="${size}" style="display:block;border-radius:8px;"/>`;
 }
 
 
@@ -102,7 +102,7 @@ If you continue to experience problems, please let us know and we'll be happy to
               </table>
               <div style="margin-top:30px;">
                 <p style="margin:0 0 4px;color:#1a1a1a;font-size:15px;font-weight:600;">Best regards,</p>
-                <p style="margin:0;color:#666666;font-size:15px;">AI Content Authenticator Support Team</p>
+                <p style="margin:0;color:#666666;font-size:15px;">Graphos AI Studio Support Team</p>
               </div>
             </td>
           </tr>
@@ -111,7 +111,7 @@ If you continue to experience problems, please let us know and we'll be happy to
             <td style="padding:32px 40px;background-color:#fafafa;border-top:1px solid #e5e5e5;text-align:center;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr><td align="center" style="padding-bottom:16px;">${getAppLogo(32)}</td></tr>
-                <tr><td align="center"><p style="margin:0 0 8px;color:#666666;font-size:13px;line-height:1.5;">This email was sent in response to your support ticket</p><p style="margin:0;color:#999999;font-size:12px;">© 2025 AI Content Authenticator. All rights reserved.</p></td></tr>
+                <tr><td align="center"><p style="margin:0 0 8px;color:#666666;font-size:13px;line-height:1.5;">This email was sent in response to your support ticket</p><p style="margin:0;color:#999999;font-size:12px;">© 2025 Graphos AI Studio. All rights reserved.</p></td></tr>
               </table>
             </td>
           </tr>
@@ -227,7 +227,7 @@ Jane</p>
             <td style="padding:32px 40px;background-color:#fafafa;border-top:1px solid #e5e5e5;text-align:center;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr><td align="center" style="padding-bottom:16px;">${getAppLogo(32)}</td></tr>
-                <tr><td align="center"><p style="margin:0 0 8px;color:#666666;font-size:13px;line-height:1.5;">This is an automated notification from AI Content Authenticator Support System</p><p style="margin:0;color:#999999;font-size:12px;">© 2025 AI Content Authenticator. All rights reserved.</p></td></tr>
+                <tr><td align="center"><p style="margin:0 0 8px;color:#666666;font-size:13px;line-height:1.5;">This is an automated notification from Graphos AI Studio Support System</p><p style="margin:0;color:#999999;font-size:12px;">© 2025 Graphos AI Studio. All rights reserved.</p></td></tr>
               </table>
             </td>
           </tr>
@@ -286,7 +286,7 @@ const backupTemplate = `<!DOCTYPE html>
               <div style="background-color:#fafafa;border-radius:8px;padding:20px;margin-bottom:24px;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                   <tr><td style="padding-bottom:8px;"><span style="color:#666666;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;"><span style="vertical-align:middle;margin-right:8px;">${getIcon('database', 'black', 16)}</span>Bucket</span></td></tr>
-                  <tr><td><p style="margin:0;color:#333333;font-size:15px;line-height:1.6;"><code style="font-family:'Courier New',monospace;font-size:13px;background:#e5e5e5;padding:2px 6px;border-radius:8px;">AI Content Authenticator-firestore-backups</code></p></td></tr>
+                  <tr><td><p style="margin:0;color:#333333;font-size:15px;line-height:1.6;"><code style="font-family:'Courier New',monospace;font-size:13px;background:#e5e5e5;padding:2px 6px;border-radius:8px;">Graphos AI Studio-firestore-backups</code></p></td></tr>
                 </table>
               </div>
               <!-- Statistics -->
@@ -321,7 +321,7 @@ const backupTemplate = `<!DOCTYPE html>
             <td style="padding:32px 40px;background-color:#fafafa;border-top:1px solid #e5e5e5;text-align:center;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr><td align="center" style="padding-bottom:16px;">${getAppLogo(32)}</td></tr>
-                <tr><td align="center"><p style="margin:0 0 8px;color:#666666;font-size:13px;line-height:1.5;">AI Content Authenticator - Automated Backup System</p><p style="margin:0;color:#999999;font-size:12px;">© 2025 AI Content Authenticator. All rights reserved.</p></td></tr>
+                <tr><td align="center"><p style="margin:0 0 8px;color:#666666;font-size:13px;line-height:1.5;">Graphos AI Studio - Automated Backup System</p><p style="margin:0;color:#999999;font-size:12px;">© 2025 Graphos AI Studio. All rights reserved.</p></td></tr>
               </table>
             </td>
           </tr>

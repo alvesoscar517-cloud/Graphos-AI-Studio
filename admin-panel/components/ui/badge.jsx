@@ -2,10 +2,10 @@ import { cn } from '@/lib/utils'
 
 const badgeVariants = {
   default: 'bg-surface-secondary text-secondary',
-  success: 'bg-success/10 text-success',
-  warning: 'bg-warning/10 text-warning',
-  error: 'bg-destructive/10 text-destructive',
-  info: 'bg-info/10 text-info',
+  success: 'bg-success/12 text-success',
+  warning: 'bg-warning/12 text-warning',
+  error: 'bg-destructive/12 text-destructive',
+  info: 'bg-info/12 text-info',
   primary: 'bg-primary text-primary-foreground',
 }
 
@@ -20,7 +20,7 @@ function Badge({ variant = 'default', className, children, ...props }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center px-3 py-1 rounded-pill text-xs font-medium',
+        'inline-flex items-center px-3 py-1.5 rounded-full text-[12px] font-semibold tracking-[-0.01em]',
         badgeVariants[variant],
         className
       )}

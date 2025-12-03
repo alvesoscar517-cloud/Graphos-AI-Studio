@@ -1,19 +1,15 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useRewrite } from '../../contexts/RewriteContext'
+import { useRewrite } from '@/stores'
 import { useTextStats } from '../../hooks/useTextStats'
 import { MODEL_LIMITS } from '../../utils/tokenUtils'
-import './TokenBadge.css'
+import { cn } from '../../lib/utils'
+import Icon from './Icon'
 
-// Warning threshold
-const WARNING_CHARS = 30000   // ~7500 tokens
-const DANGER_CHARS = 80000    // ~20000 tokens
+const WARNING_CHARS = 30000
+const DANGER_CHARS = 80000
 
-/**
- * TokenBadge - Display token count with detailed popup
- * Auto get model words from RewriteContext
- */
 const TokenBadge = ({ text, task = 'rewrite' }) => {
   const { t } = useTranslation()
   const { selectedModel } = useRewrite()
@@ -30,7 +26,6 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
   const { stats, credits } = useTextStats(text, { model, task })
   const limits = MODEL_LIMITS[model] || MODEL_LIMITS['gemini-2.5-flash']
 
-  // Calculate estimated output tokens
   const estimatedOutput = useMemo(() => {
     if (task === 'analyze') return Math.min(stats.tokens * 0.3, 2000)
     if (task === 'detect') return 500
@@ -39,14 +34,12 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
 
   const totalTokens = stats.tokens + estimatedOutput
 
-  // Determine warning level
   const warningLevel = useMemo(() => {
     if (stats.chars >= DANGER_CHARS) return 'danger'
     if (stats.chars >= WARNING_CHARS) return 'warning'
     return 'normal'
   }, [stats.chars])
 
-  // Estimated processing time (seconds)
   const estimatedTime = useMemo(() => {
     return Math.max(2, Math.ceil(stats.tokens / 500))
   }, [stats.tokens])
@@ -54,7 +47,6 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
   const formatNumber = (num) => num.toLocaleString('en-US')
   const formatCredits = (val) => val < 0.1 ? '< 0.1' : val.toFixed(1)
 
-  // Handlers cho main popup
   const handleBadgeEnter = () => {
     if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current)
     if (badgeRef.current) {
@@ -68,7 +60,6 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
     hideTimeoutRef.current = setTimeout(() => setShowPopup(false), 150)
   }
 
-  // Handlers cho warning popup
   const handleWarningEnter = () => {
     if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current)
     if (warningRef.current) {
@@ -96,77 +87,97 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
       {/* Main Badge */}
       <div 
         ref={badgeRef}
-        className="token-badge"
+        className={cn(
+          "inline-flex items-center py-1 px-2.5 text-xs font-medium",
+          "text-text-muted bg-bg-secondary rounded-xl",
+          "cursor-default transition-colors duration-150 select-none",
+          "hover:bg-bg-tertiary"
+        )}
         onMouseEnter={handleBadgeEnter}
         onMouseLeave={handleBadgeLeave}
       >
-        <span className="token-count">{formatNumber(stats.tokens)} {t('tokens.tokens')}</span>
+        <span className="tabular-nums">{formatNumber(stats.tokens)} {t('tokens.tokens')}</span>
       </div>
 
-      {/* Warning Icon - only show when text long */}
+      {/* Warning Icon */}
       {warningLevel !== 'normal' && (
         <div
           ref={warningRef}
-          className={`token-warning-icon ${warningLevel}`}
+          className={cn(
+            "inline-flex items-center justify-center w-6 h-6 ml-1",
+            "cursor-default rounded-md transition-colors duration-150",
+            "hover:bg-bg-tertiary"
+          )}
           onMouseEnter={handleWarningEnter}
           onMouseLeave={handleWarningLeave}
         >
-          <img src="/icon/alert-triangle.svg" alt="warning" />
+          <Icon 
+            name="alert-triangle" 
+            alt="warning" 
+            size="sm"
+            color={warningLevel === 'danger' ? 'error' : 'warning'}
+            themed={false}
+          />
         </div>
       )}
 
-      {/* Main Popup - Token details */}
+      {/* Main Popup */}
       {showPopup && createPortal(
         <div 
-          className="token-popup"
+          className="fixed z-modal -translate-x-1/2 animate-fade-in-fast"
           style={{ top: popupPosition.top, left: popupPosition.left }}
           onMouseEnter={handleBadgeEnter}
           onMouseLeave={handleBadgeLeave}
         >
-          <div className="token-popup-content">
-            <div className="token-popup-section">
-              <span className="token-popup-label">{t('tokens.tokenUsage')}</span>
-              <span className="token-popup-value primary">
+          <div className={cn(
+            "bg-bg-primary border border-border-light rounded-lg",
+            "py-2 px-2.5 min-w-[170px] shadow-lg"
+          )} style={{ fontSize: '11px' }}>
+            <div className="flex justify-between items-center mb-1">
+              <span className="font-semibold text-text-muted uppercase tracking-wide" style={{ fontSize: '10px' }}>
+                {t('tokens.tokenUsage')}
+              </span>
+              <span className="font-medium text-primary tabular-nums">
                 {formatNumber(stats.tokens)} / {formatNumber(limits.maxInput)}
               </span>
             </div>
 
-            <div className="token-popup-divider" />
+            <div className="h-px bg-border-light my-1.5" />
 
-            <div className="token-popup-row">
+            <div className="flex justify-between text-text-secondary py-px">
               <span>{t('tokens.inputTokens')}</span>
-              <span>{formatNumber(stats.tokens)}</span>
+              <span className="tabular-nums text-text-primary">{formatNumber(stats.tokens)}</span>
             </div>
-            <div className="token-popup-row">
+            <div className="flex justify-between text-text-secondary py-px">
               <span>{t('tokens.outputTokens')}</span>
-              <span>~{formatNumber(estimatedOutput)}</span>
+              <span className="tabular-nums text-text-primary">~{formatNumber(estimatedOutput)}</span>
             </div>
-            <div className="token-popup-row highlight">
+            <div className="flex justify-between font-medium py-px">
               <span>{t('tokens.totalTokens')}</span>
-              <span>{formatNumber(totalTokens)}</span>
+              <span className="tabular-nums text-primary">{formatNumber(totalTokens)}</span>
             </div>
 
-            <div className="token-popup-divider" />
+            <div className="h-px bg-border-light my-1.5" />
 
-            <div className="token-popup-section">
-              <span className="token-popup-label">{t('credits.credits').toUpperCase()}</span>
+            <div className="font-semibold text-text-muted uppercase tracking-wide mb-0.5" style={{ fontSize: '10px' }}>
+              {t('credits.credits').toUpperCase()}
             </div>
-            <div className="token-popup-row">
+            <div className="flex justify-between text-text-secondary py-px">
               <span>{t('tokens.inputTokens')}</span>
-              <span>{formatNumber(credits.inputTokens || 0)}</span>
+              <span className="tabular-nums text-text-primary">{formatNumber(credits.inputTokens || 0)}</span>
             </div>
-            <div className="token-popup-row">
+            <div className="flex justify-between text-text-secondary py-px">
               <span>{t('tokens.outputTokens')}</span>
-              <span>~{formatNumber(credits.outputTokens || 0)}</span>
+              <span className="tabular-nums text-text-primary">~{formatNumber(credits.outputTokens || 0)}</span>
             </div>
-            <div className="token-popup-row highlight">
+            <div className="flex justify-between font-medium py-px">
               <span>{t('tokens.total')}</span>
-              <span>{credits.display || formatCredits(credits.totalCredits || 0)} {t('credits.credits')}</span>
+              <span className="tabular-nums text-primary">{credits.display || formatCredits(credits.totalCredits || 0)} {t('credits.credits')}</span>
             </div>
 
-            <div className="token-popup-divider" />
+            <div className="h-px bg-border-light my-1.5" />
 
-            <div className="token-popup-footer">
+            <div className="flex items-center gap-1 text-text-muted flex-wrap" style={{ fontSize: '10px' }}>
               <span>{formatNumber(stats.chars)} {t('tokens.characters')}</span>
               <span>•</span>
               <span>{formatNumber(stats.words)} {t('common.words')}</span>
@@ -178,7 +189,7 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
               )}
             </div>
 
-            <div className="token-popup-model">
+            <div className="mt-1 text-text-muted text-right" style={{ fontSize: '10px' }}>
               {t('tokens.model')}: {limits.name}
             </div>
           </div>
@@ -186,42 +197,42 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
         document.body
       )}
 
-      {/* Warning Popup - Warning text dài */}
+      {/* Warning Popup */}
       {showWarningPopup && warningLevel !== 'normal' && createPortal(
         <div 
-          className="token-popup warning-popup"
+          className="fixed z-modal -translate-x-1/2 animate-fade-in-fast"
           style={{ top: warningPosition.top, left: warningPosition.left }}
           onMouseEnter={handleWarningEnter}
           onMouseLeave={handleWarningLeave}
         >
-          <div className="token-popup-content">
-            <div className="warning-popup-header">
-              <img src="/icon/alert-triangle.svg" alt={t('common.warning')} />
+          <div className="bg-bg-primary border border-warning rounded-lg py-2 px-2.5 min-w-[170px] shadow-lg" style={{ fontSize: '11px' }}>
+            <div className="flex items-center gap-1.5 font-medium text-text-primary" style={{ fontSize: '12px' }}>
+              <Icon name="alert-triangle" alt={t('common.warning')} size="sm" color="warning" themed={false} />
               <span>{warningLevel === 'danger' ? t('tokens.textVeryLong') : t('tokens.textQuiteLong')}</span>
             </div>
 
-            <div className="token-popup-divider" />
+            <div className="h-px bg-border-light my-1.5" />
 
-            <div className="token-popup-row">
+            <div className="flex justify-between text-text-secondary py-px">
               <span>{t('tokens.length')}</span>
-              <span>{formatNumber(stats.words)} {t('common.words')} (~{stats.pages} {t('tokens.pages')})</span>
+              <span className="text-text-primary">{formatNumber(stats.words)} {t('common.words')} (~{stats.pages} {t('tokens.pages')})</span>
             </div>
-            <div className="token-popup-row">
+            <div className="flex justify-between text-text-secondary py-px">
               <span>{t('tokens.tokens')}</span>
-              <span>~{formatNumber(totalTokens)}</span>
+              <span className="text-text-primary">~{formatNumber(totalTokens)}</span>
             </div>
-            <div className="token-popup-row">
+            <div className="flex justify-between text-text-secondary py-px">
               <span>{t('tokens.processingTime')}</span>
-              <span>~{estimatedTime}s</span>
+              <span className="text-text-primary">~{estimatedTime}s</span>
             </div>
-            <div className="token-popup-row highlight">
+            <div className="flex justify-between font-medium py-px">
               <span>{t('credits.credits')}</span>
-              <span>{credits.display || formatCredits(credits.totalCredits || 0)}</span>
+              <span className="text-primary">{credits.display || formatCredits(credits.totalCredits || 0)}</span>
             </div>
 
-            <div className="token-popup-divider" />
+            <div className="h-px bg-border-light my-1.5" />
 
-            <div className="warning-popup-note">
+            <div className="text-text-secondary leading-relaxed" style={{ fontSize: '10px' }}>
               {warningLevel === 'danger' 
                 ? t('tokens.veryLongWarning')
                 : t('tokens.longWarning')}

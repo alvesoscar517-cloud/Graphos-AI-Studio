@@ -3,10 +3,7 @@
  * Text analysis, statistics, and similarity calculations
  */
 
-const natural = require('natural');
-const compromise = require('compromise');
-
-const tokenizer = new natural.WordTokenizer();
+const nlpUtils = require('../utils/nlp');
 
 // ============================================================================
 // INDUSTRY BENCHMARKS - Industry standards for comparison
@@ -103,10 +100,9 @@ const VIETNAMESE_TRANSITION_WORDS = [
 // ============================================================================
 
 function calculateStatistics(text) {
-  const lang = detectLanguage(text);
-  const doc = compromise(text);
-  const sentences = doc.sentences().out('array');
-  const words = tokenizer.tokenize(text.toLowerCase()) || [];
+  const lang = nlpUtils.detectLanguage(text);
+  const sentences = nlpUtils.splitIntoSentences(text);
+  const words = nlpUtils.tokenize(text.toLowerCase());
 
   const wordLengths = words.map(w => w.length);
   const avgWordLength = wordLengths.length > 0
@@ -114,7 +110,7 @@ function calculateStatistics(text) {
     : 0;
 
   const sentenceLengths = sentences.map(s => {
-    const sentenceWords = tokenizer.tokenize(s) || [];
+    const sentenceWords = nlpUtils.tokenize(s);
     return sentenceWords.length;
   });
   const avgSentenceLength = sentenceLengths.length > 0
@@ -138,7 +134,7 @@ function calculateStatistics(text) {
 
   // Sentence starter patterns
   const sentenceStarters = sentences.map(s => {
-    const sentenceWords = tokenizer.tokenize(s) || [];
+    const sentenceWords = nlpUtils.tokenize(s);
     return sentenceWords.slice(0, 2).join(' ').toLowerCase();
   }).filter(s => s.length > 0);
   
@@ -179,7 +175,7 @@ function calculateStatistics(text) {
   const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 0);
   const avgParagraphLength = paragraphs.length > 0
     ? paragraphs.reduce((sum, p) => {
-        const pWords = tokenizer.tokenize(p) || [];
+        const pWords = nlpUtils.tokenize(p);
         return sum + pWords.length;
       }, 0) / paragraphs.length
     : 0;
@@ -401,8 +397,7 @@ function generateSuggestion(metric, status, value, benchmark, lang) {
 }
 
 function splitIntoSentences(text) {
-  const doc = compromise(text);
-  return doc.sentences().out('array').filter(s => s.trim().length > 0);
+  return nlpUtils.splitIntoSentences(text).filter(s => s.trim().length > 0);
 }
 
 // ============================================================================
@@ -708,9 +703,9 @@ function calculateAnalysisConfidence(similarities, sampleCount) {
  */
 function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {}) {
   const issues = [];
-  const lang = detectLanguage(sentence);
+  const lang = nlpUtils.detectLanguage(sentence);
   
-  const words = tokenizer.tokenize(sentence) || [];
+  const words = nlpUtils.tokenize(sentence);
   const sentenceLength = words.length;
   const sentenceLower = sentence.toLowerCase();
 
@@ -846,7 +841,7 @@ function analyzeSentenceIssues(sentence, profileStats, voiceProfile, context = {
 
   // 5. COHERENCE ANALYSIS (with context)
   if (context.previousSentence) {
-    const prevWords = new Set(tokenizer.tokenize(context.previousSentence.toLowerCase()) || []);
+    const prevWords = new Set(nlpUtils.tokenize(context.previousSentence.toLowerCase()));
     const currentWords = new Set(words.map(w => w.toLowerCase()));
     
     // Check for topic continuity
@@ -982,33 +977,7 @@ function preprocessTextForDetection(text) {
 // LANGUAGE DETECTION & MULTI-LANGUAGE SUPPORT
 // ============================================================================
 
-/**
- * Detect language of text (simple heuristic-based)
- * @param {string} text - Text to analyze
- * @returns {string} - Language code ('en', 'vi', 'unknown')
- */
-function detectLanguage(text) {
-  const textLower = text.toLowerCase();
-  
-  // Vietnamese indicators
-  const vietnameseChars = /[a-z]/;
-  const vietnameseWords = ['of', 'and', 'is', 'in', 'have', 'be', 'for', 'this', 'with', 'not', 'some', 'one', 'all', 'to', 'person'];
-  
-  // Check for Vietnamese characters
-  if (vietnameseChars.test(textLower)) {
-    return 'vi';
-  }
-  
-  // Check for Vietnamese words
-  const words = textLower.split(/\s+/);
-  const vietnameseWordCount = words.filter(w => vietnameseWords.includes(w)).length;
-  if (vietnameseWordCount > words.length * 0.05) {
-    return 'vi';
-  }
-  
-  // Default to English
-  return 'en';
-}
+// detectLanguage is now provided by nlpUtils.detectLanguage
 
 /**
  * Get transition words for specific language
@@ -1041,7 +1010,7 @@ function getTransitionWords(lang) {
  * @returns {Object} - Statistics object with language info
  */
 function calculateStatisticsMultiLang(text, forceLang = null) {
-  const lang = forceLang || detectLanguage(text);
+  const lang = forceLang || nlpUtils.detectLanguage(text);
   const baseStats = calculateStatistics(text);
   
   // Recalculate transition words for detected language
@@ -1188,7 +1157,7 @@ module.exports = {
   analyzeSentenceIssues,
   calculateSuggestionConfidence,
   preprocessTextForDetection,
-  detectLanguage,
+  detectLanguage: nlpUtils.detectLanguage,
   getTransitionWords,
   // Caching
   getCachedSuggestions,

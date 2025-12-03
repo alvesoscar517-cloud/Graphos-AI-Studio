@@ -3,28 +3,35 @@ import { useTranslation } from 'react-i18next'
 import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import ghostIcon from '../../../icon for background/ghost-with-raised-arms.svg'
-import '../Common/ErrorBoundary.css'
+// ErrorBoundary styles in main.css
 
 // Use refactored version with better code organization
 const ProfileSetup = lazy(() => import('./ProfileSetupRefactored'))
 
-// Loading skeleton - reuse design from app's error screen
+// Loading skeleton - centered on screen
 const LoadingSkeleton = () => {
   const { t } = useTranslation()
   return (
-    <div className="error-screen">
-      <div className="error-content">
-        <div style={{ marginBottom: '24px' }}>
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      width: '100%',
+      backgroundColor: 'var(--color-bg-primary)'
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
           <Lottie 
             animationData={threeDotsAnimation} 
             loop={true}
             style={{ width: 120, height: 90 }}
           />
         </div>
-        <h1 className="error-title" style={{ fontSize: '24px', marginBottom: '8px' }}>
+        <h1 style={{ fontSize: '24px', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
           {t('loadingPage.loading')}
         </h1>
-        <p className="error-message" style={{ marginBottom: '0' }}>
+        <p style={{ marginBottom: '0', color: 'var(--color-text-muted)' }}>
           {t('loadingPage.pleaseWait')}
         </p>
       </div>

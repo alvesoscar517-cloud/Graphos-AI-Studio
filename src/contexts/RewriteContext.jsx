@@ -1,38 +1,37 @@
-import { createContext, useContext, useState } from 'react'
+/**
+ * Rewrite Context (Deprecated - Use Zustand store instead)
+ * 
+ * This context now uses Zustand store internally for better performance.
+ * New code should import directly from '@/stores/rewriteStore'
+ * 
+ * @deprecated Use useRewrite from '@/stores' instead
+ */
+
+import { createContext, useContext } from 'react'
+import { useRewriteStore } from '../stores/rewriteStore'
 
 const RewriteContext = createContext()
 
+/**
+ * @deprecated Use useRewrite from '@/stores' instead
+ */
 export const useRewrite = () => {
-  const context = useContext(RewriteContext)
-  if (!context) {
-    throw new Error('useRewrite must be used within RewriteProvider')
-  }
-  return context
+  // Use Zustand store directly for better performance
+  const selectedModel = useRewriteStore((state) => state.selectedModel)
+  const writingPreferences = useRewriteStore((state) => state.writingPreferences)
+  const setSelectedModel = useRewriteStore((state) => state.setSelectedModel)
+  const setWritingPreferences = useRewriteStore((state) => state.setWritingPreferences)
+
+  return { selectedModel, setSelectedModel, writingPreferences, setWritingPreferences }
 }
 
+/**
+ * @deprecated Provider kept for backward compatibility, but state is managed by Zustand
+ */
 export const RewriteProvider = ({ children }) => {
-  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash')
-  const [writingPreferences, setWritingPreferences] = useState({
-    // Original preferences
-    useVocabularyPreferences: true,
-    useKeyCharacteristics: true,
-    useSentencePatterns: true,
-    useRewriteInstructions: true,
-    // NEW: Humanization preferences
-    useAntiAIDetection: true,      // Apply anti-AI detection rules
-    useIterativeRefinement: false, // Use iterative refinement loop
-    targetAIProbability: 35        // Target AI probability for iterative refinement
-  })
-
-  const value = {
-    selectedModel,
-    setSelectedModel,
-    writingPreferences,
-    setWritingPreferences
-  }
-
+  // Provider is now a pass-through - state is managed by Zustand
   return (
-    <RewriteContext.Provider value={value}>
+    <RewriteContext.Provider value={null}>
       {children}
     </RewriteContext.Provider>
   )

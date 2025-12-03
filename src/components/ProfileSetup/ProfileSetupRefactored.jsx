@@ -2,9 +2,12 @@
  * ProfileSetup - Refactored Version
  * Main component for creating new voice profiles
  * Split into smaller components for better maintainability
+ * Migrated to Tailwind CSS v4
+ * NOTE: This feature only supports light mode
  */
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { cn } from '../../lib/utils'
 import { createProfileComplete } from '../../services/api'
 import { clearAllProfileDetailCaches } from '../../utils/profileDetailCache'
 import useProfileSetup, { getDraftTimeAgo } from './hooks/useProfileSetup'
@@ -12,11 +15,54 @@ import { Step1NameTheme, Step2LongText, Step3ShortSamples, Step4Processing } fro
 import PasteTextModal from './PasteTextModal'
 import UploadFileModal from './UploadFileModal'
 import ConfirmModal from './ConfirmModal'
-import '../../styles/ProfileSetup.css'
-import '../../styles/ThemeSelector.css'
+
+/**
+ * Custom hook to force light mode for ProfileSetup
+ * Temporarily removes dark mode when component mounts and restores it on unmount
+ * Also prevents theme changes while on this page
+ */
+const useForceLightMode = () => {
+  const wasDarkModeRef = useRef(false)
+  
+  useEffect(() => {
+    // Check if dark mode was active and store the state
+    wasDarkModeRef.current = document.documentElement.classList.contains('dark')
+    
+    // Force light mode by removing dark class
+    document.documentElement.classList.remove('dark')
+    
+    // Create a MutationObserver to prevent dark mode from being re-added
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark')
+          }
+        }
+      })
+    })
+    
+    // Start observing
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+    
+    // Cleanup: restore dark mode if it was previously active and disconnect observer
+    return () => {
+      observer.disconnect()
+      if (wasDarkModeRef.current) {
+        document.documentElement.classList.add('dark')
+      }
+    }
+  }, [])
+}
 
 const ProfileSetup = () => {
   const { t } = useTranslation()
+  
+  // Force light mode for this feature - dark mode is not supported
+  useForceLightMode()
   const {
     // State
     currentStep,
@@ -277,14 +323,27 @@ const ProfileSetup = () => {
   }
 
   return (
-    <div className="profile-setup-page">
-      <div className="setup-container">
+    <div className={cn(
+      "fixed inset-0 bg-gray-100 flex items-center justify-center p-5 overflow-hidden z-modal-backdrop",
+      "bg-[radial-gradient(at_20%_25%,hsla(240,80%,90%,0.8)_0px,transparent_50%),radial-gradient(at_80%_15%,hsla(320,70%,92%,0.7)_0px,transparent_50%),radial-gradient(at_50%_50%,hsla(200,60%,94%,0.6)_0px,transparent_55%),radial-gradient(at_10%_80%,hsla(280,50%,91%,0.5)_0px,transparent_50%),radial-gradient(at_90%_75%,hsla(180,50%,93%,0.6)_0px,transparent_55%)]",
+      "before:content-[''] before:absolute before:inset-0 before:bg-white/25 before:z-0"
+    )}>
+      <div className={cn(
+        "w-10/12 max-w-modal-2xl h-[85vh] bg-white/75 backdrop-blur-2xl",
+        "border border-white/30 rounded-3xl shadow-lg",
+        "overflow-hidden animate-slide-in relative z-base"
+      )}>
         {/* Progress Bar */}
-        <div className="progress-bar-container" role="progressbar" aria-valuenow={currentStep} aria-valuemin={1} aria-valuemax={4} aria-label={`Progress: Step ${currentStep} of 4`}>
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
+        <div className="py-[30px] px-10 pb-5 bg-transparent" role="progressbar" aria-valuenow={currentStep} aria-valuemin={1} aria-valuemax={4} aria-label={`Progress: Step ${currentStep} of 4`}>
+          <div className="w-full h-1 bg-gray-200 rounded-xl overflow-hidden mb-3">
+            <div 
+              className="h-full bg-text-link rounded-xl transition-[width] duration-400 ease-smooth" 
+              style={{ width: `${progressPercentage}%` }}
+            />
           </div>
-          <div className="progress-text">{t('profileSetupErrors.step')} {currentStep} / 4</div>
+          <div className="text-center text-sm text-input-placeholder font-medium">
+            {t('profileSetupErrors.step')} {currentStep} / 4
+          </div>
         </div>
 
         {/* Step 1: Profile Name & Theme */}
@@ -385,10 +444,15 @@ const ProfileSetup = () => {
         maxWords={3000}
       />
 
-      {/* Draft Restore Toast - Windows-style notification */}
+      {/* Draft Restore Toast */}
       {hasDraft && draftInfo && currentStep === 1 && (
-        <div className="draft-toast">
-          <div className="draft-toast-icon">
+        <div className={cn(
+          "fixed bottom-6 left-1/2 -translate-x-1/2 z-toast",
+          "flex items-center gap-4 py-4 px-5 pr-12",
+          "bg-white rounded-xl shadow-lg",
+          "border border-gray-200 animate-slide-up"
+        )}>
+          <div className="w-10 h-10 rounded-lg bg-text-link/10 flex items-center justify-center text-text-link">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
@@ -396,22 +460,22 @@ const ProfileSetup = () => {
               <line x1="9" y1="15" x2="15" y2="15"/>
             </svg>
           </div>
-          <div className="draft-toast-content">
-            <div className="draft-toast-title">{t('profileSetup.incompleteDraft')}</div>
-            <div className="draft-toast-subtitle">
+          <div className="flex-1">
+            <div className="text-sm font-semibold text-gray-800">{t('profileSetup.incompleteDraft')}</div>
+            <div className="text-xs text-gray-600">
               {draftInfo.profileName ? `"${draftInfo.profileName}"` : t('nav.profile')} • {t('profileSetupErrors.step')} {draftInfo.currentStep || 1}
               {draftInfo.savedAt && ` • ${getDraftTimeAgo(draftInfo.savedAt)}`}
             </div>
           </div>
-          <div className="draft-toast-actions">
-            <button className="draft-toast-btn draft-toast-btn-secondary" onClick={handleDiscardDraft}>
+          <div className="flex gap-2">
+            <button className="py-2 px-4 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all" onClick={handleDiscardDraft}>
               {t('common.skip')}
             </button>
-            <button className="draft-toast-btn draft-toast-btn-primary" onClick={handleRestoreDraft}>
+            <button className="py-2 px-4 text-sm font-medium text-white bg-text-link rounded-lg hover:bg-primary transition-all" onClick={handleRestoreDraft}>
               {t('profileSetup.restore')}
             </button>
           </div>
-          <button className="draft-toast-close" onClick={handleDiscardDraft} aria-label={t('common.close')}>
+          <button className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-600 transition-all" onClick={handleDiscardDraft} aria-label={t('common.close')}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
@@ -420,17 +484,17 @@ const ProfileSetup = () => {
         </div>
       )}
 
-      {/* Auto-save indicator - subtle floating badge */}
+      {/* Auto-save indicator */}
       {lastSavedAt && currentStep < 4 && (
-        <div className="auto-save-badge" title={t('profileSetup.autoSavingDraft')}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <div className="fixed bottom-6 right-6 z-modal-backdrop flex items-center gap-1.5 py-1.5 px-3 bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 text-xs text-gray-600" title={t('profileSetup.autoSavingDraft')}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-success">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
           <span>{t('profileSetup.saved')}</span>
         </div>
       )}
 
-      {/* Cancel Confirm Modal - renders inside profile-setup-page */}
+      {/* Cancel Confirm Modal */}
       <ConfirmModal
         isOpen={showCancelConfirm}
         title={t('profileSetup.cancelProfileCreation')}

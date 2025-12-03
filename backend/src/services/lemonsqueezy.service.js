@@ -1,13 +1,17 @@
 /**
  * Lemon Squeezy Payment Service
  * Handles all payment operations with Lemon Squeezy API
+ * Protected by circuit breaker for reliability
  * REFUNDS ARE NOT ALLOWED
  */
 
 const crypto = require('crypto');
 const logger = require('../utils/logger');
+const { httpClient } = require('../utils/httpClient');
+const { lemonSqueezyBreaker } = require('../utils/circuitBreaker');
 
 const LEMON_SQUEEZY_API_URL = 'https://api.lemonsqueezy.com/v1';
+const LEMON_SQUEEZY_LICENSE_URL = 'https://api.lemonsqueezy.com/v1/licenses';
 
 class LemonSqueezyService {
   constructor() {
@@ -26,26 +30,29 @@ class LemonSqueezyService {
 
   async apiRequest(endpoint, method = 'GET', body = null) {
     const url = `${LEMON_SQUEEZY_API_URL}${endpoint}`;
-    const options = { method, headers: this.getHeaders() };
+    
+    // Use circuit breaker to protect against API failures
+    return lemonSqueezyBreaker.execute(async () => {
+      const options = {
+        method,
+        headers: this.getHeaders(),
+        throwHttpErrors: false
+      };
 
-    if (body) {
-      options.body = JSON.stringify(body);
-    }
-
-    try {
-      const response = await fetch(url, options);
-      const data = await response.json();
-
-      if (!response.ok) {
-        logger.error('Lemon Squeezy API error', { status: response.status, data, endpoint });
-        throw new Error(data.errors?.[0]?.detail || 'API request failed');
+      if (body) {
+        options.json = body;
       }
 
-      return data;
-    } catch (error) {
-      logger.error('Lemon Squeezy request failed', { error: error.message, endpoint });
-      throw error;
-    }
+      const response = await httpClient(url, options);
+
+      if (response.statusCode >= 400) {
+        const data = response.body;
+        logger.error('Lemon Squeezy API error', { status: response.statusCode, data, endpoint });
+        throw new Error(data?.errors?.[0]?.detail || 'API request failed');
+      }
+
+      return response.body;
+    });
   }
 
   verifyWebhookSignature(payload, signature) {
@@ -209,12 +216,12 @@ class LemonSqueezyService {
    */
   async validateLicenseKey(licenseKey) {
     try {
-      const response = await fetch('https://api.lemonsqueezy.com/v1/licenses/validate', {
-        method: 'POST',
+      const response = await httpClient.post(`${LEMON_SQUEEZY_LICENSE_URL}/validate`, {
+        json: { license_key: licenseKey },
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ license_key: licenseKey })
+        throwHttpErrors: false
       });
-      return await response.json();
+      return response.body;
     } catch (error) {
       logger.error('License validation failed', { error: error.message });
       return { valid: false, error: error.message };
@@ -226,12 +233,12 @@ class LemonSqueezyService {
    */
   async activateLicenseKey(licenseKey, instanceName) {
     try {
-      const response = await fetch('https://api.lemonsqueezy.com/v1/licenses/activate', {
-        method: 'POST',
+      const response = await httpClient.post(`${LEMON_SQUEEZY_LICENSE_URL}/activate`, {
+        json: { license_key: licenseKey, instance_name: instanceName },
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ license_key: licenseKey, instance_name: instanceName })
+        throwHttpErrors: false
       });
-      return await response.json();
+      return response.body;
     } catch (error) {
       logger.error('License activation failed', { error: error.message });
       return { activated: false, error: error.message };
@@ -243,12 +250,12 @@ class LemonSqueezyService {
    */
   async deactivateLicenseKey(licenseKey, instanceId) {
     try {
-      const response = await fetch('https://api.lemonsqueezy.com/v1/licenses/deactivate', {
-        method: 'POST',
+      const response = await httpClient.post(`${LEMON_SQUEEZY_LICENSE_URL}/deactivate`, {
+        json: { license_key: licenseKey, instance_id: instanceId },
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ license_key: licenseKey, instance_id: instanceId })
+        throwHttpErrors: false
       });
-      return await response.json();
+      return response.body;
     } catch (error) {
       logger.error('License deactivation failed', { error: error.message });
       return { deactivated: false, error: error.message };

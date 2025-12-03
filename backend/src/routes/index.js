@@ -37,14 +37,16 @@ const router = express.Router();
 // Home
 router.get('/', (_req, res) => {
   res.json({
-    service: 'AI Content Authenticator - Backend',
+    service: 'Graphos AI Studio - Backend',
     version: '2.1',
     status: 'running',
     powered_by: 'Google Gemini Ecosystem',
     architecture: 'Modular',
+    documentation: '/api/docs',
     endpoints: {
       '/health': 'GET - Health check',
       '/ready': 'GET - Readiness check',
+      '/api/docs': 'GET - API documentation (OpenAPI)',
       '/profiles/*': 'Profile management',
       '/analysis/*': 'Text analysis & AI detection',
       '/api/chat': 'Workspace chat',
@@ -52,6 +54,43 @@ router.get('/', (_req, res) => {
       '/send-feedback': 'Feedback & support'
     }
   });
+});
+
+// API Documentation endpoint
+router.get('/api/docs', (_req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  const YAML = require('yaml');
+  
+  try {
+    const openapiPath = path.join(__dirname, '../../docs/openapi.yaml');
+    
+    if (!fs.existsSync(openapiPath)) {
+      return res.status(404).json({
+        success: false,
+        error: 'API documentation not found'
+      });
+    }
+    
+    const openapiContent = fs.readFileSync(openapiPath, 'utf8');
+    const openapiJson = YAML.parse(openapiContent);
+    
+    res.json(openapiJson);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load API documentation',
+      details: error.message
+    });
+  }
+});
+
+// Swagger UI redirect
+router.get('/api/docs/ui', (_req, res) => {
+  const swaggerUrl = `https://petstore.swagger.io/?url=${encodeURIComponent(
+    'https://ai-authenticator-472729326429.us-central1.run.app/api/docs'
+  )}`;
+  res.redirect(swaggerUrl);
 });
 
 // Webhook endpoint (NO AUTH - verified by signature)
@@ -100,143 +139,136 @@ router.use('/api/payment', authenticate, paymentRoutes);
 router.use('/api/realtime', protectedMiddleware, realtimeRoutes);
 
 // ============================================================================
-// LEGACY ROUTES (Backward Compatibility)
-// These will be deprecated in future versions
+// LEGACY ROUTES (Deprecated - will be removed in v3.0)
+// Use new routes under /profiles/*, /analysis/* instead
 // ============================================================================
+
+const logger = require('../utils/logger');
+
+/**
+ * Deprecation warning middleware
+ * Logs warning and adds deprecation header
+ */
+const deprecationWarning = (newPath) => (req, res, next) => {
+  logger.warn('Deprecated endpoint accessed', {
+    deprecatedPath: req.path,
+    newPath,
+    userId: req.userId,
+    ip: req.ip
+  });
+  res.set('Deprecation', 'true');
+  res.set('Sunset', 'Wed, 01 Jan 2025 00:00:00 GMT');
+  res.set('Link', `<${newPath}>; rel="successor-version"`);
+  next();
+};
 
 // === Profile legacy endpoints ===
 router.post('/create_profile', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
+  deprecationWarning('/profiles/create'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
   asyncHandler(profileController.createProfile)
 );
 
 router.post('/create_profile_complete', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
+  deprecationWarning('/profiles/create'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
   creditMiddleware.profileComplete, 
   asyncHandler(profileController.createProfileComplete)
 );
 
 router.post('/add_sample', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
-  validators.addSample,
-  creditMiddleware.profileSampleAdd, 
+  deprecationWarning('/profiles/add-sample'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
+  validators.addSample, creditMiddleware.profileSampleAdd, 
   asyncHandler(profileController.addSample)
 );
 
 router.post('/add_samples_batch', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
+  deprecationWarning('/profiles/add-samples-batch'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
   creditMiddleware.profileSamplesBatch, 
   asyncHandler(profileController.addSamplesBatch)
 );
 
 router.post('/finalize_profile', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
+  deprecationWarning('/profiles/finalize'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
   creditMiddleware.profileFinalize, 
   asyncHandler(profileController.finalizeProfile)
 );
 
 router.get('/get_profile', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
+  deprecationWarning('/profiles/:id'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
   asyncHandler(profileController.getProfile)
 );
 
 router.get('/get_profiles', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
+  deprecationWarning('/profiles'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
   asyncHandler(profileController.getProfiles)
 );
 
 router.post('/delete_profile', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
+  deprecationWarning('/profiles/:id (DELETE)'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
   asyncHandler(profileController.deleteProfile)
 );
 
-// === Analysis legacy endpoints with validation and credit middleware ===
+// === Analysis legacy endpoints ===
 router.post('/authenticate', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
-  validators.detectAI,
-  creditMiddleware.aiDetection, 
+  deprecationWarning('/analysis/authenticate'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
+  validators.detectAI, creditMiddleware.aiDetection, 
   asyncHandler(analysisController.authenticateContent)
 );
 
 router.post('/analyze', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
-  validators.analyzeText,
-  creditMiddleware.textAnalysis, 
+  deprecationWarning('/analysis/analyze'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
+  validators.analyzeText, creditMiddleware.textAnalysis, 
   asyncHandler(analysisController.analyzeText)
 );
 
 router.post('/suggest_improvements', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
-  validators.getSuggestions,
-  creditMiddleware.improvementSuggestions, 
+  deprecationWarning('/analysis/suggest-improvements'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
+  validators.getSuggestions, creditMiddleware.improvementSuggestions, 
   asyncHandler(analysisController.suggestImprovements)
 );
 
 router.post('/rewrite', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
-  validators.rewriteText,
-  creditMiddleware.textRewrite, 
+  deprecationWarning('/analysis/rewrite'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
+  validators.rewriteText, creditMiddleware.textRewrite, 
   asyncHandler(analysisController.rewriteText)
 );
 
 router.post('/rewrite_stream', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
-  validators.rewriteText,
-  creditMiddleware.textRewrite, 
+  deprecationWarning('/analysis/rewrite-stream'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
+  validators.rewriteText, creditMiddleware.textRewrite, 
   asyncHandler(analysisController.rewriteTextStream)
 );
 
-// === Translation legacy endpoint ===
 router.post('/api/translate', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
-  validators.translate,
-  creditMiddleware.translation, 
+  deprecationWarning('/analysis/translate'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
+  validators.translate, creditMiddleware.translation, 
   asyncHandler(analysisController.translateText)
 );
 
-// === Humanization legacy endpoints ===
 router.post('/check-humanization', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
+  deprecationWarning('/analysis/check-humanization'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
   creditMiddleware.checkHumanization, 
   asyncHandler(analysisController.checkHumanization)
 );
 
 router.post('/iterative-humanize', 
-  optionalAuth,
-  checkLocked,
-  activityLoggerMiddleware,
-  validators.iterativeHumanize,
-  creditMiddleware.iterativeHumanize, 
+  deprecationWarning('/analysis/iterative-humanize'),
+  optionalAuth, checkLocked, activityLoggerMiddleware,
+  validators.iterativeHumanize, creditMiddleware.iterativeHumanize, 
   asyncHandler(analysisController.iterativeHumanize)
 );
 

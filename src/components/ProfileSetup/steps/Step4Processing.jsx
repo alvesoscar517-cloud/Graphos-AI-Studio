@@ -1,55 +1,53 @@
 /**
  * Step 4: Processing and Completion
+ * Migrated to Tailwind CSS v4
  */
 import { useTranslation } from 'react-i18next'
+import { cn } from '../../../lib/utils'
 import LottieWrapper from '../LottieWrapper'
 import loadingBlueAnimation from '../../../animation/loading-animation-blue.json'
 import faceIdAnimation from '../../../animation/face-id.json'
 import error404Animation from '../../../animation/404 blue.json'
 
 const ProcessingView = ({ animationKey, processingStep, processingMessage, totalSamples, t }) => (
-  <div className="step-content active" role="status" aria-live="polite" aria-busy="true">
-    <div className="content-wrapper-processing">
-      <div className="animation-container-large" aria-hidden="true">
+  <div className="block animate-fade-in h-[calc(100%-100px)] relative" role="status" aria-live="polite" aria-busy="true">
+    <div className="flex flex-col items-center justify-center h-full gap-8 p-10">
+      <div className="w-thumbnail-lg h-thumbnail-lg" aria-hidden="true">
         <LottieWrapper key={`step4-${animationKey}`} animationData={loadingBlueAnimation} loop={true} />
       </div>
-      <div className="form-container-processing">
-        <h1 className="step-title">{t('profileSetup.finalizingProfile')}</h1>
-        <p className="step-description">
+      <div className="text-center max-w-modal-md">
+        <h1 className="text-2xl font-semibold text-gray-800 mb-3 leading-tight">
+          {t('profileSetup.finalizingProfile')}
+        </h1>
+        <p className="text-sm text-input-placeholder leading-relaxed mb-8">
           {processingMessage || t('common.processing')}
         </p>
-
-        <div className="checklist">
-          <div className={`checklist-item ${processingStep >= 1 ? processingStep === 1 ? 'processing' : 'completed' : ''}`}>
-            {processingStep === 1 ? (
-              <div className="item-spinner"></div>
-            ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            )}
-            <span>{t('profileSetup.analyzingText')} ({totalSamples} {t('common.samples')})</span>
-          </div>
-          <div className={`checklist-item ${processingStep >= 2 ? processingStep === 2 ? 'processing' : 'completed' : ''}`}>
-            {processingStep === 2 ? (
-              <div className="item-spinner"></div>
-            ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            )}
-            <span>{t('profileSetup.analyzingText')}</span>
-          </div>
-          <div className={`checklist-item ${processingStep >= 3 ? processingStep === 3 ? 'processing' : 'completed' : ''}`}>
-            {processingStep === 3 ? (
-              <div className="item-spinner"></div>
-            ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            )}
-            <span>{t('profileSetup.finalizingProfile')}</span>
-          </div>
+        <div className="flex flex-col gap-4">
+          {[1, 2, 3].map((step) => (
+            <div key={step} className={cn(
+              "flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300",
+              processingStep >= step 
+                ? processingStep === step 
+                  ? "bg-text-link/10 border border-text-link/30" 
+                  : "bg-green-50 border border-green-200"
+                : "bg-bg-secondary border border-border"
+            )}>
+              {processingStep === step ? (
+                <div className="w-6 h-6 border-2 border-text-link border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={processingStep > step ? "stroke-success" : "stroke-gray-500"} strokeWidth="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              )}
+              <span className={cn(
+                "text-sm font-medium",
+                processingStep === step ? "text-text-link" : processingStep > step ? "text-green-600" : "text-text-muted"
+              )}>
+                {step === 1 ? `${t('profileSetup.analyzingText')} (${totalSamples} ${t('common.samples')})` :
+                 step === 2 ? t('profileSetup.analyzingText') : t('profileSetup.finalizingProfile')}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -57,32 +55,22 @@ const ProcessingView = ({ animationKey, processingStep, processingMessage, total
 )
 
 const ErrorView = ({ animationKey, errorMessage, onBack, onRetry, t }) => (
-  <div className="completion-modal error-modal active" role="alert" aria-live="assertive">
-    <div className="completion-modal-content">
-      <div className="completion-animation" aria-hidden="true">
+  <div className="fixed inset-0 bg-white/98 backdrop-blur-xl flex items-center justify-center z-overlay-high" role="alert" aria-live="assertive">
+    <div className="text-center animate-scale-in">
+      <div className="w-thumbnail-xl h-thumbnail-xl mx-auto mb-10 flex items-center justify-center" aria-hidden="true">
         <LottieWrapper key={`error-${animationKey}`} animationData={error404Animation} loop={true} />
       </div>
-      <h1 className="completion-title error-title">{t('profileSetup.errorOccurred')}</h1>
-      <p className="completion-subtitle error-subtitle">{errorMessage}</p>
-      <div className="error-actions">
-        <button 
-          className="btn btn-secondary btn-large" 
-          onClick={onBack}
-          aria-label={t('profileSetup.goBackToPrevious')}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
+      <h1 className="text-4xl font-semibold text-error mb-3 animate-slide-up">
+        {t('profileSetup.errorOccurred')}
+      </h1>
+      <p className="text-lg text-input-placeholder mb-8 animate-slide-up">{errorMessage}</p>
+      <div className="flex gap-4 justify-center animate-slide-up">
+        <button className="py-3.5 px-8 text-base font-semibold rounded-lg cursor-pointer transition-all duration-200 inline-flex items-center gap-2 bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200" onClick={onBack}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
           {t('common.back')}
         </button>
-        <button 
-          className="btn btn-primary btn-large" 
-          onClick={onRetry}
-          aria-label={t('profileSetup.retryCreating')}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"></path>
-          </svg>
+        <button className="py-3.5 px-8 text-base font-semibold rounded-lg cursor-pointer transition-all duration-200 inline-flex items-center gap-2 bg-text-link text-white hover:bg-primary hover:-translate-y-px" onClick={onRetry}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"></path></svg>
           {t('common.retry')}
         </button>
       </div>
@@ -91,79 +79,38 @@ const ErrorView = ({ animationKey, errorMessage, onBack, onRetry, t }) => (
 )
 
 const CompletionView = ({ animationKey, qualityScore, onComplete, t }) => (
-  <div className="completion-modal active" role="status" aria-live="polite">
-    <div className="completion-modal-content">
-      <div className="completion-animation" aria-hidden="true">
+  <div className="fixed inset-0 bg-white/98 backdrop-blur-xl flex items-center justify-center z-overlay-high" role="status" aria-live="polite">
+    <div className="text-center animate-scale-in">
+      <div className="w-thumbnail-xl h-thumbnail-xl mx-auto mb-10 flex items-center justify-center" aria-hidden="true">
         <LottieWrapper key={`completion-${animationKey}`} animationData={faceIdAnimation} loop={false} />
       </div>
-      <h1 className="completion-title">{t('profileSetup.complete')}</h1>
-      
-      {qualityScore && (
-        <div className="completion-score-inline" aria-label={t('profile.profileQuality') + `: ${qualityScore.score}/100`}>
-          <div className="score-number" data-rating={qualityScore.rating}>
-            {qualityScore.score}/100
-          </div>
-          <p className="score-message">{qualityScore.recommendation}</p>
+      <h1 className="text-4xl font-semibold mb-3 text-text-link animate-slide-up">
+        {t('profileSetup.complete')}
+      </h1>
+      {qualityScore ? (
+        <div className="mb-8 animate-slide-up">
+          <div className={cn("text-4xl font-bold mb-2",
+            qualityScore.rating === 'excellent' ? "text-success" :
+            qualityScore.rating === 'good' ? "text-text-link" :
+            qualityScore.rating === 'fair' ? "text-amber-500" : "text-text-muted"
+          )}>{qualityScore.score}/100</div>
+          <p className="text-sm text-input-placeholder">{qualityScore.recommendation}</p>
         </div>
+      ) : (
+        <p className="text-lg text-input-placeholder mb-8 animate-slide-up">{t('profileSetup.profileReady')}</p>
       )}
-      
-      {!qualityScore && (
-        <p className="completion-subtitle">{t('profileSetup.profileReady')}</p>
-      )}
-      
-      <button 
-        className="btn btn-primary btn-large completion-btn" 
-        onClick={onComplete}
-        aria-label={t('profileSetup.completeAndStart')}
-      >
+      <button className="py-3.5 px-8 text-base font-semibold rounded-lg cursor-pointer transition-all duration-200 bg-text-link text-white hover:bg-primary hover:-translate-y-px animate-slide-up" onClick={onComplete}>
         {t('profileSetup.startWriting')}
       </button>
     </div>
   </div>
 )
 
-const Step4Processing = ({
-  animationKey,
-  processing,
-  processingStep,
-  processingMessage,
-  showCompletion,
-  showError,
-  errorMessage,
-  qualityScore,
-  totalSamples,
-  onBack,
-  onRetry,
-  onComplete
-}) => {
+const Step4Processing = ({ animationKey, processing, processingStep, processingMessage, showCompletion, showError, errorMessage, qualityScore, totalSamples, onBack, onRetry, onComplete }) => {
   const { t } = useTranslation()
-
-  if (showError) {
-    return <ErrorView 
-      animationKey={animationKey} 
-      errorMessage={errorMessage} 
-      onBack={onBack} 
-      onRetry={onRetry}
-      t={t}
-    />
-  }
-
-  if (showCompletion) {
-    return <CompletionView 
-      animationKey={animationKey} 
-      qualityScore={qualityScore} 
-      onComplete={onComplete}
-      t={t}
-    />
-  }
-
-  return <ProcessingView 
-    animationKey={animationKey}
-    processingStep={processingStep}
-    processingMessage={processingMessage}
-    totalSamples={totalSamples}
-    t={t}
-  />
+  if (showError) return <ErrorView animationKey={animationKey} errorMessage={errorMessage} onBack={onBack} onRetry={onRetry} t={t} />
+  if (showCompletion) return <CompletionView animationKey={animationKey} qualityScore={qualityScore} onComplete={onComplete} t={t} />
+  return <ProcessingView animationKey={animationKey} processingStep={processingStep} processingMessage={processingMessage} totalSamples={totalSamples} t={t} />
 }
 
 export default Step4Processing

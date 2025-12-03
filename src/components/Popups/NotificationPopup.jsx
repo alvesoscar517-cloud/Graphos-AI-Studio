@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import './NotificationPopup.css';
+import Portal from '../Common/Portal';
+// CSS migrated to inline styles
 
 export default function NotificationPopup({ onClose, onViewChange }) {
   const { t, i18n } = useTranslation();
@@ -11,9 +12,6 @@ export default function NotificationPopup({ onClose, onViewChange }) {
   const [selectedItemRect, setSelectedItemRect] = useState(null);
   const popupRef = useRef(null);
   const detailPopupRef = useRef(null);
-
-  // Detect dark theme
-  const isDark = document.body.classList.contains('dark-theme');
 
   useEffect(() => {
     loadNotifications();
@@ -245,23 +243,19 @@ export default function NotificationPopup({ onClose, onViewChange }) {
   const userLang = i18n.language || 'en';
 
   return (
-    <>
+    <Portal>
       <div 
-        className="notification-popup show" 
+        className="popup notification-popup show" 
         ref={popupRef}
         style={{
           position: 'fixed',
-          bottom: '135px',
-          left: '20px',
+          bottom: '148px',
+          left: '12px',
           width: '320px',
           height: '400px',
-          background: isDark ? '#2d2d2d' : '#fff',
-          border: isDark ? '1px solid #3c4043' : '1px solid #e8eaed',
-          borderRadius: '12px',
-          boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.5)' : '0 4px 16px rgba(0, 0, 0, 0.15)',
           display: 'flex',
           flexDirection: 'column',
-          zIndex: 1000,
+          zIndex: 'var(--z-popup)',
           overflow: 'hidden'
         }}
       >
@@ -277,7 +271,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
             gap: '8px',
             fontSize: '15px',
             fontWeight: 500,
-            color: isDark ? '#e3e3e3' : '#202124'
+            color: 'var(--color-text-primary)'
           }}>
             <span>{t('notifications.notifications')}</span>
             {unreadCount > 0 && (
@@ -286,8 +280,8 @@ export default function NotificationPopup({ onClose, onViewChange }) {
                 height: '18px',
                 padding: '0 5px',
                 borderRadius: '9px',
-                background: isDark ? '#8ab4f8' : '#1967d2',
-                color: isDark ? '#1e1e1e' : '#fff',
+                background: 'var(--color-system-blue)',
+                color: '#fff',
                 fontSize: '11px',
                 fontWeight: 500,
                 display: 'flex',
@@ -303,7 +297,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
               style={{
                 background: 'none',
                 border: 'none',
-                color: isDark ? '#8ab4f8' : '#1967d2',
+                color: 'var(--color-system-blue)',
                 fontSize: '12px',
                 cursor: 'pointer',
                 fontWeight: 500,
@@ -338,11 +332,11 @@ export default function NotificationPopup({ onClose, onViewChange }) {
                   className={`notif-item ${!notif.read ? 'unread' : ''} ${selectedNotif?.id === notif.id ? 'selected' : ''}`}
                   onClick={(e) => handleItemClick(notif, e)}
                   style={{
-                    border: !notif.read ? 'none' : (isDark ? '1px solid #3c4043' : '1px solid #e8eaed'),
+                    border: !notif.read ? 'none' : '1px solid var(--color-border-light)',
                     background: selectedNotif?.id === notif.id
-                      ? (isDark ? '#3c4043' : '#d2e3fc')
+                      ? 'var(--color-primary-light)'
                       : !notif.read 
-                        ? (isDark ? 'rgba(138, 180, 248, 0.12)' : 'rgba(25, 103, 210, 0.08)') 
+                        ? 'var(--color-primary-light)' 
                         : 'transparent',
                     paddingLeft: !notif.read ? '16px' : '12px'
                   }}
@@ -355,7 +349,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
                       transform: 'translateY(-50%)',
                       width: '6px',
                       height: '6px',
-                      background: isDark ? '#8ab4f8' : '#1967d2',
+                      background: 'var(--color-system-blue)',
                       borderRadius: '50%'
                     }} />
                   )}
@@ -387,20 +381,16 @@ export default function NotificationPopup({ onClose, onViewChange }) {
       {selectedNotif && selectedItemRect && (
         <div 
           ref={detailPopupRef}
-          className="notif-detail-popup"
+          className="popup notif-detail-popup"
           style={{
             position: 'fixed',
-            bottom: '135px',
-            left: '352px',
+            bottom: '148px',
+            left: '344px',
             width: '400px',
             height: '450px',
-            background: isDark ? '#2d2d2d' : '#fff',
-            border: isDark ? '1px solid #3c4043' : '1px solid #e8eaed',
-            borderRadius: '12px',
-            boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.5)' : '0 4px 16px rgba(0, 0, 0, 0.15)',
             display: 'flex',
             flexDirection: 'column',
-            zIndex: 1001,
+            zIndex: 'var(--z-popup-submenu)',
             overflow: 'hidden',
             animation: 'notifDetailSlideIn 0.2s ease-out'
           }}
@@ -413,14 +403,14 @@ export default function NotificationPopup({ onClose, onViewChange }) {
             justifyContent: 'space-between',
             gap: '12px',
             flexShrink: 0,
-            borderBottom: isDark ? '1px solid #3c4043' : '1px solid #e8eaed'
+            borderBottom: '1px solid var(--color-border-light)'
           }}>
             {/* Title and Time */}
             <div style={{ flex: 1, minWidth: 0 }}>
               <h3 style={{
                 fontSize: '15px',
                 fontWeight: 500,
-                color: isDark ? '#e3e3e3' : '#202124',
+                color: 'var(--color-text-primary)',
                 margin: '0 0 4px 0',
                 lineHeight: 1.4
               }}>
@@ -430,7 +420,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
               </h3>
               <span style={{
                 fontSize: '12px',
-                color: isDark ? '#9aa0a6' : '#5f6368'
+                color: 'var(--color-text-secondary)'
               }}>
                 {formatFullTime(selectedNotif.createdAt)}
               </span>
@@ -453,14 +443,13 @@ export default function NotificationPopup({ onClose, onViewChange }) {
                 flexShrink: 0,
                 marginTop: '-2px'
               }}
-              onMouseEnter={e => e.currentTarget.style.background = isDark ? '#3c4043' : '#e8eaed'}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--color-fill-tertiary)'}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
             >
               <img src="/icon/x.svg" alt={t('common.close')} style={{ 
                 width: '14px', 
                 height: '14px', 
-                opacity: 0.6,
-                filter: isDark ? 'invert(1)' : 'none'
+                opacity: 0.6
               }} />
             </button>
           </div>
@@ -478,7 +467,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
           >
             <p style={{
               fontSize: '14px',
-              color: isDark ? '#bdc1c6' : '#3c4043',
+              color: 'var(--color-text-secondary)',
               lineHeight: 1.6,
               margin: 0,
               whiteSpace: 'pre-wrap'
@@ -492,7 +481,7 @@ export default function NotificationPopup({ onClose, onViewChange }) {
           {selectedNotif.translations?.[userLang]?.cta && selectedNotif.ctaAction && (
             <div style={{
               padding: '14px 18px',
-              borderTop: isDark ? '1px solid #3c4043' : '1px solid #e8eaed',
+              borderTop: '1px solid var(--color-border-light)',
               flexShrink: 0
             }}>
               <button 
@@ -502,8 +491,8 @@ export default function NotificationPopup({ onClose, onViewChange }) {
                   padding: '10px 16px',
                   borderRadius: '8px',
                   border: 'none',
-                  background: isDark ? '#8ab4f8' : '#1967d2',
-                  color: isDark ? '#1e1e1e' : '#fff',
+                  background: 'var(--color-system-blue)',
+                  color: '#fff',
                   fontSize: '13px',
                   fontWeight: 500,
                   cursor: 'pointer',
@@ -513,20 +502,20 @@ export default function NotificationPopup({ onClose, onViewChange }) {
                   gap: '8px',
                   transition: 'background 0.15s ease'
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = isDark ? '#aecbfa' : '#1557b0'}
-                onMouseLeave={e => e.currentTarget.style.background = isDark ? '#8ab4f8' : '#1967d2'}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--color-primary-hover)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'var(--color-system-blue)'}
               >
                 {selectedNotif.translations[userLang].cta}
-                <img src="/icon/arrow-right.svg" alt="" style={{ 
-                  width: '14px', 
-                  height: '14px', 
-                  filter: isDark ? 'brightness(0)' : 'brightness(0) invert(1)' 
-                }} />
+                <img 
+                  src="/icon/arrow-right.svg" 
+                  alt="" 
+                  className="w-3.5 h-3.5 brightness-0 invert" 
+                />
               </button>
             </div>
           )}
         </div>
       )}
-    </>
+    </Portal>
   );
 }

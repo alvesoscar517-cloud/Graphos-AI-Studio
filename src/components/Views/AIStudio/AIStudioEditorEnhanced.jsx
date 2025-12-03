@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNotes } from '../../../contexts/NotesContext'
-import { useAIProcessing } from '../../../contexts/AIProcessingContext'
+import { useAIProcessing } from '@/stores'
 import { useProfiles } from '../../../contexts/ProfileContext'
 import { createShare } from '../../../services/share'
 import { truncateTitleByWords } from '../../../utils/titleUtils'
@@ -9,17 +9,8 @@ import TextHighlightEditor from '../../Analysis/TextHighlightEditor'
 import EditTitleModal from '../../Common/EditTitleModal'
 import TokenBadge from '../../Common/TokenBadge'
 import modal from '../../../utils/modal'
-import './AIStudioEditor.css'
+import { cn } from '../../../lib/utils'
 
-/**
- * AIStudioEditorEnhanced - Editor with ContentEditable and inline highlighting
- * 
- * FEATURES:
- * - ContentEditable editor with full HTML/CSS support
- * - Direct highlighting in text with underline
- * - Tooltip suggestions when clicking on deviation sentences
- * - Better display and easier interaction
- */
 const AIStudioEditorEnhanced = ({ 
   onToggleLeftSidebar, 
   onToggleRightSidebar, 
@@ -28,7 +19,7 @@ const AIStudioEditorEnhanced = ({
   externalAnalysisData
 }) => {
   const { t } = useTranslation()
-  const { currentNote, updateNote, generateTitle } = useNotes()
+  const { currentNote, updateNote } = useNotes()
   const { isProcessing } = useAIProcessing()
   const { currentProfile } = useProfiles()
   
@@ -41,7 +32,6 @@ const AIStudioEditorEnhanced = ({
   const titleGenerationTimeoutRef = useRef(null)
   const isGeneratingTitleRef = useRef(false)
 
-  // Auto-generate title when user stops typing (debounced)
   const triggerAutoGenerateTitle = useCallback(() => {
     if (!currentNote || currentNote.userEditedTitle || currentNote.titleGenerated || currentNote.title !== 'Untitled') {
       return
@@ -52,34 +42,29 @@ const AIStudioEditorEnhanced = ({
       return
     }
 
-    // Clear existing timeout
     if (titleGenerationTimeoutRef.current) {
       clearTimeout(titleGenerationTimeoutRef.current)
     }
 
-    // Debounce: wait 3 seconds after user stops typing
-    titleGenerationTimeoutRef.current = setTimeout(async () => {
+    // Generate title from first characters (no AI call)
+    titleGenerationTimeoutRef.current = setTimeout(() => {
       if (isGeneratingTitleRef.current) return
       
       isGeneratingTitleRef.current = true
       try {
-        console.log('🏷️ Auto-generating title for note...')
-        const newTitle = await generateTitle(content)
+        const firstSentence = content.split(/[.!?。\n]/)[0]?.trim() || content
+        const newTitle = truncateTitleByWords(firstSentence, 7)
         if (newTitle && currentNote.title === 'Untitled' && !currentNote.userEditedTitle) {
           updateNote(currentNote.id, { title: newTitle, titleGenerated: true })
         }
-      } catch (err) {
-        console.error('Failed to auto-generate title:', err)
       } finally {
         isGeneratingTitleRef.current = false
       }
-    }, 3000) // 3 seconds debounce
-  }, [currentNote, generateTitle, updateNote])
+    }, 1500)
+  }, [currentNote, updateNote])
 
-  // Trigger title generation when content changes
   useEffect(() => {
     triggerAutoGenerateTitle()
-    
     return () => {
       if (titleGenerationTimeoutRef.current) {
         clearTimeout(titleGenerationTimeoutRef.current)
@@ -87,41 +72,34 @@ const AIStudioEditorEnhanced = ({
     }
   }, [currentNote?.content, triggerAutoGenerateTitle])
 
-  // Listen for external analysis data from RightSidebar
   useEffect(() => {
     if (externalAnalysisData) {
-      console.log('[CHART] Received external analysis data:', externalAnalysisData)
       setAnalysis(externalAnalysisData)
-      setShowHighlights(true) // Show highlights when new analysis arrives
+      setShowHighlights(true)
       
-      // Immediately generate title when AI feature is used (if not already generated)
+      // Generate title from first characters (no AI call)
       if (currentNote && !currentNote.userEditedTitle && !currentNote.titleGenerated && currentNote.title === 'Untitled') {
         const content = currentNote.content.trim()
         if (content.length > 10 && !isGeneratingTitleRef.current) {
-          // Clear debounce timeout since we're generating immediately
           if (titleGenerationTimeoutRef.current) {
             clearTimeout(titleGenerationTimeoutRef.current)
           }
           
           isGeneratingTitleRef.current = true
-          generateTitle(content).then(newTitle => {
-            updateNote(currentNote.id, { title: newTitle, titleGenerated: true })
-          }).finally(() => {
-            isGeneratingTitleRef.current = false
-          })
+          const firstSentence = content.split(/[.!?。\n]/)[0]?.trim() || content
+          const newTitle = truncateTitleByWords(firstSentence, 7)
+          updateNote(currentNote.id, { title: newTitle, titleGenerated: true })
+          isGeneratingTitleRef.current = false
         }
       }
     }
-  }, [externalAnalysisData, currentNote, generateTitle, updateNote])
+  }, [externalAnalysisData, currentNote, updateNote])
 
-  // Typing effect for title
   useEffect(() => {
     if (currentNote && currentNote.title !== displayTitle) {
       const newTitle = currentNote.title
-      // Truncate to 7 words for display
       const truncatedTitle = truncateTitleByWords(newTitle, 7)
       
-      // Only apply typing effect if title was just generated
       if (currentNote.titleGenerated && !currentNote.userEditedTitle && newTitle !== 'Untitled') {
         setIsTypingTitle(true)
         let currentIndex = 0
@@ -131,7 +109,7 @@ const AIStudioEditorEnhanced = ({
           if (currentIndex < truncatedTitle.length) {
             setDisplayTitle(truncatedTitle.substring(0, currentIndex + 1))
             currentIndex++
-            timeoutId = setTimeout(typeNextChar, 30) // 30ms per character
+            timeoutId = setTimeout(typeNextChar, 30)
           } else {
             setIsTypingTitle(false)
           }
@@ -140,12 +118,9 @@ const AIStudioEditorEnhanced = ({
         typeNextChar()
         
         return () => {
-          if (timeoutId) {
-            clearTimeout(timeoutId)
-          }
+          if (timeoutId) clearTimeout(timeoutId)
         }
       } else {
-        // No typing effect, just set directly (still truncate for display)
         setDisplayTitle(truncatedTitle)
       }
     }
@@ -153,18 +128,15 @@ const AIStudioEditorEnhanced = ({
 
   useEffect(() => {
     if (currentNote && !isTypingTitle) {
-      // Truncate to 7 words for display only
       setDisplayTitle(truncateTitleByWords(currentNote.title, 7))
     }
   }, [currentNote, isTypingTitle])
 
-  const handleEditClick = () => {
-    setShowEditTitleModal(true)
-  }
+  const handleEditClick = () => setShowEditTitleModal(true)
 
   const handleTitleSave = (newTitle) => {
     if (newTitle && newTitle !== currentNote?.title) {
-      updateNote(currentNote.id, { title: newTitle }, true) // true = user edit
+      updateNote(currentNote.id, { title: newTitle }, true)
       setDisplayTitle(truncateTitleByWords(newTitle, 7))
     }
   }
@@ -182,21 +154,16 @@ const AIStudioEditorEnhanced = ({
         return
       }
 
-      // Create share link
       const shareData = await createShare(
         'note',
         currentNote.title || t('editor.untitled'),
         currentNote.content,
         null,
-        {
-          createdAt: new Date().toISOString()
-        }
+        { createdAt: new Date().toISOString() }
       )
 
-      // Copy link to clipboard
       const shareUrl = `${window.location.origin}/shared/${shareData.share_id}`
       await navigator.clipboard.writeText(shareUrl)
-      
       modal.toast(t('share.shareLinkCopied'), '', 'success')
     } catch (error) {
       console.error('Share error:', error)
@@ -204,7 +171,6 @@ const AIStudioEditorEnhanced = ({
     }
   }
 
-  // Clear analysis when content changes significantly
   useEffect(() => {
     if (analysis && currentNote?.content) {
       const originalLength = analysis.sentence_analysis?.reduce(
@@ -213,81 +179,127 @@ const AIStudioEditorEnhanced = ({
       const currentLength = currentNote.content.length
       
       if (Math.abs(currentLength - originalLength) > originalLength * 0.1) {
-        console.log('[NOTE] Content changed significantly, clearing analysis')
         setAnalysis(null)
       }
     }
   }, [currentNote?.content, analysis])
 
   return (
-    <div className="aistudio-editor-view">
-      <header className="main-header">
+    <div className={cn(
+      "flex flex-col flex-1 overflow-hidden p-0 m-0",
+      "bg-bg-tertiary",
+      "h-full w-full box-border"
+    )}>
+      <header className={cn(
+        "flex items-center gap-2 py-2 px-4",
+        "border-b border-border-light",
+        "bg-bg-tertiary h-14 shrink-0"
+      )}>
         <button 
-          className="menu-btn icon-btn" 
+          className={cn(
+            "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+            "w-8 h-8 shrink-0 flex items-center justify-center",
+            "transition-colors duration-200",
+            "hover:bg-bg-hover"
+          )}
           onClick={onToggleLeftSidebar}
           data-tooltip={t('common.menu')} 
           data-tooltip-position="right"
         >
-          <img src="/icon/panel-left.svg" alt={t('common.menu')} />
+          <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
         </button>
         
-        <div className="title-container">
-          <div className="title-display" title={currentNote?.title || ''}>
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <div 
+            className="text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-xl shrink-0"
+            title={currentNote?.title || ''}
+          >
             {displayTitle || t('editor.untitled')}
           </div>
           <button 
-            className="title-edit-btn"
+            className={cn(
+              "bg-transparent border-none p-1.5 cursor-pointer rounded-md shrink-0",
+              "flex items-center justify-center opacity-50 transition-all duration-200",
+              "hover:opacity-100 hover:bg-bg-hover hover:scale-110",
+              "disabled:opacity-30 disabled:cursor-not-allowed"
+            )}
             onClick={handleEditClick}
             data-tooltip={t('common.edit')}
             data-tooltip-position="bottom"
             disabled={isTypingTitle}
           >
-            <img src="/icon/pencil.svg" alt={t('common.edit')} />
+            <img src="/icon/pencil.svg" alt={t('common.edit')} className="w-3.5 h-3.5 icon-invert" />
           </button>
           
-          {/* Token Badge - automatically gets model from RewriteContext */}
           <TokenBadge text={currentNote?.content || ''} />
         </div>
         
-        <div className="header-actions">
+        <div className="flex items-center gap-1">
           {hasHighlights && showHighlights && (
             <button 
-              className="done-highlights-btn"
+              className={cn(
+                "flex items-center gap-1.5 py-1.5 px-3.5",
+                "bg-transparent text-text-primary",
+                "border border-border-light",
+                "rounded-pill text-sm font-medium cursor-pointer",
+                "transition-all duration-200",
+                "hover:bg-bg-hover",
+                "hover:border-border-hover"
+              )}
               onClick={() => setShowHighlights(false)}
               data-tooltip={t('common.hide')}
             >
-              <img src="/icon/eye-off.svg" alt={t('common.hide')} />
+              <img src="/icon/eye-off.svg" alt={t('common.hide')} className="w-4 h-4 opacity-70 icon-invert" />
               <span>{t('common.done')}</span>
             </button>
           )}
 
           <button 
-            className="icon-btn" 
+            className={cn(
+              "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+              "w-8 h-8 flex items-center justify-center",
+              "transition-colors duration-200",
+              "hover:bg-bg-hover"
+            )}
             onClick={onCreateNote}
             data-tooltip={t('common.new')}
           >
-            <img src="/icon/plus.svg" alt={t('common.new')} />
+            <img src="/icon/plus.svg" alt={t('common.new')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
           </button>
           <button 
-            className="icon-btn" 
+            className={cn(
+              "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+              "w-8 h-8 flex items-center justify-center",
+              "transition-colors duration-200",
+              "hover:bg-bg-hover"
+            )}
             onClick={handleShare}
             data-tooltip={t('common.share')}
           >
-            <img src="/icon/share-2.svg" alt={t('common.share')} />
+            <img src="/icon/share-2.svg" alt={t('common.share')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
           </button>
           {rightSidebarHidden && (
             <button 
-              className="icon-btn" 
+              className={cn(
+                "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+                "w-8 h-8 flex items-center justify-center",
+                "transition-colors duration-200",
+                "hover:bg-bg-hover"
+              )}
               onClick={onToggleRightSidebar}
               data-tooltip={t('nav.sidebar')}
             >
-              <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} />
+              <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
             </button>
           )}
         </div>
       </header>
 
-      <div className="text-input-area">
+      <div className={cn(
+        "relative flex-1 p-0 m-0 border-none",
+        "bg-bg-tertiary",
+        "overflow-hidden h-full w-full box-border"
+      )}>
         <TextHighlightEditor
           value={currentNote?.content || ''}
           onChange={handleContentChange}
@@ -301,7 +313,6 @@ const AIStudioEditorEnhanced = ({
         />
       </div>
 
-      {/* Edit Title Modal */}
       <EditTitleModal
         isOpen={showEditTitleModal}
         currentTitle={currentNote?.title || ''}

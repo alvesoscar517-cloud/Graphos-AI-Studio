@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useAIProcessing } from '../../contexts/AIProcessingContext'
+import { useAIProcessing } from '@/stores'
 import useAutoScrollbar from '../../hooks/useAutoScrollbar'
 import SuggestionTooltip from './SuggestionTooltip'
 import RewriteToolbar from './RewriteToolbar'
-import './TextHighlightEditor.css'
+import { cn } from '../../lib/utils'
 
 /**
  * TextHighlightEditor - Enhanced with keyboard navigation and undo support
@@ -40,10 +40,6 @@ const TextHighlightEditor = ({
     showOnHover: true,
     externalRef: textareaRef
   })
-  
-  // Detect dark theme
-  const isDarkTheme = document.body.classList.contains('dark-theme') || 
-                      document.documentElement.getAttribute('data-theme') === 'dark'
 
   // Update analysis and reset states
   useEffect(() => {
@@ -278,17 +274,28 @@ const TextHighlightEditor = ({
   const segments = parseTextSegments()
 
   return (
-    <div className="text-highlight-editor" ref={editorRef}>
+    <div className={cn(
+      "relative w-full h-full bg-bg-tertiary overflow-hidden box-border"
+    )} ref={editorRef}>
       <div 
-        className={`highlight-editor-wrapper ${isProcessing ? 'processing-active' : ''} ${showRewriteToolbar ? 'with-toolbar' : ''}`}
+        className={cn(
+          "relative w-full h-full overflow-y-auto overflow-x-hidden box-border",
+          showRewriteToolbar && "pb-20"
+        )}
       >
         {/* Overlay with highlights */}
         {analysis && showHighlights && (
-          <div className="highlight-editor-overlay">
+          <div className={cn(
+            "absolute top-0 left-0 w-full h-full",
+            "py-6 px-8 font-sans text-sm leading-relaxed",
+            "text-transparent whitespace-pre-wrap break-words",
+            "pointer-events-none z-base box-border overflow-hidden",
+            "md:py-4 md:px-5 md:text-sm"
+          )}>
             {segments.map((segment, index) => {
               if (segment.type === 'normal') {
                 return (
-                  <span key={index} className="highlight-text-normal">
+                  <span key={index} className="pointer-events-none">
                     {segment.text}
                   </span>
                 )
@@ -299,8 +306,8 @@ const TextHighlightEditor = ({
                 return (
                   <span 
                     key={index} 
-                    className="highlight-text-dismissed"
-                    style={{ opacity: 0.5, textDecoration: 'line-through' }}
+                    className="opacity-40 line-through pointer-events-none"
+                    style={{ textDecorationColor: 'rgba(0,0,0,0.3)' }}
                   >
                     {segment.text}
                   </span>
@@ -310,21 +317,12 @@ const TextHighlightEditor = ({
               // Track highlight index for keyboard navigation
               const highlightIndex = segments.slice(0, index).filter(s => s.type === 'highlight').length
 
-              // Determine background color based on level and theme
-              let bgColor
-              if (isDarkTheme) {
-                bgColor = segment.level === 'high' 
-                  ? 'rgba(242, 139, 130, 0.25)'
-                  : segment.level === 'medium'
-                  ? 'rgba(253, 214, 99, 0.2)'
-                  : 'rgba(253, 214, 99, 0.15)'
-              } else {
-                bgColor = segment.level === 'high' 
-                  ? 'rgba(220, 38, 38, 0.15)'
-                  : segment.level === 'medium'
-                  ? 'rgba(234, 88, 12, 0.15)'
-                  : 'rgba(202, 138, 4, 0.15)'
-              }
+              // Determine background color based on level
+              const bgColor = segment.level === 'high' 
+                ? 'rgba(220, 38, 38, 0.15)'
+                : segment.level === 'medium'
+                ? 'rgba(234, 88, 12, 0.15)'
+                : 'rgba(202, 138, 4, 0.15)'
 
               const isActive = activeHighlightIndex === highlightIndex
 
@@ -332,7 +330,9 @@ const TextHighlightEditor = ({
                 <span
                   key={index}
                   ref={el => highlightRefs.current[highlightIndex] = el}
-                  className={`highlight-text-marked level-${segment.level} ${isActive ? 'active' : ''}`}
+                  className={cn(
+                    "cursor-pointer rounded-sm py-0.5 pointer-events-auto select-none"
+                  )}
                   onClick={(e) => handleHighlightClick(segment, e, highlightIndex)}
                   title={`${segment.suggestions.issues_found} issues - Click to view (Tab to navigate)`}
                   style={{
@@ -341,7 +341,7 @@ const TextHighlightEditor = ({
                     animation: 'none',
                     transform: 'none',
                     filter: 'none',
-                    boxShadow: isActive ? '0 0 0 2px var(--primary-color)' : 'none',
+                    boxShadow: isActive ? '0 0 0 2px var(--color-text-link)' : 'none',
                     outline: 'none',
                     border: 'none',
                     willChange: 'auto'
@@ -372,7 +372,23 @@ const TextHighlightEditor = ({
         {/* Input textarea */}
         <textarea
           ref={textareaRef}
-          className={`highlight-editor-input ${scrollbarClassName} ${isProcessing ? 'processing-shimmer' : ''}`}
+          className={cn(
+            "absolute top-0 left-0 w-full h-full",
+            "py-6 px-8 font-sans text-sm leading-relaxed",
+            "text-text-primary bg-transparent",
+            "border-none outline-none resize-none",
+            "whitespace-pre-wrap break-words z-base box-border",
+            "overflow-x-hidden overflow-y-auto",
+            "scrollbar-none [-ms-overflow-style:none]",
+            "[will-change:contents] [contain:layout_style]",
+            "[-webkit-font-smoothing:antialiased] [-moz-osx-font-smoothing:grayscale]",
+            "[text-rendering:optimizeSpeed]",
+            "placeholder:text-text-muted",
+            "selection:bg-selection selection:text-inherit",
+            "md:py-4 md:px-5 md:text-sm",
+            scrollbarClassName,
+            isProcessing && "processing-shimmer"
+          )}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}

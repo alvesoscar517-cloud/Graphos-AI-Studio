@@ -1,152 +1,194 @@
 /**
- * Enhanced Logger
- * Structured logging with correlation IDs and log levels
+ * Enhanced Logger - Powered by Pino
+ * High-performance structured logging with correlation IDs
+ * 
+ * @module utils/logger
  */
 
-const config = require('../config');
+const pino = require('pino');
+const pinoHttp = require('pino-http');
+const { AsyncLocalStorage } = require('async_hooks');
 
 // ============================================================================
-// LOG LEVELS
+// CONFIGURATION
 // ============================================================================
 
-const LOG_LEVELS = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  http: 3,
-  debug: 4
-};
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const LOG_LEVEL = process.env.LOG_LEVEL || (IS_PRODUCTION ? 'info' : 'debug');
 
-const CURRENT_LEVEL = LOG_LEVELS[process.env.LOG_LEVEL || (config.IS_PRODUCTION ? 'info' : 'debug')];
+/**
+ * Sensitive fields to redact from logs
+ */
+const REDACT_PATHS = [
+  'password',
+  'token',
+  'secret',
+  'authorization',
+  'cookie',
+  'apiKey',
+  'api_key',
+  'credit_card',
+  'ssn',
+  'req.headers.authorization',
+  'req.headers.cookie',
+  'res.headers["set-cookie"]'
+];
 
 // ============================================================================
-// COLORS (for development)
+// PINO LOGGER INSTANCE
 // ============================================================================
 
-const COLORS = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m',
-  gray: '\x1b[90m',
-  green: '\x1b[32m'
-};
-
-const LEVEL_COLORS = {
-  error: COLORS.red,
-  warn: COLORS.yellow,
-  info: COLORS.blue,
-  http: COLORS.cyan,
-  debug: COLORS.gray
-};
+/**
+ * Create Pino logger with appropriate configuration
+ */
+const logger = pino({
+  level: LOG_LEVEL,
+  redact: {
+    paths: REDACT_PATHS,
+    censor: '[REDACTED]'
+  },
+  // Use pino-pretty in development
+  transport: !IS_PRODUCTION ? {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+      translateTime: 'SYS:standard',
+      ignore: 'pid,hostname'
+    }
+  } : undefined,
+  // Production: JSON format
+  formatters: IS_PRODUCTION ? {
+    level: (label) => ({ level: label }),
+    bindings: () => ({})
+  } : undefined,
+  // Add timestamp
+  timestamp: pino.stdTimeFunctions.isoTime
+});
 
 // ============================================================================
 // CORRELATION ID MANAGEMENT
 // ============================================================================
 
-const asyncLocalStorage = new (require('async_hooks').AsyncLocalStorage)();
+const asyncLocalStorage = new AsyncLocalStorage();
 
+/**
+ * Get current correlation ID from async context
+ * @returns {string|null} Correlation ID or null
+ */
 function getCorrelationId() {
   const store = asyncLocalStorage.getStore();
   return store?.correlationId || null;
 }
 
-function setCorrelationId(correlationId) {
-  return asyncLocalStorage.run({ correlationId }, () => correlationId);
+/**
+ * Set correlation ID in async context
+ * @param {string} correlationId - Correlation ID to set
+ * @param {Function} callback - Callback to run with correlation ID
+ * @returns {*} Result of callback
+ */
+function runWithCorrelationId(correlationId, callback) {
+  return asyncLocalStorage.run({ correlationId }, callback);
 }
 
+/**
+ * Generate unique ID
+ * @returns {string} Unique ID
+ */
+function generateId() {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`;
+}
+
+/**
+ * Express middleware to set correlation ID
+ */
 function correlationMiddleware(req, res, next) {
   const correlationId = req.headers['x-correlation-id'] || 
                         req.headers['x-request-id'] || 
                         generateId();
   
   res.setHeader('X-Correlation-ID', correlationId);
+  req.correlationId = correlationId;
   
   asyncLocalStorage.run({ correlationId }, () => {
-    req.correlationId = correlationId;
     next();
   });
 }
 
-function generateId() {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`;
-}
-
 // ============================================================================
-// FORMATTERS
+// PINO-HTTP MIDDLEWARE
 // ============================================================================
 
 /**
- * Format log entry for console output
+ * Create pino-http middleware for request logging
  */
-function formatConsole(level, message, meta) {
-  const timestamp = new Date().toISOString();
-  const correlationId = getCorrelationId();
-  const color = LEVEL_COLORS[level] || COLORS.reset;
+const requestLogger = pinoHttp({
+  logger,
   
-  let output = '';
+  // Generate request ID
+  genReqId: (req) => req.correlationId || req.headers['x-correlation-id'] || generateId(),
   
-  if (config.IS_DEVELOPMENT) {
-    // Pretty format for development
-    output = `${COLORS.gray}${timestamp}${COLORS.reset} `;
-    output += `${color}[${level.toUpperCase().padEnd(5)}]${COLORS.reset} `;
-    if (correlationId) {
-      output += `${COLORS.cyan}[${correlationId}]${COLORS.reset} `;
-    }
-    output += message;
-    
-    if (meta && Object.keys(meta).length > 0) {
-      output += ` ${COLORS.gray}${JSON.stringify(meta)}${COLORS.reset}`;
-    }
-  } else {
-    // JSON format for production (better for log aggregation)
-    const logEntry = {
-      timestamp,
-      level,
-      message,
-      correlationId,
-      ...meta
-    };
-    output = JSON.stringify(logEntry);
+  // Custom log level based on status code
+  customLogLevel: (req, res, err) => {
+    if (res.statusCode >= 500 || err) return 'error';
+    if (res.statusCode >= 400) return 'warn';
+    return 'info';
+  },
+  
+  // Custom success message
+  customSuccessMessage: (req, res) => {
+    return `${req.method} ${req.url} ${res.statusCode}`;
+  },
+  
+  // Custom error message
+  customErrorMessage: (req, res, err) => {
+    return `${req.method} ${req.url} ${res.statusCode} - ${err.message}`;
+  },
+  
+  // Custom attributes to add to log
+  customAttributeKeys: {
+    req: 'request',
+    res: 'response',
+    err: 'error',
+    responseTime: 'duration'
+  },
+  
+  // Redact sensitive headers
+  redact: REDACT_PATHS,
+  
+  // Custom props
+  customProps: (req) => ({
+    correlationId: req.correlationId,
+    userId: req.userId
+  }),
+  
+  // Serializers
+  serializers: {
+    req: (req) => ({
+      method: req.method,
+      url: req.url,
+      path: req.path,
+      query: req.query,
+      params: req.params,
+      correlationId: req.correlationId,
+      userId: req.userId
+    }),
+    res: (res) => ({
+      statusCode: res.statusCode
+    })
   }
-  
-  return output;
-}
+});
+
+// ============================================================================
+// LOGGER WRAPPER (backward compatibility)
+// ============================================================================
 
 /**
- * Sanitize sensitive data from logs
+ * Logger class for backward compatibility
  */
-function sanitizeMeta(meta) {
-  if (!meta || typeof meta !== 'object') return meta;
-  
-  const sensitiveKeys = [
-    'password', 'token', 'secret', 'key', 'authorization',
-    'cookie', 'credit_card', 'ssn', 'api_key', 'apiKey'
-  ];
-  
-  const sanitized = { ...meta };
-  
-  for (const key of Object.keys(sanitized)) {
-    const lowerKey = key.toLowerCase();
-    
-    if (sensitiveKeys.some(sk => lowerKey.includes(sk))) {
-      sanitized[key] = '[REDACTED]';
-    } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
-      sanitized[key] = sanitizeMeta(sanitized[key]);
-    }
-  }
-  
-  return sanitized;
-}
-
-// ============================================================================
-// LOGGER CLASS
-// ============================================================================
-
 class Logger {
   constructor(context = {}) {
     this.context = context;
+    this.pino = logger.child(context);
   }
   
   /**
@@ -157,45 +199,39 @@ class Logger {
   }
   
   /**
-   * Log at specified level
+   * Add correlation ID to log context
    */
-  log(level, message, meta = {}) {
-    if (LOG_LEVELS[level] > CURRENT_LEVEL) return;
-    
-    const sanitizedMeta = sanitizeMeta({ ...this.context, ...meta });
-    const formatted = formatConsole(level, message, sanitizedMeta);
-    
-    if (level === 'error') {
-      console.error(formatted);
-    } else if (level === 'warn') {
-      console.warn(formatted);
-    } else {
-      console.log(formatted);
-    }
+  _withCorrelation(meta = {}) {
+    const correlationId = getCorrelationId();
+    return correlationId ? { correlationId, ...meta } : meta;
   }
   
   error(message, meta = {}) {
-    this.log('error', message, meta);
+    this.pino.error(this._withCorrelation(meta), message);
   }
   
   warn(message, meta = {}) {
-    this.log('warn', message, meta);
+    this.pino.warn(this._withCorrelation(meta), message);
   }
   
   info(message, meta = {}) {
-    this.log('info', message, meta);
+    this.pino.info(this._withCorrelation(meta), message);
   }
   
   http(message, meta = {}) {
-    this.log('http', message, meta);
+    this.pino.info(this._withCorrelation({ ...meta, type: 'http' }), message);
   }
   
   debug(message, meta = {}) {
-    this.log('debug', message, meta);
+    this.pino.debug(this._withCorrelation(meta), message);
+  }
+  
+  trace(message, meta = {}) {
+    this.pino.trace(this._withCorrelation(meta), message);
   }
   
   /**
-   * Log API request
+   * Log API request (legacy method)
    */
   logRequest(req, res, duration) {
     const meta = {
@@ -204,8 +240,7 @@ class Logger {
       statusCode: res.statusCode,
       duration: `${duration}ms`,
       userId: req.userId,
-      ip: req.ip,
-      userAgent: req.get('user-agent')?.substring(0, 100)
+      ip: req.ip
     };
     
     if (res.statusCode >= 500) {
@@ -230,30 +265,20 @@ class Logger {
 }
 
 // ============================================================================
-// REQUEST LOGGING MIDDLEWARE
-// ============================================================================
-
-function requestLogger(req, res, next) {
-  const startTime = Date.now();
-  
-  // Log when response finishes
-  res.on('finish', () => {
-    const duration = Date.now() - startTime;
-    logger.logRequest(req, res, duration);
-  });
-  
-  next();
-}
-
-// ============================================================================
 // EXPORTS
 // ============================================================================
 
-const logger = new Logger();
+// Create default logger instance
+const defaultLogger = new Logger();
 
-module.exports = logger;
+// Export as default
+module.exports = defaultLogger;
+
+// Named exports
 module.exports.Logger = Logger;
+module.exports.pino = logger;
 module.exports.correlationMiddleware = correlationMiddleware;
 module.exports.requestLogger = requestLogger;
 module.exports.getCorrelationId = getCorrelationId;
-module.exports.setCorrelationId = setCorrelationId;
+module.exports.runWithCorrelationId = runWithCorrelationId;
+module.exports.generateId = generateId;

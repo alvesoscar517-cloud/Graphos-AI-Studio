@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import './WritingPreferences.css'
+import Icon from '../Common/Icon'
+import { cn } from '../../lib/utils'
 
 const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange }) => {
   const { t } = useTranslation()
@@ -80,39 +81,43 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange }
   ]
 
   return (
-    <div className={`wp-container ${isDisabled ? 'wp-disabled' : ''}`}>
-      <div className="wp-header">
-        <img src="/icon/sliders.svg" alt={t('writingPreferences.advancedOptions')} className="wp-header-icon" />
-        <h4 className="wp-header-title">{t('writingPreferences.advancedOptions')}</h4>
+    <div className="flex flex-col gap-3 w-full">
+      {/* Header */}
+      <div className="flex items-center gap-1.5 px-1 mb-1">
+        <Icon name="sliders" alt={t('writingPreferences.advancedOptions')} size="xs" color="muted" />
+        <h4 className="font-medium text-text-muted m-0 tracking-wide uppercase" style={{ fontSize: '10px' }}>{t('writingPreferences.advancedOptions')}</h4>
       </div>
 
       {isDisabled && (
-        <div className="wp-notice">
-          <img src="/icon/alert-circle.svg" alt={t('common.info')} />
+        <div className="flex items-start gap-2 py-2.5 px-3 bg-warning/10 border border-warning/20 rounded-lg text-xs text-warning mb-1">
+          <Icon name="alert-circle" alt={t('common.info')} size="md" color="warning" themed={false} className="shrink-0 mt-0.5" />
           <span>{t('writingPreferences.selectProfileNotice')}</span>
         </div>
       )}
 
-      <div className="wp-list">
+      <div className="flex flex-col gap-1.5">
         {preferenceItems.map((item) => (
-          <div key={item.key} className={`wp-item ${isDisabled ? 'wp-item-disabled' : ''}`}>
-            <div className="wp-item-left">
-              <img src={item.icon} alt={item.title} className="wp-item-icon" />
-              <div className="wp-item-content">
-                <div className="wp-item-title">{item.title}</div>
-                <div className="wp-item-desc">{item.description}</div>
+          <div key={item.key} className={cn(
+            "flex items-center justify-between gap-3 py-2.5 px-3",
+            "bg-bg-secondary border border-border-light rounded-xl",
+            isDisabled && "opacity-50 pointer-events-none"
+          )}>
+            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+              <Icon name={item.icon.replace('/icon/', '').replace('.svg', '')} alt={item.title} size="lg" color="muted" themed className="shrink-0" />
+              <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                <div className="text-sm font-medium text-text-primary leading-tight flex items-center gap-1.5">{item.title}</div>
+                <div className="text-xs text-text-secondary leading-tight whitespace-nowrap overflow-hidden text-ellipsis">{item.description}</div>
               </div>
             </div>
-            <label className="wp-toggle">
+            <label className="toggle-switch">
               <input
                 type="checkbox"
                 checked={localPreferences[item.key]}
                 onChange={() => handleToggle(item.key)}
-                className="wp-toggle-input"
                 disabled={isDisabled}
               />
-              <span className="wp-toggle-track">
-                <span className="wp-toggle-thumb"></span>
+              <span className="toggle-switch-track">
+                <span className="toggle-switch-thumb"></span>
               </span>
             </label>
           </div>
@@ -120,53 +125,59 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange }
       </div>
 
       {/* Humanization Section */}
-      <div className="wp-header wp-header-humanize">
-        <img src="/icon/user-check.svg" alt={t('writingPreferences.humanization')} className="wp-header-icon" />
-        <h4 className="wp-header-title">{t('writingPreferences.humanization')}</h4>
-        <span className="wp-header-badge">{t('writingPreferences.new')}</span>
+      <div className="flex items-center gap-1.5 px-1 mb-1 mt-3">
+        <Icon name="user-check" alt={t('writingPreferences.humanization')} size="xs" color="muted" />
+        <h4 className="font-medium text-text-muted m-0 tracking-wide uppercase" style={{ fontSize: '10px' }}>{t('writingPreferences.humanization')}</h4>
       </div>
 
-      <div className="wp-list">
+      <div className="flex flex-col gap-1.5">
         {humanizationItems.map((item) => (
-          <div key={item.key} className={`wp-item ${isDisabled ? 'wp-item-disabled' : ''}`}>
-            <div className="wp-item-left">
-              <img src={item.icon} alt={item.title} className="wp-item-icon" />
-              <div className="wp-item-content">
-                <div className="wp-item-title">
+          <div key={item.key} className={cn(
+            "flex items-center justify-between gap-3 py-2.5 px-3",
+            "bg-bg-secondary border border-border-light rounded-xl",
+            isDisabled && "opacity-50 pointer-events-none"
+          )}>
+            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+              <Icon name={item.icon.replace('/icon/', '').replace('.svg', '')} alt={item.title} size="lg" color="muted" themed className="shrink-0" />
+              <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                <div className="text-sm font-medium text-text-primary leading-tight flex items-center gap-1.5">
                   {item.title}
-                  {item.badge && <span className="wp-item-badge">{item.badge}</span>}
+                  {item.badge && <span className="text-[9px] font-medium py-px px-1 bg-primary/15 text-primary rounded">{item.badge}</span>}
                 </div>
-                <div className="wp-item-desc">{item.description}</div>
+                <div className="text-xs text-text-secondary leading-tight whitespace-nowrap overflow-hidden text-ellipsis">{item.description}</div>
               </div>
             </div>
-            <label className="wp-toggle">
+            <label className="toggle-switch">
               <input
                 type="checkbox"
                 checked={localPreferences[item.key]}
                 onChange={() => handleToggle(item.key)}
-                className="wp-toggle-input"
                 disabled={isDisabled}
               />
-              <span className="wp-toggle-track">
-                <span className="wp-toggle-thumb"></span>
+              <span className="toggle-switch-track">
+                <span className="toggle-switch-thumb"></span>
               </span>
             </label>
           </div>
         ))}
 
-        {/* Target AI Probability Slider - only show when iterative refinement is enabled */}
+        {/* Target AI Probability Slider */}
         {localPreferences.useIterativeRefinement && (
-          <div className={`wp-item wp-item-slider ${isDisabled ? 'wp-item-disabled' : ''}`}>
-            <div className="wp-item-left">
-              <img src="/icon/target.svg" alt={t('writingPreferences.targetAIProbability')} className="wp-item-icon" />
-              <div className="wp-item-content">
-                <div className="wp-item-title">{t('writingPreferences.targetAIProbability')}</div>
-                <div className="wp-item-desc">
+          <div className={cn(
+            "flex flex-col items-stretch gap-2 py-2.5 px-3",
+            "bg-bg-secondary border border-border-light rounded-xl",
+            isDisabled && "opacity-50 pointer-events-none"
+          )}>
+            <div className="flex items-center gap-2.5 w-full">
+              <Icon name="target" alt={t('writingPreferences.targetAIProbability')} size="lg" color="muted" themed className="shrink-0" />
+              <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                <div className="text-sm font-medium text-text-primary leading-tight">{t('writingPreferences.targetAIProbability')}</div>
+                <div className="text-xs text-text-secondary leading-tight">
                   {t('writingPreferences.refineUntilBelow', { percent: localPreferences.targetAIProbability })}
                 </div>
               </div>
             </div>
-            <div className="wp-slider-container">
+            <div className="flex items-center gap-2.5 pl-7">
               <input
                 type="range"
                 min="20"
@@ -174,10 +185,10 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange }
                 step="5"
                 value={localPreferences.targetAIProbability}
                 onChange={(e) => handleSliderChange('targetAIProbability', parseInt(e.target.value))}
-                className="wp-slider"
+                className="flex-1 h-1.5 slider-primary"
                 disabled={isDisabled}
               />
-              <span className="wp-slider-value">{localPreferences.targetAIProbability}%</span>
+              <span className="text-sm font-semibold text-primary min-w-[40px] text-right">{localPreferences.targetAIProbability}%</span>
             </div>
           </div>
         )}
@@ -185,9 +196,9 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange }
 
       {/* Info box */}
       {localPreferences.useAntiAIDetection && !isDisabled && (
-        <div className="wp-info-box">
-          <img src="/icon/info.svg" alt={t('common.info')} className="wp-info-icon" />
-          <div className="wp-info-text">
+        <div className="flex items-start gap-2 py-2.5 px-3 bg-primary/5 border border-primary/20 rounded-lg mt-1">
+          <Icon name="info" alt={t('common.info')} size="sm" color="muted" className="shrink-0 mt-0.5" />
+          <div className="text-xs text-text-secondary leading-relaxed">
             {t('writingPreferences.antiAIInfo')}
           </div>
         </div>

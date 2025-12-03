@@ -59,6 +59,13 @@ router.post('/forgot-password', emailAuthController.forgotPassword);
  */
 router.post('/reset-password', emailAuthController.resetPassword);
 
+/**
+ * Refresh access token
+ * POST /auth/email/refresh
+ * Body: { refreshToken }
+ */
+router.post('/refresh', emailAuthController.refreshToken);
+
 // ============================================================================
 // PROTECTED ROUTES (Authentication required)
 // ============================================================================

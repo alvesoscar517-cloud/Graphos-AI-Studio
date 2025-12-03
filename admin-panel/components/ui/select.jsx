@@ -80,13 +80,13 @@ const Select = forwardRef(({
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
           className={cn(
-            'flex items-center justify-between gap-2 w-full px-4 py-2.5 rounded-lg',
-            'border border-border/50 bg-surface-secondary text-primary text-sm text-left',
-            'transition-colors duration-200 cursor-pointer',
-            'hover:bg-surface',
-            'focus:outline-none focus:bg-surface',
-            'disabled:opacity-60 disabled:cursor-not-allowed',
-            isOpen && 'bg-surface',
+            'flex items-center justify-between gap-2 w-full px-4 py-3 rounded-xl',
+            'border border-border/40 bg-surface-secondary text-primary text-[15px] text-left',
+            'transition-all duration-[250ms] ease-[cubic-bezier(0.25,0.1,0.25,1)] cursor-pointer',
+            'hover:bg-surface hover:border-border/60',
+            'focus:outline-none focus:bg-surface focus:border-border focus:shadow-[0_0_0_3px_rgba(0,122,255,0.12)]',
+            'disabled:opacity-50 disabled:cursor-not-allowed',
+            isOpen && 'bg-surface border-border shadow-[0_0_0_3px_rgba(0,122,255,0.12)]',
             error && 'border-destructive/50 bg-destructive/5',
             className
           )}
@@ -114,10 +114,10 @@ const Select = forwardRef(({
         {isOpen && (
           <div
             className={cn(
-              'absolute z-[100] w-full mt-1.5 py-1.5 rounded-xl',
-              'border border-border bg-surface shadow-xl',
-              'max-h-64 overflow-y-auto',
-              'animate-in fade-in-0 zoom-in-95 duration-150'
+              'absolute z-[100] w-full mt-2 py-2 rounded-2xl',
+              'border border-border/30 bg-surface/95 backdrop-blur-xl shadow-dropdown',
+              'max-h-72 overflow-y-auto',
+              'animate-in fade-in-0 zoom-in-[0.97] duration-200'
             )}
             role="listbox"
           >
@@ -129,9 +129,10 @@ const Select = forwardRef(({
                   type="button"
                   onClick={() => handleSelect(option.value)}
                   className={cn(
-                    'flex items-center gap-2 w-full px-3 py-2.5 text-sm text-left',
-                    'transition-colors duration-150 cursor-pointer',
-                    'hover:bg-surface-secondary focus:bg-surface-secondary focus:outline-none',
+                    'flex items-center gap-2.5 w-full px-4 py-2.5 text-[15px] text-left',
+                    'transition-all duration-150 cursor-pointer mx-1.5 rounded-xl',
+                    'w-[calc(100%-12px)]',
+                    'hover:bg-surface-secondary/80 focus:bg-surface-secondary/80 focus:outline-none',
                     isSelected && 'bg-primary/5 font-medium'
                   )}
                   role="option"
@@ -143,7 +144,7 @@ const Select = forwardRef(({
                   <span className="flex-1 truncate">{option.label}</span>
                   {isSelected && (
                     <svg 
-                      className="w-4 h-4 text-primary shrink-0" 
+                      className="w-4 h-4 text-info shrink-0" 
                       fill="none" 
                       viewBox="0 0 24 24" 
                       stroke="currentColor" 

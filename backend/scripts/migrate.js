@@ -43,7 +43,7 @@ console.log(`   Async functions: ${stats.asyncFunctions}\n`);
 console.log('[INFO] Creating new structure...\n');
 
 const newIndex = `/**
- * AI Content Authenticator - Backend Entry Point
+ * Graphos AI Studio - Backend Entry Point
  * Modular architecture for better maintainability
  */
 
@@ -66,7 +66,7 @@ app.use(rateLimit);
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    service: 'AI Content Authenticator',
+    service: 'Graphos AI Studio',
     version: config.API_VERSION,
     timestamp: new Date().toISOString(),
     uptime: process.uptime()

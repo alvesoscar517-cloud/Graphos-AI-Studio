@@ -1,11 +1,21 @@
 /**
- * Enhanced Redis Service
+ * Enhanced Redis Service - Powered by ioredis
  * Distributed caching with memory fallback
- * Supports rate limiting and session management
+ * Optimized for Cloud Run with lazy connect
+ * 
+ * @module services/redis
  */
 
+const Redis = require('ioredis');
 const logger = require('../utils/logger');
-const config = require('../config');
+
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
+
+const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+const MAX_RETRIES = 10;
+const RETRY_DELAY = 100;
 
 // ============================================================================
 // REDIS CLIENT
@@ -13,9 +23,11 @@ const config = require('../config');
 
 let redisClient = null;
 let isConnected = false;
+let cleanupInterval = null;
 
 /**
- * Initialize Redis connection
+ * Initialize Redis connection with ioredis
+ * Optimized for Cloud Run with lazy connect
  */
 async function initRedis() {
   // Skip if Redis URL not configured
@@ -25,83 +37,166 @@ async function initRedis() {
   }
   
   try {
-    // Dynamic import for optional Redis dependency
-    const { createClient } = await import('redis');
-    
-    redisClient = createClient({
-      url: process.env.REDIS_URL,
-      socket: {
-        reconnectStrategy: (retries) => {
-          if (retries > 10) {
-            logger.error('Redis max reconnection attempts reached');
-            return new Error('Max reconnection attempts reached');
-          }
-          return Math.min(retries * 100, 3000);
+    redisClient = new Redis(REDIS_URL, {
+      // Cloud Run optimization: lazy connect for faster cold start
+      lazyConnect: true,
+      
+      // Connection settings
+      maxRetriesPerRequest: 3,
+      retryStrategy: (times) => {
+        if (times > MAX_RETRIES) {
+          logger.error('Redis max reconnection attempts reached');
+          return null; // Stop retrying
         }
+        const delay = Math.min(times * RETRY_DELAY, 3000);
+        logger.info('Redis reconnecting...', { attempt: times, delay });
+        return delay;
+      },
+      
+      // Performance settings
+      enableReadyCheck: true,
+      enableOfflineQueue: true,
+      connectTimeout: 10000,
+      
+      // Keep alive for Cloud Run
+      keepAlive: 30000,
+      
+      // Auto reconnect
+      reconnectOnError: (err) => {
+        const targetErrors = ['READONLY', 'ECONNRESET', 'ETIMEDOUT'];
+        return targetErrors.some(e => err.message.includes(e));
       }
     });
     
+    // Event handlers
     redisClient.on('error', (err) => {
       logger.error('Redis error', { error: err.message });
       isConnected = false;
     });
     
     redisClient.on('connect', () => {
-      logger.info('Redis connected');
+      logger.info('Redis connecting...');
+    });
+    
+    redisClient.on('ready', () => {
+      logger.info('Redis ready');
       isConnected = true;
     });
     
-    redisClient.on('reconnecting', () => {
-      logger.info('Redis reconnecting...');
+    redisClient.on('close', () => {
+      logger.info('Redis connection closed');
+      isConnected = false;
     });
     
+    redisClient.on('reconnecting', (delay) => {
+      logger.info('Redis reconnecting...', { delay });
+    });
+    
+    // Connect
     await redisClient.connect();
+    
+    // Verify connection
+    await redisClient.ping();
     isConnected = true;
     
+    logger.info('Redis initialized successfully');
     return true;
   } catch (error) {
-    logger.warn('Redis initialization failed, using memory fallback', { error: error.message });
+    logger.warn('Redis initialization failed, using memory fallback', { 
+      error: error.message 
+    });
+    isConnected = false;
     return false;
   }
 }
 
 /**
- * Close Redis connection
+ * Get Redis client instance
+ * @returns {Redis|null} Redis client or null
+ */
+function getClient() {
+  return redisClient;
+}
+
+/**
+ * Close Redis connection gracefully
  */
 async function close() {
-  if (redisClient && isConnected) {
-    await redisClient.quit();
+  // Clear cleanup interval
+  if (cleanupInterval) {
+    clearInterval(cleanupInterval);
+    cleanupInterval = null;
+  }
+  
+  if (redisClient) {
+    try {
+      await redisClient.quit();
+      logger.info('Redis connection closed gracefully');
+    } catch (error) {
+      logger.warn('Redis close error, forcing disconnect', { error: error.message });
+      redisClient.disconnect();
+    }
+    redisClient = null;
     isConnected = false;
-    logger.info('Redis connection closed');
   }
 }
 
 /**
  * Check if Redis is available
+ * @returns {boolean}
  */
 function isAvailable() {
-  return isConnected && redisClient !== null;
+  return isConnected && redisClient !== null && redisClient.status === 'ready';
 }
 
 // ============================================================================
-// MEMORY FALLBACK CACHE
+// MEMORY FALLBACK CACHE (LRU-like)
 // ============================================================================
 
+const MAX_MEMORY_CACHE_SIZE = 1000;
 const memoryCache = new Map();
-const memoryCacheTimestamps = new Map();
+const memoryCacheTTL = new Map();
 
+/**
+ * Cleanup expired memory cache entries
+ */
 function cleanupMemoryCache() {
   const now = Date.now();
-  for (const [key, timestamp] of memoryCacheTimestamps.entries()) {
-    if (now - timestamp > 3600000) { // 1 hour max
+  let cleaned = 0;
+  
+  for (const [key, expiry] of memoryCacheTTL.entries()) {
+    if (now > expiry) {
       memoryCache.delete(key);
-      memoryCacheTimestamps.delete(key);
+      memoryCacheTTL.delete(key);
+      cleaned++;
     }
+  }
+  
+  if (cleaned > 0) {
+    logger.debug('Memory cache cleanup', { cleaned, remaining: memoryCache.size });
   }
 }
 
-// Cleanup every 5 minutes
-setInterval(cleanupMemoryCache, 300000);
+// Start cleanup interval
+cleanupInterval = setInterval(cleanupMemoryCache, 60000); // Every minute
+
+/**
+ * Evict oldest entries if cache is full
+ */
+function evictIfNeeded() {
+  if (memoryCache.size >= MAX_MEMORY_CACHE_SIZE) {
+    // Remove oldest 10% of entries
+    const toRemove = Math.ceil(MAX_MEMORY_CACHE_SIZE * 0.1);
+    const keys = Array.from(memoryCache.keys()).slice(0, toRemove);
+    
+    for (const key of keys) {
+      memoryCache.delete(key);
+      memoryCacheTTL.delete(key);
+    }
+    
+    logger.debug('Memory cache eviction', { evicted: toRemove });
+  }
+}
 
 // ============================================================================
 // GENERIC CACHE OPERATIONS
@@ -109,92 +204,187 @@ setInterval(cleanupMemoryCache, 300000);
 
 /**
  * Get value from cache
+ * @param {string} key - Cache key
+ * @returns {Promise<*>} Cached value or null
  */
 async function get(key) {
   try {
     if (isAvailable()) {
       const value = await redisClient.get(key);
-      return value ? JSON.parse(value) : null;
+      if (value) {
+        try {
+          return JSON.parse(value);
+        } catch {
+          return value; // Return as-is if not JSON
+        }
+      }
+      return null;
     }
     
     // Memory fallback
-    const cached = memoryCache.get(key);
-    if (cached) {
-      const timestamp = memoryCacheTimestamps.get(key);
-      if (Date.now() - timestamp < 3600000) {
-        return cached;
-      }
+    const expiry = memoryCacheTTL.get(key);
+    if (expiry && Date.now() > expiry) {
       memoryCache.delete(key);
-      memoryCacheTimestamps.delete(key);
+      memoryCacheTTL.delete(key);
+      return null;
     }
-    return null;
+    
+    return memoryCache.get(key) || null;
   } catch (error) {
     logger.warn('Cache get error', { key, error: error.message });
-    return null;
+    // Try memory fallback on Redis error
+    return memoryCache.get(key) || null;
   }
 }
 
 /**
  * Set value in cache
+ * @param {string} key - Cache key
+ * @param {*} value - Value to cache
+ * @param {number} ttlSeconds - TTL in seconds (default: 1 hour)
+ * @returns {Promise<boolean>} Success status
  */
 async function set(key, value, ttlSeconds = 3600) {
   try {
+    const serialized = JSON.stringify(value);
+    
     if (isAvailable()) {
-      await redisClient.setEx(key, ttlSeconds, JSON.stringify(value));
-      return true;
+      await redisClient.setex(key, ttlSeconds, serialized);
     }
     
-    // Memory fallback
+    // Also set in memory for fast access
+    evictIfNeeded();
     memoryCache.set(key, value);
-    memoryCacheTimestamps.set(key, Date.now());
+    memoryCacheTTL.set(key, Date.now() + (ttlSeconds * 1000));
+    
     return true;
   } catch (error) {
     logger.warn('Cache set error', { key, error: error.message });
+    
+    // Memory fallback
+    evictIfNeeded();
+    memoryCache.set(key, value);
+    memoryCacheTTL.set(key, Date.now() + (ttlSeconds * 1000));
+    
     return false;
   }
 }
 
 /**
  * Delete value from cache
+ * @param {string} key - Cache key
+ * @returns {Promise<boolean>} Success status
  */
 async function del(key) {
   try {
     if (isAvailable()) {
       await redisClient.del(key);
     }
+    
     memoryCache.delete(key);
-    memoryCacheTimestamps.delete(key);
+    memoryCacheTTL.delete(key);
+    
     return true;
   } catch (error) {
     logger.warn('Cache delete error', { key, error: error.message });
+    memoryCache.delete(key);
+    memoryCacheTTL.delete(key);
     return false;
   }
 }
 
 /**
  * Check if key exists
+ * @param {string} key - Cache key
+ * @returns {Promise<boolean>}
  */
 async function exists(key) {
   try {
     if (isAvailable()) {
-      return await redisClient.exists(key) === 1;
+      return (await redisClient.exists(key)) === 1;
     }
+    
+    const expiry = memoryCacheTTL.get(key);
+    if (expiry && Date.now() > expiry) {
+      memoryCache.delete(key);
+      memoryCacheTTL.delete(key);
+      return false;
+    }
+    
     return memoryCache.has(key);
   } catch (error) {
+    return memoryCache.has(key);
+  }
+}
+
+/**
+ * Set value with expiry only if key doesn't exist (for locks)
+ * @param {string} key - Cache key
+ * @param {*} value - Value to set
+ * @param {number} ttlSeconds - TTL in seconds
+ * @returns {Promise<boolean>} True if set, false if key exists
+ */
+async function setNX(key, value, ttlSeconds = 60) {
+  try {
+    if (isAvailable()) {
+      const result = await redisClient.set(key, JSON.stringify(value), 'EX', ttlSeconds, 'NX');
+      return result === 'OK';
+    }
+    
+    // Memory fallback
+    if (memoryCache.has(key)) {
+      const expiry = memoryCacheTTL.get(key);
+      if (expiry && Date.now() < expiry) {
+        return false;
+      }
+    }
+    
+    evictIfNeeded();
+    memoryCache.set(key, value);
+    memoryCacheTTL.set(key, Date.now() + (ttlSeconds * 1000));
+    return true;
+  } catch (error) {
+    logger.warn('Cache setNX error', { key, error: error.message });
     return false;
   }
 }
 
+/**
+ * Increment a counter
+ * @param {string} key - Cache key
+ * @param {number} amount - Amount to increment (default: 1)
+ * @returns {Promise<number>} New value
+ */
+async function incr(key, amount = 1) {
+  try {
+    if (isAvailable()) {
+      if (amount === 1) {
+        return await redisClient.incr(key);
+      }
+      return await redisClient.incrby(key, amount);
+    }
+    
+    // Memory fallback
+    const current = memoryCache.get(key) || 0;
+    const newValue = current + amount;
+    memoryCache.set(key, newValue);
+    return newValue;
+  } catch (error) {
+    logger.warn('Cache incr error', { key, error: error.message });
+    return 0;
+  }
+}
+
 // ============================================================================
-// RATE LIMITING
+// RATE LIMITING (Sliding Window)
 // ============================================================================
 
 const rateLimitMemory = new Map();
 
 const rateLimit = {
   /**
-   * Check and increment rate limit counter
-   * @param {string} key - Rate limit key (e.g., user:123:api)
+   * Check and increment rate limit counter using sliding window
+   * @param {string} key - Rate limit key
    * @param {number} limit - Max requests allowed
    * @param {number} windowSeconds - Time window in seconds
    * @returns {Promise<{allowed: boolean, remaining: number, resetAt: number}>}
@@ -207,19 +397,19 @@ const rateLimit = {
     try {
       if (isAvailable()) {
         // Use Redis sorted set for sliding window
-        const multi = redisClient.multi();
+        const pipeline = redisClient.pipeline();
         
         // Remove old entries
-        multi.zRemRangeByScore(fullKey, 0, now - windowMs);
+        pipeline.zremrangebyscore(fullKey, 0, now - windowMs);
         // Add current request
-        multi.zAdd(fullKey, { score: now, value: `${now}-${Math.random()}` });
+        pipeline.zadd(fullKey, now, `${now}-${Math.random()}`);
         // Count requests in window
-        multi.zCard(fullKey);
+        pipeline.zcard(fullKey);
         // Set expiry
-        multi.expire(fullKey, windowSeconds);
+        pipeline.expire(fullKey, windowSeconds);
         
-        const results = await multi.exec();
-        const count = results[2];
+        const results = await pipeline.exec();
+        const count = results[2][1]; // zcard result
         
         return {
           allowed: count <= limit,
@@ -251,6 +441,7 @@ const rateLimit = {
   
   /**
    * Reset rate limit for a key
+   * @param {string} key - Rate limit key
    */
   async reset(key) {
     const fullKey = `ratelimit:${key}`;
@@ -260,108 +451,120 @@ const rateLimit = {
 };
 
 // ============================================================================
-// EMBEDDING CACHE
+// SPECIALIZED CACHES
 // ============================================================================
 
 const embeddingCache = {
-  /**
-   * Get cached embedding
-   */
   async get(textHash, taskType) {
-    const key = `embedding:${taskType}:${textHash}`;
-    return await get(key);
+    return get(`embedding:${taskType}:${textHash}`);
   },
   
-  /**
-   * Set cached embedding
-   */
   async set(textHash, taskType, embedding) {
-    const key = `embedding:${taskType}:${textHash}`;
     // Cache embeddings for 24 hours
-    return await set(key, embedding, 86400);
+    return set(`embedding:${taskType}:${textHash}`, embedding, 86400);
   }
 };
-
-// ============================================================================
-// SESSION CACHE
-// ============================================================================
 
 const sessionCache = {
-  /**
-   * Get user session data
-   */
   async get(userId) {
-    const key = `session:${userId}`;
-    return await get(key);
+    return get(`session:${userId}`);
   },
   
-  /**
-   * Set user session data
-   */
   async set(userId, data, ttlSeconds = 3600) {
-    const key = `session:${userId}`;
-    return await set(key, data, ttlSeconds);
+    return set(`session:${userId}`, data, ttlSeconds);
   },
   
-  /**
-   * Delete user session
-   */
   async delete(userId) {
-    const key = `session:${userId}`;
-    return await del(key);
+    return del(`session:${userId}`);
   }
 };
-
-// ============================================================================
-// ANALYSIS CACHE
-// ============================================================================
 
 const analysisCache = {
-  /**
-   * Get cached analysis result
-   */
   async get(profileId, textHash) {
-    const key = `analysis:${profileId}:${textHash}`;
-    return await get(key);
+    return get(`analysis:${profileId}:${textHash}`);
   },
   
-  /**
-   * Set cached analysis result
-   */
   async set(profileId, textHash, result) {
-    const key = `analysis:${profileId}:${textHash}`;
     // Cache analysis for 10 minutes
-    return await set(key, result, 600);
+    return set(`analysis:${profileId}:${textHash}`, result, 600);
   },
   
-  /**
-   * Invalidate all analysis cache for a profile
-   */
   async invalidateProfile(profileId) {
-    // Note: This is a simplified version
-    // In production, use Redis SCAN to find and delete matching keys
-    logger.info('Analysis cache invalidated for profile', { profileId });
+    if (isAvailable()) {
+      try {
+        // Use SCAN to find and delete matching keys
+        let cursor = '0';
+        do {
+          const [newCursor, keys] = await redisClient.scan(
+            cursor, 
+            'MATCH', `analysis:${profileId}:*`,
+            'COUNT', 100
+          );
+          cursor = newCursor;
+          
+          if (keys.length > 0) {
+            await redisClient.del(...keys);
+          }
+        } while (cursor !== '0');
+        
+        logger.info('Analysis cache invalidated for profile', { profileId });
+      } catch (error) {
+        logger.warn('Failed to invalidate analysis cache', { profileId, error: error.message });
+      }
+    }
+    
+    // Also clear from memory
+    for (const key of memoryCache.keys()) {
+      if (key.startsWith(`analysis:${profileId}:`)) {
+        memoryCache.delete(key);
+        memoryCacheTTL.delete(key);
+      }
+    }
   }
 };
+
+// ============================================================================
+// STATISTICS
+// ============================================================================
+
+/**
+ * Get cache statistics
+ * @returns {Object} Cache stats
+ */
+function getStats() {
+  return {
+    redisConnected: isAvailable(),
+    redisStatus: redisClient?.status || 'not_initialized',
+    memoryCacheSize: memoryCache.size,
+    maxMemoryCacheSize: MAX_MEMORY_CACHE_SIZE
+  };
+}
 
 // ============================================================================
 // EXPORTS
 // ============================================================================
 
 module.exports = {
+  // Lifecycle
   initRedis,
   close,
   isAvailable,
+  getClient,
   
   // Generic operations
   get,
   set,
   del,
   exists,
+  setNX,
+  incr,
   
   // Specialized caches
   rateLimit,
   embeddingCache,
   sessionCache,
-  analysisCache
+  analysisCache,
+  
+  // Stats
+  getStats
 };

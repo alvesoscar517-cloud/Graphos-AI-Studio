@@ -1,5 +1,16 @@
+/**
+ * Auth API Utilities
+ * Helper functions for authentication in API calls
+ */
+
 import { CONFIG } from '../../utils/config'
 import { isDevMode, getDefaultTestUser, devLog } from '../../utils/devConfig'
+import { 
+  getUserData, 
+  getAuthMethod, 
+  secureGet, 
+  AUTH_STORAGE_KEYS 
+} from '../../utils/authStorage'
 
 /**
  * Get user info helper
@@ -18,16 +29,15 @@ export async function getUserInfo() {
   
   // Check for email auth token first (web app mode)
   try {
-    const authToken = localStorage.getItem('authToken')
-    const authMethod = localStorage.getItem('authMethod')
-    const storedUser = localStorage.getItem('user')
+    const authToken = secureGet(AUTH_STORAGE_KEYS.AUTH_TOKEN)
+    const authMethod = getAuthMethod()
+    const storedUser = getUserData()
     
     if (authToken && authMethod === 'email' && storedUser) {
-      const user = JSON.parse(storedUser)
       return {
-        userId: user.userId || user.email,
-        email: user.email,
-        name: user.displayName || user.name || 'User'
+        userId: storedUser.userId || storedUser.email,
+        email: storedUser.email,
+        name: storedUser.displayName || storedUser.name || 'User'
       }
     }
   } catch (e) {
@@ -57,7 +67,7 @@ export async function getUserInfo() {
   
   // Check localStorage userId (legacy support)
   try {
-    const userId = localStorage.getItem('userId')
+    const userId = secureGet(AUTH_STORAGE_KEYS.USER_ID)
     if (userId) {
       // Only return if it looks like a real user ID (not auto-generated)
       const isRealUser = !userId.startsWith('user_') && !userId.startsWith('temp_')

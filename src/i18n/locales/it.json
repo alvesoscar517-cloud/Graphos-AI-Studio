@@ -89,7 +89,7 @@
     "checking": "Verifica in corso...",
     "pleaseWait": "Attendi un attimo",
     "signInToContinue": "Accedi per continuare",
-    "signInSubtitle": "Accedi con il tuo account Google per utilizzare AI Content Authenticator",
+    "signInSubtitle": "Accedi con il tuo account Google per utilizzare Graphos AI Studio",
     "signInFailed": "Accesso fallito. Riprova.",
     "loginFailed": "Login fallito",
     "termsAgreement": "Accedendo, accetti i nostri",
@@ -118,7 +118,7 @@
     "sidebar": "Barra laterale"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "Elimina",
     "confirmDeleteNote": "Sei sicuro di voler eliminare la nota \"{{title}}\"?",
     "confirmDelete": "Conferma eliminazione",
@@ -129,7 +129,7 @@
     "rewrite": "Riscrivi"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "Strumento professionale per l'analisi e il raffinamento dello stile dei contenuti",
     "newProfile": "Nuovo profilo",
     "createStyleProfile": "Crea profilo di stile",
@@ -149,7 +149,7 @@
     "unableToLoadProfileDetails": "Impossibile caricare i dettagli del profilo",
     "yourProfiles": "I tuoi profili di stile di scrittura",
     "welcomeTo": "Benvenuto in",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "Crea il primo profilo",
     "createUniqueStyle": "Crea il tuo profilo di stile di scrittura unico",
     "analyzeRefine": "Analizza e affina i contenuti in modo intelligente",
@@ -459,7 +459,7 @@
   },
   "model": {
     "selectAIModel": "Seleziona modello IA",
-    "inUse": "[IN USO]",
+    "inUse": "IN USO",
     "geminiFlashExp": "Ultimo modello sperimentale, elaborazione rapida con supporto per più tipi di contenuto come testo e immagini",
     "geminiFlashLite": "Modello compatto, il più economico, adatto per compiti semplici ed elaborazione ad alto volume",
     "geminiFlash": "Modello bilanciato tra velocità e qualità, buona capacità di ragionamento, adatto per la maggior parte dei compiti",

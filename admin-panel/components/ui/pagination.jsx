@@ -31,10 +31,10 @@ PaginationItem.displayName = 'PaginationItem'
 
 const PaginationLink = ({ className, isActive, size = 'icon', ...props }) => (
   <Button
-    variant={isActive ? 'default' : 'ghost'}
+    variant={isActive ? 'primary' : 'ghost'}
     size={size}
     className={cn(
-      'h-9 w-9',
+      'h-9 w-9 rounded-xl',
       isActive && 'pointer-events-none',
       className
     )}

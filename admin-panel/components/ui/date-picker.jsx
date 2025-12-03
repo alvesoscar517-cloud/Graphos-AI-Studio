@@ -27,43 +27,43 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn('p-3', className)}
+      className={cn('p-4', className)}
       locale={vi}
       classNames={{
         months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
         month: 'space-y-4',
         caption: 'flex justify-center pt-1 relative items-center',
-        caption_label: 'text-sm font-medium text-primary',
+        caption_label: 'text-[15px] font-semibold text-primary tracking-[-0.01em]',
         nav: 'space-x-1 flex items-center',
         nav_button: cn(
-          'h-7 w-7 bg-transparent p-0 text-muted hover:text-primary hover:bg-surface-secondary rounded-md transition-colors',
+          'h-8 w-8 bg-transparent p-0 text-muted hover:text-primary hover:bg-surface-secondary/80 rounded-xl transition-all duration-150',
           'inline-flex items-center justify-center'
         ),
         nav_button_previous: 'absolute left-1',
         nav_button_next: 'absolute right-1',
         table: 'w-full border-collapse space-y-1',
         head_row: 'flex',
-        head_cell: 'text-muted rounded-md w-9 font-normal text-[0.8rem]',
+        head_cell: 'text-muted rounded-xl w-10 font-medium text-[12px]',
         row: 'flex w-full mt-2',
         cell: cn(
-          'relative p-0 text-center text-sm focus-within:relative focus-within:z-20',
-          '[&:has([aria-selected])]:bg-surface-secondary [&:has([aria-selected].day-outside)]:bg-surface-secondary/50',
-          '[&:has([aria-selected].day-range-end)]:rounded-r-md'
+          'relative p-0 text-center text-[14px] focus-within:relative focus-within:z-20',
+          '[&:has([aria-selected])]:bg-surface-secondary/60 [&:has([aria-selected].day-outside)]:bg-surface-secondary/30',
+          '[&:has([aria-selected].day-range-end)]:rounded-r-xl'
         ),
         day: cn(
-          'h-9 w-9 p-0 font-normal',
-          'inline-flex items-center justify-center rounded-md transition-colors',
-          'hover:bg-surface-secondary hover:text-primary',
-          'focus:outline-none focus:ring-2 focus:ring-primary/20',
+          'h-10 w-10 p-0 font-normal',
+          'inline-flex items-center justify-center rounded-xl transition-all duration-150',
+          'hover:bg-surface-secondary/80 hover:text-primary',
+          'focus:outline-none focus-visible:ring-[3px] focus-visible:ring-info/25',
           'aria-selected:opacity-100'
         ),
         day_range_start: 'day-range-start',
         day_range_end: 'day-range-end',
         day_selected: 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
-        day_today: 'bg-surface-secondary text-primary font-semibold',
-        day_outside: 'day-outside text-muted opacity-50 aria-selected:bg-surface-secondary/50 aria-selected:text-muted',
-        day_disabled: 'text-muted opacity-50',
-        day_range_middle: 'aria-selected:bg-surface-secondary aria-selected:text-primary',
+        day_today: 'bg-info/10 text-info font-semibold',
+        day_outside: 'day-outside text-muted opacity-50 aria-selected:bg-surface-secondary/30 aria-selected:text-muted',
+        day_disabled: 'text-muted opacity-40',
+        day_range_middle: 'aria-selected:bg-surface-secondary/60 aria-selected:text-primary',
         day_hidden: 'invisible',
         ...classNames,
       }}
@@ -112,9 +112,10 @@ function DatePicker({
         onClick={() => !disabled && setOpen(true)}
         disabled={disabled}
         className={cn(
-          'flex items-center justify-between w-full px-4 py-2.5 text-sm text-left',
-          'border-2 border-border rounded-lg bg-surface transition-colors',
-          'hover:border-primary/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/5',
+          'flex items-center justify-between w-full px-4 py-3 text-[15px] text-left',
+          'border border-border/40 rounded-xl bg-surface-secondary transition-all duration-200',
+          'hover:bg-surface hover:border-border/60',
+          'focus:outline-none focus:bg-surface focus:border-border focus:shadow-[0_0_0_3px_rgba(0,122,255,0.12)]',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           !value && 'text-muted',
           className
@@ -184,9 +185,10 @@ function DateRangePicker({
         onClick={() => !disabled && setOpen(true)}
         disabled={disabled}
         className={cn(
-          'flex items-center justify-between w-full px-4 py-2.5 text-sm text-left',
-          'border-2 border-border rounded-lg bg-surface transition-colors',
-          'hover:border-primary/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/5',
+          'flex items-center justify-between w-full px-4 py-3 text-[15px] text-left',
+          'border border-border/40 rounded-xl bg-surface-secondary transition-all duration-200',
+          'hover:bg-surface hover:border-border/60',
+          'focus:outline-none focus:bg-surface focus:border-border focus:shadow-[0_0_0_3px_rgba(0,122,255,0.12)]',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           !value?.from && 'text-muted',
           className
@@ -206,7 +208,7 @@ function DateRangePicker({
           </DialogHeader>
           <div className="flex">
             {presets && (
-              <div className="border-r border-border p-3 space-y-1">
+              <div className="border-r border-border/40 p-3 space-y-1">
                 {presets.map((preset) => (
                   <button
                     key={preset.label}
@@ -215,7 +217,7 @@ function DateRangePicker({
                       onChange?.(preset.value)
                       setOpen(false)
                     }}
-                    className="w-full px-3 py-2 text-sm text-left rounded-md hover:bg-surface-secondary transition-colors"
+                    className="w-full px-3.5 py-2.5 text-[14px] text-left rounded-xl hover:bg-surface-secondary/80 transition-all duration-150"
                   >
                     {preset.label}
                   </button>

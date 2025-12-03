@@ -22,7 +22,7 @@ export default function SettingsView() {
     system: { siteName: 'AI Authenticator', maintenanceMode: false, allowRegistration: true, requireEmailVerification: false },
     limits: { maxProfilesPerUser: 10, maxAnalysesPerDay: 100, maxRewritesPerDay: 50, maxFileSize: 5 },
     features: { enableAnalytics: true, enableNotifications: true, enableSupport: true, enableAutoBackup: false },
-    email: { smtpHost: '', smtpPort: 587, smtpUser: '', smtpPassword: '', fromEmail: 'noreply@example.com', fromName: 'AI Authenticator' },
+    email: { smtpHost: 'smtp.gmail.com', smtpPort: 587, smtpUser: '', smtpPassword: '', fromEmail: 'no-reply@graphosai.com', fromName: 'Graphos AI Studio' },
     security: { sessionTimeout: 24, maxLoginAttempts: 5, requireStrongPassword: true, enableTwoFactor: false },
   };
 

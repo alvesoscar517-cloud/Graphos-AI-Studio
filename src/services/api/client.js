@@ -1,40 +1,53 @@
 /**
  * Enhanced API Client
- * Centralized HTTP client with retry, timeout, and error handling
+ * Centralized HTTP client with retry, timeout, error handling, and request deduplication
+ * 
+ * Features:
+ * - Automatic token refresh on 401
+ * - Request retry with exponential backoff
+ * - Request deduplication
+ * - Timeout handling
+ * - Standardized error handling via logError
  */
 
-import { CONFIG } from '../../utils/config';
+import { CONFIG } from '../../utils/config'
+import { withRetry, logError } from '../../utils/errors'
+import { getUserInfo } from './auth'
+import { tokenService } from '../tokenService'
 import { 
   parseApiError, 
-  NetworkError, 
-  withRetry,
-  logError 
-} from '../../utils/errors';
-import { getUserInfo } from './auth';
+  ApiError,
+  requestDeduplicator,
+} from './errorHandler'
 
 // ============================================================================
 // REQUEST CONFIGURATION
 // ============================================================================
 
-const DEFAULT_TIMEOUT = 30000; // 30 seconds
+const DEFAULT_TIMEOUT = 30000 // 30 seconds
 const DEFAULT_RETRY_OPTIONS = {
   maxRetries: 2,
   baseDelay: 1000,
+  maxDelay: 10000, // Max 10 seconds between retries
   shouldRetry: (error) => {
     // Retry on network errors and 5xx server errors
-    if (error instanceof NetworkError) {
-      return error.statusCode >= 500 || error.statusCode === null;
+    if (error instanceof ApiError) {
+      // Don't retry on rate limit - wait for retry-after
+      if (error.code === 'RATE_LIMITED' && error.retryAfter) {
+        return false
+      }
+      return error.retryable
     }
-    return false;
+    return error?.statusCode >= 500 || error?.statusCode === null
   }
-};
+}
 
 // ============================================================================
 // REQUEST ID GENERATION
 // ============================================================================
 
 function generateRequestId() {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`;
+  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`
 }
 
 // ============================================================================
@@ -43,10 +56,10 @@ function generateRequestId() {
 
 class ApiClient {
   constructor(baseUrl = CONFIG.API_BASE_URL) {
-    this.baseUrl = baseUrl;
+    this.baseUrl = baseUrl
     this.defaultHeaders = {
       'Content-Type': 'application/json'
-    };
+    }
   }
   
   /**
@@ -61,131 +74,218 @@ class ApiClient {
       retry = true,
       includeAuth = true,
       signal = null
-    } = options;
+    } = options
     
-    const requestId = generateRequestId();
-    const url = `${this.baseUrl}${endpoint}`;
+    const requestId = generateRequestId()
+    const url = `${this.baseUrl}${endpoint}`
     
     // Build headers
     const requestHeaders = {
       ...this.defaultHeaders,
       ...headers,
       'X-Request-ID': requestId
-    };
+    }
+    
+    // Mutable body for adding user_id
+    let requestBody = body
     
     // Add auth if needed
     if (includeAuth) {
       try {
-        const userInfo = await getUserInfo();
+        const userInfo = await getUserInfo()
         if (userInfo?.userId) {
           // Add user_id to body for legacy compatibility
-          if (body && typeof body === 'object') {
-            body.user_id = userInfo.userId;
+          if (requestBody && typeof requestBody === 'object') {
+            requestBody = { ...requestBody, user_id: userInfo.userId }
           }
         }
         
         // Add auth token if available
-        const authToken = await this.getAuthToken();
+        const authToken = await this.getAuthToken()
         if (authToken) {
-          requestHeaders['Authorization'] = `Bearer ${authToken}`;
+          requestHeaders['Authorization'] = `Bearer ${authToken}`
         }
       } catch (error) {
-        logError(error, { context: 'getAuthInfo', requestId });
+        logError(error, { context: 'getAuthInfo', requestId })
       }
     }
     
     // Create abort controller for timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeout)
     
     // Build fetch options
     const fetchOptions = {
       method,
       headers: requestHeaders,
       signal: signal || controller.signal
-    };
+    }
     
-    if (body && method !== 'GET') {
-      fetchOptions.body = JSON.stringify(body);
+    if (requestBody && method !== 'GET') {
+      fetchOptions.body = JSON.stringify(requestBody)
     }
     
     // Execute request with optional retry
     const executeRequest = async () => {
-      const startTime = Date.now();
+      const startTime = Date.now()
       
       try {
-        const response = await fetch(url, fetchOptions);
-        const duration = Date.now() - startTime;
+        const response = await fetch(url, fetchOptions)
+        const duration = Date.now() - startTime
         
         // Log request in debug mode
         if (CONFIG.ENABLE_DEBUG_LOGS) {
-          console.log(`[API] ${method} ${endpoint} - ${response.status} (${duration}ms)`);
+          console.log(`[API] ${method} ${endpoint} - ${response.status} (${duration}ms)`)
         }
         
         // Parse response
-        let data;
-        const contentType = response.headers.get('content-type');
+        let data
+        const contentType = response.headers.get('content-type')
         
         if (contentType?.includes('application/json')) {
-          data = await response.json();
+          data = await response.json()
         } else if (contentType?.includes('text/event-stream')) {
           // Return response for streaming
-          return { response, stream: true };
+          return { response, stream: true }
         } else {
-          data = await response.text();
+          data = await response.text()
         }
         
         // Handle error responses
         if (!response.ok) {
-          const error = parseApiError(response, data);
+          const error = parseApiError(response, data, requestId)
+          
+          // Log error with standardized handler
+          logError(error, { 
+            context: 'API', 
+            endpoint, 
+            method, 
+            statusCode: response.status,
+            requestId 
+          })
           
           // Special handling for locked account
           if (data?.code === 'ACCOUNT_LOCKED') {
-            this.handleAccountLocked(data);
+            this.handleAccountLocked(data)
           }
           
-          throw error;
+          // Handle 401 - attempt token refresh (only once)
+          if (response.status === 401 && !options._isRetry) {
+            return this.handleUnauthorized(endpoint, options, error)
+          }
+          
+          throw error
         }
         
-        return { data, response };
+        return { data, response }
+      } catch (error) {
+        // Handle abort/timeout
+        if (error.name === 'AbortError') {
+          const timeoutError = new ApiError('Request timed out', {
+            code: 'TIMEOUT',
+            requestId
+          })
+          logError(timeoutError, { context: 'API', endpoint, method, requestId })
+          throw timeoutError
+        }
+        
+        // Handle network errors
+        if (error.message === 'Failed to fetch') {
+          const networkError = new ApiError('Network connection failed', {
+            code: 'NETWORK_ERROR',
+            requestId
+          })
+          logError(networkError, { context: 'API', endpoint, method, requestId })
+          throw networkError
+        }
+        
+        throw error
       } finally {
-        clearTimeout(timeoutId);
+        clearTimeout(timeoutId)
       }
-    };
-    
-    if (retry) {
-      return withRetry(executeRequest, DEFAULT_RETRY_OPTIONS);
     }
     
-    return executeRequest();
+    if (retry) {
+      return withRetry(executeRequest, DEFAULT_RETRY_OPTIONS)
+    }
+    
+    return executeRequest()
   }
   
   /**
    * Get auth token from Chrome extension or localStorage
+   * Uses tokenService for automatic refresh
    */
   async getAuthToken() {
-    // First check localStorage for email auth token
+    // First check localStorage for email auth token (with auto-refresh)
     try {
-      const authToken = localStorage.getItem('authToken');
-      const authMethod = localStorage.getItem('authMethod');
+      const { getAuthMethod } = await import('../../utils/authStorage')
+      const authMethod = getAuthMethod()
       
-      if (authToken && authMethod === 'email') {
-        return authToken;
+      if (authMethod === 'email') {
+        // Use tokenService to get valid token (auto-refreshes if needed)
+        const token = await tokenService.getValidToken()
+        if (token) return token
       }
-    } catch {
-      // localStorage not available
+    } catch (error) {
+      logError(error, { context: 'getAuthToken' })
     }
     
     // Then try Chrome extension
     try {
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
-        const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' });
-        return response?.token || null;
+        const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' })
+        return response?.token || null
       }
     } catch {
       // Not in extension context
     }
-    return null;
+    return null
+  }
+
+  /**
+   * Handle 401 response - attempt token refresh and retry
+   */
+  async handleUnauthorized(endpoint, options, originalError) {
+    try {
+      const { getAuthMethod } = await import('../../utils/authStorage')
+      const authMethod = getAuthMethod()
+      
+      // Only attempt refresh for email auth
+      if (authMethod !== 'email') {
+        throw originalError
+      }
+
+      // Try to refresh token
+      const newToken = await tokenService.refreshAccessToken()
+      
+      if (!newToken) {
+        // Refresh failed - session expired
+        this.handleSessionExpired()
+        throw originalError
+      }
+
+      // Retry original request with new token
+      console.log('[API] Retrying request with refreshed token')
+      return this.request(endpoint, { ...options, _isRetry: true })
+    } catch (error) {
+      logError(error, { context: 'handleUnauthorized', endpoint })
+      throw originalError
+    }
+  }
+
+  /**
+   * Handle session expired
+   */
+  handleSessionExpired() {
+    console.log('[API] Session expired, clearing auth')
+    tokenService.clearTokens()
+    
+    // Dispatch event for UI to handle
+    const event = new CustomEvent('sessionExpired', {
+      detail: { message: 'Your session has expired. Please sign in again.' }
+    })
+    window.dispatchEvent(event)
   }
   
   /**
@@ -193,7 +293,10 @@ class ApiClient {
    * Show modal and prevent further access
    */
   handleAccountLocked(errorData) {
-    console.error('[API] Account locked:', errorData);
+    logError(new Error('Account locked'), { 
+      context: 'API', 
+      reason: errorData.reason 
+    })
     
     // Dispatch custom event for UI to handle
     const event = new CustomEvent('accountLocked', {
@@ -202,11 +305,11 @@ class ApiClient {
         message: errorData.message,
         locked: true
       }
-    });
-    window.dispatchEvent(event);
+    })
+    window.dispatchEvent(event)
     
     // Clear auth data
-    this.clearAuth();
+    this.clearAuth()
   }
   
   /**
@@ -216,19 +319,19 @@ class ApiClient {
     try {
       // Clear from Chrome storage
       if (typeof chrome !== 'undefined' && chrome.storage?.local) {
-        await chrome.storage.local.remove(['authToken', 'userInfo']);
+        await chrome.storage.local.remove(['authToken', 'userInfo'])
       }
       
-      // Clear from localStorage
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('userInfo');
+      // Clear via authStorage utility
+      const { clearAuthStorage } = await import('../../utils/authStorage')
+      clearAuthStorage()
       
       // Send message to background script
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
-        chrome.runtime.sendMessage({ action: 'clearAuth' });
+        chrome.runtime.sendMessage({ action: 'clearAuth' })
       }
     } catch (error) {
-      console.error('[API] Failed to clear auth:', error);
+      logError(error, { context: 'clearAuth' })
     }
   }
   
@@ -237,19 +340,40 @@ class ApiClient {
   // ============================================================================
   
   async get(endpoint, options = {}) {
-    return this.request(endpoint, { ...options, method: 'GET' });
+    return this.request(endpoint, { ...options, method: 'GET' })
   }
   
   async post(endpoint, body, options = {}) {
-    return this.request(endpoint, { ...options, method: 'POST', body });
+    return this.request(endpoint, { ...options, method: 'POST', body })
   }
   
   async put(endpoint, body, options = {}) {
-    return this.request(endpoint, { ...options, method: 'PUT', body });
+    return this.request(endpoint, { ...options, method: 'PUT', body })
   }
   
   async delete(endpoint, options = {}) {
-    return this.request(endpoint, { ...options, method: 'DELETE' });
+    return this.request(endpoint, { ...options, method: 'DELETE' })
+  }
+  
+  // ============================================================================
+  // DEDUPLICATED REQUESTS
+  // ============================================================================
+  
+  /**
+   * Make a deduplicated POST request
+   * Prevents duplicate concurrent requests to the same endpoint with same body
+   */
+  async postDeduplicated(endpoint, body, options = {}) {
+    const key = requestDeduplicator.getKey(endpoint, body)
+    return requestDeduplicator.execute(key, () => this.post(endpoint, body, options))
+  }
+  
+  /**
+   * Make a deduplicated GET request
+   */
+  async getDeduplicated(endpoint, options = {}) {
+    const key = requestDeduplicator.getKey(endpoint, null)
+    return requestDeduplicator.execute(key, () => this.get(endpoint, options))
   }
   
   // ============================================================================
@@ -263,48 +387,48 @@ class ApiClient {
     const { response, stream } = await this.post(endpoint, body, {
       ...options,
       retry: false // Don't retry streaming requests
-    });
+    })
     
     if (!stream) {
-      throw new Error('Expected streaming response');
+      throw new Error('Expected streaming response')
     }
     
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
     
     try {
       while (true) {
-        const { done, value } = await reader.read();
+        const { done, value } = await reader.read()
         
-        if (done) break;
+        if (done) break
         
-        buffer += decoder.decode(value, { stream: true });
+        buffer += decoder.decode(value, { stream: true })
         
         // Process SSE events
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
         
         for (const line of lines) {
           if (line.startsWith('data: ')) {
-            const data = line.slice(6);
+            const data = line.slice(6)
             
             if (data === '[DONE]') {
-              return;
+              return
             }
             
             try {
-              const parsed = JSON.parse(data);
-              onChunk(parsed);
+              const parsed = JSON.parse(data)
+              onChunk(parsed)
             } catch {
               // Not JSON, pass raw data
-              onChunk({ raw: data });
+              onChunk({ raw: data })
             }
           }
         }
       }
     } finally {
-      reader.releaseLock();
+      reader.releaseLock()
     }
   }
 }
@@ -313,7 +437,7 @@ class ApiClient {
 // SINGLETON INSTANCE
 // ============================================================================
 
-export const apiClient = new ApiClient();
+export const apiClient = new ApiClient()
 
 // ============================================================================
 // LEGACY COMPATIBILITY
@@ -323,8 +447,8 @@ export const apiClient = new ApiClient();
  * Legacy fetch wrapper for backward compatibility
  */
 export async function apiFetch(endpoint, options = {}) {
-  const { data } = await apiClient.request(endpoint, options);
-  return data;
+  const { data } = await apiClient.request(endpoint, options)
+  return data
 }
 
-export default apiClient;
+export default apiClient

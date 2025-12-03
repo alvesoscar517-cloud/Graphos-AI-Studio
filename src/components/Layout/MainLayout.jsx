@@ -3,6 +3,7 @@ import Sidebar from './Sidebar'
 import MainContent from './MainContent'
 import RightSidebar from './RightSidebar'
 import { useNotes } from '../../contexts/NotesContext'
+import { cn } from '../../lib/utils'
 
 const MainLayout = () => {
   const [leftSidebarHidden, setLeftSidebarHidden] = useState(false)
@@ -35,11 +36,12 @@ const MainLayout = () => {
     : (rightSidebarHidden || !shouldShowRightSidebar)
 
   return (
-    <div className="container">
+    <div className={cn("flex h-screen w-full overflow-hidden bg-bg-secondary")}>
       <Sidebar 
         hidden={leftSidebarHidden}
         currentView={currentView}
         onViewChange={handleViewChange}
+        onToggle={() => setLeftSidebarHidden(!leftSidebarHidden)}
       />
       <MainContent 
         currentView={currentView}

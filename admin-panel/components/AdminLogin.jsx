@@ -5,8 +5,6 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { cn } from '@/lib/utils';
-import CLOUDS from 'vanta/dist/vanta.clouds.min';
-import * as THREE from 'three';
 
 export default function AdminLogin() {
   const { 
@@ -23,28 +21,54 @@ export default function AdminLogin() {
   const vantaRef = useRef(null);
   const vantaEffect = useRef(null);
 
-  // Vanta CLOUDS background effect
+  // Vanta FOG background effect (same as main app - lighter than clouds)
   useEffect(() => {
     if (!vantaRef.current) return;
 
-    if (!vantaEffect.current) {
-      vantaEffect.current = CLOUDS({
-        el: vantaRef.current,
-        THREE: THREE,
-        mouseControls: false,
-        touchControls: false,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        skyColor: 0x68b8d7,
-        cloudColor: 0xadc1de,
-        cloudShadowColor: 0x183550,
-        sunColor: 0xff9919,
-        sunGlareColor: 0xff6633,
-        sunlightColor: 0xff9933,
-        speed: 1.00
-      });
-    }
+    const loadVanta = async () => {
+      try {
+        // Load Three.js dynamically if not loaded
+        if (!window.THREE) {
+          const threeScript = document.createElement('script');
+          threeScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js';
+          threeScript.async = true;
+          document.head.appendChild(threeScript);
+          await new Promise(resolve => { threeScript.onload = resolve; });
+        }
+
+        // Load Vanta FOG dynamically
+        if (!window.VANTA) {
+          const vantaScript = document.createElement('script');
+          vantaScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.fog.min.js';
+          vantaScript.async = true;
+          document.head.appendChild(vantaScript);
+          await new Promise(resolve => { vantaScript.onload = resolve; });
+        }
+
+        // Initialize Vanta FOG effect with monochrome colors for admin
+        if (window.VANTA && vantaRef.current && !vantaEffect.current) {
+          vantaEffect.current = window.VANTA.FOG({
+            el: vantaRef.current,
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            highlightColor: 0x6e6e73,   // Apple gray
+            midtoneColor: 0x1d1d1f,     // Apple dark
+            lowlightColor: 0x000000,    // Black
+            baseColor: 0x1d1d1f,        // Apple dark
+            blurFactor: 0.6,
+            speed: 1.0,
+            zoom: 1.0
+          });
+        }
+      } catch (error) {
+        console.error('Vanta.js load error:', error);
+      }
+    };
+
+    loadVanta();
 
     return () => {
       if (vantaEffect.current) {
@@ -112,17 +136,17 @@ export default function AdminLogin() {
   // Login icon component
   const LoginIcon = ({ icon, isSetup = false }) => (
     <div className={cn(
-      "w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center",
+      "w-[72px] h-[72px] mx-auto mb-7 rounded-[22px] flex items-center justify-center shadow-lg",
       isSetup ? "bg-secondary" : "bg-primary"
     )}>
-      <img src={icon} alt="" className="w-8 h-8 icon-white" />
+      <img src={icon} alt="" className="w-9 h-9 icon-white" />
     </div>
   );
 
   // Error message component
   const ErrorMessage = ({ message }) => message ? (
-    <div className="flex items-center gap-2 p-3 rounded-md bg-primary text-primary-foreground text-sm">
-      <img src="/icon/alert-circle.svg" alt="" className="w-4 h-4 icon-white" />
+    <div className="flex items-center gap-2.5 p-4 rounded-xl bg-destructive/10 text-destructive text-[14px]">
+      <img src="/icon/alert-circle.svg" alt="" className="w-4 h-4" />
       {message}
     </div>
   ) : null;
@@ -130,13 +154,17 @@ export default function AdminLogin() {
   // Setup mode
   if (mode === 'setup' || needsSetup) {
     return (
-      <div ref={vantaRef} className="min-h-screen flex items-center justify-center p-5 relative overflow-hidden">
+      <div 
+        ref={vantaRef} 
+        className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #1d1d1f 0%, #000000 100%)' }}
+      >
         
-        <Card className="w-full max-w-[420px] p-12 relative z-10 shadow-xl">
+        <Card className="w-full max-w-[440px] p-10 relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">
           <div className="text-center mb-10">
             <LoginIcon icon="/icon/settings.svg" isSetup />
-            <h1 className="text-3xl font-semibold text-primary tracking-tight mb-2">Initial Setup</h1>
-            <p className="text-muted text-sm">Create your admin account to get started</p>
+            <h1 className="text-[28px] font-semibold text-primary tracking-[-0.022em] mb-2">Initial Setup</h1>
+            <p className="text-muted text-[15px]">Create your admin account to get started</p>
           </div>
 
           <form onSubmit={handleSetup} className="flex flex-col gap-6">
@@ -181,7 +209,7 @@ export default function AdminLogin() {
 
             <ErrorMessage message={displayError} />
 
-            <Button type="submit" size="lg" loading={loading} className="w-full">
+            <Button type="submit" size="lg" loading={loading} className="w-full mt-2">
               {loading ? 'Creating Account...' : (
                 <>
                   <img src="/icon/check.svg" alt="" className="w-4.5 h-4.5 icon-white" />
@@ -194,7 +222,7 @@ export default function AdminLogin() {
           {!needsSetup && (
             <div className="mt-8 text-center">
               <button 
-                className="text-muted text-sm hover:text-primary transition-colors"
+                className="text-muted text-[14px] hover:text-primary transition-all duration-200"
                 onClick={() => setMode('login')}
               >
                 ← Back to Login
@@ -210,16 +238,20 @@ export default function AdminLogin() {
   const loginError = loginForm.rootError || error;
   
   return (
-    <div ref={vantaRef} className="min-h-screen flex items-center justify-center p-5 relative overflow-hidden">
+    <div 
+      ref={vantaRef} 
+      className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #1d1d1f 0%, #000000 100%)' }}
+    >
       
-      <Card className="w-full max-w-[420px] p-12 relative z-10 shadow-xl">
+      <Card className="w-full max-w-[440px] p-10 relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">
         <div className="text-center mb-10">
           <LoginIcon icon="/icon/shield-check.svg" />
-          <h1 className="text-3xl font-semibold text-primary tracking-tight mb-2">Admin Panel</h1>
-          <p className="text-muted text-sm">Login to manage the system</p>
+          <h1 className="text-[28px] font-semibold text-primary tracking-[-0.022em] mb-2">Admin Panel</h1>
+          <p className="text-muted text-[15px]">Login to manage the system</p>
         </div>
 
-        <form onSubmit={loginForm.handleSubmit} className="flex flex-col gap-6">
+        <form onSubmit={loginForm.handleSubmit} className="flex flex-col gap-5">
           <Input
             label="Email"
             type="email"
@@ -239,7 +271,7 @@ export default function AdminLogin() {
 
           <ErrorMessage message={loginError} />
 
-          <Button type="submit" size="lg" loading={loginForm.isLoading} className="w-full">
+          <Button type="submit" size="lg" loading={loginForm.isLoading} className="w-full mt-2">
             {loginForm.isLoading ? 'Logging in...' : (
               <>
                 <img src="/icon/log-in.svg" alt="" className="w-4.5 h-4.5 icon-white" />
@@ -249,7 +281,7 @@ export default function AdminLogin() {
           </Button>
         </form>
 
-        <div className="mt-8 flex items-center justify-center gap-1.5 text-muted text-xs">
+        <div className="mt-8 flex items-center justify-center gap-2 text-muted text-[13px]">
           <img src="/icon/info.svg" alt="" className="w-3.5 h-3.5 opacity-50" />
           <p>Contact administrator if you need help</p>
         </div>

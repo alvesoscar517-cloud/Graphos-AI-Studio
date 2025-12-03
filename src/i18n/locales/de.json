@@ -89,7 +89,7 @@
     "checking": "Prüfe...",
     "pleaseWait": "Bitte warten Sie einen Moment",
     "signInToContinue": "Zum Fortfahren anmelden",
-    "signInSubtitle": "Bitte melden Sie sich mit Ihrem Google-Konto an, um den AI Content Authenticator zu nutzen",
+    "signInSubtitle": "Bitte melden Sie sich mit Ihrem Google-Konto an, um den Graphos AI Studio zu nutzen",
     "signInFailed": "Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "loginFailed": "Login fehlgeschlagen",
     "termsAgreement": "Mit der Anmeldung stimmen Sie unseren",
@@ -118,7 +118,7 @@
     "sidebar": "Seitenleiste"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "Löschen",
     "confirmDeleteNote": "Möchten Sie die Notiz \"{{title}}\" wirklich löschen?",
     "confirmDelete": "Löschen bestätigen",
@@ -129,7 +129,7 @@
     "rewrite": "Umschreiben"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "Professionelles Tool zur Analyse und Verfeinerung des Inhaltsstils",
     "newProfile": "Neues Profil",
     "createStyleProfile": "Stilprofil erstellen",
@@ -149,7 +149,7 @@
     "unableToLoadProfileDetails": "Profildetails konnten nicht geladen werden",
     "yourProfiles": "Ihre Schreibstil-Profile",
     "welcomeTo": "Willkommen bei",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "Erstes Profil erstellen",
     "createUniqueStyle": "Erstellen Sie Ihr einzigartiges Schreibstil-Profil",
     "analyzeRefine": "Inhalte intelligent analysieren und verfeinern",
@@ -459,7 +459,7 @@
   },
   "model": {
     "selectAIModel": "KI-Modell wählen",
-    "inUse": "[IN VERWENDUNG]",
+    "inUse": "IN VERWENDUNG",
     "geminiFlashExp": "Neuestes experimentelles Modell, schnelle Verarbeitung mit Unterstützung für mehrere Inhaltstypen",
     "geminiFlashLite": "Kompaktes Modell, kostengünstig, geeignet für einfache Aufgaben und hohes Volumen",
     "geminiFlash": "Ausgewogenes Modell zwischen Geschwindigkeit und Qualität, gute logische Fähigkeiten",

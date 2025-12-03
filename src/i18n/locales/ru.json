@@ -89,7 +89,7 @@
     "checking": "Проверка...",
     "pleaseWait": "Пожалуйста, подождите",
     "signInToContinue": "Войдите, чтобы продолжить",
-    "signInSubtitle": "Пожалуйста, войдите через Google аккаунт для использования AI Content Authenticator",
+    "signInSubtitle": "Пожалуйста, войдите через Google аккаунт для использования Graphos AI Studio",
     "signInFailed": "Ошибка входа. Пожалуйста, попробуйте снова.",
     "loginFailed": "Не удалось войти",
     "termsAgreement": "Выполняя вход, вы соглашаетесь с нашими",
@@ -118,7 +118,7 @@
     "sidebar": "Боковая панель"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "Удалить",
     "confirmDeleteNote": "Вы уверены, что хотите удалить заметку \"{{title}}\"?",
     "confirmDelete": "Подтвердить удаление",
@@ -129,7 +129,7 @@
     "rewrite": "Рерайт"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "Профессиональный инструмент для анализа и улучшения стиля контента",
     "newProfile": "Новый профиль",
     "createStyleProfile": "Создать профиль стиля",
@@ -149,7 +149,7 @@
     "unableToLoadProfileDetails": "Не удалось загрузить детали профиля",
     "yourProfiles": "Ваши профили стиля письма",
     "welcomeTo": "Добро пожаловать в",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "Создать первый профиль",
     "createUniqueStyle": "Создайте свой уникальный профиль стиля письма",
     "analyzeRefine": "Анализируйте и улучшайте контент с умом",
@@ -459,7 +459,7 @@
   },
   "model": {
     "selectAIModel": "Выберите модель ИИ",
-    "inUse": "[ИСПОЛЬЗУЕТСЯ]",
+    "inUse": "ИСПОЛЬЗУЕТСЯ",
     "geminiFlashExp": "Новейшая экспериментальная модель, быстрая обработка с поддержкой текста и изображений",
     "geminiFlashLite": "Компактная модель, экономичная, для простых задач и больших объемов",
     "geminiFlash": "Сбалансированная модель (скорость/качество), хорошая логика, для большинства задач",

@@ -5,6 +5,7 @@ import apiClient from './client'
 
 /**
  * Rewrite text using AI
+ * Uses request deduplication to prevent duplicate concurrent requests
  * @param {string} profileId 
  * @param {string} text 
  * @param {string} model 
@@ -26,7 +27,8 @@ export async function rewriteText(profileId, text, model = 'gemini-2.5-flash', w
     
     console.log('[CHART] Rewrite text stats:', validation.stats.display)
     
-    const { data } = await apiClient.post('/rewrite', {
+    // Use deduplicated request to prevent duplicate concurrent rewrite calls
+    const { data } = await apiClient.postDeduplicated('/rewrite', {
       profile_id: profileId,
       text: text,
       model: model,

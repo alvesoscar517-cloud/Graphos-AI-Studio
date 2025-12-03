@@ -1,23 +1,23 @@
 import { useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNotes } from '../../../contexts/NotesContext'
-import { useAuth } from '../../../contexts/AuthContext'
-import { useAIProcessing } from '../../../contexts/AIProcessingContext'
+import { useUser, useAIProcessing } from '@/stores'
 import { createShare } from '../../../services/share'
 import modal from '../../../utils/modal'
 import TextShimmer from '../../Common/TextShimmer'
-import './AIStudioEditor.css'
+import Icon from '../../Common/Icon'
+import { cn } from '../../../lib/utils'
 
 const AIStudioEditor = ({ 
   onToggleLeftSidebar, 
   onToggleRightSidebar, 
   rightSidebarHidden,
   onCreateNote,
-  highlightedSentence // NEW: Sentence to highlight from deviation card
+  highlightedSentence
 }) => {
   const { t } = useTranslation()
   const { currentNote, updateNote } = useNotes()
-  const { user } = useAuth()
+  const user = useUser() // Use Zustand store directly
   const { isProcessing, processingType } = useAIProcessing()
   const textareaRef = useRef(null)
 
@@ -33,33 +33,21 @@ const AIStudioEditor = ({
     }
   }
 
-  // Highlight and scroll to sentence when clicked from deviation card
   useEffect(() => {
     if (highlightedSentence && textareaRef.current && currentNote?.content) {
       const content = currentNote.content
       const sentenceText = highlightedSentence.sentence
-      
-      // Find sentence position in content
       const startIndex = content.indexOf(sentenceText)
       
       if (startIndex !== -1) {
         const endIndex = startIndex + sentenceText.length
-        
-        // Focus textarea
         textareaRef.current.focus()
-        
-        // Select the sentence
         textareaRef.current.setSelectionRange(startIndex, endIndex)
         
-        // Scroll to selection
-        const lineHeight = 24 // Approximate line height
+        const lineHeight = 24
         const lines = content.substring(0, startIndex).split('\n').length
         const scrollTop = (lines - 1) * lineHeight
-        textareaRef.current.scrollTop = Math.max(0, scrollTop - 100) // Offset for visibility
-        
-        console.log('📍 Highlighted sentence at position:', { startIndex, endIndex, lines })
-      } else {
-        console.warn('[WARNING] Sentence not found in content')
+        textareaRef.current.scrollTop = Math.max(0, scrollTop - 100)
       }
     }
   }, [highlightedSentence, currentNote?.content])
@@ -71,21 +59,16 @@ const AIStudioEditor = ({
         return
       }
 
-      // Create share link
       const shareData = await createShare(
         'note',
         currentNote.title || t('editor.untitled'),
         currentNote.content,
         null,
-        {
-          createdAt: new Date().toISOString()
-        }
+        { createdAt: new Date().toISOString() }
       )
 
-      // Copy link to clipboard
       const shareUrl = `${window.location.origin}/shared/${shareData.share_id}`
       await navigator.clipboard.writeText(shareUrl)
-      
       modal.toast(t('share.shareLinkCopied'), '', 'success')
     } catch (error) {
       console.error('Share error:', error)
@@ -94,56 +77,104 @@ const AIStudioEditor = ({
   }
 
   return (
-    <div className="aistudio-editor-view">
-      <header className="main-header">
+    <div className={cn(
+      "flex flex-col flex-1 overflow-hidden p-0 m-0",
+      "bg-bg-tertiary",
+      "h-full w-full box-border"
+    )}>
+      <header className={cn(
+        "flex items-center gap-2 py-2 px-4",
+        "border-b border-border-light",
+        "bg-bg-tertiary h-14 shrink-0"
+      )}>
         <button 
-          className="menu-btn icon-btn" 
+          className={cn(
+            "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+            "w-8 h-8 shrink-0 flex items-center justify-center",
+            "transition-colors duration-200",
+            "hover:bg-bg-hover"
+          )}
           onClick={onToggleLeftSidebar}
           data-tooltip={t('common.menu')} 
           data-tooltip-position="right"
         >
-          <img src="/icon/panel-left.svg" alt={t('common.menu')} />
+          <Icon name="panel-left" alt={t('common.menu')} size="lg" color="muted" />
         </button>
         
         <input 
           type="text" 
-          className="title-input" 
+          className={cn(
+            "flex-1 border-none outline-none",
+            "text-sm font-medium text-text-primary",
+            "bg-transparent py-1 px-2 -ml-1",
+            "placeholder:text-text-muted placeholder:font-semibold",
+            "focus:outline-none focus:shadow-none focus:border-none"
+          )}
           placeholder={t('editor.enterTitle')}
           value={currentNote?.title || ''}
           onChange={handleTitleChange}
         />
         
-        <div className="header-actions">
+        <div className="flex items-center gap-1">
           <button 
-            className="icon-btn" 
+            className={cn(
+              "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+              "w-8 h-8 flex items-center justify-center",
+              "transition-colors duration-200",
+              "hover:bg-bg-hover"
+            )}
             onClick={onCreateNote}
             data-tooltip={t('common.new')}
           >
-            <img src="/icon/plus.svg" alt={t('common.new')} />
+            <Icon name="plus" alt={t('common.new')} size="lg" color="muted" />
           </button>
           <button 
-            className="icon-btn" 
+            className={cn(
+              "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+              "w-8 h-8 flex items-center justify-center",
+              "transition-colors duration-200",
+              "hover:bg-bg-hover"
+            )}
             onClick={handleShare}
             data-tooltip={t('common.share')}
           >
-            <img src="/icon/share-2.svg" alt={t('common.share')} />
+            <Icon name="share-2" alt={t('common.share')} size="lg" color="muted" />
           </button>
           {rightSidebarHidden && (
             <button 
-              className="icon-btn" 
+              className={cn(
+                "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+                "w-8 h-8 flex items-center justify-center",
+                "transition-colors duration-200",
+                "hover:bg-bg-hover"
+              )}
               onClick={onToggleRightSidebar}
               data-tooltip={t('nav.sidebar')}
             >
-              <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} />
+              <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} className="w-icon-md h-icon-md opacity-60 icon-invert" />
             </button>
           )}
         </div>
       </header>
 
-      <div className="text-input-area">
+      <div className={cn(
+        "relative flex-1 p-0 m-0 border-none",
+        "bg-bg-tertiary",
+        "overflow-hidden h-full w-full box-border"
+      )}>
         <textarea 
           ref={textareaRef}
-          className="main-textarea" 
+          className={cn(
+            "flex-1 border-none py-6 px-8 m-0",
+            "font-[Google_Sans,Roboto,Arial,sans-serif] text-sm text-text-primary",
+            "resize-none outline-none bg-bg-tertiary",
+            "leading-relaxed w-full h-full",
+            "shadow-none rounded-none appearance-none box-border",
+            "overflow-x-hidden overflow-y-auto scrollbar-none",
+            "placeholder:text-transparent",
+            "focus:outline-none focus:shadow-none focus:border-none",
+            "hover:border-none hover:shadow-none"
+          )}
           placeholder=""
           value={currentNote?.content || ''}
           onChange={handleContentChange}
@@ -154,8 +185,8 @@ const AIStudioEditor = ({
           }}
         />
         {isProcessing && (
-          <div className="shimmer-overlay">
-            <TextShimmer className="shimmer-text" duration={2}>
+          <div className="absolute inset-0 flex items-center justify-center bg-bg-tertiary">
+            <TextShimmer className="text-sm" duration={2}>
               {currentNote?.content || ''}
             </TextShimmer>
           </div>

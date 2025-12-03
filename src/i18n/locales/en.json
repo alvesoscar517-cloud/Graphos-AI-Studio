@@ -76,7 +76,7 @@
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "getStarted": "Get Started",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "signInTagline": "Sign in to keep your content authentic",
     "signOut": "Sign Out",
     "signInAgain": "Sign In Again",
@@ -91,7 +91,7 @@
     "checking": "Checking...",
     "pleaseWait": "Please wait a moment",
     "signInToContinue": "Sign in to continue",
-    "signInSubtitle": "Please sign in with your Google account to use AI Content Authenticator",
+    "signInSubtitle": "Please sign in with your Google account to use Graphos AI Studio",
     "signInFailed": "Sign in failed. Please try again.",
     "loginFailed": "Login failed",
     "termsAgreement": "By signing in, you agree to our",
@@ -120,6 +120,7 @@
       "loggingIn": "Signing in...",
       "registering": "Creating account...",
       "forgotPassword": "Forgot password?",
+      "rememberMe": "Remember me",
       "createAccount": "Create an account",
       "alreadyHaveAccount": "Already have an account? Sign in",
       "dontHaveAccount": "Don't have an account?",
@@ -246,7 +247,7 @@
     "sidebar": "Sidebar"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "Delete",
     "confirmDeleteNote": "Are you sure you want to delete note \"{{title}}\"?",
     "confirmDelete": "Confirm Delete",
@@ -257,7 +258,7 @@
     "rewrite": "Rewrite"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "Professional tool for analyzing and refining content style",
     "newProfile": "New profile",
     "createStyleProfile": "Create Style Profile",
@@ -277,7 +278,7 @@
     "unableToLoadProfileDetails": "Unable to load profile details",
     "yourProfiles": "Your Writing Style Profiles",
     "welcomeTo": "Welcome to",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "Create first profile",
     "createUniqueStyle": "Create your unique writing style profile",
     "analyzeRefine": "Analyze and refine content intelligently",
@@ -590,7 +591,7 @@
   },
   "model": {
     "selectAIModel": "Select AI Model",
-    "inUse": "[IN USE]",
+    "inUse": "IN USE",
     "geminiFlashExp": "Latest experimental model, fast processing with support for multiple content types like text and images",
     "geminiFlashLite": "Compact model, most cost-effective, suitable for simple tasks and high-volume processing",
     "geminiFlash": "Balanced model between speed and quality, good reasoning capability, suitable for most tasks",
@@ -715,6 +716,7 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System",
+    "darkMode": "Dark Mode",
     "submitPromptKey": "Submit prompt key",
     "viewStatus": "View status",
     "termsOfService": "Terms of service",
@@ -962,6 +964,16 @@
     "errorLoadingPage": "An error occurred while loading the profile creation page. Please try again.",
     "retry": "Retry",
     "backToHome": "Back to Home"
+  },
+  "errorPage": {
+    "title": "Oops! Something went wrong",
+    "message": "An unexpected error occurred. Please try again.",
+    "tryAgain": "Try Again",
+    "reload": "Reload Page",
+    "goBack": "Go Back",
+    "backToHome": "Back to Home",
+    "technicalDetails": "Technical Details",
+    "helpText": "If the problem persists, please contact support."
   },
   "profileSetupErrors": {
     "atLeast3Samples": "At least 3 text samples are required to create a profile",

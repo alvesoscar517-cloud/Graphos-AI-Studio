@@ -16,7 +16,7 @@ export const CONFIG = {
 
 // App Configuration
 export const APP_CONFIG = {
-  APP_NAME: 'AI Content Authenticator Admin',
+  APP_NAME: 'Graphos AI Studio Admin',
   VERSION: '2.0.0',
   
   // Pagination

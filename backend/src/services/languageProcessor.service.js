@@ -3,8 +3,7 @@
  * Handles language-specific text processing, benchmarks, and analysis
  */
 
-const natural = require('natural');
-const tokenizer = new natural.WordTokenizer();
+const nlpUtils = require('../utils/nlp');
 
 // ============================================================================
 // LANGUAGE CONFIGURATIONS
@@ -1165,8 +1164,8 @@ class LanguageProcessorService {
       return text.split(/\s+/).filter(w => w.length > 0);
     }
     
-    // European languages (fr, de, es, pt, it): use natural tokenizer
-    return tokenizer.tokenize(text.toLowerCase()) || [];
+    // European languages (fr, de, es, pt, it): use wink-nlp tokenizer
+    return nlpUtils.tokenize(text.toLowerCase());
   }
 
   /**

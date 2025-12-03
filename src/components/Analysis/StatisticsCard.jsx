@@ -5,8 +5,9 @@ import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
+import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
-import './Analysis.css'
+import { cn } from '../../lib/utils'
 
 const StatisticsCard = ({ disabled, currentProfile, text }) => {
   const { t } = useTranslation()
@@ -19,19 +20,14 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
   const [textChanged, setTextChanged] = useState(true)
   const { currentNote } = useNotes()
 
-  // Reset state and load cached result when note or profile changes
   useEffect(() => {
-    // Always reset state first when note/profile changes
     setStats(null)
     setBenchmarkData(null)
     setSuggestions([])
     setTextChanged(true)
 
-    if (!currentNote || !currentProfile) {
-      return
-    }
+    if (!currentNote || !currentProfile) return
 
-    // Only load cache if we have text and exact match exists
     if (text) {
       const cacheKey = `stats_${currentProfile.profile_id}`
       const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
@@ -40,12 +36,10 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
         setBenchmarkData(cached.benchmarkData || null)
         setSuggestions(cached.suggestions || [])
         setTextChanged(false)
-        console.log('[PACKAGE] Loaded cached statistics for note:', currentNote.id)
       }
     }
   }, [currentNote?.id, currentProfile?.profile_id])
 
-  // Check if text has changed and load cache if available
   useEffect(() => {
     if (!currentNote || !text || !currentProfile) {
       setTextChanged(true)
@@ -59,9 +53,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
       setBenchmarkData(cached.benchmarkData || null)
       setSuggestions(cached.suggestions || [])
       setTextChanged(false)
-      console.log('[PACKAGE] Loaded cached statistics for text change')
     } else {
-      // Text changed but no cache - reset result and enable button
       setStats(null)
       setBenchmarkData(null)
       setSuggestions([])
@@ -74,7 +66,6 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
       modal.error(t('analysis.pleaseSelectProfileAndText'))
       return
     }
-    
     if (!currentNote) {
       modal.error(t('analysis.currentNoteNotFound'))
       return
@@ -82,10 +73,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
     
     setIsLoading(true)
     try {
-      console.log('[CHART] Analyzing statistics for text:', text.substring(0, 50) + '...')
       const result = await analyzeText(currentProfile.profile_id, text)
-      
-      console.log('[CHART] API Result:', result)
       
       if (result.success && result.data && result.data.statistics) {
         const statistics = result.data.statistics
@@ -103,7 +91,6 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
           detectedLanguage: statistics.detectedLanguage || 'en'
         }
         
-        // Get benchmark data and suggestions from API
         const benchmarkResult = result.data.benchmark_comparison || null
         const improvementSuggestions = result.data.improvement_suggestions || []
         
@@ -111,7 +98,6 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
         setBenchmarkData(benchmarkResult)
         setSuggestions(improvementSuggestions)
         
-        // Save to cache
         const cacheKey = `stats_${currentProfile.profile_id}`
         setCachedAnalysis(currentNote.id, text, cacheKey, {
           stats: statsData,
@@ -141,11 +127,11 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
   }
 
   const getReadabilityColor = (score) => {
-    if (score >= 80) return '#34a853' // Green - Very Easy
-    if (score >= 60) return '#4285f4' // Blue - Easy
-    if (score >= 40) return '#fbbc04' // Yellow - Medium
-    if (score >= 20) return '#ff9800' // Orange - Hard
-    return '#ea4335' // Red - Very Hard
+    if (score >= 80) return '#34a853'
+    if (score >= 60) return '#4285f4'
+    if (score >= 40) return '#fbbc04'
+    if (score >= 20) return '#ff9800'
+    return '#ea4335'
   }
 
   const getReadabilityLabel = (score) => {
@@ -171,275 +157,238 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
     if (key === 'vocabularyRichness' || key === 'punctuationRatio') {
       return `${(value * 100).toFixed(0)}%`
     }
-    if (typeof value === 'number') {
-      return value.toFixed(1)
-    }
+    if (typeof value === 'number') return value.toFixed(1)
     return value
   }
 
   return (
     <>
-      <div className="feature-card stats-card">
-        <div className="feature-card-header">
-          <div className="feature-icon stats-icon">
-            <img src="/icon/bar-chart-4.svg" alt={t('analysis.statistics')} />
+      <div className={cn(
+        "p-4 border border-border-light rounded-xl",
+        "bg-bg-secondary transition-all duration-200 hover:shadow-md"
+      )}>
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-3 relative">
+          <div className="card-icon">
+            <Icon name="bar-chart-4" size="lg" color="primary" />
           </div>
-          <div className="feature-info">
-            <h4>{t('analysis.statistics')}</h4>
-            <p>{t('analysis.detailedAnalysis')}</p>
+          <div className="flex-1">
+            <h4 className="text-sm font-medium text-text-primary m-0 mb-0.5">{t('analysis.statistics')}</h4>
+            <p className="text-xs text-text-secondary m-0">{t('analysis.detailedAnalysis')}</p>
           </div>
           {stats && (
             <button 
-              className={`toggle-result-btn ${showResult ? 'expanded' : 'collapsed'}`}
+              className={cn(
+                "bg-transparent border-none p-1.5 cursor-pointer rounded-md",
+                "flex items-center justify-center transition-colors duration-200",
+                "hover:bg-bg-tertiary ml-auto"
+              )}
               onClick={() => setShowResult(!showResult)}
-              data-tooltip={showResult ? t('common.hide') : t('common.show')}
-              data-tooltip-position="left"
             >
               <img 
-                src="/icon/chevron-down.svg"
-                alt="toggle" 
+                src="/icon/chevron-down.svg" alt="toggle"
+                className={cn("w-icon-md h-icon-md opacity-60 transition-all duration-300 hover:opacity-100 icon-invert", showResult ? "rotate-180" : "rotate-0")}
               />
             </button>
           )}
         </div>
+
+        {/* Action Button */}
         <button 
-          className={`feature-btn ${isLoading ? 'loading' : ''}`}
+          className={cn(
+            "w-full flex items-center justify-between py-2.5 px-3.5",
+            "bg-bg-secondary border border-border-light rounded-xl",
+            "text-sm font-medium text-text-primary cursor-pointer",
+            "transition-all duration-200 hover:border-border-hover hover:shadow-md",
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+            isLoading && "pointer-events-none opacity-70"
+          )}
           onClick={analyzeStats}
           disabled={disabled || isLoading || !textChanged}
-          title={!textChanged ? t('analysis.analyzed') : ''}
         >
           {isLoading ? (
-            <Lottie 
-              animationData={threeDotsAnimation} 
-              loop={true}
-              style={{ width: 50, height: 16 }}
-            />
+            <Lottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
           ) : (
             <>
               <span>{!textChanged ? t('analysis.analyzed') : t('analysis.analyze')}</span>
-              <img src="/icon/arrow-right.svg" alt="" className="btn-arrow" />
+              <Icon name="arrow-right" size="md" color="muted" />
             </>
           )}
         </button>
+
+        {/* Result Section */}
         {stats && showResult && (
-          <div className="feature-result" style={{ display: 'block' }}>
-            <div className="stats-grid-modern">
-              <div className="stat-item-modern">
-                <div className="stat-icon-wrapper readability">
-                  <img src="/icon/book-open.svg" alt={t('analysis.readability')} />
+          <div className="mt-2 block animate-slide-down">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-1.5">
+              <div className="stat-box">
+                <div className="stat-box-icon">
+                  <Icon name="book-open" size="md" color="primary" />
                 </div>
-                <span className="stat-label-modern">{t('analysis.readability').toUpperCase()}</span>
-                <span className="stat-value-modern">{stats.readabilityScore}</span>
+                <span className="stat-box-label">{t('analysis.readability').toUpperCase()}</span>
+                <span className="stat-box-value">{stats.readabilityScore}</span>
               </div>
-              <div className="stat-item-modern">
-                <div className="stat-icon-wrapper sentence">
-                  <img src="/icon/align-left.svg" alt={t('analysis.avgSentence')} />
+              <div className="stat-box">
+                <div className="stat-box-icon">
+                  <Icon name="align-left" size="md" color="primary" />
                 </div>
-                <span className="stat-label-modern">{t('analysis.avgSentence')}</span>
-                <span className="stat-value-modern">{stats.avgSentenceLength}</span>
+                <span className="stat-box-label">{t('analysis.avgSentence')}</span>
+                <span className="stat-box-value">{stats.avgSentenceLength}</span>
               </div>
-              <div className="stat-item-modern">
-                <div className="stat-icon-wrapper complexity">
-                  <img src="/icon/zap.svg" alt={t('analysis.vocabulary')} />
+              <div className="stat-box">
+                <div className="stat-box-icon">
+                  <Icon name="zap" size="md" color="primary" />
                 </div>
-                <span className="stat-label-modern">{t('analysis.vocabulary').toUpperCase()}</span>
-                <span className="stat-value-modern">{stats.vocabularyRichness}%</span>
+                <span className="stat-box-label">{t('analysis.vocabulary').toUpperCase()}</span>
+                <span className="stat-box-value">{stats.vocabularyRichness}%</span>
               </div>
-              <div className="stat-item-modern">
-                <div className="stat-icon-wrapper words">
-                  <img src="/icon/type.svg" alt={t('analysis.totalWords')} />
+              <div className="stat-box">
+                <div className="stat-box-icon">
+                  <Icon name="type" size="md" color="primary" />
                 </div>
-                <span className="stat-label-modern">{t('analysis.totalWords')}</span>
-                <span className="stat-value-modern">{stats.totalWords}</span>
+                <span className="stat-box-label">{t('analysis.totalWords')}</span>
+                <span className="stat-box-value">{stats.totalWords}</span>
               </div>
             </div>
 
-            {/* Suggestions preview */}
+            {/* Suggestions Preview */}
             {suggestions.length > 0 && (
-              <div className="suggestions-preview">
-                <div className="suggestions-header">
-                  <img src="/icon/lightbulb.svg" alt={t('analysis.suggestions')} className="icon-filter" />
+              <div className="mt-2 p-2 bg-bg-secondary rounded-lg">
+                <div className="flex items-center gap-2 text-xs text-text-secondary mb-1">
+                  <Icon name="lightbulb" size="sm" color="primary" />
                   <span>{suggestions.length} {t('analysis.suggestions')}</span>
                 </div>
-                <div className="suggestion-item-preview">
+                <div className="text-xs text-text-primary truncate">
                   {suggestions[0]?.message?.substring(0, 80)}...
                 </div>
               </div>
             )}
 
+            {/* View Details Button */}
             <button 
-              className="detail-btn-full"
+              className={cn(
+                "w-full py-2 px-3 mt-2",
+                "bg-bg-secondary border-none rounded-lg",
+                "flex items-center justify-between cursor-pointer",
+                "transition-all duration-200 text-xs font-medium text-text-primary",
+                "hover:bg-bg-tertiary"
+              )}
               onClick={() => setShowModal(true)}
             >
               <span>{t('common.viewDetails')}</span>
-              <img src="/icon/chevron-right.svg" alt="detail" />
+              <img src="/icon/chevron-right.svg" alt="detail" className="w-4 h-4 opacity-60 icon-invert" />
             </button>
           </div>
         )}
       </div>
 
-      {/* Modal showing details */}
+      {/* Detail Modal */}
       {showModal && stats && (
-        <div className="ai-detail-overlay" onClick={() => setShowModal(false)}>
-          <div className="ai-detail-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="ai-detail-header">
-              <h3>{t('analysis.detailedStatistics')}</h3>
-              <button className="close-detail-btn" onClick={() => setShowModal(false)}>
-                <img src="/icon/x.svg" alt={t('common.close')} />
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="flex items-center justify-between py-5 px-6 border-b border-border-light">
+              <h3 className="text-lg font-medium text-text-primary m-0">{t('analysis.detailedStatistics')}</h3>
+              <button 
+                className="bg-transparent border-none p-2 cursor-pointer rounded-full flex items-center justify-center hover:bg-bg-tertiary"
+                onClick={() => setShowModal(false)}
+              >
+                <Icon name="x" alt={t('common.close')} size="lg" color="muted" />
               </button>
             </div>
-            <div className="ai-detail-body">
-              {/* Readability Score với màu sắc */}
-              <div className="ai-detail-score">
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {/* Readability Score */}
+              <div className="flex items-center justify-between p-4 bg-bg-secondary rounded-xl mb-5">
                 <div>
-                  <div className="ai-detail-label">
-                    {t('analysis.readability')}
-                  </div>
-                  <div 
-                    className="ai-detail-value" 
-                    style={{ color: getReadabilityColor(stats.readabilityScore) }}
-                  >
-                    {stats.readabilityScore}
-                  </div>
+                  <div className="text-sm text-text-secondary mb-1">{t('analysis.readability')}</div>
+                  <div className="text-3xl font-semibold" style={{ color: getReadabilityColor(stats.readabilityScore) }}>{stats.readabilityScore}</div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div className="ai-detail-label">
-                    {t('analysis.language')}
-                  </div>
-                  <div className="ai-detail-verdict">
+                <div className="text-right">
+                  <div className="text-sm text-text-secondary mb-1">{t('analysis.language')}</div>
+                  <div className="text-sm font-medium text-text-primary">
                     {stats.detectedLanguage === 'vi' ? `🇻🇳 ${t('analysis.vietnamese')}` : `🇺🇸 ${t('analysis.english')}`}
                   </div>
                 </div>
               </div>
 
-              {/* Statistics Grid */}
-              <div className="compatibility-detail-stats">
-                <div className="stat-card">
-                  <div className="stat-label">{t('analysis.words')}</div>
-                  <div className="stat-value">{stats.totalWords}</div>
-                  <div className="stat-desc">{t('analysis.words')}</div>
+              {/* Stats Grid */}
+              <div className="grid grid-cols-4 gap-3 mb-4">
+                <div className="p-3 bg-bg-secondary rounded-lg text-center">
+                  <div className="text-2xs text-text-secondary mb-1">{t('analysis.words')}</div>
+                  <div className="text-xl font-semibold text-text-primary">{stats.totalWords}</div>
                 </div>
-                <div className="stat-card">
-                  <div className="stat-label">{t('analysis.sentences')}</div>
-                  <div className="stat-value">{stats.totalSentences}</div>
-                  <div className="stat-desc">{t('analysis.sentences')}</div>
+                <div className="p-3 bg-bg-secondary rounded-lg text-center">
+                  <div className="text-2xs text-text-secondary mb-1">{t('analysis.sentences')}</div>
+                  <div className="text-xl font-semibold text-text-primary">{stats.totalSentences}</div>
                 </div>
-                <div className="stat-card">
-                  <div className="stat-label">{t('analysis.paragraphs')}</div>
-                  <div className="stat-value">{stats.totalParagraphs || 1}</div>
-                  <div className="stat-desc">{t('analysis.paragraphs')}</div>
+                <div className="p-3 bg-bg-secondary rounded-lg text-center">
+                  <div className="text-2xs text-text-secondary mb-1">{t('analysis.paragraphs')}</div>
+                  <div className="text-xl font-semibold text-text-primary">{stats.totalParagraphs || 1}</div>
                 </div>
-                <div className="stat-card">
-                  <div className="stat-label">{t('analysis.transitions')}</div>
-                  <div className="stat-value">{stats.transitionWordCount || 0}</div>
-                  <div className="stat-desc">{t('analysis.connectors')}</div>
+                <div className="p-3 bg-bg-secondary rounded-lg text-center">
+                  <div className="text-2xs text-text-secondary mb-1">{t('analysis.transitions')}</div>
+                  <div className="text-xl font-semibold text-text-primary">{stats.transitionWordCount || 0}</div>
                 </div>
               </div>
 
               {/* Benchmark Comparison */}
               {benchmarkData && benchmarkData.comparison && (
-                <div className="benchmark-section">
-                  <h4 className="section-title">
-                    <img src="/icon/bar-chart-2.svg" alt="" className="icon-filter" />
+                <div className="p-3 bg-bg-secondary rounded-lg mb-4">
+                  <h4 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+                    <Icon name="bar-chart-2" size="sm" color="primary" />
                     {t('analysis.benchmarkComparison')} ({benchmarkData.styleType})
                   </h4>
-                  <div className="benchmark-grid">
+                  <div className="flex flex-col gap-2">
                     {Object.entries(benchmarkData.comparison).map(([key, data]) => (
-                      <div key={key} className={`benchmark-item ${data.status}`}>
-                        <div className="benchmark-label">{getBenchmarkLabel(key)}</div>
-                        <div className="benchmark-values">
-                          <span className="current-value">{formatBenchmarkValue(key, data.value)}</span>
-                          <span className="benchmark-range">
-                            ({data.benchmark.min} - {data.benchmark.max})
-                          </span>
-                        </div>
-                        <div className="benchmark-bar">
+                      <div key={key} className="flex items-center gap-2">
+                        <span className="text-xs text-text-secondary w-label-lg flex-shrink-0">{getBenchmarkLabel(key)}</span>
+                        <div className="flex-1 h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
                           <div 
-                            className={`benchmark-fill ${data.status}`}
+                            className={cn("h-full rounded-sm", data.status === 'good' ? 'bg-success' : data.status === 'warning' ? 'bg-warning' : 'bg-error')}
                             style={{ width: `${Math.min(100, data.benchmarkScore)}%` }}
                           />
                         </div>
-                        <div className="benchmark-score">{Math.round(data.benchmarkScore)}%</div>
-                        {data.profileComparison && (
-                          <div className={`profile-comparison ${data.profileComparison.status}`}>
-                            {t('analysis.vsProfile')}: {data.profileComparison.difference > 0 ? '+' : ''}{data.profileComparison.difference}%
-                          </div>
-                        )}
+                        <span className="text-xs font-semibold text-text-primary w-10 text-right">{Math.round(data.benchmarkScore)}%</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Improvement Suggestions */}
+              {/* Suggestions */}
               {suggestions.length > 0 && (
-                <div className="suggestions-section">
-                  <h4 className="section-title">
-                    <img src="/icon/lightbulb.svg" alt="" className="icon-filter" />
+                <div className="p-3 bg-bg-secondary rounded-lg mb-4">
+                  <h4 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+                    <Icon name="lightbulb" size="sm" color="primary" />
                     {t('analysis.improvementSuggestions')} ({suggestions.length})
                   </h4>
-                  <div className="suggestions-list">
+                  <div className="flex flex-col gap-2">
                     {suggestions.map((suggestion, index) => (
-                      <div key={index} className={`suggestion-item ${suggestion.status}`}>
-                        <div className="suggestion-header">
-                          <span className={`status-badge ${suggestion.status}`}>
+                      <div key={index} className={cn("p-2 rounded-lg", suggestion.status === 'low' ? 'bg-error/10' : 'bg-success/10')}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={cn("text-2xs py-0.5 px-1.5 rounded font-medium", suggestion.status === 'low' ? 'bg-error/20 text-error' : 'bg-success/20 text-success')}>
                             {suggestion.status === 'low' ? `↓ ${t('analysis.low')}` : `↑ ${t('analysis.high')}`}
                           </span>
-                          <span className="metric-name">{getBenchmarkLabel(suggestion.metric)}</span>
+                          <span className="text-xs font-medium text-text-primary">{getBenchmarkLabel(suggestion.metric)}</span>
                         </div>
-                        <p className="suggestion-message">{suggestion.message}</p>
-                        <div className="suggestion-meta">
-                          <span>{t('analysis.current')}: {formatBenchmarkValue(suggestion.metric, suggestion.currentValue)}</span>
-                          <span>{t('analysis.recommended')}: {suggestion.recommendedRange}</span>
-                        </div>
+                        <p className="text-xs text-text-secondary m-0">{suggestion.message}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Detailed Stats */}
-              <div className="compatibility-detail-info">
-                <div className="info-row">
-                  <img src="/icon/align-left.svg" alt="" />
-                  <span>{t('analysis.avgSentenceLength')}:</span>
-                  <span>{stats.avgSentenceLength} {t('common.words')}</span>
-                </div>
-                <div className="info-row">
-                  <img src="/icon/type.svg" alt="" />
-                  <span>{t('analysis.avgWordLength')}:</span>
-                  <span>{stats.avgWordLength} {t('common.characters')}</span>
-                </div>
-                <div className="info-row">
-                  <img src="/icon/zap.svg" alt="" />
-                  <span>{t('analysis.vocabularyRichness')}:</span>
-                  <span>{stats.vocabularyRichness}%</span>
-                </div>
-                <div className="info-row">
-                  <img src="/icon/more-horizontal.svg" alt="" />
-                  <span>{t('analysis.punctuationRatio')}</span>
-                  <span>{stats.punctuationRatio}%</span>
-                </div>
-                <div className="info-row">
-                  <img src="/icon/file-text.svg" alt="" />
-                  <span>{t('analysis.avgParagraphLength')}:</span>
-                  <span>{stats.avgParagraphLength || 0} {t('common.words')}</span>
-                </div>
-              </div>
-
               {/* Readability Explanation */}
-              <div className="ai-detail-evidence">
-                <h4 className="ai-detail-evidence-title">
-                  {t('analysis.readabilityExplanation')}
-                </h4>
-                <div className="evidence-paragraphs">
-                  <p className="evidence-paragraph">
-                    <strong>80-100:</strong> {t('analysis.veryEasyToRead')}<br/>
-                    <strong>60-80:</strong> {t('analysis.easyToRead')}<br/>
-                    <strong>40-60:</strong> {t('analysis.average')}<br/>
-                    <strong>0-40:</strong> {t('analysis.difficultToRead')}
-                  </p>
-                  <p className="evidence-paragraph">
+              <div className="p-3 bg-bg-secondary rounded-lg">
+                <h4 className="text-sm font-semibold text-text-primary mb-2">{t('analysis.readabilityExplanation')}</h4>
+                <div className="text-xs text-text-secondary space-y-1">
+                  <p className="m-0"><strong>80-100:</strong> {t('analysis.veryEasyToRead')}</p>
+                  <p className="m-0"><strong>60-80:</strong> {t('analysis.easyToRead')}</p>
+                  <p className="m-0"><strong>40-60:</strong> {t('analysis.average')}</p>
+                  <p className="m-0"><strong>0-40:</strong> {t('analysis.difficultToRead')}</p>
+                  <p className="m-0 mt-2 pt-2 border-t border-border-light">
                     <strong>{stats.readabilityScore}</strong> - <strong>{getReadabilityLabel(stats.readabilityScore)}</strong>
                   </p>
                 </div>

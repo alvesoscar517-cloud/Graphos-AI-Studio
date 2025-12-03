@@ -89,7 +89,7 @@
     "checking": "Memeriksa...",
     "pleaseWait": "Harap tunggu sebentar",
     "signInToContinue": "Masuk untuk melanjutkan",
-    "signInSubtitle": "Silakan masuk dengan akun Google Anda untuk menggunakan AI Content Authenticator",
+    "signInSubtitle": "Silakan masuk dengan akun Google Anda untuk menggunakan Graphos AI Studio",
     "signInFailed": "Gagal masuk. Silakan coba lagi.",
     "loginFailed": "Login gagal",
     "termsAgreement": "Dengan masuk, Anda menyetujui",
@@ -118,7 +118,7 @@
     "sidebar": "Bilah Sisi"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "Hapus",
     "confirmDeleteNote": "Apakah Anda yakin ingin menghapus catatan \"{{title}}\"?",
     "confirmDelete": "Konfirmasi Hapus",
@@ -129,7 +129,7 @@
     "rewrite": "Tulis Ulang"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "Alat profesional untuk menganalisis dan menyempurnakan gaya konten",
     "newProfile": "Profil baru",
     "createStyleProfile": "Buat Profil Gaya",
@@ -149,7 +149,7 @@
     "unableToLoadProfileDetails": "Tidak dapat memuat detail profil",
     "yourProfiles": "Profil Gaya Penulisan Anda",
     "welcomeTo": "Selamat datang di",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "Buat profil pertama",
     "createUniqueStyle": "Buat profil gaya penulisan unik Anda",
     "analyzeRefine": "Analisis dan sempurnakan konten dengan cerdas",
@@ -459,7 +459,7 @@
   },
   "model": {
     "selectAIModel": "Pilih Model AI",
-    "inUse": "[DIGUNAKAN]",
+    "inUse": "DIGUNAKAN",
     "geminiFlashExp": "Model eksperimental terbaru, pemrosesan cepat dengan dukungan untuk berbagai jenis konten seperti teks dan gambar",
     "geminiFlashLite": "Model ringkas, paling hemat biaya, cocok untuk tugas sederhana dan pemrosesan volume tinggi",
     "geminiFlash": "Model seimbang antara kecepatan dan kualitas, kemampuan penalaran yang baik, cocok untuk sebagian besar tugas",

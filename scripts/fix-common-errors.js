@@ -25,7 +25,7 @@ function checkPackageLock() {
     console.log('[FAIL] package-lock.json is corrupted');
     console.log('[SETTINGS] Fixing: Removing corrupted package-lock.json');
     fs.unlinkSync(lockPath);
-    console.log('💡 Run: npm install');
+    console.log('Run: npm install');
     fixCount++;
   }
 }
@@ -50,7 +50,7 @@ function checkEnvFiles() {
   
   if (!fs.existsSync(env) && fs.existsSync(envExample)) {
     console.log('[WARNING]  .env file not found');
-    console.log('💡 Copy .env.example to .env and fill in your values');
+    console.log('Copy .env.example to .env and fill in your values');
   } else {
     console.log('[SUCCESS] .env file exists');
   }
@@ -61,7 +61,7 @@ function checkEnvFiles() {
   
   if (!fs.existsSync(backendEnv) && fs.existsSync(backendEnvExample)) {
     console.log('[WARNING]  backend/.env file not found');
-    console.log('💡 Copy backend/.env.example to backend/.env and fill in your values');
+    console.log('Copy backend/.env.example to backend/.env and fill in your values');
   } else {
     console.log('[SUCCESS] backend/.env file exists');
   }
@@ -72,7 +72,7 @@ function checkNodeModules() {
   const nodeModules = path.join(__dirname, '..', 'node_modules');
   if (!fs.existsSync(nodeModules)) {
     console.log('[WARNING]  node_modules not found');
-    console.log('💡 Run: npm install');
+    console.log('Run: npm install');
   } else {
     console.log('[SUCCESS] node_modules exists');
   }
@@ -80,7 +80,7 @@ function checkNodeModules() {
   const backendNodeModules = path.join(__dirname, '..', 'backend', 'node_modules');
   if (!fs.existsSync(backendNodeModules)) {
     console.log('[WARNING]  backend/node_modules not found');
-    console.log('💡 Run: cd backend && npm install');
+    console.log('Run: cd backend && npm install');
   } else {
     console.log('[SUCCESS] backend/node_modules exists');
   }

@@ -1,36 +1,28 @@
 /**
  * Input Validation Utilities
+ * Now powered by Zod schemas with backward compatibility
+ * 
+ * @module utils/validation
  */
 
-/**
- * Validate text input with smart content detection
- */
-function validateText(text, minLength = 1, maxLength = 20000) {
-  if (!text || typeof text !== 'string') {
-    throw new Error('INVALID_INPUT: Text must be a non-empty string');
-  }
-  
-  const trimmed = text.trim();
-  
-  if (trimmed.length < minLength) {
-    throw new Error(`INVALID_INPUT: Text must be at least ${minLength} characters`);
-  }
-  
-  if (trimmed.length > maxLength) {
-    throw new Error(`INVALID_INPUT: Text must not exceed ${maxLength} characters`);
-  }
-  
-  // Smart content validation
-  const contentCheck = validateContentQuality(trimmed);
-  if (!contentCheck.valid) {
-    throw new Error(`INVALID_CONTENT: ${contentCheck.reason}`);
-  }
-  
-  return trimmed;
-}
+const { z } = require('zod');
+const {
+  emailSchema,
+  profileIdSchema,
+  userIdSchema,
+  textSchema,
+  modelSchema,
+  ALLOWED_MODELS
+} = require('../schemas');
+
+// ============================================================================
+// CONTENT QUALITY VALIDATION
+// ============================================================================
 
 /**
  * Validate content quality - detect spam, code, gibberish
+ * @param {string} text - Text to validate
+ * @returns {{valid: boolean, reason?: string}}
  */
 function validateContentQuality(text) {
   // 1. Check for code patterns
@@ -41,11 +33,11 @@ function validateContentQuality(text) {
     /var\s+\w+\s*=/gi,
     /import\s+.*from/gi,
     /export\s+(default|const|function)/gi,
-    /<\/?[a-z][\s\S]*>/gi, // HTML tags
-    /\{[\s\S]*\}/g, // JSON-like structures
+    /<\/?[a-z][\s\S]*>/gi,
+    /\{[\s\S]*\}/g,
     /class\s+\w+\s*\{/gi,
-    /def\s+\w+\s*\(/gi, // Python
-    /public\s+class/gi, // Java
+    /def\s+\w+\s*\(/gi,
+    /public\s+class/gi,
   ];
   
   let codeMatches = 0;
@@ -54,7 +46,6 @@ function validateContentQuality(text) {
     if (matches) codeMatches += matches.length;
   }
   
-  // If more than 3 code patterns found, likely code
   if (codeMatches >= 3) {
     return {
       valid: false,
@@ -62,7 +53,7 @@ function validateContentQuality(text) {
     };
   }
   
-  // 2. Check for excessive special characters (gibberish)
+  // 2. Check for excessive special characters
   const specialChars = text.match(/[^a-zA-Z0-9\s\u00C0-\u1EF9.,!?;:'"()\-]/g) || [];
   const specialCharRatio = specialChars.length / text.length;
   
@@ -73,17 +64,17 @@ function validateContentQuality(text) {
     };
   }
   
-  // 3. Check for excessive repetition (spam)
+  // 3. Check for excessive repetition
   const words = text.toLowerCase().split(/\s+/);
   const wordFreq = {};
   words.forEach(word => {
-    if (word.length > 2) { // Only count words longer than 2 chars
+    if (word.length > 2) {
       wordFreq[word] = (wordFreq[word] || 0) + 1;
     }
   });
   
-  const maxFreq = Math.max(...Object.values(wordFreq));
-  const repetitionRatio = maxFreq / words.length;
+  const maxFreq = Math.max(...Object.values(wordFreq), 0);
+  const repetitionRatio = words.length > 0 ? maxFreq / words.length : 0;
   
   if (repetitionRatio > 0.3) {
     return {
@@ -94,7 +85,7 @@ function validateContentQuality(text) {
   
   // 4. Check for minimum word diversity
   const uniqueWords = new Set(words.filter(w => w.length > 2));
-  const diversity = uniqueWords.size / words.length;
+  const diversity = words.length > 0 ? uniqueWords.size / words.length : 0;
   
   if (diversity < 0.15 && words.length > 20) {
     return {
@@ -115,50 +106,119 @@ function validateContentQuality(text) {
   return { valid: true };
 }
 
+// ============================================================================
+// ZOD-BASED VALIDATION FUNCTIONS
+// ============================================================================
+
 /**
- * Validate profile ID
+ * Validate text input with smart content detection
+ * @param {string} text - Text to validate
+ * @param {number} minLength - Minimum length
+ * @param {number} maxLength - Maximum length
+ * @returns {string} Validated and trimmed text
+ * @throws {Error} If validation fails
  */
-function validateProfileId(profileId) {
-  if (!profileId || typeof profileId !== 'string') {
-    throw new Error('INVALID_INPUT: Profile ID is required');
+function validateText(text, minLength = 1, maxLength = 20000) {
+  const schema = z.string()
+    .min(minLength, `Text must be at least ${minLength} characters`)
+    .max(maxLength, `Text must not exceed ${maxLength} characters`)
+    .transform(s => s.trim());
+  
+  const result = schema.safeParse(text);
+  
+  if (!result.success) {
+    const message = result.error.issues[0]?.message || 'Invalid text input';
+    throw new Error(`INVALID_INPUT: ${message}`);
   }
   
-  if (!/^[a-zA-Z0-9_-]+$/.test(profileId)) {
+  const trimmed = result.data;
+  
+  // Smart content validation
+  const contentCheck = validateContentQuality(trimmed);
+  if (!contentCheck.valid) {
+    throw new Error(`INVALID_CONTENT: ${contentCheck.reason}`);
+  }
+  
+  return trimmed;
+}
+
+/**
+ * Validate profile ID
+ * @param {string} profileId - Profile ID to validate
+ * @returns {string} Validated profile ID
+ * @throws {Error} If validation fails
+ */
+function validateProfileId(profileId) {
+  const result = profileIdSchema.safeParse(profileId);
+  
+  if (!result.success) {
     throw new Error('INVALID_INPUT: Invalid profile ID format');
   }
   
-  return profileId;
+  return result.data;
 }
 
 /**
  * Validate user ID
+ * @param {string} userId - User ID to validate
+ * @returns {string} Validated user ID
+ * @throws {Error} If validation fails
  */
 function validateUserId(userId) {
-  if (!userId || typeof userId !== 'string') {
+  const result = userIdSchema.safeParse(userId);
+  
+  if (!result.success) {
     throw new Error('INVALID_INPUT: User ID is required');
   }
   
-  return userId;
+  return result.data;
 }
 
 /**
  * Validate email
+ * @param {string} email - Email to validate
+ * @returns {string} Validated and normalized email
+ * @throws {Error} If validation fails
  */
 function validateEmail(email) {
-  if (!email || typeof email !== 'string') {
-    throw new Error('INVALID_INPUT: Email is required');
-  }
+  const result = emailSchema.safeParse(email);
   
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!result.success) {
     throw new Error('INVALID_INPUT: Invalid email format');
   }
   
-  return email.toLowerCase();
+  return result.data;
 }
 
 /**
+ * Validate and normalize model name
+ * @param {string} model - Model name from request
+ * @param {string} defaultModel - Default model if invalid
+ * @returns {string} Valid model name
+ */
+function validateModel(model, defaultModel = 'gemini-2.5-flash') {
+  if (!model || typeof model !== 'string') {
+    return defaultModel;
+  }
+  
+  const normalizedModel = model.trim().toLowerCase();
+  const validModel = ALLOWED_MODELS.find(m => m.toLowerCase() === normalizedModel);
+  
+  if (validModel) {
+    return validModel;
+  }
+  
+  console.warn(`[WARN] Invalid model requested: ${model}, using default: ${defaultModel}`);
+  return defaultModel;
+}
+
+// ============================================================================
+// LEGACY FUNCTIONS (kept for backward compatibility)
+// ============================================================================
+
+/**
  * Sanitize HTML to prevent XSS
+ * @deprecated Use sanitize-html library instead
  */
 function sanitizeHtml(html) {
   if (!html) return '';
@@ -218,7 +278,7 @@ function calculateProfileScore(samples) {
   const allText = samples.map(s => s.text.toLowerCase()).join(' ');
   const words = allText.split(/\s+/).filter(w => w.length > 2);
   const uniqueWords = new Set(words);
-  const diversity = uniqueWords.size / words.length;
+  const diversity = words.length > 0 ? uniqueWords.size / words.length : 0;
   
   if (diversity >= 0.6) {
     score += 25;
@@ -281,40 +341,6 @@ function calculateProfileScore(samples) {
       shortSamples
     }
   };
-}
-
-/**
- * Allowed AI models for rewrite and chat features
- */
-const ALLOWED_MODELS = [
-  'gemini-2.0-flash-exp',
-  'gemini-2.5-flash-lite',
-  'gemini-2.5-flash',
-  'gemini-2.5-pro'
-];
-
-/**
- * Validate and normalize model name
- * @param {string} model - Model name from request
- * @param {string} defaultModel - Default model if invalid
- * @returns {string} - Valid model name
- */
-function validateModel(model, defaultModel = 'gemini-2.5-flash') {
-  if (!model || typeof model !== 'string') {
-    return defaultModel;
-  }
-  
-  const normalizedModel = model.trim().toLowerCase();
-  
-  // Check if model is in allowed list
-  const validModel = ALLOWED_MODELS.find(m => m.toLowerCase() === normalizedModel);
-  
-  if (validModel) {
-    return validModel;
-  }
-  
-  console.warn(`[WARN] Invalid model requested: ${model}, using default: ${defaultModel}`);
-  return defaultModel;
 }
 
 module.exports = {

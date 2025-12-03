@@ -1,20 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useIsAuthenticated } from '../../stores/authStore'
 import { useAuth } from '../../contexts/AuthContext'
 import * as lottie from 'lottie-web'
-import CLOUDS from 'vanta/dist/vanta.clouds.min'
-import * as THREE from 'three'
 import EmailLoginForm from './EmailLoginForm'
-import EmailRegisterForm from './EmailRegisterForm'
+import EmailRegisterForm from './EmailRegisterFormV2'
 import OTPVerification from './OTPVerification'
-import ForgotPassword from './ForgotPassword'
-import './LoginOverlay.css'
-import './EmailAuth.css'
+import ForgotPassword from './ForgotPasswordV2'
+import { cn } from '../../lib/utils'
 
 const LoginOverlay = () => {
   const { t } = useTranslation()
+  const isAuthenticated = useIsAuthenticated() // Use Zustand store
   const { 
-    isAuthenticated, 
     signIn, 
     signInWithEmail, 
     registerWithEmail, 
@@ -30,8 +28,6 @@ const LoginOverlay = () => {
   const [pendingEmail, setPendingEmail] = useState('')
   const animationContainer = useRef(null)
   const animationInstance = useRef(null)
-  
-  // Vanta background refs
   const vantaRef = useRef(null)
   const vantaEffect = useRef(null)
 
@@ -47,6 +43,62 @@ const LoginOverlay = () => {
     }
   }, [authLoading, isAuthenticated])
 
+  // Vanta.js fog effect
+  useEffect(() => {
+    if (!shouldShow || !vantaRef.current) return
+
+    const loadVanta = async () => {
+      try {
+        // Load Three.js and Vanta dynamically
+        if (!window.THREE) {
+          const threeScript = document.createElement('script')
+          threeScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js'
+          threeScript.async = true
+          document.head.appendChild(threeScript)
+          await new Promise(resolve => { threeScript.onload = resolve })
+        }
+
+        if (!window.VANTA) {
+          const vantaScript = document.createElement('script')
+          vantaScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.fog.min.js'
+          vantaScript.async = true
+          document.head.appendChild(vantaScript)
+          await new Promise(resolve => { vantaScript.onload = resolve })
+        }
+
+        // Initialize Vanta effect with Apple System Blue colors
+        if (window.VANTA && vantaRef.current && !vantaEffect.current) {
+          vantaEffect.current = window.VANTA.FOG({
+            el: vantaRef.current,
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            highlightColor: 0x5AC8FA,  // Apple System Teal
+            midtoneColor: 0x007AFF,    // Apple System Blue
+            lowlightColor: 0x5856D6,   // Apple System Indigo
+            baseColor: 0x0051D5,       // Apple Blue Hover (darker)
+            blurFactor: 0.6,
+            speed: 1.2,
+            zoom: 1.0
+          })
+        }
+      } catch (error) {
+        console.error('Vanta.js load error:', error)
+      }
+    }
+
+    loadVanta()
+
+    return () => {
+      if (vantaEffect.current) {
+        vantaEffect.current.destroy()
+        vantaEffect.current = null
+      }
+    }
+  }, [shouldShow])
+
   useEffect(() => {
     if (shouldShow && animationContainer.current) {
       loadAnimation()
@@ -55,37 +107,6 @@ const LoginOverlay = () => {
     return () => {
       if (animationInstance.current) {
         animationInstance.current.destroy()
-      }
-    }
-  }, [shouldShow])
-
-  // Vanta CLOUDS background effect
-  useEffect(() => {
-    if (!shouldShow || !vantaRef.current) return
-
-    if (!vantaEffect.current) {
-      vantaEffect.current = CLOUDS({
-        el: vantaRef.current,
-        THREE: THREE,
-        mouseControls: false,
-        touchControls: false,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        skyColor: 0x68b8d7,
-        cloudColor: 0xadc1de,
-        cloudShadowColor: 0x183550,
-        sunColor: 0xff9919,
-        sunGlareColor: 0xff6633,
-        sunlightColor: 0xff9933,
-        speed: 1.00
-      })
-    }
-
-    return () => {
-      if (vantaEffect.current) {
-        vantaEffect.current.destroy()
-        vantaEffect.current = null
       }
     }
   }, [shouldShow])
@@ -207,8 +228,8 @@ const LoginOverlay = () => {
     if (authLoading) {
       return (
         <>
-          <h2 className="login-title">{t('auth.checking')}</h2>
-          <p className="login-subtitle">{t('auth.pleaseWait')}</p>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2 tracking-tight">{t('auth.checking')}</h2>
+          <p className="text-md text-gray-400 leading-relaxed mb-8">{t('auth.pleaseWait')}</p>
         </>
       )
     }
@@ -271,12 +292,21 @@ const LoginOverlay = () => {
   }
 
   return (
-    <div className="login-overlay" ref={vantaRef}>
-      
-      <div className="login-container">
+    <div 
+      ref={vantaRef}
+      className="fixed inset-0 z-modal flex items-center justify-center overflow-hidden p-5 light-mode-only"
+      style={{
+        background: 'linear-gradient(135deg, #0071E3 0%, #5856D6 100%)'
+      }}
+    >
+      <div className={cn(
+        "relative z-10 w-full max-w-[400px] text-center",
+        "py-8 px-8 pb-6 bg-white rounded-2xl",
+        "border border-black/[0.04] shadow-modal animate-slide-up-slow"
+      )}>
         {authMode === 'select' && (
-          <div className="login-animation" ref={animationContainer}>
-            <svg className="fallback-icon" width="120" height="120" viewBox="0 0 48 48" style={{ display: 'none' }}>
+          <div className="w-thumbnail-md h-thumbnail-md mx-auto mb-8 flex items-center justify-center" ref={animationContainer}>
+            <svg className="animate-pulse hidden" width="120" height="120" viewBox="0 0 48 48">
               <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
               <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
               <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
@@ -287,7 +317,13 @@ const LoginOverlay = () => {
         
         {(authMode === 'email-register' || authMode === 'forgot-password') && (
           <button 
-            className="back-btn"
+            className={cn(
+              "absolute top-8 left-9 bg-transparent border-none",
+              "text-sm text-gray-400 cursor-pointer p-0 rounded-lg",
+              "transition-all duration-150 font-medium flex items-center gap-1",
+              "hover:not-disabled:text-gray-900",
+              "disabled:opacity-50 disabled:cursor-not-allowed"
+            )}
             onClick={() => setAuthMode('email-login')}
             disabled={isLoading}
           >

@@ -148,13 +148,22 @@ exports.replyToTicket = async (req, res) => {
     if (sendEmail) {
       try {
         const nodemailer = require('nodemailer');
+        const config = require('../config');
         const { supportReplyEmail } = require('../services/emailTemplate.service');
         
+        // Use new SMTP config with fallback to legacy
+        const smtpUser = config.SMTP_USER || process.env.SMTP_USER || process.env.EMAIL_USER;
+        const smtpPass = config.SMTP_PASS || process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
+        const fromEmail = config.EMAIL_FROM || process.env.EMAIL_FROM || 'no-reply@graphosai.com';
+        const fromName = config.EMAIL_FROM_NAME || process.env.EMAIL_FROM_NAME || 'Graphos AI Studio';
+        
         const transporter = nodemailer.createTransport({
-          service: 'gmail',
+          host: config.SMTP_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
+          port: config.SMTP_PORT || process.env.SMTP_PORT || 587,
+          secure: (config.SMTP_PORT || process.env.SMTP_PORT) === 465,
           auth: {
-            user: process.env.EMAIL_USER || 'alvesoscar517@gmail.com',
-            pass: process.env.EMAIL_PASSWORD
+            user: smtpUser,
+            pass: smtpPass
           }
         });
         
@@ -183,7 +192,8 @@ exports.replyToTicket = async (req, res) => {
         });
         
         await transporter.sendMail({
-          from: process.env.EMAIL_USER || 'alvesoscar517@gmail.com',
+          from: `"${fromName}" <${fromEmail}>`,
+          replyTo: config.EMAIL_SUPPORT || process.env.EMAIL_SUPPORT || fromEmail,
           to: ticket.userEmail,
           subject: `Re: ${ticket.title} - #${id.substring(0, 8)}`,
           html: htmlContent

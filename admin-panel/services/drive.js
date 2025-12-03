@@ -24,7 +24,7 @@ export async function getOrCreateAppFolder() {
 
     // Search for existing folder
     const searchResponse = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q=name='AI Content Authenticator' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      `https://www.googleapis.com/drive/v3/files?q=name='Graphos AI Studio' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -59,7 +59,7 @@ export async function getOrCreateAppFolder() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          name: 'AI Content Authenticator',
+          name: 'Graphos AI Studio',
           mimeType: 'application/vnd.google-apps.folder'
         })
       }

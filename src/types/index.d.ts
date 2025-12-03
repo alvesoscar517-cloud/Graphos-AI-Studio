@@ -1,10 +1,12 @@
 /**
- * TypeScript Type Definitions
- * Provides type safety for the application
+ * TypeScript Type Definitions for Graphos AI Studio Frontend
+ * 
+ * These types provide IntelliSense support for JavaScript files
+ * and can be used for gradual TypeScript migration.
  */
 
 // ============================================================================
-// USER & AUTH TYPES
+// AUTH TYPES
 // ============================================================================
 
 export interface User {
@@ -12,15 +14,83 @@ export interface User {
   userId: string;
   email: string;
   name?: string;
+  displayName?: string;
   picture?: string;
   emailVerified?: boolean;
+  hasGoogleLinked?: boolean;
+  authProvider?: 'google' | 'email';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AuthState {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  authMethod: 'google' | 'email' | null;
+  hasGoogleLinked: boolean;
   error: string | null;
+}
+
+export interface AuthActions {
+  initAuth: () => Promise<void>;
+  signInWithGoogle: () => Promise<AuthResult>;
+  signInWithEmail: (email: string, password: string) => Promise<AuthResult>;
+  registerWithEmail: (email: string, password: string, displayName?: string) => Promise<AuthResult>;
+  verifyEmail: (email: string, otp: string) => Promise<AuthResult>;
+  resendVerificationOTP: (email: string) => Promise<AuthResult>;
+  requestPasswordReset: (email: string) => Promise<AuthResult>;
+  resetPassword: (email: string, otp: string, newPassword: string) => Promise<AuthResult>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<AuthResult>;
+  deleteAccount: (password?: string) => Promise<AuthResult>;
+  signOut: () => Promise<AuthResult>;
+  setUser: (user: User | null) => void;
+  updateUser: (updates: Partial<User>) => void;
+  linkGoogleAccount: () => Promise<AuthResult>;
+  unlinkGoogleAccount: () => Promise<AuthResult>;
+  getActiveSessions: () => Promise<SessionsResult>;
+  revokeSession: (sessionId: string) => Promise<AuthResult>;
+  revokeAllOtherSessions: () => Promise<AuthResult>;
+  getLoginHistory: (limit?: number) => Promise<LoginHistoryResult>;
+}
+
+export interface AuthResult {
+  success: boolean;
+  error?: string;
+  code?: string;
+  pendingVerification?: boolean;
+  needsLogin?: boolean;
+  message?: string;
+}
+
+export interface Session {
+  id: string;
+  deviceInfo: string;
+  ipAddress: string;
+  lastActive: string;
+  createdAt: string;
+  isCurrent: boolean;
+}
+
+export interface SessionsResult {
+  success: boolean;
+  sessions: Session[];
+  error?: string;
+}
+
+export interface LoginHistoryEntry {
+  timestamp: string;
+  ipAddress: string;
+  deviceInfo: string;
+  success: boolean;
+  failureReason?: string;
+}
+
+export interface LoginHistoryResult {
+  success: boolean;
+  history: LoginHistoryEntry[];
+  error?: string;
 }
 
 // ============================================================================
@@ -31,52 +101,33 @@ export interface Profile {
   id: string;
   name: string;
   description?: string;
-  status: 'pending' | 'processing' | 'ready' | 'error';
   sampleCount: number;
+  status: 'draft' | 'finalized';
+  voiceProfile?: VoiceProfile;
   createdAt: string;
   updatedAt: string;
-  voiceProfile?: VoiceProfile;
-  statisticalFeatures?: StatisticalFeatures;
 }
 
 export interface VoiceProfile {
-  tone: string;
-  formality_level: number;
-  key_characteristics: string[];
-  sentence_starters: string[];
-  transition_preferences: string[];
-  punctuation_style: string;
-  vocabulary_preferences: {
-    common_phrases: string[];
-    avoid_words: string[];
-    preferred_connectors: string[];
-  };
-  sentence_patterns: {
-    typical_length: string;
-    structure_preference: string;
-    opening_style: string;
-  };
-  rewrite_instructions: string;
-}
-
-export interface StatisticalFeatures {
-  avgWordLength: number;
-  avgSentenceLength: number;
-  vocabularyRichness: number;
-  punctuationRatio: number;
-  totalWords: number;
-  totalSentences: number;
-  readabilityScore: number;
-  topSentenceStarters: string[];
-  transitionWordUsage: Record<string, number>;
+  vocabulary: string[];
+  sentencePatterns: string[];
+  styleMarkers: string[];
+  averageSentenceLength: number;
+  formalityScore: number;
 }
 
 export interface Sample {
   id: string;
   text: string;
-  type: 'short' | 'long';
   wordCount: number;
-  createdAt: string;
+  addedAt: string;
+}
+
+export interface ProfileState {
+  profiles: Profile[];
+  activeProfile: Profile | null;
+  isLoading: boolean;
+  error: string | null;
 }
 
 // ============================================================================
@@ -84,127 +135,50 @@ export interface Sample {
 // ============================================================================
 
 export interface AnalysisResult {
-  success: boolean;
-  voice_compatibility_score: number;
-  vector_score: number;
-  statistical_score: number;
-  confidence: number;
-  sentence_analysis: SentenceAnalysis[];
-  deviant_sentences: DeviantSentence[];
-  statistics: StatisticalFeatures;
-  benchmark_comparison: BenchmarkComparison;
-  improvement_suggestions: ImprovementSuggestion[];
-  processing_time_ms: number;
-}
-
-export interface SentenceAnalysis {
-  sentence: string;
-  index: number;
-  similarityScore: number;
-  centroidSimilarity: number;
-  isDeviant: boolean;
-  deviationSeverity: 'mild' | 'moderate' | 'severe' | null;
-}
-
-export interface DeviantSentence {
-  sentence: string;
-  score: number;
-  index: number;
-  severity: 'mild' | 'moderate' | 'severe';
-}
-
-export interface BenchmarkComparison {
-  comparison: Record<string, MetricComparison>;
-  suggestions: ImprovementSuggestion[];
-  overallBenchmarkScore: number;
-  styleType: string;
-  language: string;
-}
-
-export interface MetricComparison {
-  value: number;
-  benchmark: {
-    min: number;
-    max: number;
-    ideal: number;
-  };
-  benchmarkScore: number;
-  status: 'good' | 'low' | 'high';
-  deviation: number;
-}
-
-export interface ImprovementSuggestion {
-  metric: string;
-  status: string;
-  currentValue: number;
-  recommendedRange: string;
-  idealValue: number;
-  message: string;
-}
-
-// ============================================================================
-// AI DETECTION TYPES
-// ============================================================================
-
-export interface AIDetectionResult {
-  success: boolean;
-  ai_probability: number;
+  aiProbability: number;
   confidence: number;
   evidence: string[];
-  human_indicators: string[];
-  ai_indicators: string[];
-  verdict: string;
-  analysis_details: {
-    multi_pass: boolean;
-    key_factor: string | null;
-    text_length: number;
-    word_count: number;
-  };
+  humanIndicators: string[];
+  aiIndicators: string[];
+  summary?: string;
+  multiPass?: boolean;
+  keyFactor?: string;
+  chunksAnalyzed?: number;
 }
 
-// ============================================================================
-// REWRITE TYPES
-// ============================================================================
+export interface TextAnalysisResult {
+  similarity: number;
+  matchScore: number;
+  styleMatch: StyleMatch;
+  suggestions: string[];
+}
+
+export interface StyleMatch {
+  vocabulary: number;
+  sentenceStructure: number;
+  formality: number;
+  overall: number;
+}
 
 export interface RewriteResult {
-  success: boolean;
-  original_text: string;
-  rewritten_text: string;
-  profile_name: string;
-  tone: string;
-  processing_time_ms: number;
-  ai_check?: {
-    ai_probability: number;
-    confidence: number;
-    human_indicators: string[];
-    ai_indicators: string[];
-  };
+  originalText: string;
+  rewrittenText: string;
+  changes: Change[];
+  styleScore: number;
 }
 
-export interface WritingPreferences {
-  useVocabularyPreferences: boolean;
-  useKeyCharacteristics: boolean;
-  useSentencePatterns: boolean;
-  useRewriteInstructions: boolean;
+export interface Change {
+  type: 'addition' | 'deletion' | 'modification';
+  original: string;
+  replacement: string;
+  reason: string;
 }
 
-// ============================================================================
-// CREDIT TYPES
-// ============================================================================
-
-export interface Credits {
-  balance: number;
-  purchased: number;
-  used: number;
-  bonus?: number;
-}
-
-export interface CreditPackage {
-  id: string;
-  credits: number;
-  price: number;
-  bonus: number;
-  description: string;
+export interface HumanizationResult {
+  text: string;
+  score: number;
+  iterations: number;
+  improvements: string[];
 }
 
 // ============================================================================
@@ -216,16 +190,114 @@ export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: string;
-  metadata?: Record<string, any>;
+  attachments?: Attachment[];
+}
+
+export interface Attachment {
+  id: string;
+  type: 'image' | 'document' | 'file';
+  name: string;
+  url: string;
+  mimeType: string;
+  size: number;
 }
 
 export interface Conversation {
   id: string;
   title: string;
   messages: ChatMessage[];
+  workspaceId?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ChatState {
+  conversations: Conversation[];
+  activeConversation: Conversation | null;
+  isStreaming: boolean;
+  error: string | null;
+}
+
+// ============================================================================
+// CREDIT TYPES
+// ============================================================================
+
+export interface CreditBalance {
+  balance: number;
+  plan: 'free' | 'starter' | 'pro' | 'enterprise';
+  monthlyCredits: number;
+  usedThisMonth: number;
+  resetDate: string;
+}
+
+export interface CreditPackage {
+  id: string;
+  name: string;
+  credits: number;
+  price: number;
+  currency: string;
+  popular?: boolean;
+  savings?: number;
+}
+
+export interface CreditTransaction {
+  id: string;
+  type: 'purchase' | 'usage' | 'bonus' | 'refund';
+  amount: number;
+  balance: number;
+  description: string;
+  operation?: string;
+  timestamp: string;
+}
+
+export interface CreditState {
+  balance: CreditBalance | null;
+  packages: CreditPackage[];
+  history: CreditTransaction[];
+  isLoading: boolean;
+  error: string | null;
+}
+
+// ============================================================================
+// NOTIFICATION TYPES
+// ============================================================================
+
+export interface Notification {
+  id: string;
+  type: 'info' | 'success' | 'warning' | 'error' | 'system';
+  title: string;
+  message: string;
+  read: boolean;
+  actionUrl?: string;
+  actionLabel?: string;
+  createdAt: string;
+}
+
+// ============================================================================
+// WORKSPACE TYPES
+// ============================================================================
+
+export interface Workspace {
+  id: string;
+  name: string;
+  description?: string;
   profileId?: string;
+  settings: WorkspaceSettings;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkspaceSettings {
+  defaultLanguage: string;
+  autoSave: boolean;
+  theme: 'light' | 'dark' | 'system';
+}
+
+export interface WorkspaceState {
+  workspaces: Workspace[];
+  activeWorkspace: Workspace | null;
+  isLoading: boolean;
+  error: string | null;
 }
 
 // ============================================================================
@@ -236,58 +308,140 @@ export interface Note {
   id: string;
   title: string;
   content: string;
+  workspaceId?: string;
+  tags: string[];
+  isPinned: boolean;
   createdAt: string;
   updatedAt: string;
-  tags?: string[];
+}
+
+export interface NotesState {
+  notes: Note[];
+  activeNote: Note | null;
+  isLoading: boolean;
+  error: string | null;
 }
 
 // ============================================================================
-// API RESPONSE TYPES
+// API TYPES
 // ============================================================================
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
   code?: string;
-  details?: any;
+  message?: string;
 }
 
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  hasMore: boolean;
-}
-
-// ============================================================================
-// ERROR TYPES
-// ============================================================================
-
-export interface AppError {
-  name: string;
-  message: string;
-  code: string;
-  details?: any;
-  timestamp: string;
-}
-
-// ============================================================================
-// CONFIG TYPES
-// ============================================================================
-
-export interface Config {
-  IS_DEV: boolean;
-  IS_PROD: boolean;
-  MODE: string;
-  API_BASE_URL: string;
-  REQUEST_TIMEOUT: number;
-  ENABLE_DEBUG_LOGS: boolean;
-  FEATURES: {
-    ENABLE_MONITORING: boolean;
-    ENABLE_ERROR_TRACKING: boolean;
-    ENABLE_ANALYTICS: boolean;
-    ENABLE_CACHING: boolean;
+export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
   };
+}
+
+export interface ApiError {
+  code: string;
+  message: string;
+  errorId?: string;
+  details?: Record<string, unknown>;
+  retryAfter?: number;
+}
+
+// ============================================================================
+// UI TYPES
+// ============================================================================
+
+export interface Toast {
+  id: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  title?: string;
+  message: string;
+  duration?: number;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
+
+export interface Modal {
+  id: string;
+  component: React.ComponentType<unknown>;
+  props?: Record<string, unknown>;
+  onClose?: () => void;
+}
+
+export interface UIState {
+  theme: 'light' | 'dark' | 'system';
+  sidebarOpen: boolean;
+  toasts: Toast[];
+  modals: Modal[];
+  isLoading: boolean;
+}
+
+// ============================================================================
+// STORE TYPES
+// ============================================================================
+
+export type AuthStore = AuthState & AuthActions;
+
+export interface AppStore {
+  initialized: boolean;
+  version: string;
+  setInitialized: (value: boolean) => void;
+}
+
+export interface ThemeStore {
+  theme: 'light' | 'dark' | 'system';
+  resolvedTheme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark' | 'system') => void;
+  initTheme: () => void;
+}
+
+// ============================================================================
+// UTILITY TYPES
+// ============================================================================
+
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
+export type AsyncFunction<T = void> = () => Promise<T>;
+
+export type EventHandler<T = Event> = (event: T) => void;
+
+// ============================================================================
+// CHROME EXTENSION TYPES
+// ============================================================================
+
+export interface ChromeMessage {
+  action: string;
+  [key: string]: unknown;
+}
+
+export interface ChromeResponse {
+  success: boolean;
+  [key: string]: unknown;
+}
+
+declare global {
+  interface Window {
+    modal: {
+      show: (options: ModalOptions) => void;
+      hide: () => void;
+    };
+  }
+}
+
+export interface ModalOptions {
+  title: string;
+  content: string | React.ReactNode;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+  type?: 'info' | 'warning' | 'error' | 'confirm';
 }

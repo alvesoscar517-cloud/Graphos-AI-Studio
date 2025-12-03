@@ -89,7 +89,7 @@
     "checking": "Verificando...",
     "pleaseWait": "Por favor espere un momento",
     "signInToContinue": "Inicie sesión para continuar",
-    "signInSubtitle": "Por favor, inicie sesión con su cuenta de Google para usar AI Content Authenticator",
+    "signInSubtitle": "Por favor, inicie sesión con su cuenta de Google para usar Graphos AI Studio",
     "signInFailed": "Inicio de sesión fallido. Por favor intente de nuevo.",
     "loginFailed": "Error de inicio de sesión",
     "termsAgreement": "Al iniciar sesión, acepta nuestros",
@@ -118,7 +118,7 @@
     "sidebar": "Barra lateral"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "Eliminar",
     "confirmDeleteNote": "¿Está seguro de eliminar la nota \"{{title}}\"?",
     "confirmDelete": "Confirmar eliminación",
@@ -129,7 +129,7 @@
     "rewrite": "Reescribir"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "Herramienta profesional para analizar y refinar el estilo del contenido",
     "newProfile": "Nuevo perfil",
     "createStyleProfile": "Crear perfil de estilo",
@@ -149,7 +149,7 @@
     "unableToLoadProfileDetails": "No se pudieron cargar los detalles del perfil",
     "yourProfiles": "Sus perfiles de estilo de escritura",
     "welcomeTo": "Bienvenido a",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "Crear primer perfil",
     "createUniqueStyle": "Cree su perfil de estilo de escritura único",
     "analyzeRefine": "Analice y refine contenido inteligentemente",
@@ -459,7 +459,7 @@
   },
   "model": {
     "selectAIModel": "Seleccionar modelo IA",
-    "inUse": "[EN USO]",
+    "inUse": "EN USO",
     "geminiFlashExp": "Último modelo experimental, procesamiento rápido con soporte para múltiples tipos de contenido como texto e imágenes",
     "geminiFlashLite": "Modelo compacto, el más rentable, adecuado para tareas simples y procesamiento de alto volumen",
     "geminiFlash": "Modelo equilibrado entre velocidad y calidad, buena capacidad de razonamiento, adecuado para la mayoría de las tareas",

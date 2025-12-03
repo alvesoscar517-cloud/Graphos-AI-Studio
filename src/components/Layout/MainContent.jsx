@@ -2,6 +2,7 @@ import HomeView from '../Views/HomeView'
 import AIStudioView from '../Views/AIStudioView'
 import WorkspaceView from '../Views/WorkspaceView'
 import HistoryView from '../Views/HistoryView'
+import { cn } from '../../lib/utils'
 
 const MainContent = ({ 
   currentView, 
@@ -13,18 +14,13 @@ const MainContent = ({
   analysisData,
   rewriteMode
 }) => {
-  // Only add margin-right for aistudio-editor (RightSidebar)
-  // Workspace handles its own sidebar internally
-  const shouldAddRightMargin = currentView === 'aistudio-editor' && !rightSidebarHidden
-  
   return (
     <main 
-      className="main-content"
-      style={{
-        marginLeft: leftSidebarHidden ? 0 : '238px',
-        marginRight: shouldAddRightMargin ? '300px' : 0,
-        transition: 'margin 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
-      }}
+      className={cn(
+        "flex-1 flex flex-col h-screen overflow-hidden bg-bg-tertiary",
+        "min-w-0", // Important: allows flex item to shrink below content size
+        "relative z-base" // Lower z-index to allow sidebar popups to appear above
+      )}
     >
       {currentView === 'home' && (
         <HomeView 

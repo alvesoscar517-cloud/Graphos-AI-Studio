@@ -5,8 +5,9 @@ import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
+import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
-import './Analysis.css'
+import { cn } from '../../lib/utils'
 
 const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) => {
   const { t } = useTranslation()
@@ -17,18 +18,13 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
   const [textChanged, setTextChanged] = useState(true)
   const { currentNote } = useNotes()
 
-  // Reset state and load cached result when note or profile changes
   useEffect(() => {
-    // Always reset state first when note/profile changes
     setDeviations([])
     setAnalysisData(null)
     setTextChanged(true)
 
-    if (!currentNote || !currentProfile) {
-      return
-    }
+    if (!currentNote || !currentProfile) return
 
-    // Only load cache if we have text and exact match exists
     if (text) {
       const cacheKey = `deviation_${currentProfile.profile_id}`
       const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
@@ -36,18 +32,11 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
         setDeviations(cached.deviant_sentences || [])
         setAnalysisData(cached)
         setTextChanged(false)
-        
-        // Trigger inline highlighting in editor
-        if (onAnalysisComplete) {
-          onAnalysisComplete(cached)
-        }
-        
-        console.log('[PACKAGE] Loaded cached deviation analysis for note:', currentNote.id)
+        if (onAnalysisComplete) onAnalysisComplete(cached)
       }
     }
   }, [currentNote?.id, currentProfile?.profile_id])
 
-  // Check if text has changed and load cache if available
   useEffect(() => {
     if (!currentNote || !text || !currentProfile) {
       setTextChanged(true)
@@ -60,13 +49,8 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
       setDeviations(cached.deviant_sentences || [])
       setAnalysisData(cached)
       setTextChanged(false)
-      
-      if (onAnalysisComplete) {
-        onAnalysisComplete(cached)
-      }
-      console.log('[PACKAGE] Loaded cached deviation analysis for text change')
+      if (onAnalysisComplete) onAnalysisComplete(cached)
     } else {
-      // Text changed but no cache - reset result and enable button
       setDeviations([])
       setAnalysisData(null)
       setTextChanged(true)
@@ -75,7 +59,6 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
 
   const findDeviations = async () => {
     if (!currentProfile || !text) return
-    
     if (!currentNote) {
       modal.error(t('analysis.currentNoteNotFound'))
       return
@@ -83,47 +66,26 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
     
     setIsLoading(true)
     try {
-      // Show progress toast
       const progressToast = modal.toast(t('analysis.analyzing'), t('analysis.checkingStyleSuggestions'), 'info', { duration: 0 })
-      
       const result = await analyzeText(currentProfile.profile_id, text)
-      
-      // Dismiss progress toast
       if (progressToast?.dismiss) progressToast.dismiss()
-      
-      console.log('[CHART] Analysis result:', result)
       
       if (result.success && result.data) {
         const deviantSentences = result.data.deviant_sentences || []
-        
-        console.log('[WARNING] Deviant sentences:', deviantSentences.length)
-        
         setDeviations(deviantSentences)
         setAnalysisData(result.data)
         
-        // Save to cache
         const cacheKey = `deviation_${currentProfile.profile_id}`
         setCachedAnalysis(currentNote.id, text, cacheKey, result.data)
         setTextChanged(false)
         
-        // Trigger inline highlighting in editor
-        if (onAnalysisComplete) {
-          onAnalysisComplete(result.data)
-        }
-        
-        const suggestionsCount = result.data.sentence_suggestions ? Object.keys(result.data.sentence_suggestions).length : 0
-        const rewriteCount = result.data.sentence_suggestions 
-          ? Object.values(result.data.sentence_suggestions).filter(s => s.rewritten).length 
-          : 0
-        
-        console.log('💡 Suggestions generated:', suggestionsCount, 'with', rewriteCount, 'rewrites')
+        if (onAnalysisComplete) onAnalysisComplete(result.data)
         
         if (deviantSentences.length > 0) {
           const severeSummary = result.data.deviation_summary?.by_severity || {}
           let summaryText = t('analysis.foundSentencesToImprove', { count: deviantSentences.length })
           if (severeSummary.severe > 0) summaryText += ` (${severeSummary.severe} ${t('analysis.severe')})`
           summaryText += `. ${t('analysis.clickSentencesForSuggestions')}`
-          
           modal.toast(t('analysis.analysisComplete'), summaryText, 'success')
         } else {
           modal.toast(t('analysis.analysisComplete'), t('analysis.textMatchesStyle'), 'success')
@@ -140,130 +102,113 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
   }
 
   return (
-    <div className="feature-card deviation-card">
-      <div className="feature-card-header">
-        <div className="feature-icon deviation-icon">
-          <img src="/icon/alert-triangle.svg" alt={t('analysis.deviations')} />
+    <div className={cn(
+      "p-4 border border-border-light rounded-xl",
+      "bg-bg-secondary transition-all duration-200 hover:shadow-md"
+    )}>
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-3 relative">
+        <div className="card-icon">
+          <Icon name="alert-triangle" size="lg" color="primary" />
         </div>
-        <div className="feature-info">
-          <h4>{t('analysis.deviations')}</h4>
-          <p>{t('analysis.suggestionsHighlights')}</p>
+        <div className="flex-1">
+          <h4 className="text-sm font-medium text-text-primary m-0 mb-0.5">{t('analysis.deviations')}</h4>
+          <p className="text-xs text-text-secondary m-0">{t('analysis.suggestionsHighlights')}</p>
         </div>
         {analysisData && (
           <button 
-            className={`toggle-result-btn ${showResult ? 'expanded' : 'collapsed'}`}
+            className={cn(
+              "bg-transparent border-none p-1.5 cursor-pointer rounded-md",
+              "flex items-center justify-center transition-colors duration-200",
+              "hover:bg-bg-tertiary ml-auto"
+            )}
             onClick={() => setShowResult(!showResult)}
-            data-tooltip={showResult ? t('common.hide') : t('common.show')}
-            data-tooltip-position="left"
           >
             <img 
-              src="/icon/chevron-down.svg"
-              alt="toggle" 
+              src="/icon/chevron-down.svg" alt="toggle"
+              className={cn("w-icon-md h-icon-md opacity-60 transition-all duration-300 hover:opacity-100 icon-invert", showResult ? "rotate-180" : "rotate-0")}
             />
           </button>
         )}
       </div>
+
+      {/* Action Button */}
       <button 
-        className={`feature-btn ${isLoading ? 'loading' : ''}`}
+        className={cn(
+          "w-full flex items-center justify-between py-2.5 px-3.5",
+          "bg-bg-secondary border border-border-light rounded-xl",
+          "text-sm font-medium text-text-primary cursor-pointer",
+          "transition-all duration-200 hover:border-border-hover hover:shadow-md",
+          "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+          isLoading && "pointer-events-none opacity-70"
+        )}
         onClick={findDeviations}
         disabled={disabled || isLoading || !textChanged}
-        title={!textChanged ? t('analysis.alreadySearched') : ''}
       >
         {isLoading ? (
-          <Lottie 
-            animationData={threeDotsAnimation} 
-            loop={true}
-            style={{ width: 50, height: 16 }}
-          />
+          <Lottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
         ) : (
           <>
             <span>{!textChanged ? t('analysis.alreadySearched') : t('common.search')}</span>
-            <img src="/icon/arrow-right.svg" alt="" className="btn-arrow" />
+            <Icon name="arrow-right" size="md" color="muted" />
           </>
         )}
       </button>
+
+      {/* Result Section */}
       {analysisData && showResult && (
-        <div className="feature-result" style={{ display: 'block' }}>
-          {/* Analysis stats */}
-          <div className="stats-grid-modern">
-            <div className="stat-item-modern">
-              <div className="stat-icon-wrapper">
-                <img src="/icon/target.svg" alt={t('analysis.compatibility')} />
+        <div className="mt-2 block animate-slide-down">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-1.5">
+            <div className="stat-box">
+              <div className="stat-box-icon">
+                <Icon name="target" size="md" color="primary" />
               </div>
-              <span className="stat-label-modern">{t('analysis.compatibility').toUpperCase()}</span>
-              <span className="stat-value-modern">{analysisData.voice_compatibility_score}%</span>
+              <span className="stat-box-label">{t('analysis.compatibility').toUpperCase()}</span>
+              <span className="stat-box-value">{analysisData.voice_compatibility_score}%</span>
             </div>
-            <div className="stat-item-modern">
-              <div className="stat-icon-wrapper">
-                <img src="/icon/alert-circle.svg" alt={t('analysis.suggestions')} />
+            <div className="stat-box">
+              <div className="stat-box-icon">
+                <Icon name="alert-circle" size="md" color="primary" />
               </div>
-              <span className="stat-label-modern">{t('analysis.sentencesWithSuggestions')}</span>
-              <span className="stat-value-modern">
-                {analysisData.sentence_suggestions ? Object.keys(analysisData.sentence_suggestions).filter(
-                  key => analysisData.sentence_suggestions[key].issues_found > 0
-                ).length : 0}
+              <span className="stat-box-label">{t('analysis.sentencesWithSuggestions')}</span>
+              <span className="stat-box-value">
+                {analysisData.sentence_suggestions ? Object.keys(analysisData.sentence_suggestions).filter(key => analysisData.sentence_suggestions[key].issues_found > 0).length : 0}
               </span>
             </div>
           </div>
 
           {deviations.length > 0 ? (
             <>
-              {/* Severity Summary - using new deviation_summary from API */}
-              {analysisData.deviation_summary ? (
-                <div className="sentence-summary-simple">
+              {/* Severity Summary */}
+              {analysisData.deviation_summary && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
                   {analysisData.deviation_summary.by_severity?.severe > 0 && (
-                    <span className="summary-badge summary-critical">
+                    <span className="text-2xs py-1 px-2 rounded bg-error/15 text-error font-medium">
                       {analysisData.deviation_summary.by_severity.severe} {t('analysis.severe')}
                     </span>
                   )}
                   {analysisData.deviation_summary.by_severity?.moderate > 0 && (
-                    <span className="summary-badge summary-minor">
+                    <span className="text-2xs py-1 px-2 rounded bg-warning/15 text-warning font-medium">
                       {analysisData.deviation_summary.by_severity.moderate} {t('analysis.moderate')}
                     </span>
                   )}
                   {analysisData.deviation_summary.by_severity?.mild > 0 && (
-                    <span className="summary-badge summary-good">
+                    <span className="text-2xs py-1 px-2 rounded bg-primary/15 text-primary font-medium">
                       {analysisData.deviation_summary.by_severity.mild} {t('analysis.mild')}
                     </span>
                   )}
                 </div>
-              ) : analysisData.sentence_suggestions && (() => {
-                // Fallback to old logic if deviation_summary not available
-                const suggestions = Object.values(analysisData.sentence_suggestions)
-                const withIssues = suggestions.filter(s => s.issues_found > 0)
-                const high = withIssues.filter(s => s.issues_found >= 3 || s.confidence < 40).length
-                const medium = withIssues.filter(s => s.issues_found === 2 || (s.confidence >= 40 && s.confidence < 60)).length
-                const low = withIssues.filter(s => s.issues_found === 1 && s.confidence >= 60).length
-                
-                return (
-                  <div className="sentence-summary-simple">
-                    {high > 0 && (
-                      <span className="summary-badge summary-critical">
-                        {high} {t('analysis.severe')}
-                      </span>
-                    )}
-                    {medium > 0 && (
-                      <span className="summary-badge summary-minor">
-                        {medium} {t('analysis.moderate')}
-                      </span>
-                    )}
-                    {low > 0 && (
-                      <span className="summary-badge summary-good">
-                        {low} {t('analysis.mild')}
-                      </span>
-                    )}
-                  </div>
-                )
-              })()}
+              )}
               
-              <div className="deviation-hint">
-                <img src="/icon/mouse-pointer.svg" alt="info" className="icon-filter" />
+              <div className="flex items-center gap-2 mt-2 p-2 bg-bg-secondary rounded-lg text-xs text-text-secondary">
+                <Icon name="mouse-pointer" size="sm" color="muted" />
                 <span>{t('analysis.clickHighlightedSentences')}</span>
               </div>
             </>
           ) : (
-            <div className="deviation-success">
-              <img src="/icon/check-circle.svg" alt="success" className="icon-filter" />
+            <div className="flex items-center gap-2 mt-2 p-2 bg-success/10 rounded-lg text-xs text-success">
+              <Icon name="check-circle" size="sm" color="success" />
               <span>{t('analysis.textMatchesStyle')}</span>
             </div>
           )}

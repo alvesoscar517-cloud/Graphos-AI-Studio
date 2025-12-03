@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef } f
 import { useAuth } from './AuthContext'
 import { useProfiles } from './ProfileContext'
 import apiClient from '../services/api/client'
+import { logError } from '../utils/errors'
 
 const WorkspaceContext = createContext()
 
@@ -116,9 +117,16 @@ export const WorkspaceProvider = ({ children }) => {
     }
   }, [conversations, user])
   
-  // Periodic cleanup
+  // Periodic cleanup - with proper cleanup ref to prevent memory leaks
+  const cleanupIntervalRef = useRef(null)
+  
   useEffect(() => {
-    const cleanupInterval = setInterval(() => {
+    // Clear any existing interval first
+    if (cleanupIntervalRef.current) {
+      clearInterval(cleanupIntervalRef.current)
+    }
+    
+    cleanupIntervalRef.current = setInterval(() => {
       setConversations(prev => {
         if (prev.length <= MAX_CONVERSATIONS) return prev
         
@@ -131,7 +139,12 @@ export const WorkspaceProvider = ({ children }) => {
       })
     }, 5 * 60 * 1000)
     
-    return () => clearInterval(cleanupInterval)
+    return () => {
+      if (cleanupIntervalRef.current) {
+        clearInterval(cleanupIntervalRef.current)
+        cleanupIntervalRef.current = null
+      }
+    }
   }, [])
 
   // Generate system prompt based on user profile
@@ -220,31 +233,9 @@ export const WorkspaceProvider = ({ children }) => {
     return words.slice(0, maxWords).join(' ') + '...'
   }, [])
 
-  // Generate title from AI
-  const generateTitle = useCallback(async (firstMessage) => {
-    try {
-      const truncatedMessage = firstMessage.substring(0, 150)
-      
-      const { data } = await apiClient.post('/api/chat', {
-        messages: [{
-          role: 'user',
-          content: `Create a short title (maximum 7 words) for the following content. ONLY return the title, no explanation: "${truncatedMessage}"`
-        }],
-        systemPrompt: 'You are a title generation assistant. Only return a short title of maximum 7 words, no explanation, no quotes.',
-        model: 'gemini-2.0-flash-lite',
-        temperature: 0.2,
-        maxTokens: 30
-      })
-
-      if (data.message) {
-        let title = data.message.trim().replace(/^["']|["']$/g, '')
-        return truncateTitleToWords(title, 7)
-      }
-    } catch (err) {
-      console.error('Failed to generate title:', err)
-    }
-    
-    const firstSentence = firstMessage.split(/[.!?。]/)[0]?.trim() || firstMessage
+  // Generate title from first characters of content (no AI call)
+  const generateTitle = useCallback((firstMessage) => {
+    const firstSentence = firstMessage.split(/[.!?。\n]/)[0]?.trim() || firstMessage
     return truncateTitleToWords(firstSentence, 7)
   }, [truncateTitleToWords])
 
@@ -499,23 +490,20 @@ export const WorkspaceProvider = ({ children }) => {
 
       const finalMessages = [...updatedMessages, finalAiMessage]
 
-      // Auto-generate title for first message
+      // Auto-generate title for first message (using first characters, no AI)
       let newTitle = currentConversation?.title || conversation?.title
       const isFirstMessage = (currentConversation?.messages || conversation?.messages || []).length === 0
       const userEditedTitle = currentConversation?.userEditedTitle || conversation?.userEditedTitle
       
       if (isFirstMessage && !userEditedTitle) {
-        generateTitle(content).then(title => {
-          setConversations(prev => 
-            prev.map(c => c.id === (currentConversation?.id || conversation?.id) 
-              ? { ...c, title, titleGenerated: true } 
-              : c
-            )
+        newTitle = generateTitle(content)
+        setConversations(prev => 
+          prev.map(c => c.id === (currentConversation?.id || conversation?.id) 
+            ? { ...c, title: newTitle, titleGenerated: true } 
+            : c
           )
-          setCurrentConversation(prev => prev ? { ...prev, title, titleGenerated: true } : prev)
-        })
-        
-        newTitle = truncateTitleToWords(content, 7)
+        )
+        setCurrentConversation(prev => prev ? { ...prev, title: newTitle, titleGenerated: true } : prev)
       }
 
       const updatedConversation = {
@@ -538,7 +526,7 @@ export const WorkspaceProvider = ({ children }) => {
       })
 
     } catch (err) {
-      console.error('Error sending message:', err)
+      logError(err, { context: 'sendMessage', conversationId: conversation?.id })
       const errorMessage = formatErrorMessage(err)
       setError(errorMessage)
       

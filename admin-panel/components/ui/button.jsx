@@ -4,16 +4,16 @@ import Spinner from './spinner'
 
 const buttonVariants = {
   variant: {
-    primary: 'bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm hover:shadow-md',
-    secondary: 'bg-surface-secondary text-secondary-foreground border border-border/50 hover:bg-surface-tertiary',
-    ghost: 'bg-transparent hover:bg-surface-secondary text-secondary',
+    primary: 'bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm hover:shadow-md active:shadow-sm',
+    secondary: 'bg-surface-secondary text-secondary-foreground border border-border/40 hover:bg-surface hover:border-border/60',
+    ghost: 'bg-transparent hover:bg-surface-secondary/80 text-secondary',
     destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm',
     success: 'bg-success text-success-foreground hover:bg-success/90 shadow-sm',
   },
   size: {
-    sm: 'h-8 px-3 text-xs gap-1.5',
-    md: 'h-10 px-4 text-sm gap-2',
-    lg: 'h-12 px-6 text-base gap-2',
+    sm: 'h-[34px] px-3.5 text-[13px] gap-1.5',
+    md: 'h-[42px] px-5 text-[15px] gap-2',
+    lg: 'h-[50px] px-7 text-[17px] gap-2.5',
   },
 }
 
@@ -40,10 +40,11 @@ const Button = forwardRef(({
     <button
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-primary/20',
-        'disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none',
-        'active:scale-[0.98]',
+        'inline-flex items-center justify-center font-medium rounded-[10px]',
+        'transition-all duration-[250ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+        'focus:outline-none focus-visible:ring-[3px] focus-visible:ring-info/25',
+        'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none',
+        'active:scale-[0.97] active:transition-none',
         buttonVariants.variant[variant],
         buttonVariants.size[size],
         className

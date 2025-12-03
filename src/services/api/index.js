@@ -1,10 +1,26 @@
 /**
  * API Services Index
  * Re-exports all API functions for easy importing
+ * 
+ * Now supports both legacy client and new ky-based client
  */
 
-// API Client
+// API Clients
 export { apiClient, apiFetch } from './client';
+export { kyClient } from './kyClient';
+
+// Error Handling - All exports for flexibility
+export { 
+  ApiError,
+  parseApiError,
+  parseNetworkError,
+  handleApiError,
+  withErrorHandling,
+  getErrorMessage,
+  isRetryableError,
+  requestDeduplicator,
+  ERROR_MESSAGES,
+} from './errorHandler';
 
 // Auth
 export { getUserInfo } from './auth';

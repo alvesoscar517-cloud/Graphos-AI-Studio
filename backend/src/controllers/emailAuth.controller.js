@@ -8,13 +8,22 @@ const { otpVerificationEmail, passwordResetEmail, newDeviceLoginEmail, passwordC
 const { createLocalizer } = require('../utils/localized-messages.util');
 const logger = require('../utils/logger');
 const nodemailer = require('nodemailer');
+const config = require('../config');
+
+// Email configuration
+const smtpUser = config.SMTP_USER || process.env.SMTP_USER || process.env.EMAIL_USER;
+const smtpPass = config.SMTP_PASS || process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
+const fromEmail = config.EMAIL_FROM || process.env.EMAIL_FROM || 'no-reply@graphosai.com';
+const fromName = config.EMAIL_FROM_NAME || process.env.EMAIL_FROM_NAME || 'Graphos AI Studio';
 
 // Email transporter
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: config.SMTP_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: config.SMTP_PORT || process.env.SMTP_PORT || 587,
+  secure: (config.SMTP_PORT || process.env.SMTP_PORT) === 465,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
+    user: smtpUser,
+    pass: smtpPass
   }
 });
 
@@ -24,8 +33,8 @@ const transporter = nodemailer.createTransport({
 async function sendOTPEmail(email, code, type, userName, locale) {
   const templateFn = type === 'verification' ? otpVerificationEmail : passwordResetEmail;
   const subject = type === 'verification' 
-    ? 'Verify Your Email - AI Content Authenticator'
-    : 'Reset Your Password - AI Content Authenticator';
+    ? 'Verify Your Email - Graphos AI Studio'
+    : 'Reset Your Password - Graphos AI Studio';
   
   const html = templateFn({
     code,
@@ -35,7 +44,7 @@ async function sendOTPEmail(email, code, type, userName, locale) {
   });
   
   await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+    from: `"${fromName}" <${fromEmail}>`,
     to: email,
     subject,
     html
@@ -217,9 +226,9 @@ exports.login = async (req, res) => {
         });
         
         await transporter.sendMail({
-          from: process.env.EMAIL_USER,
+          from: `"${fromName}" <${fromEmail}>`,
           to: email,
-          subject: 'New Device Login - AI Content Authenticator',
+          subject: 'New Device Login - Graphos AI Studio',
           html
         });
         
@@ -538,9 +547,9 @@ exports.changePassword = async (req, res) => {
         });
         
         await transporter.sendMail({
-          from: process.env.EMAIL_USER,
+          from: `"${fromName}" <${fromEmail}>`,
           to: req.user.email,
-          subject: 'Password Changed - AI Content Authenticator',
+          subject: 'Password Changed - Graphos AI Studio',
           html
         });
         
@@ -732,6 +741,52 @@ exports.getLoginHistory = async (req, res) => {
       success: false,
       error: 'Failed to get login history',
       code: 'GET_HISTORY_ERROR'
+    });
+  }
+};
+
+/**
+ * Refresh access token
+ * POST /auth/email/refresh
+ */
+exports.refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        error: 'Refresh token is required',
+        code: 'MISSING_REFRESH_TOKEN'
+      });
+    }
+    
+    const result = await emailAuthService.refreshAccessToken(refreshToken);
+    
+    res.json({
+      success: true,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken, // New refresh token (rotation)
+      expiresIn: result.expiresIn
+    });
+    
+  } catch (error) {
+    logger.error('Refresh token error', { error: error.message });
+    
+    const errorCode = error.message.split(':')[0];
+    const errorMessage = error.message.split(': ')[1] || error.message;
+    
+    let statusCode = 500;
+    if (errorCode === 'AUTH_INVALID_REFRESH_TOKEN' || errorCode === 'AUTH_REFRESH_TOKEN_EXPIRED') {
+      statusCode = 401;
+    } else if (errorCode === 'AUTH_USER_NOT_FOUND') {
+      statusCode = 404;
+    }
+    
+    res.status(statusCode).json({
+      success: false,
+      error: errorMessage,
+      code: errorCode
     });
   }
 };

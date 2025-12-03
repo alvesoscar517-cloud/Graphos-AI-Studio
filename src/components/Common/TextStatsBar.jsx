@@ -1,17 +1,8 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useTextStats } from '../../hooks/useTextStats'
-import './TextStatsBar.css'
+import { cn } from '../../lib/utils'
 
-/**
- * TextStatsBar - Display text statistics and warnings
- * 
- * Features:
- * - Display character count, words, tokens, pages
- * - Warning khi text quá dài
- * - Suggest appropriate model
- * - Estimated cost (optional)
- */
 const TextStatsBar = ({ 
   text, 
   model = 'gemini-2.5-flash',
@@ -32,7 +23,6 @@ const TextStatsBar = ({
     isTooLong
   } = useTextStats(text, { model, task })
 
-  // Status color
   const statusColor = useMemo(() => {
     switch (status) {
       case 'error': return 'error'
@@ -43,23 +33,25 @@ const TextStatsBar = ({
     }
   }, [status])
 
-  if (!text || stats.chars === 0) {
-    return null
-  }
+  if (!text || stats.chars === 0) return null
 
   if (compact) {
     return (
-      <div className={`text-stats-bar compact ${statusColor} ${className}`}>
-        <span className="stat-item">
-          {stats.chars.toLocaleString()} {t('tokens.characters')}
-        </span>
+      <div className={cn(
+        "flex flex-row items-center py-1 px-2 gap-3 text-xs",
+        "text-text-muted bg-bg-secondary rounded-md",
+        statusColor === 'warning' && "border-l-2 border-amber-400 bg-amber-500/5",
+        statusColor === 'error' && "border-l-2 border-red-400 bg-error/5",
+        statusColor === 'muted' && "opacity-60",
+        statusColor === 'normal' && "border-l-2 border-green-400",
+        className
+      )}>
+        <span>{stats.chars.toLocaleString()} {t('tokens.characters')}</span>
         {stats.words > 0 && (
-          <span className="stat-item">
-            {stats.words.toLocaleString()} {t('common.words')}
-          </span>
+          <span>{stats.words.toLocaleString()} {t('common.words')}</span>
         )}
         {isTooLong && (
-          <span className="stat-warning" title={t('tokens.textQuiteLong')}>
+          <span className="ml-auto text-amber-500" title={t('tokens.textQuiteLong')}>
             [{t('common.warning').toUpperCase()}]
           </span>
         )}
@@ -68,59 +60,69 @@ const TextStatsBar = ({
   }
 
   return (
-    <div className={`text-stats-bar ${statusColor} ${className}`}>
-      <div className="stats-main">
-        <span className="stat-item" title={t('tokens.characters')}>
-          <span className="stat-icon">[NOTE]</span>
+    <div className={cn(
+      "flex flex-col gap-1 py-1.5 px-3 text-xs",
+      "text-text-muted bg-bg-secondary rounded-md",
+      "transition-all duration-200",
+      statusColor === 'warning' && "border-l-2 border-amber-400 bg-amber-500/5",
+      statusColor === 'error' && "border-l-2 border-red-400 bg-error/5",
+      statusColor === 'muted' && "opacity-60",
+      statusColor === 'normal' && "border-l-2 border-green-400",
+      className
+    )}>
+      <div className="flex items-center gap-4 flex-wrap">
+        <span className="flex items-center gap-1 whitespace-nowrap" title={t('tokens.characters')}>
+          <span className="text-2xs opacity-80">[NOTE]</span>
           {stats.chars.toLocaleString()}
         </span>
         
-        <span className="stat-item" title={t('common.words')}>
-          <span className="stat-icon">📖</span>
+        <span className="flex items-center gap-1 whitespace-nowrap" title={t('common.words')}>
+          <span className="text-2xs opacity-80">📖</span>
           {stats.words.toLocaleString()} {t('common.words')}
         </span>
         
-        <span className="stat-item" title={t('tokens.tokens')}>
-          <span className="stat-icon">[TARGET]</span>
+        <span className="flex items-center gap-1 whitespace-nowrap" title={t('tokens.tokens')}>
+          <span className="text-2xs opacity-80">[TARGET]</span>
           ~{stats.tokens.toLocaleString()} {t('tokens.tokens')}
         </span>
         
         {stats.pages > 1 && (
-          <span className="stat-item" title={t('tokens.pages')}>
-            <span className="stat-icon">📄</span>
+          <span className="flex items-center gap-1 whitespace-nowrap" title={t('tokens.pages')}>
+            <span className="text-2xs opacity-80">📄</span>
             ~{stats.pages} {t('tokens.pages')}
           </span>
         )}
 
         {showCost && (
-          <span className="stat-item cost" title={t('credits.credits')}>
-            <span className="stat-icon">💰</span>
+          <span className="flex items-center gap-1 whitespace-nowrap text-amber-400" title={t('credits.credits')}>
+            <span className="text-2xs opacity-80">💰</span>
             {estimatedCost}
           </span>
         )}
       </div>
 
-      {/* Warnings */}
       {warnings.length > 0 && (
-        <div className="stats-warnings">
+        <div className="flex flex-wrap gap-2 mt-1">
           {warnings.map((w, i) => (
-            <span key={i} className="warning-item">[{t('common.warning').toUpperCase()}] {w}</span>
+            <span key={i} className="text-2xs text-amber-400">
+              [{t('common.warning').toUpperCase()}] {w}
+            </span>
           ))}
         </div>
       )}
 
-      {/* Errors */}
       {errors.length > 0 && (
-        <div className="stats-errors">
+        <div className="flex flex-wrap gap-2 mt-1">
           {errors.map((e, i) => (
-            <span key={i} className="error-item">[{t('common.error').toUpperCase()}] {e}</span>
+            <span key={i} className="text-2xs text-red-400">
+              [{t('common.error').toUpperCase()}] {e}
+            </span>
           ))}
         </div>
       )}
 
-      {/* Model hint */}
       {showModelHint && modelRecommendation.model !== model && (
-        <div className="stats-hint">
+        <div className="text-2xs text-blue-400 mt-1">
           💡 {t('analysis.suggestions')}: {modelRecommendation.reason}
         </div>
       )}

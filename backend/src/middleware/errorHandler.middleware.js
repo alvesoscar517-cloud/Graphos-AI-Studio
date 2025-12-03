@@ -1,6 +1,8 @@
 /**
  * Enhanced Error Handling Middleware
- * Provides structured error responses and logging
+ * Re-exports from new http-errors based module with backward compatibility
+ * 
+ * @module middleware/errorHandler.middleware
  */
 
 const config = require('../config');
@@ -9,18 +11,21 @@ const { v4: uuidv4 } = require('uuid');
 const localization = require('../services/localization.service');
 const { getLanguage } = require('./language.middleware');
 
+// Import new http-errors based module
+const httpErrors = require('./errorHandler');
+
 // ============================================================================
-// CUSTOM ERROR CLASSES
+// CUSTOM ERROR CLASSES (Legacy - for backward compatibility)
 // ============================================================================
 
 class AppError extends Error {
   constructor(message, statusCode = 500, code = 'INTERNAL_ERROR', details = null) {
     super(message);
     this.statusCode = statusCode;
+    this.status = statusCode;
     this.code = code;
     this.details = details;
     this.isOperational = true;
-    
     Error.captureStackTrace(this, this.constructor);
   }
 }
@@ -54,6 +59,7 @@ class RateLimitError extends AppError {
     super('Rate limit exceeded', 429, 'RATE_LIMIT_EXCEEDED', { retryAfter });
   }
 }
+
 
 class InsufficientCreditsError extends AppError {
   constructor(required, available) {
@@ -124,7 +130,7 @@ function mapError(error) {
 // ============================================================================
 
 /**
- * Global error handler
+ * Global error handler - Enhanced with http-errors support
  */
 function errorHandler(err, req, res, next) {
   // Generate error ID for tracking
@@ -133,10 +139,13 @@ function errorHandler(err, req, res, next) {
   // Get language for localized error messages
   const lang = getLanguage(req);
   
+  // Use new parseError for http-errors compatibility
+  const parsed = httpErrors.parseError(err);
+  
   // Default error values
-  let statusCode = err.statusCode || 500;
-  let code = err.code || 'INTERNAL_ERROR';
-  let message = err.message || 'An unexpected error occurred';
+  let statusCode = err.statusCode || err.status || parsed.status || 500;
+  let code = err.code || parsed.code || 'INTERNAL_ERROR';
+  let message = err.message || parsed.message || 'An unexpected error occurred';
   let details = err.details || null;
   
   // Check for mapped errors
@@ -154,9 +163,11 @@ function errorHandler(err, req, res, next) {
     'FORBIDDEN': 'forbidden',
     'NOT_FOUND': 'not_found',
     'RATE_LIMIT_EXCEEDED': 'rate_limited',
+    'RATE_LIMITED': 'rate_limited',
     'INSUFFICIENT_CREDITS': 'insufficient_credits',
     'QUOTA_EXCEEDED': 'quota_exceeded',
     'SERVICE_ERROR': 'service_unavailable',
+    'SERVICE_UNAVAILABLE': 'service_unavailable',
     'REQUEST_TIMEOUT': 'timeout',
     'INTERNAL_ERROR': 'server_error'
   };
@@ -187,23 +198,27 @@ function errorHandler(err, req, res, next) {
     message = 'Authentication token has expired';
   }
   
+  // Categorize error for monitoring
+  const category = httpErrors.categorizeError(err);
+  const shouldReport = httpErrors.shouldReportError(err);
+  
   // Log error
   const logData = {
     errorId,
     statusCode,
     code,
+    category,
     message: err.message,
     path: req.path,
     method: req.method,
     userId: req.userId,
-    ip: req.ip
+    ip: req.ip,
+    correlationId: req.correlationId
   };
   
-  if (statusCode >= 500) {
-    // Log full stack for server errors
+  if (statusCode >= 500 || shouldReport) {
     logger.error('Server error', { ...logData, stack: err.stack });
   } else if (statusCode >= 400) {
-    // Log warning for client errors
     logger.warn('Client error', logData);
   }
   
@@ -218,9 +233,15 @@ function errorHandler(err, req, res, next) {
     language: lang
   };
   
-  // Add details if available and not in production
+  // Add details if available
   if (details) {
     response.error.details = details;
+  }
+  
+  // Add retry-after for rate limits
+  if (err.retryAfter) {
+    response.error.retryAfter = err.retryAfter;
+    res.set('Retry-After', err.retryAfter);
   }
   
   // Add stack trace in development
@@ -233,23 +254,14 @@ function errorHandler(err, req, res, next) {
 
 /**
  * Sanitize error message for production
- * Remove sensitive information
  */
 function sanitizeErrorMessage(message) {
-  // Remove file paths
   message = message.replace(/\/[^\s]+\.(js|ts|json)/g, '[file]');
-  
-  // Remove IP addresses
   message = message.replace(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/g, '[ip]');
-  
-  // Remove potential secrets
   message = message.replace(/key[=:]\s*['"]?[a-zA-Z0-9_-]+['"]?/gi, 'key=[redacted]');
-  
-  // Truncate long messages
   if (message.length > 200) {
     message = message.substring(0, 200) + '...';
   }
-  
   return message;
 }
 
@@ -273,7 +285,6 @@ function notFoundHandler(req, res) {
 
 /**
  * Async error wrapper
- * Wraps async route handlers to catch errors
  */
 function asyncHandler(fn) {
   return (req, res, next) => {
@@ -294,6 +305,10 @@ function requestTimeout(timeout = 30000) {
   };
 }
 
+// ============================================================================
+// EXPORTS
+// ============================================================================
+
 module.exports = {
   // Middleware
   errorHandler,
@@ -301,7 +316,7 @@ module.exports = {
   asyncHandler,
   requestTimeout,
   
-  // Error classes
+  // Error classes (legacy)
   AppError,
   ValidationError,
   AuthenticationError,
@@ -309,5 +324,30 @@ module.exports = {
   NotFoundError,
   RateLimitError,
   InsufficientCreditsError,
-  ExternalServiceError
+  ExternalServiceError,
+  
+  // Re-export new http-errors factories
+  validationError: httpErrors.validationError,
+  authError: httpErrors.authError,
+  forbiddenError: httpErrors.forbiddenError,
+  notFoundError: httpErrors.notFoundError,
+  rateLimitError: httpErrors.rateLimitError,
+  internalError: httpErrors.internalError,
+  serviceUnavailableError: httpErrors.serviceUnavailableError,
+  conflictError: httpErrors.conflictError,
+  badGatewayError: httpErrors.badGatewayError,
+  quotaExceededError: httpErrors.quotaExceededError,
+  payloadTooLargeError: httpErrors.payloadTooLargeError,
+  unprocessableEntityError: httpErrors.unprocessableEntityError,
+  
+  // Re-export utilities
+  createError: httpErrors.createError,
+  categorizeError: httpErrors.categorizeError,
+  shouldReportError: httpErrors.shouldReportError,
+  wrapController: httpErrors.wrapController,
+  
+  // Constants
+  ERROR_CODES: httpErrors.ERROR_CODES,
+  ERROR_CATEGORIES: httpErrors.ERROR_CATEGORIES,
+  ERROR_MAPPINGS
 };

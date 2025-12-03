@@ -1,16 +1,18 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { useProfiles } from '../../../contexts/ProfileContext'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import ProfileSelector from '../../Analysis/ProfileSelector'
 import ModelSelector from '../../Analysis/ModelSelector'
-import './WorkspaceSidebar.css'
+import Icon from '../../Common/Icon'
+import { cn } from '../../../lib/utils'
 
 const WorkspaceSidebar = ({ hidden, onClose }) => {
   const { t } = useTranslation()
   const { currentProfile, selectProfile } = useProfiles()
   const { modelSettings, updateModelSettings } = useWorkspace()
+  const [isDragging, setIsDragging] = useState(false)
 
   const chatSettings = modelSettings.chatSettings || {}
 
@@ -25,14 +27,12 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
   const handleSettingChange = (key, value) => {
     const newChatSettings = { ...chatSettings, [key]: value }
     
-    // If turning off useVoiceProfile, also turn off sub-options
     if (key === 'useVoiceProfile' && !value) {
       newChatSettings.useVocabularyPreferences = false
       newChatSettings.useKeyCharacteristics = false
       newChatSettings.useSentencePatterns = false
     }
     
-    // Sync writingPreferences with chatSettings for backend compatibility
     const useVoice = newChatSettings.useVoiceProfile !== false
     const writingPreferences = {
       useVocabularyPreferences: useVoice && newChatSettings.useVocabularyPreferences !== false,
@@ -53,67 +53,30 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
     handleSettingChange(key, !chatSettings[key])
   }
 
-  // Sync initial model if not set
   useEffect(() => {
     if (!modelSettings.model) {
       updateModelSettings({ model: 'gemini-2.0-flash-exp' })
     }
   }, [])
 
-  // Voice profile options
   const voiceProfileOptions = [
-    {
-      key: 'useVoiceProfile',
-      icon: '/icon/user.svg',
-      title: t('workspace.useVoiceProfile'),
-      description: t('workspace.useVoiceProfileDesc')
-    },
-    {
-      key: 'useVocabularyPreferences',
-      icon: '/icon/book-open.svg',
-      title: t('workspace.vocabularyPreferences'),
-      description: t('workspace.vocabularyPreferencesDesc')
-    },
-    {
-      key: 'useKeyCharacteristics',
-      icon: '/icon/list.svg',
-      title: t('workspace.keyCharacteristics'),
-      description: t('workspace.keyCharacteristicsDesc')
-    },
-    {
-      key: 'useSentencePatterns',
-      icon: '/icon/align-left.svg',
-      title: t('workspace.sentencePatterns'),
-      description: t('workspace.sentencePatternsDesc')
-    }
+    { key: 'useVoiceProfile', icon: '/icon/user.svg', title: t('workspace.useVoiceProfile'), description: t('workspace.useVoiceProfileDesc') },
+    { key: 'useVocabularyPreferences', icon: '/icon/book-open.svg', title: t('workspace.vocabularyPreferences'), description: t('workspace.vocabularyPreferencesDesc') },
+    { key: 'useKeyCharacteristics', icon: '/icon/list.svg', title: t('workspace.keyCharacteristics'), description: t('workspace.keyCharacteristicsDesc') },
+    { key: 'useSentencePatterns', icon: '/icon/align-left.svg', title: t('workspace.sentencePatterns'), description: t('workspace.sentencePatternsDesc') }
   ]
 
-  // Humanization options
   const humanizationOptions = [
-    {
-      key: 'useAntiAIDetection',
-      icon: '/icon/shield.svg',
-      title: t('workspace.antiAIDetection'),
-      description: t('workspace.antiAIDetectionDesc'),
-      badge: 'NEW'
-    },
-    {
-      key: 'humanizeResponse',
-      icon: '/icon/user-check.svg',
-      title: t('workspace.humanizeOutput'),
-      description: t('workspace.humanizeOutputDesc'),
-      badge: 'BETA'
-    }
+    { key: 'useAntiAIDetection', icon: '/icon/shield.svg', title: t('workspace.antiAIDetection'), description: t('workspace.antiAIDetectionDesc'), badge: 'NEW' },
+    { key: 'humanizeResponse', icon: '/icon/user-check.svg', title: t('workspace.humanizeOutput'), description: t('workspace.humanizeOutputDesc'), badge: 'BETA' }
   ]
 
-  // Response style options
   const responseStyles = [
     { value: 'concise', label: t('workspace.concise') },
     { value: 'balanced', label: t('workspace.balanced') },
     { value: 'detailed', label: t('workspace.detailed') }
   ]
 
-  // Creativity levels
   const creativityLevels = [
     { value: 'low', label: t('workspace.precise'), temp: 0.3 },
     { value: 'medium', label: t('workspace.balanced'), temp: 0.7 },
@@ -122,92 +85,106 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
 
   return (
     <motion.aside 
-      className="workspace-sidebar right-sidebar"
-      initial={{ x: 0, opacity: 1 }}
+      className={cn(
+        "bg-bg-tertiary",
+        "border-l border-separator",
+        "overflow-y-auto overflow-x-hidden flex flex-col",
+        "h-screen shrink-0",
+        "touch-pan-y overscroll-contain scrollbar-none",
+        "absolute right-0 top-0 bottom-0",
+        "max-md:w-full",
+        isDragging ? "z-[100] shadow-xl" : "z-sidebar"
+      )}
+      initial={false}
       animate={{
-        x: hidden ? 300 : 0,
-        opacity: hidden ? 0 : 1
+        width: hidden ? 0 : 300,
+        opacity: hidden ? 0 : 1,
+        x: 0
       }}
-      transition={hidden ? {
-        type: "tween",
-        duration: 0.2,
-        ease: "easeOut"
-      } : {
-        duration: 0
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        mass: 0.8
       }}
-      drag="x"
+      drag={hidden ? false : "x"}
       dragConstraints={{ left: 0, right: 300 }}
-      dragElastic={0.2}
+      dragElastic={0.15}
       dragMomentum={false}
-      onDragEnd={(event, info) => {
-        const threshold = 300 * 0.4
-        if (info.offset.x > threshold && !hidden) {
-          onClose?.()
-        }
+      onDragStart={() => setIsDragging(true)}
+      onDragEnd={(_, info) => {
+        setIsDragging(false)
+        if (info.offset.x > 80 && !hidden) onClose?.()
       }}
       style={{
-        pointerEvents: hidden ? 'none' : 'auto'
+        pointerEvents: hidden ? 'none' : 'auto',
+        overflow: hidden ? 'hidden' : undefined,
+        minWidth: isDragging ? 300 : undefined
       }}
     >
       {/* Header */}
-      <div className="ws-header">
-        <div className="ws-header-title">
-          <img src="/icon/settings.svg" alt={t('nav.settings')} />
+      <div className="flex items-center justify-between gap-2 py-3 px-4 h-14 shrink-0">
+        <div className="flex items-center gap-2 py-1.5 px-3 border border-border-light rounded-lg text-sm font-semibold text-text-primary">
+          <img src="/icon/settings.svg" alt={t('nav.settings')} className="w-icon-lg h-icon-lg opacity-70 icon-invert" />
           <span>{t('workspace.aiSettings')}</span>
         </div>
-        <button className="ws-close-btn" onClick={onClose} data-tooltip={t('common.close')} data-tooltip-position="left">
-          <img src="/icon/x.svg" alt={t('common.close')} />
+        <button 
+          className={cn(
+            "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+            "flex items-center justify-center transition-all duration-200",
+            "w-8 h-8 shrink-0",
+            "hover:bg-bg-hover"
+          )}
+          onClick={onClose}
+          data-tooltip={t('common.close')}
+          data-tooltip-position="left"
+        >
+          <img src="/icon/x.svg" alt={t('common.close')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
         </button>
       </div>
 
-      <div className="ws-content">
-        {/* Profile & Model Selection */}
-        <ProfileSelector 
-          currentProfile={currentProfile}
-          onProfileSelect={handleProfileSelect}
-        />
-
-        <ModelSelector 
-          selectedModel={modelSettings.model || 'gemini-2.0-flash-exp'}
-          onModelSelect={handleModelSelect}
-        />
+      <div className={cn(
+        "flex-1 overflow-y-auto p-4 flex flex-col gap-5",
+        "scrollbar-hidden"
+      )}>
+        <ProfileSelector currentProfile={currentProfile} onProfileSelect={handleProfileSelect} />
+        <ModelSelector selectedModel={modelSettings.model || 'gemini-2.0-flash-exp'} onModelSelect={handleModelSelect} />
 
         {/* Voice Profile Section */}
-        <div className="ws-section">
-          <div className="ws-section-header">
-            <img src="/icon/mic.svg" alt={t('workspace.voiceProfile')} />
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 text-xs font-semibold text-text-secondary uppercase tracking-wide">
+            <img src="/icon/mic.svg" alt={t('workspace.voiceProfile')} className="w-3.5 h-3.5 opacity-60 icon-invert" />
             <span>{t('workspace.voiceProfile')}</span>
           </div>
 
-          <div className="ws-toggle-list">
+          <div className="flex flex-col gap-1.5">
             {voiceProfileOptions.map((option) => {
               const isMainToggle = option.key === 'useVoiceProfile'
               const voiceEnabled = chatSettings.useVoiceProfile !== false
               const isDisabled = !isMainToggle && (!currentProfile || !voiceEnabled)
-              const isChecked = isMainToggle 
-                ? voiceEnabled 
-                : voiceEnabled && chatSettings[option.key] !== false
+              const isChecked = isMainToggle ? voiceEnabled : voiceEnabled && chatSettings[option.key] !== false
               
               return (
                 <div 
                   key={option.key} 
-                  className={`ws-toggle-item ${isDisabled ? 'ws-disabled' : ''}`}
+                  className={cn(
+                    "flex items-center justify-between py-2.5 px-3 gap-3 rounded-xl",
+                    "bg-bg-secondary border border-border-light",
+                    isDisabled && "opacity-50 pointer-events-none"
+                  )}
                 >
-                  <div className="ws-toggle-left">
-                    <img src={option.icon} alt="" className="ws-toggle-icon" />
-                    <div className="ws-toggle-info">
-                      <span className="ws-toggle-title">{option.title}</span>
-                      <span className="ws-toggle-desc">{option.description}</span>
+                  <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                    <img src={option.icon} alt="" className="w-icon-lg h-icon-lg opacity-60 shrink-0 icon-invert" />
+                    <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                      <span className="text-sm font-medium text-text-primary flex items-center gap-1.5">{option.title}</span>
+                      <span className="text-xs text-text-secondary whitespace-nowrap overflow-hidden text-ellipsis">{option.description}</span>
                     </div>
                   </div>
-                  <label className="ws-toggle">
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => handleToggle(option.key)}
-                      disabled={isDisabled}
-                    />
-                    <span className="ws-toggle-track"></span>
+                  <label className="toggle-switch">
+                    <input type="checkbox" checked={isChecked} onChange={() => handleToggle(option.key)} disabled={isDisabled} />
+                    <span className="toggle-switch-track">
+                      <span className="toggle-switch-thumb"></span>
+                    </span>
                   </label>
                 </div>
               )
@@ -215,63 +192,66 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
           </div>
 
           {!currentProfile && (
-            <div className="ws-notice">
-              <img src="/icon/alert-circle.svg" alt={t('common.info')} />
+            <div className={cn(
+              "flex items-start gap-2 py-2.5 px-3 mt-1 rounded-lg text-xs",
+              "bg-warning/10 border border-warning/20 text-warning"
+            )}>
+              <Icon name="alert-circle" size="sm" color="warning" className="shrink-0 mt-0.5" />
               <span>{t('workspace.selectProfileNotice')}</span>
             </div>
           )}
         </div>
 
         {/* Humanization Section */}
-        <div className="ws-section">
-          <div className="ws-section-header">
-            <img src="/icon/user-check.svg" alt={t('workspace.humanization')} />
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 text-xs font-semibold text-text-secondary uppercase tracking-wide">
+            <img src="/icon/user-check.svg" alt={t('workspace.humanization')} className="w-3.5 h-3.5 opacity-60 icon-invert" />
             <span>{t('workspace.humanization')}</span>
-            <span className="ws-badge">{t('common.new').toUpperCase()}</span>
           </div>
 
-          <div className="ws-toggle-list">
+          <div className="flex flex-col gap-1.5">
             {humanizationOptions.map((option) => (
-              <div key={option.key} className="ws-toggle-item">
-                <div className="ws-toggle-left">
-                  <img src={option.icon} alt="" className="ws-toggle-icon" />
-                  <div className="ws-toggle-info">
-                    <span className="ws-toggle-title">
+              <div key={option.key} className="flex items-center justify-between py-2.5 px-3 gap-3 rounded-xl bg-bg-secondary border border-border-light">
+                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                  <img src={option.icon} alt="" className="w-icon-lg h-icon-lg opacity-60 shrink-0 icon-invert" />
+                  <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                    <span className="text-sm font-medium text-text-primary flex items-center gap-1.5">
                       {option.title}
-                      {option.badge && <span className="ws-item-badge">{option.badge}</span>}
+                      {option.badge && <span className="text-[9px] font-medium py-px px-1 bg-primary/15 text-primary rounded">{option.badge}</span>}
                     </span>
-                    <span className="ws-toggle-desc">{option.description}</span>
+                    <span className="text-xs text-text-secondary whitespace-nowrap overflow-hidden text-ellipsis">{option.description}</span>
                   </div>
                 </div>
-                <label className="ws-toggle">
-                  <input
-                    type="checkbox"
-                    checked={chatSettings[option.key] || false}
-                    onChange={() => handleToggle(option.key)}
-                  />
-                  <span className="ws-toggle-track"></span>
+                <label className="toggle-switch">
+                  <input type="checkbox" checked={chatSettings[option.key] || false} onChange={() => handleToggle(option.key)} />
+                  <span className="toggle-switch-track">
+                    <span className="toggle-switch-thumb"></span>
+                  </span>
                 </label>
               </div>
             ))}
           </div>
 
-          {/* Target AI Probability - show when humanize is enabled */}
           {chatSettings.humanizeResponse && (
-            <div className="ws-slider-item">
-              <div className="ws-slider-header">
-                <span>{t('workspace.targetAIProbability')}</span>
-                <span className="ws-slider-value">{chatSettings.targetAIProbability || 35}%</span>
+            <div className="flex flex-col gap-2 py-2.5 px-3 rounded-xl bg-bg-secondary border border-border-light">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-text-primary font-medium">{t('workspace.targetAIProbability')}</span>
+                <span className="text-primary font-semibold">{chatSettings.targetAIProbability || 35}%</span>
               </div>
               <input
-                type="range"
-                min="20"
-                max="50"
-                step="5"
+                type="range" min="20" max="50" step="5"
                 value={chatSettings.targetAIProbability || 35}
                 onChange={(e) => handleSettingChange('targetAIProbability', parseInt(e.target.value))}
-                className="ws-slider"
+                className={cn(
+                  "w-full h-1 rounded appearance-none cursor-pointer",
+                  "bg-bg-tertiary",
+                  "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4",
+                  "[&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-full",
+                  "[&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform",
+                  "[&::-webkit-slider-thumb]:hover:scale-110"
+                )}
               />
-              <div className="ws-slider-labels">
+              <div className="flex justify-between text-xs text-text-muted">
                 <span>{t('workspace.moreHuman')}</span>
                 <span>{t('workspace.faster')}</span>
               </div>
@@ -280,19 +260,25 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
         </div>
 
         {/* Response Style Section */}
-        <div className="ws-section">
-          <div className="ws-section-header">
-            <img src="/icon/sliders.svg" alt={t('workspace.responseStyle')} />
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 text-xs font-semibold text-text-secondary uppercase tracking-wide">
+            <img src="/icon/sliders.svg" alt={t('workspace.responseStyle')} className="w-3.5 h-3.5 opacity-60 icon-invert" />
             <span>{t('workspace.responseStyle')}</span>
           </div>
           
-          <div className="ws-option-group">
-            <span className="ws-option-label">{t('workspace.length')}</span>
-            <div className="ws-btn-group">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs text-text-secondary">{t('workspace.length')}</span>
+            <div className="flex gap-1 p-1 rounded-lg bg-bg-secondary border border-border-light">
               {responseStyles.map((style) => (
                 <button
                   key={style.value}
-                  className={`ws-btn ${(chatSettings.responseStyle || 'balanced') === style.value ? 'active' : ''}`}
+                  className={cn(
+                    "flex-1 py-2 px-3 bg-transparent border-none rounded-md",
+                    "text-xs font-medium text-text-secondary cursor-pointer whitespace-nowrap",
+                    "transition-all duration-200",
+                    "hover:text-text-primary hover:bg-bg-tertiary",
+                    (chatSettings.responseStyle || 'balanced') === style.value && "bg-bg-primary text-primary shadow-sm"
+                  )}
                   onClick={() => handleSettingChange('responseStyle', style.value)}
                 >
                   {style.label}
@@ -301,13 +287,19 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
             </div>
           </div>
 
-          <div className="ws-option-group">
-            <span className="ws-option-label">{t('workspace.creativity')}</span>
-            <div className="ws-btn-group">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs text-text-secondary">{t('workspace.creativity')}</span>
+            <div className="flex gap-1 p-1 rounded-lg bg-bg-secondary border border-border-light">
               {creativityLevels.map((level) => (
                 <button
                   key={level.value}
-                  className={`ws-btn ${(chatSettings.creativityLevel || 'medium') === level.value ? 'active' : ''}`}
+                  className={cn(
+                    "flex-1 py-2 px-3 bg-transparent border-none rounded-md",
+                    "text-xs font-medium text-text-secondary cursor-pointer whitespace-nowrap",
+                    "transition-all duration-200",
+                    "hover:text-text-primary hover:bg-bg-tertiary",
+                    (chatSettings.creativityLevel || 'medium') === level.value && "bg-bg-primary text-primary shadow-sm"
+                  )}
                   onClick={() => {
                     handleSettingChange('creativityLevel', level.value)
                     updateModelSettings({ temperature: level.temp })

@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "AI Content Authenticator",
+  "name": "Graphos AI Studio",
   "version": "1.0.1",
   "description": "A Chrome extension for AI content authentication and verification",
   "action": {
-    "default_title": "Open AI Content Authenticator"
+    "default_title": "Open Graphos AI Studio"
   },
   "background": {
     "service_worker": "background.js"

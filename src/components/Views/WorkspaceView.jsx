@@ -4,7 +4,7 @@ import WorkspaceDefault from './Workspace/WorkspaceDefault'
 import WorkspaceChat from './Workspace/WorkspaceChat'
 import WorkspaceSidebar from './Workspace/WorkspaceSidebar'
 import SharedChatInput from './Workspace/SharedChatInput'
-import './WorkspaceView.css'
+import { cn } from '../../lib/utils'
 
 const WorkspaceView = ({ 
   onToggleLeftSidebar, 
@@ -39,14 +39,16 @@ const WorkspaceView = ({
   const showDefaultView = !currentConversation || currentConversation.messages.length === 0
 
   return (
-    <div className="workspace-view">
+    <div className={cn(
+      "flex flex-col flex-1 bg-bg-tertiary",
+      "h-screen overflow-hidden relative"
+    )}>
       {showDefaultView ? (
         <>
           <div 
-            className="workspace-default-wrapper"
+            className="absolute inset-0 z-base transition-[padding] duration-sidebar ease-smooth"
             style={{
-              paddingRight: rightSidebarHidden ? 0 : '300px',
-              transition: 'padding 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
+              paddingRight: rightSidebarHidden ? 0 : '300px'
             }}
           >
             <WorkspaceDefault 

@@ -1,5 +1,5 @@
 /**
- * AI Content Authenticator - Main Server Entry Point
+ * Graphos AI Studio - Main Server Entry Point
  * Modular Architecture with Google Gemini Ecosystem
  * Version: 2.1 - Enhanced Security & Monitoring
  */
@@ -13,10 +13,16 @@ const { activityLoggerMiddleware } = require('./src/middleware/activityLogger.mi
 const { languageMiddleware } = require('./src/middleware/language.middleware');
 const { responseLocalizationMiddleware } = require('./src/utils/response.util');
 const { correlationMiddleware, requestLogger } = require('./src/utils/logger');
+const compressionMiddleware = require('./src/middleware/compression');
 const routes = require('./src/routes');
 const logger = require('./src/utils/logger');
 const redisService = require('./src/services/redis.service');
 const activityLogService = require('./src/services/activityLog.service');
+const { setupHealthCheck } = require('./src/utils/health');
+const queueService = require('./src/services/queue.service');
+const { startEmailWorker, stopEmailWorker } = require('./src/workers/email.worker');
+const { startAnalysisWorker, stopAnalysisWorker } = require('./src/workers/analysis.worker');
+const { getAllStates: getCircuitBreakerStates } = require('./src/utils/circuitBreaker');
 
 // ============================================================================
 // INITIALIZE APP
@@ -53,16 +59,19 @@ app.use((req, res, next) => {
 // MIDDLEWARE STACK
 // ============================================================================
 
-// 1. Correlation ID for request tracing
+// 1. Response compression (early in middleware chain)
+app.use(compressionMiddleware);
+
+// 2. Correlation ID for request tracing
 app.use(correlationMiddleware);
 
-// 2. Request timeout (30 seconds default)
+// 3. Request timeout (30 seconds default)
 app.use(requestTimeout(30000));
 
-// 3. CORS
+// 4. CORS
 app.use(corsMiddleware);
 
-// 4. Capture raw body for webhook signature verification (MUST be before express.json)
+// 5. Capture raw body for webhook signature verification (MUST be before express.json)
 app.use('/webhooks/lemonsqueezy', express.raw({ type: 'application/json' }), (req, res, next) => {
   req.rawBody = req.body.toString();
   try {
@@ -73,7 +82,7 @@ app.use('/webhooks/lemonsqueezy', express.raw({ type: 'application/json' }), (re
   next();
 });
 
-// 5. Body parser for all other routes
+// 6. Body parser for all other routes
 app.use(express.json({ 
   limit: config.MAX_REQUEST_SIZE,
   verify: (req, res, buf) => {
@@ -83,22 +92,34 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: true, limit: config.MAX_REQUEST_SIZE }));
 
-// 6. Rate limiting
+// 7. Rate limiting
 if (config.FEATURES.ENABLE_RATE_LIMITING) {
   app.use(rateLimitMiddleware);
 }
 
-// 7. Request logging
+// 8. Request logging
 app.use(requestLogger);
 
-// 8. Activity logging middleware
+// 9. Activity logging middleware
 app.use(activityLoggerMiddleware);
 
-// 9. Language detection middleware
+// 10. Language detection middleware
 app.use(languageMiddleware);
 
-// 10. Response localization helpers
+// 11. Response localization helpers
 app.use(responseLocalizationMiddleware);
+
+// 12. Input sanitization middleware (if enabled)
+if (config.SECURITY.SANITIZE_INPUT) {
+  const { sanitizeMiddleware } = require('./src/utils/sanitize');
+  app.use(sanitizeMiddleware({
+    sanitizeBody: true,
+    sanitizeQuery: true,
+    sanitizeParams: true,
+    textFields: ['text', 'content', 'message', 'sentence'],
+    maxTextLength: config.MAX_TEXT_LENGTH,
+  }));
+}
 
 // ============================================================================
 // HEALTH CHECK (before auth)
@@ -133,24 +154,72 @@ app.get('/ready', async (req, res) => {
   });
 });
 
-// Debug endpoint to check Firebase Admin status (remove in production)
-app.get('/debug/firebase-admin', async (req, res) => {
-  try {
-    const admin = require('firebase-admin');
-    const app = admin.apps.length ? admin.app() : null;
-    
-    res.json({
-      initialized: !!app,
-      projectId: app?.options?.projectId || 'not set',
-      appsCount: admin.apps.length
-    });
-  } catch (error) {
-    res.status(500).json({
-      error: error.message,
-      stack: error.stack
-    });
-  }
-});
+// Debug endpoints - ONLY enabled when ENABLE_DEBUG_ENDPOINTS is true (disabled in production by default)
+if (config.FEATURES.ENABLE_DEBUG_ENDPOINTS) {
+  app.get('/debug/firebase-admin', async (req, res) => {
+    try {
+      const admin = require('firebase-admin');
+      const app = admin.apps.length ? admin.app() : null;
+      
+      res.json({
+        initialized: !!app,
+        projectId: app?.options?.projectId || 'not set',
+        appsCount: admin.apps.length
+      });
+    } catch (error) {
+      res.status(500).json({
+        error: error.message,
+        stack: error.stack
+      });
+    }
+  });
+  
+  // Cache statistics endpoint
+  app.get('/debug/cache-stats', async (req, res) => {
+    try {
+      const geminiService = require('./src/services/gemini.service');
+      const cacheStats = geminiService.getCacheStats();
+      
+      res.json({
+        embedding_cache: cacheStats,
+        redis: redisService.getStats(),
+        memory: {
+          used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + 'MB',
+          total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + 'MB'
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
+  // Queue statistics endpoint
+  app.get('/debug/queue-stats', async (req, res) => {
+    try {
+      const { QUEUE_NAMES, getQueueStats } = require('./src/services/queue.service');
+      const stats = {};
+      
+      for (const name of Object.values(QUEUE_NAMES)) {
+        try {
+          stats[name] = await getQueueStats(name);
+        } catch (e) {
+          stats[name] = { error: e.message };
+        }
+      }
+      
+      res.json({ queues: stats });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
+  // Circuit breaker status endpoint
+  app.get('/debug/circuit-breakers', (req, res) => {
+    res.json({ circuitBreakers: getCircuitBreakerStates() });
+  });
+  
+  console.log('[WARNING] Debug endpoints are ENABLED - disable in production!');
+}
 
 // ============================================================================
 // ROUTES
@@ -178,13 +247,40 @@ async function startServer() {
   try {
     // Start server FIRST to respond to health checks immediately
     const server = app.listen(PORT, async () => {
+      // Setup terminus health checks with graceful shutdown
+      setupHealthCheck(server, {
+        redisClient: redisService.getClient?.(),
+        onShutdown: async () => {
+          // Stop workers first
+          await stopEmailWorker();
+          await stopAnalysisWorker();
+          // Close queue service
+          await queueService.closeAll();
+          // Flush activity logs
+          await activityLogService.flushBuffer();
+          // Close Redis
+          await redisService.close();
+        }
+      });
       console.log(`[START] Server listening on port ${PORT}`);
       
       // Initialize Redis AFTER server is listening (optional, will fallback to memory cache)
       const redisConnected = await redisService.initRedis().catch(() => false);
+      
+      // Start background workers if Redis is connected
+      let workersStarted = false;
+      if (redisConnected) {
+        try {
+          startEmailWorker();
+          startAnalysisWorker();
+          workersStarted = true;
+        } catch (workerError) {
+          console.warn('[WORKERS] Failed to start workers:', workerError.message);
+        }
+      }
       console.log('');
       console.log('========================================================');
-      console.log('   AI Content Authenticator - Backend Server v2.1');
+      console.log('   Graphos AI Studio - Backend Server v2.1');
       console.log('========================================================');
       console.log('');
       console.log(`[START] Server running on port ${PORT}`);
@@ -198,6 +294,7 @@ async function startServer() {
       console.log(`   - Rate Limiting: ${config.FEATURES.ENABLE_RATE_LIMITING ? 'ENABLED' : 'DISABLED'}`);
       console.log(`   - Analytics: ${config.FEATURES.ENABLE_ANALYTICS ? 'ENABLED' : 'DISABLED'}`);
       console.log(`   - Redis Cache: ${redisConnected ? 'ENABLED (distributed)' : 'DISABLED (memory fallback)'}`);
+      console.log(`   - Background Workers: ${workersStarted ? 'ENABLED' : 'DISABLED (no Redis)'}`);
       console.log('');
       console.log('[SECURITY]');
       console.log(`   - CORS: Configured`);
@@ -245,6 +342,14 @@ const shutdown = async (signal) => {
   logger.info(`${signal} received, shutting down gracefully`);
   
   try {
+    // Stop cache cleanup interval
+    try {
+      const geminiService = require('./src/services/gemini.service');
+      geminiService.stopCacheCleanup();
+    } catch (e) {
+      // Ignore if service not loaded
+    }
+    
     // Flush pending activity logs
     await activityLogService.flushBuffer();
     

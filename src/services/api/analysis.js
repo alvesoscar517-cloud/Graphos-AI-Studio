@@ -7,6 +7,7 @@ import apiClient from './client'
 
 /**
  * Analyze text against a profile
+ * Uses request deduplication to prevent duplicate concurrent requests
  * @param {string} profileId 
  * @param {string} text 
  * @param {Object} options 
@@ -29,7 +30,8 @@ export async function analyzeText(profileId, text, options = {}) {
       console.warn('[WARNING] Warnings:', validation.warnings)
     }
     
-    const { data } = await apiClient.post('/analyze', {
+    // Use deduplicated request to prevent duplicate concurrent analysis calls
+    const { data } = await apiClient.postDeduplicated('/analyze', {
       profile_id: profileId,
       text: text,
       text_stats: validation.stats
@@ -56,6 +58,7 @@ export async function analyzeText(profileId, text, options = {}) {
 
 /**
  * Detect AI-generated content
+ * Uses request deduplication to prevent duplicate concurrent requests
  * @param {string} text 
  * @param {boolean} enhanced - Use enhanced multi-pass detection (default: true)
  * @param {string} language - Language for verdict (default: from localStorage or 'en')
@@ -80,12 +83,15 @@ export async function detectAI(text, enhanced = true, language = null) {
     // Get language from parameter, localStorage, or default to 'en'
     const lang = language || localStorage.getItem('i18nextLng') || 'en'
     
-    const { data } = await apiClient.post('/authenticate', {
+    const requestBody = {
       text: text,
       text_stats: validation.stats,
       enhanced: enhanced,
-      language: lang.substring(0, 2) // Only use first 2 chars (e.g., 'en-US' -> 'en')
-    })
+      language: lang.substring(0, 2)
+    }
+    
+    // Use deduplicated request to prevent duplicate concurrent AI detection calls
+    const { data } = await apiClient.postDeduplicated('/authenticate', requestBody)
     
     return { 
       success: data.success, 

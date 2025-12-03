@@ -89,7 +89,7 @@
     "checking": "जाँच हो रही है...",
     "pleaseWait": "कृपया एक क्षण प्रतीक्षा करें",
     "signInToContinue": "जारी रखने के लिए साइन इन करें",
-    "signInSubtitle": "AI Content Authenticator का उपयोग करने के लिए कृपया अपने Google खाते से साइन इन करें",
+    "signInSubtitle": "Graphos AI Studio का उपयोग करने के लिए कृपया अपने Google खाते से साइन इन करें",
     "signInFailed": "साइन इन विफल रहा। कृपया पुनः प्रयास करें।",
     "loginFailed": "लॉगिन विफल",
     "termsAgreement": "साइन इन करके, आप हमारी",
@@ -118,7 +118,7 @@
     "sidebar": "साइडबार"
   },
   "sidebar": {
-    "appTitle": "AI Content Auth",
+    "appTitle": "Graphos AI Studio",
     "deleteNote": "हटाएं",
     "confirmDeleteNote": "क्या आप वाकई नोट \"{{title}}\" हटाना चाहते हैं?",
     "confirmDelete": "हटाने की पुष्टि करें",
@@ -129,7 +129,7 @@
     "rewrite": "री-राइट"
   },
   "home": {
-    "heroTitle": "AI Content Authenticator",
+    "heroTitle": "Graphos AI Studio",
     "heroSubtitle": "कंटेंट शैली का विश्लेषण और उसे निखारने के लिए पेशेवर उपकरण",
     "newProfile": "नया प्रोफाइल",
     "createStyleProfile": "शैली प्रोफाइल बनाएं",
@@ -149,7 +149,7 @@
     "unableToLoadProfileDetails": "प्रोफाइल विवरण लोड करने में असमर्थ",
     "yourProfiles": "आपकी लेखन शैली प्रोफाइल",
     "welcomeTo": "स्वागत है",
-    "appName": "AI Content Authenticator",
+    "appName": "Graphos AI Studio",
     "createFirstProfile": "पहला प्रोफाइल बनाएं",
     "createUniqueStyle": "अपनी अनूठी लेखन शैली प्रोफाइल बनाएं",
     "analyzeRefine": "कंटेंट का विश्लेषण और सुधार बुद्धिमानी से करें",
@@ -459,7 +459,7 @@
   },
   "model": {
     "selectAIModel": "AI मॉडल चुनें",
-    "inUse": "[उपयोग में]",
+    "inUse": "उपयोग में",
     "geminiFlashExp": "नवीनतम प्रयोगात्मक मॉडल, टेक्स्ट और छवियों जैसी कई सामग्री प्रकारों के समर्थन के साथ तेज़ प्रसंस्करण",
     "geminiFlashLite": "कॉम्पैक्ट मॉडल, सबसे अधिक लागत प्रभावी, सरल कार्यों और उच्च-मात्रा प्रसंस्करण के लिए उपयुक्त",
     "geminiFlash": "गति और गुणवत्ता के बीच संतुलित मॉडल, अच्छी तर्क क्षमता, अधिकांश कार्यों के लिए उपयुक्त",
