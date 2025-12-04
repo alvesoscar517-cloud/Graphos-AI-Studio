@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { settingsApi, backupApi, debugApi } from '../../services/adminApi';
+import { settingsApi, backupApi, emailConfigApi } from '../../services/adminApi';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
@@ -35,13 +35,23 @@ export default function SettingsView() {
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [backupResult, setBackupResult] = useState(null);
   const [emailConfig, setEmailConfig] = useState(null);
+  const [emailForm, setEmailForm] = useState({
+    smtpHost: 'smtp.gmail.com',
+    smtpPort: 587,
+    smtpUser: '',
+    smtpPass: '',
+    fromEmail: 'no-reply@graphosai.com',
+    fromName: 'Graphos AI Studio',
+    supportEmail: 'support@graphosai.com'
+  });
+  const [savingEmail, setSavingEmail] = useState(false);
   const [testingEmail, setTestingEmail] = useState(false);
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const notify = useNotify();
 
   useEffect(() => { loadSettings(); }, []);
   useEffect(() => { if (activeTab === 'backup') loadBackupList(); }, [activeTab]);
-  useEffect(() => { if (activeTab === 'email') checkEmailConfig(); }, [activeTab]);
+  useEffect(() => { if (activeTab === 'email') loadEmailConfig(); }, [activeTab]);
 
   const loadSettings = async () => {
     try {
@@ -88,13 +98,46 @@ export default function SettingsView() {
     }
   };
 
-  const checkEmailConfig = async () => {
+  const loadEmailConfig = async () => {
     try {
-      const response = await debugApi.testEmail();
-      setEmailConfig(response.config);
+      const response = await emailConfigApi.get();
+      if (response?.config) {
+        setEmailConfig(response.config);
+        // Update form with existing config (but not password)
+        setEmailForm(prev => ({
+          ...prev,
+          smtpHost: response.config.smtpHost || 'smtp.gmail.com',
+          smtpPort: response.config.smtpPort || 587,
+          fromEmail: response.config.fromEmail || 'no-reply@graphosai.com',
+          fromName: response.config.fromName || 'Graphos AI Studio',
+          supportEmail: response.config.supportEmail || 'support@graphosai.com',
+          // Don't set smtpUser/smtpPass - they're masked
+        }));
+      }
     } catch (err) {
-      console.error('Check email config error:', err);
+      console.error('Load email config error:', err);
       setEmailConfig({ error: err.message });
+    }
+  };
+
+  const handleSaveEmailConfig = async () => {
+    if (!emailForm.smtpUser || !emailForm.smtpPass) {
+      notify.warning('Please enter SMTP username and password');
+      return;
+    }
+    try {
+      setSavingEmail(true);
+      const response = await emailConfigApi.save(emailForm);
+      if (response.success) {
+        notify.success('Email configuration saved!');
+        setEmailConfig(response.config);
+        // Clear password field after save
+        setEmailForm(prev => ({ ...prev, smtpPass: '' }));
+      }
+    } catch (err) {
+      notify.error('Error: ' + err.message);
+    } finally {
+      setSavingEmail(false);
     }
   };
 
@@ -105,7 +148,7 @@ export default function SettingsView() {
     }
     try {
       setTestingEmail(true);
-      const response = await debugApi.testEmail(testEmailAddress);
+      const response = await emailConfigApi.test(testEmailAddress);
       if (response.success) {
         notify.success('Test email sent successfully! Check your inbox.');
       } else {
@@ -416,66 +459,78 @@ export default function SettingsView() {
           {/* Email */}
           {activeTab === 'email' && (
             <div className="space-y-6">
-              {/* Server SMTP Status */}
+              {/* SMTP Configuration Form */}
               <Card className="p-6">
-                <h2 className="text-lg font-semibold text-primary mb-4">Server Email Configuration</h2>
-                <p className="text-sm text-muted mb-4">
-                  Email settings are configured via environment variables on the server (Cloud Run).
-                </p>
-                
-                {emailConfig ? (
-                  <div className="space-y-3">
-                    <div className={cn(
-                      "p-4 rounded-lg",
-                      emailConfig.isConfigured ? "bg-success/10 border border-success/30" : "bg-destructive/10 border border-destructive/30"
-                    )}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <img 
-                          src={emailConfig.isConfigured ? "/icon/check-circle.svg" : "/icon/x-circle.svg"} 
-                          alt="" 
-                          className="w-5 h-5" 
-                        />
-                        <span className={cn("font-medium", emailConfig.isConfigured ? "text-success" : "text-destructive")}>
-                          {emailConfig.isConfigured ? 'SMTP Configured' : 'SMTP Not Configured'}
-                        </span>
-                      </div>
-                      {!emailConfig.isConfigured && (
-                        <p className="text-sm text-muted">
-                          Set SMTP_USER and SMTP_PASS environment variables in Cloud Run to enable email sending.
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="p-3 bg-surface-secondary rounded-lg">
-                        <span className="text-muted">SMTP Host:</span>
-                        <span className="ml-2 text-primary font-mono">{emailConfig.smtpHost}</span>
-                      </div>
-                      <div className="p-3 bg-surface-secondary rounded-lg">
-                        <span className="text-muted">SMTP Port:</span>
-                        <span className="ml-2 text-primary font-mono">{emailConfig.smtpPort}</span>
-                      </div>
-                      <div className="p-3 bg-surface-secondary rounded-lg">
-                        <span className="text-muted">SMTP User:</span>
-                        <span className="ml-2 text-primary font-mono">{emailConfig.smtpUser}</span>
-                      </div>
-                      <div className="p-3 bg-surface-secondary rounded-lg">
-                        <span className="text-muted">SMTP Pass:</span>
-                        <span className="ml-2 text-primary font-mono">{emailConfig.smtpPass}</span>
-                      </div>
-                      <div className="p-3 bg-surface-secondary rounded-lg">
-                        <span className="text-muted">From Email:</span>
-                        <span className="ml-2 text-primary font-mono">{emailConfig.fromEmail}</span>
-                      </div>
-                      <div className="p-3 bg-surface-secondary rounded-lg">
-                        <span className="text-muted">From Name:</span>
-                        <span className="ml-2 text-primary font-mono">{emailConfig.fromName}</span>
-                      </div>
-                    </div>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="text-lg font-semibold text-primary">SMTP Configuration</h2>
+                    <p className="text-sm text-muted">Configure email settings for sending notifications</p>
                   </div>
-                ) : (
-                  <div className="text-center py-4 text-muted">Loading configuration...</div>
-                )}
+                  <div className={cn(
+                    "px-3 py-1 rounded-full text-sm font-medium",
+                    emailConfig?.isConfigured ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                  )}>
+                    {emailConfig?.isConfigured ? '✓ Configured' : '✗ Not Configured'}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <Input 
+                    label="SMTP Host" 
+                    value={emailForm.smtpHost} 
+                    onChange={(e) => setEmailForm(prev => ({ ...prev, smtpHost: e.target.value }))} 
+                    placeholder="smtp.gmail.com" 
+                  />
+                  <Input 
+                    label="SMTP Port" 
+                    type="number" 
+                    value={emailForm.smtpPort} 
+                    onChange={(e) => setEmailForm(prev => ({ ...prev, smtpPort: parseInt(e.target.value) || 587 }))} 
+                  />
+                  <Input 
+                    label="SMTP Username (Email)" 
+                    type="email"
+                    value={emailForm.smtpUser} 
+                    onChange={(e) => setEmailForm(prev => ({ ...prev, smtpUser: e.target.value }))} 
+                    placeholder="your-email@gmail.com"
+                    hint={emailConfig?.smtpUser ? `Current: ${emailConfig.smtpUser}` : ''}
+                  />
+                  <Input 
+                    label="SMTP Password (App Password)" 
+                    type="password" 
+                    value={emailForm.smtpPass} 
+                    onChange={(e) => setEmailForm(prev => ({ ...prev, smtpPass: e.target.value }))} 
+                    placeholder={emailConfig?.isConfigured ? '••••••••' : 'Enter app password'}
+                    hint="For Gmail, use App Password (16 chars, no spaces)"
+                  />
+                  <Input 
+                    label="From Email" 
+                    type="email" 
+                    value={emailForm.fromEmail} 
+                    onChange={(e) => setEmailForm(prev => ({ ...prev, fromEmail: e.target.value }))} 
+                    placeholder="no-reply@yourdomain.com"
+                  />
+                  <Input 
+                    label="From Name" 
+                    value={emailForm.fromName} 
+                    onChange={(e) => setEmailForm(prev => ({ ...prev, fromName: e.target.value }))} 
+                    placeholder="Your App Name"
+                  />
+                  <Input 
+                    label="Support Email" 
+                    type="email" 
+                    value={emailForm.supportEmail} 
+                    onChange={(e) => setEmailForm(prev => ({ ...prev, supportEmail: e.target.value }))} 
+                    placeholder="support@yourdomain.com"
+                  />
+                </div>
+                
+                <div className="flex justify-end">
+                  <Button onClick={handleSaveEmailConfig} loading={savingEmail}>
+                    <img src="/icon/save.svg" alt="" className="w-4 h-4 icon-white" />
+                    {savingEmail ? 'Saving...' : 'Save Configuration'}
+                  </Button>
+                </div>
               </Card>
 
               {/* Test Email */}
@@ -499,25 +554,35 @@ export default function SettingsView() {
                 </div>
                 {!emailConfig?.isConfigured && (
                   <p className="text-xs text-destructive mt-2">
-                    Configure SMTP credentials first to send test emails.
+                    Configure SMTP credentials above first to send test emails.
                   </p>
                 )}
               </Card>
 
-              {/* Local Settings (for reference) */}
-              <Card className="p-6 opacity-60">
-                <h2 className="text-lg font-semibold text-primary mb-4">Local Settings (Reference Only)</h2>
-                <p className="text-xs text-muted mb-4">
-                  These settings are stored in database but actual email sending uses server environment variables.
-                </p>
-                <div className="grid grid-cols-2 gap-4">
-                  <Input label="SMTP Host" value={settings?.email?.smtpHost || ''} onChange={(e) => updateSetting('email', 'smtpHost', e.target.value)} placeholder="smtp.gmail.com" />
-                  <Input label="SMTP Port" type="number" value={settings?.email?.smtpPort || 587} onChange={(e) => updateSetting('email', 'smtpPort', parseInt(e.target.value) || 587)} />
-                  <Input label="SMTP Username" value={settings?.email?.smtpUser || ''} onChange={(e) => updateSetting('email', 'smtpUser', e.target.value)} />
-                  <Input label="SMTP Password" type="password" value={settings?.email?.smtpPassword || ''} onChange={(e) => updateSetting('email', 'smtpPassword', e.target.value)} />
-                  <Input label="From Email" type="email" value={settings?.email?.fromEmail || ''} onChange={(e) => updateSetting('email', 'fromEmail', e.target.value)} />
-                  <Input label="From Name" value={settings?.email?.fromName || ''} onChange={(e) => updateSetting('email', 'fromName', e.target.value)} />
-                </div>
+              {/* Gmail Setup Guide */}
+              <Card className="p-6 bg-surface-secondary">
+                <h3 className="font-semibold text-primary mb-3 flex items-center gap-2">
+                  <img src="/icon/info.svg" alt="" className="w-5 h-5" />
+                  Gmail SMTP Setup Guide
+                </h3>
+                <ul className="space-y-2 text-sm text-muted">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-medium">1.</span>
+                    Enable 2-Factor Authentication on your Google Account
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-medium">2.</span>
+                    Go to Google Account → Security → App Passwords
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-medium">3.</span>
+                    Create a new App Password (select "Mail" and your device)
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-medium">4.</span>
+                    Copy the 16-character password (remove spaces) and paste above
+                  </li>
+                </ul>
               </Card>
             </div>
           )}

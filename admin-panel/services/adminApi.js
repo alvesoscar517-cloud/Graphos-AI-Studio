@@ -522,16 +522,36 @@ export const supportApi = {
 };
 
 // ============================================================================
-// DEBUG / DIAGNOSTICS API
+// EMAIL CONFIGURATION API
 // ============================================================================
 
-export const debugApi = {
-  // Test email configuration
-  testEmail: async (testEmail = null) => {
+export const emailConfigApi = {
+  // Get email configuration
+  get: async () => {
+    return apiCall('/api/admin/email-config');
+  },
+  
+  // Save email configuration
+  save: async (config) => {
+    return apiCall('/api/admin/email-config', {
+      method: 'POST',
+      body: JSON.stringify(config),
+    });
+  },
+  
+  // Test email
+  test: async (testEmail) => {
     return apiCall('/api/admin/test-email', {
       method: 'POST',
       body: JSON.stringify({ testEmail }),
     });
+  },
+};
+
+// Legacy alias for backward compatibility
+export const debugApi = {
+  testEmail: async (testEmail = null) => {
+    return emailConfigApi.test(testEmail);
   },
 };
 
