@@ -5,7 +5,7 @@ import { truncateTitleByWords } from '../../../utils/titleUtils'
 import useAutoScrollbar from '../../../hooks/useAutoScrollbar'
 import ChatMessage from './ChatMessage'
 import WorkspaceSidebar from './WorkspaceSidebar'
-import SharePopup from '../../Popups/SharePopup'
+
 import EditTitleModal from '../../Common/EditTitleModal'
 import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
@@ -26,7 +26,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
   const [showEditTitleModal, setShowEditTitleModal] = useState(false)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [isTypingTitle, setIsTypingTitle] = useState(false)
-  const [showSharePopup, setShowSharePopup] = useState(false)
+
   const typingTimeoutRef = useRef(null)
 
   // Typing effect for title
@@ -111,26 +111,8 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
     }
   }
 
-  const handleShareClick = () => {
-    if (currentConversation && currentConversation.messages.length > 0) {
-      setShowSharePopup(true)
-    }
-  }
-
   return (
     <>
-      {showSharePopup && currentConversation && (
-        <SharePopup 
-          item={{
-            id: currentConversation.id,
-            title: currentConversation.title,
-            type: 'chat',
-            updated: new Date(currentConversation.updated),
-            data: currentConversation
-          }}
-          onClose={() => setShowSharePopup(false)}
-        />
-      )}
       <div 
         className="flex flex-col flex-1 h-full bg-bg-tertiary overflow-hidden"
         style={{
@@ -175,15 +157,6 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
               data-tooltip-position="left"
             >
               <img src="/icon/plus.svg" alt={t('workspace.newChat')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
-            </button>
-            <button 
-              className="p-1.5 bg-transparent border-none cursor-pointer rounded-full w-8 h-8 flex items-center justify-center transition-colors duration-200 hover:bg-bg-hover disabled:opacity-30"
-              onClick={handleShareClick}
-              data-tooltip={t('common.share')} 
-              data-tooltip-position="left"
-              disabled={!currentConversation || currentConversation.messages.length === 0}
-            >
-              <img src="/icon/share-2.svg" alt={t('common.share')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
             </button>
             {rightSidebarHidden && (
               <button 

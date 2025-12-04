@@ -85,7 +85,7 @@ const UserProfilePopup = ({ onClose }) => {
         {/* Credit Balance Section */}
         <div className="p-0">
           <CreditBalance 
-            userId={user?.id || localStorage.getItem('userId')}
+            userId={user?.userId || user?.uid || user?.id || localStorage.getItem('userId')}
             onUpgradeClick={handleUpgradeClick}
           />
         </div>

@@ -59,12 +59,6 @@ export const queryKeys = {
     packages: () => [...queryKeys.payment.all, 'packages'],
   },
 
-  // Share
-  share: {
-    all: ['share'],
-    detail: (id) => [...queryKeys.share.all, 'detail', id],
-  },
-
   // Feedback
   feedback: {
     all: ['feedback'],

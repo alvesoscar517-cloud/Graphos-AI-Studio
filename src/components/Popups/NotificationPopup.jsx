@@ -3,15 +3,24 @@ import { useTranslation } from 'react-i18next'
 import Portal from '../Common/Portal'
 import { useNotifications, useNotificationActions } from '../../stores/notificationStore'
 
-export default function NotificationPopup({ onClose, onViewChange }) {
+export default function NotificationPopup({ onClose, onViewChange, autoShowNotification = null }) {
   const { t, i18n } = useTranslation()
   const { notifications, unreadCount, loading } = useNotifications()
   const { markAsRead, markAllAsRead, deleteNotification, handleCtaAction, refresh } = useNotificationActions()
   
   const [selectedNotif, setSelectedNotif] = useState(null);
   const [selectedItemRect, setSelectedItemRect] = useState(null);
+  const [showCenteredModal, setShowCenteredModal] = useState(false);
   const popupRef = useRef(null);
   const detailPopupRef = useRef(null);
+
+  // Auto show notification when passed from parent (new notification)
+  useEffect(() => {
+    if (autoShowNotification) {
+      setSelectedNotif(autoShowNotification);
+      setShowCenteredModal(true);
+    }
+  }, [autoShowNotification]);
 
   useEffect(() => {
     // Don't force refresh on open - store handles caching
@@ -62,31 +71,44 @@ export default function NotificationPopup({ onClose, onViewChange }) {
 
   const handleItemClick = (notif, event) => {
     if (!notif.read) handleMarkAsRead(notif.id);
-    
-    const itemElement = event.currentTarget;
-    const rect = itemElement.getBoundingClientRect();
-    setSelectedItemRect(rect);
     setSelectedNotif(notif);
+    setShowCenteredModal(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setSelectedNotif(null);
+    setShowCenteredModal(false);
+    setSelectedItemRect(null);
   };
 
   useEffect(() => {
-    if (!selectedNotif) return;
+    if (!selectedNotif || !showCenteredModal) return;
     
     const handleClickOutsideDetail = (e) => {
       if (detailPopupRef.current && 
           !detailPopupRef.current.contains(e.target) &&
-          !e.target.closest('.notif-item')) {
-        setSelectedNotif(null);
-        setSelectedItemRect(null);
+          !e.target.closest('.notif-item') &&
+          !e.target.closest('.cat-animation-container')) {
+        handleCloseDetailModal();
+      }
+    };
+    
+    const handleEscKey = (e) => {
+      if (e.key === 'Escape') {
+        handleCloseDetailModal();
       }
     };
     
     document.addEventListener('mousedown', handleClickOutsideDetail);
-    return () => document.removeEventListener('mousedown', handleClickOutsideDetail);
-  }, [selectedNotif]);
+    document.addEventListener('keydown', handleEscKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideDetail);
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [selectedNotif, showCenteredModal]);
 
   const handleCtaClick = (notif) => {
-    setSelectedNotif(null);
+    handleCloseDetailModal();
     handleCtaAction(notif, (view) => {
       onClose?.();
       onViewChange?.(view);
@@ -211,17 +233,22 @@ export default function NotificationPopup({ onClose, onViewChange }) {
           ) : (
             notifications.map(notif => {
               const content = notif.translations?.[userLang] || notif.translations?.en || {};
+              const isSelected = selectedNotif?.id === notif.id;
               return (
                 <div 
                   key={notif.id} 
-                  className={`notif-item ${!notif.read ? 'unread' : ''} ${selectedNotif?.id === notif.id ? 'selected' : ''}`}
+                  className={`notif-item ${!notif.read ? 'unread' : ''} ${isSelected ? 'selected' : ''}`}
                   onClick={(e) => handleItemClick(notif, e)}
                   style={{
-                    border: !notif.read ? 'none' : '1px solid var(--color-border-light)',
-                    background: selectedNotif?.id === notif.id
-                      ? 'var(--color-primary-light)'
+                    border: isSelected 
+                      ? '1px solid var(--color-border-light)' 
                       : !notif.read 
-                        ? 'var(--color-primary-light)' 
+                        ? 'none' 
+                        : '1px solid var(--color-border-light)',
+                    background: isSelected
+                      ? 'var(--color-fill-tertiary)'
+                      : !notif.read 
+                        ? 'var(--color-fill-quaternary, rgba(120, 120, 128, 0.08))' 
                         : 'transparent',
                     paddingLeft: !notif.read ? '16px' : '12px'
                   }}
@@ -262,138 +289,174 @@ export default function NotificationPopup({ onClose, onViewChange }) {
         </div>
       </div>
 
-      {/* Detail Popup */}
-      {selectedNotif && selectedItemRect && (
+      {/* Centered Detail Modal - No overlay */}
+      {selectedNotif && showCenteredModal && (
         <div 
-          ref={detailPopupRef}
-          className="popup notif-detail-popup"
           style={{
             position: 'fixed',
-            bottom: '148px',
-            left: '344px',
-            width: '400px',
-            height: '450px',
+            inset: 0,
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 'var(--z-popup-submenu)',
-            overflow: 'hidden',
-            animation: 'notifDetailSlideIn 0.2s ease-out'
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 'var(--z-modal)',
+            pointerEvents: 'none'
           }}
         >
-          <div style={{
-            padding: '14px 18px',
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            gap: '12px',
-            flexShrink: 0,
-            borderBottom: '1px solid var(--color-border-light)'
-          }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h3 style={{
-                fontSize: '15px',
-                fontWeight: 500,
-                color: 'var(--color-text-primary)',
-                margin: '0 0 4px 0',
-                lineHeight: 1.4
-              }}>
-                {selectedNotif.translations?.[userLang]?.title || 
-                 selectedNotif.translations?.en?.title || 
-                 t('notifications.notification')}
-              </h3>
-              <span style={{
-                fontSize: '12px',
-                color: 'var(--color-text-secondary)'
-              }}>
-                {formatFullTime(selectedNotif.createdAt)}
-              </span>
-            </div>
-            
-            <button 
-              onClick={() => { setSelectedNotif(null); setSelectedItemRect(null); }}
-              style={{
-                width: '24px',
-                height: '24px',
-                border: 'none',
-                background: 'transparent',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'background 0.15s ease',
-                flexShrink: 0,
-                marginTop: '-2px'
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--color-fill-tertiary)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >
-              <img src="/icon/x.svg" alt={t('common.close')} style={{ 
-                width: '14px', 
-                height: '14px', 
-                opacity: 0.6
-              }} />
-            </button>
-          </div>
-
+          {/* Modal Container */}
           <div 
-            className="notif-detail-body-scroll"
             style={{
-              padding: '14px 18px',
-              flex: 1,
-              overflowY: 'auto',
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
+              animation: 'notifModalSlideUp 0.3s ease-out',
+              pointerEvents: 'auto'
             }}
           >
-            <p style={{
-              fontSize: '14px',
-              color: 'var(--color-text-secondary)',
-              lineHeight: 1.6,
-              margin: 0,
-              whiteSpace: 'pre-wrap'
-            }}>
-              {selectedNotif.translations?.[userLang]?.message || 
-               selectedNotif.translations?.en?.message || ''}
-            </p>
-          </div>
+            {/* Detail Modal - Fixed size */}
+            <div 
+              ref={detailPopupRef}
+              className="popup notif-detail-popup"
+              style={{
+                width: '380px',
+                height: '500px',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                borderRadius: '20px',
+                boxShadow: '0 25px 80px rgba(0, 0, 0, 0.35), 0 10px 30px rgba(0, 0, 0, 0.2)',
+                position: 'relative'
+              }}
+            >
+              {/* Header - compact */}
+              <div style={{
+                padding: '14px 16px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                gap: '12px',
+                flexShrink: 0,
+                borderBottom: '1px solid var(--color-border-light)'
+              }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h3 style={{
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    color: 'var(--color-text-primary)',
+                    margin: '0 0 4px 0',
+                    lineHeight: 1.3
+                  }}>
+                    {selectedNotif.translations?.[userLang]?.title || 
+                     selectedNotif.translations?.en?.title || 
+                     t('notifications.notification')}
+                  </h3>
+                  <span style={{
+                    fontSize: '11px',
+                    color: 'var(--color-text-tertiary)'
+                  }}>
+                    {formatFullTime(selectedNotif.createdAt)}
+                  </span>
+                </div>
+                
+                <button 
+                  onClick={handleCloseDetailModal}
+                  className="notif-modal-close-btn"
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    border: '1px solid var(--color-border-light)',
+                    background: 'var(--color-fill-tertiary)',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.15s ease',
+                    flexShrink: 0
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'var(--color-fill-secondary)';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'var(--color-fill-tertiary)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.borderColor = 'var(--color-border-light)';
+                  }}
+                >
+                  <img src="/icon/x.svg" alt={t('common.close')} className="icon-invert" style={{ 
+                    width: '14px', 
+                    height: '14px',
+                    opacity: 0.6
+                  }} />
+                </button>
+              </div>
 
-          {selectedNotif.translations?.[userLang]?.cta && selectedNotif.ctaAction && (
-            <div style={{
-              padding: '14px 18px',
-              borderTop: '1px solid var(--color-border-light)',
-              flexShrink: 0
-            }}>
-              <button 
-                onClick={() => handleCtaClick(selectedNotif)}
+              {/* Body - Fixed height with scroll */}
+              <div 
+                className="notif-detail-body-scroll"
                 style={{
-                  width: '100%',
-                  padding: '10px 16px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: 'var(--color-system-blue)',
-                  color: '#fff',
-                  fontSize: '13px',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  transition: 'background 0.15s ease'
+                  padding: '16px',
+                  flex: 1,
+                  overflowY: 'auto',
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none'
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = 'var(--color-primary-hover)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'var(--color-system-blue)'}
               >
-                {selectedNotif.translations[userLang].cta}
-                <img 
-                  src="/icon/arrow-right.svg" 
-                  alt="" 
-                  className="w-3.5 h-3.5 brightness-0 invert" 
-                />
-              </button>
+                <p style={{
+                  fontSize: '14px',
+                  color: 'var(--color-text-secondary)',
+                  lineHeight: 1.7,
+                  margin: 0,
+                  whiteSpace: 'pre-wrap'
+                }}>
+                  {selectedNotif.translations?.[userLang]?.message || 
+                   selectedNotif.translations?.en?.message || ''}
+                </p>
+              </div>
+
+              {/* CTA Button */}
+              {selectedNotif.translations?.[userLang]?.cta && selectedNotif.ctaAction && (
+                <div style={{
+                  padding: '14px 16px',
+                  borderTop: '1px solid var(--color-border-light)',
+                  flexShrink: 0
+                }}>
+                  <button 
+                    onClick={() => handleCtaClick(selectedNotif)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '10px',
+                      border: 'none',
+                      background: 'var(--color-system-blue)',
+                      color: '#fff',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = 'var(--color-primary-hover)';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = 'var(--color-system-blue)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    {selectedNotif.translations[userLang].cta}
+                    <img 
+                      src="/icon/arrow-right.svg" 
+                      alt="" 
+                      className="w-3.5 h-3.5 brightness-0 invert" 
+                    />
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       )}
     </Portal>

@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, useSearchParams } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AppProviders } from './providers/AppProviders'
 import { useAuth } from './contexts/AuthContext'
 import { useAuthStore } from './stores/authStore'
@@ -7,7 +7,7 @@ import { useThemeStore } from './stores/themeStore'
 import LoginOverlay from './components/Auth/LoginOverlay'
 import MainLayout from './components/Layout/MainLayout'
 import ProfileSetupWrapper from './components/ProfileSetup/ProfileSetupWrapper'
-import SharedContentView from './components/Views/SharedContentView'
+
 import ErrorBoundary from './components/Common/ErrorBoundary'
 import ContextMenu from './components/Common/ContextMenu'
 import ToastContainer from './components/Common/ToastContainer'
@@ -74,22 +74,6 @@ function App() {
 function AppContent() {
   const { isLoading } = useAuth()
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated) // Use Zustand store
-  const [searchParams] = useSearchParams()
-  const shareId = searchParams.get('share')
-
-  // If there's a share parameter, show shared content view
-  if (shareId) {
-    return (
-      <Routes>
-        <Route path="*" element={
-          <ErrorBoundary>
-            <SharedContentView />
-          </ErrorBoundary>
-        } />
-      </Routes>
-    )
-  }
-
   return (
     <Routes>
       <Route 

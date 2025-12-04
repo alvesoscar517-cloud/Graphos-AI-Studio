@@ -355,33 +355,6 @@ export interface MarkAllNotificationsReadResponse {
 }
 
 // ============================================================================
-// SHARE API
-// ============================================================================
-
-export interface CreateShareRequest {
-  contentType: 'analysis' | 'rewrite' | 'chat';
-  contentId: string;
-  expiresIn?: number; // hours
-}
-
-export interface CreateShareResponse {
-  success: boolean;
-  shareId: string;
-  shareUrl: string;
-  expiresAt: string;
-}
-
-export interface GetSharedContentResponse {
-  success: boolean;
-  content: {
-    type: string;
-    data: unknown;
-    createdAt: string;
-    expiresAt: string;
-  };
-}
-
-// ============================================================================
 // FEEDBACK API
 // ============================================================================
 

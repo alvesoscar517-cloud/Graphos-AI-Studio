@@ -73,7 +73,7 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
             
             {/* Header */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-bg-secondary rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="card-icon !w-10 !h-10">
                 <img src={model.icon} alt={model.name} className="w-5 h-5" />
               </div>
               

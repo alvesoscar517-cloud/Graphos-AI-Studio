@@ -152,7 +152,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [] }) => {
       <div className={cn("bg-white rounded-3xl w-full max-w-[580px] max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up-bounce max-md:max-w-[95%]")} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-start gap-3 px-6 pt-6 pb-4 shrink-0">
-          <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-xl shrink-0">
+          <div className="card-icon !w-10 !h-10">
             <Icon name="paperclip" size="md" color="primary" />
           </div>
           <div>

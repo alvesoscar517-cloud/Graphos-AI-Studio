@@ -254,16 +254,16 @@ export const useAuthStore = create(
             }
             
             // Use tokenService for token management
-            // If rememberMe, use longer expiry (30 days vs default)
+            // Backend now handles expiry based on rememberMe
             tokenService.setTokens({
-              accessToken: data.token || `direct_${data.user.userId}`,
-              refreshToken: data.refreshToken || null,
-              expiresIn: rememberMe ? (data.expiresIn || 2592000) : (data.expiresIn || 3600)
+              accessToken: data.accessToken,
+              refreshToken: data.refreshToken,
+              expiresIn: data.expiresIn || 3600
             })
             
             set({ 
               user: data.user, 
-              token: data.token, 
+              token: data.accessToken, 
               isAuthenticated: true, 
               authMethod: 'email', 
               hasGoogleLinked: data.user.hasGoogleLinked || false, 
@@ -332,14 +332,14 @@ export const useAuthStore = create(
             setStorageAuthMethod('email')
             
             tokenService.setTokens({
-              accessToken: data.token,
-              refreshToken: data.refreshToken || null,
+              accessToken: data.accessToken,
+              refreshToken: data.refreshToken,
               expiresIn: data.expiresIn || 3600
             })
 
             set({ 
               user: data.user, 
-              token: data.token,
+              token: data.accessToken,
               isAuthenticated: true, 
               authMethod: 'email', 
               error: null 

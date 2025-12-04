@@ -1,14 +1,24 @@
 /**
  * Realtime Context for Admin Panel
  * Provides centralized real-time data management across all components
- * Reduces API calls by sharing data and using smart refresh strategies
+ * 
+ * Features:
+ * - SSE (Server-Sent Events) for real-time stats and support updates
+ * - Smart caching with TTL to reduce API calls
+ * - Automatic reconnection with exponential backoff
+ * - Fallback to polling when SSE fails
  */
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { analyticsApi, advancedAnalyticsApi, supportApi, usersApi, logsApi, notificationsApi } from '../services/adminApi';
 import { cache } from '../utils/cache';
+import { getApiBaseUrl } from '../utils/config';
+import { getAccessToken } from '../services/authService';
 
 const RealtimeContext = createContext();
+
+// API Base URL for SSE
+const API_BASE_URL = getApiBaseUrl();
 
 // Cache TTL settings (in milliseconds)
 const CACHE_TTL = {
@@ -22,6 +32,12 @@ const CACHE_TTL = {
 
 // Minimum refresh interval to prevent spam
 const MIN_REFRESH_INTERVAL = 30 * 1000; // 30 seconds
+
+// SSE Configuration
+const SSE_CONFIG = {
+  reconnectDelay: 5000,
+  maxReconnectAttempts: 5
+};
 
 export function RealtimeProvider({ children }) {
   // Centralized state for all data
@@ -44,6 +60,12 @@ export function RealtimeProvider({ children }) {
     notifications: false
   });
 
+  // SSE connection states
+  const [sseConnected, setSseConnected] = useState(false);
+  const statsEventSourceRef = useRef(null);
+  const supportEventSourceRef = useRef(null);
+  const reconnectAttemptsRef = useRef(0);
+
   // Last fetch timestamps to prevent excessive calls
   const lastFetch = useRef({
     overview: 0,
@@ -56,6 +78,153 @@ export function RealtimeProvider({ children }) {
 
   // Track active tab for smart refresh
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  /**
+   * Get auth parameter for SSE connection
+   */
+  const getAuthParam = useCallback(() => {
+    const token = getAccessToken();
+    if (token) return `token=${encodeURIComponent(token)}`;
+    
+    const adminKey = localStorage.getItem('adminKey');
+    if (adminKey && adminKey !== 'jwt-auth') return `adminKey=${encodeURIComponent(adminKey)}`;
+    
+    return '';
+  }, []);
+
+  /**
+   * Connect to SSE for real-time stats updates
+   */
+  const connectStatsSSE = useCallback(() => {
+    const authParam = getAuthParam();
+    if (!authParam) return;
+
+    // Close existing connection
+    if (statsEventSourceRef.current) {
+      statsEventSourceRef.current.close();
+    }
+
+    const url = `${API_BASE_URL}/api/admin/realtime/stats?${authParam}`;
+    
+    try {
+      const eventSource = new EventSource(url);
+      statsEventSourceRef.current = eventSource;
+
+      eventSource.onopen = () => {
+        console.log('[RealtimeContext] Stats SSE connected');
+        setSseConnected(true);
+        reconnectAttemptsRef.current = 0;
+      };
+
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          if (data.type === 'stats_update' && data.stats) {
+            // Update overview with SSE data
+            setOverview(prev => ({
+              ...prev,
+              totalUsers: data.stats.totalUsers,
+              totalProfiles: data.stats.totalProfiles,
+              totalNotifications: data.stats.totalNotifications,
+              newUsers: data.stats.newUsers,
+              lastUpdated: data.stats.timestamp
+            }));
+            cache.set('admin_overview', data.stats, CACHE_TTL.overview);
+            lastFetch.current.overview = Date.now();
+          }
+        } catch (err) {
+          console.error('[RealtimeContext] Error parsing SSE data:', err);
+        }
+      };
+
+      eventSource.onerror = () => {
+        console.warn('[RealtimeContext] Stats SSE error');
+        setSseConnected(false);
+        eventSource.close();
+        
+        // Attempt reconnection with backoff
+        if (reconnectAttemptsRef.current < SSE_CONFIG.maxReconnectAttempts) {
+          reconnectAttemptsRef.current++;
+          const delay = SSE_CONFIG.reconnectDelay * reconnectAttemptsRef.current;
+          console.log(`[RealtimeContext] Reconnecting in ${delay}ms...`);
+          setTimeout(connectStatsSSE, delay);
+        }
+      };
+    } catch (err) {
+      console.error('[RealtimeContext] Failed to create SSE:', err);
+    }
+  }, [getAuthParam]);
+
+  /**
+   * Connect to SSE for real-time support updates
+   */
+  const connectSupportSSE = useCallback(() => {
+    const authParam = getAuthParam();
+    if (!authParam) return;
+
+    if (supportEventSourceRef.current) {
+      supportEventSourceRef.current.close();
+    }
+
+    const url = `${API_BASE_URL}/api/admin/realtime/support?${authParam}`;
+    
+    try {
+      const eventSource = new EventSource(url);
+      supportEventSourceRef.current = eventSource;
+
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          if (data.type === 'support_update') {
+            if (data.tickets) {
+              setSupportTickets(data.tickets);
+            }
+            if (data.statistics) {
+              setSupportStats(data.statistics);
+            }
+            cache.set('admin_support', data, CACHE_TTL.support);
+            lastFetch.current.support = Date.now();
+          }
+        } catch (err) {
+          console.error('[RealtimeContext] Error parsing support SSE:', err);
+        }
+      };
+
+      eventSource.onerror = () => {
+        eventSource.close();
+        setTimeout(connectSupportSSE, SSE_CONFIG.reconnectDelay);
+      };
+    } catch (err) {
+      console.error('[RealtimeContext] Failed to create support SSE:', err);
+    }
+  }, [getAuthParam]);
+
+  /**
+   * Close all SSE connections
+   */
+  const closeSSEConnections = useCallback(() => {
+    if (statsEventSourceRef.current) {
+      statsEventSourceRef.current.close();
+      statsEventSourceRef.current = null;
+    }
+    if (supportEventSourceRef.current) {
+      supportEventSourceRef.current.close();
+      supportEventSourceRef.current = null;
+    }
+    setSseConnected(false);
+  }, []);
+
+  // Initialize SSE connections on mount
+  useEffect(() => {
+    connectStatsSSE();
+    connectSupportSSE();
+    
+    return () => {
+      closeSSEConnections();
+    };
+  }, [connectStatsSSE, connectSupportSSE, closeSSEConnections]);
 
   /**
    * Check if data should be refreshed based on TTL and last fetch time
@@ -363,6 +532,9 @@ export function RealtimeProvider({ children }) {
     // Loading states
     loading,
     
+    // SSE status
+    sseConnected,
+    
     // Actions
     loadOverview,
     loadAnalytics,
@@ -373,6 +545,10 @@ export function RealtimeProvider({ children }) {
     invalidateCache,
     refreshCurrentTab,
     setActiveTab,
+    
+    // SSE controls
+    reconnectSSE: connectStatsSSE,
+    closeSSE: closeSSEConnections,
     
     // Utilities
     activeTab

@@ -252,7 +252,7 @@ exports.login = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const { email, password, locale } = req.body;
+    const { email, password, locale, rememberMe } = req.body;
     
     if (!email || !password) {
       return res.status(400).json({
@@ -270,7 +270,13 @@ exports.login = async (req, res) => {
       language: req.headers['accept-language']?.split(',')[0] || 'en'
     };
     
-    const result = await emailAuthService.loginWithDeviceTracking(email, password, deviceInfo);
+    // Pass rememberMe option to service
+    const result = await emailAuthService.loginWithDeviceTracking(
+      email, 
+      password, 
+      deviceInfo,
+      { rememberMe: !!rememberMe }
+    );
     
     // Send new device login notification if this is a new device
     if (result.isNewDevice && result.user) {
@@ -279,7 +285,7 @@ exports.login = async (req, res) => {
           userName: result.user.name || email.split('@')[0],
           deviceInfo: deviceInfo.userAgent,
           ipAddress: deviceInfo.ipAddress,
-          location: 'Unknown', // Could integrate with IP geolocation service
+          location: 'Unknown',
           loginTime: new Date(),
           secureAccountUrl: process.env.APP_URL ? `${process.env.APP_URL}/settings/security` : null,
           lang: locale || 'en'
@@ -301,13 +307,10 @@ exports.login = async (req, res) => {
     res.json({
       success: true,
       user: result.user,
-      // Support both old format (token) and new format (accessToken + refreshToken)
-      token: result.accessToken,
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
       expiresIn: result.expiresIn,
-      isNewDevice: result.isNewDevice,
-      hasToken: !!result.accessToken
+      isNewDevice: result.isNewDevice
     });
     
   } catch (error) {
@@ -320,11 +323,11 @@ exports.login = async (req, res) => {
     if (errorCode === 'AUTH_INVALID_CREDENTIALS') {
       statusCode = 401;
     } else if (errorCode === 'AUTH_ACCOUNT_LOCKED') {
-      statusCode = 423; // Locked (temporary - too many failed attempts)
+      statusCode = 423;
     } else if (errorCode === 'AUTH_ACCOUNT_SUSPENDED') {
-      statusCode = 403; // Forbidden (locked by admin)
+      statusCode = 403;
     } else if (errorCode === 'AUTH_ACCOUNT_DELETED') {
-      statusCode = 410; // Gone (account deleted)
+      statusCode = 410;
     } else if (errorCode === 'AUTH_EMAIL_NOT_VERIFIED') {
       statusCode = 403;
     }

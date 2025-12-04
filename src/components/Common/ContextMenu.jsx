@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import Portal from './Portal'
 
 /**
@@ -6,6 +7,7 @@ import Portal from './Portal'
  * Hoạt động trên input và textarea trong toàn bộ hệ thống
  */
 const ContextMenu = () => {
+  const { t } = useTranslation()
   const [isVisible, setIsVisible] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [targetElement, setTargetElement] = useState(null)
@@ -15,14 +17,14 @@ const ContextMenu = () => {
 
   // Menu items configuration
   const menuItems = [
-    { id: 'cut', label: 'Cắt', shortcut: 'Ctrl+X', icon: 'cut', requiresSelection: true },
-    { id: 'copy', label: 'Sao chép', shortcut: 'Ctrl+C', icon: 'copy', requiresSelection: true },
-    { id: 'paste', label: 'Dán', shortcut: 'Ctrl+V', icon: 'paste', requiresPaste: true },
+    { id: 'cut', labelKey: 'common.cut', shortcut: 'Ctrl+X', icon: 'cut', requiresSelection: true },
+    { id: 'copy', labelKey: 'common.copy', shortcut: 'Ctrl+C', icon: 'copy', requiresSelection: true },
+    { id: 'paste', labelKey: 'common.paste', shortcut: 'Ctrl+V', icon: 'paste', requiresPaste: true },
     { id: 'divider1', type: 'divider' },
-    { id: 'selectAll', label: 'Chọn tất cả', shortcut: 'Ctrl+A', icon: 'select-all' },
+    { id: 'selectAll', labelKey: 'common.selectAll', shortcut: 'Ctrl+A', icon: 'select-all' },
     { id: 'divider2', type: 'divider' },
-    { id: 'undo', label: 'Hoàn tác', shortcut: 'Ctrl+Z', icon: 'undo' },
-    { id: 'redo', label: 'Làm lại', shortcut: 'Ctrl+Shift+Z', icon: 'redo' },
+    { id: 'undo', labelKey: 'common.undo', shortcut: 'Ctrl+Z', icon: 'undo' },
+    { id: 'redo', labelKey: 'common.redo', shortcut: 'Ctrl+Shift+Z', icon: 'redo' },
   ]
 
   // Check if element is input or textarea
@@ -227,7 +229,7 @@ const ContextMenu = () => {
               disabled={isDisabled}
             >
               <span className="context-menu-icon">{getIcon(item.icon)}</span>
-              <span className="context-menu-label">{item.label}</span>
+              <span className="context-menu-label">{t(item.labelKey)}</span>
               <span className="context-menu-shortcut">{item.shortcut}</span>
             </button>
           )

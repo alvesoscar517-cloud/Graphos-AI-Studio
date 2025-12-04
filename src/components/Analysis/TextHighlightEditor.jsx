@@ -287,10 +287,10 @@ const TextHighlightEditor = ({
         {analysis && showHighlights && (
           <div className={cn(
             "absolute top-0 left-0 w-full h-full",
-            "py-6 px-8 font-sans text-sm leading-relaxed",
+            "py-6 px-8 font-sans text-base leading-relaxed",
             "text-transparent whitespace-pre-wrap break-words",
             "pointer-events-none z-base box-border overflow-hidden",
-            "md:py-4 md:px-5 md:text-sm"
+            "md:py-4 md:px-5 md:text-base"
           )}>
             {segments.map((segment, index) => {
               if (segment.type === 'normal') {
@@ -374,7 +374,7 @@ const TextHighlightEditor = ({
           ref={textareaRef}
           className={cn(
             "absolute top-0 left-0 w-full h-full",
-            "py-6 px-8 font-sans text-sm leading-relaxed",
+            "py-6 px-8 font-sans text-base leading-relaxed",
             "text-text-primary bg-transparent",
             "border-none outline-none resize-none",
             "whitespace-pre-wrap break-words z-base box-border",
@@ -385,7 +385,7 @@ const TextHighlightEditor = ({
             "[text-rendering:optimizeSpeed]",
             "placeholder:text-text-muted",
             "selection:bg-selection selection:text-inherit",
-            "md:py-4 md:px-5 md:text-sm",
+            "md:py-4 md:px-5 md:text-base",
             scrollbarClassName,
             isProcessing && "processing-shimmer"
           )}

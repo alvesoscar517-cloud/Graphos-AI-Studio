@@ -40,8 +40,5 @@ export { default as indexedDBService } from './indexedDB';
 // Analysis Cache
 export { default as analysisCache } from './analysisCache';
 
-// Share Service
-export { default as shareService } from './share';
-
 // Drive Service
 export { default as driveService } from './drive';

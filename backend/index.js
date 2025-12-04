@@ -22,6 +22,7 @@ let responseLocalizationMiddleware, correlationMiddleware, requestLogger;
 let compressionMiddleware, routes, logger, redisService, activityLogService;
 let setupHealthCheck, queueService, startEmailWorker, stopEmailWorker;
 let startAnalysisWorker, stopAnalysisWorker, getCircuitBreakerStates;
+let realtimeEventsService, realtimeController;
 
 try {
   express = require('express');
@@ -122,6 +123,16 @@ try {
   getCircuitBreakerStates = require('./src/utils/circuitBreaker').getAllStates;
   console.log('[STARTUP] ✓ circuitBreaker');
 } catch (e) { console.error('[STARTUP] ✗ circuitBreaker:', e.message); process.exit(1); }
+
+try {
+  realtimeEventsService = require('./src/services/realtimeEvents.service');
+  console.log('[STARTUP] ✓ realtimeEvents.service');
+} catch (e) { console.error('[STARTUP] ✗ realtimeEvents.service:', e.message); process.exit(1); }
+
+try {
+  realtimeController = require('./src/controllers/realtime.controller');
+  console.log('[STARTUP] ✓ realtime.controller');
+} catch (e) { console.error('[STARTUP] ✗ realtime.controller:', e.message); process.exit(1); }
 
 console.log('[STARTUP] All dependencies loaded successfully!');
 
@@ -385,6 +396,14 @@ async function startServer() {
           console.warn('[WORKERS] Failed to start workers:', workerError.message);
         }
       }
+      
+      // Initialize realtime events listener (Firestore -> SSE bridge)
+      try {
+        realtimeEventsService.initialize(realtimeController);
+        console.log('[STARTUP] ✓ Realtime events listener initialized');
+      } catch (realtimeError) {
+        console.warn('[STARTUP] ⚠ Realtime events listener failed:', realtimeError.message);
+      }
       console.log('');
       console.log('========================================================');
       console.log('   Graphos AI Studio - Backend Server v2.1');
@@ -449,6 +468,13 @@ const shutdown = async (signal) => {
   logger.info(`${signal} received, shutting down gracefully`);
   
   try {
+    // Stop realtime events listener
+    try {
+      realtimeEventsService.shutdown();
+    } catch (e) {
+      // Ignore if service not loaded
+    }
+    
     // Stop cache cleanup interval
     try {
       const geminiService = require('./src/services/gemini.service');

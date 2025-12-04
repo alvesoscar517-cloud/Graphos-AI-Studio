@@ -21,8 +21,9 @@ const getUserId = () => {
   }
   
   // Fallback to user object
+  // Support all user ID formats: userId (email auth), uid (Google), id (legacy)
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  return user.uid || user.id || user.email || null;
+  return user.userId || user.uid || user.id || user.email || null;
 };
 
 /**

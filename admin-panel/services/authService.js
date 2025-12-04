@@ -1,32 +1,132 @@
 /**
- * Authentication Service for Admin Panel
- * Handles login, logout, token management
+ * Authentication Service for Admin Panel (Simplified)
+ * 
+ * Features:
+ * - JWT token management with auto-refresh
+ * - Encrypted storage (consistent with main app)
+ * - Single source of truth for admin auth
  */
 
 import { getApiBaseUrl } from '../utils/config';
 
 const API_BASE_URL = getApiBaseUrl();
 
-// Token storage keys
-const ACCESS_TOKEN_KEY = 'adminAccessToken';
-const ADMIN_INFO_KEY = 'adminInfo';
-const TOKEN_EXPIRY_KEY = 'tokenExpiry';
+// Storage keys
+const STORAGE_KEYS = {
+  ACCESS_TOKEN: 'admin_access_token',
+  ADMIN_INFO: 'admin_info',
+  TOKEN_EXPIRY: 'admin_token_expiry'
+};
 
-/**
- * Authentication API calls
- */
+// ============================================================================
+// SIMPLE ENCRYPTION (consistent with main app)
+// ============================================================================
+
+const getEncryptionKey = () => {
+  const fingerprint = [
+    navigator.userAgent.slice(0, 20),
+    navigator.language,
+    screen.colorDepth,
+    new Date().getTimezoneOffset()
+  ].join('|');
+  
+  let hash = 0;
+  for (let i = 0; i < fingerprint.length; i++) {
+    const char = fingerprint.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(36);
+};
+
+function encrypt(data) {
+  if (!data) return null;
+  try {
+    const key = getEncryptionKey();
+    const str = typeof data === 'string' ? data : JSON.stringify(data);
+    let encrypted = '';
+    for (let i = 0; i < str.length; i++) {
+      const charCode = str.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+      encrypted += String.fromCharCode(charCode);
+    }
+    return btoa(encodeURIComponent(encrypted));
+  } catch {
+    return null;
+  }
+}
+
+function decrypt(encryptedData) {
+  if (!encryptedData) return null;
+  try {
+    const key = getEncryptionKey();
+    const encrypted = decodeURIComponent(atob(encryptedData));
+    let decrypted = '';
+    for (let i = 0; i < encrypted.length; i++) {
+      const charCode = encrypted.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+      decrypted += String.fromCharCode(charCode);
+    }
+    try {
+      return JSON.parse(decrypted);
+    } catch {
+      return decrypted;
+    }
+  } catch {
+    return null;
+  }
+}
+
+// ============================================================================
+// SECURE STORAGE
+// ============================================================================
+
+function secureSet(key, value) {
+  try {
+    const encrypted = key === STORAGE_KEYS.ACCESS_TOKEN ? encrypt(value) : value;
+    localStorage.setItem(key, typeof encrypted === 'object' ? JSON.stringify(encrypted) : encrypted);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function secureGet(key) {
+  try {
+    const value = localStorage.getItem(key);
+    if (!value) return null;
+    
+    if (key === STORAGE_KEYS.ACCESS_TOKEN) {
+      return decrypt(value);
+    }
+    
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  } catch {
+    return null;
+  }
+}
+
+function secureRemove(key) {
+  try {
+    localStorage.removeItem(key);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ============================================================================
+// AUTH API
+// ============================================================================
+
 export const authApi = {
-  /**
-   * Check if initial setup is needed
-   */
   checkSetup: async () => {
     const response = await fetch(`${API_BASE_URL}/api/auth/check-setup`);
     return response.json();
   },
 
-  /**
-   * Initial setup - create first admin
-   */
   setup: async (email, password, name) => {
     const response = await fetch(`${API_BASE_URL}/api/auth/setup`, {
       method: 'POST',
@@ -36,33 +136,24 @@ export const authApi = {
     return response.json();
   },
 
-  /**
-   * Login with email/password
-   */
   login: async (email, password) => {
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // For cookies
+      credentials: 'include',
       body: JSON.stringify({ email, password })
     });
     return response.json();
   },
 
-  /**
-   * Refresh access token
-   */
   refresh: async () => {
     const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
       method: 'POST',
-      credentials: 'include' // For cookies
+      credentials: 'include'
     });
     return response.json();
   },
 
-  /**
-   * Logout
-   */
   logout: async () => {
     const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
       method: 'POST',
@@ -71,24 +162,16 @@ export const authApi = {
     return response.json();
   },
 
-  /**
-   * Get current admin info
-   */
   me: async () => {
     const token = getAccessToken();
     if (!token) return { success: false };
 
     const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: { 'Authorization': `Bearer ${token}` }
     });
     return response.json();
   },
 
-  /**
-   * Change password
-   */
   changePassword: async (currentPassword, newPassword) => {
     const token = getAccessToken();
     const response = await fetch(`${API_BASE_URL}/api/auth/change-password`, {
@@ -103,36 +186,35 @@ export const authApi = {
   }
 };
 
-/**
- * Token management
- */
+// ============================================================================
+// TOKEN MANAGEMENT
+// ============================================================================
+
 export function setAuthData(accessToken, admin, expiresIn) {
-  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-  localStorage.setItem(ADMIN_INFO_KEY, JSON.stringify(admin));
-  localStorage.setItem(TOKEN_EXPIRY_KEY, String(Date.now() + expiresIn));
+  secureSet(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+  secureSet(STORAGE_KEYS.ADMIN_INFO, admin);
+  secureSet(STORAGE_KEYS.TOKEN_EXPIRY, String(Date.now() + expiresIn));
 }
 
 export function getAccessToken() {
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+  return secureGet(STORAGE_KEYS.ACCESS_TOKEN);
 }
 
 export function getAdminInfo() {
-  const info = localStorage.getItem(ADMIN_INFO_KEY);
-  return info ? JSON.parse(info) : null;
+  return secureGet(STORAGE_KEYS.ADMIN_INFO);
 }
 
 export function isTokenExpired() {
-  const expiry = localStorage.getItem(TOKEN_EXPIRY_KEY);
+  const expiry = secureGet(STORAGE_KEYS.TOKEN_EXPIRY);
   if (!expiry) return true;
-  
   // Consider expired 1 minute before actual expiry
   return Date.now() > (parseInt(expiry) - 60000);
 }
 
 export function clearAuthData() {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(ADMIN_INFO_KEY);
-  localStorage.removeItem(TOKEN_EXPIRY_KEY);
+  secureRemove(STORAGE_KEYS.ACCESS_TOKEN);
+  secureRemove(STORAGE_KEYS.ADMIN_INFO);
+  secureRemove(STORAGE_KEYS.TOKEN_EXPIRY);
 }
 
 export function isAuthenticated() {
@@ -140,15 +222,16 @@ export function isAuthenticated() {
   return !!token && !isTokenExpired();
 }
 
-/**
- * Auto refresh token before expiry
- */
+// ============================================================================
+// AUTO REFRESH
+// ============================================================================
+
 let refreshTimer = null;
 
 export function startTokenRefresh() {
   stopTokenRefresh();
   
-  const expiry = localStorage.getItem(TOKEN_EXPIRY_KEY);
+  const expiry = secureGet(STORAGE_KEYS.TOKEN_EXPIRY);
   if (!expiry) return;
   
   const expiryTime = parseInt(expiry);
@@ -162,11 +245,10 @@ export function startTokenRefresh() {
       try {
         const result = await authApi.refresh();
         if (result.success && result.accessToken) {
-          localStorage.setItem(ACCESS_TOKEN_KEY, result.accessToken);
-          localStorage.setItem(TOKEN_EXPIRY_KEY, String(Date.now() + result.expiresIn));
-          startTokenRefresh(); // Schedule next refresh
+          secureSet(STORAGE_KEYS.ACCESS_TOKEN, result.accessToken);
+          secureSet(STORAGE_KEYS.TOKEN_EXPIRY, String(Date.now() + result.expiresIn));
+          startTokenRefresh();
         } else {
-          // Refresh failed, clear auth
           clearAuthData();
           window.location.reload();
         }
@@ -184,15 +266,13 @@ export function stopTokenRefresh() {
   }
 }
 
-/**
- * Get authorization header for API calls
- */
+// ============================================================================
+// AUTH HEADER
+// ============================================================================
+
 export function getAuthHeader() {
   const token = getAccessToken();
-  if (token) {
-    return { 'Authorization': `Bearer ${token}` };
-  }
-  return {};
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
 
 export default {

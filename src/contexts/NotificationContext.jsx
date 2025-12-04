@@ -50,7 +50,8 @@ export const NotificationProvider = ({ children }) => {
   // Initialize on auth change
   useEffect(() => {
     if (isAuthenticated && user) {
-      const userId = user.uid || user.id || localStorage.getItem('userId')
+      // Support all user ID formats: userId (email auth), uid (Google), id (legacy)
+      const userId = user.userId || user.uid || user.id || localStorage.getItem('userId')
       if (userId) {
         actions.init(userId)
       }

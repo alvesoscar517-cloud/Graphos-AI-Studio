@@ -55,10 +55,6 @@ export {
 } from './usePayment'
 
 export {
-  useCreateShare,
-} from './useShare'
-
-export {
   useSendFeedback,
   useSendBillingSupport,
 } from './useFeedback'

@@ -1,17 +1,26 @@
 /**
- * Enhanced Authentication Middleware
- * Supports Firebase Auth token verification and API key authentication
+ * Authentication Middleware (Simplified)
+ * 
+ * Supports only 2 token types:
+ * 1. Firebase ID Token - for Google OAuth users
+ * 2. JWT Token (type: email_auth) - for email/password users
+ * 
+ * Legacy tokens (direct_, Firebase custom token) are no longer supported.
  */
 
 const { getAdmin } = require('../config/firebaseAdmin');
 const admin = getAdmin();
+const jwt = require('jsonwebtoken');
 const config = require('../config');
 const logger = require('../utils/logger');
 const localization = require('../services/localization.service');
 const { getLanguage } = require('./language.middleware');
+const { db } = require('../config/firebase');
+
+const JWT_SECRET = config.JWT_SECRET;
 
 /**
- * Verify Firebase ID Token
+ * Verify Firebase ID Token (for Google OAuth users)
  * @param {string} idToken - Firebase ID token from client
  * @returns {Promise<Object|null>} - Decoded token or null
  */
@@ -23,11 +32,46 @@ async function verifyFirebaseToken(idToken) {
       email: decodedToken.email,
       emailVerified: decodedToken.email_verified,
       name: decodedToken.name || decodedToken.email?.split('@')[0],
-      picture: decodedToken.picture
+      picture: decodedToken.picture,
+      authType: 'firebase'
     };
   } catch (error) {
-    // Don't log for expected failures (custom tokens, email JWT tokens)
-    // These will be handled by verifyEmailAuthToken fallback
+    return null;
+  }
+}
+
+/**
+ * Verify JWT Token (for email/password users)
+ * 
+ * OPTIMIZED: User info is embedded in JWT payload, no DB query needed.
+ * Locked/deleted status is checked only during token refresh.
+ * 
+ * @param {string} token - JWT token
+ * @returns {Object|null} - User info or null (sync, no DB call)
+ */
+function verifyJWTToken(token) {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET, { issuer: 'graphosai' });
+
+    // Must be email_auth type
+    if (decoded.type !== 'email_auth' || !decoded.userId) {
+      return null;
+    }
+
+    // User info is embedded in JWT - no DB query needed
+    // Locked/deleted status is checked during token refresh (every 1h max)
+    return {
+      userId: decoded.userId,
+      email: decoded.email || '',
+      emailVerified: decoded.emailVerified ?? true,
+      name: decoded.name || decoded.email?.split('@')[0] || '',
+      picture: decoded.picture || '',
+      authType: 'jwt'
+    };
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      logger.debug('JWT token expired');
+    }
     return null;
   }
 }
@@ -48,100 +92,35 @@ function extractBearerToken(authHeader) {
 }
 
 /**
- * Verify email auth token (JWT or direct_ prefix)
- * For email users who don't have Firebase ID token
+ * Determine token type and verify accordingly
+ * @param {string} token - Token to verify
+ * @returns {Promise<Object|null>} - User info or null
  */
-async function verifyEmailAuthToken(token) {
-  const jwt = require('jsonwebtoken');
-  const JWT_SECRET = config.JWT_SECRET;
+async function verifyToken(token) {
+  if (!token) return null;
   
-  try {
-    // Handle direct auth token (direct_{userId})
-    if (token.startsWith('direct_')) {
-      const userId = token.replace('direct_', '');
-      
-      // Verify user exists in database
-      const { db } = require('../config/firebase');
-      const userDoc = await db.collection('users').doc(userId).get();
-      
-      if (userDoc.exists) {
-        const userData = userDoc.data();
-        if (userData.authProvider === 'email') {
-          return {
-            userId: userId,
-            email: userData.email,
-            emailVerified: userData.emailVerified,
-            name: userData.name || userData.email?.split('@')[0],
-            picture: userData.picture || ''
-          };
-        }
-      }
-      return null;
-    }
+  // JWT tokens from our system start with 'eyJ' (base64 of '{"')
+  // and have issuer 'graphosai'
+  if (token.startsWith('eyJ')) {
+    // Try JWT first (most common for email users)
+    const jwtUser = await verifyJWTToken(token);
+    if (jwtUser) return jwtUser;
     
-    // Try to verify as our JWT token first (new format)
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET, { issuer: 'graphosai' });
-      if (decoded.userId && decoded.type === 'email_auth') {
-        const { db } = require('../config/firebase');
-        const userDoc = await db.collection('users').doc(decoded.userId).get();
-        
-        if (userDoc.exists) {
-          const userData = userDoc.data();
-          return {
-            userId: decoded.userId,
-            email: userData.email,
-            emailVerified: userData.emailVerified,
-            name: userData.name || userData.email?.split('@')[0],
-            picture: userData.picture || ''
-          };
-        }
-      }
-    } catch (jwtError) {
-      // Not our JWT, try legacy format
-    }
-    
-    // Legacy: Try to verify as Firebase custom token by extracting userId from payload
-    // This handles tokens created before the JWT migration
-    try {
-      const parts = token.split('.');
-      if (parts.length === 3) {
-        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-        const userId = payload.uid || payload.userId || payload.sub;
-        if (userId) {
-          const { db } = require('../config/firebase');
-          const userDoc = await db.collection('users').doc(userId).get();
-          
-          if (userDoc.exists) {
-            const userData = userDoc.data();
-            return {
-              userId: userId,
-              email: userData.email,
-              emailVerified: userData.emailVerified,
-              name: userData.name || userData.email?.split('@')[0],
-              picture: userData.picture || ''
-            };
-          }
-        }
-      }
-    } catch {
-      // Not a valid JWT
-    }
-    
-    return null;
-  } catch (error) {
-    logger.warn('Email auth token verification failed', { error: error.message });
-    return null;
+    // If JWT fails, try Firebase ID token (for Google users)
+    const firebaseUser = await verifyFirebaseToken(token);
+    if (firebaseUser) return firebaseUser;
   }
+  
+  return null;
 }
 
 /**
  * Authentication middleware - verifies user identity
+ * 
  * Checks in order:
- * 1. Firebase ID token in Authorization header
- * 2. Firebase ID token in query param (for SSE/EventSource which doesn't support headers)
- * 3. Email auth token (direct_ prefix or custom token)
- * 4. API key in X-API-Key header (for service-to-service)
+ * 1. Bearer token in Authorization header (JWT or Firebase ID token)
+ * 2. Token in query param (for SSE/EventSource)
+ * 3. API key in X-API-Key header (for service-to-service)
  * 
  * @param {import('express').Request} req
  * @param {import('express').Response} res
@@ -149,31 +128,21 @@ async function verifyEmailAuthToken(token) {
  */
 async function authenticate(req, res, next) {
   try {
-    // 1. Try Firebase token authentication from header
+    // 1. Try token from Authorization header
     const authHeader = req.headers.authorization;
-    let idToken = extractBearerToken(authHeader);
+    let token = extractBearerToken(authHeader);
     
     // 2. Try token from query param (for SSE/EventSource)
-    if (!idToken && req.query.token) {
-      idToken = req.query.token;
+    if (!token && req.query.token) {
+      token = req.query.token;
     }
     
-    if (idToken) {
-      // First try Firebase ID token verification
-      const user = await verifyFirebaseToken(idToken);
+    if (token) {
+      const user = await verifyToken(token);
       if (user) {
         req.user = user;
         req.userId = user.userId;
-        req.authMethod = 'firebase';
-        return next();
-      }
-      
-      // Then try email auth token verification
-      const emailUser = await verifyEmailAuthToken(idToken);
-      if (emailUser) {
-        req.user = emailUser;
-        req.userId = emailUser.userId;
-        req.authMethod = 'email';
+        req.authMethod = user.authType === 'firebase' ? 'google' : 'email';
         return next();
       }
     }
@@ -216,25 +185,14 @@ async function authenticate(req, res, next) {
 async function optionalAuth(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
-    const idToken = extractBearerToken(authHeader);
+    const token = extractBearerToken(authHeader);
     
-    if (idToken) {
-      // Try Firebase token first
-      const user = await verifyFirebaseToken(idToken);
+    if (token) {
+      const user = await verifyToken(token);
       if (user) {
         req.user = user;
         req.userId = user.userId;
-        req.authMethod = 'firebase';
-        return next();
-      }
-      
-      // Try email auth token
-      const emailUser = await verifyEmailAuthToken(idToken);
-      if (emailUser) {
-        req.user = emailUser;
-        req.userId = emailUser.userId;
-        req.authMethod = 'email';
-        return next();
+        req.authMethod = user.authType === 'firebase' ? 'google' : 'email';
       }
     }
     
@@ -302,5 +260,7 @@ module.exports = {
   optionalAuth,
   userRateLimit,
   verifyFirebaseToken,
+  verifyJWTToken,
+  verifyToken,
   extractBearerToken
 };

@@ -30,6 +30,9 @@
     "deselectAll": "Deselect All",
     "items": "items",
     "copy": "Copy",
+    "cut": "Cut",
+    "paste": "Paste",
+    "redo": "Redo",
     "copied": "Copied",
     "tryAgain": "Try Again",
     "reloadPage": "Reload Page",
@@ -751,6 +754,7 @@
   },
   "feedback": {
     "sendFeedback": "Send Feedback",
+    "helpUsImprove": "Help us improve your experience",
     "title": "Title",
     "titlePlaceholder": "Enter feedback title...",
     "content": "Content",

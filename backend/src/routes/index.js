@@ -10,7 +10,7 @@ const profileRoutes = require('./profile.routes');
 const analysisRoutes = require('./analysis.routes');
 const chatRoutes = require('./chat.routes');
 const notificationRoutes = require('./notification.routes');
-const shareRoutes = require('./share.routes');
+
 const creditRoutes = require('./credit.routes');
 const paymentRoutes = require('./payment.routes');
 const realtimeRoutes = require('./realtime.routes');
@@ -126,8 +126,7 @@ router.use('/api/chat', protectedMiddleware, chatRoutes);
 // Notification routes (allow locked users to see notifications about their lock)
 router.use('/api/notifications', authenticate, notificationRoutes);
 
-// Share routes
-router.use('/api/share', protectedMiddleware, shareRoutes);
+
 
 // Credit routes
 router.use('/api/credits', protectedMiddleware, creditRoutes);
@@ -150,6 +149,7 @@ const internalApiKeyAuth = (req, res, next) => {
   return authenticate(req, res, next);
 };
 router.post('/api/internal/broadcast-notification', internalApiKeyAuth, realtimeController.broadcastNotificationApi);
+router.post('/api/internal/broadcast-credits', internalApiKeyAuth, realtimeController.broadcastCreditsApi);
 
 // ============================================================================
 // LEGACY ROUTES (Deprecated - will be removed in v3.0)

@@ -117,13 +117,13 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
             <button 
               className={cn(
                 "flex items-center gap-2 bg-transparent border border-border-light",
-                "py-1 px-4 rounded-pill cursor-pointer text-sm text-text-primary font-medium",
+                "py-2 px-5 rounded-pill cursor-pointer text-base text-text-primary font-medium",
                 "ml-auto shrink-0 h-fit leading-relaxed transition-all duration-200",
                 "hover:bg-bg-secondary hover:shadow-sm"
               )}
               onClick={handleCreateProfile}
             >
-              <img src="/icon/plus.svg" alt="Plus" className="w-icon-lg h-icon-lg opacity-80 icon-invert" />
+              <img src="/icon/plus.svg" alt="Plus" className="w-icon-xl h-icon-xl opacity-80 icon-invert" />
               <span>{t('home.newProfile')}</span>
             </button>
           </p>

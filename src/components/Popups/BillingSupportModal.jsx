@@ -131,7 +131,7 @@ const BillingSupportModal = ({ onClose }) => {
       >
         <div className="flex items-center justify-between py-5 px-6 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 p-2 bg-bg-secondary rounded-xl flex items-center justify-center">
+            <div className="card-icon !w-10 !h-10">
               <Icon name="dollar-sign" alt={t('settings.billingSupport')} size="lg" color="muted" />
             </div>
             <div>

@@ -52,7 +52,8 @@ export const useNotificationStore = create(
           // Fallback to user object
           try {
             const user = JSON.parse(localStorage.getItem('user') || '{}')
-            return user.uid || user.id || user.email || null
+            // Support all user ID formats: userId (email auth), uid (Google), id (legacy)
+            return user.userId || user.uid || user.id || user.email || null
           } catch {
             return null
           }

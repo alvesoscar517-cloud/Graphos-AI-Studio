@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNotes } from '../../../contexts/NotesContext'
 import { useUser, useAIProcessing } from '@/stores'
-import { createShare } from '../../../services/share'
+
 import modal from '../../../utils/modal'
 import TextShimmer from '../../Common/TextShimmer'
 import Icon from '../../Common/Icon'
@@ -51,30 +51,6 @@ const AIStudioEditor = ({
       }
     }
   }, [highlightedSentence, currentNote?.content])
-
-  const handleShare = async () => {
-    try {
-      if (!currentNote || !currentNote.content.trim()) {
-        modal.alert(t('share.noContentToShare'), t('common.error'))
-        return
-      }
-
-      const shareData = await createShare(
-        'note',
-        currentNote.title || t('editor.untitled'),
-        currentNote.content,
-        null,
-        { createdAt: new Date().toISOString() }
-      )
-
-      const shareUrl = `${window.location.origin}/shared/${shareData.share_id}`
-      await navigator.clipboard.writeText(shareUrl)
-      modal.toast(t('share.shareLinkCopied'), '', 'success')
-    } catch (error) {
-      console.error('Share error:', error)
-      modal.error(t('share.unableToCreate') + ': ' + error.message)
-    }
-  }
 
   return (
     <div className={cn(
@@ -128,18 +104,6 @@ const AIStudioEditor = ({
           >
             <Icon name="plus" alt={t('common.new')} size="lg" color="muted" />
           </button>
-          <button 
-            className={cn(
-              "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
-              "w-8 h-8 flex items-center justify-center",
-              "transition-colors duration-200",
-              "hover:bg-bg-hover"
-            )}
-            onClick={handleShare}
-            data-tooltip={t('common.share')}
-          >
-            <Icon name="share-2" alt={t('common.share')} size="lg" color="muted" />
-          </button>
           {rightSidebarHidden && (
             <button 
               className={cn(
@@ -166,7 +130,7 @@ const AIStudioEditor = ({
           ref={textareaRef}
           className={cn(
             "flex-1 border-none py-6 px-8 m-0",
-            "font-[Google_Sans,Roboto,Arial,sans-serif] text-sm text-text-primary",
+            "font-[Google_Sans,Roboto,Arial,sans-serif] text-base text-text-primary",
             "resize-none outline-none bg-bg-tertiary",
             "leading-relaxed w-full h-full",
             "shadow-none rounded-none appearance-none box-border",

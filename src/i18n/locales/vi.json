@@ -30,6 +30,9 @@
     "deselectAll": "Bỏ chọn tất cả",
     "items": "mục",
     "copy": "Sao chép",
+    "cut": "Cắt",
+    "paste": "Dán",
+    "redo": "Làm lại",
     "copied": "Đã sao chép",
     "tryAgain": "Thử lại",
     "reloadPage": "Tải lại trang",
@@ -749,6 +752,7 @@
   },
   "feedback": {
     "sendFeedback": "Gửi phản hồi",
+    "helpUsImprove": "Giúp chúng tôi cải thiện trải nghiệm của bạn",
     "title": "Tiêu đề",
     "titlePlaceholder": "Nhập tiêu đề phản hồi...",
     "content": "Nội dung",

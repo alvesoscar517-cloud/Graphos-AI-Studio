@@ -115,7 +115,15 @@ const FeedbackModal = ({ onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between py-5 px-6 shrink-0">
-          <h2 className="m-0 text-xl font-semibold text-text-primary">{t('feedback.sendFeedback')}</h2>
+          <div className="flex items-center gap-3">
+            <div className="card-icon !w-10 !h-10">
+              <Icon name="message-square" alt={t('feedback.sendFeedback')} size="lg" color="muted" />
+            </div>
+            <div>
+              <h2 className="m-0 text-xl font-semibold text-text-primary">{t('feedback.sendFeedback')}</h2>
+              <p className="m-0 mt-0.5 text-sm text-text-secondary">{t('feedback.helpUsImprove')}</p>
+            </div>
+          </div>
           <button 
             className="bg-transparent border-none cursor-pointer p-2 rounded-lg flex items-center justify-center transition-colors duration-200 hover:bg-bg-hover"
             onClick={onClose}
@@ -124,7 +132,7 @@ const FeedbackModal = ({ onClose }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-none">
+        <form onSubmit={handleSubmit(onSubmit)} className="pt-2 pb-6 px-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-none">
           <div className="mb-5">
             <label className="block mb-2.5 text-sm font-semibold text-text-primary tracking-tight">
               {t('feedback.title')}

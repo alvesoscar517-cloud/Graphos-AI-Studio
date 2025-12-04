@@ -225,4 +225,42 @@ exports.broadcastNotificationApi = (req, res) => {
   }
 };
 
+/**
+ * API endpoint to broadcast credits update (called by admin backend)
+ * POST /api/realtime/broadcast-credits
+ */
+exports.broadcastCreditsApi = (req, res) => {
+  try {
+    const { userId, credits } = req.body;
+    
+    if (!userId || !credits) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'userId and credits are required' 
+      });
+    }
+    
+    const sent = broadcastToUser(userId, 'credits', {
+      type: 'update',
+      credits: {
+        balance: credits.balance || 0,
+        used: credits.used || 0,
+        purchased: credits.purchased || 0
+      },
+      timestamp: Date.now()
+    });
+    
+    logger.info('Broadcast credits via API', { userId, sent, balance: credits.balance });
+    
+    res.json({ 
+      success: true, 
+      sent,
+      message: sent ? 'Credits broadcasted' : 'User not connected'
+    });
+  } catch (error) {
+    logger.error('Broadcast credits API error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 module.exports = exports;

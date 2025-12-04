@@ -229,7 +229,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
       >
         {/* Header */}
         <div className="flex items-start gap-3.5 py-6 px-7 pb-3 shrink-0">
-          <div className="w-11 h-11 flex items-center justify-center bg-gray-100 rounded-xl shrink-0">
+          <div className="card-icon !w-11 !h-11">
             <Icon name="edit-3" size="md" color="primary" />
           </div>
           <div>

@@ -6,7 +6,6 @@
 // Notification hooks
 export { useNotification } from './useNotification'
 export { useToast } from './useToast'
-export { useRealtimeStats } from './useRealtimeStats'
 
 // Query hooks
 export { useUsers, useUser, useUserLogs, useUpdateUser, useToggleUserLock, useAdjustUserCredits, useDeleteUser } from './queries/useUsers'

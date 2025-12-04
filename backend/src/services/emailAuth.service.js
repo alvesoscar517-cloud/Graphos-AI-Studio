@@ -269,8 +269,15 @@ async function verifyEmail(email, otp) {
   await db.collection(PENDING_REGISTRATIONS_COLLECTION).doc(normalizedEmail).delete();
   await otpService.invalidateOTP(normalizedEmail, 'verification');
   
-  // Generate tokens (access + refresh) for proper token rotation
-  const tokens = await generateTokens(userId);
+  // Generate tokens with embedded user info (avoid extra DB query)
+  const tokens = await generateTokens(userId, {
+    userInfo: {
+      email: normalizedEmail,
+      name: pendingData.displayName,
+      picture: '',
+      emailVerified: true
+    }
+  });
 
   logger.info('User registered and verified', { userId, email: normalizedEmail });
 
@@ -295,10 +302,13 @@ async function verifyEmail(email, otp) {
  * 
  * @param {string} email - User email
  * @param {string} password - User password
- * @returns {Promise<{success: boolean, user: Object, token: string}>}
+ * @param {Object} options - Login options
+ * @param {boolean} options.rememberMe - If true, use longer token expiry
+ * @returns {Promise<{success: boolean, user: Object, accessToken: string, refreshToken: string, expiresIn: number}>}
  */
-async function login(email, password) {
+async function login(email, password, options = {}) {
   const normalizedEmail = normalizeEmail(email);
+  const { rememberMe = false } = options;
   
   // Find user by email
   const usersSnapshot = await db.collection(USERS_COLLECTION)
@@ -395,10 +405,19 @@ async function login(email, password) {
     lastLoginAt: now
   });
   
-  // Generate tokens (access + refresh) for proper token rotation
-  const tokens = await generateTokens(userId);
+  // Generate tokens with rememberMe option and embedded user info
+  // Pass userInfo to avoid extra DB query in generateTokens
+  const tokens = await generateTokens(userId, {
+    rememberMe,
+    userInfo: {
+      email: normalizedEmail,
+      name: userData.name,
+      picture: userData.picture || '',
+      emailVerified: userData.emailVerified
+    }
+  });
 
-  logger.info('User logged in', { userId, email: normalizedEmail });
+  logger.info('User logged in', { userId, email: normalizedEmail, rememberMe });
 
   return {
     success: true,
@@ -423,10 +442,12 @@ async function login(email, password) {
  * @param {string} email - User email
  * @param {string} password - User password
  * @param {Object} deviceInfo - Device information
- * @returns {Promise<{success: boolean, user: Object, token: string, isNewDevice: boolean}>}
+ * @param {Object} options - Login options
+ * @param {boolean} options.rememberMe - If true, use longer token expiry
+ * @returns {Promise<{success: boolean, user: Object, accessToken: string, refreshToken: string, expiresIn: number, isNewDevice: boolean}>}
  */
-async function loginWithDeviceTracking(email, password, deviceInfo = {}) {
-  const result = await login(email, password);
+async function loginWithDeviceTracking(email, password, deviceInfo = {}, options = {}) {
+  const result = await login(email, password, options);
   
   if (result.success) {
     const { userId } = result.user;
@@ -1120,73 +1141,91 @@ async function linkGoogleWithOAuth(userId, googleData) {
 }
 
 // ============================================================================
-// TOKEN REFRESH
+// TOKEN MANAGEMENT (Simplified - Firestore only, no in-memory cache)
 // ============================================================================
 
-// Refresh token storage (in production, use Redis or database)
-const refreshTokens = new Map();
 const REFRESH_TOKEN_EXPIRY_DAYS = 30;
 const ACCESS_TOKEN_EXPIRY_SECONDS = 3600; // 1 hour
-
-// JWT secret for email auth tokens
-const JWT_SECRET = config.JWT_SECRET;
+const REFRESH_TOKEN_COLLECTION = 'refresh_tokens';
 
 /**
- * Generate tokens for user
- * Uses JWT instead of Firebase custom token for better compatibility
+ * Generate access and refresh tokens for user
+ * 
+ * OPTIMIZED: User info is embedded in JWT to avoid DB queries on every request.
+ * 
  * @param {string} userId - User ID
+ * @param {Object} options - Options
+ * @param {boolean} options.rememberMe - If true, use longer expiry
+ * @param {Object} options.userInfo - User info to embed (optional, will fetch if not provided)
  * @returns {Promise<{accessToken: string, refreshToken: string, expiresIn: number}>}
  */
-async function generateTokens(userId) {
+async function generateTokens(userId, options = {}) {
   const crypto = require('crypto');
-  const jwt = require('jsonwebtoken');
-  
-  // Generate access token as JWT (not Firebase custom token)
-  // This allows server-side verification without Firebase client SDK
+
+  // Get user info to embed in JWT (if not provided)
+  let userInfo = options.userInfo;
+  if (!userInfo) {
+    const userDoc = await db.collection(USERS_COLLECTION).doc(userId).get();
+    if (userDoc.exists) {
+      const data = userDoc.data();
+      userInfo = {
+        email: data.email,
+        name: data.name,
+        picture: data.picture || '',
+        emailVerified: data.emailVerified
+      };
+    }
+  }
+
+  // Access token expiry: 1 hour default, 24 hours if rememberMe
+  const accessTokenExpiry = options.rememberMe ? 86400 : ACCESS_TOKEN_EXPIRY_SECONDS;
+
+  // Generate access token as JWT with embedded user info
+  // This eliminates DB queries on every authenticated request
   const accessToken = jwt.sign(
-    { 
+    {
       userId,
       type: 'email_auth',
-      iat: Math.floor(Date.now() / 1000)
+      // Embed user info to avoid DB lookups
+      email: userInfo?.email || '',
+      name: userInfo?.name || '',
+      picture: userInfo?.picture || '',
+      emailVerified: userInfo?.emailVerified ?? true
     },
-    JWT_SECRET,
-    { 
-      expiresIn: ACCESS_TOKEN_EXPIRY_SECONDS,
+    config.JWT_SECRET,
+    {
+      expiresIn: accessTokenExpiry,
       issuer: 'graphosai',
       subject: userId
     }
   );
-  
+
   // Generate refresh token (random secure token)
   const refreshToken = crypto.randomBytes(64).toString('hex');
+  const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
   const expiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
-  
-  // Store refresh token
-  refreshTokens.set(refreshToken, {
+
+  // Store refresh token in Firestore
+  await db.collection(REFRESH_TOKEN_COLLECTION).add({
+    tokenHash,
     userId,
     expiresAt,
-    createdAt: new Date()
+    createdAt: new Date(),
+    rememberMe: options.rememberMe || false
   });
-  
-  // Also store in Firestore for persistence across restarts
-  await db.collection('refresh_tokens').doc(refreshToken.substring(0, 32)).set({
-    tokenHash: crypto.createHash('sha256').update(refreshToken).digest('hex'),
-    userId,
-    expiresAt,
-    createdAt: new Date()
-  });
-  
+
   logger.info('Tokens generated', { userId });
-  
+
   return {
     accessToken,
     refreshToken,
-    expiresIn: ACCESS_TOKEN_EXPIRY_SECONDS
+    expiresIn: accessTokenExpiry
   };
 }
 
 /**
  * Refresh access token using refresh token
+ * Implements token rotation for security
  * @param {string} refreshToken - Refresh token
  * @returns {Promise<{accessToken: string, refreshToken: string, expiresIn: number}>}
  */
@@ -1197,62 +1236,47 @@ async function refreshAccessToken(refreshToken) {
     throw new Error('AUTH_INVALID_REFRESH_TOKEN: Refresh token is required');
   }
   
-  // Check in-memory cache first
-  let tokenData = refreshTokens.get(refreshToken);
+  // Find token in Firestore
+  const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+  const tokenDocs = await db.collection(REFRESH_TOKEN_COLLECTION)
+    .where('tokenHash', '==', tokenHash)
+    .limit(1)
+    .get();
   
-  // If not in memory, check Firestore
-  if (!tokenData) {
-    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    const tokenDocs = await db.collection('refresh_tokens')
-      .where('tokenHash', '==', tokenHash)
-      .limit(1)
-      .get();
-    
-    if (!tokenDocs.empty) {
-      const doc = tokenDocs.docs[0];
-      tokenData = {
-        userId: doc.data().userId,
-        expiresAt: doc.data().expiresAt.toDate(),
-        docId: doc.id
-      };
-    }
-  }
-  
-  if (!tokenData) {
+  if (tokenDocs.empty) {
     throw new Error('AUTH_INVALID_REFRESH_TOKEN: Invalid refresh token');
   }
   
+  const tokenDoc = tokenDocs.docs[0];
+  const tokenData = tokenDoc.data();
+  
   // Check if expired
-  if (tokenData.expiresAt < new Date()) {
-    // Clean up expired token
-    refreshTokens.delete(refreshToken);
-    if (tokenData.docId) {
-      await db.collection('refresh_tokens').doc(tokenData.docId).delete();
-    }
+  const expiresAt = tokenData.expiresAt.toDate();
+  if (expiresAt < new Date()) {
+    await tokenDoc.ref.delete();
     throw new Error('AUTH_REFRESH_TOKEN_EXPIRED: Refresh token has expired');
   }
   
-  const { userId } = tokenData;
+  const { userId, rememberMe } = tokenData;
   
   // Verify user still exists and is not locked
   const userDoc = await db.collection(USERS_COLLECTION).doc(userId).get();
   if (!userDoc.exists) {
+    await tokenDoc.ref.delete();
     throw new Error('AUTH_USER_NOT_FOUND: User not found');
   }
   
   const userData = userDoc.data();
   if (userData.locked || userData.deleted) {
+    await tokenDoc.ref.delete();
     throw new Error('AUTH_ACCOUNT_SUSPENDED: Account is suspended');
   }
   
-  // Invalidate old refresh token (token rotation for security)
-  refreshTokens.delete(refreshToken);
-  if (tokenData.docId) {
-    await db.collection('refresh_tokens').doc(tokenData.docId).delete();
-  }
+  // Delete old refresh token (token rotation)
+  await tokenDoc.ref.delete();
   
   // Generate new tokens
-  const newTokens = await generateTokens(userId);
+  const newTokens = await generateTokens(userId, { rememberMe });
   
   logger.info('Access token refreshed', { userId });
   
@@ -1264,17 +1288,11 @@ async function refreshAccessToken(refreshToken) {
  * @param {string} userId - User ID
  */
 async function invalidateAllRefreshTokens(userId) {
-  // Clear from memory
-  for (const [token, data] of refreshTokens.entries()) {
-    if (data.userId === userId) {
-      refreshTokens.delete(token);
-    }
-  }
-  
-  // Clear from Firestore
-  const tokenDocs = await db.collection('refresh_tokens')
+  const tokenDocs = await db.collection(REFRESH_TOKEN_COLLECTION)
     .where('userId', '==', userId)
     .get();
+  
+  if (tokenDocs.empty) return;
   
   const batch = db.batch();
   tokenDocs.docs.forEach(doc => batch.delete(doc.ref));
@@ -1284,30 +1302,26 @@ async function invalidateAllRefreshTokens(userId) {
 }
 
 /**
- * Cleanup expired refresh tokens (run periodically)
+ * Cleanup expired refresh tokens (run periodically via cron)
  */
 async function cleanupExpiredRefreshTokens() {
   const now = new Date();
   
-  // Clear from memory
-  for (const [token, data] of refreshTokens.entries()) {
-    if (data.expiresAt < now) {
-      refreshTokens.delete(token);
-    }
-  }
-  
-  // Clear from Firestore
-  const expiredDocs = await db.collection('refresh_tokens')
+  const expiredDocs = await db.collection(REFRESH_TOKEN_COLLECTION)
     .where('expiresAt', '<', now)
-    .limit(100)
+    .limit(500)
     .get();
   
-  if (!expiredDocs.empty) {
-    const batch = db.batch();
-    expiredDocs.docs.forEach(doc => batch.delete(doc.ref));
-    await batch.commit();
-    logger.info('Cleaned up expired refresh tokens', { count: expiredDocs.size });
+  if (expiredDocs.empty) {
+    return { deletedCount: 0 };
   }
+  
+  const batch = db.batch();
+  expiredDocs.docs.forEach(doc => batch.delete(doc.ref));
+  await batch.commit();
+  
+  logger.info('Cleaned up expired refresh tokens', { count: expiredDocs.size });
+  return { deletedCount: expiredDocs.size };
 }
 
 module.exports = {

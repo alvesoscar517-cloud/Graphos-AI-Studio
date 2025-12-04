@@ -44,18 +44,17 @@ const EmptyProfileCard = () => {
               </h3>
             </div>
 
-            <div className="empty-profile-text-container flex items-center gap-3 mb-6 py-3 px-5 bg-fill-tertiary rounded-xl">
+            <div className="flex items-center gap-3 mb-6">
               <div className="card-icon !w-11 !h-11 shrink-0">
                 <img src="/icon/fingerprint.svg" alt="Fingerprint" className="w-5 h-5 opacity-70 icon-invert" />
               </div>
-              <p className="text-lg text-text-muted m-0 min-h-[24px] flex-1">
-                <TextScramble 
-                  key={currentPhraseIndex} 
-                  className="inline-block !bg-transparent text-lg"
-                >
-                  {phrases[currentPhraseIndex]}
-                </TextScramble>
-              </p>
+              <div className="bg-fill-tertiary rounded-xl px-4 py-2.5">
+                <p className="text-lg text-text-muted m-0">
+                  <TextScramble key={currentPhraseIndex}>
+                    {phrases[currentPhraseIndex]}
+                  </TextScramble>
+                </p>
+              </div>
             </div>
 
             <button 

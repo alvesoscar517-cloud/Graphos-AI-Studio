@@ -6,9 +6,10 @@ const express = require('express');
 const router = express.Router();
 const config = require('../config');
 const { createLocalizer } = require('../utils/localized-messages.util');
+const { optionalAuth } = require('../middleware/auth.middleware');
 
-// Feedback endpoint
-router.post('/send-feedback', async (req, res) => {
+// Feedback endpoint - uses optionalAuth middleware for consistent token handling
+router.post('/send-feedback', optionalAuth, async (req, res) => {
   const l = createLocalizer(req);
   
   try {
@@ -21,31 +22,16 @@ router.post('/send-feedback', async (req, res) => {
     const { db } = require('../config/firebase');
     const { v4: uuidv4 } = require('uuid');
 
-    // Get user info from auth token (Firestore)
-    let userEmail = 'anonymous@user.com';
-    let userName = 'Anonymous User';
+    // Get user info from middleware (already verified)
+    // optionalAuth sets req.user and req.userId if token is valid
+    const userId = req.userId || null;
+    const userEmail = req.user?.email || 'anonymous@user.com';
+    const userName = req.user?.name || 'Anonymous User';
     
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      try {
-        // Decode token to get userId
-        const jwt = require('jsonwebtoken');
-        const decoded = jwt.decode(token);
-        const userId = decoded?.userId || decoded?.sub;
-        
-        if (userId) {
-          // Fetch user from Firestore
-          const userDoc = await db.collection('users').doc(userId).get();
-          if (userDoc.exists) {
-            const userData = userDoc.data();
-            userEmail = userData.email || userEmail;
-            userName = userData.displayName || userData.name || userName;
-          }
-        }
-      } catch (tokenError) {
-        console.log('[INFO] Could not decode token, using anonymous user');
-      }
+    if (req.user) {
+      console.log('[INFO] Authenticated user:', { userId, email: userEmail, name: userName, authMethod: req.authMethod });
+    } else {
+      console.log('[INFO] Anonymous user (no valid token provided)');
     }
 
     const isBillingSupport = type === 'billing_support';
@@ -64,6 +50,7 @@ router.post('/send-feedback', async (req, res) => {
       title,
       content,
       images: images || [],
+      userId: userId || null,  // Store userId for future reference
       userEmail,
       userName,
       status: 'open',

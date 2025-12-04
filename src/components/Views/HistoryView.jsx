@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNotes } from '../../contexts/NotesContext'
 import { useWorkspace } from '../../contexts/WorkspaceContext'
@@ -8,7 +7,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { openDriveFolder } from '../../services/drive'
 import { truncateTitleByWords } from '../../utils/titleUtils'
 import modal from '../../utils/modal'
-import SharePopup from '../Popups/SharePopup'
+
 import LinkGooglePrompt from '../Auth/LinkGooglePrompt'
 import { cn } from '../../lib/utils'
 
@@ -47,9 +46,6 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const [sortBy, setSortBy] = useState('updated')
   const [sortOrder, setSortOrder] = useState('asc')
   const [isSyncing, setIsSyncing] = useState(false)
-  const [activeMenu, setActiveMenu] = useState(null)
-  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
-  const [shareItem, setShareItem] = useState(null)
   const [selectedItems, setSelectedItems] = useState(new Set())
   const [isSelectionMode, setIsSelectionMode] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -239,21 +235,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     else { setSortBy(newSortBy); setSortOrder('asc') }
   }
 
-  const handleMenuClick = (e, item) => {
-    e.stopPropagation()
-    const rect = e.currentTarget.getBoundingClientRect()
-    const menuWidth = 160, menuHeight = 100
-    const x = rect.left + (rect.width / 2) - (menuWidth / 2)
-    const spaceBelow = window.innerHeight - rect.bottom
-    const y = spaceBelow > menuHeight + 20 ? rect.bottom + 8 : rect.top - menuHeight - 8
-    setMenuPosition({ x, y })
-    setActiveMenu(activeMenu === item.id ? null : item.id)
-  }
-
-  const handleCloseMenu = (e) => { e.stopPropagation(); setActiveMenu(null) }
-
   const handleDeleteItem = async (item) => {
-    setActiveMenu(null)
     const confirmed = await modal.confirm(
       t('history.confirmDeleteItem', { title: item.title }),
       t('sidebar.confirmDelete'),
@@ -269,8 +251,6 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       }
     }
   }
-
-  const handleShareItem = (item) => { setActiveMenu(null); setShareItem(item) }
 
   const needsGoogleLink = authMethod === 'email' && !hasGoogleLinked
 
@@ -385,42 +365,16 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           <button 
             className={cn(
               "p-1 bg-transparent border-none cursor-pointer rounded",
-              "opacity-60 transition-all duration-200 flex items-center justify-center",
+              "opacity-40 transition-all duration-200 flex items-center justify-center",
               "w-7 h-7 shrink-0",
-              "hover:opacity-100 hover:bg-bg-hover"
+              "hover:opacity-100 hover:bg-error/10"
             )}
-            onClick={(e) => handleMenuClick(e, item)}
-            data-tooltip={t('common.more')}
+            onClick={(e) => { e.stopPropagation(); handleDeleteItem(item) }}
+            data-tooltip={t('common.delete')}
             data-tooltip-position="left"
           >
-            <img src="/icon/more-vertical.svg" alt={t('common.more')} className="w-5 h-5 opacity-60 icon-invert" />
+            <img src="/icon/trash-2.svg" alt={t('common.delete')} className="w-4 h-4 icon-invert" />
           </button>
-          {activeMenu === item.id && createPortal(
-            <>
-              <div className="fixed inset-0 z-modal-backdrop bg-transparent" onClick={handleCloseMenu} />
-              <div 
-                className="fixed bg-bg-secondary border border-border rounded-lg shadow-lg min-w-40 z-modal overflow-hidden"
-                style={{ left: `${menuPosition.x}px`, top: `${menuPosition.y}px` }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button 
-                  className="flex items-center gap-3 w-full py-2.5 px-4 bg-transparent border-none cursor-pointer text-sm text-text-primary text-left transition-colors duration-100 hover:bg-bg-tertiary rounded-t-lg"
-                  onClick={(e) => { e.stopPropagation(); handleShareItem(item) }}
-                >
-                  <img src="/icon/share-2.svg" alt={t('common.share')} className="w-4 h-4 opacity-60 icon-invert" />
-                  {t('common.share')}
-                </button>
-                <button 
-                  className="flex items-center gap-3 w-full py-2.5 px-4 bg-transparent border-none cursor-pointer text-sm text-error text-left transition-colors duration-100 hover:bg-bg-tertiary rounded-b-lg"
-                  onClick={(e) => { e.stopPropagation(); handleDeleteItem(item) }}
-                >
-                  <img src="/icon/trash-2.svg" alt={t('common.delete')} className="w-4 h-4 opacity-60 icon-invert" />
-                  {t('common.delete')}
-                </button>
-              </div>
-            </>,
-            document.body
-          )}
         </td>
       </tr>
     )
@@ -463,12 +417,12 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
             </span>
           </div>
           <button 
-            className="p-1 bg-transparent border-none cursor-pointer rounded opacity-60 transition-all duration-200 flex items-center justify-center w-7 h-7 shrink-0 hover:opacity-100 hover:bg-bg-hover"
-            onClick={(e) => handleMenuClick(e, item)}
-            data-tooltip={t('common.more')}
+            className="p-1 bg-transparent border-none cursor-pointer rounded opacity-40 transition-all duration-200 flex items-center justify-center w-7 h-7 shrink-0 hover:opacity-100 hover:bg-error/10"
+            onClick={(e) => { e.stopPropagation(); handleDeleteItem(item) }}
+            data-tooltip={t('common.delete')}
             data-tooltip-position="left"
           >
-            <img src="/icon/more-vertical.svg" alt={t('common.more')} className="w-5 h-5 opacity-60 icon-invert" />
+            <img src="/icon/trash-2.svg" alt={t('common.delete')} className="w-4 h-4 icon-invert" />
           </button>
         </div>
         <div className="flex items-center gap-2 text-sm text-text-secondary flex-wrap">
@@ -478,39 +432,12 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           <span className="text-border">•</span>
           <span>{formatTimeAgo(item.updated)}</span>
         </div>
-        {activeMenu === item.id && createPortal(
-          <>
-            <div className="fixed inset-0 z-modal-backdrop bg-transparent" onClick={handleCloseMenu} />
-            <div 
-              className="fixed bg-bg-secondary border border-border rounded-lg shadow-lg min-w-40 z-modal overflow-hidden"
-              style={{ left: `${menuPosition.x}px`, top: `${menuPosition.y}px` }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button 
-                className="flex items-center gap-3 w-full py-2.5 px-4 bg-transparent border-none cursor-pointer text-sm text-text-primary text-left transition-colors duration-100 hover:bg-bg-tertiary rounded-t-lg"
-                onClick={(e) => { e.stopPropagation(); handleShareItem(item) }}
-              >
-                <img src="/icon/share-2.svg" alt={t('common.share')} className="w-4 h-4 opacity-60 icon-invert" />
-                {t('common.share')}
-              </button>
-              <button 
-                className="flex items-center gap-3 w-full py-2.5 px-4 bg-transparent border-none cursor-pointer text-sm text-error text-left transition-colors duration-100 hover:bg-bg-tertiary rounded-b-lg"
-                onClick={(e) => { e.stopPropagation(); handleDeleteItem(item) }}
-              >
-                <img src="/icon/trash-2.svg" alt={t('common.delete')} className="w-4 h-4 opacity-60 icon-invert" />
-                {t('common.delete')}
-              </button>
-            </div>
-          </>,
-          document.body
-        )}
       </div>
     )
   }
 
   return (
     <>
-      {shareItem && <SharePopup item={shareItem} onClose={() => setShareItem(null)} />}
       {showLinkGooglePrompt && <LinkGooglePrompt onLink={handleLinkGoogleAndContinue} onClose={() => setShowLinkGooglePrompt(false)} />}
       
       <div className="flex flex-col flex-1 bg-bg-tertiary h-screen overflow-hidden">

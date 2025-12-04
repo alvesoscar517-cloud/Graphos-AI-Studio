@@ -101,8 +101,18 @@ export default function SupportDetail() {
     }
     try {
       setSending(true);
-      await supportApi.reply(id, { message: replyMessage, sendEmail, sendNotification });
-      notify.success('Reply sent!');
+      const result = await supportApi.reply(id, { message: replyMessage, sendEmail, sendNotification });
+      
+      // Show success with any warnings
+      if (result.warnings && result.warnings.length > 0) {
+        notify.warning(`Reply sent with warnings: ${result.warnings.join('; ')}`);
+      } else {
+        let successMsg = 'Reply sent!';
+        if (sendEmail && result.emailSent) successMsg += ' Email delivered.';
+        if (sendNotification && result.notificationSent) successMsg += ' Notification sent.';
+        notify.success(successMsg);
+      }
+      
       setReplyMessage('');
       loadTicket();
     } catch (err) {

@@ -16,4 +16,7 @@ router.get('/stats', realtimeController.getStats);
 // Broadcast notification (called by admin backend via internal API)
 router.post('/broadcast-notification', realtimeController.broadcastNotificationApi);
 
+// Broadcast credits update (called by admin backend via internal API)
+router.post('/broadcast-credits', realtimeController.broadcastCreditsApi);
+
 module.exports = router;

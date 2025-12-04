@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNotes } from '../../../contexts/NotesContext'
 import { useAIProcessing } from '@/stores'
 import { useProfiles } from '../../../contexts/ProfileContext'
-import { createShare } from '../../../services/share'
+
 import { truncateTitleByWords } from '../../../utils/titleUtils'
 import TextHighlightEditor from '../../Analysis/TextHighlightEditor'
 import EditTitleModal from '../../Common/EditTitleModal'
@@ -147,30 +147,6 @@ const AIStudioEditorEnhanced = ({
     }
   }
 
-  const handleShare = async () => {
-    try {
-      if (!currentNote || !currentNote.content.trim()) {
-        modal.alert(t('share.noContentToShare'), t('common.error'))
-        return
-      }
-
-      const shareData = await createShare(
-        'note',
-        currentNote.title || t('editor.untitled'),
-        currentNote.content,
-        null,
-        { createdAt: new Date().toISOString() }
-      )
-
-      const shareUrl = `${window.location.origin}/shared/${shareData.share_id}`
-      await navigator.clipboard.writeText(shareUrl)
-      modal.toast(t('share.shareLinkCopied'), '', 'success')
-    } catch (error) {
-      console.error('Share error:', error)
-      modal.error(t('share.unableToCreate') + ': ' + error.message)
-    }
-  }
-
   useEffect(() => {
     if (analysis && currentNote?.content) {
       const originalLength = analysis.sentence_analysis?.reduce(
@@ -265,18 +241,6 @@ const AIStudioEditorEnhanced = ({
             data-tooltip={t('common.new')}
           >
             <img src="/icon/plus.svg" alt={t('common.new')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
-          </button>
-          <button 
-            className={cn(
-              "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
-              "w-8 h-8 flex items-center justify-center",
-              "transition-colors duration-200",
-              "hover:bg-bg-hover"
-            )}
-            onClick={handleShare}
-            data-tooltip={t('common.share')}
-          >
-            <img src="/icon/share-2.svg" alt={t('common.share')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
           </button>
           {rightSidebarHidden && (
             <button 
