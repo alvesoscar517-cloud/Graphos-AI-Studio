@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { settingsApi, backupApi } from '../../services/adminApi';
+import { settingsApi, backupApi, debugApi } from '../../services/adminApi';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
@@ -34,10 +34,14 @@ export default function SettingsView() {
   const [backupList, setBackupList] = useState([]);
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [backupResult, setBackupResult] = useState(null);
+  const [emailConfig, setEmailConfig] = useState(null);
+  const [testingEmail, setTestingEmail] = useState(false);
+  const [testEmailAddress, setTestEmailAddress] = useState('');
   const notify = useNotify();
 
   useEffect(() => { loadSettings(); }, []);
   useEffect(() => { if (activeTab === 'backup') loadBackupList(); }, [activeTab]);
+  useEffect(() => { if (activeTab === 'email') checkEmailConfig(); }, [activeTab]);
 
   const loadSettings = async () => {
     try {
@@ -81,6 +85,36 @@ export default function SettingsView() {
       if (response?.data) setBackupList(response.data);
     } catch (err) {
       console.error('Load backup list error:', err);
+    }
+  };
+
+  const checkEmailConfig = async () => {
+    try {
+      const response = await debugApi.testEmail();
+      setEmailConfig(response.config);
+    } catch (err) {
+      console.error('Check email config error:', err);
+      setEmailConfig({ error: err.message });
+    }
+  };
+
+  const handleTestEmail = async () => {
+    if (!testEmailAddress) {
+      notify.warning('Please enter a test email address');
+      return;
+    }
+    try {
+      setTestingEmail(true);
+      const response = await debugApi.testEmail(testEmailAddress);
+      if (response.success) {
+        notify.success('Test email sent successfully! Check your inbox.');
+      } else {
+        notify.error('Failed: ' + (response.error || 'Unknown error'));
+      }
+    } catch (err) {
+      notify.error('Error: ' + err.message);
+    } finally {
+      setTestingEmail(false);
     }
   };
 
@@ -381,21 +415,111 @@ export default function SettingsView() {
 
           {/* Email */}
           {activeTab === 'email' && (
-            <Card className="p-6">
-              <h2 className="text-lg font-semibold text-primary mb-6">Email Configuration</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <Input label="SMTP Host" value={settings?.email?.smtpHost || ''} onChange={(e) => updateSetting('email', 'smtpHost', e.target.value)} placeholder="smtp.gmail.com" />
-                <Input label="SMTP Port" type="number" value={settings?.email?.smtpPort || 587} onChange={(e) => updateSetting('email', 'smtpPort', parseInt(e.target.value) || 587)} />
-                <Input label="SMTP Username" value={settings?.email?.smtpUser || ''} onChange={(e) => updateSetting('email', 'smtpUser', e.target.value)} />
-                <Input label="SMTP Password" type="password" value={settings?.email?.smtpPassword || ''} onChange={(e) => updateSetting('email', 'smtpPassword', e.target.value)} />
-                <Input label="From Email" type="email" value={settings?.email?.fromEmail || ''} onChange={(e) => updateSetting('email', 'fromEmail', e.target.value)} />
-                <Input label="From Name" value={settings?.email?.fromName || ''} onChange={(e) => updateSetting('email', 'fromName', e.target.value)} />
-              </div>
-              <Button variant="secondary" className="mt-4">
-                <img src="/icon/send.svg" alt="" className="w-4 h-4 icon-dark" />
-                Send Test Email
-              </Button>
-            </Card>
+            <div className="space-y-6">
+              {/* Server SMTP Status */}
+              <Card className="p-6">
+                <h2 className="text-lg font-semibold text-primary mb-4">Server Email Configuration</h2>
+                <p className="text-sm text-muted mb-4">
+                  Email settings are configured via environment variables on the server (Cloud Run).
+                </p>
+                
+                {emailConfig ? (
+                  <div className="space-y-3">
+                    <div className={cn(
+                      "p-4 rounded-lg",
+                      emailConfig.isConfigured ? "bg-success/10 border border-success/30" : "bg-destructive/10 border border-destructive/30"
+                    )}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <img 
+                          src={emailConfig.isConfigured ? "/icon/check-circle.svg" : "/icon/x-circle.svg"} 
+                          alt="" 
+                          className="w-5 h-5" 
+                        />
+                        <span className={cn("font-medium", emailConfig.isConfigured ? "text-success" : "text-destructive")}>
+                          {emailConfig.isConfigured ? 'SMTP Configured' : 'SMTP Not Configured'}
+                        </span>
+                      </div>
+                      {!emailConfig.isConfigured && (
+                        <p className="text-sm text-muted">
+                          Set SMTP_USER and SMTP_PASS environment variables in Cloud Run to enable email sending.
+                        </p>
+                      )}
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="p-3 bg-surface-secondary rounded-lg">
+                        <span className="text-muted">SMTP Host:</span>
+                        <span className="ml-2 text-primary font-mono">{emailConfig.smtpHost}</span>
+                      </div>
+                      <div className="p-3 bg-surface-secondary rounded-lg">
+                        <span className="text-muted">SMTP Port:</span>
+                        <span className="ml-2 text-primary font-mono">{emailConfig.smtpPort}</span>
+                      </div>
+                      <div className="p-3 bg-surface-secondary rounded-lg">
+                        <span className="text-muted">SMTP User:</span>
+                        <span className="ml-2 text-primary font-mono">{emailConfig.smtpUser}</span>
+                      </div>
+                      <div className="p-3 bg-surface-secondary rounded-lg">
+                        <span className="text-muted">SMTP Pass:</span>
+                        <span className="ml-2 text-primary font-mono">{emailConfig.smtpPass}</span>
+                      </div>
+                      <div className="p-3 bg-surface-secondary rounded-lg">
+                        <span className="text-muted">From Email:</span>
+                        <span className="ml-2 text-primary font-mono">{emailConfig.fromEmail}</span>
+                      </div>
+                      <div className="p-3 bg-surface-secondary rounded-lg">
+                        <span className="text-muted">From Name:</span>
+                        <span className="ml-2 text-primary font-mono">{emailConfig.fromName}</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-muted">Loading configuration...</div>
+                )}
+              </Card>
+
+              {/* Test Email */}
+              <Card className="p-6">
+                <h2 className="text-lg font-semibold text-primary mb-4">Test Email</h2>
+                <p className="text-sm text-muted mb-4">
+                  Send a test email to verify SMTP configuration is working correctly.
+                </p>
+                <div className="flex gap-3">
+                  <Input 
+                    placeholder="Enter test email address" 
+                    type="email"
+                    value={testEmailAddress}
+                    onChange={(e) => setTestEmailAddress(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleTestEmail} loading={testingEmail} disabled={!emailConfig?.isConfigured}>
+                    <img src="/icon/send.svg" alt="" className="w-4 h-4 icon-white" />
+                    {testingEmail ? 'Sending...' : 'Send Test'}
+                  </Button>
+                </div>
+                {!emailConfig?.isConfigured && (
+                  <p className="text-xs text-destructive mt-2">
+                    Configure SMTP credentials first to send test emails.
+                  </p>
+                )}
+              </Card>
+
+              {/* Local Settings (for reference) */}
+              <Card className="p-6 opacity-60">
+                <h2 className="text-lg font-semibold text-primary mb-4">Local Settings (Reference Only)</h2>
+                <p className="text-xs text-muted mb-4">
+                  These settings are stored in database but actual email sending uses server environment variables.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <Input label="SMTP Host" value={settings?.email?.smtpHost || ''} onChange={(e) => updateSetting('email', 'smtpHost', e.target.value)} placeholder="smtp.gmail.com" />
+                  <Input label="SMTP Port" type="number" value={settings?.email?.smtpPort || 587} onChange={(e) => updateSetting('email', 'smtpPort', parseInt(e.target.value) || 587)} />
+                  <Input label="SMTP Username" value={settings?.email?.smtpUser || ''} onChange={(e) => updateSetting('email', 'smtpUser', e.target.value)} />
+                  <Input label="SMTP Password" type="password" value={settings?.email?.smtpPassword || ''} onChange={(e) => updateSetting('email', 'smtpPassword', e.target.value)} />
+                  <Input label="From Email" type="email" value={settings?.email?.fromEmail || ''} onChange={(e) => updateSetting('email', 'fromEmail', e.target.value)} />
+                  <Input label="From Name" value={settings?.email?.fromName || ''} onChange={(e) => updateSetting('email', 'fromName', e.target.value)} />
+                </div>
+              </Card>
+            </div>
           )}
 
           {/* Security */}

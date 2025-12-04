@@ -522,6 +522,20 @@ export const supportApi = {
 };
 
 // ============================================================================
+// DEBUG / DIAGNOSTICS API
+// ============================================================================
+
+export const debugApi = {
+  // Test email configuration
+  testEmail: async (testEmail = null) => {
+    return apiCall('/api/admin/test-email', {
+      method: 'POST',
+      body: JSON.stringify({ testEmail }),
+    });
+  },
+};
+
+// ============================================================================
 // BACKUP API
 // ============================================================================
 

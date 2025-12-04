@@ -110,7 +110,8 @@ router.post('/send-feedback', optionalAuth, async (req, res) => {
       }
 
       const subjectPrefix = isBillingSupport ? '[Billing Support]' : '[Feedback]';
-      const fromEmail = config.EMAIL_FROM || process.env.EMAIL_FROM || smtpUser;
+      // Use no-reply for system notifications, not SMTP_USER (admin email)
+      const fromEmail = config.EMAIL_FROM || process.env.EMAIL_FROM || 'no-reply@graphosai.com';
       const fromName = config.EMAIL_FROM_NAME || process.env.EMAIL_FROM_NAME || 'Graphos AI Studio';
       
       await transporter.sendMail({

@@ -1280,12 +1280,23 @@ function getIconUrl(name, color = 'black') {
 function icon(name, color = 'black', size = 20) {
   const colorVariant = (color === 'white' || color === '#ffffff') ? 'white' : 'black';
   if (!ICON_BASE_URL) return '';
-  return `<img src="${getIconUrl(name, colorVariant)}" alt="${name}" width="${size}" height="${size}" style="display:inline-block;vertical-align:middle;"/>`;
+  return `<img src="${getIconUrl(name, colorVariant)}" alt="${name}" width="${size}" height="${size}" style="display:block;"/>`;
 }
 
 function logo(size = 36) {
   if (!ICON_BASE_URL) return '';
   return `<img src="${ICON_BASE_URL}/content.png" alt="Graphos AI Studio" width="${size}" height="${size}" style="display:block;border-radius:10px;"/>`;
+}
+
+// Header icon with circular background - email-safe table layout
+function headerIcon(name, color = 'black', iconSize = 32, circleSize = 80) {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 24px;">
+  <tr>
+    <td style="width:${circleSize}px;height:${circleSize}px;background-color:#f5f5f7;border-radius:50%;text-align:center;vertical-align:middle;">
+      ${icon(name, color, iconSize)}
+    </td>
+  </tr>
+</table>`;
 }
 
 
@@ -1344,9 +1355,7 @@ function otpVerificationEmail({ code, userName, expiryMinutes = 10, lang = DEFAU
     <!-- Header -->
     <tr>
       <td style="padding:48px 40px 32px;text-align:center;">
-        <div style="width:80px;height:80px;background-color:#f5f5f7;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;">
-          ${icon('mail', 'black', 32)}
-        </div>
+        ${headerIcon('mail', 'black', 32)}
         <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">${t('otpVerification.title', lang)}</h1>
         <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">${t('otpVerification.subtitle', lang)}</p>
       </td>
@@ -1393,9 +1402,7 @@ function passwordResetEmail({ code, userName, expiryMinutes = 15, lang = DEFAULT
     <!-- Header -->
     <tr>
       <td style="padding:48px 40px 32px;text-align:center;">
-        <div style="width:80px;height:80px;background-color:#f5f5f7;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;">
-          ${icon('alertCircle', 'black', 32)}
-        </div>
+        ${headerIcon('alertCircle', 'black', 32)}
         <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">${t('passwordReset.title', lang)}</h1>
         <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">${t('passwordReset.subtitle', lang)}</p>
       </td>
@@ -1444,9 +1451,7 @@ function welcomeEmail({ userName, dashboardUrl, lang = DEFAULT_LANG }) {
     <!-- Header -->
     <tr>
       <td style="padding:48px 40px 32px;text-align:center;">
-        <div style="width:80px;height:80px;background-color:#f5f5f7;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;">
-          ${icon('check', 'black', 32)}
-        </div>
+        ${headerIcon('check', 'black', 32)}
         <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">${t('welcome.title', lang)}</h1>
         <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">${t('welcome.subtitle', lang)}</p>
       </td>
@@ -1520,9 +1525,7 @@ function newDeviceLoginEmail({ userName, deviceInfo, ipAddress, location, loginT
     <!-- Header -->
     <tr>
       <td style="padding:48px 40px 32px;text-align:center;">
-        <div style="width:80px;height:80px;background-color:#f5f5f7;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;">
-          ${icon('alertCircle', 'black', 32)}
-        </div>
+        ${headerIcon('alertCircle', 'black', 32)}
         <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">${t('newDeviceLogin.title', lang)}</h1>
         <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">${t('newDeviceLogin.subtitle', lang)}</p>
       </td>
@@ -1595,9 +1598,7 @@ function passwordChangedEmail({ userName, changedAt, lang = DEFAULT_LANG }) {
     <!-- Header -->
     <tr>
       <td style="padding:48px 40px 32px;text-align:center;">
-        <div style="width:80px;height:80px;background-color:#f5f5f7;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;">
-          ${icon('check', 'black', 32)}
-        </div>
+        ${headerIcon('check', 'black', 32)}
         <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">${t('passwordChanged.title', lang)}</h1>
         <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">${t('passwordChanged.subtitle', lang)}</p>
       </td>
@@ -1645,9 +1646,7 @@ function supportReplyEmail({ ticketId, ticketType, userName, ticketTitle, replyM
     <!-- Header -->
     <tr>
       <td style="padding:48px 40px 32px;text-align:center;">
-        <div style="width:80px;height:80px;background-color:#f5f5f7;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;">
-          ${icon('message', 'black', 32)}
-        </div>
+        ${headerIcon('message', 'black', 32)}
         <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">${t('supportReply.title', lang, { type: typeText })}</h1>
         <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">Ticket #${ticketId.substring(0, 8).toUpperCase()}</p>
       </td>
@@ -1706,9 +1705,7 @@ function newTicketEmail({ ticketId, ticketType, userName, userEmail, title, cont
     <!-- Header -->
     <tr>
       <td style="padding:48px 40px 32px;text-align:center;">
-        <div style="width:80px;height:80px;background-color:#f5f5f7;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;">
-          ${icon(isBilling ? 'creditCard' : 'file', 'black', 32)}
-        </div>
+        ${headerIcon(isBilling ? 'creditCard' : 'file', 'black', 32)}
         <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">New ${typeText}</h1>
         <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">Ticket #${ticketId.substring(0, 8).toUpperCase()}</p>
       </td>
@@ -1809,6 +1806,7 @@ module.exports = {
   t,
   getLocale,
   icon,
+  headerIcon,
   logo,
   appleBase,
   

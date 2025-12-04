@@ -154,8 +154,9 @@ exports.replyToTicket = async (req, res) => {
         // Use new SMTP config with fallback to legacy
         const smtpUser = config.SMTP_USER || process.env.SMTP_USER || process.env.EMAIL_USER;
         const smtpPass = config.SMTP_PASS || process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
-        const fromEmail = config.EMAIL_FROM || process.env.EMAIL_FROM || 'no-reply@graphosai.com';
-        const fromName = config.EMAIL_FROM_NAME || process.env.EMAIL_FROM_NAME || 'Graphos AI Studio';
+        // Use support email for support replies instead of no-reply
+        const supportEmail = config.EMAIL_SUPPORT || process.env.EMAIL_SUPPORT || 'support@graphosai.com';
+        const fromName = config.EMAIL_FROM_NAME || process.env.EMAIL_FROM_NAME || 'Graphos AI Studio Support';
         
         const transporter = nodemailer.createTransport({
           host: config.SMTP_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -192,8 +193,8 @@ exports.replyToTicket = async (req, res) => {
         });
         
         await transporter.sendMail({
-          from: `"${fromName}" <${fromEmail}>`,
-          replyTo: config.EMAIL_SUPPORT || process.env.EMAIL_SUPPORT || fromEmail,
+          from: `"${fromName}" <${supportEmail}>`,
+          replyTo: supportEmail,
           to: ticket.userEmail,
           subject: `Re: ${ticket.title} - #${id.substring(0, 8)}`,
           html: htmlContent
