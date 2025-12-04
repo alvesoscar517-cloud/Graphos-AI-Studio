@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { detectAI as detectAIAPI } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
-import Lottie from 'lottie-react'
+import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
@@ -202,7 +202,7 @@ const AIDetectionCard = ({ disabled, text }) => {
           disabled={disabled || isLoading || !textChanged}
         >
           {isLoading ? (
-            <Lottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
+            <LazyLottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
           ) : (
             <>
               <span>{!textChanged ? t('analysis.detected') : t('analysis.detect')}</span>

@@ -249,11 +249,16 @@ export function startTokenRefresh() {
           secureSet(STORAGE_KEYS.TOKEN_EXPIRY, String(Date.now() + result.expiresIn));
           startTokenRefresh();
         } else {
+          // Refresh failed - clear auth and stop (don't reload to avoid loop)
+          console.log('Token refresh failed, clearing auth data');
           clearAuthData();
-          window.location.reload();
+          stopTokenRefresh();
         }
       } catch (error) {
         console.error('Token refresh failed:', error);
+        // On error, clear auth and stop
+        clearAuthData();
+        stopTokenRefresh();
       }
     }, refreshTime);
   }

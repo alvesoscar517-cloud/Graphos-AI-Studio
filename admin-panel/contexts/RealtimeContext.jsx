@@ -13,7 +13,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef } f
 import { analyticsApi, advancedAnalyticsApi, supportApi, usersApi, logsApi, notificationsApi } from '../services/adminApi';
 import { cache } from '../utils/cache';
 import { getApiBaseUrl } from '../utils/config';
-import { getAccessToken } from '../services/authService';
+import { getAccessToken, isAuthenticated } from '../services/authService';
 
 const RealtimeContext = createContext();
 
@@ -96,6 +96,12 @@ export function RealtimeProvider({ children }) {
    * Connect to SSE for real-time stats updates
    */
   const connectStatsSSE = useCallback(() => {
+    // Don't connect if not authenticated
+    if (!isAuthenticated()) {
+      console.log('[RealtimeContext] Not authenticated, skipping SSE connection');
+      return;
+    }
+    
     const authParam = getAuthParam();
     if (!authParam) return;
 
@@ -143,6 +149,13 @@ export function RealtimeProvider({ children }) {
         setSseConnected(false);
         eventSource.close();
         
+        // Only attempt reconnection if still authenticated
+        if (!isAuthenticated()) {
+          console.log('[RealtimeContext] Not authenticated, stopping reconnection');
+          reconnectAttemptsRef.current = 0;
+          return;
+        }
+        
         // Attempt reconnection with backoff
         if (reconnectAttemptsRef.current < SSE_CONFIG.maxReconnectAttempts) {
           reconnectAttemptsRef.current++;
@@ -160,6 +173,11 @@ export function RealtimeProvider({ children }) {
    * Connect to SSE for real-time support updates
    */
   const connectSupportSSE = useCallback(() => {
+    // Don't connect if not authenticated
+    if (!isAuthenticated()) {
+      return;
+    }
+    
     const authParam = getAuthParam();
     if (!authParam) return;
 
@@ -194,7 +212,10 @@ export function RealtimeProvider({ children }) {
 
       eventSource.onerror = () => {
         eventSource.close();
-        setTimeout(connectSupportSSE, SSE_CONFIG.reconnectDelay);
+        // Only reconnect if still authenticated
+        if (isAuthenticated()) {
+          setTimeout(connectSupportSSE, SSE_CONFIG.reconnectDelay);
+        }
       };
     } catch (err) {
       console.error('[RealtimeContext] Failed to create support SSE:', err);
@@ -216,10 +237,12 @@ export function RealtimeProvider({ children }) {
     setSseConnected(false);
   }, []);
 
-  // Initialize SSE connections on mount
+  // Initialize SSE connections on mount (only if authenticated)
   useEffect(() => {
-    connectStatsSSE();
-    connectSupportSSE();
+    if (isAuthenticated()) {
+      connectStatsSSE();
+      connectSupportSSE();
+    }
     
     return () => {
       closeSSEConnections();

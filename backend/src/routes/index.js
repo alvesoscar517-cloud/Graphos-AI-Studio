@@ -139,9 +139,11 @@ router.use('/api/realtime', protectedMiddleware, realtimeRoutes);
 
 // Internal API for backend-to-backend communication (broadcast notifications)
 const realtimeController = require('../controllers/realtime.controller');
+const envConfig = require('../config/envConfigHelper');
+
 const internalApiKeyAuth = (req, res, next) => {
   const apiKey = req.headers['x-api-key'];
-  const validKey = process.env.INTERNAL_API_KEY;
+  const validKey = envConfig.get('INTERNAL_API_KEY');
   if (validKey && apiKey === validKey) {
     return next();
   }
@@ -150,6 +152,17 @@ const internalApiKeyAuth = (req, res, next) => {
 };
 router.post('/api/internal/broadcast-notification', internalApiKeyAuth, realtimeController.broadcastNotificationApi);
 router.post('/api/internal/broadcast-credits', internalApiKeyAuth, realtimeController.broadcastCreditsApi);
+
+// Refresh environment config from Firestore
+router.post('/api/internal/refresh-env-config', internalApiKeyAuth, async (req, res) => {
+  try {
+    const envConfigService = require('../services/envConfig.service');
+    await envConfigService.refreshCache();
+    res.json({ success: true, message: 'Environment config refreshed from Firestore' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // ============================================================================
 // LEGACY ROUTES (Deprecated - will be removed in v3.0)

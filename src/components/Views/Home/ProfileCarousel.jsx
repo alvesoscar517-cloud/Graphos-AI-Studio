@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Lottie from 'lottie-react'
+import LazyLottie from '../../Common/LazyLottie'
 import ProfileCard from './ProfileCard'
 import EmptyProfileCard from './EmptyProfileCard'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
@@ -71,7 +71,7 @@ const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile, loading }) =
       {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center min-h-[200px] py-10">
-          <Lottie 
+          <LazyLottie 
             animationData={threeDotsAnimation} 
             loop={true}
             style={{ width: 80, height: 40 }}

@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
-import Lottie from 'lottie-react'
+
+// Lazy load lottie-react
+const Lottie = lazy(() => import('lottie-react'))
 
 const LottieAnimation = ({ animationPath, width = 100, height = 100, loop = true, autoplay = true, className = '' }) => {
   const { t } = useTranslation()
@@ -14,23 +16,27 @@ const LottieAnimation = ({ animationPath, width = 100, height = 100, loop = true
       .catch(error => console.error('Error loading animation:', error))
   }, [animationPath])
 
+  const LoadingPlaceholder = () => (
+    <div className={className} style={{ width, height, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ fontSize: '12px', color: '#999' }}>{t('common.loading')}</div>
+    </div>
+  )
+
   if (!animationData) {
-    return (
-      <div className={className} style={{ width, height, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontSize: '12px', color: '#999' }}>{t('common.loading')}</div>
-      </div>
-    )
+    return <LoadingPlaceholder />
   }
 
   return (
     <div className={className} style={{ width, height }}>
-      <Lottie
-        animationData={animationData}
-        loop={loop}
-        autoplay={autoplay}
-        style={{ width: '100%', height: '100%' }}
-        className={className}
-      />
+      <Suspense fallback={<LoadingPlaceholder />}>
+        <Lottie
+          animationData={animationData}
+          loop={loop}
+          autoplay={autoplay}
+          style={{ width: '100%', height: '100%' }}
+          className={className}
+        />
+      </Suspense>
     </div>
   )
 }

@@ -7,7 +7,7 @@ import ChatMessage from './ChatMessage'
 import WorkspaceSidebar from './WorkspaceSidebar'
 
 import EditTitleModal from '../../Common/EditTitleModal'
-import Lottie from 'lottie-react'
+import LazyLottie from '../../Common/LazyLottie'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
 
 const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden }) => {
@@ -192,7 +192,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
             ))}
             {isLoading && (
               <div className="workspace-loading">
-                <Lottie 
+                <LazyLottie 
                   animationData={threeDotsAnimation} 
                   loop={true}
                   style={{ width: 60, height: 40 }}

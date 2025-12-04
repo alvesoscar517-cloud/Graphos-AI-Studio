@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, MotionConfig } from 'framer-motion'
-import Lottie from 'lottie-react'
+import LazyLottie from '../Common/LazyLottie'
 import { rewriteTextStream, iterativeHumanize } from '../../services/api'
 import { useRewrite } from '@/stores'
 import modal from '../../utils/modal'
@@ -341,7 +341,7 @@ const RewriteToolbar = ({
               )}>{rewriteLabel}</span>
               {isLoading && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-                  <Lottie 
+                  <LazyLottie 
                     animationData={threeDotsAnimation} 
                     loop={true}
                     style={{ width: 40, height: 16 }}

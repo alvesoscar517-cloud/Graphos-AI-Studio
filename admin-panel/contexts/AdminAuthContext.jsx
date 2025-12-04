@@ -53,18 +53,11 @@ export function AdminAuthProvider({ children }) {
         setIsAdminAuthenticated(true);
         startTokenRefresh();
       } else {
-        // Try to refresh token
-        try {
-          const refreshResult = await authApi.refresh();
-          if (refreshResult.success && refreshResult.accessToken) {
-            setAuthData(refreshResult.accessToken, getAdminInfo(), refreshResult.expiresIn);
-            setIsAdminAuthenticated(true);
-            startTokenRefresh();
-          }
-        } catch (refreshError) {
-          // Refresh failed, user needs to login
-          console.log('Token refresh failed, user needs to login');
-        }
+        // Clear any stale auth data first
+        clearAuthData();
+        // User needs to login - don't try to refresh if no token exists
+        console.log('No valid token, user needs to login');
+        setIsAdminAuthenticated(false);
       }
     } catch (err) {
       console.error('Auth check error:', err);

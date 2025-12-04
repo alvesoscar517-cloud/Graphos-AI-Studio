@@ -7,6 +7,8 @@
  * - Standardized pricing across all AI-consuming endpoints
  */
 
+const envConfig = require('./envConfigHelper');
+
 // ============================================================================
 // FREE CREDITS FOR NEW USERS
 // ============================================================================
@@ -214,46 +216,54 @@ const FEATURE_COSTS = {
 // Pricing strategy: ~$0.02-0.03 per credit, better value for larger packages
 // ============================================================================
 
-const CREDIT_PACKAGES = {
-  'basic': {
-    credits: 150,
-    price: 4.99,
-    bonus: 15,                     // +10% bonus = 165 total
-    description: 'Basic',
-    variantId: process.env.LS_VARIANT_BASIC || null    // ~$0.03/credit
-  },
-  'pro': {
-    credits: 500,
-    price: 14.99,
-    bonus: 100,                    // +20% bonus = 600 total
-    description: 'Pro',
-    variantId: process.env.LS_VARIANT_PRO || null      // ~$0.025/credit
-  },
-  'pro_plus': {
-    credits: 1500,
-    price: 39.99,
-    bonus: 450,                    // +30% bonus = 1950 total
-    description: 'Pro Plus',
-    variantId: process.env.LS_VARIANT_PRO_PLUS || null // ~$0.02/credit
-  },
-  'power': {
-    credits: 5000,
-    price: 99.99,
-    bonus: 2000,                   // +40% bonus = 7000 total
-    description: 'Power',
-    variantId: process.env.LS_VARIANT_POWER || null    // ~$0.014/credit
-  }
-};
+// Use getter function to always get latest variant IDs from config
+function getCreditPackages() {
+  return {
+    'basic': {
+      credits: 150,
+      price: 4.99,
+      bonus: 15,                     // +10% bonus = 165 total
+      description: 'Basic',
+      variantId: envConfig.get('LS_VARIANT_BASIC') || null    // ~$0.03/credit
+    },
+    'pro': {
+      credits: 500,
+      price: 14.99,
+      bonus: 100,                    // +20% bonus = 600 total
+      description: 'Pro',
+      variantId: envConfig.get('LS_VARIANT_PRO') || null      // ~$0.025/credit
+    },
+    'pro_plus': {
+      credits: 1500,
+      price: 39.99,
+      bonus: 450,                    // +30% bonus = 1950 total
+      description: 'Pro Plus',
+      variantId: envConfig.get('LS_VARIANT_PRO_PLUS') || null // ~$0.02/credit
+    },
+    'power': {
+      credits: 5000,
+      price: 99.99,
+      bonus: 2000,                   // +40% bonus = 7000 total
+      description: 'Power',
+      variantId: envConfig.get('LS_VARIANT_POWER') || null    // ~$0.014/credit
+    }
+  };
+}
+
+// For backward compatibility
+const CREDIT_PACKAGES = getCreditPackages();
 
 /**
  * Get package by Lemon Squeezy variant ID
  * Supports both string and number comparison
+ * Uses getCreditPackages() to get latest config from Firestore
  */
 function getPackageByVariantId(variantId) {
   const variantIdStr = String(variantId);
   const variantIdNum = parseInt(variantId, 10);
+  const packages = getCreditPackages();
   
-  for (const [packageId, pkg] of Object.entries(CREDIT_PACKAGES)) {
+  for (const [packageId, pkg] of Object.entries(packages)) {
     if (!pkg.variantId) continue;
     
     const pkgVariantStr = String(pkg.variantId);
@@ -271,7 +281,8 @@ function getPackageByVariantId(variantId) {
  * Matches based on total price in cents
  */
 function getPackageByPrice(priceInCents) {
-  for (const [packageId, pkg] of Object.entries(CREDIT_PACKAGES)) {
+  const packages = getCreditPackages();
+  for (const [packageId, pkg] of Object.entries(packages)) {
     const pkgPriceInCents = Math.round(pkg.price * 100);
     if (pkgPriceInCents === priceInCents) {
       return { packageId, ...pkg };

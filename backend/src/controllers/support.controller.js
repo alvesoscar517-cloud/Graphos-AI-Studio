@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const { db } = require('../config/firebase');
 const logger = require('../utils/logger');
 const { createLocalizer } = require('../utils/localized-messages.util');
+const envConfig = require('../config/envConfigHelper');
 
 // Get all tickets
 exports.getTickets = async (req, res) => {
@@ -151,17 +152,19 @@ exports.replyToTicket = async (req, res) => {
         const config = require('../config');
         const { supportReplyEmail } = require('../services/emailTemplate.service');
         
-        // Use new SMTP config with fallback to legacy
-        const smtpUser = config.SMTP_USER || process.env.SMTP_USER || process.env.EMAIL_USER;
-        const smtpPass = config.SMTP_PASS || process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
+        // Use new SMTP config with fallback to legacy (Firestore > config > process.env)
+        const smtpUser = envConfig.get('SMTP_USER') || config.SMTP_USER;
+        const smtpPass = envConfig.get('SMTP_PASS') || config.SMTP_PASS;
         // Use support email for support replies instead of no-reply
-        const supportEmail = config.EMAIL_SUPPORT || process.env.EMAIL_SUPPORT || 'support@graphosai.com';
-        const fromName = config.EMAIL_FROM_NAME || process.env.EMAIL_FROM_NAME || 'Graphos AI Studio Support';
+        const supportEmail = envConfig.get('EMAIL_SUPPORT') || config.EMAIL_SUPPORT || 'support@graphosai.com';
+        const fromName = envConfig.get('EMAIL_FROM_NAME') || config.EMAIL_FROM_NAME || 'Graphos AI Studio Support';
+        const smtpHost = envConfig.get('SMTP_HOST') || config.SMTP_HOST || 'smtp.gmail.com';
+        const smtpPort = envConfig.get('SMTP_PORT') || config.SMTP_PORT || 587;
         
         const transporter = nodemailer.createTransport({
-          host: config.SMTP_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
-          port: config.SMTP_PORT || process.env.SMTP_PORT || 587,
-          secure: (config.SMTP_PORT || process.env.SMTP_PORT) === 465,
+          host: smtpHost,
+          port: smtpPort,
+          secure: smtpPort === 465,
           auth: {
             user: smtpUser,
             pass: smtpPass

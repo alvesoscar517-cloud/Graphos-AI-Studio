@@ -5,6 +5,7 @@ import { useNotify } from '../Common/NotificationProvider';
 import PageHeader from '../Common/PageHeader';
 import LoadingScreen from '../Common/LoadingScreen';
 import BackupSuccessModal from './BackupSuccessModal';
+import EnvironmentConfig from './EnvironmentConfig';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -233,6 +234,7 @@ export default function SettingsView() {
     { id: 'limits', label: 'Limits', icon: 'shield.svg' },
     { id: 'features', label: 'Features', icon: 'toggle-right.svg' },
     { id: 'email', label: 'Email', icon: 'mail.svg' },
+    { id: 'environment', label: 'Environment', icon: 'terminal.svg' },
     { id: 'security', label: 'Security', icon: 'lock.svg' },
     { id: 'backup', label: 'Backup', icon: 'database.svg' },
   ];
@@ -467,10 +469,15 @@ export default function SettingsView() {
                     <p className="text-sm text-muted">Configure email settings for sending notifications</p>
                   </div>
                   <div className={cn(
-                    "px-3 py-1 rounded-full text-sm font-medium",
+                    "px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1",
                     emailConfig?.isConfigured ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
                   )}>
-                    {emailConfig?.isConfigured ? '✓ Configured' : '✗ Not Configured'}
+                    <img 
+                      src={emailConfig?.isConfigured ? "/icon/check-circle.svg" : "/icon/x-circle.svg"} 
+                      alt="" 
+                      className="w-4 h-4" 
+                    />
+                    {emailConfig?.isConfigured ? 'Configured' : 'Not Configured'}
                   </div>
                 </div>
                 
@@ -585,6 +592,11 @@ export default function SettingsView() {
                 </ul>
               </Card>
             </div>
+          )}
+
+          {/* Environment */}
+          {activeTab === 'environment' && (
+            <EnvironmentConfig />
           )}
 
           {/* Security */}

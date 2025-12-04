@@ -5,7 +5,7 @@ import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
-import Lottie from 'lottie-react'
+import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
 
@@ -195,7 +195,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
           disabled={disabled || isLoading || !textChanged}
         >
           {isLoading ? (
-            <Lottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
+            <LazyLottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
           ) : (
             <>
               <span>{!textChanged ? t('analysis.calculated') : t('analysis.calculateScore')}</span>

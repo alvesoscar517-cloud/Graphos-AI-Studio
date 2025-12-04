@@ -6,7 +6,7 @@
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { getUserInfo } from '../services/api';
 import realtimeService from '../services/realtimeService';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../stores/authStore';
 
 const PaymentContext = createContext();
 

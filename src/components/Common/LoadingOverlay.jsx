@@ -1,6 +1,35 @@
-import Lottie from 'lottie-react'
-import threeDotsAnimation from '../../animation/Three dots loading.json'
+import { lazy, Suspense, useState, useEffect } from 'react'
 import { cn } from '../../lib/utils'
+
+// Lazy load lottie-react
+const LazyLottie = lazy(() => import('lottie-react'))
+
+// Simple spinner fallback
+const SpinnerFallback = () => (
+  <div className="w-20 h-15 flex items-center justify-center">
+    <div className="w-6 h-6 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+)
+
+// Separate component to handle async loading
+const LottieLoader = () => {
+  const [animationData, setAnimationData] = useState(null)
+  
+  useEffect(() => {
+    import('../../animation/Three dots loading.json')
+      .then(module => setAnimationData(module.default))
+  }, [])
+  
+  if (!animationData) return <SpinnerFallback />
+  
+  return (
+    <LazyLottie 
+      animationData={animationData} 
+      loop={true}
+      style={{ width: 80, height: 60 }}
+    />
+  )
+}
 
 const LoadingOverlay = ({ show }) => {
   if (!show) return null
@@ -19,11 +48,9 @@ const LoadingOverlay = ({ show }) => {
         "bg-bg-primary/80 shadow-elevated",
         "animate-scale-in-bounce"
       )}>
-        <Lottie 
-          animationData={threeDotsAnimation} 
-          loop={true}
-          style={{ width: 80, height: 60 }}
-        />
+        <Suspense fallback={<SpinnerFallback />}>
+          <LottieLoader />
+        </Suspense>
       </div>
     </div>
   )

@@ -1,5 +1,7 @@
-import { useEffect, useRef } from 'react'
-import Lottie from 'lottie-react'
+import { useEffect, useRef, lazy, Suspense } from 'react'
+
+// Lazy load lottie-react
+const Lottie = lazy(() => import('lottie-react'))
 
 const LottieWrapper = ({ animationData, loop = true }) => {
   const lottieRef = useRef(null)
@@ -28,13 +30,15 @@ const LottieWrapper = ({ animationData, loop = true }) => {
 
   return (
     <div style={{ width: '100%', height: '100%', pointerEvents: 'none' }}>
-      <Lottie
-        lottieRef={lottieRef}
-        animationData={animationData}
-        loop={loop}
-        autoplay={true}
-        style={{ width: '100%', height: '100%' }}
-      />
+      <Suspense fallback={<div className="w-full h-full animate-pulse bg-gray-200 dark:bg-gray-700 rounded" />}>
+        <Lottie
+          lottieRef={lottieRef}
+          animationData={animationData}
+          loop={loop}
+          autoplay={true}
+          style={{ width: '100%', height: '100%' }}
+        />
+      </Suspense>
     </div>
   )
 }

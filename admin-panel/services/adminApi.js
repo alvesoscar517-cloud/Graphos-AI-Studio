@@ -556,6 +556,68 @@ export const debugApi = {
 };
 
 // ============================================================================
+// ENVIRONMENT CONFIGURATION API
+// ============================================================================
+
+export const envConfigApi = {
+  // Get environment variable definitions
+  getDefinitions: async () => {
+    return apiCall('/api/admin/env-config/definitions');
+  },
+  
+  // Get all environment configs
+  getAll: async () => {
+    return apiCall('/api/admin/env-config');
+  },
+  
+  // Get environment config by type
+  get: async (type) => {
+    return apiCall(`/api/admin/env-config/${type}`);
+  },
+  
+  // Save environment config
+  save: async (type, variables) => {
+    return apiCall(`/api/admin/env-config/${type}`, {
+      method: 'PUT',
+      body: JSON.stringify({ variables }),
+    });
+  },
+  
+  // Get custom variables
+  getCustomVariables: async () => {
+    return apiCall('/api/admin/env-config/custom/variables');
+  },
+  
+  // Add custom variable
+  addCustomVariable: async (variable) => {
+    return apiCall('/api/admin/env-config/custom/variables', {
+      method: 'POST',
+      body: JSON.stringify(variable),
+    });
+  },
+  
+  // Delete custom variable
+  deleteCustomVariable: async (target, key) => {
+    return apiCall(`/api/admin/env-config/custom/variables/${target}/${key}`, {
+      method: 'DELETE',
+    });
+  },
+  
+  // Export all configs
+  exportAll: async () => {
+    return apiCall('/api/admin/env-config/export/all');
+  },
+  
+  // Refresh main backend config
+  refreshMainBackend: async () => {
+    // This is handled automatically when saving, but can be called manually
+    return apiCall('/api/admin/env-config/refresh-main-backend', {
+      method: 'POST',
+    });
+  },
+};
+
+// ============================================================================
 // BACKUP API
 // ============================================================================
 

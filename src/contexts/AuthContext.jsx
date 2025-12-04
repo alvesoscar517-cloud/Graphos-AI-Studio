@@ -1,90 +1,29 @@
 /**
- * Auth Context - Thin Wrapper for Backward Compatibility
+ * Auth Context - DEPRECATED
  * 
- * IMPORTANT: This context now delegates to authStore (Zustand).
- * authStore is the SINGLE SOURCE OF TRUTH for authentication.
+ * This file is kept for backward compatibility only.
+ * All functionality has been moved to authStore (Zustand).
  * 
- * New code should use authStore directly:
- * import { useAuthStore, useAuthActions } from '@/stores/authStore'
+ * New code should import from authStore directly:
+ * import { useAuth, useAuthStore, useAuthActions } from '@/stores/authStore'
  * 
- * This context is maintained for backward compatibility with existing components.
+ * @deprecated Use stores/authStore.js instead
  */
 
-import { createContext, useContext, useEffect } from 'react'
-import { useAuthStore, useAuthActions } from '../stores/authStore'
+// Re-export from authStore for backward compatibility
+export { 
+  useAuth,
+  useAuthStore,
+  useAuthActions,
+  useUser,
+  useIsAuthenticated,
+  useAuthMethod,
+  useHasGoogleLinked,
+  useAuthLoading,
+  useAuthError,
+} from '../stores/authStore'
 
-const AuthContext = createContext()
+// Legacy AuthProvider - now a no-op wrapper
+export const AuthProvider = ({ children }) => children
 
-/**
- * useAuth hook - delegates to authStore
- */
-export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-  return context
-}
-
-/**
- * Auth Provider - Thin wrapper around authStore
- * Initializes auth on mount and provides context for backward compatibility
- */
-export const AuthProvider = ({ children }) => {
-  // Get state from Zustand store
-  const user = useAuthStore((state) => state.user)
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-  const isLoading = useAuthStore((state) => state.isLoading)
-  const error = useAuthStore((state) => state.error)
-  const authMethod = useAuthStore((state) => state.authMethod)
-  const hasGoogleLinked = useAuthStore((state) => state.hasGoogleLinked)
-  
-  // Get actions from Zustand store
-  const actions = useAuthActions()
-
-  // Initialize auth on mount
-  useEffect(() => {
-    actions.initAuth()
-  }, [])
-
-  // Build context value from store state and actions
-  const value = {
-    // State
-    user,
-    isAuthenticated,
-    isLoading,
-    error,
-    authMethod,
-    hasGoogleLinked,
-    
-    // Google auth
-    signIn: actions.signInWithGoogle,
-    signOut: actions.signOut,
-    
-    // Email auth
-    signInWithEmail: actions.signInWithEmail,
-    registerWithEmail: actions.registerWithEmail,
-    verifyEmail: actions.verifyEmail,
-    resendVerificationOTP: actions.resendVerificationOTP,
-    requestPasswordReset: actions.requestPasswordReset,
-    resetPassword: actions.resetPassword,
-    
-    // Password & account management
-    changePassword: actions.changePassword,
-    deleteAccount: actions.deleteAccount,
-    
-    // Session management
-    getActiveSessions: actions.getActiveSessions,
-    revokeSession: actions.revokeSession,
-    revokeAllOtherSessions: actions.revokeAllOtherSessions,
-    getLoginHistory: actions.getLoginHistory,
-    
-    // Google linking
-    linkGoogleAccount: actions.linkGoogleAccount,
-    unlinkGoogleAccount: actions.unlinkGoogleAccount,
-  }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-export default AuthProvider
+export default { AuthProvider, useAuth: () => require('../stores/authStore').useAuth() }

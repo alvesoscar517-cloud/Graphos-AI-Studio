@@ -5,6 +5,7 @@
 const express = require('express');
 const router = express.Router();
 const config = require('../config');
+const envConfig = require('../config/envConfigHelper');
 const { createLocalizer } = require('../utils/localized-messages.util');
 const { optionalAuth } = require('../middleware/auth.middleware');
 
@@ -67,11 +68,11 @@ router.post('/send-feedback', optionalAuth, async (req, res) => {
       const nodemailer = require('nodemailer');
       const { newTicketEmail } = require('../services/emailTemplate.service');
       
-      // Use SMTP config
-      const smtpHost = config.SMTP_HOST || process.env.SMTP_HOST || 'smtp.gmail.com';
-      const smtpPort = config.SMTP_PORT || process.env.SMTP_PORT || 587;
-      const smtpUser = config.SMTP_USER || process.env.SMTP_USER || process.env.EMAIL_USER;
-      const smtpPass = config.SMTP_PASS || process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
+      // Use SMTP config from Firestore > config > defaults
+      const smtpHost = envConfig.get('SMTP_HOST') || config.SMTP_HOST || 'smtp.gmail.com';
+      const smtpPort = envConfig.get('SMTP_PORT') || config.SMTP_PORT || 587;
+      const smtpUser = envConfig.get('SMTP_USER') || config.SMTP_USER || '';
+      const smtpPass = envConfig.get('SMTP_PASS') || config.SMTP_PASS || '';
       
       const transporter = nodemailer.createTransport({
         host: smtpHost,
@@ -111,8 +112,8 @@ router.post('/send-feedback', optionalAuth, async (req, res) => {
 
       const subjectPrefix = isBillingSupport ? '[Billing Support]' : '[Feedback]';
       // Use no-reply for system notifications, not SMTP_USER (admin email)
-      const fromEmail = config.EMAIL_FROM || process.env.EMAIL_FROM || 'no-reply@graphosai.com';
-      const fromName = config.EMAIL_FROM_NAME || process.env.EMAIL_FROM_NAME || 'Graphos AI Studio';
+      const fromEmail = envConfig.get('EMAIL_FROM') || config.EMAIL_FROM || 'no-reply@graphosai.com';
+      const fromName = envConfig.get('EMAIL_FROM_NAME') || config.EMAIL_FROM_NAME || 'Graphos AI Studio';
       
       await transporter.sendMail({
         from: `"${fromName}" <${fromEmail}>`,

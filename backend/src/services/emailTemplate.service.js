@@ -6,7 +6,8 @@
  * Supported languages: en, vi, zh, ja, ko, fr, de, es, pt, it, ru, ar, th, id, ms
  */
 
-const ICON_BASE_URL = process.env.ICON_BASE_URL || 'https://alvesoscar517-cloud.github.io/icons-for-Gmail';
+const envConfig = require('../config/envConfigHelper');
+const ICON_BASE_URL = envConfig.get('ICON_BASE_URL', 'https://alvesoscar517-cloud.github.io/icons-for-Gmail');
 
 // ============================================================================
 // TRANSLATIONS (15 languages)
@@ -1280,7 +1281,7 @@ function getIconUrl(name, color = 'black') {
 function icon(name, color = 'black', size = 20) {
   const colorVariant = (color === 'white' || color === '#ffffff') ? 'white' : 'black';
   if (!ICON_BASE_URL) return '';
-  return `<img src="${getIconUrl(name, colorVariant)}" alt="${name}" width="${size}" height="${size}" style="display:block;"/>`;
+  return `<img src="${getIconUrl(name, colorVariant)}" alt="${name}" width="${size}" height="${size}" style="display:block;margin:0 auto;"/>`;
 }
 
 function logo(size = 36) {

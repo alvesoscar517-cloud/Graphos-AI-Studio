@@ -9,18 +9,31 @@ const { createLocalizer } = require('../utils/localized-messages.util');
 const logger = require('../utils/logger');
 const nodemailer = require('nodemailer');
 const config = require('../config');
+const envConfig = require('../config/envConfigHelper');
 
-// Email configuration
-// Note: Check for env vars with potential leading space (Cloud Run config issue)
-const smtpHost = config.SMTP_HOST || process.env.SMTP_HOST || process.env[' SMTP_HOST'] || 'smtp.gmail.com';
-const smtpPort = config.SMTP_PORT || process.env.SMTP_PORT || process.env[' SMTP_PORT'] || 587;
-const smtpUser = config.SMTP_USER || process.env.SMTP_USER || process.env[' SMTP_USER'] || process.env.EMAIL_USER;
-const smtpPass = config.SMTP_PASS || process.env.SMTP_PASS || process.env[' SMTP_PASS'] || process.env.EMAIL_PASSWORD;
-const fromEmail = config.EMAIL_FROM || process.env.EMAIL_FROM || process.env[' EMAIL_FROM'] || 'no-reply@graphosai.com';
-const fromName = config.EMAIL_FROM_NAME || process.env.EMAIL_FROM_NAME || process.env[' EMAIL_FROM_NAME'] || 'Graphos AI Studio';
+// Email configuration - use envConfig helper for Firestore > process.env > default fallback
+// Lazy getter functions to always get latest config
+function getSmtpConfig() {
+  return {
+    host: envConfig.get('SMTP_HOST') || config.SMTP_HOST || 'smtp.gmail.com',
+    port: envConfig.get('SMTP_PORT') || config.SMTP_PORT || 587,
+    user: envConfig.get('SMTP_USER') || config.SMTP_USER || '',
+    pass: envConfig.get('SMTP_PASS') || config.SMTP_PASS || '',
+    fromEmail: envConfig.get('EMAIL_FROM') || config.EMAIL_FROM || 'no-reply@graphosai.com',
+    fromName: envConfig.get('EMAIL_FROM_NAME') || config.EMAIL_FROM_NAME || 'Graphos AI Studio'
+  };
+}
+
+// For backward compatibility - these will be updated when Firestore config loads
+let smtpHost = config.SMTP_HOST || 'smtp.gmail.com';
+let smtpPort = config.SMTP_PORT || 587;
+let smtpUser = config.SMTP_USER || '';
+let smtpPass = config.SMTP_PASS || '';
+let fromEmail = config.EMAIL_FROM || 'no-reply@graphosai.com';
+let fromName = config.EMAIL_FROM_NAME || 'Graphos AI Studio';
 
 // Log SMTP configuration (without sensitive data)
-logger.info('Email configuration loaded', {
+logger.info('Email configuration loaded (will update from Firestore)', {
   smtpHost,
   smtpPort,
   smtpUser: smtpUser ? `${smtpUser.substring(0, 3)}***` : 'NOT SET',
@@ -29,7 +42,21 @@ logger.info('Email configuration loaded', {
   fromName
 });
 
-// Email transporter
+// Create transporter lazily to get latest config
+function getTransporter() {
+  const smtp = getSmtpConfig();
+  return nodemailer.createTransport({
+    host: smtp.host,
+    port: smtp.port,
+    secure: smtp.port === 465,
+    auth: {
+      user: smtp.user,
+      pass: smtp.pass
+    }
+  });
+}
+
+// Legacy transporter for backward compatibility (will be replaced by getTransporter())
 const transporter = nodemailer.createTransport({
   host: smtpHost,
   port: smtpPort,
@@ -83,8 +110,9 @@ async function sendOTPEmail(email, code, type, userName, locale) {
   });
   
   try {
-    const result = await transporter.sendMail({
-      from: `"${fromName}" <${fromEmail}>`,
+    const smtp = getSmtpConfig();
+    const result = await getTransporter().sendMail({
+      from: `"${smtp.fromName}" <${smtp.fromEmail}>`,
       to: email,
       subject,
       html
@@ -291,8 +319,9 @@ exports.login = async (req, res) => {
           lang: locale || 'en'
         });
         
-        await transporter.sendMail({
-          from: `"${fromName}" <${fromEmail}>`,
+        const smtp = getSmtpConfig();
+        await getTransporter().sendMail({
+          from: `"${smtp.fromName}" <${smtp.fromEmail}>`,
           to: email,
           subject: 'New Device Login - Graphos AI Studio',
           html
@@ -635,8 +664,9 @@ exports.changePassword = async (req, res) => {
           lang: locale || 'en'
         });
         
-        await transporter.sendMail({
-          from: `"${fromName}" <${fromEmail}>`,
+        const smtp = getSmtpConfig();
+        await getTransporter().sendMail({
+          from: `"${smtp.fromName}" <${smtp.fromEmail}>`,
           to: req.user.email,
           subject: 'Password Changed - Graphos AI Studio',
           html

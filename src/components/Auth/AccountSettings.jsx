@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useUser, useAuthMethod, useHasGoogleLinked } from '../../stores/authStore'
-import { useAuth } from '../../contexts/AuthContext'
+import { useUser, useAuthMethod, useHasGoogleLinked, useAuth } from '../../stores/authStore'
 import { cn } from '../../lib/utils'
 import LinkGoogleAccount from './LinkGoogleAccount'
 import SecuritySettings from './SecuritySettings'

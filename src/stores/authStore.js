@@ -753,6 +753,56 @@ export const useHasGoogleLinked = () => useAuthStore((state) => state.hasGoogleL
 export const useAuthLoading = () => useAuthStore((state) => state.isLoading)
 export const useAuthError = () => useAuthStore((state) => state.error)
 
+/**
+ * useAuth - Drop-in replacement for AuthContext's useAuth hook
+ * Returns the same interface as the old AuthContext for backward compatibility
+ */
+export const useAuth = () => {
+  const user = useAuthStore((state) => state.user)
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const isLoading = useAuthStore((state) => state.isLoading)
+  const error = useAuthStore((state) => state.error)
+  const authMethod = useAuthStore((state) => state.authMethod)
+  const hasGoogleLinked = useAuthStore((state) => state.hasGoogleLinked)
+  const actions = useAuthActions()
+
+  return {
+    // State
+    user,
+    isAuthenticated,
+    isLoading,
+    error,
+    authMethod,
+    hasGoogleLinked,
+    
+    // Google auth
+    signIn: actions.signInWithGoogle,
+    signOut: actions.signOut,
+    
+    // Email auth
+    signInWithEmail: actions.signInWithEmail,
+    registerWithEmail: actions.registerWithEmail,
+    verifyEmail: actions.verifyEmail,
+    resendVerificationOTP: actions.resendVerificationOTP,
+    requestPasswordReset: actions.requestPasswordReset,
+    resetPassword: actions.resetPassword,
+    
+    // Password & account management
+    changePassword: actions.changePassword,
+    deleteAccount: actions.deleteAccount,
+    
+    // Session management
+    getActiveSessions: actions.getActiveSessions,
+    revokeSession: actions.revokeSession,
+    revokeAllOtherSessions: actions.revokeAllOtherSessions,
+    getLoginHistory: actions.getLoginHistory,
+    
+    // Google linking
+    linkGoogleAccount: actions.linkGoogleAccount,
+    unlinkGoogleAccount: actions.unlinkGoogleAccount,
+  }
+}
+
 export const useAuthActions = () => useAuthStore(
   useShallow((state) => ({
     initAuth: state.initAuth,

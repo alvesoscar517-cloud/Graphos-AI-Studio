@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
-import { useAuth } from './AuthContext'
+import { useAuth } from '../stores/authStore'
 import { logError } from '../utils/errors'
 
 const WorkspaceContext = createContext()

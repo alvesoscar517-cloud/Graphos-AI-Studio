@@ -15,7 +15,7 @@ import {
   useSyncNotes,
 } from '../hooks/queries/useNotes'
 import { queryKeys } from '../lib/queryKeys'
-import { useAuth } from './AuthContext'
+import { useAuth } from '../stores/authStore'
 import { useNotesStore } from '../stores/notesStore'
 import { logError } from '../utils/errors'
 

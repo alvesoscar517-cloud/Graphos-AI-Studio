@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useIsAuthenticated } from '../../stores/authStore'
-import { useAuth } from '../../contexts/AuthContext'
-import * as lottie from 'lottie-web'
+import { useIsAuthenticated, useAuth } from '../../stores/authStore'
 import EmailLoginForm from './EmailLoginForm'
 import EmailRegisterForm from './EmailRegisterFormV2'
 import OTPVerification from './OTPVerification'
@@ -111,7 +109,7 @@ const LoginOverlay = () => {
     }
   }, [shouldShow])
 
-  const loadAnimation = () => {
+  const loadAnimation = async () => {
     if (animationInstance.current) {
       animationInstance.current.destroy()
     }
@@ -120,7 +118,9 @@ const LoginOverlay = () => {
     const animationPath = '/animation/Loader cat.json'
 
     try {
-      animationInstance.current = lottie.loadAnimation({
+      // Lazy load lottie-web
+      const lottie = await import('lottie-web')
+      animationInstance.current = lottie.default.loadAnimation({
         container: animationContainer.current,
         renderer: 'svg',
         loop: true,

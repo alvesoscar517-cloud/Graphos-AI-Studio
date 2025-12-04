@@ -134,6 +134,12 @@ try {
   console.log('[STARTUP] ✓ realtime.controller');
 } catch (e) { console.error('[STARTUP] ✗ realtime.controller:', e.message); process.exit(1); }
 
+let envConfigService;
+try {
+  envConfigService = require('./src/services/envConfig.service');
+  console.log('[STARTUP] ✓ envConfig.service');
+} catch (e) { console.error('[STARTUP] ✗ envConfig.service:', e.message); process.exit(1); }
+
 console.log('[STARTUP] All dependencies loaded successfully!');
 
 // ============================================================================
@@ -403,6 +409,15 @@ async function startServer() {
         console.log('[STARTUP] ✓ Realtime events listener initialized');
       } catch (realtimeError) {
         console.warn('[STARTUP] ⚠ Realtime events listener failed:', realtimeError.message);
+      }
+      
+      // Initialize environment config from Firestore (async, non-blocking)
+      try {
+        const envConfigHelper = require('./src/config/envConfigHelper');
+        await envConfigHelper.loadFromFirestore();
+        console.log('[STARTUP] ✓ Environment config loaded from Firestore');
+      } catch (envError) {
+        console.warn('[STARTUP] ⚠ Environment config from Firestore failed, using process.env:', envError.message);
       }
       console.log('');
       console.log('========================================================');

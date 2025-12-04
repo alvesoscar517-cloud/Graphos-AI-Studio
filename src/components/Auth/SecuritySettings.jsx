@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useAuthMethod } from '../../stores/authStore'
-import { useAuth } from '../../contexts/AuthContext'
+import { useAuthMethod, useAuth } from '../../stores/authStore'
 import { cn } from '../../lib/utils'
 import ChangePasswordV2 from './ChangePasswordV2'
 

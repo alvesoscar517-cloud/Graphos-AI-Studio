@@ -1,258 +1,409 @@
 /**
- * Cache Service - Powered by ioredis, keyv, and lru-cache
- * Multi-tier caching with Redis backend and LRU memory fallback
+ * Unified Cache Service
+ * 
+ * MERGED: redis.service.js + cache.service.js
+ * Single source of truth for all caching operations
+ * 
+ * Features:
+ * - Redis distributed cache with ioredis
+ * - LRU memory fallback for Cloud Run cold starts
+ * - Specialized caches (profile, analysis, embedding, session)
+ * - Rate limiting with sliding window
+ * - Automatic cleanup and eviction
  * 
  * @module services/cache
  */
 
-const KeyvModule = require('keyv');
-const KeyvRedisModule = require('@keyv/redis');
+const Redis = require('ioredis');
 const { createLRUCache, createAutoCleanupCache } = require('../utils/lruCache');
 const logger = require('../utils/logger');
-
-// Handle both ESM and CJS exports
-const Keyv = KeyvModule.default || KeyvModule;
-const KeyvRedis = KeyvRedisModule.default || KeyvRedisModule;
+const envConfig = require('../config/envConfigHelper');
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes
-const PROFILE_TTL = 5 * 60 * 1000; // 5 minutes
-const ANALYSIS_TTL = 10 * 60 * 1000; // 10 minutes
+// Use lazy getter for REDIS_URL to support Firestore config
+const getRedisUrl = () => envConfig.get('REDIS_URL') || 'redis://localhost:6379';
+const MAX_RETRIES = 10;
+const RETRY_DELAY = 100;
+
+// TTL Configuration (in milliseconds for memory, seconds for Redis)
+const TTL = {
+  DEFAULT: 5 * 60,        // 5 minutes
+  PROFILE: 5 * 60,        // 5 minutes
+  ANALYSIS: 10 * 60,      // 10 minutes
+  EMBEDDING: 24 * 60 * 60, // 24 hours
+  SESSION: 60 * 60,       // 1 hour
+};
+
 const MAX_MEMORY_CACHE_SIZE = 1000;
 
 // ============================================================================
-// CACHE INSTANCES
+// REDIS CLIENT
 // ============================================================================
 
-let redisStore = null;
-let isRedisConnected = false;
-
-// LRU memory cache with automatic cleanup (replaces simple Map)
-const memoryCache = createAutoCleanupCache({
-  maxSize: MAX_MEMORY_CACHE_SIZE,
-  maxAge: DEFAULT_TTL,
-  onEvict: (key, value, reason) => {
-    logger.debug('Memory cache eviction', { key, reason });
-  }
-}, 60000); // Cleanup every minute
+let redisClient = null;
+let isConnected = false;
+let cleanupInterval = null;
 
 /**
- * Initialize Redis connection
+ * Initialize Redis connection with ioredis
+ * Optimized for Cloud Run with lazy connect
  */
-function initializeRedis() {
-  try {
-    redisStore = new KeyvRedis(REDIS_URL);
-    
-    redisStore.on('error', (err) => {
-      logger.warn('Redis cache error, falling back to memory', { error: err.message });
-      isRedisConnected = false;
-    });
-    
-    isRedisConnected = true;
-    logger.info('Cache service Redis connected');
-  } catch (error) {
-    logger.warn('Failed to connect to Redis, using memory cache', { error: error.message });
-    isRedisConnected = false;
-  }
-}
-
-// Initialize on module load
-initializeRedis();
-
-/**
- * Create Keyv instance with namespace
- * @param {string} namespace - Cache namespace
- * @param {number} ttl - Time to live in milliseconds
- * @returns {Keyv} Keyv instance
- */
-function createCache(namespace, ttl = DEFAULT_TTL) {
-  if (isRedisConnected && redisStore) {
-    return new Keyv({
-      store: redisStore,
-      namespace,
-      ttl
-    });
+async function initRedis() {
+  const redisUrl = getRedisUrl();
+  if (!redisUrl || redisUrl === 'redis://localhost:6379') {
+    // Only skip if truly not configured (empty or default localhost)
+    const configuredUrl = envConfig.get('REDIS_URL');
+    if (!configuredUrl) {
+      logger.info('[CACHE] Redis URL not configured, using memory cache only');
+      return false;
+    }
   }
   
-  // Memory fallback
-  return new Keyv({
-    namespace,
-    ttl
-  });
+  try {
+    redisClient = new Redis(getRedisUrl(), {
+      lazyConnect: true,
+      maxRetriesPerRequest: 3,
+      retryStrategy: (times) => {
+        if (times > MAX_RETRIES) {
+          logger.error('[CACHE] Redis max reconnection attempts reached');
+          return null;
+        }
+        return Math.min(times * RETRY_DELAY, 3000);
+      },
+      enableReadyCheck: true,
+      enableOfflineQueue: true,
+      connectTimeout: 10000,
+      keepAlive: 30000,
+      reconnectOnError: (err) => {
+        const targetErrors = ['READONLY', 'ECONNRESET', 'ETIMEDOUT'];
+        return targetErrors.some(e => err.message.includes(e));
+      }
+    });
+    
+    redisClient.on('error', (err) => {
+      logger.error('[CACHE] Redis error', { error: err.message });
+      isConnected = false;
+    });
+    
+    redisClient.on('ready', () => {
+      logger.info('[CACHE] Redis ready');
+      isConnected = true;
+    });
+    
+    redisClient.on('close', () => {
+      logger.info('[CACHE] Redis connection closed');
+      isConnected = false;
+    });
+    
+    await redisClient.connect();
+    await redisClient.ping();
+    isConnected = true;
+    
+    logger.info('[CACHE] Redis initialized successfully');
+    return true;
+  } catch (error) {
+    logger.warn('[CACHE] Redis initialization failed, using memory fallback', { 
+      error: error.message 
+    });
+    isConnected = false;
+    return false;
+  }
 }
 
-// Create namespaced caches
-const profileCache = createCache('profile', PROFILE_TTL);
-const analysisCache = createCache('analysis', ANALYSIS_TTL);
-const generalCache = createCache('general', DEFAULT_TTL);
+function getClient() {
+  return redisClient;
+}
+
+async function close() {
+  if (cleanupInterval) {
+    clearInterval(cleanupInterval);
+    cleanupInterval = null;
+  }
+  
+  if (redisClient) {
+    try {
+      await redisClient.quit();
+      logger.info('[CACHE] Redis connection closed gracefully');
+    } catch (error) {
+      redisClient.disconnect();
+    }
+    redisClient = null;
+    isConnected = false;
+  }
+}
+
+function isAvailable() {
+  return isConnected && redisClient !== null && redisClient.status === 'ready';
+}
+
+// ============================================================================
+// MEMORY CACHE (LRU with auto cleanup)
+// ============================================================================
+
+const memoryCache = createAutoCleanupCache({
+  maxSize: MAX_MEMORY_CACHE_SIZE,
+  maxAge: TTL.DEFAULT * 1000,
+  onEvict: (key, value, reason) => {
+    logger.debug('[CACHE] Memory eviction', { key, reason });
+  }
+}, 60000);
 
 // ============================================================================
 // CORE CACHE OPERATIONS
 // ============================================================================
 
 /**
- * Get value from cache
- * @param {string} key - Cache key
- * @param {string} namespace - Cache namespace
- * @returns {Promise<*>} Cached value or undefined
+ * Get value from cache (Redis first, then memory)
  */
-async function getCache(key, namespace = 'general') {
+async function get(key) {
   try {
-    const cache = namespace === 'profile' ? profileCache :
-                  namespace === 'analysis' ? analysisCache : generalCache;
-    
-    const value = await cache.get(key);
-    
-    if (value !== undefined) {
-      logger.debug('Cache HIT', { key, namespace });
-    } else {
-      logger.debug('Cache MISS', { key, namespace });
+    if (isAvailable()) {
+      const value = await redisClient.get(key);
+      if (value) {
+        try {
+          return JSON.parse(value);
+        } catch {
+          return value;
+        }
+      }
     }
-    
-    return value;
+    return memoryCache.get(key) || null;
   } catch (error) {
-    logger.warn('Cache get error', { key, namespace, error: error.message });
-    return getFromMemory(key, namespace);
+    logger.warn('[CACHE] Get error', { key, error: error.message });
+    return memoryCache.get(key) || null;
   }
 }
 
 /**
- * Set value in cache
- * @param {string} key - Cache key
- * @param {*} value - Value to cache
- * @param {number} ttl - Time to live in milliseconds
- * @param {string} namespace - Cache namespace
- * @returns {Promise<boolean>} Success status
+ * Set value in cache (both Redis and memory)
  */
-async function setCache(key, value, ttl = DEFAULT_TTL, namespace = 'general') {
+async function set(key, value, ttlSeconds = TTL.DEFAULT) {
   try {
-    const cache = namespace === 'profile' ? profileCache :
-                  namespace === 'analysis' ? analysisCache : generalCache;
+    const serialized = JSON.stringify(value);
     
-    await cache.set(key, value, ttl);
-    logger.debug('Cache SET', { key, namespace, ttl });
+    if (isAvailable()) {
+      await redisClient.setex(key, ttlSeconds, serialized);
+    }
     
-    // Also set in memory for fast access
-    setInMemory(key, value, ttl, namespace);
-    
+    memoryCache.set(key, value, ttlSeconds * 1000);
     return true;
   } catch (error) {
-    logger.warn('Cache set error', { key, namespace, error: error.message });
-    setInMemory(key, value, ttl, namespace);
+    logger.warn('[CACHE] Set error', { key, error: error.message });
+    memoryCache.set(key, value, ttlSeconds * 1000);
     return false;
   }
 }
 
 /**
  * Delete value from cache
- * @param {string} key - Cache key
- * @param {string} namespace - Cache namespace
- * @returns {Promise<boolean>} Success status
  */
-async function deleteCache(key, namespace = 'general') {
+async function del(key) {
   try {
-    const cache = namespace === 'profile' ? profileCache :
-                  namespace === 'analysis' ? analysisCache : generalCache;
-    
-    await cache.delete(key);
-    deleteFromMemory(key, namespace);
-    
-    logger.debug('Cache DELETE', { key, namespace });
+    if (isAvailable()) {
+      await redisClient.del(key);
+    }
+    memoryCache.delete(key);
     return true;
   } catch (error) {
-    logger.warn('Cache delete error', { key, namespace, error: error.message });
-    deleteFromMemory(key, namespace);
+    logger.warn('[CACHE] Delete error', { key, error: error.message });
+    memoryCache.delete(key);
     return false;
   }
 }
 
 /**
- * Clear all cache in namespace
- * @param {string} namespace - Cache namespace
- * @returns {Promise<boolean>} Success status
+ * Check if key exists
  */
-async function clearCache(namespace = 'general') {
+async function exists(key) {
   try {
-    const cache = namespace === 'profile' ? profileCache :
-                  namespace === 'analysis' ? analysisCache : generalCache;
+    if (isAvailable()) {
+      return (await redisClient.exists(key)) === 1;
+    }
+    return memoryCache.has(key);
+  } catch (error) {
+    return memoryCache.has(key);
+  }
+}
+
+/**
+ * Set only if not exists (for locks)
+ */
+async function setNX(key, value, ttlSeconds = 60) {
+  try {
+    if (isAvailable()) {
+      const result = await redisClient.set(key, JSON.stringify(value), 'EX', ttlSeconds, 'NX');
+      return result === 'OK';
+    }
     
-    await cache.clear();
-    clearMemoryNamespace(namespace);
+    if (memoryCache.has(key)) {
+      return false;
+    }
     
-    logger.info('Cache CLEAR', { namespace });
+    memoryCache.set(key, value, ttlSeconds * 1000);
     return true;
   } catch (error) {
-    logger.warn('Cache clear error', { namespace, error: error.message });
+    logger.warn('[CACHE] SetNX error', { key, error: error.message });
     return false;
   }
 }
 
+/**
+ * Increment counter
+ */
+async function incr(key, amount = 1) {
+  try {
+    if (isAvailable()) {
+      return amount === 1 
+        ? await redisClient.incr(key)
+        : await redisClient.incrby(key, amount);
+    }
+    
+    const current = memoryCache.get(key) || 0;
+    const newValue = current + amount;
+    memoryCache.set(key, newValue);
+    return newValue;
+  } catch (error) {
+    logger.warn('[CACHE] Incr error', { key, error: error.message });
+    return 0;
+  }
+}
+
 // ============================================================================
-// MEMORY CACHE HELPERS (using LRU cache)
+// RATE LIMITING
 // ============================================================================
 
-function getMemoryKey(key, namespace) {
-  return `${namespace}:${key}`;
-}
+const rateLimitMemory = new Map();
 
-function getFromMemory(key, namespace) {
-  const memKey = getMemoryKey(key, namespace);
-  return memoryCache.get(memKey);
-}
+const rateLimit = {
+  async check(key, limit, windowSeconds) {
+    const fullKey = `ratelimit:${key}`;
+    const now = Date.now();
+    const windowMs = windowSeconds * 1000;
+    
+    try {
+      if (isAvailable()) {
+        const pipeline = redisClient.pipeline();
+        pipeline.zremrangebyscore(fullKey, 0, now - windowMs);
+        pipeline.zadd(fullKey, now, `${now}-${Math.random()}`);
+        pipeline.zcard(fullKey);
+        pipeline.expire(fullKey, windowSeconds);
+        
+        const results = await pipeline.exec();
+        const count = results[2][1];
+        
+        return {
+          allowed: count <= limit,
+          remaining: Math.max(0, limit - count),
+          resetAt: now + windowMs
+        };
+      }
+      
+      if (!rateLimitMemory.has(fullKey)) {
+        rateLimitMemory.set(fullKey, []);
+      }
+      
+      const requests = rateLimitMemory.get(fullKey);
+      const validRequests = requests.filter(t => now - t < windowMs);
+      validRequests.push(now);
+      rateLimitMemory.set(fullKey, validRequests);
+      
+      return {
+        allowed: validRequests.length <= limit,
+        remaining: Math.max(0, limit - validRequests.length),
+        resetAt: now + windowMs
+      };
+    } catch (error) {
+      logger.warn('[CACHE] Rate limit error', { key, error: error.message });
+      return { allowed: true, remaining: limit, resetAt: now + windowMs };
+    }
+  },
+  
+  async reset(key) {
+    const fullKey = `ratelimit:${key}`;
+    await del(fullKey);
+    rateLimitMemory.delete(fullKey);
+  }
+};
 
-function setInMemory(key, value, ttl, namespace) {
-  const memKey = getMemoryKey(key, namespace);
-  // LRU cache handles size limits automatically
-  memoryCache.set(memKey, value, ttl);
-}
+// ============================================================================
+// SPECIALIZED CACHES
+// ============================================================================
 
-function deleteFromMemory(key, namespace) {
-  const memKey = getMemoryKey(key, namespace);
-  memoryCache.delete(memKey);
-}
+const embeddingCache = {
+  async get(textHash, taskType) {
+    return get(`embedding:${taskType}:${textHash}`);
+  },
+  async set(textHash, taskType, embedding) {
+    return set(`embedding:${taskType}:${textHash}`, embedding, TTL.EMBEDDING);
+  }
+};
 
-function clearMemoryNamespace(namespace) {
-  const keys = memoryCache.keys();
-  for (const key of keys) {
-    if (key.startsWith(`${namespace}:`)) {
-      memoryCache.delete(key);
+const sessionCache = {
+  async get(userId) {
+    return get(`session:${userId}`);
+  },
+  async set(userId, data, ttlSeconds = TTL.SESSION) {
+    return set(`session:${userId}`, data, ttlSeconds);
+  },
+  async delete(userId) {
+    return del(`session:${userId}`);
+  }
+};
+
+const profileCache = {
+  async get(profileId) {
+    return get(`profile:${profileId}`);
+  },
+  async set(profileId, data) {
+    return set(`profile:${profileId}`, data, TTL.PROFILE);
+  },
+  async invalidate(profileId) {
+    await del(`profile:${profileId}`);
+    await del(`centroid:${profileId}`);
+  }
+};
+
+const analysisCache = {
+  async get(profileId, textHash) {
+    return get(`analysis:${profileId}:${textHash}`);
+  },
+  async set(profileId, textHash, result) {
+    return set(`analysis:${profileId}:${textHash}`, result, TTL.ANALYSIS);
+  },
+  async invalidateProfile(profileId) {
+    if (isAvailable()) {
+      try {
+        let cursor = '0';
+        do {
+          const [newCursor, keys] = await redisClient.scan(
+            cursor, 'MATCH', `analysis:${profileId}:*`, 'COUNT', 100
+          );
+          cursor = newCursor;
+          if (keys.length > 0) {
+            await redisClient.del(...keys);
+          }
+        } while (cursor !== '0');
+        logger.info('[CACHE] Analysis cache invalidated', { profileId });
+      } catch (error) {
+        logger.warn('[CACHE] Failed to invalidate analysis cache', { profileId, error: error.message });
+      }
+    }
+    
+    for (const key of memoryCache.keys()) {
+      if (key.startsWith(`analysis:${profileId}:`)) {
+        memoryCache.delete(key);
+      }
     }
   }
-}
+};
 
 // ============================================================================
-// LEGACY COMPATIBILITY FUNCTIONS
+// UTILITIES
 // ============================================================================
 
-/**
- * Get cached profile (legacy)
- */
-async function getCachedProfile(profileId) {
-  return getCache(profileId, 'profile');
-}
-
-/**
- * Set cached profile (legacy)
- */
-async function setCachedProfile(profileId, data) {
-  return setCache(profileId, data, PROFILE_TTL, 'profile');
-}
-
-/**
- * Invalidate profile cache (legacy)
- */
-async function invalidateProfileCache(profileId) {
-  await deleteCache(profileId, 'profile');
-  await deleteCache(`centroid:${profileId}`, 'profile');
-}
-
-/**
- * Hash text for cache key
- */
 function hashText(text) {
   let hash = 0;
   for (let i = 0; i < text.length; i++) {
@@ -263,92 +414,106 @@ function hashText(text) {
   return hash.toString();
 }
 
-/**
- * Get cached analysis (legacy)
- */
-async function getCachedAnalysis(profileId, text) {
-  const key = `${profileId}_${hashText(text)}`;
-  return getCache(key, 'analysis');
-}
-
-/**
- * Set cached analysis (legacy)
- */
-async function setCachedAnalysis(profileId, text, result) {
-  const key = `${profileId}_${hashText(text)}`;
-  return setCache(key, result, ANALYSIS_TTL, 'analysis');
-}
-
-// ============================================================================
-// CACHE UTILITIES
-// ============================================================================
-
-/**
- * Get cache statistics
- * @returns {Object} Cache statistics
- */
-function getCacheStats() {
-  const lruStats = memoryCache.getStats();
+function getStats() {
+  const lruStats = memoryCache.getStats ? memoryCache.getStats() : { size: memoryCache.size };
   return {
-    memorySize: memoryCache.size,
-    memoryMaxSize: lruStats.maxSize,
-    memoryUtilization: lruStats.utilization,
-    redisConnected: isRedisConnected
+    redisConnected: isAvailable(),
+    redisStatus: redisClient?.status || 'not_initialized',
+    memoryCacheSize: lruStats.size || memoryCache.size,
+    maxMemoryCacheSize: MAX_MEMORY_CACHE_SIZE
   };
 }
 
 /**
  * Wrap function with caching
- * @param {Function} fn - Function to wrap
- * @param {Function} keyGenerator - Function to generate cache key
- * @param {Object} options - Cache options
- * @returns {Function} Wrapped function
  */
 function withCache(fn, keyGenerator, options = {}) {
-  const { ttl = DEFAULT_TTL, namespace = 'general' } = options;
+  const { ttl = TTL.DEFAULT, namespace = 'general' } = options;
   
   return async (...args) => {
-    const key = keyGenerator(...args);
-    
-    // Try to get from cache
-    const cached = await getCache(key, namespace);
-    if (cached !== undefined) {
+    const key = `${namespace}:${keyGenerator(...args)}`;
+    const cached = await get(key);
+    if (cached !== undefined && cached !== null) {
       return cached;
     }
-    
-    // Execute function and cache result
     const result = await fn(...args);
-    await setCache(key, result, ttl, namespace);
-    
+    await set(key, result, ttl);
     return result;
   };
 }
+
+// ============================================================================
+// LEGACY COMPATIBILITY (for cache.service.js consumers)
+// ============================================================================
+
+const getCache = get;
+const setCache = set;
+const deleteCache = del;
+const clearCache = async (namespace) => {
+  logger.info('[CACHE] Clear namespace', { namespace });
+  // Clear memory cache for namespace
+  for (const key of memoryCache.keys()) {
+    if (key.startsWith(`${namespace}:`)) {
+      memoryCache.delete(key);
+    }
+  }
+  return true;
+};
+
+// Legacy profile functions
+const getCachedProfile = (profileId) => profileCache.get(profileId);
+const setCachedProfile = (profileId, data) => profileCache.set(profileId, data);
+const invalidateProfileCache = (profileId) => profileCache.invalidate(profileId);
+
+// Legacy analysis functions
+const getCachedAnalysis = (profileId, text) => analysisCache.get(profileId, hashText(text));
+const setCachedAnalysis = (profileId, text, result) => analysisCache.set(profileId, hashText(text), result);
 
 // ============================================================================
 // EXPORTS
 // ============================================================================
 
 module.exports = {
+  // Lifecycle
+  initRedis,
+  close,
+  isAvailable,
+  getClient,
+  
   // Core operations
+  get,
+  set,
+  del,
+  exists,
+  setNX,
+  incr,
+  
+  // Specialized caches
+  rateLimit,
+  embeddingCache,
+  sessionCache,
+  profileCache,
+  analysisCache,
+  
+  // Utilities
+  hashText,
+  getStats,
+  withCache,
+  
+  // Legacy compatibility (cache.service.js interface)
   getCache,
   setCache,
   deleteCache,
   clearCache,
-  
-  // Legacy compatibility
   getCachedProfile,
   setCachedProfile,
   invalidateProfileCache,
   getCachedAnalysis,
   setCachedAnalysis,
   
-  // Utilities
-  getCacheStats,
-  withCache,
-  hashText,
-  
-  // Configuration
-  DEFAULT_TTL,
-  PROFILE_TTL,
-  ANALYSIS_TTL
+  // TTL constants
+  TTL,
+  DEFAULT_TTL: TTL.DEFAULT * 1000,
+  PROFILE_TTL: TTL.PROFILE * 1000,
+  ANALYSIS_TTL: TTL.ANALYSIS * 1000,
 };

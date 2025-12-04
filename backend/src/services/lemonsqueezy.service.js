@@ -10,14 +10,31 @@ const logger = require('../utils/logger');
 const { httpClient } = require('../utils/httpClient');
 const { lemonSqueezyBreaker } = require('../utils/circuitBreaker');
 
+const envConfig = require('../config/envConfigHelper');
+
 const LEMON_SQUEEZY_API_URL = 'https://api.lemonsqueezy.com/v1';
 const LEMON_SQUEEZY_LICENSE_URL = 'https://api.lemonsqueezy.com/v1/licenses';
 
 class LemonSqueezyService {
   constructor() {
-    this.apiKey = process.env.LEMON_SQUEEZY_API_KEY;
-    this.storeId = process.env.LEMON_SQUEEZY_STORE_ID;
-    this.webhookSecret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET;
+    // These will be loaded from Firestore after server starts
+    // Initial values from process.env for bootstrap
+    this._apiKey = null;
+    this._storeId = null;
+    this._webhookSecret = null;
+  }
+
+  // Lazy getters to always get latest config
+  get apiKey() {
+    return envConfig.get('LEMON_SQUEEZY_API_KEY') || this._apiKey;
+  }
+
+  get storeId() {
+    return envConfig.get('LEMON_SQUEEZY_STORE_ID') || this._storeId;
+  }
+
+  get webhookSecret() {
+    return envConfig.get('LEMON_SQUEEZY_WEBHOOK_SECRET') || this._webhookSecret;
   }
 
   getHeaders() {

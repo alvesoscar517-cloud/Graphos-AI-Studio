@@ -12,6 +12,7 @@ const logger = require('../utils/logger');
 const realtimeController = require('./realtime.controller');
 const autoNotification = require('../services/autoNotification.service');
 const { createLocalizer } = require('../utils/localized-messages.util');
+const envConfig = require('../config/envConfigHelper');
 
 // Webhook event types
 const WEBHOOK_EVENTS = {
@@ -39,13 +40,16 @@ exports.createCheckout = async (req, res) => {
   try {
     const { variantId, packageId, userId, email } = req.body;
 
+    const apiKey = envConfig.get('LEMON_SQUEEZY_API_KEY');
+    const storeId = envConfig.get('LEMON_SQUEEZY_STORE_ID');
+
     logger.info('Checkout request received', { 
       variantId, 
       packageId, 
       userId, 
       email,
-      hasApiKey: !!process.env.LEMON_SQUEEZY_API_KEY,
-      hasStoreId: !!process.env.LEMON_SQUEEZY_STORE_ID
+      hasApiKey: !!apiKey,
+      hasStoreId: !!storeId
     });
 
     if (!variantId || !userId) {
@@ -57,10 +61,10 @@ exports.createCheckout = async (req, res) => {
     }
 
     // Check if LemonSqueezy is configured
-    if (!process.env.LEMON_SQUEEZY_API_KEY || !process.env.LEMON_SQUEEZY_STORE_ID) {
+    if (!apiKey || !storeId) {
       logger.error('LemonSqueezy not configured', {
-        hasApiKey: !!process.env.LEMON_SQUEEZY_API_KEY,
-        hasStoreId: !!process.env.LEMON_SQUEEZY_STORE_ID
+        hasApiKey: !!apiKey,
+        hasStoreId: !!storeId
       });
       return res.status(503).json({ 
         success: false, 
@@ -110,7 +114,7 @@ exports.handleWebhook = async (req, res) => {
     });
 
     // Verify webhook signature (skip in test mode if no secret configured)
-    const webhookSecret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET;
+    const webhookSecret = envConfig.get('LEMON_SQUEEZY_WEBHOOK_SECRET');
     if (webhookSecret && signature) {
       if (!lemonSqueezy.verifyWebhookSignature(rawBody, signature)) {
         logger.warn('Invalid webhook signature', { signature: signature?.substring(0, 20) + '...' });

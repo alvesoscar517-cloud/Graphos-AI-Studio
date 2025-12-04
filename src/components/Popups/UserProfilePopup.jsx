@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useUser } from '../../stores/authStore'
-import { useAuth } from '../../contexts/AuthContext'
+import { useUser, useAuth } from '../../stores/authStore'
 import CreditBalance from '../CreditBalance'
 import UpgradePlanModal from '../UpgradePlanModal'
 import Icon from '../Common/Icon'
