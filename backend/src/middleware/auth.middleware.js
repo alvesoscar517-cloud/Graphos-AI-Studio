@@ -1,9 +1,13 @@
 /**
- * Authentication Middleware (Simplified)
+ * Authentication Middleware (Optimized)
  * 
- * Supports only 2 token types:
+ * Supports 2 token types with smart detection:
  * 1. Firebase ID Token - for Google OAuth users
  * 2. JWT Token (type: email_auth) - for email/password users
+ * 
+ * OPTIMIZATION: Uses X-Auth-Type header hint to avoid double verification.
+ * If header is provided, only verifies the specified token type.
+ * Falls back to trying both types if header is missing (backward compatible).
  * 
  * Legacy tokens (direct_, Firebase custom token) are no longer supported.
  */
@@ -19,12 +23,19 @@ const { db } = require('../config/firebase');
 
 const JWT_SECRET = config.JWT_SECRET;
 
+// Auth type constants
+const AUTH_TYPE = {
+  EMAIL: 'email',    // JWT token for email/password users
+  GOOGLE: 'google',  // Firebase ID token for Google OAuth users
+};
+
 /**
  * Verify Firebase ID Token (for Google OAuth users)
  * @param {string} idToken - Firebase ID token from client
+ * @param {boolean} silent - If true, don't log errors (for fallback attempts)
  * @returns {Promise<Object|null>} - Decoded token or null
  */
-async function verifyFirebaseToken(idToken) {
+async function verifyFirebaseToken(idToken, silent = false) {
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     return {
@@ -36,6 +47,12 @@ async function verifyFirebaseToken(idToken) {
       authType: 'firebase'
     };
   } catch (error) {
+    if (!silent) {
+      logger.debug('Firebase token verification failed', { 
+        code: error.code,
+        message: error.message?.substring(0, 100)
+      });
+    }
     return null;
   }
 }
@@ -47,14 +64,18 @@ async function verifyFirebaseToken(idToken) {
  * Locked/deleted status is checked only during token refresh.
  * 
  * @param {string} token - JWT token
+ * @param {boolean} silent - If true, don't log errors (for fallback attempts)
  * @returns {Object|null} - User info or null (sync, no DB call)
  */
-function verifyJWTToken(token) {
+function verifyJWTToken(token, silent = false) {
   try {
     const decoded = jwt.verify(token, JWT_SECRET, { issuer: 'graphosai' });
 
     // Must be email_auth type
     if (decoded.type !== 'email_auth' || !decoded.userId) {
+      if (!silent) {
+        logger.debug('JWT token invalid type', { type: decoded.type });
+      }
       return null;
     }
 
@@ -69,8 +90,15 @@ function verifyJWTToken(token) {
       authType: 'jwt'
     };
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      logger.debug('JWT token expired');
+    if (!silent) {
+      if (error.name === 'TokenExpiredError') {
+        logger.debug('JWT token expired');
+      } else {
+        logger.debug('JWT verification failed', { 
+          name: error.name,
+          message: error.message?.substring(0, 50)
+        });
+      }
     }
     return null;
   }
@@ -93,24 +121,46 @@ function extractBearerToken(authHeader) {
 
 /**
  * Determine token type and verify accordingly
+ * 
+ * OPTIMIZED: Uses authTypeHint to avoid double verification.
+ * - If hint is 'email', only try JWT verification
+ * - If hint is 'google', only try Firebase verification
+ * - If no hint, try JWT first then Firebase (backward compatible)
+ * 
  * @param {string} token - Token to verify
+ * @param {string|null} authTypeHint - Optional hint: 'email' or 'google'
  * @returns {Promise<Object|null>} - User info or null
  */
-async function verifyToken(token) {
+async function verifyToken(token, authTypeHint = null) {
   if (!token) return null;
   
-  // JWT tokens from our system start with 'eyJ' (base64 of '{"')
-  // and have issuer 'graphosai'
-  if (token.startsWith('eyJ')) {
-    // Try JWT first (most common for email users)
-    const jwtUser = await verifyJWTToken(token);
-    if (jwtUser) return jwtUser;
-    
-    // If JWT fails, try Firebase ID token (for Google users)
-    const firebaseUser = await verifyFirebaseToken(token);
-    if (firebaseUser) return firebaseUser;
+  // All our tokens start with 'eyJ' (base64 of '{"')
+  if (!token.startsWith('eyJ')) {
+    return null;
   }
   
+  // If auth type hint is provided, only verify that type
+  if (authTypeHint === AUTH_TYPE.EMAIL) {
+    // Only try JWT for email auth
+    return verifyJWTToken(token, false);
+  }
+  
+  if (authTypeHint === AUTH_TYPE.GOOGLE) {
+    // Only try Firebase for Google auth
+    return await verifyFirebaseToken(token, false);
+  }
+  
+  // No hint provided - try both (backward compatible)
+  // Try JWT first (most common for email users, faster - no network call)
+  const jwtUser = verifyJWTToken(token, true); // silent mode
+  if (jwtUser) return jwtUser;
+  
+  // If JWT fails, try Firebase ID token (for Google users)
+  const firebaseUser = await verifyFirebaseToken(token, true); // silent mode
+  if (firebaseUser) return firebaseUser;
+  
+  // Both failed - log once
+  logger.debug('Token verification failed for both JWT and Firebase');
   return null;
 }
 
@@ -121,6 +171,11 @@ async function verifyToken(token) {
  * 1. Bearer token in Authorization header (JWT or Firebase ID token)
  * 2. Token in query param (for SSE/EventSource)
  * 3. API key in X-API-Key header (for service-to-service)
+ * 
+ * OPTIMIZATION: Uses X-Auth-Type header to determine token type:
+ * - 'email' = JWT token (email/password users)
+ * - 'google' = Firebase ID token (Google OAuth users)
+ * - If not provided, tries both types (backward compatible)
  * 
  * @param {import('express').Request} req
  * @param {import('express').Response} res
@@ -138,7 +193,11 @@ async function authenticate(req, res, next) {
     }
     
     if (token) {
-      const user = await verifyToken(token);
+      // Get auth type hint from header (optimization)
+      // This avoids trying both JWT and Firebase verification
+      const authTypeHint = req.headers['x-auth-type'] || req.query.authType || null;
+      
+      const user = await verifyToken(token, authTypeHint);
       if (user) {
         req.user = user;
         req.userId = user.userId;
@@ -188,7 +247,10 @@ async function optionalAuth(req, res, next) {
     const token = extractBearerToken(authHeader);
     
     if (token) {
-      const user = await verifyToken(token);
+      // Get auth type hint from header (optimization)
+      const authTypeHint = req.headers['x-auth-type'] || null;
+      
+      const user = await verifyToken(token, authTypeHint);
       if (user) {
         req.user = user;
         req.userId = user.userId;

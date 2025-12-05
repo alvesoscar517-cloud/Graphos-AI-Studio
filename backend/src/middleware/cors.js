@@ -89,7 +89,8 @@ const corsOptions = {
     'X-API-Key',
     'X-Request-ID',
     'X-Correlation-ID',
-    'X-Source'
+    'X-Source',
+    'X-Auth-Type'
   ],
   
   exposedHeaders: [

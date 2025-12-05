@@ -48,9 +48,10 @@ class RealtimeService {
   }
 
   /**
-   * Get auth token from tokenService (properly decrypted)
+   * Get auth token and type from tokenService (properly decrypted)
+   * @returns {Promise<{token: string|null, authType: 'email'|'google'|null}>}
    */
-  async getAuthToken() {
+  async getAuthTokenWithType() {
     try {
       // Use tokenService for proper token handling (decryption + auto-refresh)
       const { tokenService } = await import('./tokenService');
@@ -59,22 +60,33 @@ class RealtimeService {
       const authMethod = getAuthMethod();
       if (authMethod === 'email') {
         const token = await tokenService.getValidToken();
-        if (token) return token;
+        if (token) return { token, authType: 'email' };
       }
     } catch (err) {
       console.warn('[RealtimeService] Failed to get token from tokenService:', err.message);
     }
     
-    // Fallback to Chrome extension
+    // Fallback to Chrome extension (Google OAuth)
     try {
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
         const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' });
-        return response?.token || null;
+        if (response?.token) {
+          return { token: response.token, authType: 'google' };
+        }
       }
     } catch {
       // Not in extension context
     }
-    return null;
+    return { token: null, authType: null };
+  }
+  
+  /**
+   * Get auth token from tokenService (properly decrypted)
+   * @deprecated Use getAuthTokenWithType() instead
+   */
+  async getAuthToken() {
+    const { token } = await this.getAuthTokenWithType();
+    return token;
   }
 
   /**
@@ -132,15 +144,25 @@ class RealtimeService {
 
     console.log('[RealtimeService] Connecting...', { userId, attempt: this.reconnectAttempts + 1 });
 
-    // Build URL with auth token
+    // Build URL with auth token and type hint
     let url = `${CONFIG.API_BASE_URL}/api/realtime/events/${userId}`;
-    const authToken = await this.getAuthToken();
+    const { token: authToken, authType } = await this.getAuthTokenWithType();
+    
+    const params = new URLSearchParams();
     if (authToken) {
-      url += `?token=${encodeURIComponent(authToken)}`;
+      params.set('token', authToken);
+      // Add auth type hint for backend optimization
+      if (authType) {
+        params.set('authType', authType);
+      }
+    }
+    if (this.lastEventId) {
+      params.set('lastEventId', this.lastEventId);
     }
     
-    if (this.lastEventId) {
-      url += `${authToken ? '&' : '?'}lastEventId=${this.lastEventId}`;
+    const queryString = params.toString();
+    if (queryString) {
+      url += `?${queryString}`;
     }
 
     try {

@@ -22,8 +22,17 @@ import {
 
 const API_BASE_URL = CONFIG.API_BASE_URL || 'https://graphosai-472729326429.us-central1.run.app'
 
-// Refresh token 5 minutes before expiry
-const REFRESH_THRESHOLD_MS = 5 * 60 * 1000
+/**
+ * Token refresh configuration
+ * 
+ * REFRESH_THRESHOLD: How early to refresh before expiry
+ * - For 1h token: 5 minutes is good (8% of lifetime)
+ * - For 7d token (rememberMe): 1 hour is better (0.6% of lifetime)
+ * 
+ * We use 5 minutes as default since most tokens are 1h
+ * The backend handles sliding expiration for refresh tokens
+ */
+const REFRESH_THRESHOLD_MS = 5 * 60 * 1000 // 5 minutes before expiry
 
 // Singleton state
 let refreshPromise = null

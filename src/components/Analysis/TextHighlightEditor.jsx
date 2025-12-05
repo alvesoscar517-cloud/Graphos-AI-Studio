@@ -4,6 +4,7 @@ import { useAIProcessing } from '@/stores'
 import useAutoScrollbar from '../../hooks/useAutoScrollbar'
 import SuggestionTooltip from './SuggestionTooltip'
 import RewriteToolbar from './RewriteToolbar'
+import TextShimmer from '../Common/TextShimmer'
 import { cn } from '../../lib/utils'
 
 /**
@@ -386,15 +387,33 @@ const TextHighlightEditor = ({
             "placeholder:text-text-muted",
             "selection:bg-selection selection:text-inherit",
             "md:py-4 md:px-5 md:text-base",
-            scrollbarClassName,
-            isProcessing && "processing-shimmer"
+            scrollbarClassName
           )}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
+          disabled={disabled || isProcessing}
           placeholder={placeholder || t('editor.enterYourText')}
           spellCheck={false}
+          style={{
+            opacity: isProcessing ? 0 : 1,
+            pointerEvents: isProcessing ? 'none' : 'auto'
+          }}
         />
+        
+        {/* Shimmer overlay when AI is processing */}
+        {isProcessing && value && (
+          <div className={cn(
+            "absolute top-0 left-0 w-full h-full",
+            "py-6 px-8 font-sans text-base leading-relaxed",
+            "whitespace-pre-wrap break-words z-base box-border",
+            "overflow-y-auto overflow-x-hidden pointer-events-none",
+            "md:py-4 md:px-5 md:text-base"
+          )}>
+            <TextShimmer className="text-base leading-relaxed w-full" duration={2.5} block>
+              {value}
+            </TextShimmer>
+          </div>
+        )}
       </div>
 
       {/* Tooltip */}

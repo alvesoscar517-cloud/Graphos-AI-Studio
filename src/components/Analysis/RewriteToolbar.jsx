@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, MotionConfig } from 'framer-motion'
 import LazyLottie from '../Common/LazyLottie'
 import { rewriteTextStream, iterativeHumanize } from '../../services/api'
-import { useRewrite } from '@/stores'
+import { useRewrite, useAIProcessingActions } from '@/stores'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import { handleCreditError } from '../../utils/creditHandler'
 import modal from '../../utils/modal'
@@ -53,6 +53,7 @@ const RewriteToolbar = ({
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { selectedModel, writingPreferences } = useRewrite()
+  const { startProcessing, stopProcessing } = useAIProcessingActions()
   const [isLoading, setIsLoading] = useState(false)
   const fileInputRef = useRef(null)
 
@@ -74,6 +75,7 @@ const RewriteToolbar = ({
       // Use iterative humanization (non-streaming)
       console.log('[LAUNCH] Starting iterative humanization...')
       setIsLoading(true)
+      startProcessing('rewrite')
       
       const loadingModal = modal.loading(t('rewrite.humanizing'))
       
@@ -117,6 +119,7 @@ const RewriteToolbar = ({
         onTextChange(originalText)
       } finally {
         setIsLoading(false)
+        stopProcessing()
       }
       return
     }
@@ -124,6 +127,7 @@ const RewriteToolbar = ({
     // Standard streaming rewrite with enhanced anti-AI detection
     console.log('[LAUNCH] Starting rewrite process...')
     setIsLoading(true)
+    startProcessing('rewrite')
     
     try {
       let fullText = '' // Complete text buffer
@@ -213,6 +217,7 @@ const RewriteToolbar = ({
       onTextChange(originalText)
     } finally {
       setIsLoading(false)
+      stopProcessing()
     }
   }
 

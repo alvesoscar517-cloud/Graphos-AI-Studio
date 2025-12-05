@@ -1141,26 +1141,51 @@ async function linkGoogleWithOAuth(userId, googleData) {
 }
 
 // ============================================================================
-// TOKEN MANAGEMENT (Simplified - Firestore only, no in-memory cache)
+// TOKEN MANAGEMENT (Optimized - Industry Best Practices)
 // ============================================================================
 
-const REFRESH_TOKEN_EXPIRY_DAYS = 30;
-const ACCESS_TOKEN_EXPIRY_SECONDS = 3600; // 1 hour
+/**
+ * Token Expiry Configuration (aligned with industry standards)
+ * 
+ * Comparison with major platforms:
+ * - Google: Access 1h, Refresh 6 months
+ * - Facebook: Access 1-2h, Refresh 60 days
+ * - GitHub: Access 8h, Refresh 6 months
+ * - Auth0: Access 24h, Refresh 30 days
+ * - AWS Cognito: Access 1h, Refresh 30 days
+ */
+const TOKEN_CONFIG = {
+  // Access token: Short-lived for security
+  ACCESS_TOKEN_EXPIRY: 3600,              // 1 hour (standard)
+  ACCESS_TOKEN_EXPIRY_REMEMBER: 86400 * 7, // 7 days when rememberMe
+  
+  // Refresh token: Long-lived for UX
+  REFRESH_TOKEN_EXPIRY_DAYS: 90,          // 90 days (standard)
+  REFRESH_TOKEN_EXPIRY_REMEMBER_DAYS: 180, // 180 days when rememberMe
+  
+  // Sliding expiration: Extend refresh token if used within threshold
+  SLIDING_EXPIRATION_THRESHOLD_DAYS: 30,  // Extend if < 30 days remaining
+};
+
 const REFRESH_TOKEN_COLLECTION = 'refresh_tokens';
 
 /**
  * Generate access and refresh tokens for user
  * 
- * OPTIMIZED: User info is embedded in JWT to avoid DB queries on every request.
+ * OPTIMIZED: 
+ * - User info embedded in JWT (no DB query per request)
+ * - Industry-standard expiry times
+ * - RememberMe extends both access and refresh tokens
  * 
  * @param {string} userId - User ID
  * @param {Object} options - Options
- * @param {boolean} options.rememberMe - If true, use longer expiry
+ * @param {boolean} options.rememberMe - If true, use longer expiry (7d access, 180d refresh)
  * @param {Object} options.userInfo - User info to embed (optional, will fetch if not provided)
  * @returns {Promise<{accessToken: string, refreshToken: string, expiresIn: number}>}
  */
 async function generateTokens(userId, options = {}) {
   const crypto = require('crypto');
+  const { rememberMe = false } = options;
 
   // Get user info to embed in JWT (if not provided)
   let userInfo = options.userInfo;
@@ -1177,11 +1202,17 @@ async function generateTokens(userId, options = {}) {
     }
   }
 
-  // Access token expiry: 1 hour default, 24 hours if rememberMe
-  const accessTokenExpiry = options.rememberMe ? 86400 : ACCESS_TOKEN_EXPIRY_SECONDS;
+  // Access token expiry based on rememberMe
+  const accessTokenExpiry = rememberMe 
+    ? TOKEN_CONFIG.ACCESS_TOKEN_EXPIRY_REMEMBER 
+    : TOKEN_CONFIG.ACCESS_TOKEN_EXPIRY;
+
+  // Refresh token expiry based on rememberMe
+  const refreshTokenExpiryDays = rememberMe 
+    ? TOKEN_CONFIG.REFRESH_TOKEN_EXPIRY_REMEMBER_DAYS 
+    : TOKEN_CONFIG.REFRESH_TOKEN_EXPIRY_DAYS;
 
   // Generate access token as JWT with embedded user info
-  // This eliminates DB queries on every authenticated request
   const accessToken = jwt.sign(
     {
       userId,
@@ -1200,10 +1231,10 @@ async function generateTokens(userId, options = {}) {
     }
   );
 
-  // Generate refresh token (random secure token)
+  // Generate refresh token (cryptographically secure random)
   const refreshToken = crypto.randomBytes(64).toString('hex');
   const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
-  const expiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + refreshTokenExpiryDays * 24 * 60 * 60 * 1000);
 
   // Store refresh token in Firestore
   await db.collection(REFRESH_TOKEN_COLLECTION).add({
@@ -1211,10 +1242,15 @@ async function generateTokens(userId, options = {}) {
     userId,
     expiresAt,
     createdAt: new Date(),
-    rememberMe: options.rememberMe || false
+    rememberMe
   });
 
-  logger.info('Tokens generated', { userId });
+  logger.info('Tokens generated', { 
+    userId, 
+    accessExpiry: `${accessTokenExpiry}s`,
+    refreshExpiry: `${refreshTokenExpiryDays}d`,
+    rememberMe 
+  });
 
   return {
     accessToken,
@@ -1225,7 +1261,12 @@ async function generateTokens(userId, options = {}) {
 
 /**
  * Refresh access token using refresh token
- * Implements token rotation for security
+ * 
+ * Features:
+ * - Token rotation for security (old token invalidated)
+ * - Sliding expiration (extends refresh token if near expiry)
+ * - User status verification (locked/deleted check)
+ * 
  * @param {string} refreshToken - Refresh token
  * @returns {Promise<{accessToken: string, refreshToken: string, expiresIn: number}>}
  */
@@ -1272,13 +1313,32 @@ async function refreshAccessToken(refreshToken) {
     throw new Error('AUTH_ACCOUNT_SUSPENDED: Account is suspended');
   }
   
-  // Delete old refresh token (token rotation)
+  // Delete old refresh token (token rotation - security best practice)
   await tokenDoc.ref.delete();
   
-  // Generate new tokens
-  const newTokens = await generateTokens(userId, { rememberMe });
+  // Check if sliding expiration should apply
+  // If refresh token is within threshold of expiry, extend it
+  const daysUntilExpiry = (expiresAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000);
+  const shouldExtend = daysUntilExpiry < TOKEN_CONFIG.SLIDING_EXPIRATION_THRESHOLD_DAYS;
   
-  logger.info('Access token refreshed', { userId });
+  // Generate new tokens
+  // If sliding expiration applies, treat as rememberMe to get longer refresh token
+  const effectiveRememberMe = rememberMe || shouldExtend;
+  const newTokens = await generateTokens(userId, { 
+    rememberMe: effectiveRememberMe,
+    userInfo: {
+      email: userData.email,
+      name: userData.name,
+      picture: userData.picture || '',
+      emailVerified: userData.emailVerified
+    }
+  });
+  
+  logger.info('Access token refreshed', { 
+    userId, 
+    slidingExtension: shouldExtend,
+    daysUntilExpiry: Math.round(daysUntilExpiry)
+  });
   
   return newTokens;
 }

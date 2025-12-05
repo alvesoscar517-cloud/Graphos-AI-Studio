@@ -100,10 +100,15 @@ class ApiClient {
           }
         }
         
-        // Add auth token if available
-        const authToken = await this.getAuthToken()
+        // Add auth token and type hint if available
+        // X-Auth-Type header helps backend verify token efficiently
+        const { token: authToken, authType } = await this.getAuthTokenWithType()
         if (authToken) {
           requestHeaders['Authorization'] = `Bearer ${authToken}`
+          // Add auth type hint for backend optimization
+          if (authType) {
+            requestHeaders['X-Auth-Type'] = authType
+          }
         }
       } catch (error) {
         logError(error, { context: 'getAuthInfo', requestId })
@@ -213,10 +218,11 @@ class ApiClient {
   }
   
   /**
-   * Get auth token from Chrome extension or localStorage
+   * Get auth token and auth type from Chrome extension or localStorage
    * Uses tokenService for automatic refresh
+   * @returns {Promise<{token: string|null, authType: 'email'|'google'|null}>}
    */
-  async getAuthToken() {
+  async getAuthTokenWithType() {
     // First check localStorage for email auth token (with auto-refresh)
     try {
       const { getAuthMethod } = await import('../../utils/authStorage')
@@ -225,22 +231,34 @@ class ApiClient {
       if (authMethod === 'email') {
         // Use tokenService to get valid token (auto-refreshes if needed)
         const token = await tokenService.getValidToken()
-        if (token) return token
+        if (token) return { token, authType: 'email' }
       }
     } catch (error) {
       logError(error, { context: 'getAuthToken' })
     }
     
-    // Then try Chrome extension
+    // Then try Chrome extension (Google OAuth)
     try {
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
         const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' })
-        return response?.token || null
+        if (response?.token) {
+          return { token: response.token, authType: 'google' }
+        }
       }
     } catch {
       // Not in extension context
     }
-    return null
+    return { token: null, authType: null }
+  }
+  
+  /**
+   * Get auth token from Chrome extension or localStorage
+   * Uses tokenService for automatic refresh
+   * @deprecated Use getAuthTokenWithType() instead for better performance
+   */
+  async getAuthToken() {
+    const { token } = await this.getAuthTokenWithType()
+    return token
   }
 
   /**

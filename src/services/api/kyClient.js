@@ -40,29 +40,45 @@ function generateRequestId() {
 // AUTH TOKEN GETTER
 // ============================================================================
 
-async function getAuthToken() {
+/**
+ * Get auth token and type for API requests
+ * @returns {Promise<{token: string|null, authType: 'email'|'google'|null}>}
+ */
+async function getAuthTokenWithType() {
   try {
     const { getAuthMethod } = await import('../../utils/authStorage');
     const authMethod = getAuthMethod();
     
     if (authMethod === 'email') {
-      return await tokenService.getValidToken();
+      const token = await tokenService.getValidToken();
+      if (token) return { token, authType: 'email' };
     }
   } catch (error) {
     console.warn('[kyClient] Failed to get email auth token:', error.message);
   }
   
-  // Try Chrome extension
+  // Try Chrome extension (Google OAuth)
   try {
     if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
       const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' });
-      return response?.token || null;
+      if (response?.token) {
+        return { token: response.token, authType: 'google' };
+      }
     }
   } catch {
     // Not in extension context
   }
   
-  return null;
+  return { token: null, authType: null };
+}
+
+/**
+ * Get auth token (legacy, for backward compatibility)
+ * @deprecated Use getAuthTokenWithType() instead
+ */
+async function getAuthToken() {
+  const { token } = await getAuthTokenWithType();
+  return token;
 }
 
 // ============================================================================
@@ -170,10 +186,14 @@ const kyInstance = ky.create({
         const requestId = generateRequestId();
         request.headers.set('X-Request-ID', requestId);
         
-        // Add auth token
-        const token = await getAuthToken();
+        // Add auth token and type hint
+        const { token, authType } = await getAuthTokenWithType();
         if (token) {
           request.headers.set('Authorization', `Bearer ${token}`);
+          // Add auth type hint for backend optimization
+          if (authType) {
+            request.headers.set('X-Auth-Type', authType);
+          }
         }
         
         // Log in debug mode
@@ -301,15 +321,23 @@ class KyApiClient {
   async stream(endpoint, body, onChunk, options = {}) {
     const userId = await getUserId();
     const requestBody = userId ? { ...body, user_id: userId } : body;
-    const token = await getAuthToken();
+    const { token, authType } = await getAuthTokenWithType();
+    
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-Request-ID': generateRequestId()
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      if (authType) {
+        headers['X-Auth-Type'] = authType;
+      }
+    }
     
     const response = await fetch(`${CONFIG.API_BASE_URL}/${endpoint}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-        'X-Request-ID': generateRequestId()
-      },
+      headers,
       body: JSON.stringify(requestBody),
       signal: options.signal
     });
