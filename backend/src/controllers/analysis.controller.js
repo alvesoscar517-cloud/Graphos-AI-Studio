@@ -89,11 +89,14 @@ exports.authenticateContent = async (req, res) => {
         'usage.analysesCount': FieldValue.increment(1)
       });
       
-      // Log activity
+      // Log activity with credits info from middleware
       activityLogService.logFeatureUsage(user_id, 'ai_detection', {
         wordCount: textFeatures.totalWords,
         aiProbability,
-        isAuthentic
+        isAuthentic,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
       });
     }
 
@@ -425,12 +428,15 @@ exports.analyzeText = async (req, res) => {
         'usage.analysesCount': FieldValue.increment(1)
       });
       
-      // Log activity
+      // Log activity with credits info from middleware
       activityLogService.logFeatureUsage(user_id, 'text_analysis', {
         profileId,
         wordCount: textFeatures.totalWords,
         voiceCompatibility: parseFloat(voiceCompatibility.toFixed(2)),
-        duration: processingTime
+        duration: processingTime,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
       });
     }
 
@@ -619,13 +625,16 @@ exports.rewriteText = async (req, res) => {
         'usage.rewritesCount': FieldValue.increment(1)
       });
       
-      // Log activity
+      // Log activity with credits info from middleware
       activityLogService.logFeatureUsage(user_id, 'text_rewrite', {
         profileId: profile_id,
         inputLength: text.length,
         outputLength: rewrittenText.length,
         duration: processingTime,
-        model
+        model,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
       });
     }
 
@@ -774,13 +783,16 @@ exports.rewriteTextStream = async (req, res) => {
         'usage.rewritesCount': FieldValue.increment(1)
       });
       
-      // Log activity
+      // Log activity with credits info from middleware
       activityLogService.logFeatureUsage(user_id, 'text_rewrite', {
         profileId: profile_id,
         inputLength: text.length,
         outputLength: fullText.length,
         model,
-        streaming: true
+        streaming: true,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
       });
     }
   } catch (error) {
@@ -821,6 +833,19 @@ exports.checkHumanization = async (req, res) => {
         : 'humanize.no_changes_needed',
       { count: suggestions.suggestions?.length || 0 }
     );
+
+    // Log activity if user_id is available
+    const userId = req.body.user_id || req.headers['x-user-id'];
+    if (userId) {
+      activityLogService.logFeatureUsage(userId, 'check_humanization', {
+        inputLength: text.length,
+        aiProbability: aiDetection.aiProbability,
+        overallRisk: suggestions.overallRisk,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
+      });
+    }
 
     res.json({
       success: true,
@@ -920,7 +945,7 @@ exports.iterativeHumanize = async (req, res) => {
         'usage.rewritesCount': FieldValue.increment(result.iterations)
       });
       
-      // Log activity
+      // Log activity with credits info from middleware
       activityLogService.logFeatureUsage(user_id, 'iterative_humanize', {
         profileId: profile_id,
         inputLength: text.length,
@@ -929,7 +954,10 @@ exports.iterativeHumanize = async (req, res) => {
         aiProbability: result.aiProbability,
         reachedTarget: result.reachedTarget,
         duration: processingTime,
-        model
+        model,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
       });
     }
 
@@ -988,6 +1016,20 @@ exports.translateText = async (req, res) => {
 
     const result = await model.generateContent(prompt);
     const translatedText = result.response.candidates[0].content.parts[0].text.trim();
+
+    // Log activity if user_id is available
+    const userId = req.body.user_id || req.headers['x-user-id'];
+    if (userId) {
+      activityLogService.logFeatureUsage(userId, 'translation', {
+        inputLength: text.length,
+        outputLength: translatedText.length,
+        sourceLang: source_lang,
+        targetLang: target_lang,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
+      });
+    }
 
     res.json({
       success: true,

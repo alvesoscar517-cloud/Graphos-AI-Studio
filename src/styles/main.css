@@ -245,6 +245,7 @@
   --width-score-circle: var(--size-score-circle);
   --width-otp: var(--size-otp-width);
   
+  --height-score-circle: var(--size-score-circle);
   --height-otp: var(--size-otp-height);
   --size-feature-icon: 11.25rem;
   
@@ -2231,4 +2232,11 @@
 /* Notification detail modal dark mode */
 .dark .notif-detail-popup {
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   Color Filter - Yellow to Blue
+   ============================================ */
+.filter-yellow-to-blue {
+  filter: hue-rotate(180deg) saturate(1.1);
 }

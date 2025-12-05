@@ -297,6 +297,7 @@ export const useProfileSetup = () => {
   const [showCompletion, setShowCompletion] = useState(false)
   const [showError, setShowError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [errorCode, setErrorCode] = useState('')
   const [isCancelling, setIsCancelling] = useState(false)
   const [qualityScore, setQualityScore] = useState(null)
   
@@ -857,6 +858,8 @@ export const useProfileSetup = () => {
     setShowError,
     errorMessage,
     setErrorMessage,
+    errorCode,
+    setErrorCode,
     isCancelling,
     qualityScore,
     setQualityScore,

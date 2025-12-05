@@ -26,7 +26,7 @@ const Step2LongText = ({
       <div className="grid grid-cols-2 h-full gap-0 relative min-h-0 overflow-hidden max-lg:grid-cols-1">
         {/* Animation Container */}
         <div className="flex items-center justify-center w-full h-full p-10 box-border bg-transparent">
-          <div className="!w-lottie-md !h-lottie-md max-w-full max-h-full max-lg:!w-lottie-sm max-lg:!h-lottie-sm">
+          <div className="!w-lottie-md !h-lottie-md max-w-full max-h-full max-lg:!w-lottie-sm max-lg:!h-lottie-sm filter-yellow-to-blue">
             <LottieWrapper key={`step2-${animationKey}`} animationData={biometricAnimation} loop={true} />
           </div>
         </div>

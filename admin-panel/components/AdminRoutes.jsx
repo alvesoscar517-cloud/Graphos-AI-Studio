@@ -20,7 +20,7 @@ const AnalyticsView = lazy(() => import('./Analytics/AnalyticsView'));
 const OrdersView = lazy(() => import('./Orders/OrdersView'));
 const SettingsView = lazy(() => import('./Settings/SettingsView'));
 const SystemLogs = lazy(() => import('./Logs/SystemLogs'));
-const UserActivityLogs = lazy(() => import('./Logs/UserActivityLogs'));
+const UserCreditsDetail = lazy(() => import('./Logs/UserCreditsDetail'));
 const AllActivityLogs = lazy(() => import('./Logs/AllActivityLogs'));
 
 // Loading component
@@ -58,7 +58,7 @@ export default function AdminRoutes() {
               <Route path="/users/:id" element={<UserDetail />} />
               <Route path="/users/:userId/profiles" element={<UserProfiles />} />
               <Route path="/users/:userId/logs" element={<UserLogs />} />
-              <Route path="/users/:userId/activity" element={<UserActivityLogs />} />
+              <Route path="/users/:userId/credits" element={<UserCreditsDetail />} />
               <Route path="/support" element={<SupportList />} />
               <Route path="/support/:id" element={<SupportDetail />} />
               <Route path="/analytics" element={<AnalyticsView />} />

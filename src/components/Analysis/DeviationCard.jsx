@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
+import { getLocalizedContentError } from '../../utils/errorMessages'
 import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import Icon from '../Common/Icon'
@@ -95,7 +96,8 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
       }
     } catch (error) {
       console.error('Error finding deviations:', error)
-      modal.error(t('analysis.analysisFailed') + ' ' + error.message)
+      const localizedError = getLocalizedContentError(error.message, t)
+      modal.error(localizedError || t('analysis.analysisFailed'))
     } finally {
       setIsLoading(false)
     }

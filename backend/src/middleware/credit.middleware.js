@@ -1,15 +1,92 @@
 /**
- * Credit Middleware
- * Validates and deducts credits before processing requests
+ * Credit Middleware - REFACTORED
+ * 
+ * CRITICAL CHANGE: Credits are now deducted AFTER successful processing
+ * using a "reserve -> process -> commit/rollback" pattern
+ * 
+ * This prevents users from losing credits when API calls fail
+ * 
+ * Supports both:
+ * - Regular JSON responses (res.json)
+ * - Streaming responses (res.write/res.end) - SSE endpoints
  */
 
 const creditService = require('../services/credit.service');
+const activityLogService = require('../services/activityLog.service');
 const logger = require('../utils/logger');
 const localization = require('../services/localization.service');
 const { getLanguage } = require('./language.middleware');
 
 /**
- * Middleware to check and deduct credits for a feature
+ * Helper function to deduct credits and log
+ */
+async function commitCreditDeduction(req) {
+  if (!req.creditReservation || req.creditReservation.deducted) {
+    return false;
+  }
+  
+  try {
+    await creditService.deductCredits(
+      req.creditReservation.userId, 
+      req.creditReservation.cost, 
+      req.creditReservation.featureName, 
+      {
+        endpoint: req.path,
+        method: req.method
+      }
+    );
+    
+    // Track usage
+    await creditService.trackFeatureUsage(
+      req.creditReservation.userId, 
+      req.creditReservation.featureName, 
+      req.creditReservation.cost, 
+      { endpoint: req.path }
+    );
+    
+    // Log credit usage to activity logs
+    const creditsAfter = req.creditReservation.creditsBefore - req.creditReservation.cost;
+    activityLogService.logCreditUsage(
+      req.creditReservation.userId, 
+      req.creditReservation.featureName, 
+      req.creditReservation.cost, 
+      {
+        creditsBefore: req.creditReservation.creditsBefore,
+        creditsAfter,
+        endpoint: req.path,
+        method: req.method,
+        ip: req.ip || req.connection?.remoteAddress,
+        userAgent: req.get('User-Agent')?.substring(0, 100),
+        source: req.get('X-Source') || 'extension'
+      }
+    ).catch(err => logger.warn('Failed to log credit usage', { error: err.message }));
+    
+    // Mark as deducted
+    req.creditReservation.deducted = true;
+    req.creditCost = req.creditReservation.cost;
+    req.creditsBefore = req.creditReservation.creditsBefore;
+    req.creditsAfter = creditsAfter;
+    
+    logger.info('Credits deducted after success', { 
+      userId: req.creditReservation.userId, 
+      feature: req.creditReservation.featureName, 
+      cost: req.creditReservation.cost,
+      creditsAfter
+    });
+    
+    return { creditsAfter, cost: req.creditReservation.cost };
+  } catch (deductError) {
+    logger.error('Failed to deduct credits after success', { 
+      error: deductError.message,
+      userId: req.creditReservation.userId
+    });
+    return false;
+  }
+}
+
+/**
+ * Reserve credits before processing (soft lock)
+ * Credits are only actually deducted after successful response
  */
 function requireCredits(featureName, costCalculator) {
   return async (req, res, next) => {
@@ -29,7 +106,7 @@ function requireCredits(featureName, costCalculator) {
       // Calculate cost based on request
       const cost = costCalculator(req);
       
-      // Check if user has enough credits
+      // Check if user has enough credits (but don't deduct yet!)
       const hasEnough = await creditService.hasEnoughCredits(userId, cost);
       
       if (!hasEnough) {
@@ -47,21 +124,90 @@ function requireCredits(featureName, costCalculator) {
         });
       }
       
-      // Deduct credits
-      await creditService.deductCredits(userId, cost, featureName, {
-        endpoint: req.path,
-        method: req.method
+      // Store credit info for later deduction (after successful processing)
+      req.creditReservation = {
+        userId,
+        cost,
+        featureName,
+        creditsBefore: (await creditService.getUserCredits(userId)).balance,
+        reserved: true,
+        deducted: false,
+        streamingSuccess: false, // Track if streaming completed successfully
+        streamingStarted: false
+      };
+      
+      // Expose commit function for streaming endpoints to call manually
+      req.commitCredits = () => commitCreditDeduction(req);
+      
+      // Override res.json to intercept successful responses and deduct credits
+      const originalJson = res.json.bind(res);
+      res.json = async function(data) {
+        // Only deduct credits if response is successful
+        if (data && data.success !== false && req.creditReservation && !req.creditReservation.deducted) {
+          const result = await commitCreditDeduction(req);
+          if (result) {
+            // Add credit info to response
+            data.credits_used = result.cost;
+            data.credits_remaining = result.creditsAfter;
+          }
+        } else if (data && data.success === false) {
+          // Log that credits were NOT deducted due to failure
+          logger.info('Credits NOT deducted - request failed', { 
+            userId: req.creditReservation?.userId, 
+            feature: req.creditReservation?.featureName,
+            error: data.error
+          });
+        }
+        
+        return originalJson(data);
+      };
+      
+      // Override res.write to track streaming
+      const originalWrite = res.write.bind(res);
+      res.write = function(chunk, encoding, callback) {
+        if (req.creditReservation) {
+          req.creditReservation.streamingStarted = true;
+          
+          // Check if this is a [DONE] marker (SSE completion)
+          const chunkStr = chunk?.toString() || '';
+          if (chunkStr.includes('[DONE]')) {
+            req.creditReservation.streamingSuccess = true;
+          }
+          // Check for error in stream
+          if (chunkStr.includes('"error"')) {
+            req.creditReservation.streamingSuccess = false;
+          }
+        }
+        return originalWrite(chunk, encoding, callback);
+      };
+      
+      // Override res.end to deduct credits for successful streaming
+      const originalEnd = res.end.bind(res);
+      res.end = async function(chunk, encoding, callback) {
+        // For streaming responses, deduct credits if streaming completed successfully
+        if (req.creditReservation && 
+            req.creditReservation.streamingStarted && 
+            req.creditReservation.streamingSuccess && 
+            !req.creditReservation.deducted) {
+          await commitCreditDeduction(req);
+        } else if (req.creditReservation && 
+                   req.creditReservation.streamingStarted && 
+                   !req.creditReservation.streamingSuccess) {
+          logger.info('Credits NOT deducted - streaming failed or incomplete', { 
+            userId: req.creditReservation?.userId, 
+            feature: req.creditReservation?.featureName
+          });
+        }
+        
+        return originalEnd(chunk, encoding, callback);
+      };
+      
+      logger.info('Credits reserved', { 
+        userId, 
+        feature: featureName, 
+        cost, 
+        creditsBefore: req.creditReservation.creditsBefore 
       });
-      
-      // Track usage
-      await creditService.trackFeatureUsage(userId, featureName, cost, {
-        endpoint: req.path
-      });
-      
-      // Attach cost info to request for response
-      req.creditCost = cost;
-      
-      logger.info('Credits deducted', { userId, feature: featureName, cost });
       
       next();
     } catch (error) {

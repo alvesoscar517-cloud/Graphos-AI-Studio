@@ -63,11 +63,14 @@ exports.createProfile = async (req, res) => {
 
     logger.info('Profile created', { profileId, userId });
     
-    // Log activity
+    // Log activity with credits info from middleware
     activityLogService.logFeatureUsage(userId, 'profile_create', {
       profileId,
       profileName: profile_name,
-      theme
+      theme,
+      creditsUsed: req.creditCost || 0,
+      creditsBefore: req.creditsBefore,
+      creditsAfter: req.creditsAfter
     });
 
     // Broadcast profile update via SSE
@@ -122,6 +125,19 @@ exports.addSample = async (req, res) => {
     cacheService.invalidateProfileCache(profileId);
 
     logger.info('Sample added', { profileId, sampleId });
+    
+    // Log activity with credits info from middleware
+    const userId = profileDoc.data().userId;
+    if (userId) {
+      activityLogService.logFeatureUsage(userId, 'profile_sample_add', {
+        profileId,
+        sampleId,
+        wordCount: validText.split(/\s+/).length,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -191,6 +207,18 @@ exports.addSamplesBatch = async (req, res) => {
 
     await batch.commit();
     cacheService.invalidateProfileCache(profile_id);
+    
+    // Log activity with credits info from middleware
+    const userId = profileDoc.data().userId;
+    if (userId) {
+      activityLogService.logFeatureUsage(userId, 'profile_sample_add', {
+        profileId: profile_id,
+        sampleCount: samples.length,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -260,6 +288,18 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
       await autoNotification.sendProfileCreatedNotification(profileData.userId, profileData.name);
     } catch (notifError) {
       console.warn('[WARN] Failed to send profile created notification:', notifError.message);
+    }
+    
+    // Log activity with credits info from middleware
+    if (profileData.userId) {
+      activityLogService.logFeatureUsage(profileData.userId, 'profile_finalize', {
+        profileId: profile_id,
+        profileName: profileData.name,
+        sampleCount: samples.length,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
+      });
     }
 
     res.json({

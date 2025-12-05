@@ -10,7 +10,6 @@ const ProfileSetup = lazy(() => import('./ProfileSetupRefactored'))
 
 // Loading skeleton - centered on screen
 const LoadingSkeleton = () => {
-  const { t } = useTranslation()
   return (
     <div style={{
       display: 'flex',
@@ -20,21 +19,11 @@ const LoadingSkeleton = () => {
       width: '100%',
       backgroundColor: 'var(--color-bg-primary)'
     }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
-          <LazyLottie 
-            animationData={threeDotsAnimation} 
-            loop={true}
-            style={{ width: 120, height: 90 }}
-          />
-        </div>
-        <h1 style={{ fontSize: '24px', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
-          {t('loadingPage.loading')}
-        </h1>
-        <p style={{ marginBottom: '0', color: 'var(--color-text-muted)' }}>
-          {t('loadingPage.pleaseWait')}
-        </p>
-      </div>
+      <LazyLottie 
+        animationData={threeDotsAnimation} 
+        loop={true}
+        style={{ width: 120, height: 90 }}
+      />
     </div>
   )
 }

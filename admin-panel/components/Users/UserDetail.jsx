@@ -27,6 +27,10 @@ export default function UserDetail() {
     message: ''
   });
   const [sendingNotification, setSendingNotification] = useState(false);
+  const [adjustingCredits, setAdjustingCredits] = useState(false);
+  const [editingUser, setEditingUser] = useState(false);
+  const [lockingUser, setLockingUser] = useState(false);
+  const [deletingUser, setDeletingUser] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -51,12 +55,15 @@ export default function UserDetail() {
 
   const handleEditUser = async () => {
     try {
+      setEditingUser(true);
       await usersApi.update(id, editData);
       notify.success('User updated successfully!');
       setShowEditModal(false);
       loadUser();
     } catch (err) {
       notify.error('Error: ' + err.message);
+    } finally {
+      setEditingUser(false);
     }
   };
 
@@ -71,6 +78,7 @@ export default function UserDetail() {
     }
 
     try {
+      setAdjustingCredits(true);
       const result = await usersApi.adjustCredits(
         id,
         creditsData.amount,
@@ -83,6 +91,8 @@ export default function UserDetail() {
       loadUser();
     } catch (err) {
       notify.error('Error: ' + err.message);
+    } finally {
+      setAdjustingCredits(false);
     }
   };
 
@@ -108,11 +118,14 @@ export default function UserDetail() {
     }
 
     try {
+      setLockingUser(true);
       await usersApi.toggleLock(id, !user.locked, reason);
       notify.success(`Account ${user.locked ? 'unlocked' : 'locked'} successfully!`);
       loadUser();
     } catch (err) {
       notify.error('Error: ' + err.message);
+    } finally {
+      setLockingUser(false);
     }
   };
 
@@ -139,11 +152,14 @@ export default function UserDetail() {
     }
 
     try {
+      setDeletingUser(true);
       await usersApi.delete(id);
       notify.success('User deleted successfully!');
       navigate('/users');
     } catch (err) {
       notify.error('Error: ' + err.message);
+    } finally {
+      setDeletingUser(false);
     }
   };
 
@@ -351,17 +367,17 @@ export default function UserDetail() {
             </Button>
             <Button variant="secondary" onClick={() => navigate(`/users/${id}/logs`)}>
               <img src="/icon/activity.svg" alt="" className="w-4 h-4 icon-dark" />
-              View Logs
+              Activity Logs
             </Button>
-            <Button variant="secondary" onClick={() => navigate(`/users/${id}/activity`)}>
-              <img src="/icon/bar-chart-2.svg" alt="" className="w-4 h-4 icon-dark" />
-              Activity Details
+            <Button variant="secondary" onClick={() => navigate(`/users/${id}/credits`)}>
+              <img src="/icon/credit-card.svg" alt="" className="w-4 h-4 icon-dark" />
+              Credit Details
             </Button>
-            <Button variant="secondary" onClick={handleLockUser}>
+            <Button variant="secondary" onClick={handleLockUser} disabled={lockingUser} loading={lockingUser}>
               <img src={`/icon/${user.locked ? 'unlock' : 'lock'}.svg`} alt="" className="w-4 h-4 icon-dark" />
               {user.locked ? 'Unlock' : 'Lock'} Account
             </Button>
-            <Button variant="destructive" onClick={handleDeleteUser}>
+            <Button variant="destructive" onClick={handleDeleteUser} disabled={deletingUser} loading={deletingUser}>
               <img src="/icon/trash-2.svg" alt="" className="w-4 h-4 icon-white" />
               Delete User
             </Button>
@@ -443,8 +459,8 @@ export default function UserDetail() {
               <Button variant="secondary" onClick={() => setShowNotificationModal(false)} disabled={sendingNotification}>
                 Cancel
               </Button>
-              <Button onClick={handleSendNotification} disabled={sendingNotification}>
-                {sendingNotification ? 'Sending...' : 'Send Notification'}
+              <Button onClick={handleSendNotification} disabled={sendingNotification} loading={sendingNotification}>
+                Send Notification
               </Button>
             </div>
           </div>
@@ -484,8 +500,8 @@ export default function UserDetail() {
               </div>
             </div>
             <div className="flex justify-end gap-3 p-4 border-t border-border">
-              <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancel</Button>
-              <Button onClick={handleEditUser}>Save Changes</Button>
+              <Button variant="secondary" onClick={() => setShowEditModal(false)} disabled={editingUser}>Cancel</Button>
+              <Button onClick={handleEditUser} disabled={editingUser} loading={editingUser}>Save Changes</Button>
             </div>
           </div>
         </div>
@@ -569,8 +585,8 @@ export default function UserDetail() {
               </div>
             </div>
             <div className="flex justify-end gap-3 p-4 border-t border-border">
-              <Button variant="secondary" onClick={() => setShowCreditsModal(false)}>Cancel</Button>
-              <Button variant={creditsData.type === 'add' ? 'success' : 'destructive'} onClick={handleAdjustCredits}>
+              <Button variant="secondary" onClick={() => setShowCreditsModal(false)} disabled={adjustingCredits}>Cancel</Button>
+              <Button variant={creditsData.type === 'add' ? 'success' : 'destructive'} onClick={handleAdjustCredits} disabled={adjustingCredits} loading={adjustingCredits}>
                 {creditsData.type === 'add' ? 'Add' : 'Deduct'} Credits
               </Button>
             </div>

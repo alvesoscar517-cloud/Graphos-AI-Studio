@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
+import { getLocalizedContentError } from '../../utils/errorMessages'
 import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import Icon from '../Common/Icon'
@@ -117,7 +118,8 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
       }
     } catch (error) {
       console.error('[FAIL] Error analyzing stats:', error)
-      modal.error(t('analysis.analysisFailed') + ' ' + error.message)
+      const localizedError = getLocalizedContentError(error.message, t)
+      modal.error(localizedError || t('analysis.analysisFailed'))
       setStats(null)
       setBenchmarkData(null)
       setSuggestions([])

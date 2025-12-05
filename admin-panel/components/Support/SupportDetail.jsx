@@ -37,6 +37,8 @@ export default function SupportDetail() {
   const [translatedContent, setTranslatedContent] = useState('');
   const [currentTranslateLang, setCurrentTranslateLang] = useState('');
   const [lightboxImage, setLightboxImage] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => { loadTicket(); }, [id]);
   useEffect(() => {
@@ -60,11 +62,14 @@ export default function SupportDetail() {
 
   const handleStatusChange = async (newStatus) => {
     try {
+      setUpdatingStatus(true);
       await supportApi.updateStatus(id, newStatus);
       notify.success('Status updated!');
       loadTicket();
     } catch (err) {
       notify.error('Error: ' + err.message);
+    } finally {
+      setUpdatingStatus(false);
     }
   };
 
@@ -130,11 +135,14 @@ export default function SupportDetail() {
     });
     if (!confirmed) return;
     try {
+      setDeleting(true);
       await supportApi.delete(id);
       notify.success('Deleted!');
       navigate('/support');
     } catch (err) {
       notify.error('Error: ' + err.message);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -311,16 +319,16 @@ export default function SupportDetail() {
           <Card className="p-6">
             <h3 className="text-sm font-medium text-primary mb-4">Quick Actions</h3>
             <div className="space-y-2">
-              <Button variant="secondary" className="w-full justify-start" onClick={() => handleStatusChange('in_progress')} disabled={ticket.status === 'in_progress'}>
+              <Button variant="secondary" className="w-full justify-start" onClick={() => handleStatusChange('in_progress')} disabled={ticket.status === 'in_progress' || updatingStatus} loading={updatingStatus}>
                 <img src="/icon/clock.svg" alt="" className="w-4 h-4 icon-dark" /> In Progress
               </Button>
-              <Button variant="secondary" className="w-full justify-start" onClick={() => handleStatusChange('resolved')} disabled={ticket.status === 'resolved'}>
+              <Button variant="secondary" className="w-full justify-start" onClick={() => handleStatusChange('resolved')} disabled={ticket.status === 'resolved' || updatingStatus} loading={updatingStatus}>
                 <img src="/icon/check-circle.svg" alt="" className="w-4 h-4 icon-dark" /> Resolved
               </Button>
-              <Button variant="secondary" className="w-full justify-start" onClick={() => handleStatusChange('closed')} disabled={ticket.status === 'closed'}>
+              <Button variant="secondary" className="w-full justify-start" onClick={() => handleStatusChange('closed')} disabled={ticket.status === 'closed' || updatingStatus} loading={updatingStatus}>
                 <img src="/icon/x-circle.svg" alt="" className="w-4 h-4 icon-dark" /> Close
               </Button>
-              <Button variant="destructive" className="w-full justify-start" onClick={handleDelete}>
+              <Button variant="destructive" className="w-full justify-start" onClick={handleDelete} disabled={deleting} loading={deleting}>
                 <img src="/icon/trash-2.svg" alt="" className="w-4 h-4 icon-white" /> Delete
               </Button>
             </div>

@@ -409,7 +409,19 @@
     "fillAllRequired": "Please fill in all required information",
     "serviceUnavailable": "Service is temporarily unavailable. Please try again later.",
     "verificationFailed": "Verification failed. Please try again.",
-    "serverError": "Server error. Please try again later."
+    "serverError": "Server error. Please try again later.",
+    "textLacksDiversity": "Your text contains too many repeated words or phrases. Please provide more varied content for accurate AI detection.",
+    "textTooRepetitive": "Your text repeats too much. Please provide more diverse content.",
+    "textContainsCode": "Your text appears to contain code. Please provide natural text (email, blog, message, etc.) for AI detection.",
+    "textTooManySpecialChars": "Your text contains too many special characters. Please provide meaningful text.",
+    "textTooShort": "Your text is too short. Please provide at least {{min}} characters for accurate AI detection.",
+    "textTooLong": "Your text is too long. Please provide no more than {{max}} characters.",
+    "textLacksMeaningfulContent": "Your text is too short or lacks meaningful content. Please provide more substantial text.",
+    "quotaExceeded": "AI service quota exceeded. Please try again later or contact support.",
+    "insufficientCredits": "You don't have enough credits for this action. Please purchase more credits.",
+    "rateLimited": "Too many requests. Please wait a moment and try again.",
+    "timeout": "Request timed out. Please try again.",
+    "profileNotFound": "Voice profile not found. Please select a valid profile."
   },
   "profile": {
     "selectProfile": "Select Profile",
@@ -650,6 +662,7 @@
     "viewNextSample": "View next sample",
     "finalizingProfile": "Finalizing Profile",
     "errorOccurred": "Oops! An error occurred",
+    "insufficientCredits": "Insufficient Credits",
     "complete": "Complete!",
     "profileReady": "Your writing style profile is ready",
     "goBackToPrevious": "Go back to previous step to edit",
@@ -830,7 +843,10 @@
     "balance": "{{balance}} credits / {{used}} used",
     "upgradePlan": "Upgrade Plan",
     "newBalance": "New balance: {{balance}} credits",
-    "used": "used"
+    "used": "used",
+    "required": "Required",
+    "available": "Available",
+    "shortfall": "Shortfall"
   },
   "editor": {
     "enterYourText": "Enter your text...",
@@ -1003,6 +1019,7 @@
     "finalizingProfile": "Finalizing profile...",
     "retrying": "Retrying... ({{current}}/{{max}})",
     "unableToCreate": "Unable to create profile. Please try again.",
+    "insufficientCredits": "You don't have enough credits to create this profile. Please purchase more credits to continue.",
     "textContainsCode": "Text contains code. Please provide natural text.",
     "tooManySpecialChars": "Text contains too many special characters.",
     "tooMuchRepetition": "Text has too much repetition.",

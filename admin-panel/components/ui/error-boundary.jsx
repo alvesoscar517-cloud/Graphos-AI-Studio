@@ -1,107 +1,121 @@
-import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary'
-import { Button } from './button'
+import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
+import { useState } from 'react';
+import { Button } from './button';
 
 /**
  * Error Fallback Component
  * Displayed when an error is caught by the boundary
  */
 function ErrorFallback({ error, resetErrorBoundary }) {
+  const [showDetails, setShowDetails] = useState(false);
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center">
-      <div className="w-16 h-16 mb-4 rounded-full bg-destructive/10 flex items-center justify-center">
-        <svg
-          className="w-8 h-8 text-destructive"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
+    <div className="flex flex-col items-center justify-center min-h-[400px] p-8">
+      {/* Icon */}
+      <div className="w-12 h-12 bg-surface-secondary/80 rounded-2xl flex items-center justify-center shadow-xs mb-5">
+        <img src="/icon/alert-circle.svg" alt="Error" className="w-6 h-6 icon-dark" />
       </div>
-      
-      <h2 className="text-xl font-semibold text-primary mb-2">
-        Something went wrong
-      </h2>
-      
-      <p className="text-muted-foreground mb-4 max-w-md">
+
+      {/* Title */}
+      <h2 className="text-[20px] font-semibold text-primary tracking-[-0.02em] mb-2">Something went wrong</h2>
+
+      {/* Description */}
+      <p className="text-[14px] text-muted mb-6 max-w-md text-center">
         An error occurred while displaying this content. Please try again or contact support if the issue persists.
       </p>
-      
-      {import.meta.env.DEV && (
-        <pre className="text-xs text-left bg-surface-secondary p-4 rounded-md mb-4 max-w-full overflow-auto">
-          <code className="text-destructive">{error.message}</code>
-        </pre>
-      )}
-      
-      <div className="flex gap-3">
-        <Button onClick={resetErrorBoundary}>
+
+      {/* Actions */}
+      <div className="flex items-center gap-2.5">
+        <Button variant="primary" size="sm" onClick={resetErrorBoundary}>
+          <img src="/icon/refresh-cw.svg" alt="" className="w-4 h-4 icon-white" />
           Try again
         </Button>
-        <Button variant="outline" onClick={() => window.location.reload()}>
+        <Button variant="secondary" size="sm" onClick={() => window.location.reload()}>
           Reload page
         </Button>
       </div>
-    </div>
-  )
-}
 
+      {/* Technical details */}
+      {import.meta.env.DEV && error && (
+        <div className="mt-6 w-full max-w-md">
+          <button
+            onClick={() => setShowDetails(!showDetails)}
+            className="text-[13px] text-muted hover:text-primary transition-colors flex items-center gap-1.5"
+          >
+            <img
+              src="/icon/chevron-right.svg"
+              alt=""
+              className={`w-3.5 h-3.5 icon-gray transition-transform ${showDetails ? 'rotate-90' : ''}`}
+            />
+            Technical details
+          </button>
+          {showDetails && (
+            <pre className="text-[12px] bg-surface-secondary/60 text-destructive p-3 rounded-xl mt-2 overflow-auto max-h-32 border border-border/30">
+              {error.message}
+            </pre>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 /**
  * Page Error Fallback - for route-level errors
  */
 function PageErrorFallback({ error, resetErrorBoundary }) {
+  const [showDetails, setShowDetails] = useState(false);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-surface">
-      <div className="w-20 h-20 mb-6 rounded-full bg-destructive/10 flex items-center justify-center">
-        <svg
-          className="w-10 h-10 text-destructive"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
+      {/* Icon */}
+      <div className="w-14 h-14 bg-surface-secondary/80 rounded-2xl flex items-center justify-center shadow-xs mb-6">
+        <img src="/icon/alert-circle.svg" alt="Error" className="w-7 h-7 icon-dark" />
       </div>
-      
-      <h1 className="text-2xl font-bold text-primary mb-2">
-        Something went wrong
-      </h1>
-      
-      <p className="text-muted-foreground mb-6 max-w-md text-center">
-        This page encountered an error. Please try again or go back to home.
+
+      {/* Title */}
+      <h1 className="text-[24px] font-semibold text-primary tracking-[-0.02em] mb-2">Something went wrong</h1>
+
+      {/* Description */}
+      <p className="text-[14px] text-muted mb-8 max-w-md text-center">
+        An unexpected error occurred. Try reloading the page or return to dashboard.
       </p>
-      
-      {import.meta.env.DEV && (
-        <details className="mb-6 max-w-lg w-full">
-          <summary className="cursor-pointer text-sm text-muted-foreground hover:text-primary">
-            Error details (dev only)
-          </summary>
-          <pre className="text-xs bg-surface-secondary p-4 rounded-md mt-2 overflow-auto">
-            <code className="text-destructive">{error.stack || error.message}</code>
-          </pre>
-        </details>
-      )}
-      
-      <div className="flex gap-3">
-        <Button onClick={resetErrorBoundary}>
+
+      {/* Actions */}
+      <div className="flex items-center gap-2.5 mb-6">
+        <Button variant="primary" onClick={resetErrorBoundary}>
+          <img src="/icon/refresh-cw.svg" alt="" className="w-4 h-4 icon-white" />
           Try again
         </Button>
-        <Button variant="outline" onClick={() => window.location.href = '/'}>
-          Go to home
+        <Button variant="secondary" onClick={() => (window.location.href = '/')}>
+          <img src="/icon/home.svg" alt="" className="w-4 h-4 icon-dark" />
+          Dashboard
         </Button>
       </div>
+
+      {/* Technical details */}
+      {import.meta.env.DEV && error && (
+        <div className="w-full max-w-lg">
+          <button
+            onClick={() => setShowDetails(!showDetails)}
+            className="text-[13px] text-muted hover:text-primary transition-colors flex items-center gap-1.5"
+          >
+            <img
+              src="/icon/chevron-right.svg"
+              alt=""
+              className={`w-3.5 h-3.5 icon-gray transition-transform ${showDetails ? 'rotate-90' : ''}`}
+            />
+            Technical details
+          </button>
+          {showDetails && (
+            <pre className="text-[12px] bg-surface-secondary/60 text-destructive p-4 rounded-xl mt-3 overflow-auto max-h-48 border border-border/30 whitespace-pre-wrap break-words">
+              {error.stack || error.message}
+            </pre>
+          )}
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
 /**
@@ -109,22 +123,15 @@ function PageErrorFallback({ error, resetErrorBoundary }) {
  */
 function ErrorBoundary({ children, fallback, onReset, onError }) {
   const handleError = (error, info) => {
-    // Log error to console in dev
-    console.error('Error caught by boundary:', error, info)
-    
-    // Call custom error handler if provided
-    onError?.(error, info)
-  }
+    console.error('Error caught by boundary:', error, info);
+    onError?.(error, info);
+  };
 
   return (
-    <ReactErrorBoundary
-      FallbackComponent={fallback || ErrorFallback}
-      onReset={onReset}
-      onError={handleError}
-    >
+    <ReactErrorBoundary FallbackComponent={fallback || ErrorFallback} onReset={onReset} onError={handleError}>
       {children}
     </ReactErrorBoundary>
-  )
+  );
 }
 
 /**
@@ -135,7 +142,7 @@ function PageErrorBoundary({ children, onReset }) {
     <ErrorBoundary fallback={PageErrorFallback} onReset={onReset}>
       {children}
     </ErrorBoundary>
-  )
+  );
 }
 
-export { ErrorBoundary, PageErrorBoundary, ErrorFallback, PageErrorFallback }
+export { ErrorBoundary, PageErrorBoundary, ErrorFallback, PageErrorFallback };

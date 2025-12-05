@@ -129,7 +129,10 @@ exports.sendMessage = async (req, res) => {
         profileId,
         model,
         inputLength: messages.reduce((sum, m) => sum + (m.content?.length || 0), 0),
-        outputLength: text.length
+        outputLength: text.length,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
       });
     }
 
@@ -271,6 +274,21 @@ exports.sendMessageStream = async (req, res) => {
     res.write('data: [DONE]\n\n');
     res.end();
 
+    // Log activity if user_id is available from request
+    const userId = req.body.user_id || req.headers['x-user-id'];
+    if (userId) {
+      activityLogService.logFeatureUsage(userId, 'chat_message', {
+        profileId,
+        model,
+        inputLength: messages.reduce((sum, m) => sum + (m.content?.length || 0), 0),
+        outputLength: totalChars,
+        streaming: true,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
+      });
+    }
+
     console.log(`[SUCCESS] Chat stream completed (${totalChars} chars)`);
 
   } catch (error) {
@@ -333,6 +351,21 @@ exports.uploadFile = async (req, res) => {
       }
     }
 
+    // Log activity if user_id is available
+    const userId = req.body.user_id || req.headers['x-user-id'];
+    if (userId) {
+      activityLogService.logFeatureUsage(userId, 'file_upload', {
+        fileId,
+        fileName: fileName || `file_${fileId}`,
+        mimeType,
+        fileType: type,
+        hasExtractedText: !!extractedText,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
+      });
+    }
+
     res.json({
       fileId,
       fileName: fileName || `file_${fileId}`,
@@ -369,6 +402,18 @@ exports.summarizeConversation = async (req, res) => {
 
     const { summarizeConversation } = require('../utils/conversationSummarizer');
     const result = await summarizeConversation(messages);
+
+    // Log activity if user_id is available
+    const userId = req.body.user_id || req.headers['x-user-id'];
+    if (userId) {
+      activityLogService.logFeatureUsage(userId, 'conversation_summarize', {
+        messagesCount: messages.length,
+        summarizedCount: result.summarizedCount || messages.length,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
+      });
+    }
 
     res.json({
       summary: result.summary,
@@ -512,6 +557,22 @@ exports.sendMessageHumanized = async (req, res) => {
     } else if (chatSettings?.useAntiAIDetection) {
       // Apply lighter humanization (just imperfection injection)
       text = humanizeService.injectHumanImperfections(text, profile.voice_profile);
+    }
+
+    // Log activity
+    const userId = req.body.user_id || req.headers['x-user-id'];
+    if (userId) {
+      activityLogService.logFeatureUsage(userId, 'chat_humanized', {
+        profileId,
+        model,
+        inputLength: messages.reduce((sum, m) => sum + (m.content?.length || 0), 0),
+        outputLength: text.length,
+        humanized: !!humanizationResult,
+        iterations: humanizationResult?.iterations,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
+      });
     }
 
     res.json({
@@ -694,6 +755,22 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
     
     res.write('data: [DONE]\n\n');
     res.end();
+
+    // Log activity
+    const userId = req.body.user_id || req.headers['x-user-id'];
+    if (userId) {
+      activityLogService.logFeatureUsage(userId, 'chat_humanized', {
+        profileId,
+        model,
+        inputLength: messages.reduce((sum, m) => sum + (m.content?.length || 0), 0),
+        outputLength: totalChars,
+        streaming: true,
+        humanized: !!humanizationResult,
+        creditsUsed: req.creditCost || 0,
+        creditsBefore: req.creditsBefore,
+        creditsAfter: req.creditsAfter
+      });
+    }
 
     console.log(`[SUCCESS] Humanized stream completed (${totalChars} chars)`);
 

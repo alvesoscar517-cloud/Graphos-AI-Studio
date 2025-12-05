@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
+import { getLocalizedContentError } from '../../utils/errorMessages'
 import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
 import LazyLottie from '../Common/LazyLottie'
@@ -113,7 +114,8 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
       }
     } catch (error) {
       console.error('[FAIL] Error calculating score:', error)
-      modal.error(t('analysis.calculationFailed') + ' ' + error.message)
+      const localizedError = getLocalizedContentError(error.message, t)
+      modal.error(localizedError || t('analysis.calculationFailed'))
       setScore(null)
       setAnalysisDetails(null)
     } finally {

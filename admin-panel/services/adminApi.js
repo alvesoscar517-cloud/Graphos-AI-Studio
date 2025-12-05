@@ -641,11 +641,9 @@ export const backupApi = {
 
   // Download backup directly
   download: async (filename) => {
-    const adminKey = getAdminKey();
+    const authHeaders = getAuthHeader();
     const response = await fetch(`${API_BASE_URL}/api/backup/download/${filename}`, {
-      headers: {
-        'X-Admin-Key': adminKey,
-      },
+      headers: authHeaders,
     });
 
     if (!response.ok) {
@@ -668,5 +666,10 @@ export const backupApi = {
     return apiCall(`/api/backup/cleanup?keep=${keepCount}`, {
       method: 'DELETE',
     });
+  },
+
+  // Get storage statistics
+  getStorageStats: async () => {
+    return apiCall('/api/backup/storage-stats');
   },
 };

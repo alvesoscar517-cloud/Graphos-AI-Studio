@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { detectAI as detectAIAPI } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
+import { getLocalizedContentError } from '../../utils/errorMessages'
+import { handleCreditError } from '../../utils/creditHandler'
 import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import Icon from '../Common/Icon'
@@ -11,17 +14,10 @@ import { cn } from '../../lib/utils'
 
 const AIDetectionCard = ({ disabled, text }) => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [result, setResult] = useState(null)
   const [confidence, setConfidence] = useState(null)
   
-  // Debug: Log text prop changes
-  useEffect(() => {
-    console.log('[AIDetectionCard] text prop changed:', { 
-      length: text?.length, 
-      preview: text?.substring(0, 50),
-      isEmpty: !text || text.trim().length === 0
-    })
-  }, [text])
   const [evidence, setEvidence] = useState([])
   const [humanIndicators, setHumanIndicators] = useState([])
   const [aiIndicators, setAiIndicators] = useState([])
@@ -98,7 +94,7 @@ const AIDetectionCard = ({ disabled, text }) => {
 
     // Check minimum text length (50 characters required for AI detection)
     if (text.trim().length < 50) {
-      modal.error(t('analysis.textTooShort', { min: 50, current: text.trim().length }))
+      modal.error(t('errors.textTooShort', { min: 50 }))
       return
     }
 
@@ -109,7 +105,6 @@ const AIDetectionCard = ({ disabled, text }) => {
     
     setIsLoading(true)
     try {
-      console.log('[AI Detection] Sending text:', { length: text.length, preview: text.substring(0, 100) })
       const apiResult = await detectAIAPI(text)
       
       if (apiResult.success && apiResult.data) {
@@ -147,7 +142,16 @@ const AIDetectionCard = ({ disabled, text }) => {
       }
     } catch (error) {
       console.error('[FAIL] Error detecting AI:', error)
-      modal.error(t('analysis.detectionFailed') + ' ' + error.message)
+      
+      // Check if it's a credit error first
+      const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+      
+      if (!wasCreditError) {
+        // Get localized error message for other errors
+        const localizedError = getLocalizedContentError(error.message, t)
+        modal.error(localizedError || t('analysis.detectionFailed'))
+      }
+      
       setResult(null)
       setConfidence(null)
       setEvidence([])
@@ -232,23 +236,41 @@ const AIDetectionCard = ({ disabled, text }) => {
           <div className="mt-2 block animate-slide-down">
             <div className="flex flex-col items-center gap-2 p-0">
               {/* Score Circle */}
-              <div className="relative w-score-circle h-score-circle flex items-center justify-center my-1">
-                <svg className="absolute top-0 left-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
-                  <circle className="fill-none stroke-bg-tertiary stroke-[8]" cx="50" cy="50" r="45" />
+              <div className="relative w-score-circle h-score-circle flex items-center justify-center my-3">
+                <svg 
+                  className="absolute top-0 left-0 w-full h-full -rotate-90" 
+                  viewBox="0 0 100 100"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08))' }}
+                >
+                  {/* Background circle - transparent fill */}
                   <circle 
-                    className="fill-none stroke-text-link stroke-[8]"
-                    cx="50" cy="50" r="45"
-                    style={{
-                      strokeDasharray: 282.74,
-                      strokeDashoffset: 282.74 - (result / 100) * 282.74,
-                      strokeLinecap: 'round'
+                    className="fill-none" 
+                    cx="50" cy="50" r="42"
+                    style={{ 
+                      stroke: 'var(--color-border-light)',
+                      strokeWidth: 8
                     }}
                   />
-                  <circle className="fill-bg-primary" cx="50" cy="50" r="40" />
+                  {/* Progress circle */}
+                  <circle 
+                    className="fill-none"
+                    cx="50" cy="50" r="42"
+                    style={{
+                      stroke: 'var(--color-text-link)',
+                      strokeWidth: 8,
+                      strokeDasharray: 263.89,
+                      strokeDashoffset: 263.89 - (result / 100) * 263.89,
+                      strokeLinecap: 'round',
+                      transition: 'stroke-dashoffset 0.5s ease-out',
+                      filter: 'drop-shadow(0 1px 3px rgba(66, 133, 244, 0.3))'
+                    }}
+                  />
                 </svg>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-baseline justify-center gap-0.5 z-10">
-                  <div className="text-3xl font-semibold leading-none tracking-tight text-text-primary">{result}</div>
-                  <div className="text-sm font-medium leading-none text-text-secondary opacity-50">%</div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="flex items-baseline justify-center gap-0.5">
+                    <span className="text-3xl font-semibold leading-none tracking-tight text-text-primary">{result}</span>
+                    <span className="text-sm font-medium leading-none text-text-secondary opacity-60">%</span>
+                  </div>
                 </div>
               </div>
               

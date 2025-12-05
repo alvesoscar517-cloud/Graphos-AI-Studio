@@ -17,6 +17,7 @@ export default function UserProfiles() {
   const [user, setUser] = useState(null);
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deletingProfile, setDeletingProfile] = useState(null);
 
   useEffect(() => { loadData(); }, [userId]);
 
@@ -45,11 +46,14 @@ export default function UserProfiles() {
     });
     if (!confirmed) return;
     try {
+      setDeletingProfile(profileId);
       await usersApi.deleteProfile(userId, profileId);
       notify.success('Deleted!');
       loadData();
     } catch (err) {
       notify.error('Error: ' + err.message);
+    } finally {
+      setDeletingProfile(null);
     }
   };
 
@@ -80,10 +84,15 @@ export default function UserProfiles() {
           {profiles.map(profile => (
             <Card key={profile.id} className="p-5 relative group">
               <button
-                className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-surface-secondary opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity hover:bg-destructive/10"
+                className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-surface-secondary opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity hover:bg-destructive/10 disabled:opacity-50"
                 onClick={() => handleDeleteProfile(profile.id, profile.name)}
+                disabled={deletingProfile === profile.id}
               >
-                <img src="/icon/trash-2.svg" alt="" className="w-4 h-4" style={{ filter: 'invert(36%) sepia(76%) saturate(2696%) hue-rotate(338deg)' }} />
+                {deletingProfile === profile.id ? (
+                  <div className="w-4 h-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <img src="/icon/trash-2.svg" alt="" className="w-4 h-4" style={{ filter: 'invert(36%) sepia(76%) saturate(2696%) hue-rotate(338deg)' }} />
+                )}
               </button>
 
               <div className="flex items-start gap-3 mb-3">

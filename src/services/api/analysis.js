@@ -77,10 +77,6 @@ export async function detectAI(text, enhanced = true, language = null) {
       }
     }
     
-    console.log('[CHART] AI detection text stats:', validation.stats)
-    console.log(`[SEARCH] Using ${enhanced ? 'ENHANCED' : 'STANDARD'} detection mode`)
-    console.log('[DEBUG] Text to send:', { length: text?.length, preview: text?.substring(0, 100) })
-    
     // Get language from parameter, localStorage, or default to 'en'
     const lang = language || localStorage.getItem('i18nextLng') || 'en'
     
@@ -90,8 +86,6 @@ export async function detectAI(text, enhanced = true, language = null) {
       enhanced: enhanced,
       language: lang.substring(0, 2)
     }
-    
-    console.log('[DEBUG] Request body:', { ...requestBody, text: `[${requestBody.text?.length} chars]` })
     
     // Use deduplicated request to prevent duplicate concurrent AI detection calls
     const { data } = await apiClient.postDeduplicated('/authenticate', requestBody)

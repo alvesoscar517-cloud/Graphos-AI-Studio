@@ -145,36 +145,44 @@ function handleError(res, error, options = {}) {
     code: error.code,
   });
   
-  // Determine error code
+  // Determine error code and extract user-friendly message
   let code = 'SERVER_ERROR';
   let details = null;
+  let userMessage = null;
   
   if (error.code && ERROR_CODES[error.code]) {
     code = error.code;
   } else if (error.message) {
-    // Try to map error message to code
-    const msg = error.message.toLowerCase();
+    const msg = error.message;
+    const msgLower = msg.toLowerCase();
     
-    if (msg.includes('quota') || msg.includes('resource_exhausted')) {
-      code = 'QUOTA_EXCEEDED';
-    } else if (msg.includes('not found')) {
-      code = 'NOT_FOUND';
-    } else if (msg.includes('invalid') || msg.includes('validation')) {
+    // Extract user-friendly message from INVALID_CONTENT errors
+    if (msg.startsWith('INVALID_CONTENT:')) {
       code = 'INVALID_INPUT';
-    } else if (msg.includes('unauthorized') || msg.includes('auth')) {
+      userMessage = msg.replace('INVALID_CONTENT:', '').trim();
+      details = userMessage;
+    } else if (msg.startsWith('INVALID_INPUT:')) {
+      code = 'INVALID_INPUT';
+      userMessage = msg.replace('INVALID_INPUT:', '').trim();
+      details = userMessage;
+    } else if (msgLower.includes('quota') || msgLower.includes('resource_exhausted')) {
+      code = 'QUOTA_EXCEEDED';
+    } else if (msgLower.includes('not found')) {
+      code = 'NOT_FOUND';
+    } else if (msgLower.includes('invalid') || msgLower.includes('validation')) {
+      code = 'INVALID_INPUT';
+      details = msg;
+    } else if (msgLower.includes('unauthorized') || msgLower.includes('auth')) {
       code = 'UNAUTHORIZED';
-    } else if (msg.includes('rate') || msg.includes('429')) {
+    } else if (msgLower.includes('rate') || msgLower.includes('429')) {
       code = 'RATE_LIMITED';
-    }
-    
-    // Include original message as details in non-production
-    if (process.env.NODE_ENV !== 'production') {
-      details = error.message;
     }
   }
   
-  // Use localizer if available
-  if (localizer && typeof localizer.error === 'function') {
+  // Use localizer if available, but prefer userMessage for content validation errors
+  if (userMessage) {
+    sendError(res, code, { message: userMessage, details });
+  } else if (localizer && typeof localizer.error === 'function') {
     const localized = localizer.error(code.toLowerCase());
     sendError(res, code, { 
       message: localized.error || localized.message,

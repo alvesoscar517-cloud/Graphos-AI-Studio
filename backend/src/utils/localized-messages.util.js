@@ -17,11 +17,11 @@ function getAIVerdict(aiProbability, lang = 'en') {
   if (aiProbability < 20) {
     return localization.t('ai_detection.result_human', lang);
   } else if (aiProbability < 40) {
-    return localization.t('voice_profile.match_high', lang, { score: Math.round(100 - aiProbability) });
+    return localization.t('ai_detection.result_mostly_human', lang);
   } else if (aiProbability < 60) {
     return localization.t('ai_detection.result_mixed', lang);
   } else if (aiProbability < 80) {
-    return localization.t('ai_detection.result_ai', lang);
+    return localization.t('ai_detection.result_likely_ai', lang);
   } else {
     return localization.t('ai_detection.result_ai', lang);
   }

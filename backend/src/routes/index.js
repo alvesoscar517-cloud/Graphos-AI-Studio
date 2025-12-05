@@ -195,9 +195,18 @@ router.post('/create_profile',
   asyncHandler(profileController.createProfile)
 );
 
+// Rate limiter for profile creation - max 3 requests per 60 seconds per user
+const { operationRateLimiter } = require('../middleware/rateLimit');
+const profileCreationRateLimiter = operationRateLimiter('profile_creation', {
+  points: 3,      // Max 3 profile creations
+  duration: 60,   // Per 60 seconds
+  blockDuration: 120 // Block for 2 minutes if exceeded
+});
+
 router.post('/create_profile_complete', 
   deprecationWarning('/profiles/create'),
   optionalAuth, checkLocked, activityLoggerMiddleware,
+  profileCreationRateLimiter, // Add rate limiting BEFORE credit check
   creditMiddleware.profileComplete, 
   asyncHandler(profileController.createProfileComplete)
 );
@@ -241,10 +250,18 @@ router.post('/delete_profile',
   asyncHandler(profileController.deleteProfile)
 );
 
+// Rate limiter for AI detection - max 10 requests per 60 seconds per user
+const aiDetectionRateLimiter = operationRateLimiter('ai_detection', {
+  points: 10,     // Max 10 AI detections
+  duration: 60,   // Per 60 seconds
+  blockDuration: 60 // Block for 1 minute if exceeded
+});
+
 // === Analysis legacy endpoints ===
 router.post('/authenticate', 
   deprecationWarning('/analysis/authenticate'),
   optionalAuth, checkLocked, activityLoggerMiddleware,
+  aiDetectionRateLimiter, // Add rate limiting BEFORE credit check
   validators.detectAI, creditMiddleware.aiDetection, 
   asyncHandler(analysisController.authenticateContent)
 );

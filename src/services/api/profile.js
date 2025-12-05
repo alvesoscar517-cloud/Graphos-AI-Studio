@@ -186,6 +186,7 @@ export async function finalizeProfile(profileId) {
 
 /**
  * Create profile with all data in one call (optimized flow)
+ * Uses request deduplication to prevent duplicate concurrent requests
  * @param {string} profileName 
  * @param {string} theme 
  * @param {Array<string>} samples 
@@ -202,7 +203,9 @@ export async function createProfileComplete(profileName, theme, samples, options
     
     console.log(`[PACKAGE] Creating complete profile with ${samples.length} samples...`)
     
-    const { data } = await apiClient.post('/create_profile_complete', {
+    // Use deduplicated request to prevent duplicate concurrent profile creation
+    // This is critical to prevent multiple credits being deducted
+    const { data } = await apiClient.postDeduplicated('/create_profile_complete', {
       profile_name: profileName,
       email: userInfo.email,
       name: userInfo.name,

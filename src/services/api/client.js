@@ -153,14 +153,6 @@ class ApiClient {
         
         // Handle error responses
         if (!response.ok) {
-          // Debug: Log raw response data
-          console.log('[API ERROR] Raw response:', { 
-            status: response.status, 
-            data,
-            endpoint,
-            contentType
-          })
-          
           const error = parseApiError(response, data, requestId)
           
           // Log error with standardized handler
@@ -370,9 +362,16 @@ class ApiClient {
   /**
    * Make a deduplicated POST request
    * Prevents duplicate concurrent requests to the same endpoint with same body
+   * Also enforces cooldown between identical requests to prevent rapid re-requests
    */
   async postDeduplicated(endpoint, body, options = {}) {
-    const key = requestDeduplicator.getKey(endpoint, body)
+    // For profile creation, use a simpler key to catch all attempts
+    // This prevents multiple profile creations even with slightly different data
+    const isProfileCreation = endpoint.includes('profile_complete') || endpoint.includes('create_profile')
+    const key = isProfileCreation 
+      ? `${endpoint}:profile_creation` // Simplified key for profile creation
+      : requestDeduplicator.getKey(endpoint, body)
+    
     return requestDeduplicator.execute(key, () => this.post(endpoint, body, options))
   }
   

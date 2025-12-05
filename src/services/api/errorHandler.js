@@ -27,6 +27,9 @@ export const ERROR_MESSAGES = {
   RATE_LIMITED: 'Too many requests. Please wait a moment and try again.',
   QUOTA_EXCEEDED: 'API quota exceeded. Please try again later.',
   
+  // Credit errors
+  INSUFFICIENT_CREDITS: 'Insufficient credits. Please purchase more credits to continue.',
+  
   // Server errors
   SERVER_ERROR: 'Something went wrong on our end. Please try again.',
   SERVICE_UNAVAILABLE: 'Service temporarily unavailable. Please try again later.',
@@ -84,10 +87,9 @@ export function parseApiError(response, data, requestId = null) {
   
   // Determine error code from response
   let code = data?.code || 'UNKNOWN'
-  let message = data?.error || data?.message || ERROR_MESSAGES.UNKNOWN
   let details = data?.details || null
   
-  // Map HTTP status codes to error codes
+  // Map HTTP status codes to error codes if not provided
   if (!data?.code) {
     switch (statusCode) {
       case 400:
@@ -95,6 +97,9 @@ export function parseApiError(response, data, requestId = null) {
         break
       case 401:
         code = 'UNAUTHORIZED'
+        break
+      case 402:
+        code = 'INSUFFICIENT_CREDITS'
         break
       case 403:
         code = 'FORBIDDEN'
@@ -116,9 +121,13 @@ export function parseApiError(response, data, requestId = null) {
     }
   }
   
-  // Use mapped message if available
-  if (ERROR_MESSAGES[code]) {
-    message = ERROR_MESSAGES[code]
+  // Prefer backend's detailed message, then details, then fallback to generic message
+  // This ensures user-friendly validation messages are shown
+  let message = data?.error || data?.message || details || ERROR_MESSAGES[code] || ERROR_MESSAGES.UNKNOWN
+  
+  // If details contains more specific info than the generic error, use it
+  if (details && message === ERROR_MESSAGES[code]) {
+    message = details
   }
   
   return new ApiError(message, {
@@ -245,6 +254,8 @@ export function isRetryableError(error) {
 class RequestDeduplicator {
   constructor() {
     this.pendingRequests = new Map()
+    this.recentRequests = new Map() // Track recent completed requests
+    this.COOLDOWN_MS = 2000 // 2 second cooldown between identical requests
   }
 
   /**
@@ -256,7 +267,7 @@ class RequestDeduplicator {
   }
 
   /**
-   * Execute request with deduplication
+   * Execute request with deduplication and rate limiting
    */
   async execute(key, requestFn) {
     // Check if request is already pending
@@ -265,9 +276,23 @@ class RequestDeduplicator {
       return this.pendingRequests.get(key)
     }
 
+    // Check cooldown for recently completed requests (prevent rapid re-requests)
+    const lastCompleted = this.recentRequests.get(key)
+    if (lastCompleted && Date.now() - lastCompleted < this.COOLDOWN_MS) {
+      const waitTime = this.COOLDOWN_MS - (Date.now() - lastCompleted)
+      console.log(`[DEDUP] Request on cooldown, waiting ${waitTime}ms: ${key.substring(0, 50)}...`)
+      await new Promise(resolve => setTimeout(resolve, waitTime))
+    }
+
     // Create new request promise
     const promise = requestFn().finally(() => {
       this.pendingRequests.delete(key)
+      this.recentRequests.set(key, Date.now())
+      
+      // Clean up old entries after 1 minute
+      setTimeout(() => {
+        this.recentRequests.delete(key)
+      }, 60000)
     })
 
     this.pendingRequests.set(key, promise)
@@ -279,6 +304,7 @@ class RequestDeduplicator {
    */
   clear() {
     this.pendingRequests.clear()
+    this.recentRequests.clear()
   }
 }
 

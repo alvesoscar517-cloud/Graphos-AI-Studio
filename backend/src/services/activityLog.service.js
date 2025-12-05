@@ -26,6 +26,12 @@ const ACTIVITY_TYPES = {
   // Authentication
   LOGIN: 'login',
   LOGOUT: 'logout',
+  REGISTER: 'register',
+  VERIFY_EMAIL: 'verify_email',
+  FORGOT_PASSWORD: 'forgot_password',
+  RESET_PASSWORD: 'reset_password',
+  CHANGE_PASSWORD: 'change_password',
+  DELETE_ACCOUNT: 'delete_account',
   
   // Profile operations
   PROFILE_CREATE: 'profile_create',
@@ -37,6 +43,7 @@ const ACTIVITY_TYPES = {
   // Analysis operations
   AI_DETECTION: 'ai_detection',
   TEXT_ANALYSIS: 'text_analysis',
+  CHECK_HUMANIZATION: 'check_humanization',
   
   // Rewrite operations
   TEXT_REWRITE: 'text_rewrite',
@@ -58,11 +65,15 @@ const ACTIVITY_TYPES = {
   CREDIT_PURCHASE: 'credit_purchase',
   CREDIT_DEDUCT: 'credit_deduct',
   CREDIT_BONUS: 'credit_bonus',
+  CREDITS_ADDED: 'credits_added',
   
   // Account operations
   ACCOUNT_UPDATE: 'account_update',
   ACCOUNT_LOCKED: 'account_locked',
-  ACCOUNT_UNLOCKED: 'account_unlocked'
+  ACCOUNT_UNLOCKED: 'account_unlocked',
+  
+  // Notification
+  NOTIFICATION_RECEIVED: 'notification_received'
 };
 
 // Buffer for batch write
@@ -164,10 +175,26 @@ function sanitizeData(data) {
   const allowedFields = [
     'creditsUsed', 'creditsBefore', 'creditsAfter',
     'feature', 'model', 'wordCount', 'sentenceCount',
-    'profileId', 'profileName', 'sampleCount',
+    'profileId', 'profileName', 'sampleCount', 'sampleId',
     'inputLength', 'outputLength',
     'success', 'error', 'duration',
-    'ip', 'userAgent', 'source'
+    'ip', 'userAgent', 'source',
+    // Additional fields for detailed tracking
+    'aiProbability', 'isAuthentic', 'voiceCompatibility',
+    'iterations', 'reachedTarget', 'streaming',
+    'endpoint', 'method', 'theme',
+    // Translation fields
+    'sourceLang', 'targetLang',
+    // File upload fields
+    'fileId', 'fileName', 'mimeType', 'fileType', 'hasExtractedText',
+    // Summarize fields
+    'messagesCount', 'summarizedCount',
+    // Check humanization fields
+    'overallRisk',
+    // Payment fields
+    'orderId', 'packageId', 'packageName', 'price', 'priceFormatted',
+    // Admin action fields
+    'reason', 'adminId', 'humanized'
   ];
   
   for (const field of allowedFields) {
@@ -211,7 +238,12 @@ async function logFeatureUsage(userId, featureType, data = {}) {
     'file_upload': ACTIVITY_TYPES.FILE_UPLOAD,
     'profile_create': ACTIVITY_TYPES.PROFILE_CREATE,
     'profile_sample_add': ACTIVITY_TYPES.PROFILE_SAMPLE_ADD,
-    'profile_finalize': ACTIVITY_TYPES.PROFILE_FINALIZE
+    'profile_finalize': ACTIVITY_TYPES.PROFILE_FINALIZE,
+    'conversation_summarize': ACTIVITY_TYPES.CONVERSATION_SUMMARIZE,
+    'check_humanization': ACTIVITY_TYPES.CHECK_HUMANIZATION,
+    'credit_purchase': ACTIVITY_TYPES.CREDIT_PURCHASE,
+    'account_locked': ACTIVITY_TYPES.ACCOUNT_LOCKED,
+    'account_unlocked': ACTIVITY_TYPES.ACCOUNT_UNLOCKED
   };
   
   const activityType = typeMap[featureType] || featureType;

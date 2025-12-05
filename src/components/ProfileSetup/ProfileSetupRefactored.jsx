@@ -100,6 +100,8 @@ const ProfileSetup = () => {
     setShowError,
     errorMessage,
     setErrorMessage,
+    errorCode,
+    setErrorCode,
     isCancelling,
     qualityScore,
     setQualityScore,
@@ -145,9 +147,22 @@ const ProfileSetup = () => {
     MAX_SAMPLE_WORDS
   } = useProfileSetup()
 
+  // Ref to track if profile creation is already in progress (prevent duplicate calls)
+  const isCreatingProfileRef = useRef(false)
+  
   // Step 4: Create complete profile with retry mechanism
   const createProfile = useCallback(async (retryCount = 0) => {
+    // CRITICAL: Prevent duplicate/concurrent profile creation
     if (!mountedRef.current) return
+    if (isCreatingProfileRef.current && retryCount === 0) {
+      console.log('[PROFILE] Creation already in progress, skipping duplicate call')
+      return
+    }
+    
+    // Mark as creating (only for initial call, not retries)
+    if (retryCount === 0) {
+      isCreatingProfileRef.current = true
+    }
     
     const MAX_RETRIES = 2
     
@@ -235,25 +250,40 @@ const ProfileSetup = () => {
         if (mountedRef.current) {
           setProcessing(false)
           setShowCompletion(true)
+          isCreatingProfileRef.current = false // Reset flag on success
         }
       } catch (apiError) {
         // Ignore abort errors
         if (apiError.name === 'AbortError') {
           console.log('API request was aborted')
+          isCreatingProfileRef.current = false
           return
         }
         
         console.error('API error:', apiError)
         
-        // Retry logic for transient errors only
         const errMsg = apiError.message?.toLowerCase() || ''
-        const isRetryable = (
+        const errorCode = apiError.code || ''
+        
+        // Check for non-retryable errors first (credit, rate limit, duplicate, etc.)
+        const isInsufficientCredits = errorCode === 'INSUFFICIENT_CREDITS' || 
+          errMsg.includes('insufficient credits') || 
+          errMsg.includes('credit')
+        const isRateLimit = errMsg.includes('rate_limit') || errorCode === 'RATE_LIMITED'
+        const isDuplicate = errMsg.includes('duplicate') || errMsg.includes('already exists') || errorCode === 'DUPLICATE'
+        const isSimilar = errMsg.includes('similar') || errorCode === 'SIMILAR_SAMPLES'
+        
+        // These errors should NOT be retried
+        const isNonRetryable = isInsufficientCredits || isRateLimit || isDuplicate || isSimilar
+        
+        // Retry logic for transient errors only
+        const isRetryable = !isNonRetryable && (
           errMsg.includes('quota') || 
           errMsg.includes('overload') ||
           errMsg.includes('timeout') ||
           errMsg.includes('network') ||
           errMsg.includes('database_write')
-        ) && !errMsg.includes('rate_limit') && !errMsg.includes('duplicate') && !errMsg.includes('similar')
+        )
         
         if (isRetryable && retryCount < MAX_RETRIES) {
           console.log(`[SYNC] Retrying... (${retryCount + 1}/${MAX_RETRIES})`)
@@ -269,10 +299,14 @@ const ProfileSetup = () => {
         
         if (mountedRef.current) {
           let errorMsg = t('profileSetupErrors.unableToCreate')
+          let finalErrorCode = errorCode
           const errMessage = apiError.message || ''
           
           // Handle specific error types
-          if (errMessage.includes('code') || errMessage.includes('Code')) {
+          if (isInsufficientCredits) {
+            errorMsg = t('profileSetupErrors.insufficientCredits') || errMessage
+            finalErrorCode = 'INSUFFICIENT_CREDITS'
+          } else if (errMessage.includes('code') || errMessage.includes('Code')) {
             errorMsg = t('profileSetupErrors.textContainsCode')
           } else if (errMessage.includes('ký tự đặc biệt')) {
             errorMsg = t('profileSetupErrors.tooManySpecialChars')
@@ -280,11 +314,11 @@ const ProfileSetup = () => {
             errorMsg = t('profileSetupErrors.tooMuchRepetition')
           } else if (errMessage.includes('quota') || errMessage.includes('overload')) {
             errorMsg = t('profileSetupErrors.systemOverloaded')
-          } else if (errMessage.includes('limit') || errMessage.includes('RATE_LIMIT')) {
+          } else if (isRateLimit) {
             errorMsg = errMessage // Use the rate limit message from backend
-          } else if (errMessage.includes('already exists') || errMessage.includes('DUPLICATE')) {
+          } else if (isDuplicate) {
             errorMsg = errMessage // Use the duplicate name message from backend
-          } else if (errMessage.includes('too similar') || errMessage.includes('SIMILAR_SAMPLES')) {
+          } else if (isSimilar) {
             errorMsg = errMessage // Use the similar samples message from backend
           } else if (errMessage.includes('timeout') || errMessage.includes('TIMEOUT')) {
             errorMsg = t('profileSetupErrors.processingTooLong')
@@ -295,8 +329,10 @@ const ProfileSetup = () => {
           }
           
           setErrorMessage(errorMsg)
+          setErrorCode(finalErrorCode)
           setShowError(true)
           setProcessing(false)
+          isCreatingProfileRef.current = false // Reset flag on error
         }
       }
     } catch (error) {
@@ -305,17 +341,40 @@ const ProfileSetup = () => {
         setErrorMessage(t('profileSetupErrors.unexpectedError'))
         setShowError(true)
         setProcessing(false)
+        isCreatingProfileRef.current = false // Reset flag on error
       }
     }
   }, [profileData, setProfileData, setProcessing, setShowError, setShowCompletion, 
-      setProcessingStep, setProcessingMessage, setErrorMessage, setQualityScore, 
-      mountedRef, timeoutsRef])
+      setProcessingStep, setProcessingMessage, setErrorMessage, setErrorCode, setQualityScore, 
+      mountedRef, timeoutsRef, t])
 
   // Trigger profile creation when entering step 4
+  // CRITICAL: Use ref to ensure this only runs ONCE when entering step 4
+  const hasTriggeredCreationRef = useRef(false)
+  
   useEffect(() => {
-    if (currentStep !== 4 || processing || !mountedRef.current) return
+    // Reset trigger flag when leaving step 4
+    if (currentStep !== 4) {
+      hasTriggeredCreationRef.current = false
+      isCreatingProfileRef.current = false
+      return
+    }
+    
+    // Only trigger once when entering step 4
+    if (hasTriggeredCreationRef.current) {
+      return
+    }
+    
+    // Don't trigger if already processing, has error, or completed
+    if (processing || showError || showCompletion || !mountedRef.current) {
+      return
+    }
+    
+    // Mark as triggered and start creation
+    hasTriggeredCreationRef.current = true
+    console.log('[PROFILE] Triggering profile creation (step 4 entered)')
     createProfile()
-  }, [currentStep, processing, createProfile, mountedRef])
+  }, [currentStep, processing, showError, showCompletion, createProfile])
 
   // Don't render if cancelling or unmounted
   if (isCancelling || !mountedRef.current) {
@@ -337,7 +396,7 @@ const ProfileSetup = () => {
         <div className="py-[30px] px-10 pb-5 bg-transparent" role="progressbar" aria-valuenow={currentStep} aria-valuemin={1} aria-valuemax={4} aria-label={`Progress: Step ${currentStep} of 4`}>
           <div className="w-full h-1 bg-gray-200 rounded-xl overflow-hidden mb-3">
             <div 
-              className="h-full bg-text-link rounded-xl transition-[width] duration-400 ease-smooth" 
+              className="h-full bg-gradient-to-r from-[#38bdf8] via-[#3b82f6] to-[#06b6d4] rounded-xl transition-[width] duration-400 ease-smooth" 
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
@@ -409,14 +468,17 @@ const ProfileSetup = () => {
             showCompletion={showCompletion}
             showError={showError}
             errorMessage={errorMessage}
+            errorCode={errorCode}
             qualityScore={qualityScore}
             totalSamples={totalSamples}
             onBack={() => {
               setShowError(false)
+              setErrorCode('')
               setCurrentStep(3)
             }}
             onRetry={() => {
               setShowError(false)
+              setErrorCode('')
               createProfile()
             }}
             onComplete={handleComplete}

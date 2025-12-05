@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { rewriteText as rewriteTextAPI } from '../../services/api'
 import { useRewrite } from '@/stores'
+import { getLocalizedContentError } from '../../utils/errorMessages'
 import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
 import { cn } from '../../lib/utils'
@@ -36,7 +37,8 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
     } catch (error) {
       loadingModal.close()
       console.error('Error rewriting:', error)
-      modal.error(t('rewrite.rewriteFailed') + ' ' + error.message)
+      const localizedError = getLocalizedContentError(error.message, t)
+      modal.error(localizedError || t('rewrite.rewriteFailed'))
     } finally {
       setIsLoading(false)
     }

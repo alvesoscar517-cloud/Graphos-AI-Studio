@@ -407,7 +407,19 @@
     "fillAllRequired": "Vui lòng điền đầy đủ thông tin bắt buộc",
     "serviceUnavailable": "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau.",
     "verificationFailed": "Xác minh thất bại. Vui lòng thử lại.",
-    "serverError": "Lỗi máy chủ. Vui lòng thử lại sau."
+    "serverError": "Lỗi máy chủ. Vui lòng thử lại sau.",
+    "textLacksDiversity": "Văn bản của bạn chứa quá nhiều từ hoặc cụm từ lặp lại. Vui lòng cung cấp nội dung đa dạng hơn để phát hiện AI chính xác.",
+    "textTooRepetitive": "Văn bản của bạn lặp lại quá nhiều. Vui lòng cung cấp nội dung đa dạng hơn.",
+    "textContainsCode": "Văn bản của bạn có vẻ chứa mã code. Vui lòng cung cấp văn bản tự nhiên (email, blog, tin nhắn, v.v.) để phát hiện AI.",
+    "textTooManySpecialChars": "Văn bản của bạn chứa quá nhiều ký tự đặc biệt. Vui lòng cung cấp văn bản có ý nghĩa.",
+    "textTooShort": "Văn bản của bạn quá ngắn. Vui lòng cung cấp ít nhất {{min}} ký tự để phát hiện AI chính xác.",
+    "textTooLong": "Văn bản của bạn quá dài. Vui lòng cung cấp không quá {{max}} ký tự.",
+    "textLacksMeaningfulContent": "Văn bản của bạn quá ngắn hoặc thiếu nội dung có ý nghĩa. Vui lòng cung cấp văn bản đầy đủ hơn.",
+    "quotaExceeded": "Đã vượt quá hạn mức dịch vụ AI. Vui lòng thử lại sau hoặc liên hệ hỗ trợ.",
+    "insufficientCredits": "Bạn không có đủ credits cho hành động này. Vui lòng mua thêm credits.",
+    "rateLimited": "Quá nhiều yêu cầu. Vui lòng đợi một chút và thử lại.",
+    "timeout": "Yêu cầu đã hết thời gian. Vui lòng thử lại.",
+    "profileNotFound": "Không tìm thấy hồ sơ giọng văn. Vui lòng chọn hồ sơ hợp lệ."
   },
   "profile": {
     "selectProfile": "Chọn hồ sơ",
@@ -648,6 +660,7 @@
     "viewNextSample": "Xem mẫu sau",
     "finalizingProfile": "Đang hoàn tất hồ sơ",
     "errorOccurred": "Rất tiếc! Đã xảy ra lỗi",
+    "insufficientCredits": "Không đủ Credits",
     "complete": "Hoàn tất!",
     "profileReady": "Hồ sơ phong cách viết của bạn đã sẵn sàng",
     "goBackToPrevious": "Quay lại bước trước để sửa",
@@ -828,7 +841,10 @@
     "balance": "{{balance}} credit / {{used}} đã dùng",
     "upgradePlan": "Nâng cấp gói",
     "newBalance": "Số dư mới: {{balance}} credit",
-    "used": "đã dùng"
+    "used": "đã dùng",
+    "required": "Cần",
+    "available": "Hiện có",
+    "shortfall": "Thiếu"
   },
   "editor": {
     "enterYourText": "Nhập văn bản của bạn...",
@@ -1001,6 +1017,7 @@
     "finalizingProfile": "Đang hoàn tất hồ sơ...",
     "retrying": "Đang thử lại... ({{current}}/{{max}})",
     "unableToCreate": "Không thể tạo hồ sơ. Vui lòng thử lại.",
+    "insufficientCredits": "Bạn không đủ credits để tạo hồ sơ này. Vui lòng mua thêm credits để tiếp tục.",
     "textContainsCode": "Văn bản chứa mã code. Vui lòng cung cấp văn bản tự nhiên.",
     "tooManySpecialChars": "Văn bản chứa quá nhiều ký tự đặc biệt.",
     "tooMuchRepetition": "Văn bản lặp lại quá nhiều.",

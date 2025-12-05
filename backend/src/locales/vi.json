@@ -90,8 +90,10 @@
   "ai_detection": {
     "title": "Phát hiện nội dung AI",
     "result_human": "Văn bản này có vẻ do người viết",
-    "result_ai": "Văn bản này có vẻ do AI tạo ra",
+    "result_mostly_human": "Chủ yếu do người viết với một số dấu hiệu AI nhỏ",
     "result_mixed": "Văn bản này có dấu hiệu hỗn hợp (có thể có sự hỗ trợ của AI)",
+    "result_likely_ai": "Văn bản này có khả năng do AI tạo ra",
+    "result_ai": "Văn bản này có vẻ do AI tạo ra",
     "result_uncertain": "Không thể xác định chắc chắn",
     "evidence_title": "Bằng chứng",
     "human_indicators_title": "Chỉ số con người",

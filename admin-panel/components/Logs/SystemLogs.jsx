@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 export default function SystemLogs() {
   const { systemLogs: logs, loading: realtimeLoading, loadLogs, setActiveTab } = useRealtime();
   const [filter, setFilter] = useState('all');
+  const [clearing, setClearing] = useState(false);
   const notify = useNotify();
 
   useEffect(() => {
@@ -37,11 +38,14 @@ export default function SystemLogs() {
     if (!confirmed) return;
 
     try {
+      setClearing(true);
       await logsApi.clear();
       await loadLogs({}, true);
       notify.success('All logs cleared!');
     } catch (err) {
       notify.error('Error: ' + err.message);
+    } finally {
+      setClearing(false);
     }
   };
 
@@ -66,7 +70,7 @@ export default function SystemLogs() {
         title="System Logs"
         subtitle="Monitor system activities and events"
         actions={
-          <Button variant="destructive" size="sm" onClick={handleClearLogs}>
+          <Button variant="destructive" size="sm" onClick={handleClearLogs} disabled={clearing} loading={clearing}>
             <img src="/icon/trash-2.svg" alt="" className="w-4 h-4 icon-white" />
             Clear all logs
           </Button>

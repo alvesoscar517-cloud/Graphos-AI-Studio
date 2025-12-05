@@ -35,6 +35,7 @@ export default function SettingsView() {
   const [backupList, setBackupList] = useState([]);
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [backupResult, setBackupResult] = useState(null);
+  const [storageStats, setStorageStats] = useState(null);
   const [emailConfig, setEmailConfig] = useState(null);
   const [emailForm, setEmailForm] = useState({
     smtpHost: 'smtp.gmail.com',
@@ -51,7 +52,12 @@ export default function SettingsView() {
   const notify = useNotify();
 
   useEffect(() => { loadSettings(); }, []);
-  useEffect(() => { if (activeTab === 'backup') loadBackupList(); }, [activeTab]);
+  useEffect(() => { 
+    if (activeTab === 'backup') {
+      loadBackupList();
+      loadStorageStats();
+    }
+  }, [activeTab]);
   useEffect(() => { if (activeTab === 'email') loadEmailConfig(); }, [activeTab]);
 
   const loadSettings = async () => {
@@ -99,12 +105,20 @@ export default function SettingsView() {
     }
   };
 
+  const loadStorageStats = async () => {
+    try {
+      const response = await backupApi.getStorageStats();
+      if (response?.data) setStorageStats(response.data);
+    } catch (err) {
+      console.error('Load storage stats error:', err);
+    }
+  };
+
   const loadEmailConfig = async () => {
     try {
       const response = await emailConfigApi.get();
       if (response?.config) {
         setEmailConfig(response.config);
-        // Update form with existing config (but not password)
         setEmailForm(prev => ({
           ...prev,
           smtpHost: response.config.smtpHost || 'smtp.gmail.com',
@@ -112,7 +126,6 @@ export default function SettingsView() {
           fromEmail: response.config.fromEmail || 'no-reply@graphosai.com',
           fromName: response.config.fromName || 'Graphos AI Studio',
           supportEmail: response.config.supportEmail || 'support@graphosai.com',
-          // Don't set smtpUser/smtpPass - they're masked
         }));
       }
     } catch (err) {
@@ -132,7 +145,6 @@ export default function SettingsView() {
       if (response.success) {
         notify.success('Email configuration saved!');
         setEmailConfig(response.config);
-        // Clear password field after save
         setEmailForm(prev => ({ ...prev, smtpPass: '' }));
       }
     } catch (err) {
@@ -172,6 +184,7 @@ export default function SettingsView() {
         setShowBackupModal(true);
         notify.success('Backup completed successfully!');
         loadBackupList();
+        loadStorageStats();
       } else {
         notify.error('Backup failed: ' + (response.message || 'Unknown error'));
       }
@@ -240,6 +253,7 @@ export default function SettingsView() {
   ];
 
   if (loading) return <LoadingScreen />;
+
 
   return (
     <div className="p-6">
@@ -314,28 +328,9 @@ export default function SettingsView() {
 
                 {showPasswordForm && (
                   <form onSubmit={handleChangePassword} className="p-4 bg-surface-secondary rounded-xl space-y-4">
-                    <Input
-                      label="Current Password"
-                      type="password"
-                      value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                      required
-                    />
-                    <Input
-                      label="New Password"
-                      type="password"
-                      value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                      hint="Minimum 8 characters"
-                      required
-                    />
-                    <Input
-                      label="Confirm Password"
-                      type="password"
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      required
-                    />
+                    <Input label="Current Password" type="password" value={passwordData.currentPassword} onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))} required />
+                    <Input label="New Password" type="password" value={passwordData.newPassword} onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))} hint="Minimum 8 characters" required />
+                    <Input label="Confirm Password" type="password" value={passwordData.confirmPassword} onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))} required />
                     <div className="flex justify-end gap-3">
                       <Button type="button" variant="secondary" onClick={() => setShowPasswordForm(false)}>Cancel</Button>
                       <Button type="submit" loading={changingPassword}>Update Password</Button>
@@ -343,10 +338,7 @@ export default function SettingsView() {
                   </form>
                 )}
 
-                <button
-                  className="w-full flex items-center gap-4 p-4 rounded-xl border border-destructive/30 hover:border-destructive hover:bg-destructive/5 transition-colors text-left"
-                  onClick={logoutAdmin}
-                >
+                <button className="w-full flex items-center gap-4 p-4 rounded-xl border border-destructive/30 hover:border-destructive hover:bg-destructive/5 transition-colors text-left" onClick={logoutAdmin}>
                   <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
                     <img src="/icon/log-out.svg" alt="" className="w-5 h-5" style={{ filter: 'invert(36%) sepia(76%) saturate(2696%) hue-rotate(338deg)' }} />
                   </div>
@@ -364,29 +356,10 @@ export default function SettingsView() {
             <Card className="p-6">
               <h2 className="text-lg font-semibold text-primary mb-6">System Settings</h2>
               <div className="space-y-6">
-                <Input
-                  label="Website Name"
-                  value={settings?.system?.siteName || ''}
-                  onChange={(e) => updateSetting('system', 'siteName', e.target.value)}
-                />
-                <SettingToggle
-                  label="Maintenance Mode"
-                  description="Temporarily block user access"
-                  checked={settings?.system?.maintenanceMode || false}
-                  onChange={(checked) => updateSetting('system', 'maintenanceMode', checked)}
-                />
-                <SettingToggle
-                  label="Allow Registration"
-                  description="New users can create accounts"
-                  checked={settings?.system?.allowRegistration || false}
-                  onChange={(checked) => updateSetting('system', 'allowRegistration', checked)}
-                />
-                <SettingToggle
-                  label="Require Email Verification"
-                  description="Users must verify email before using"
-                  checked={settings?.system?.requireEmailVerification || false}
-                  onChange={(checked) => updateSetting('system', 'requireEmailVerification', checked)}
-                />
+                <Input label="Website Name" value={settings?.system?.siteName || ''} onChange={(e) => updateSetting('system', 'siteName', e.target.value)} />
+                <SettingToggle label="Maintenance Mode" description="Temporarily block user access" checked={settings?.system?.maintenanceMode || false} onChange={(checked) => updateSetting('system', 'maintenanceMode', checked)} />
+                <SettingToggle label="Allow Registration" description="New users can create accounts" checked={settings?.system?.allowRegistration || false} onChange={(checked) => updateSetting('system', 'allowRegistration', checked)} />
+                <SettingToggle label="Require Email Verification" description="Users must verify email before using" checked={settings?.system?.requireEmailVerification || false} onChange={(checked) => updateSetting('system', 'requireEmailVerification', checked)} />
               </div>
             </Card>
           )}
@@ -396,31 +369,10 @@ export default function SettingsView() {
             <Card className="p-6">
               <h2 className="text-lg font-semibold text-primary mb-6">Usage Limits</h2>
               <div className="space-y-6">
-                <Input
-                  label="Max Profiles per User"
-                  type="number"
-                  value={settings?.limits?.maxProfilesPerUser || 10}
-                  onChange={(e) => updateSetting('limits', 'maxProfilesPerUser', parseInt(e.target.value) || 10)}
-                  hint="Maximum writing profiles each user can create"
-                />
-                <Input
-                  label="Max Analyses per Day"
-                  type="number"
-                  value={settings?.limits?.maxAnalysesPerDay || 100}
-                  onChange={(e) => updateSetting('limits', 'maxAnalysesPerDay', parseInt(e.target.value) || 100)}
-                />
-                <Input
-                  label="Max Rewrites per Day"
-                  type="number"
-                  value={settings?.limits?.maxRewritesPerDay || 50}
-                  onChange={(e) => updateSetting('limits', 'maxRewritesPerDay', parseInt(e.target.value) || 50)}
-                />
-                <Input
-                  label="Max File Size (MB)"
-                  type="number"
-                  value={settings?.limits?.maxFileSize || 5}
-                  onChange={(e) => updateSetting('limits', 'maxFileSize', parseInt(e.target.value) || 5)}
-                />
+                <Input label="Max Profiles per User" type="number" value={settings?.limits?.maxProfilesPerUser || 10} onChange={(e) => updateSetting('limits', 'maxProfilesPerUser', parseInt(e.target.value) || 10)} hint="Maximum writing profiles each user can create" />
+                <Input label="Max Analyses per Day" type="number" value={settings?.limits?.maxAnalysesPerDay || 100} onChange={(e) => updateSetting('limits', 'maxAnalysesPerDay', parseInt(e.target.value) || 100)} />
+                <Input label="Max Rewrites per Day" type="number" value={settings?.limits?.maxRewritesPerDay || 50} onChange={(e) => updateSetting('limits', 'maxRewritesPerDay', parseInt(e.target.value) || 50)} />
+                <Input label="Max File Size (MB)" type="number" value={settings?.limits?.maxFileSize || 5} onChange={(e) => updateSetting('limits', 'maxFileSize', parseInt(e.target.value) || 5)} />
               </div>
             </Card>
           )}
@@ -430,106 +382,38 @@ export default function SettingsView() {
             <Card className="p-6">
               <h2 className="text-lg font-semibold text-primary mb-6">Features</h2>
               <div className="space-y-6">
-                <SettingToggle
-                  label="Enable Analytics"
-                  description="Collect and display usage statistics"
-                  checked={settings?.features?.enableAnalytics || false}
-                  onChange={(checked) => updateSetting('features', 'enableAnalytics', checked)}
-                />
-                <SettingToggle
-                  label="Enable Notifications"
-                  description="Allow sending notifications to users"
-                  checked={settings?.features?.enableNotifications || false}
-                  onChange={(checked) => updateSetting('features', 'enableNotifications', checked)}
-                />
-                <SettingToggle
-                  label="Enable Support"
-                  description="Users can send support requests"
-                  checked={settings?.features?.enableSupport || false}
-                  onChange={(checked) => updateSetting('features', 'enableSupport', checked)}
-                />
-                <SettingToggle
-                  label="Auto Backup"
-                  description="Automatically backup data daily"
-                  checked={settings?.features?.enableAutoBackup || false}
-                  onChange={(checked) => updateSetting('features', 'enableAutoBackup', checked)}
-                />
+                <SettingToggle label="Enable Analytics" description="Collect and display usage statistics" checked={settings?.features?.enableAnalytics || false} onChange={(checked) => updateSetting('features', 'enableAnalytics', checked)} />
+                <SettingToggle label="Enable Notifications" description="Allow sending notifications to users" checked={settings?.features?.enableNotifications || false} onChange={(checked) => updateSetting('features', 'enableNotifications', checked)} />
+                <SettingToggle label="Enable Support" description="Users can send support requests" checked={settings?.features?.enableSupport || false} onChange={(checked) => updateSetting('features', 'enableSupport', checked)} />
+                <SettingToggle label="Auto Backup" description="Automatically backup data daily" checked={settings?.features?.enableAutoBackup || false} onChange={(checked) => updateSetting('features', 'enableAutoBackup', checked)} />
               </div>
             </Card>
           )}
 
+
           {/* Email */}
           {activeTab === 'email' && (
             <div className="space-y-6">
-              {/* SMTP Configuration Form */}
               <Card className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h2 className="text-lg font-semibold text-primary">SMTP Configuration</h2>
                     <p className="text-sm text-muted">Configure email settings for sending notifications</p>
                   </div>
-                  <div className={cn(
-                    "px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1",
-                    emailConfig?.isConfigured ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
-                  )}>
-                    <img 
-                      src={emailConfig?.isConfigured ? "/icon/check-circle.svg" : "/icon/x-circle.svg"} 
-                      alt="" 
-                      className="w-4 h-4" 
-                    />
+                  <div className={cn("px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1", emailConfig?.isConfigured ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive")}>
+                    <img src={emailConfig?.isConfigured ? "/icon/check-circle.svg" : "/icon/x-circle.svg"} alt="" className="w-4 h-4" />
                     {emailConfig?.isConfigured ? 'Configured' : 'Not Configured'}
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 mb-4">
-                  <Input 
-                    label="SMTP Host" 
-                    value={emailForm.smtpHost} 
-                    onChange={(e) => setEmailForm(prev => ({ ...prev, smtpHost: e.target.value }))} 
-                    placeholder="smtp.gmail.com" 
-                  />
-                  <Input 
-                    label="SMTP Port" 
-                    type="number" 
-                    value={emailForm.smtpPort} 
-                    onChange={(e) => setEmailForm(prev => ({ ...prev, smtpPort: parseInt(e.target.value) || 587 }))} 
-                  />
-                  <Input 
-                    label="SMTP Username (Email)" 
-                    type="email"
-                    value={emailForm.smtpUser} 
-                    onChange={(e) => setEmailForm(prev => ({ ...prev, smtpUser: e.target.value }))} 
-                    placeholder="your-email@gmail.com"
-                    hint={emailConfig?.smtpUser ? `Current: ${emailConfig.smtpUser}` : ''}
-                  />
-                  <Input 
-                    label="SMTP Password (App Password)" 
-                    type="password" 
-                    value={emailForm.smtpPass} 
-                    onChange={(e) => setEmailForm(prev => ({ ...prev, smtpPass: e.target.value }))} 
-                    placeholder={emailConfig?.isConfigured ? '••••••••' : 'Enter app password'}
-                    hint="For Gmail, use App Password (16 chars, no spaces)"
-                  />
-                  <Input 
-                    label="From Email" 
-                    type="email" 
-                    value={emailForm.fromEmail} 
-                    onChange={(e) => setEmailForm(prev => ({ ...prev, fromEmail: e.target.value }))} 
-                    placeholder="no-reply@yourdomain.com"
-                  />
-                  <Input 
-                    label="From Name" 
-                    value={emailForm.fromName} 
-                    onChange={(e) => setEmailForm(prev => ({ ...prev, fromName: e.target.value }))} 
-                    placeholder="Your App Name"
-                  />
-                  <Input 
-                    label="Support Email" 
-                    type="email" 
-                    value={emailForm.supportEmail} 
-                    onChange={(e) => setEmailForm(prev => ({ ...prev, supportEmail: e.target.value }))} 
-                    placeholder="support@yourdomain.com"
-                  />
+                  <Input label="SMTP Host" value={emailForm.smtpHost} onChange={(e) => setEmailForm(prev => ({ ...prev, smtpHost: e.target.value }))} placeholder="smtp.gmail.com" />
+                  <Input label="SMTP Port" type="number" value={emailForm.smtpPort} onChange={(e) => setEmailForm(prev => ({ ...prev, smtpPort: parseInt(e.target.value) || 587 }))} />
+                  <Input label="SMTP Username (Email)" type="email" value={emailForm.smtpUser} onChange={(e) => setEmailForm(prev => ({ ...prev, smtpUser: e.target.value }))} placeholder="your-email@gmail.com" hint={emailConfig?.smtpUser ? `Current: ${emailConfig.smtpUser}` : ''} />
+                  <Input label="SMTP Password (App Password)" type="password" value={emailForm.smtpPass} onChange={(e) => setEmailForm(prev => ({ ...prev, smtpPass: e.target.value }))} placeholder={emailConfig?.isConfigured ? '••••••••' : 'Enter app password'} hint="For Gmail, use App Password (16 chars, no spaces)" />
+                  <Input label="From Email" type="email" value={emailForm.fromEmail} onChange={(e) => setEmailForm(prev => ({ ...prev, fromEmail: e.target.value }))} placeholder="no-reply@yourdomain.com" />
+                  <Input label="From Name" value={emailForm.fromName} onChange={(e) => setEmailForm(prev => ({ ...prev, fromName: e.target.value }))} placeholder="Your App Name" />
+                  <Input label="Support Email" type="email" value={emailForm.supportEmail} onChange={(e) => setEmailForm(prev => ({ ...prev, supportEmail: e.target.value }))} placeholder="support@yourdomain.com" />
                 </div>
                 
                 <div className="flex justify-end">
@@ -540,103 +424,128 @@ export default function SettingsView() {
                 </div>
               </Card>
 
-              {/* Test Email */}
               <Card className="p-6">
                 <h2 className="text-lg font-semibold text-primary mb-4">Test Email</h2>
-                <p className="text-sm text-muted mb-4">
-                  Send a test email to verify SMTP configuration is working correctly.
-                </p>
+                <p className="text-sm text-muted mb-4">Send a test email to verify SMTP configuration is working correctly.</p>
                 <div className="flex gap-3">
-                  <Input 
-                    placeholder="Enter test email address" 
-                    type="email"
-                    value={testEmailAddress}
-                    onChange={(e) => setTestEmailAddress(e.target.value)}
-                    className="flex-1"
-                  />
+                  <Input placeholder="Enter test email address" type="email" value={testEmailAddress} onChange={(e) => setTestEmailAddress(e.target.value)} className="flex-1" />
                   <Button onClick={handleTestEmail} loading={testingEmail} disabled={!emailConfig?.isConfigured}>
                     <img src="/icon/send.svg" alt="" className="w-4 h-4 icon-white" />
                     {testingEmail ? 'Sending...' : 'Send Test'}
                   </Button>
                 </div>
-                {!emailConfig?.isConfigured && (
-                  <p className="text-xs text-destructive mt-2">
-                    Configure SMTP credentials above first to send test emails.
-                  </p>
-                )}
+                {!emailConfig?.isConfigured && <p className="text-xs text-destructive mt-2">Configure SMTP credentials above first to send test emails.</p>}
               </Card>
 
-              {/* Gmail Setup Guide */}
               <Card className="p-6 bg-surface-secondary">
                 <h3 className="font-semibold text-primary mb-3 flex items-center gap-2">
                   <img src="/icon/info.svg" alt="" className="w-5 h-5" />
                   Gmail SMTP Setup Guide
                 </h3>
                 <ul className="space-y-2 text-sm text-muted">
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary font-medium">1.</span>
-                    Enable 2-Factor Authentication on your Google Account
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary font-medium">2.</span>
-                    Go to Google Account → Security → App Passwords
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary font-medium">3.</span>
-                    Create a new App Password (select "Mail" and your device)
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary font-medium">4.</span>
-                    Copy the 16-character password (remove spaces) and paste above
-                  </li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-medium">1.</span>Enable 2-Factor Authentication on your Google Account</li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-medium">2.</span>Go to Google Account → Security → App Passwords</li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-medium">3.</span>Create a new App Password (select "Mail" and your device)</li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-medium">4.</span>Copy the 16-character password (remove spaces) and paste above</li>
                 </ul>
               </Card>
             </div>
           )}
 
           {/* Environment */}
-          {activeTab === 'environment' && (
-            <EnvironmentConfig />
-          )}
+          {activeTab === 'environment' && <EnvironmentConfig />}
 
           {/* Security */}
           {activeTab === 'security' && (
             <Card className="p-6">
               <h2 className="text-lg font-semibold text-primary mb-6">Security</h2>
               <div className="space-y-6">
-                <Input
-                  label="Session Timeout (hours)"
-                  type="number"
-                  value={settings?.security?.sessionTimeout || 24}
-                  onChange={(e) => updateSetting('security', 'sessionTimeout', parseInt(e.target.value) || 24)}
-                  hint="Auto logout time when inactive"
-                />
-                <Input
-                  label="Max Login Attempts"
-                  type="number"
-                  value={settings?.security?.maxLoginAttempts || 5}
-                  onChange={(e) => updateSetting('security', 'maxLoginAttempts', parseInt(e.target.value) || 5)}
-                  hint="Lock account after failed attempts"
-                />
-                <SettingToggle
-                  label="Require Strong Password"
-                  description="Must have uppercase, numbers and special characters"
-                  checked={settings?.security?.requireStrongPassword || false}
-                  onChange={(checked) => updateSetting('security', 'requireStrongPassword', checked)}
-                />
-                <SettingToggle
-                  label="Two-Factor Authentication"
-                  description="Require OTP code when logging in"
-                  checked={settings?.security?.enableTwoFactor || false}
-                  onChange={(checked) => updateSetting('security', 'enableTwoFactor', checked)}
-                />
+                <Input label="Session Timeout (hours)" type="number" value={settings?.security?.sessionTimeout || 24} onChange={(e) => updateSetting('security', 'sessionTimeout', parseInt(e.target.value) || 24)} hint="Auto logout time when inactive" />
+                <Input label="Max Login Attempts" type="number" value={settings?.security?.maxLoginAttempts || 5} onChange={(e) => updateSetting('security', 'maxLoginAttempts', parseInt(e.target.value) || 5)} hint="Lock account after failed attempts" />
+                <SettingToggle label="Require Strong Password" description="Must have uppercase, numbers and special characters" checked={settings?.security?.requireStrongPassword || false} onChange={(checked) => updateSetting('security', 'requireStrongPassword', checked)} />
+                <SettingToggle label="Two-Factor Authentication" description="Require OTP code when logging in" checked={settings?.security?.enableTwoFactor || false} onChange={(checked) => updateSetting('security', 'enableTwoFactor', checked)} />
               </div>
             </Card>
           )}
 
+
           {/* Backup */}
           {activeTab === 'backup' && (
             <div className="space-y-6">
+              {/* Storage Overview */}
+              {storageStats && (
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Cloud Storage Card */}
+                  <Card className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                        <img src="/icon/cloud.svg" alt="" className="w-5 h-5" style={{ filter: 'invert(45%) sepia(98%) saturate(1653%) hue-rotate(196deg)' }} />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-primary">Cloud Storage</h4>
+                        <p className="text-xs text-muted">Primary backup storage</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted">Total Backups</span>
+                        <span className="font-medium text-primary">{storageStats.cloudStorage?.totalFiles || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted">Total Size</span>
+                        <span className="font-medium text-primary">{storageStats.cloudStorage?.totalSizeFormatted || '0 Bytes'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted">Est. Monthly Cost</span>
+                        <span className="font-medium text-success">{storageStats.cloudStorage?.estimatedMonthlyCost || '$0.00'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted">Bucket</span>
+                        <span className="font-medium text-primary text-xs truncate max-w-[150px]">{storageStats.cloudStorage?.bucket || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Google Drive Card */}
+                  <Card className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", storageStats.googleDrive?.enabled ? "bg-green-500/10" : "bg-gray-500/10")}>
+                        <img src="/icon/hard-drive.svg" alt="" className="w-5 h-5" style={{ filter: storageStats.googleDrive?.enabled ? 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg)' : 'grayscale(100%)' }} />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-primary">Google Drive</h4>
+                        <p className="text-xs text-muted">Secondary sync (shared folder)</p>
+                      </div>
+                    </div>
+                    {storageStats.googleDrive?.enabled ? (
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted">Synced Backups</span>
+                          <span className="font-medium text-primary">{storageStats.googleDrive?.backupCount || 0}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted">Backup Size</span>
+                          <span className="font-medium text-primary">{storageStats.googleDrive?.backupSizeFormatted || '0 Bytes'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted">Status</span>
+                          <span className="font-medium text-success flex items-center gap-1">
+                            <span className="w-2 h-2 rounded-full bg-success"></span>
+                            Connected
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-muted">
+                        <p className="mb-2">Drive sync is disabled. Share a folder with Service Account and set GOOGLE_DRIVE_FOLDER_ID in Environment settings.</p>
+                        <p className="text-xs">Auto-enables when folder ID is configured</p>
+                      </div>
+                    )}
+                  </Card>
+                </div>
+              )}
+
+              {/* Create Backup */}
               <Card className="p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 rounded-xl bg-surface-secondary flex items-center justify-center">
@@ -644,7 +553,7 @@ export default function SettingsView() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-primary">Firestore Backup</h3>
-                    <p className="text-sm text-muted">Backup all data to Cloud Storage</p>
+                    <p className="text-sm text-muted">Backup to Cloud Storage → Sync to Google Drive</p>
                   </div>
                   <Button onClick={handleBackupNow} loading={backingUp}>
                     <img src="/icon/download.svg" alt="" className="w-4 h-4 icon-white" />
@@ -653,6 +562,7 @@ export default function SettingsView() {
                 </div>
               </Card>
 
+              {/* Recent Backups */}
               <Card className="p-6">
                 <h3 className="font-semibold text-primary mb-4">Recent Backups</h3>
                 {backupList.length === 0 ? (
@@ -664,7 +574,12 @@ export default function SettingsView() {
                         <img src="/icon/check-circle.svg" alt="" className="w-5 h-5 text-success" />
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-medium text-primary truncate">{backup.name}</div>
-                          <div className="text-xs text-muted">{new Date(backup.created).toLocaleString()}</div>
+                          <div className="text-xs text-muted flex items-center gap-2">
+                            <span>{new Date(backup.created).toLocaleString()}</span>
+                            {backup.driveSynced && (
+                              <span className="px-1.5 py-0.5 bg-green-500/10 text-green-600 rounded text-[10px]">Drive ✓</span>
+                            )}
+                          </div>
                         </div>
                         <span className="text-xs text-muted">{(parseInt(backup.size) / 1024 / 1024).toFixed(2)} MB</span>
                         <Button variant="ghost" size="sm" onClick={() => handleDownloadBackup(backup.name)}>
@@ -676,16 +591,18 @@ export default function SettingsView() {
                 )}
               </Card>
 
+              {/* Backup Info */}
               <Card className="p-6 bg-surface-secondary">
                 <h3 className="font-semibold text-primary mb-3 flex items-center gap-2">
                   <img src="/icon/info.svg" alt="" className="w-5 h-5" />
-                  Backup Information
+                  Backup Architecture
                 </h3>
                 <ul className="space-y-2 text-sm text-muted">
-                  <li className="flex items-center gap-2"><img src="/icon/check-circle.svg" alt="" className="w-4 h-4" /> Stored in Google Cloud Storage</li>
-                  <li className="flex items-center gap-2"><img src="/icon/refresh-cw.svg" alt="" className="w-4 h-4" /> Auto backup every 24 hours</li>
-                  <li className="flex items-center gap-2"><img src="/icon/trash-2.svg" alt="" className="w-4 h-4" /> Keeps 30 most recent backups</li>
-                  <li className="flex items-center gap-2"><img src="/icon/dollar-sign.svg" alt="" className="w-4 h-4" /> ~$0.02/GB/month</li>
+                  <li className="flex items-center gap-2"><img src="/icon/cloud.svg" alt="" className="w-4 h-4" /> Primary: Google Cloud Storage (cost-optimized lifecycle)</li>
+                  <li className="flex items-center gap-2"><img src="/icon/hard-drive.svg" alt="" className="w-4 h-4" /> Secondary: Google Drive (share folder with Service Account)</li>
+                  <li className="flex items-center gap-2"><img src="/icon/refresh-cw.svg" alt="" className="w-4 h-4" /> Auto backup every 24 hours (if enabled)</li>
+                  <li className="flex items-center gap-2"><img src="/icon/trash-2.svg" alt="" className="w-4 h-4" /> Cloud Storage: keeps 60 backups, Drive: keeps ALL backups</li>
+                  <li className="flex items-center gap-2"><img src="/icon/dollar-sign.svg" alt="" className="w-4 h-4" /> Cost: ~$0.02/GB/month (auto-moves to cheaper tiers)</li>
                 </ul>
               </Card>
             </div>

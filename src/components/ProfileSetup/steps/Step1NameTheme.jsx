@@ -83,8 +83,9 @@ const Step1NameTheme = ({
                         "flex flex-col items-center justify-center gap-2 py-4 px-2.5",
                         "aspect-square bg-white/50 border border-black/8 rounded-xl",
                         "cursor-pointer transition-all duration-250 relative overflow-hidden",
-                        "hover:bg-white/70 hover:border-black/12 hover:-translate-y-px hover:shadow-sm",
-                        selectedTheme === theme.id && "border-text-link bg-text-link/10 shadow-md"
+                        selectedTheme === theme.id 
+                          ? "!border-text-link !bg-text-link/10 shadow-md" 
+                          : "hover:bg-white/70 hover:border-black/12 hover:-translate-y-px hover:shadow-sm"
                       )}
                       data-theme={theme.id}
                       onClick={() => setSelectedTheme(theme.id)}
@@ -106,10 +107,10 @@ const Step1NameTheme = ({
                     >
                       <Icon 
                         name={theme.icon}
-                        size="lg"
+                        size="xl"
                         color="primary"
                         className={cn(
-                          "transition-all duration-250 opacity-70",
+                          "!w-7 !h-7 transition-all duration-250 opacity-70",
                           "group-hover:opacity-85 group-hover:scale-[1.04]",
                           selectedTheme === theme.id && "opacity-100 scale-[1.08]"
                         )}

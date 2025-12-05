@@ -116,10 +116,11 @@ const Select = forwardRef(({
             className={cn(
               'absolute z-[100] w-full mt-2 py-2 rounded-2xl',
               'border border-border/30 bg-surface/95 backdrop-blur-xl shadow-dropdown',
-              'max-h-72 overflow-y-auto',
+              'max-h-72 overflow-y-auto scrollbar-hide',
               'animate-in fade-in-0 zoom-in-[0.97] duration-200'
             )}
             role="listbox"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {options.map((option) => {
               const isSelected = String(option.value) === String(value)

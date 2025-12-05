@@ -1,9 +1,12 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { motion, MotionConfig } from 'framer-motion'
 import LazyLottie from '../Common/LazyLottie'
 import { rewriteTextStream, iterativeHumanize } from '../../services/api'
 import { useRewrite } from '@/stores'
+import { getLocalizedContentError } from '../../utils/errorMessages'
+import { handleCreditError } from '../../utils/creditHandler'
 import modal from '../../utils/modal'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
@@ -48,6 +51,7 @@ const RewriteToolbar = ({
   disabled 
 }) => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { selectedModel, writingPreferences } = useRewrite()
   const [isLoading, setIsLoading] = useState(false)
   const fileInputRef = useRef(null)
@@ -102,7 +106,14 @@ const RewriteToolbar = ({
       } catch (error) {
         loadingModal.close()
         console.error('[FAIL] Error in iterative humanize:', error)
-        modal.error(t('rewrite.humanizationFailed') + ' ' + error.message)
+        
+        // Check if it's a credit error first
+        const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+        
+        if (!wasCreditError) {
+          const localizedError = getLocalizedContentError(error.message, t)
+          modal.error(localizedError || t('rewrite.humanizationFailed'))
+        }
         onTextChange(originalText)
       } finally {
         setIsLoading(false)
@@ -190,12 +201,18 @@ const RewriteToolbar = ({
       
     } catch (error) {
       console.error('[FAIL] Error rewriting:', error)
-      modal.error(t('rewrite.rewriteFailed') + ' ' + error.message)
+      
+      // Check if it's a credit error first
+      const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+      
+      if (!wasCreditError) {
+        const localizedError = getLocalizedContentError(error.message, t)
+        modal.error(localizedError || t('rewrite.rewriteFailed'))
+      }
       // Restore original text on error
       onTextChange(originalText)
     } finally {
       setIsLoading(false)
-      console.log('🏁 Rewrite process finished')
     }
   }
 

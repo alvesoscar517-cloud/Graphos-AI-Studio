@@ -3,10 +3,10 @@ import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 const toastStyles = {
-  success: 'border-l-success',
-  error: 'border-l-destructive',
-  warning: 'border-l-warning',
-  info: 'border-l-info',
+  success: '',
+  error: '',
+  warning: '',
+  info: '',
 };
 
 export default function Toast({ message, type = 'info', onClose, duration = 3000 }) {
@@ -37,7 +37,7 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
     <div 
       className={cn(
         "fixed bottom-6 right-6 flex items-center gap-3 px-4 py-3 bg-surface rounded-lg shadow-lg",
-        "min-w-[300px] max-w-[420px] z-[3000] border-l-4 animate-[slideIn_0.3s_ease]",
+        "min-w-[300px] max-w-[420px] z-[3000] animate-[slideIn_0.3s_ease]",
         toastStyles[type]
       )}
     >

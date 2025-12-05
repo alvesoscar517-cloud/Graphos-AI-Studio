@@ -21,6 +21,7 @@ export default function NotificationList() {
     setActiveTab 
   } = useRealtime();
   const [filter, setFilter] = useState('all');
+  const [actionLoading, setActionLoading] = useState(null);
   const navigate = useNavigate();
   const notify = useNotify();
   const loading = realtimeLoading.notifications;
@@ -49,12 +50,15 @@ export default function NotificationList() {
     if (!confirmed) return;
 
     try {
+      setActionLoading(id);
       await notificationsApi.delete(id);
       invalidateCache('notifications');
       await handleLoadNotifications();
       notify.success('Notification deleted!');
     } catch (err) {
       notify.error('Error: ' + err.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -68,12 +72,15 @@ export default function NotificationList() {
     if (!confirmed) return;
 
     try {
+      setActionLoading(id);
       await notificationsApi.send(id);
       notify.success('Notification sent successfully!');
       invalidateCache('notifications');
       await handleLoadNotifications();
     } catch (err) {
       notify.error('Error: ' + err.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 

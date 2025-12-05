@@ -3,13 +3,19 @@
  * Handle credit errors and display notifications to user
  */
 
+import modal from './modal'
+
 /**
  * Check if response is a credit error
  */
 export function isCreditError(error) {
-  return error?.code === 'INSUFFICIENT_CREDITS' || 
-         error?.message?.includes('Insufficient credits') ||
-         error?.message?.includes('credit');
+  const errorCode = error?.code || ''
+  const errorMessage = error?.message?.toLowerCase() || ''
+  
+  return errorCode === 'INSUFFICIENT_CREDITS' || 
+         errorMessage.includes('insufficient credits') ||
+         errorMessage.includes('credit') ||
+         error?.statusCode === 402
 }
 
 /**
@@ -137,4 +143,68 @@ export function showCreditPreview(operation, cost) {
 
   const name = operationNames[operation] || operation;
   console.log(`[Credit] ${name}: ~${cost.toFixed(2)} credits`);
+}
+
+/**
+ * Handle credit error with localized message and action button
+ * Use this in catch blocks to show a user-friendly credit error modal
+ * 
+ * @param {Error} error - The error object
+ * @param {Function} t - i18n translation function
+ * @param {Function} onBuyCredits - Optional callback when user clicks "Buy Credits"
+ * @returns {boolean} - Returns true if error was a credit error and was handled
+ */
+export function handleCreditError(error, t, onBuyCredits = null) {
+  if (!isCreditError(error)) {
+    return false
+  }
+  
+  // Extract credit info from error if available
+  const required = error?.required || error?.details?.required || 0
+  const available = error?.available || error?.details?.available || 0
+  
+  // Build message
+  let message = t ? t('errors.insufficientCredits') : 'You don\'t have enough credits for this action.'
+  
+  if (required > 0 && available >= 0) {
+    const shortfall = required - available
+    message += `\n\n${t ? t('credits.required') : 'Required'}: ${required.toFixed(2)} credits`
+    message += `\n${t ? t('credits.available') : 'Available'}: ${available.toFixed(2)} credits`
+    message += `\n${t ? t('credits.shortfall') : 'Shortfall'}: ${shortfall.toFixed(2)} credits`
+  }
+  
+  // Show modal with Buy Credits button
+  const title = t ? t('credits.insufficientCredits') : 'Insufficient Credits'
+  const buyText = t ? t('credits.buyCreditsNow') : 'Buy Credits Now'
+  const closeText = t ? t('common.close') : 'Close'
+  
+  modal.confirm(message, title, {
+    type: 'warning',
+    confirmText: buyText,
+    cancelText: closeText,
+    confirmStyle: 'primary'
+  }).then((confirmed) => {
+    if (confirmed && onBuyCredits) {
+      onBuyCredits()
+    }
+  })
+  
+  return true
+}
+
+/**
+ * Navigate to credits/pricing page
+ * Can be used as onBuyCredits callback
+ */
+export function navigateToBuyCredits() {
+  // Dispatch custom event for app to handle navigation
+  const event = new CustomEvent('navigateTo', {
+    detail: { path: '/pricing' }
+  })
+  window.dispatchEvent(event)
+  
+  // Fallback: try to use React Router if available
+  if (window.__REACT_ROUTER_NAVIGATE__) {
+    window.__REACT_ROUTER_NAVIGATE__('/pricing')
+  }
 }

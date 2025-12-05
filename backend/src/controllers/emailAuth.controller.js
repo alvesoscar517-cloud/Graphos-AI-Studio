@@ -10,6 +10,7 @@ const logger = require('../utils/logger');
 const nodemailer = require('nodemailer');
 const config = require('../config');
 const envConfig = require('../config/envConfigHelper');
+const activityLogService = require('../services/activityLog.service');
 
 // Email configuration - use envConfig helper for Firestore > process.env > default fallback
 // Lazy getter functions to always get latest config
@@ -170,6 +171,14 @@ exports.register = async (req, res) => {
       // Continue - user can request resend
     }
     
+    // Log registration activity (pending verification)
+    activityLogService.logActivity(result.userId || email, 'register', {
+      email,
+      displayName,
+      source: 'email_auth',
+      status: 'pending_verification'
+    }).catch(err => logger.warn('Failed to log register activity', { error: err.message }));
+    
     res.status(201).json({
       success: true,
       pendingVerification: true,
@@ -230,6 +239,15 @@ exports.verifyEmail = async (req, res) => {
       });
     }
 
+    // Log email verification activity
+    if (result.user?.uid) {
+      activityLogService.logActivity(result.user.uid, 'verify_email', {
+        email,
+        source: 'email_auth',
+        success: true
+      }).catch(err => logger.warn('Failed to log verify_email activity', { error: err.message }));
+    }
+    
     res.json({
       success: true,
       user: result.user,
@@ -331,6 +349,17 @@ exports.login = async (req, res) => {
       } catch (emailError) {
         logger.error('Failed to send new device login email', { email, error: emailError.message });
       }
+    }
+    
+    // Log login activity
+    if (result.user?.uid) {
+      activityLogService.logActivity(result.user.uid, 'login', {
+        ip: deviceInfo.ipAddress,
+        userAgent: deviceInfo.userAgent,
+        platform: deviceInfo.platform,
+        isNewDevice: result.isNewDevice,
+        source: 'email_auth'
+      }).catch(err => logger.warn('Failed to log login activity', { error: err.message }));
     }
     
     res.json({
@@ -474,6 +503,12 @@ exports.forgotPassword = async (req, res) => {
       }
     }
     
+    // Log forgot password request (don't log email for security)
+    activityLogService.logActivity('system', 'forgot_password', {
+      source: 'email_auth',
+      requested: true
+    }).catch(err => logger.warn('Failed to log forgot_password activity', { error: err.message }));
+    
     // Always return success (security - don't reveal if email exists)
     res.json({
       success: true,
@@ -518,6 +553,14 @@ exports.resetPassword = async (req, res) => {
     }
     
     const result = await emailAuthService.resetPassword(email, otp, newPassword);
+    
+    // Log password reset activity
+    if (result.userId) {
+      activityLogService.logActivity(result.userId, 'reset_password', {
+        source: 'email_auth',
+        success: true
+      }).catch(err => logger.warn('Failed to log reset_password activity', { error: err.message }));
+    }
     
     res.json({
       success: true,
@@ -655,6 +698,12 @@ exports.changePassword = async (req, res) => {
     
     const result = await emailAuthService.changePassword(userId, currentPassword, newPassword);
     
+    // Log password change activity
+    activityLogService.logActivity(userId, 'change_password', {
+      source: 'email_auth',
+      success: true
+    }).catch(err => logger.warn('Failed to log change_password activity', { error: err.message }));
+    
     // Send password changed notification email
     if (result.success && req.user?.email) {
       try {
@@ -714,6 +763,12 @@ exports.deleteAccount = async (req, res) => {
     const { password } = req.body;
     
     const result = await emailAuthService.deleteAccount(userId, password);
+    
+    // Log account deletion activity
+    activityLogService.logActivity(userId, 'delete_account', {
+      source: 'email_auth',
+      success: true
+    }).catch(err => logger.warn('Failed to log delete_account activity', { error: err.message }));
     
     res.json(result);
     

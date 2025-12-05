@@ -63,31 +63,14 @@ function getMaxChars(model = 'gemini-2.0-flash-exp') {
 export function validateTextBeforeAI(text, model = 'gemini-2.0-flash-exp', options = {}) {
   const { task = 'analyze', showWarning = true } = options;
   
-  console.log('[validateTextBeforeAI] Input:', { 
-    textLength: text?.length, 
-    textType: typeof text,
-    preview: text?.substring(0, 50)
-  });
-  
   // Sanitize input first
   const sanitized = sanitizeText(text);
-  
-  console.log('[validateTextBeforeAI] After sanitize:', { 
-    sanitizedLength: sanitized?.length,
-    sanitizedPreview: sanitized?.substring(0, 50)
-  });
   
   // Basic validation
   const validation = validateText(sanitized, {
     minLength: task === 'detect' ? 50 : 10,
     maxLength: CONFIG.MAX_TEXT_LENGTH,
     task
-  });
-  
-  console.log('[validateTextBeforeAI] Validation result:', { 
-    valid: validation.valid, 
-    errors: validation.errors,
-    hasStats: !!validation.stats
   });
   
   if (!validation.valid) {

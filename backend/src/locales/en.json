@@ -90,8 +90,10 @@
   "ai_detection": {
     "title": "AI Content Detection",
     "result_human": "This text appears to be human-written",
-    "result_ai": "This text appears to be AI-generated",
+    "result_mostly_human": "Mostly human-written with minor AI patterns",
     "result_mixed": "This text shows mixed signals (possibly AI-assisted)",
+    "result_likely_ai": "This text is likely AI-generated",
+    "result_ai": "This text appears to be AI-generated",
     "result_uncertain": "Unable to determine with confidence",
     "evidence_title": "Evidence",
     "human_indicators_title": "Human Indicators",

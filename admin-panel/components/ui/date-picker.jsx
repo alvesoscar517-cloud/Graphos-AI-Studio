@@ -1,246 +1,237 @@
 /**
- * Date Picker component using react-day-picker
- * Lightweight, accessible date selection
+ * Date Picker component with custom calendar
  */
 
-import * as React from 'react'
-import { DayPicker } from 'react-day-picker'
-import { vi } from 'date-fns/locale'
-import { format } from 'date-fns'
-import { cn } from '@/lib/utils'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from './dialog'
+import * as React from 'react';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameMonth, isSameDay, isToday } from 'date-fns';
+import { vi } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+
+const WEEKDAYS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
 /**
- * Calendar component
+ * Custom Calendar component
  */
-function Calendar({
-  className,
-  classNames,
-  showOutsideDays = true,
-  ...props
-}) {
-  return (
-    <DayPicker
-      showOutsideDays={showOutsideDays}
-      className={cn('p-4', className)}
-      locale={vi}
-      classNames={{
-        months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
-        month: 'space-y-4',
-        caption: 'flex justify-center pt-1 relative items-center',
-        caption_label: 'text-[15px] font-semibold text-primary tracking-[-0.01em]',
-        nav: 'space-x-1 flex items-center',
-        nav_button: cn(
-          'h-8 w-8 bg-transparent p-0 text-muted hover:text-primary hover:bg-surface-secondary/80 rounded-xl transition-all duration-150',
-          'inline-flex items-center justify-center'
-        ),
-        nav_button_previous: 'absolute left-1',
-        nav_button_next: 'absolute right-1',
-        table: 'w-full border-collapse space-y-1',
-        head_row: 'flex',
-        head_cell: 'text-muted rounded-xl w-10 font-medium text-[12px]',
-        row: 'flex w-full mt-2',
-        cell: cn(
-          'relative p-0 text-center text-[14px] focus-within:relative focus-within:z-20',
-          '[&:has([aria-selected])]:bg-surface-secondary/60 [&:has([aria-selected].day-outside)]:bg-surface-secondary/30',
-          '[&:has([aria-selected].day-range-end)]:rounded-r-xl'
-        ),
-        day: cn(
-          'h-10 w-10 p-0 font-normal',
-          'inline-flex items-center justify-center rounded-xl transition-all duration-150',
-          'hover:bg-surface-secondary/80 hover:text-primary',
-          'focus:outline-none focus-visible:ring-[3px] focus-visible:ring-info/25',
-          'aria-selected:opacity-100'
-        ),
-        day_range_start: 'day-range-start',
-        day_range_end: 'day-range-end',
-        day_selected: 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
-        day_today: 'bg-info/10 text-info font-semibold',
-        day_outside: 'day-outside text-muted opacity-50 aria-selected:bg-surface-secondary/30 aria-selected:text-muted',
-        day_disabled: 'text-muted opacity-40',
-        day_range_middle: 'aria-selected:bg-surface-secondary/60 aria-selected:text-primary',
-        day_hidden: 'invisible',
-        ...classNames,
-      }}
-      components={{
-        IconLeft: () => (
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M10 12L6 8l4-4" />
-          </svg>
-        ),
-        IconRight: () => (
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M6 4l4 4-4 4" />
-          </svg>
-        ),
-      }}
-      {...props}
-    />
-  )
-}
-Calendar.displayName = 'Calendar'
+function Calendar({ selected, onSelect, minDate, maxDate }) {
+  const [currentMonth, setCurrentMonth] = React.useState(selected || new Date());
 
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  // Get the day of week for the first day (0 = Sunday)
+  const startDay = monthStart.getDay();
+
+  // Create empty cells for days before the first day of month
+  const emptyCells = Array(startDay).fill(null);
+
+  const isDisabled = (date) => {
+    if (minDate && date < minDate) return true;
+    if (maxDate && date > maxDate) return true;
+    return false;
+  };
+
+  return (
+    <div className="p-3 w-[280px]">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <button
+          type="button"
+          onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-secondary transition-colors text-muted hover:text-primary"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9 11L5 7l4-4" />
+          </svg>
+        </button>
+        <span className="text-[14px] font-semibold text-primary">
+          {format(currentMonth, 'MMMM yyyy', { locale: vi })}
+        </span>
+        <button
+          type="button"
+          onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-secondary transition-colors text-muted hover:text-primary"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M5 3l4 4-4 4" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Weekday headers */}
+      <div className="grid grid-cols-7 mb-1">
+        {WEEKDAYS.map((day) => (
+          <div key={day} className="h-8 flex items-center justify-center text-[11px] font-medium text-muted">
+            {day}
+          </div>
+        ))}
+      </div>
+
+      {/* Days grid */}
+      <div className="grid grid-cols-7">
+        {emptyCells.map((_, i) => (
+          <div key={`empty-${i}`} className="h-9" />
+        ))}
+        {days.map((day) => {
+          const isSelected = selected && isSameDay(day, selected);
+          const isTodayDate = isToday(day);
+          const disabled = isDisabled(day);
+
+          return (
+            <button
+              key={day.toISOString()}
+              type="button"
+              onClick={() => !disabled && onSelect(day)}
+              disabled={disabled}
+              className={cn(
+                'h-9 w-full flex items-center justify-center text-[13px] rounded-lg transition-colors',
+                'hover:bg-surface-secondary',
+                disabled && 'opacity-30 cursor-not-allowed hover:bg-transparent',
+                isTodayDate && !isSelected && 'bg-surface-secondary font-semibold',
+                isSelected && 'bg-primary text-white hover:bg-primary'
+              )}
+            >
+              {format(day, 'd')}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/30">
+        <button
+          type="button"
+          onClick={() => onSelect(null)}
+          className="text-[12px] text-muted hover:text-primary transition-colors"
+        >
+          Clear
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setCurrentMonth(new Date());
+            onSelect(new Date());
+          }}
+          className="text-[12px] text-info hover:text-info/80 transition-colors"
+        >
+          Today
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /**
  * Date Picker Input component
  */
-function DatePicker({
-  value,
-  onChange,
-  placeholder = 'Chọn ngày',
-  disabled = false,
-  className,
-  minDate,
-  maxDate,
-}) {
-  const [open, setOpen] = React.useState(false)
+function DatePicker({ value, onChange, placeholder = 'Select date', disabled = false, className, minDate, maxDate }) {
+  const [open, setOpen] = React.useState(false);
+  const containerRef = React.useRef(null);
+
+  // Close on click outside
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [open]);
 
   const handleSelect = (date) => {
-    onChange?.(date)
-    setOpen(false)
-  }
+    onChange?.(date);
+    setOpen(false);
+  };
 
   return (
-    <>
+    <div ref={containerRef} className="relative">
+      {/* Trigger button */}
       <button
         type="button"
-        onClick={() => !disabled && setOpen(true)}
+        onClick={() => !disabled && setOpen(!open)}
         disabled={disabled}
         className={cn(
-          'flex items-center justify-between w-full px-4 py-3 text-[15px] text-left',
+          'flex items-center justify-between w-full h-[42px] px-4 text-[14px] text-left',
           'border border-border/40 rounded-xl bg-surface-secondary transition-all duration-200',
           'hover:bg-surface hover:border-border/60',
-          'focus:outline-none focus:bg-surface focus:border-border focus:shadow-[0_0_0_3px_rgba(0,122,255,0.12)]',
+          'focus:outline-none focus:bg-surface focus:border-border',
           'disabled:opacity-50 disabled:cursor-not-allowed',
+          open && 'bg-surface border-border shadow-[0_0_0_3px_rgba(0,122,255,0.12)]',
           !value && 'text-muted',
           className
         )}
       >
         <span>{value ? format(value, 'dd/MM/yyyy') : placeholder}</span>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          className="text-muted"
+        >
           <rect x="2" y="3" width="12" height="11" rx="2" />
           <path d="M5 1v3M11 1v3M2 7h12" />
         </svg>
       </button>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-fit p-0">
-          <DialogHeader className="px-4 pt-4 pb-0 mb-0">
-            <DialogTitle>Chọn ngày</DialogTitle>
-          </DialogHeader>
-          <Calendar
-            mode="single"
-            selected={value}
-            onSelect={handleSelect}
-            disabled={(date) => {
-              if (minDate && date < minDate) return true
-              if (maxDate && date > maxDate) return true
-              return false
-            }}
-            initialFocus
-          />
-        </DialogContent>
-      </Dialog>
-    </>
-  )
+      {/* Dropdown calendar */}
+      {open && (
+        <div className="absolute top-full left-0 mt-2 z-50 bg-surface border border-border/30 rounded-xl shadow-lg">
+          <Calendar selected={value} onSelect={handleSelect} minDate={minDate} maxDate={maxDate} />
+        </div>
+      )}
+    </div>
+  );
 }
 
 /**
- * Date Range Picker component
+ * Date Range Picker - Two date pickers for range selection
  */
 function DateRangePicker({
   value,
   onChange,
-  placeholder = 'Chọn khoảng thời gian',
+  placeholderFrom = 'Start date',
+  placeholderTo = 'End date',
   disabled = false,
   className,
   minDate,
-  maxDate,
-  presets,
+  maxDate
 }) {
-  const [open, setOpen] = React.useState(false)
+  const handleFromChange = (date) => {
+    onChange?.({ ...value, from: date });
+  };
 
-  const handleSelect = (range) => {
-    onChange?.(range)
-    if (range?.from && range?.to) {
-      setOpen(false)
-    }
-  }
-
-  const formatRange = () => {
-    if (!value?.from) return placeholder
-    if (!value?.to) return format(value.from, 'dd/MM/yyyy')
-    return `${format(value.from, 'dd/MM/yyyy')} - ${format(value.to, 'dd/MM/yyyy')}`
-  }
+  const handleToChange = (date) => {
+    onChange?.({ ...value, to: date });
+  };
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => !disabled && setOpen(true)}
+    <div className={cn('flex items-center gap-2', className)}>
+      <DatePicker
+        value={value?.from}
+        onChange={handleFromChange}
+        placeholder={placeholderFrom}
         disabled={disabled}
-        className={cn(
-          'flex items-center justify-between w-full px-4 py-3 text-[15px] text-left',
-          'border border-border/40 rounded-xl bg-surface-secondary transition-all duration-200',
-          'hover:bg-surface hover:border-border/60',
-          'focus:outline-none focus:bg-surface focus:border-border focus:shadow-[0_0_0_3px_rgba(0,122,255,0.12)]',
-          'disabled:opacity-50 disabled:cursor-not-allowed',
-          !value?.from && 'text-muted',
-          className
-        )}
-      >
-        <span>{formatRange()}</span>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted">
-          <rect x="2" y="3" width="12" height="11" rx="2" />
-          <path d="M5 1v3M11 1v3M2 7h12" />
-        </svg>
-      </button>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-fit p-0">
-          <DialogHeader className="px-4 pt-4 pb-0 mb-0">
-            <DialogTitle>Chọn khoảng thời gian</DialogTitle>
-          </DialogHeader>
-          <div className="flex">
-            {presets && (
-              <div className="border-r border-border/40 p-3 space-y-1">
-                {presets.map((preset) => (
-                  <button
-                    key={preset.label}
-                    type="button"
-                    onClick={() => {
-                      onChange?.(preset.value)
-                      setOpen(false)
-                    }}
-                    className="w-full px-3.5 py-2.5 text-[14px] text-left rounded-xl hover:bg-surface-secondary/80 transition-all duration-150"
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
-            )}
-            <Calendar
-              mode="range"
-              selected={value}
-              onSelect={handleSelect}
-              numberOfMonths={2}
-              disabled={(date) => {
-                if (minDate && date < minDate) return true
-                if (maxDate && date > maxDate) return true
-                return false
-              }}
-              initialFocus
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
-  )
+        minDate={minDate}
+        maxDate={value?.to || maxDate}
+      />
+      <span className="text-muted">-</span>
+      <DatePicker
+        value={value?.to}
+        onChange={handleToChange}
+        placeholder={placeholderTo}
+        disabled={disabled}
+        minDate={value?.from || minDate}
+        maxDate={maxDate}
+      />
+    </div>
+  );
 }
 
-export { Calendar, DatePicker, DateRangePicker }
+export { DatePicker, DateRangePicker, Calendar };

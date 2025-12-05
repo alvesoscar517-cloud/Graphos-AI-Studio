@@ -416,11 +416,11 @@ export default function NotificationEditor() {
 
       {/* Footer Actions */}
       <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-border">
-        <Button variant="secondary" onClick={() => handleSave(false)} disabled={saving}>
-          {saving ? 'Saving...' : 'Save Draft'}
+        <Button variant="secondary" onClick={() => handleSave(false)} disabled={saving} loading={saving}>
+          Save Draft
         </Button>
-        <Button onClick={() => handleSave(true)} disabled={saving || translating}>
-          {translating ? 'Translating...' : saving ? 'Sending...' : `Send Now${notification.targetLanguages?.length > 0 ? ` (+${notification.targetLanguages.length})` : ''}`}
+        <Button onClick={() => handleSave(true)} disabled={saving || translating} loading={saving || translating}>
+          {`Send Now${notification.targetLanguages?.length > 0 ? ` (+${notification.targetLanguages.length})` : ''}`}
         </Button>
       </div>
     </div>

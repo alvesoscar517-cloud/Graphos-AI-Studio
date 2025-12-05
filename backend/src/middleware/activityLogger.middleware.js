@@ -9,36 +9,53 @@ const logger = require('../utils/logger');
 
 // Map routes to activity types
 const ROUTE_ACTIVITY_MAP = {
-  // Analysis routes
-  'POST /api/analysis/detect': 'ai_detection',
-  'POST /api/analysis/analyze': 'text_analysis',
-  'POST /api/analysis/analyze-text': 'text_analysis',
+  // Analysis routes (mounted at /analysis)
+  'POST /analysis/authenticate': 'ai_detection',
+  'POST /analysis/analyze': 'text_analysis',
+  'POST /analysis/suggest-improvements': 'text_analysis',
+  'POST /analysis/rewrite': 'text_rewrite',
+  'POST /analysis/rewrite-stream': 'text_rewrite',
+  'POST /analysis/translate': 'translation',
+  'POST /analysis/check-humanization': 'check_humanization',
+  'POST /analysis/iterative-humanize': 'iterative_humanize',
   
-  // Rewrite routes
-  'POST /api/analysis/rewrite': 'text_rewrite',
-  'POST /api/analysis/humanize': 'humanize',
-  'POST /api/analysis/iterative-humanize': 'iterative_humanize',
-  
-  // Chat routes
-  'POST /api/chat/message': 'chat_message',
+  // Chat routes (mounted at /api/chat)
+  'POST /api/chat': 'chat_message',
+  'POST /api/chat/': 'chat_message',
+  'POST /api/chat/stream': 'chat_message',
   'POST /api/chat/humanized': 'chat_humanized',
+  'POST /api/chat/humanized/stream': 'chat_humanized',
+  'POST /api/chat/upload': 'file_upload',
   'POST /api/chat/summarize': 'conversation_summarize',
   
-  // Profile routes
-  'POST /api/profile/create': 'profile_create',
-  'PUT /api/profile/update': 'profile_update',
-  'DELETE /api/profile/delete': 'profile_delete',
-  'POST /api/profile/sample': 'profile_sample_add',
-  'POST /api/profile/finalize': 'profile_finalize',
+  // Profile routes (mounted at /profiles)
+  'POST /profiles/create': 'profile_create',
+  'POST /profiles/add-sample': 'profile_sample_add',
+  'POST /profiles/add-samples-batch': 'profile_sample_add',
+  'POST /profiles/finalize': 'profile_finalize',
+  'DELETE /profiles/:id': 'profile_delete',
   
-  // Translation
+  // Legacy routes (root level)
+  'POST /authenticate': 'ai_detection',
+  'POST /analyze': 'text_analysis',
+  'POST /rewrite': 'text_rewrite',
+  'POST /rewrite_stream': 'text_rewrite',
+  'POST /create_profile': 'profile_create',
+  'POST /create_profile_complete': 'profile_create',
+  'POST /add_sample': 'profile_sample_add',
+  'POST /add_samples_batch': 'profile_sample_add',
+  'POST /finalize_profile': 'profile_finalize',
+  'POST /delete_profile': 'profile_delete',
+  'POST /suggest_improvements': 'text_analysis',
+  'POST /check-humanization': 'check_humanization',
+  'POST /iterative-humanize': 'iterative_humanize',
   'POST /api/translate': 'translation',
   
-  // File upload
-  'POST /api/upload': 'file_upload',
+  // Credit routes
+  'POST /api/credits/purchase': 'credit_purchase',
   
-  // Credit purchase
-  'POST /api/credits/purchase': 'credit_purchase'
+  // Notification routes
+  'GET /api/notifications': 'notification_received'
 };
 
 /**
@@ -75,12 +92,23 @@ function extractMetadata(req, res, responseBody) {
     metadata.profileId = req.body.profile_id || req.body.profileId;
   }
   
-  // Response info
+  // Get credits info from request (set by credit middleware)
+  if (req.creditCost !== undefined) {
+    metadata.creditsUsed = req.creditCost;
+  }
+  if (req.creditsBefore !== undefined) {
+    metadata.creditsBefore = req.creditsBefore;
+  }
+  if (req.creditsAfter !== undefined) {
+    metadata.creditsAfter = req.creditsAfter;
+  }
+  
+  // Response info (fallback if not set by middleware)
   if (responseBody) {
-    if (responseBody.creditsUsed !== undefined) {
+    if (metadata.creditsUsed === undefined && responseBody.creditsUsed !== undefined) {
       metadata.creditsUsed = responseBody.creditsUsed;
     }
-    if (responseBody.credits_used !== undefined) {
+    if (metadata.creditsUsed === undefined && responseBody.credits_used !== undefined) {
       metadata.creditsUsed = responseBody.credits_used;
     }
     if (responseBody.result?.length) {
@@ -88,6 +116,9 @@ function extractMetadata(req, res, responseBody) {
     }
     if (responseBody.rewritten_text?.length) {
       metadata.outputLength = responseBody.rewritten_text.length;
+    }
+    if (responseBody.message?.length) {
+      metadata.outputLength = responseBody.message.length;
     }
   }
   

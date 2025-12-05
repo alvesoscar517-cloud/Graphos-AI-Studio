@@ -272,7 +272,27 @@ async function handleOrderCreated(data, customData) {
 
     // Get updated credit balance
     const userDoc = await db.collection('users').doc(userId).get();
-    newCredits = userDoc.exists ? userDoc.data().credits : null;
+    const userData = userDoc.exists ? userDoc.data() : null;
+    newCredits = userData?.credits || null;
+    const creditsBefore = (newCredits?.balance || 0) - totalCredits;
+
+    // Log to user_activity_logs for Activity Logs page
+    await db.collection('user_activity_logs').add({
+      userId,
+      type: 'credit_purchase',
+      feature: 'payment',
+      source: 'lemon_squeezy',
+      creditsUsed: -totalCredits, // Negative because credits are added
+      creditsBefore: creditsBefore,
+      creditsAfter: newCredits?.balance || totalCredits,
+      orderId: data.id,
+      packageId,
+      packageName: foundPkg.name || packageId,
+      price: foundPkg.price,
+      priceFormatted: attrs.total_formatted,
+      timestamp: new Date(),
+      createdAt: new Date()
+    });
 
     logger.info('Credits added from order', { userId, credits: totalCredits, orderId: data.id, packageId });
   } else {
