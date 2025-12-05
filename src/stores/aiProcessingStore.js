@@ -4,6 +4,7 @@
  */
 
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 
 export const useAIProcessingStore = create((set) => ({
   // State
@@ -25,20 +26,24 @@ export const useAIProcessingStore = create((set) => ({
 export const useIsProcessing = () => useAIProcessingStore((state) => state.isProcessing)
 export const useProcessingType = () => useAIProcessingStore((state) => state.processingType)
 
-export const useAIProcessingActions = () => useAIProcessingStore((state) => ({
-  startProcessing: state.startProcessing,
-  stopProcessing: state.stopProcessing,
-  setProcessing: state.setProcessing,
-}))
+// Use useShallow to prevent infinite re-renders when returning objects
+export const useAIProcessingActions = () => useAIProcessingStore(
+  useShallow((state) => ({
+    startProcessing: state.startProcessing,
+    stopProcessing: state.stopProcessing,
+    setProcessing: state.setProcessing,
+  }))
+)
 
 // Backward compatible hook (matches old useAIProcessing interface)
-export const useAIProcessing = () => {
-  const isProcessing = useAIProcessingStore((state) => state.isProcessing)
-  const processingType = useAIProcessingStore((state) => state.processingType)
-  const startProcessing = useAIProcessingStore((state) => state.startProcessing)
-  const stopProcessing = useAIProcessingStore((state) => state.stopProcessing)
-
-  return { isProcessing, processingType, startProcessing, stopProcessing }
-}
+// Using useShallow to return stable reference and prevent infinite re-renders
+export const useAIProcessing = () => useAIProcessingStore(
+  useShallow((state) => ({
+    isProcessing: state.isProcessing,
+    processingType: state.processingType,
+    startProcessing: state.startProcessing,
+    stopProcessing: state.stopProcessing,
+  }))
+)
 
 export default useAIProcessingStore

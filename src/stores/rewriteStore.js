@@ -5,6 +5,7 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { useShallow } from 'zustand/react/shallow'
 
 export const useRewriteStore = create(
   persist(
@@ -65,21 +66,25 @@ export const useRewriteStore = create(
 export const useSelectedModel = () => useRewriteStore((state) => state.selectedModel)
 export const useWritingPreferences = () => useRewriteStore((state) => state.writingPreferences)
 
-export const useRewriteActions = () => useRewriteStore((state) => ({
-  setSelectedModel: state.setSelectedModel,
-  setWritingPreferences: state.setWritingPreferences,
-  updatePreference: state.updatePreference,
-  resetPreferences: state.resetPreferences,
-}))
+// Use useShallow to prevent infinite re-renders when returning objects
+export const useRewriteActions = () => useRewriteStore(
+  useShallow((state) => ({
+    setSelectedModel: state.setSelectedModel,
+    setWritingPreferences: state.setWritingPreferences,
+    updatePreference: state.updatePreference,
+    resetPreferences: state.resetPreferences,
+  }))
+)
 
 // Backward compatible hook (matches old useRewrite interface)
-export const useRewrite = () => {
-  const selectedModel = useRewriteStore((state) => state.selectedModel)
-  const writingPreferences = useRewriteStore((state) => state.writingPreferences)
-  const setSelectedModel = useRewriteStore((state) => state.setSelectedModel)
-  const setWritingPreferences = useRewriteStore((state) => state.setWritingPreferences)
-
-  return { selectedModel, setSelectedModel, writingPreferences, setWritingPreferences }
-}
+// Using useShallow to return stable reference and prevent infinite re-renders
+export const useRewrite = () => useRewriteStore(
+  useShallow((state) => ({
+    selectedModel: state.selectedModel,
+    writingPreferences: state.writingPreferences,
+    setSelectedModel: state.setSelectedModel,
+    setWritingPreferences: state.setWritingPreferences,
+  }))
+)
 
 export default useRewriteStore

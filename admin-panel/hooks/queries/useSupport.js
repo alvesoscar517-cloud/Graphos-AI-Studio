@@ -1,16 +1,40 @@
+import { useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supportApi } from '@/services/adminApi'
 import { queryKeys } from '@/lib/queryKeys'
+import firestoreRealtimeService from '@/services/firestoreRealtimeService'
 
 /**
- * Hook to fetch support tickets list
+ * Hook to fetch support tickets list with Firestore Realtime updates
  * @param {object} filters - Filter parameters (status, priority, page, etc.)
  */
 export function useTickets(filters = {}) {
+  const queryClient = useQueryClient()
+  const unsubscribeRef = useRef(null)
+
+  // Subscribe to Firestore Realtime support updates
+  useEffect(() => {
+    unsubscribeRef.current = firestoreRealtimeService.subscribe('support', (data) => {
+      if (data.type === 'support_update' && data.tickets) {
+        // Update cache with realtime data
+        queryClient.setQueryData(queryKeys.support.list(filters), (old) => ({
+          ...old,
+          tickets: data.tickets,
+        }))
+      }
+    })
+
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current()
+      }
+    }
+  }, [queryClient, filters])
+
   return useQuery({
     queryKey: queryKeys.support.list(filters),
     queryFn: () => supportApi.getAll(filters),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: 2 * 60 * 1000, // 2 minutes - Firestore handles instant updates
   })
 }
 
@@ -28,9 +52,30 @@ export function useTicket(ticketId) {
 }
 
 /**
- * Hook to fetch support statistics
+ * Hook to fetch support statistics with Firestore Realtime updates
  */
 export function useSupportStatistics() {
+  const queryClient = useQueryClient()
+  const unsubscribeRef = useRef(null)
+
+  // Subscribe to Firestore Realtime support updates for statistics
+  useEffect(() => {
+    unsubscribeRef.current = firestoreRealtimeService.subscribe('support', (data) => {
+      if (data.type === 'support_update' && data.statistics) {
+        queryClient.setQueryData([...queryKeys.support.all, 'statistics'], (old) => ({
+          ...old,
+          statistics: data.statistics,
+        }))
+      }
+    })
+
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current()
+      }
+    }
+  }, [queryClient])
+
   return useQuery({
     queryKey: [...queryKeys.support.all, 'statistics'],
     queryFn: () => supportApi.getStatistics(),

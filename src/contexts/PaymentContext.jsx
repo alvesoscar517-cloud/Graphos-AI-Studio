@@ -1,6 +1,6 @@
 /**
  * PaymentContext
- * Real-time payment detection using unified SSE service
+ * Real-time payment detection using Firestore Realtime
  */
 
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
@@ -89,9 +89,8 @@ export const PaymentProvider = ({ children }) => {
     try {
       const userInfo = await getUserInfo();
       
-      // Connect to realtime service only if not already connected
-      // This is the ONLY place that should initiate connection for payment flow
-      if (!realtimeService.isConnected() && !realtimeService.authFailed) {
+      // Connect to Firestore Realtime if not already connected
+      if (!realtimeService.isConnected()) {
         realtimeService.connect(userInfo.userId);
       }
       
@@ -111,7 +110,7 @@ export const PaymentProvider = ({ children }) => {
         stopListening();
       }, MAX_LISTEN_DURATION);
       
-      console.log('🎧 Started listening for payments (SSE)');
+      console.log('🎧 Started listening for payments (Firestore Realtime)');
       
       // Store status unsubscribe for cleanup
       const originalUnsub = unsubscribeRef.current;

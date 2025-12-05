@@ -758,48 +758,50 @@ export const useAuthError = () => useAuthStore((state) => state.error)
  * Returns the same interface as the old AuthContext for backward compatibility
  */
 export const useAuth = () => {
-  const user = useAuthStore((state) => state.user)
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-  const isLoading = useAuthStore((state) => state.isLoading)
-  const error = useAuthStore((state) => state.error)
-  const authMethod = useAuthStore((state) => state.authMethod)
-  const hasGoogleLinked = useAuthStore((state) => state.hasGoogleLinked)
-  const actions = useAuthActions()
+  // Use useShallow to prevent unnecessary re-renders
+  const state = useAuthStore(
+    useShallow((s) => ({
+      user: s.user,
+      isAuthenticated: s.isAuthenticated,
+      isLoading: s.isLoading,
+      error: s.error,
+      authMethod: s.authMethod,
+      hasGoogleLinked: s.hasGoogleLinked,
+    }))
+  )
+  
+  // Get actions from store directly - stable references
+  const store = useAuthStore.getState()
 
   return {
     // State
-    user,
-    isAuthenticated,
-    isLoading,
-    error,
-    authMethod,
-    hasGoogleLinked,
+    ...state,
     
     // Google auth
-    signIn: actions.signInWithGoogle,
-    signOut: actions.signOut,
+    signIn: store.signInWithGoogle,
+    signOut: store.signOut,
     
     // Email auth
-    signInWithEmail: actions.signInWithEmail,
-    registerWithEmail: actions.registerWithEmail,
-    verifyEmail: actions.verifyEmail,
-    resendVerificationOTP: actions.resendVerificationOTP,
-    requestPasswordReset: actions.requestPasswordReset,
-    resetPassword: actions.resetPassword,
+    signInWithEmail: store.signInWithEmail,
+    registerWithEmail: store.registerWithEmail,
+    verifyEmail: store.verifyEmail,
+    resendVerificationOTP: store.resendVerificationOTP,
+    requestPasswordReset: store.requestPasswordReset,
+    resetPassword: store.resetPassword,
     
     // Password & account management
-    changePassword: actions.changePassword,
-    deleteAccount: actions.deleteAccount,
+    changePassword: store.changePassword,
+    deleteAccount: store.deleteAccount,
     
     // Session management
-    getActiveSessions: actions.getActiveSessions,
-    revokeSession: actions.revokeSession,
-    revokeAllOtherSessions: actions.revokeAllOtherSessions,
-    getLoginHistory: actions.getLoginHistory,
+    getActiveSessions: store.getActiveSessions,
+    revokeSession: store.revokeSession,
+    revokeAllOtherSessions: store.revokeAllOtherSessions,
+    getLoginHistory: store.getLoginHistory,
     
     // Google linking
-    linkGoogleAccount: actions.linkGoogleAccount,
-    unlinkGoogleAccount: actions.unlinkGoogleAccount,
+    linkGoogleAccount: store.linkGoogleAccount,
+    unlinkGoogleAccount: store.unlinkGoogleAccount,
   }
 }
 

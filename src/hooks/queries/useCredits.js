@@ -1,6 +1,6 @@
 /**
  * Credits Query Hook
- * TanStack Query hook for user credits management with real-time updates
+ * TanStack Query hook for user credits management with Firestore Realtime updates
  */
 
 import { useEffect, useRef, useCallback } from 'react'
@@ -12,7 +12,7 @@ import apiClient from '@/services/api/client'
 const VISIBILITY_REFETCH_COOLDOWN = 30 * 1000
 
 /**
- * Fetch user credits with real-time updates via SSE
+ * Fetch user credits with Firestore Realtime updates (instant)
  */
 export function useCredits(options = {}) {
   const queryClient = useQueryClient()
@@ -33,9 +33,9 @@ export function useCredits(options = {}) {
       }
       return data?.credits || data
     },
-    staleTime: 30 * 1000, // 30 seconds - shorter to catch missed SSE updates
-    refetchInterval: false, // Realtime SSE handles updates, no need for polling
-    refetchOnWindowFocus: false, // We handle this manually below with smarter logic
+    staleTime: 60 * 1000, // 1 minute - Firestore Realtime handles instant updates
+    refetchInterval: false, // Firestore Realtime handles updates, no polling needed
+    refetchOnWindowFocus: false, // We handle this manually below
     refetchOnReconnect: true, // Refetch when network reconnects
     ...options,
   })
@@ -50,7 +50,7 @@ export function useCredits(options = {}) {
     }
   }, [queryClient])
 
-  // Subscribe to real-time credit updates + visibility change handler
+  // Subscribe to Firestore Realtime credit updates + visibility change handler
   useEffect(() => {
     const setupRealtime = async () => {
       try {
@@ -70,21 +70,19 @@ export function useCredits(options = {}) {
     setupRealtime()
 
     // Handle visibility change - refetch when tab becomes visible
-    // This catches cases where SSE missed the update (e.g., user was on payment page)
+    // Firestore Realtime should handle most updates, this is a fallback
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible') {
         try {
           const { default: realtimeService } = await import('@/services/realtimeService')
-          // Only refetch if SSE is not connected (missed updates likely)
-          // OR if data is stale (> 30 seconds old)
-          const isStale = query.dataUpdatedAt && (Date.now() - query.dataUpdatedAt > 30000)
+          // Only refetch if not connected (Firestore handles updates when connected)
+          const isStale = query.dataUpdatedAt && (Date.now() - query.dataUpdatedAt > 60000)
           
           if (!realtimeService.isConnected() || isStale) {
-            console.log('[Credits] Tab visible, SSE status:', realtimeService.connectionStatus, 'isStale:', isStale)
+            console.log('[Credits] Tab visible, connected:', realtimeService.isConnected(), 'isStale:', isStale)
             refetchCredits()
           }
         } catch (err) {
-          // Fallback: always refetch on visibility if we can't check SSE
           refetchCredits()
         }
       }

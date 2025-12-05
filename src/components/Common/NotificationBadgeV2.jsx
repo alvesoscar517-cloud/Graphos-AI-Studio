@@ -1,6 +1,6 @@
 /**
  * Notification Badge V2
- * Uses TanStack Query for unread count with real-time updates
+ * Uses TanStack Query for unread count with Firestore Realtime updates
  */
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
@@ -13,7 +13,7 @@ const NotificationBadgeV2 = ({ userId, className }) => {
   const queryClient = useQueryClient()
   const { data: unreadCount = 0 } = useUnreadNotifications()
 
-  // Subscribe to real-time notification updates (SSE connection handled centrally)
+  // Subscribe to Firestore Realtime notification updates
   useEffect(() => {
     if (!userId) return
 

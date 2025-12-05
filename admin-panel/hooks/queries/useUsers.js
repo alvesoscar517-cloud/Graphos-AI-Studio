@@ -1,12 +1,33 @@
+import { useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { usersApi } from '@/services/adminApi'
 import { queryKeys } from '@/lib/queryKeys'
+import firestoreRealtimeService from '@/services/firestoreRealtimeService'
 
 /**
- * Hook to fetch users list with filters
+ * Hook to fetch users list with filters and Firestore Realtime updates
  * @param {object} filters - Filter parameters (page, limit, search, status, etc.)
  */
 export function useUsers(filters = {}) {
+  const queryClient = useQueryClient()
+  const unsubscribeRef = useRef(null)
+
+  // Subscribe to Firestore Realtime for new user registrations
+  useEffect(() => {
+    unsubscribeRef.current = firestoreRealtimeService.subscribe('users', (data) => {
+      if (data.type === 'user_created' && data.user) {
+        // Invalidate users list to refetch with new user
+        queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() })
+      }
+    })
+
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current()
+      }
+    }
+  }, [queryClient])
+
   return useQuery({
     queryKey: queryKeys.users.list(filters),
     queryFn: () => usersApi.getAllAdvanced(filters),

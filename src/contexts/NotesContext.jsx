@@ -47,7 +47,9 @@ export const NotesProvider = ({ children }) => {
   // Current note state - sync with Zustand store
   const [currentNoteId, setCurrentNoteIdLocal] = useState(null)
   const [needsReauth, setNeedsReauth] = useState(false)
-  const setStoreNoteId = useNotesStore((state) => state.setCurrentNoteId)
+  
+  // Get store action once - stable reference
+  const setStoreNoteId = useNotesStore.getState().setCurrentNoteId
   
   // Wrapper to sync both local state and Zustand store
   const setCurrentNoteId = useCallback((id) => {

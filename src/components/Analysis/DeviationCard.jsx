@@ -19,30 +19,14 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
   const [textChanged, setTextChanged] = useState(true)
   const { currentNote } = useNotes()
 
+  // Single useEffect to handle cache loading - avoid duplicate calls
   useEffect(() => {
+    // Reset state when note or profile changes
     setDeviations([])
     setAnalysisData(null)
     setTextChanged(true)
 
-    if (!currentNote || !currentProfile) return
-
-    if (text) {
-      const cacheKey = `deviation_${currentProfile.profile_id}`
-      const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
-      if (cached) {
-        setDeviations(cached.deviant_sentences || [])
-        setAnalysisData(cached)
-        setTextChanged(false)
-        if (onAnalysisComplete) onAnalysisComplete(cached)
-      }
-    }
-  }, [currentNote?.id, currentProfile?.profile_id])
-
-  useEffect(() => {
-    if (!currentNote || !text || !currentProfile) {
-      setTextChanged(true)
-      return
-    }
+    if (!currentNote || !currentProfile || !text) return
 
     const cacheKey = `deviation_${currentProfile.profile_id}`
     const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
@@ -50,11 +34,8 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
       setDeviations(cached.deviant_sentences || [])
       setAnalysisData(cached)
       setTextChanged(false)
-      if (onAnalysisComplete) onAnalysisComplete(cached)
-    } else {
-      setDeviations([])
-      setAnalysisData(null)
-      setTextChanged(true)
+      // Don't call onAnalysisComplete here to avoid infinite loops
+      // User needs to click "Search" button to trigger analysis
     }
   }, [currentNote?.id, text, currentProfile?.profile_id])
 

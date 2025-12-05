@@ -5,8 +5,7 @@
  * Features:
  * - Auto-load notifications on login
  * - Memory + localStorage cache with TTL
- * - SSE real-time sync
- * - Periodic refresh
+ * - Firestore Realtime sync (instant updates)
  * - Optimistic updates
  */
 
@@ -18,9 +17,6 @@ import realtimeService from '../services/realtimeService'
 
 // Cache TTL: 10 minutes (reduce API calls)
 const CACHE_TTL = 10 * 60 * 1000
-
-// Polling interval when SSE is disconnected: 30 minutes
-const FALLBACK_POLLING_INTERVAL = 30 * 60 * 1000
 
 export const useNotificationStore = create(
   subscribeWithSelector(
@@ -257,10 +253,9 @@ export const useNotificationStore = create(
          * Initialize store - call after auth
          * 
          * Cost optimization:
-         * - SSE is primary source for real-time updates (no polling needed when connected)
-         * - Fallback polling disabled - rely on SSE only
+         * - Firestore Realtime is primary source (instant updates, no polling)
          * - Cache TTL 10 minutes to reduce redundant fetches
-         * - Only fetch on visibility change if cache expired AND SSE disconnected
+         * - Only fetch on visibility change if cache expired AND not connected
          */
         init: (userId) => {
           if (get()._initialized) return
@@ -272,36 +267,44 @@ export const useNotificationStore = create(
             get().fetchNotifications()
           }
           
-          // Setup SSE listener - PRIMARY source for real-time updates
+          // Setup Firestore Realtime listener - PRIMARY source for real-time updates
           const unsubscribe = realtimeService.subscribe('notification', (data) => {
-            console.log('[NotificationStore] SSE notification received:', data)
-            if (data.notification) {
+            console.log('[NotificationStore] Realtime notification received:', data)
+            if (data.type === 'new' && data.notification) {
               get().addNotification(data.notification)
+            } else if (data.type === 'updated' && data.notification) {
+              // Update existing notification
+              set((state) => ({
+                notifications: state.notifications.map(n =>
+                  n.id === data.notification.id ? data.notification : n
+                )
+              }))
+            } else if (data.type === 'removed' && data.notificationId) {
+              // Remove notification
+              set((state) => ({
+                notifications: state.notifications.filter(n => n.id !== data.notificationId),
+                unreadCount: state.notifications.filter(n => n.id !== data.notificationId && !n.read).length
+              }))
             }
           })
           
-          // CENTRALIZED SSE CONNECTION - NotificationStore is the primary initializer
-          // Other components should only subscribe, not connect
-          if (!realtimeService.isConnected() && !realtimeService.authFailed && userId) {
-            console.log('[NotificationStore] Initializing SSE connection')
+          // Initialize Firestore Realtime connection
+          if (!realtimeService.isConnected() && userId) {
+            console.log('[NotificationStore] Initializing Firestore Realtime connection')
             realtimeService.connect(userId)
           }
           
-          // NO POLLING - rely entirely on SSE for real-time updates
-          // This saves significant API costs
-          
           set({ 
             _sseUnsubscribe: unsubscribe, 
-            _refreshInterval: null, // No polling
+            _refreshInterval: null,
             _initialized: true 
           })
           
-          // Listen for visibility change - only fetch if cache expired AND SSE not connected
+          // Listen for visibility change - only fetch if cache expired AND not connected
           const handleVisibility = () => {
             if (document.visibilityState === 'visible') {
-              // Only fetch if both: cache expired AND SSE disconnected
               if (!get()._isCacheValid() && !realtimeService.isConnected()) {
-                console.log('[NotificationStore] Visibility fetch (cache expired, SSE down)')
+                console.log('[NotificationStore] Visibility fetch (cache expired, not connected)')
                 get().fetchNotifications(true)
               }
             }

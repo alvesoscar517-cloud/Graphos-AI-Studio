@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNotes } from '../../../contexts/NotesContext'
 import { useAIProcessing } from '@/stores'
@@ -8,7 +8,6 @@ import { truncateTitleByWords } from '../../../utils/titleUtils'
 import TextHighlightEditor from '../../Analysis/TextHighlightEditor'
 import EditTitleModal from '../../Common/EditTitleModal'
 import TokenBadge from '../../Common/TokenBadge'
-import modal from '../../../utils/modal'
 import { cn } from '../../../lib/utils'
 
 const AIStudioEditorEnhanced = ({ 
@@ -32,12 +31,37 @@ const AIStudioEditorEnhanced = ({
   const titleGenerationTimeoutRef = useRef(null)
   const isGeneratingTitleRef = useRef(false)
 
-  const triggerAutoGenerateTitle = useCallback(() => {
-    if (!currentNote || currentNote.userEditedTitle || currentNote.titleGenerated || currentNote.title !== 'Untitled') {
+  // Store currentNote and updateNote in refs to avoid dependency issues
+  const currentNoteRef = useRef(currentNote)
+  currentNoteRef.current = currentNote
+  
+  const updateNoteRef = useRef(updateNote)
+  updateNoteRef.current = updateNote
+  
+  // Track previous values to prevent unnecessary effect runs
+  const prevContentRef = useRef(null)
+  const prevNoteIdRef = useRef(null)
+
+  // TEMPORARILY DISABLED - Auto-generate title effect
+  // This effect was causing potential infinite loops
+  // TODO: Re-enable after fixing the root cause
+  /*
+  useEffect(() => {
+    const note = currentNoteRef.current
+    const noteId = note?.id
+    const content = note?.content?.trim() || ''
+    
+    // Skip if note ID or content hasn't actually changed
+    if (prevNoteIdRef.current === noteId && prevContentRef.current === content) {
+      return
+    }
+    prevNoteIdRef.current = noteId
+    prevContentRef.current = content
+    
+    if (!note || note.userEditedTitle || note.titleGenerated || note.title !== 'Untitled') {
       return
     }
     
-    const content = currentNote.content?.trim()
     if (!content || content.length < 20 || isGeneratingTitleRef.current) {
       return
     }
@@ -48,89 +72,85 @@ const AIStudioEditorEnhanced = ({
 
     // Generate title from first characters (no AI call)
     titleGenerationTimeoutRef.current = setTimeout(() => {
-      if (isGeneratingTitleRef.current) return
+      const currentNoteNow = currentNoteRef.current
+      if (isGeneratingTitleRef.current || !currentNoteNow) return
+      if (currentNoteNow.title !== 'Untitled' || currentNoteNow.userEditedTitle || currentNoteNow.titleGenerated) return
       
       isGeneratingTitleRef.current = true
       try {
-        const firstSentence = content.split(/[.!?。\n]/)[0]?.trim() || content
+        const currentContent = currentNoteNow.content?.trim() || ''
+        const firstSentence = currentContent.split(/[.!?。\n]/)[0]?.trim() || currentContent
         const newTitle = truncateTitleByWords(firstSentence, 7)
-        if (newTitle && currentNote.title === 'Untitled' && !currentNote.userEditedTitle) {
-          updateNote(currentNote.id, { title: newTitle, titleGenerated: true })
+        if (newTitle) {
+          updateNoteRef.current(currentNoteNow.id, { title: newTitle, titleGenerated: true })
         }
       } finally {
         isGeneratingTitleRef.current = false
       }
     }, 1500)
-  }, [currentNote, updateNote])
 
-  useEffect(() => {
-    triggerAutoGenerateTitle()
     return () => {
       if (titleGenerationTimeoutRef.current) {
         clearTimeout(titleGenerationTimeoutRef.current)
       }
     }
-  }, [currentNote?.content, triggerAutoGenerateTitle])
+  }, [currentNote?.content, currentNote?.id])
+  */
 
+  // Track previous externalAnalysisData to avoid duplicate processing
+  const prevAnalysisDataRef = useRef(null)
+  
   useEffect(() => {
-    if (externalAnalysisData) {
-      setAnalysis(externalAnalysisData)
-      setShowHighlights(true)
+    if (!externalAnalysisData) return
+    // Skip if same analysis data
+    if (prevAnalysisDataRef.current === externalAnalysisData) return
+    prevAnalysisDataRef.current = externalAnalysisData
+    
+    setAnalysis(externalAnalysisData)
+    setShowHighlights(true)
+    
+    // DISABLED: Auto-generate title on analysis complete
+    // This was causing potential infinite loops
+    // Title generation is now only done manually or via the first useEffect
+  }, [externalAnalysisData])
+
+  // Track previous title to avoid unnecessary updates
+  const prevTitleRef = useRef(null)
+  
+  useEffect(() => {
+    if (!currentNote) return
+    
+    const newTitle = currentNote.title
+    const truncatedTitle = truncateTitleByWords(newTitle, 7)
+    
+    // Skip if title hasn't changed
+    if (prevTitleRef.current === newTitle) return
+    prevTitleRef.current = newTitle
+    
+    if (currentNote.titleGenerated && !currentNote.userEditedTitle && newTitle !== 'Untitled') {
+      setIsTypingTitle(true)
+      let currentIndex = 0
+      let timeoutId
       
-      // Generate title from first characters (no AI call)
-      if (currentNote && !currentNote.userEditedTitle && !currentNote.titleGenerated && currentNote.title === 'Untitled') {
-        const content = currentNote.content.trim()
-        if (content.length > 10 && !isGeneratingTitleRef.current) {
-          if (titleGenerationTimeoutRef.current) {
-            clearTimeout(titleGenerationTimeoutRef.current)
-          }
-          
-          isGeneratingTitleRef.current = true
-          const firstSentence = content.split(/[.!?。\n]/)[0]?.trim() || content
-          const newTitle = truncateTitleByWords(firstSentence, 7)
-          updateNote(currentNote.id, { title: newTitle, titleGenerated: true })
-          isGeneratingTitleRef.current = false
+      const typeNextChar = () => {
+        if (currentIndex < truncatedTitle.length) {
+          setDisplayTitle(truncatedTitle.substring(0, currentIndex + 1))
+          currentIndex++
+          timeoutId = setTimeout(typeNextChar, 30)
+        } else {
+          setIsTypingTitle(false)
         }
       }
-    }
-  }, [externalAnalysisData, currentNote, updateNote])
-
-  useEffect(() => {
-    if (currentNote && currentNote.title !== displayTitle) {
-      const newTitle = currentNote.title
-      const truncatedTitle = truncateTitleByWords(newTitle, 7)
       
-      if (currentNote.titleGenerated && !currentNote.userEditedTitle && newTitle !== 'Untitled') {
-        setIsTypingTitle(true)
-        let currentIndex = 0
-        let timeoutId
-        
-        const typeNextChar = () => {
-          if (currentIndex < truncatedTitle.length) {
-            setDisplayTitle(truncatedTitle.substring(0, currentIndex + 1))
-            currentIndex++
-            timeoutId = setTimeout(typeNextChar, 30)
-          } else {
-            setIsTypingTitle(false)
-          }
-        }
-        
-        typeNextChar()
-        
-        return () => {
-          if (timeoutId) clearTimeout(timeoutId)
-        }
-      } else {
-        setDisplayTitle(truncatedTitle)
+      typeNextChar()
+      
+      return () => {
+        if (timeoutId) clearTimeout(timeoutId)
       }
+    } else {
+      setDisplayTitle(truncatedTitle)
     }
-  }, [currentNote?.title, currentNote?.titleGenerated])
-
-  useEffect(() => {
-    if (currentNote && !isTypingTitle) {
-      setDisplayTitle(truncateTitleByWords(currentNote.title, 7))
-    }
-  }, [currentNote, isTypingTitle])
+  }, [currentNote?.title, currentNote?.titleGenerated, currentNote?.userEditedTitle])
 
   const handleEditClick = () => setShowEditTitleModal(true)
 

@@ -5,6 +5,7 @@
 
 import { create } from 'zustand'
 import { devtools, subscribeWithSelector } from 'zustand/middleware'
+import { useShallow } from 'zustand/react/shallow'
 
 export const useAppStore = create(
   devtools(
@@ -123,41 +124,51 @@ export const useAppStore = create(
 )
 
 // ============================================
-// Convenience Hooks
+// Convenience Hooks (using useShallow to prevent infinite re-renders)
 // ============================================
 
-export const useActiveProfile = () => useAppStore((state) => ({
-  activeProfileId: state.activeProfileId,
-  setActiveProfile: state.setActiveProfile,
-}))
+export const useActiveProfile = () => useAppStore(
+  useShallow((state) => ({
+    activeProfileId: state.activeProfileId,
+    setActiveProfile: state.setActiveProfile,
+  }))
+)
 
-export const useActiveView = () => useAppStore((state) => ({
-  activeView: state.activeView,
-  setActiveView: state.setActiveView,
-}))
+export const useActiveView = () => useAppStore(
+  useShallow((state) => ({
+    activeView: state.activeView,
+    setActiveView: state.setActiveView,
+  }))
+)
 
-export const useSearch = () => useAppStore((state) => ({
-  searchQuery: state.searchQuery,
-  searchFilters: state.searchFilters,
-  searchResults: state.searchResults,
-  setSearchQuery: state.setSearchQuery,
-  setSearchFilters: state.setSearchFilters,
-  setSearchResults: state.setSearchResults,
-  clearSearch: state.clearSearch,
-}))
+export const useSearch = () => useAppStore(
+  useShallow((state) => ({
+    searchQuery: state.searchQuery,
+    searchFilters: state.searchFilters,
+    searchResults: state.searchResults,
+    setSearchQuery: state.setSearchQuery,
+    setSearchFilters: state.setSearchFilters,
+    setSearchResults: state.setSearchResults,
+    clearSearch: state.clearSearch,
+  }))
+)
 
-export const useFeatures = () => useAppStore((state) => ({
-  features: state.features,
-  setFeature: state.setFeature,
-  toggleFeature: state.toggleFeature,
-  isFeatureEnabled: state.isFeatureEnabled,
-}))
+export const useFeatures = () => useAppStore(
+  useShallow((state) => ({
+    features: state.features,
+    setFeature: state.setFeature,
+    toggleFeature: state.toggleFeature,
+    isFeatureEnabled: state.isFeatureEnabled,
+  }))
+)
 
-export const useAppStatus = () => useAppStore((state) => ({
-  isInitialized: state.isInitialized,
-  isOnline: state.isOnline,
-  version: state.version,
-}))
+export const useAppStatus = () => useAppStore(
+  useShallow((state) => ({
+    isInitialized: state.isInitialized,
+    isOnline: state.isOnline,
+    version: state.version,
+  }))
+)
 
 // ============================================
 // Online/Offline Listener

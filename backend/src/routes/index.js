@@ -34,6 +34,40 @@ const router = express.Router();
 // PUBLIC ROUTES (No Auth Required)
 // ============================================================================
 
+// Public Firebase config for frontend Firestore Realtime
+router.get('/api/config/firebase', async (_req, res) => {
+  try {
+    const envConfigService = require('../services/envConfig.service');
+    const sharedConfig = await envConfigService.getEnvConfig('shared');
+    
+    // Only return Firebase-related config (non-sensitive)
+    const firebaseConfig = {
+      apiKey: sharedConfig.variables?.FIREBASE_API_KEY || '',
+      authDomain: sharedConfig.variables?.FIREBASE_AUTH_DOMAIN || '',
+      projectId: sharedConfig.variables?.FIREBASE_PROJECT_ID || '',
+      storageBucket: sharedConfig.variables?.FIREBASE_STORAGE_BUCKET || '',
+      messagingSenderId: sharedConfig.variables?.FIREBASE_MESSAGING_SENDER_ID || '',
+      appId: sharedConfig.variables?.FIREBASE_APP_ID || '',
+    };
+    
+    // Check if config is valid
+    const isConfigured = firebaseConfig.apiKey && firebaseConfig.projectId;
+    
+    res.json({
+      success: true,
+      config: firebaseConfig,
+      isConfigured
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load Firebase config',
+      config: {},
+      isConfigured: false
+    });
+  }
+});
+
 // Home
 router.get('/', (_req, res) => {
   res.json({

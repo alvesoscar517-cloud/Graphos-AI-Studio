@@ -5,6 +5,7 @@
  */
 
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 
 export const useNotesStore = create((set) => ({
   // Current note ID
@@ -26,9 +27,12 @@ if (typeof window !== 'undefined') {
 // Convenience hooks
 export const useCurrentNoteId = () => useNotesStore((state) => state.currentNoteId)
 
-export const useNotesActions = () => useNotesStore((state) => ({
-  setCurrentNoteId: state.setCurrentNoteId,
-  clearCurrentNote: state.clearCurrentNote,
-}))
+// Use useShallow to prevent infinite re-renders when returning objects
+export const useNotesActions = () => useNotesStore(
+  useShallow((state) => ({
+    setCurrentNoteId: state.setCurrentNoteId,
+    clearCurrentNote: state.clearCurrentNote,
+  }))
+)
 
 export default useNotesStore

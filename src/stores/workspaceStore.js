@@ -6,6 +6,7 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { useShallow } from 'zustand/react/shallow'
 
 export const useWorkspaceStore = create(
   persist(
@@ -92,19 +93,22 @@ export const useModelSettings = () => useWorkspaceStore((state) => state.modelSe
 export const useWorkspaceLoading = () => useWorkspaceStore((state) => state.isLoading)
 export const useWorkspaceError = () => useWorkspaceStore((state) => state.error)
 
-export const useWorkspaceActions = () => useWorkspaceStore((state) => ({
-  setCurrentConversation: state.setCurrentConversation,
-  clearCurrentConversation: state.clearCurrentConversation,
-  updateModelSettings: state.updateModelSettings,
-  setModel: state.setModel,
-  setTemperature: state.setTemperature,
-  updateWritingPreferences: state.updateWritingPreferences,
-  updateChatSettings: state.updateChatSettings,
-  setLoading: state.setLoading,
-  setError: state.setError,
-  clearError: state.clearError,
-  reset: state.reset,
-}))
+// Use useShallow to prevent infinite re-renders when returning objects
+export const useWorkspaceActions = () => useWorkspaceStore(
+  useShallow((state) => ({
+    setCurrentConversation: state.setCurrentConversation,
+    clearCurrentConversation: state.clearCurrentConversation,
+    updateModelSettings: state.updateModelSettings,
+    setModel: state.setModel,
+    setTemperature: state.setTemperature,
+    updateWritingPreferences: state.updateWritingPreferences,
+    updateChatSettings: state.updateChatSettings,
+    setLoading: state.setLoading,
+    setError: state.setError,
+    clearError: state.clearError,
+    reset: state.reset,
+  }))
+)
 
 // Listen for sign out event to clear state
 if (typeof window !== 'undefined') {

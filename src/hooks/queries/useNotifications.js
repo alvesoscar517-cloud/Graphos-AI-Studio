@@ -1,6 +1,6 @@
 /**
  * Notifications Query Hook
- * TanStack Query hook for user notifications with real-time support
+ * TanStack Query hook for user notifications with Firestore Realtime support
  */
 
 import { useEffect } from 'react'
@@ -10,7 +10,7 @@ import apiClient from '@/services/api/client'
 import realtimeService from '@/services/realtimeService'
 
 /**
- * Fetch user notifications with real-time updates
+ * Fetch user notifications with Firestore Realtime updates
  */
 export function useNotifications(userId) {
   const queryClient = useQueryClient()
@@ -21,12 +21,12 @@ export function useNotifications(userId) {
       const { data } = await apiClient.get('/api/notifications')
       return data.notifications || []
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes - rely on SSE for real-time updates
-    // No polling - SSE handles real-time updates, saves API costs
+    staleTime: 5 * 60 * 1000, // 5 minutes - Firestore Realtime handles instant updates
+    // No polling - Firestore Realtime handles updates, saves API costs
     refetchOnWindowFocus: true, // Refetch when user returns to tab
   })
 
-  // Subscribe to real-time notification updates via SSE
+  // Subscribe to Firestore Realtime notification updates
   useEffect(() => {
     if (!userId) return
 
@@ -67,8 +67,8 @@ export function useUnreadNotifications() {
       const { data } = await apiClient.get('/api/notifications/unread')
       return data.count || 0
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes - rely on SSE for real-time updates
-    // No polling - SSE handles real-time updates
+    staleTime: 5 * 60 * 1000, // 5 minutes - Firestore Realtime handles instant updates
+    // No polling - Firestore Realtime handles updates
     refetchOnWindowFocus: true,
   })
 }
