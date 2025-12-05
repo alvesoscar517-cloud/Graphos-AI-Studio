@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRealtime } from '../../contexts/RealtimeContext';
 import { ordersApi, supportApi } from '../../services/adminApi';
@@ -8,14 +8,26 @@ import PageHeader from '../Common/PageHeader';
 import StatsCard from './StatsCard';
 import ActivityStatsWidget from './ActivityStatsWidget';
 import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
 
 export default function DashboardView() {
-  const { overview: stats, loading: realtimeLoading, loadOverview, setActiveTab } = useRealtime();
+  const { 
+    overview: stats, 
+    loading: realtimeLoading, 
+    loadOverview, 
+    setActiveTab,
+    realtimeEvents,
+    realtimeConnected
+  } = useRealtime();
   const [error, setError] = useState('');
   const [revenueStats, setRevenueStats] = useState(null);
   const [supportStats, setSupportStats] = useState(null);
+  const [realtimeAlerts, setRealtimeAlerts] = useState([]);
   const navigate = useNavigate();
   const loading = realtimeLoading.overview;
+  
+  // Track last seen events
+  const lastSeenEvents = useRef({ user: null, order: null });
 
   useEffect(() => {
     setError('');
@@ -25,6 +37,51 @@ export default function DashboardView() {
     
     return () => {};
   }, []);
+  
+  // Listen for realtime events and show alerts
+  useEffect(() => {
+    const newAlerts = [];
+    
+    // New user alert
+    if (realtimeEvents?.lastNewUser && 
+        realtimeEvents.lastNewUser.timestamp !== lastSeenEvents.current.user) {
+      lastSeenEvents.current.user = realtimeEvents.lastNewUser.timestamp;
+      const user = realtimeEvents.lastNewUser.user;
+      newAlerts.push({
+        id: `user-${Date.now()}`,
+        type: 'user',
+        icon: 'user-plus.svg',
+        title: 'New User Registered',
+        message: user.email || user.name || 'Unknown user',
+        timestamp: realtimeEvents.lastNewUser.timestamp,
+        action: () => navigate('/users')
+      });
+    }
+    
+    // New order alert
+    if (realtimeEvents?.lastNewOrder && 
+        realtimeEvents.lastNewOrder.timestamp !== lastSeenEvents.current.order) {
+      lastSeenEvents.current.order = realtimeEvents.lastNewOrder.timestamp;
+      const order = realtimeEvents.lastNewOrder.order;
+      const amount = order.amount || order.price || 0;
+      newAlerts.push({
+        id: `order-${Date.now()}`,
+        type: 'order',
+        icon: 'dollar-sign.svg',
+        title: 'New Purchase',
+        message: `${order.productName || 'Credits'} - $${amount.toFixed(2)}`,
+        timestamp: realtimeEvents.lastNewOrder.timestamp,
+        action: () => navigate('/orders')
+      });
+      
+      // Refresh revenue stats
+      loadExtraStats();
+    }
+    
+    if (newAlerts.length > 0) {
+      setRealtimeAlerts(prev => [...newAlerts, ...prev].slice(0, 5));
+    }
+  }, [realtimeEvents?.lastNewUser, realtimeEvents?.lastNewOrder, navigate]);
 
   const loadStats = async () => {
     try {
@@ -149,13 +206,65 @@ export default function DashboardView() {
     ? stats.recentActivities.slice(0, 5) 
     : defaultActivities;
 
+  // Dismiss alert
+  const dismissAlert = (alertId) => {
+    setRealtimeAlerts(prev => prev.filter(a => a.id !== alertId));
+  };
+
   return (
     <div className="p-6">
       <PageHeader
         icon="layout-dashboard.svg"
         title="Dashboard"
         subtitle="System overview and recent activities"
+        actions={
+          <div className="flex items-center gap-2">
+            {realtimeConnected && (
+              <span className="flex items-center gap-1.5 text-xs text-green-600">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                Live
+              </span>
+            )}
+          </div>
+        }
       />
+      
+      {/* Realtime Alerts Banner */}
+      {realtimeAlerts.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {realtimeAlerts.map(alert => (
+            <div 
+              key={alert.id}
+              className={cn(
+                "flex items-center gap-3 p-3 rounded-lg border animate-in slide-in-from-top-2 duration-300",
+                alert.type === 'user' && "bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800",
+                alert.type === 'order' && "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800"
+              )}
+            >
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center",
+                alert.type === 'user' && "bg-blue-100 dark:bg-blue-900",
+                alert.type === 'order' && "bg-green-100 dark:bg-green-900"
+              )}>
+                <img src={`/icon/${alert.icon}`} alt="" className="w-4 h-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-primary">{alert.title}</p>
+                <p className="text-xs text-muted truncate">{alert.message}</p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={alert.action}>
+                View
+              </Button>
+              <button 
+                onClick={() => dismissAlert(alert.id)}
+                className="p-1 hover:bg-surface-secondary rounded"
+              >
+                <img src="/icon/x.svg" alt="Dismiss" className="w-4 h-4 icon-gray" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">

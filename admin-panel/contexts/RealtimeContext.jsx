@@ -6,6 +6,7 @@
  * - Firestore Realtime for instant updates (primary)
  * - Smart caching with TTL to reduce API calls
  * - Automatic reconnection
+ * - Toast notifications for realtime events (new users, orders)
  */
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
@@ -13,6 +14,7 @@ import { analyticsApi, advancedAnalyticsApi, supportApi, usersApi, logsApi, noti
 import { cache } from '../utils/cache';
 import { isAuthenticated } from '../services/authService';
 import firestoreRealtimeService from '../services/firestoreRealtimeService';
+import { showToast } from '@/components/ui/toast';
 
 const RealtimeContext = createContext();
 
@@ -66,6 +68,16 @@ export function RealtimeProvider({ children }) {
 
   // Track active tab for smart refresh
   const [activeTab, setActiveTab] = useState('dashboard');
+  
+  // Realtime events for components to react to
+  const [realtimeEvents, setRealtimeEvents] = useState({
+    lastNewUser: null,      // Last new user registration
+    lastNewOrder: null,     // Last new order/purchase
+    lastSupportTicket: null // Last support ticket update
+  });
+  
+  // Track if initial load is done (to avoid showing toasts on first load)
+  const initialLoadDone = useRef(false);
 
   /**
    * Initialize Firestore Realtime listeners
@@ -109,12 +121,34 @@ export function RealtimeProvider({ children }) {
       // Subscribe to support updates
       const unsubSupport = firestoreRealtimeService.subscribe('support', (data) => {
         if (data.type === 'support_update') {
+          const prevTickets = supportTickets;
+          
           if (data.tickets) {
             setSupportTickets(data.tickets);
+            
+            // Check for new open tickets (only after initial load)
+            if (initialLoadDone.current && prevTickets.length > 0) {
+              const newOpenTickets = data.tickets.filter(t => 
+                t.status === 'open' && !prevTickets.some(pt => pt.id === t.id)
+              );
+              if (newOpenTickets.length > 0) {
+                showToast.info(
+                  `🎫 ${newOpenTickets.length} new support ticket(s)`,
+                  { duration: 5000 }
+                );
+              }
+            }
           }
           if (data.statistics) {
             setSupportStats(data.statistics);
           }
+          
+          // Store event for components
+          setRealtimeEvents(prev => ({
+            ...prev,
+            lastSupportTicket: { tickets: data.tickets, timestamp: data.timestamp }
+          }));
+          
           cache.set('admin_support', data, CACHE_TTL.support);
           lastFetch.current.support = Date.now();
         }
@@ -125,9 +159,12 @@ export function RealtimeProvider({ children }) {
       const unsubUsers = firestoreRealtimeService.subscribe('users', (data) => {
         if (data.type === 'user_created' && data.user) {
           console.log('[RealtimeContext] New user:', data.user.email);
+          
           // Invalidate users cache to trigger refetch
           cache.delete('admin_users');
+          cache.clearPattern(/^admin_users_/);
           lastFetch.current.users = 0;
+          
           // Update users list if loaded
           setUsers(prev => {
             if (!prev || prev.length === 0) return prev;
@@ -136,6 +173,20 @@ export function RealtimeProvider({ children }) {
             if (exists) return prev;
             return [data.user, ...prev].slice(0, 100);
           });
+          
+          // Store event for components to react
+          setRealtimeEvents(prev => ({
+            ...prev,
+            lastNewUser: { user: data.user, timestamp: data.timestamp }
+          }));
+          
+          // Show toast notification (only after initial load)
+          if (initialLoadDone.current) {
+            showToast.success(
+              `New user registered: ${data.user.email || data.user.name || 'Unknown'}`,
+              { duration: 5000 }
+            );
+          }
         }
       });
       unsubscribersRef.current.push(unsubUsers);
@@ -144,10 +195,27 @@ export function RealtimeProvider({ children }) {
       const unsubOrders = firestoreRealtimeService.subscribe('orders', (data) => {
         if (data.type === 'order_created' && data.order) {
           console.log('[RealtimeContext] New order:', data.order.productName);
-          // Could show a toast notification here
+          
           // Invalidate analytics cache
           cache.delete('admin_analytics');
+          cache.clearPattern(/^admin_analytics_/);
           lastFetch.current.analytics = 0;
+          
+          // Store event for components to react
+          setRealtimeEvents(prev => ({
+            ...prev,
+            lastNewOrder: { order: data.order, timestamp: data.timestamp }
+          }));
+          
+          // Show toast notification for new purchase (only after initial load)
+          if (initialLoadDone.current) {
+            const amount = data.order.amount || data.order.price || 0;
+            const productName = data.order.productName || data.order.product || 'Credits';
+            showToast.success(
+              `💰 New purchase: ${productName} ($${amount.toFixed(2)})`,
+              { duration: 6000 }
+            );
+          }
         }
       });
       unsubscribersRef.current.push(unsubOrders);
@@ -173,6 +241,14 @@ export function RealtimeProvider({ children }) {
   useEffect(() => {
     if (isAuthenticated()) {
       initializeRealtime();
+      
+      // Mark initial load as done after a short delay
+      // This prevents toasts from showing on first data load
+      const timer = setTimeout(() => {
+        initialLoadDone.current = true;
+      }, 3000);
+      
+      return () => clearTimeout(timer);
     }
     
     return () => {
@@ -485,6 +561,9 @@ export function RealtimeProvider({ children }) {
     sseConnected: realtimeConnected,
     realtimeConnected,
     
+    // Realtime events for components to react to
+    realtimeEvents,
+    
     // Actions
     loadOverview,
     loadAnalytics,
@@ -514,7 +593,35 @@ export function RealtimeProvider({ children }) {
 export function useRealtime() {
   const context = useContext(RealtimeContext);
   if (!context) {
-    throw new Error('useRealtime must be used within RealtimeProvider');
+    // Return safe default values instead of throwing error
+    // This handles edge cases during initial render or error boundaries
+    console.warn('[useRealtime] Context not available, returning defaults');
+    return {
+      overview: null,
+      userAnalytics: null,
+      usageAnalytics: null,
+      users: [],
+      supportTickets: [],
+      supportStats: null,
+      systemLogs: [],
+      notifications: [],
+      loading: {},
+      sseConnected: false,
+      realtimeConnected: false,
+      realtimeEvents: {},
+      loadOverview: async () => null,
+      loadAnalytics: async () => null,
+      loadUsers: async () => [],
+      loadSupport: async () => null,
+      loadLogs: async () => [],
+      loadNotifications: async () => [],
+      invalidateCache: () => {},
+      refreshCurrentTab: async () => null,
+      setActiveTab: () => {},
+      reconnectSSE: () => {},
+      closeSSE: () => {},
+      activeTab: 'dashboard'
+    };
   }
   return context;
 }

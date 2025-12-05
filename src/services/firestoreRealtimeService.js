@@ -169,7 +169,18 @@ class FirestoreRealtimeService {
    */
   _handleListenerError(key, error) {
     const attempts = this.retryAttempts.get(key) || 0
-    if (attempts < this.maxRetries && error.code !== 'permission-denied') {
+    
+    // Don't retry for permanent errors
+    const permanentErrors = ['permission-denied', 'failed-precondition', 'invalid-argument']
+    const isPermanentError = permanentErrors.includes(error.code) || 
+      error.message?.includes('requires an index')
+    
+    if (isPermanentError) {
+      console.error(`[FirestoreRealtime] Permanent error for ${key}, not retrying:`, error.message)
+      return
+    }
+    
+    if (attempts < this.maxRetries) {
       this.retryAttempts.set(key, attempts + 1)
       const delay = 1000 * Math.pow(2, attempts)
       console.warn(`[FirestoreRealtime] Will retry ${key} in ${delay}ms`)
@@ -212,11 +223,11 @@ class FirestoreRealtimeService {
   }
 
   /**
-   * Listen to user's notifications
+   * Listen to user's notifications (user_notifications collection)
    */
   _setupNotificationsListener(db, userId) {
     this._setupWithRetry('notifications', () => {
-      const notificationsRef = collection(db, 'notifications')
+      const notificationsRef = collection(db, 'user_notifications')
       const q = query(
         notificationsRef,
         where('userId', '==', userId),
@@ -278,8 +289,8 @@ class FirestoreRealtimeService {
       const profilesRef = collection(db, 'voice_profiles')
       const q = query(
         profilesRef,
-        where('user_id', '==', userId),
-        orderBy('updated_at', 'desc')
+        where('userId', '==', userId),
+        orderBy('createdAt', 'desc')
       )
 
       const unsubscribe = onSnapshot(
@@ -288,9 +299,9 @@ class FirestoreRealtimeService {
           snapshot.docChanges().forEach((change) => {
             const docData = change.doc.data()
             
-            // Convert Firestore Timestamps
-            let createdAt = docData.created_at
-            let updatedAt = docData.updated_at
+            // Convert Firestore Timestamps (backend uses camelCase)
+            let createdAt = docData.createdAt
+            let updatedAt = docData.updatedAt
             if (createdAt instanceof Timestamp) {
               createdAt = createdAt.toDate().toISOString()
             }
@@ -301,8 +312,8 @@ class FirestoreRealtimeService {
             const profile = { 
               profile_id: change.doc.id, 
               ...docData, 
-              created_at: createdAt,
-              updated_at: updatedAt
+              createdAt,
+              updatedAt
             }
             
             if (change.type === 'added') {

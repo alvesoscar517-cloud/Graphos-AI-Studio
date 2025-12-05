@@ -93,7 +93,18 @@ class FirestoreRealtimeService {
    */
   _handleListenerError(key, error) {
     const attempts = this.retryAttempts.get(key) || 0
-    if (attempts < this.maxRetries && error.code !== 'permission-denied') {
+    
+    // Don't retry for permanent errors
+    const permanentErrors = ['permission-denied', 'failed-precondition', 'invalid-argument']
+    const isPermanentError = permanentErrors.includes(error.code) || 
+      error.message?.includes('requires an index')
+    
+    if (isPermanentError) {
+      console.error(`[FirestoreRealtime] Permanent error for ${key}, not retrying:`, error.message)
+      return
+    }
+    
+    if (attempts < this.maxRetries) {
       this.retryAttempts.set(key, attempts + 1)
       const delay = 1000 * Math.pow(2, attempts)
       console.warn(`[FirestoreRealtime] Will retry ${key} in ${delay}ms`)
@@ -210,6 +221,9 @@ class FirestoreRealtimeService {
         limit(20)
       )
 
+      // Track initial load to avoid notifying for existing users
+      let isInitialLoad = true
+
       const unsubscribe = onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
@@ -226,14 +240,24 @@ class FirestoreRealtimeService {
               createdAt
             }
             
-            console.log('[FirestoreRealtime] New user registered:', user.email || user.id)
-            this._notify('users', {
-              type: 'user_created',
-              user,
-              timestamp: new Date().toISOString()
-            })
+            // Only notify for truly new users (not initial load)
+            // Check if user was created in the last 30 seconds
+            const userCreatedAt = new Date(createdAt)
+            const isRecentlyCreated = (Date.now() - userCreatedAt.getTime()) < 30000
+            
+            if (!isInitialLoad || isRecentlyCreated) {
+              console.log('[FirestoreRealtime] New user registered:', user.email || user.id)
+              this._notify('users', {
+                type: 'user_created',
+                user,
+                timestamp: new Date().toISOString()
+              })
+            }
           }
         })
+        
+        // Mark initial load as complete after first snapshot
+        isInitialLoad = false
       }, (error) => {
         console.error('[FirestoreRealtime] Users listener error:', error)
         this._handleListenerError('usersRecent', error)
@@ -260,6 +284,9 @@ class FirestoreRealtimeService {
         limit(20)
       )
 
+      // Track initial load to avoid notifying for existing orders
+      let isInitialLoad = true
+
       const unsubscribe = onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
@@ -276,14 +303,24 @@ class FirestoreRealtimeService {
               createdAt
             }
             
-            console.log('[FirestoreRealtime] New order:', order.id, order.productName)
-            this._notify('orders', {
-              type: 'order_created',
-              order,
-              timestamp: new Date().toISOString()
-            })
+            // Only notify for truly new orders (not initial load)
+            // Check if order was created in the last 30 seconds
+            const orderCreatedAt = new Date(createdAt)
+            const isRecentlyCreated = (Date.now() - orderCreatedAt.getTime()) < 30000
+            
+            if (!isInitialLoad || isRecentlyCreated) {
+              console.log('[FirestoreRealtime] New order:', order.id, order.productName)
+              this._notify('orders', {
+                type: 'order_created',
+                order,
+                timestamp: new Date().toISOString()
+              })
+            }
           }
         })
+        
+        // Mark initial load as complete after first snapshot
+        isInitialLoad = false
       }, (error) => {
         console.error('[FirestoreRealtime] Orders listener error:', error)
         this._handleListenerError('ordersRecent', error)

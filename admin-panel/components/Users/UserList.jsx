@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usersApi } from '../../services/adminApi';
 import { useNotify } from '../Common/NotificationProvider';
+import { useRealtime } from '../../contexts/RealtimeContext';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge, StatusBadge } from '../ui/badge';
@@ -17,8 +18,13 @@ export default function UserList() {
   const [filters, setFilters] = useState({ status: 'all' });
   const [pagination, setPagination] = useState({ total: 0, limit: 20, offset: 0 });
   const [sortConfig, setSortConfig] = useState({ sortBy: 'createdAt', sortOrder: 'desc' });
+  const [hasNewUsers, setHasNewUsers] = useState(false);
   const navigate = useNavigate();
   const notify = useNotify();
+  
+  // Get realtime events from context
+  const { realtimeEvents, setActiveTab } = useRealtime();
+  const lastNewUserRef = useRef(null);
 
   const loadUsers = useCallback(async (resetOffset = false) => {
     try {
@@ -42,10 +48,32 @@ export default function UserList() {
     }
   }, [searchTerm, filters, pagination.limit, pagination.offset, sortConfig]);
 
+  // Set active tab for realtime context
+  useEffect(() => {
+    setActiveTab('users');
+  }, [setActiveTab]);
+
   useEffect(() => {
     const debounce = setTimeout(() => loadUsers(true), 300);
     return () => clearTimeout(debounce);
   }, [searchTerm, filters, sortConfig]);
+  
+  // Listen for realtime new user events
+  useEffect(() => {
+    if (realtimeEvents?.lastNewUser && 
+        realtimeEvents.lastNewUser.timestamp !== lastNewUserRef.current) {
+      lastNewUserRef.current = realtimeEvents.lastNewUser.timestamp;
+      
+      // Show indicator that new users are available
+      setHasNewUsers(true);
+      
+      // Auto-refresh if on first page with default sort
+      if (pagination.offset === 0 && sortConfig.sortBy === 'createdAt' && sortConfig.sortOrder === 'desc') {
+        loadUsers(true);
+        setHasNewUsers(false);
+      }
+    }
+  }, [realtimeEvents?.lastNewUser, pagination.offset, sortConfig]);
 
   const handlePageChange = (newOffset) => {
     setPagination(prev => ({ ...prev, offset: newOffset }));
@@ -118,10 +146,26 @@ export default function UserList() {
         title="User Management"
         subtitle={`${pagination.total} total users`}
         actions={
-          <Button variant="secondary" size="sm" onClick={() => handleExport('csv')}>
-            <img src="/icon/download.svg" alt="Export" className="w-4 h-4 icon-dark" />
-            Export CSV
-          </Button>
+          <div className="flex items-center gap-2">
+            {hasNewUsers && (
+              <Button 
+                variant="primary" 
+                size="sm" 
+                onClick={() => {
+                  loadUsers(true);
+                  setHasNewUsers(false);
+                }}
+                className="animate-pulse"
+              >
+                <img src="/icon/refresh-cw.svg" alt="Refresh" className="w-4 h-4" />
+                New users available
+              </Button>
+            )}
+            <Button variant="secondary" size="sm" onClick={() => handleExport('csv')}>
+              <img src="/icon/download.svg" alt="Export" className="w-4 h-4 icon-dark" />
+              Export CSV
+            </Button>
+          </div>
         }
       />
 
