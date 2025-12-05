@@ -13,6 +13,15 @@ const AIDetectionCard = ({ disabled, text }) => {
   const { t } = useTranslation()
   const [result, setResult] = useState(null)
   const [confidence, setConfidence] = useState(null)
+  
+  // Debug: Log text prop changes
+  useEffect(() => {
+    console.log('[AIDetectionCard] text prop changed:', { 
+      length: text?.length, 
+      preview: text?.substring(0, 50),
+      isEmpty: !text || text.trim().length === 0
+    })
+  }, [text])
   const [evidence, setEvidence] = useState([])
   const [humanIndicators, setHumanIndicators] = useState([])
   const [aiIndicators, setAiIndicators] = useState([])
@@ -87,6 +96,12 @@ const AIDetectionCard = ({ disabled, text }) => {
       return
     }
 
+    // Check minimum text length (50 characters required for AI detection)
+    if (text.trim().length < 50) {
+      modal.error(t('analysis.textTooShort', { min: 50, current: text.trim().length }))
+      return
+    }
+
     if (!currentNote) {
       modal.error(t('analysis.currentNoteNotFound'))
       return
@@ -94,6 +109,7 @@ const AIDetectionCard = ({ disabled, text }) => {
     
     setIsLoading(true)
     try {
+      console.log('[AI Detection] Sending text:', { length: text.length, preview: text.substring(0, 100) })
       const apiResult = await detectAIAPI(text)
       
       if (apiResult.success && apiResult.data) {

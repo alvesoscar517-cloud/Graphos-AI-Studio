@@ -1838,7 +1838,7 @@
   gap: 12px;
   padding: 12px;
   margin: 4px 8px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all var(--transition-fast) var(--ease-apple);
 }
@@ -1881,8 +1881,17 @@
   opacity: 0.7;
 }
 
+.notif-item-icon.unread img {
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(100%) contrast(98%);
+  opacity: 1;
+}
+
 .dark .notif-item-icon img {
   filter: invert(1) brightness(2);
+}
+
+.dark .notif-item-icon.unread img {
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(118%) contrast(98%);
 }
 
 .notif-item-content {

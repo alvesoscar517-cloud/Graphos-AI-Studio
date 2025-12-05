@@ -22,6 +22,14 @@ const { sendSuccess, sendError, handleError } = require('../utils/apiResponse');
 exports.authenticateContent = async (req, res) => {
   try {
     const { text, user_id, enhanced = true } = req.body;
+    
+    // Debug log
+    logger.info('authenticateContent called', { 
+      textLength: text?.length, 
+      textPreview: text?.substring(0, 100),
+      hasText: !!text,
+      userId: user_id 
+    });
 
     const validText = validateText(text, 50, 20000);
 

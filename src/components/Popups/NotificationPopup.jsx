@@ -240,32 +240,11 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                   className={`notif-item ${!notif.read ? 'unread' : ''} ${isSelected ? 'selected' : ''}`}
                   onClick={(e) => handleItemClick(notif, e)}
                   style={{
-                    border: isSelected 
-                      ? '1px solid var(--color-border-light)' 
-                      : !notif.read 
-                        ? 'none' 
-                        : '1px solid var(--color-border-light)',
-                    background: isSelected
-                      ? 'var(--color-fill-tertiary)'
-                      : !notif.read 
-                        ? 'var(--color-fill-quaternary, rgba(120, 120, 128, 0.08))' 
-                        : 'transparent',
-                    paddingLeft: !notif.read ? '16px' : '12px'
+                    border: '1px solid var(--color-border-light)',
+                    background: isSelected ? 'var(--color-fill-tertiary)' : 'transparent'
                   }}
                 >
-                  {!notif.read && (
-                    <div style={{
-                      position: 'absolute',
-                      left: '6px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      width: '6px',
-                      height: '6px',
-                      background: 'var(--color-system-blue)',
-                      borderRadius: '50%'
-                    }} />
-                  )}
-                  <div className="notif-item-icon">
+                  <div className={`notif-item-icon ${!notif.read ? 'unread' : ''}`}>
                     <img src={`/icon/${getNotificationIcon(notif.type)}`} alt={notif.type} />
                   </div>
                   <div className="notif-item-content">

@@ -334,10 +334,20 @@ function sanitizeMiddleware(options = {}) {
       if (sanitizeBody && req.body) {
         for (const field of textFields) {
           if (req.body[field] && typeof req.body[field] === 'string') {
-            req.body[field] = sanitizeText(req.body[field], maxTextLength);
+            try {
+              req.body[field] = sanitizeText(req.body[field], maxTextLength);
+            } catch (fieldError) {
+              console.error(`[SANITIZE] Error sanitizing field "${field}":`, fieldError.message);
+              throw fieldError;
+            }
           }
         }
-        req.body = sanitizeObject(req.body, { stripTags: true });
+        try {
+          req.body = sanitizeObject(req.body, { stripTags: true });
+        } catch (objError) {
+          console.error('[SANITIZE] Error sanitizing object:', objError.message);
+          throw objError;
+        }
       }
       
       // Debug: log body after sanitization for auth routes
@@ -355,11 +365,16 @@ function sanitizeMiddleware(options = {}) {
       
       next();
     } catch (error) {
-      console.error('[SANITIZE] Error:', error.message, 'Body was:', JSON.stringify(req.body));
+      console.error('[SANITIZE] Error:', error.message);
+      console.error('[SANITIZE] Stack:', error.stack);
+      console.error('[SANITIZE] Path:', req.path);
+      console.error('[SANITIZE] Body keys:', Object.keys(req.body || {}));
+      console.error('[SANITIZE] Text length:', req.body?.text?.length);
       res.status(400).json({
         success: false,
         error: 'Invalid input',
-        code: 'INVALID_INPUT'
+        code: 'INVALID_INPUT',
+        details: process.env.NODE_ENV !== 'production' ? error.message : undefined
       });
     }
   };

@@ -353,7 +353,13 @@ function validate(schema) {
     }
     
     if (errors.length > 0) {
-      logger.warn('Validation failed', { errors, path: req.path });
+      logger.warn('Validation failed', { 
+        errors, 
+        path: req.path,
+        bodyKeys: Object.keys(req.body || {}),
+        textLength: req.body?.text?.length,
+        textPreview: req.body?.text?.substring(0, 100)
+      });
       return res.status(400).json({
         error: 'Validation failed',
         code: 'VALIDATION_ERROR',

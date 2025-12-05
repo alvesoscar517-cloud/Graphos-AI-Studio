@@ -22,7 +22,7 @@ const NotificationBadge = () => {
 
   if (unreadCount === 0) return null
   return (
-    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-error shadow-ring-2 shadow-bg-secondary z-10" />
+    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-error" />
   )
 }
 

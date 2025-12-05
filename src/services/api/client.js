@@ -153,6 +153,14 @@ class ApiClient {
         
         // Handle error responses
         if (!response.ok) {
+          // Debug: Log raw response data
+          console.log('[API ERROR] Raw response:', { 
+            status: response.status, 
+            data,
+            endpoint,
+            contentType
+          })
+          
           const error = parseApiError(response, data, requestId)
           
           // Log error with standardized handler

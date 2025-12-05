@@ -156,6 +156,9 @@ export default function EnvironmentConfig() {
     const value = formData[type]?.[variable.key] ?? '';
     const hasValue = configs[type]?.variables?.[variable.key];
     
+    // For sensitive fields that have saved value but no current input
+    const showSavedIndicator = variable.sensitive && hasValue && !value;
+    
     switch (variable.type) {
       case 'boolean':
         return (
@@ -180,22 +183,48 @@ export default function EnvironmentConfig() {
       
       case 'textarea':
         return (
-          <textarea
-            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[100px] font-mono text-sm"
-            value={value}
-            onChange={(e) => handleInputChange(type, variable.key, e.target.value)}
-            placeholder={variable.sensitive && hasValue ? '••••••••' : `Enter ${variable.label}`}
-          />
+          <div className="relative">
+            <textarea
+              className={cn(
+                "w-full px-3 py-2 rounded-lg border bg-background text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[100px] font-mono text-sm",
+                showSavedIndicator ? "border-success/50 bg-success/5" : "border-border"
+              )}
+              value={value}
+              onChange={(e) => handleInputChange(type, variable.key, e.target.value)}
+              placeholder={variable.sensitive && hasValue ? '••••••••••••••••' : `Enter ${variable.label}`}
+            />
+            {showSavedIndicator && (
+              <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-success/10 text-success text-xs rounded-md">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Saved
+              </div>
+            )}
+          </div>
         );
       
       case 'password':
         return (
-          <Input
-            type="password"
-            value={value}
-            onChange={(e) => handleInputChange(type, variable.key, e.target.value)}
-            placeholder={hasValue ? '••••••••' : `Enter ${variable.label}`}
-          />
+          <div className="relative">
+            <Input
+              type="password"
+              value={value}
+              onChange={(e) => handleInputChange(type, variable.key, e.target.value)}
+              placeholder={hasValue ? '••••••••••••••••' : `Enter ${variable.label}`}
+              className={cn(
+                showSavedIndicator && "border-success/50 bg-success/5 pr-20"
+              )}
+            />
+            {showSavedIndicator && (
+              <div className="absolute top-1/2 right-2 -translate-y-1/2 flex items-center gap-1 px-2 py-1 bg-success/10 text-success text-xs rounded-md">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Saved
+              </div>
+            )}
+          </div>
         );
       
       case 'number':
