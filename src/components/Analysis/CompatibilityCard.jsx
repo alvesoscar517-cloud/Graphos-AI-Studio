@@ -65,14 +65,6 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
     const cacheKey = `${currentProfile.profile_id}_${text}`
     const cached = getCachedAnalysis(currentNote.id, cacheKey, 'compatibility')
     if (cached) {
-      // Debug: Log cached data
-      console.log('[DEBUG] Loading from cache:', {
-        cachedScore: cached.score,
-        cachedDetailsKeys: cached.details ? Object.keys(cached.details).slice(0, 10) : [],
-        cachedVoiceScore: cached.details?.voice_compatibility_score,
-        cachedVectorScore: cached.details?.vector_score,
-        cachedStatisticalScore: cached.details?.statistical_score
-      })
       setScore(cached.score)
       setAnalysisDetails(cached.details)
       setTextChanged(false)
@@ -109,18 +101,9 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
     try {
       const result = await analyzeText(currentProfile.profile_id, text)
       
-      // Debug: Log full response to check voice_compatibility_score
-      console.log('[DEBUG] Full analyze result:', result)
-      console.log('[DEBUG] result.data:', result.data)
-      console.log('[DEBUG] voice_compatibility_score:', result.data?.voice_compatibility_score)
-      console.log('[DEBUG] vector_score:', result.data?.vector_score)
-      console.log('[DEBUG] statistical_score:', result.data?.statistical_score)
-      
       if (result.success && result.data) {
         const rawVoiceScore = result.data.voice_compatibility_score
-        console.log('[DEBUG] rawVoiceScore:', rawVoiceScore, 'type:', typeof rawVoiceScore)
         const compatibilityScore = Math.round(Number.isFinite(rawVoiceScore) ? rawVoiceScore : 0)
-        console.log('[DEBUG] compatibilityScore after Math.round:', compatibilityScore)
         
         const resultData = {
           score: compatibilityScore,
@@ -159,7 +142,6 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
   // Force recalculate - clear cache and recalculate
   const forceRecalculate = () => {
     if (currentNote) {
-      console.log('[DEBUG] Force recalculate - clearing cache for note:', currentNote.id)
       clearNoteCache(currentNote.id)
       setScore(null)
       setAnalysisDetails(null)

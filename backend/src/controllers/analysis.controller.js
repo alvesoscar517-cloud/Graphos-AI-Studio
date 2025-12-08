@@ -138,15 +138,19 @@ exports.analyzeText = async (req, res) => {
     const validText = validateText(text, 10, 20000);
 
     if (use_cache) {
-      const cachedResult = cacheService.getCachedAnalysis(profileId, validText);
+      const cachedResult = await cacheService.getCachedAnalysis(profileId, validText);
       if (cachedResult) {
         logger.info('Analysis cache hit', { 
           profileId,
           cachedHasSuccess: cachedResult.success,
-          cachedKeys: Object.keys(cachedResult).slice(0, 10)
+          cachedKeys: Object.keys(cachedResult).slice(0, 15),
+          cachedVoiceScore: cachedResult.voice_compatibility_score,
+          cachedVectorScore: cachedResult.vector_score,
+          cachedStatisticalScore: cachedResult.statistical_score
         });
         // Localize cached result and ensure success flag is present
         const localizedResult = l.localizeResult(cachedResult);
+        
         return res.json({ 
           success: true, // Ensure success flag is always present
           ...localizedResult, 
@@ -157,7 +161,7 @@ exports.analyzeText = async (req, res) => {
 
     const startTime = Date.now();
 
-    let cachedData = cacheService.getCachedProfile(profileId);
+    let cachedData = await cacheService.getCachedProfile(profileId);
     let profileData, sampleVectors, centroid;
 
     if (cachedData) {
@@ -177,7 +181,7 @@ exports.analyzeText = async (req, res) => {
       // Validate cached centroid - if invalid, invalidate cache and reload
       if (!centroid || !Array.isArray(centroid) || centroid.length === 0) {
         logger.warn('[WARN] Invalid cached centroid, invalidating cache', { profileId });
-        cacheService.invalidateProfileCache(profileId);
+        await cacheService.invalidateProfileCache(profileId);
         cachedData = null; // Force reload
       }
     }
@@ -248,7 +252,7 @@ exports.analyzeText = async (req, res) => {
         });
       }
       
-      cacheService.setCachedProfile(profileId, {
+      await cacheService.setCachedProfile(profileId, {
         profileData,
         sampleVectors,
         centroid
@@ -543,7 +547,7 @@ exports.analyzeText = async (req, res) => {
     };
 
     if (use_cache) {
-      cacheService.setCachedAnalysis(profileId, validText, result);
+      await cacheService.setCachedAnalysis(profileId, validText, result);
     }
 
     if (user_id) {
