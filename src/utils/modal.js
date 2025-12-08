@@ -82,49 +82,41 @@ class ModalSystem {
   }
 
   toast(message, title = '', type = 'info') {
-    // Simple toast notification
+    // Simple toast notification with inline styles for consistency
     const toast = document.createElement('div')
-    toast.className = `simple-toast ${type}`
-    toast.innerHTML = `
-      <span class="simple-toast-message">${this.escapeHtml(message)}</span>
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 14px 24px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 10001;
+      opacity: 0;
+      transition: all 0.2s ease;
+      background: #fff;
+      color: #333;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      border: 1px solid rgba(0,0,0,0.06);
     `
-    
-    // Add styles if not exists
-    if (!document.getElementById('simple-toast-styles')) {
-      const style = document.createElement('style')
-      style.id = 'simple-toast-styles'
-      style.textContent = `
-        .simple-toast {
-          position: fixed;
-          bottom: 24px;
-          left: 50%;
-          transform: translateX(-50%) translateY(20px);
-          padding: 10px 16px;
-          border-radius: 8px;
-          font-size: 13px;
-          z-index: 10001;
-          opacity: 0;
-          transition: all 0.2s ease;
-        }
-        .simple-toast.show {
-          opacity: 1;
-          transform: translateX(-50%) translateY(0);
-        }
-        .simple-toast {
-          background: #fff;
-          color: #333;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-      `
-      document.head.appendChild(style)
-    }
+    toast.innerHTML = `
+      <span>${this.escapeHtml(message)}</span>
+    `
     
     document.body.appendChild(toast)
     
-    requestAnimationFrame(() => toast.classList.add('show'))
+    // Animate in
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1'
+      toast.style.transform = 'translateX(-50%) translateY(0)'
+    })
     
+    // Animate out and remove
     setTimeout(() => {
-      toast.classList.remove('show')
+      toast.style.opacity = '0'
+      toast.style.transform = 'translateX(-50%) translateY(20px)'
       setTimeout(() => toast.remove(), 200)
     }, 3000)
     

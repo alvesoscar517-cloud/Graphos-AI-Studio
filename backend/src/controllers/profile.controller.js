@@ -332,6 +332,13 @@ exports.createProfileComplete = async (req, res) => {
   try {
     const { user_id, profile_name = 'Default Profile', email, name = 'User', theme = 'work', samples } = req.body;
 
+    logger.info('createProfileComplete started', { 
+      user_id: user_id ? 'present' : 'missing',
+      profile_name,
+      samplesCount: samples?.length || 0,
+      theme
+    });
+
     // Validate inputs
     if (!samples || !Array.isArray(samples) || samples.length < 3) {
       return res.status(400).json({ 
@@ -364,7 +371,9 @@ exports.createProfileComplete = async (req, res) => {
       }
     }
 
+    logger.info('Validating user_id', { user_id: user_id ? 'present' : 'missing' });
     const userId = validateUserId(user_id);
+    logger.info('User validated', { userId });
 
     // Rate limiting: Check profiles created in last 24 hours
     const rateLimitTime = new Date(Date.now() - PROFILE_RATE_LIMIT_HOURS * 60 * 60 * 1000);
@@ -428,10 +437,20 @@ exports.createProfileComplete = async (req, res) => {
     const profileId = uuidv4();
 
     // Step 2: Create embeddings for all samples
-    logger.info('Creating embeddings', { count: samples.length });
+    logger.info('Creating embeddings', { count: samples.length, profileId });
     const texts = samples.map(s => s.text);
-    const embeddings = await geminiService.createBatchEmbeddings(texts, 'RETRIEVAL_DOCUMENT');
-    logger.info('Embeddings created', { count: embeddings.length });
+    let embeddings;
+    try {
+      embeddings = await geminiService.createBatchEmbeddings(texts, 'RETRIEVAL_DOCUMENT');
+      logger.info('Embeddings created', { count: embeddings.length, profileId });
+    } catch (embeddingError) {
+      logger.error('Embedding creation failed', { 
+        error: embeddingError.message, 
+        profileId,
+        samplesCount: texts.length 
+      });
+      throw embeddingError;
+    }
 
     // Step 2.5: Cross-sample similarity check (prevent duplicate/near-duplicate samples)
     const similarPairs = [];
@@ -461,7 +480,7 @@ exports.createProfileComplete = async (req, res) => {
     const statisticalFeatures = analysisService.calculateStatistics(allText);
 
     // Step 4: Generate voice summary with timeout
-    logger.info('Generating voice profile');
+    logger.info('Generating voice profile', { profileId, textsCount: texts.length });
     const VOICE_SUMMARY_TIMEOUT = 30000; // 30 seconds
     
     let voiceProfile;
@@ -472,7 +491,12 @@ exports.createProfileComplete = async (req, res) => {
       );
       
       voiceProfile = await Promise.race([voicePromise, timeoutPromise]);
+      logger.info('Voice profile generated', { profileId, tone: voiceProfile?.tone });
     } catch (voiceError) {
+      logger.error('Voice profile generation failed', { 
+        error: voiceError.message, 
+        profileId 
+      });
       if (voiceError.message === 'VOICE_SUMMARY_TIMEOUT') {
         logger.warn('Voice summary generation timed out, using fallback');
         // Use fallback voice profile
@@ -555,6 +579,7 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
     });
 
     // Commit batch with retry logic
+    logger.info('Committing batch to Firestore', { profileId, samplesCount: samples.length });
     const MAX_BATCH_RETRIES = 3;
     let batchCommitted = false;
     let lastBatchError = null;
@@ -563,9 +588,14 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
       try {
         await batch.commit();
         batchCommitted = true;
+        logger.info('Batch committed successfully', { profileId, attempt });
       } catch (batchError) {
         lastBatchError = batchError;
-        logger.warn(`Batch commit attempt ${attempt} failed`, { error: batchError.message });
+        logger.warn(`Batch commit attempt ${attempt} failed`, { 
+          error: batchError.message,
+          code: batchError.code,
+          profileId 
+        });
         
         if (attempt < MAX_BATCH_RETRIES) {
           // Wait before retry (exponential backoff)
@@ -575,7 +605,11 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
     }
 
     if (!batchCommitted) {
-      logger.error('All batch commit attempts failed', { error: lastBatchError?.message });
+      logger.error('All batch commit attempts failed', { 
+        error: lastBatchError?.message,
+        code: lastBatchError?.code,
+        profileId 
+      });
       throw new Error('DATABASE_WRITE_FAILED: Unable to save profile. Please try again.');
     }
 
@@ -609,40 +643,63 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
       quality_score: qualityScore
     });
   } catch (error) {
-    logger.error('Create profile complete error', { error: error.message });
+    // Log full error details for debugging
+    logger.error('Create profile complete error', { 
+      error: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     
     // Return user-friendly error messages
     let errorMessage = 'Unable to create profile. Please try again.';
     let errorCode = 'UNKNOWN_ERROR';
     let statusCode = 500;
     
-    if (error.message.includes('INVALID_CONTENT')) {
-      errorMessage = error.message.replace('INVALID_CONTENT: ', '');
+    const errMsg = error.message || '';
+    
+    if (errMsg.includes('INVALID_CONTENT')) {
+      errorMessage = errMsg.replace('INVALID_CONTENT: ', '');
       errorCode = 'INVALID_CONTENT';
       statusCode = 400;
-    } else if (error.message.includes('QUOTA_EXCEEDED')) {
+    } else if (errMsg.includes('INVALID_INPUT')) {
+      errorMessage = errMsg.replace('INVALID_INPUT: ', '');
+      errorCode = 'INVALID_INPUT';
+      statusCode = 400;
+    } else if (errMsg.includes('QUOTA_EXCEEDED')) {
       errorMessage = 'System is overloaded. Please try again in a few minutes.';
       errorCode = 'QUOTA_EXCEEDED';
       statusCode = 503;
-    } else if (error.message.includes('EMBEDDING_FAILED')) {
+    } else if (errMsg.includes('BATCH_EMBEDDING_FAILED') || errMsg.includes('EMBEDDING_FAILED')) {
       errorMessage = 'Text processing error. Please check content and try again.';
       errorCode = 'EMBEDDING_FAILED';
       statusCode = 500;
-    } else if (error.message.includes('DATABASE_WRITE_FAILED')) {
-      errorMessage = error.message.replace('DATABASE_WRITE_FAILED: ', '');
+    } else if (errMsg.includes('DATABASE_WRITE_FAILED')) {
+      errorMessage = errMsg.replace('DATABASE_WRITE_FAILED: ', '');
       errorCode = 'DATABASE_WRITE_FAILED';
       statusCode = 503;
-    } else if (error.message.includes('VOICE_SUMMARY_TIMEOUT')) {
+    } else if (errMsg.includes('VOICE_SUMMARY_TIMEOUT')) {
       errorMessage = 'Voice analysis took too long. Please try again.';
       errorCode = 'VOICE_SUMMARY_TIMEOUT';
       statusCode = 504;
+    } else if (errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('quota')) {
+      errorMessage = 'AI service quota exceeded. Please try again later.';
+      errorCode = 'QUOTA_EXCEEDED';
+      statusCode = 503;
+    } else if (errMsg.includes('PERMISSION_DENIED')) {
+      errorMessage = 'AI service permission error. Please contact support.';
+      errorCode = 'PERMISSION_DENIED';
+      statusCode = 503;
+    } else if (errMsg.includes('UNAVAILABLE') || errMsg.includes('unavailable')) {
+      errorMessage = 'AI service temporarily unavailable. Please try again.';
+      errorCode = 'SERVICE_UNAVAILABLE';
+      statusCode = 503;
     }
     
     res.status(statusCode).json({ 
       success: false,
       error: errorMessage,
       error_code: errorCode,
-      error_detail: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error_detail: process.env.NODE_ENV === 'development' ? errMsg : undefined
     });
   }
 };

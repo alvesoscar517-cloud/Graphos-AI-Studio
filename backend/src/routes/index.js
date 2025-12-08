@@ -237,8 +237,24 @@ const profileCreationRateLimiter = operationRateLimiter('profile_creation', {
   blockDuration: 120 // Block for 2 minutes if exceeded
 });
 
+// Debug middleware for create_profile_complete
+const debugProfileCreate = (req, res, next) => {
+  const logger = require('../utils/logger');
+  logger.info('create_profile_complete request received', {
+    hasBody: !!req.body,
+    bodyKeys: req.body ? Object.keys(req.body) : [],
+    hasUserId: !!req.body?.user_id,
+    hasSamples: !!req.body?.samples,
+    samplesCount: req.body?.samples?.length || 0,
+    contentType: req.headers['content-type'],
+    authHeader: req.headers['authorization'] ? 'present' : 'missing'
+  });
+  next();
+};
+
 router.post('/create_profile_complete', 
   deprecationWarning('/profiles/create'),
+  debugProfileCreate, // Add debug logging first
   optionalAuth, checkLocked, activityLoggerMiddleware,
   profileCreationRateLimiter, // Add rate limiting BEFORE credit check
   creditMiddleware.profileComplete, 

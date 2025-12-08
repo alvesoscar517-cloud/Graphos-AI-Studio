@@ -149,6 +149,8 @@ const ProfileSetup = () => {
 
   // Ref to track if profile creation is already in progress (prevent duplicate calls)
   const isCreatingProfileRef = useRef(false)
+  // Ref to store the latest createProfile function
+  const createProfileRef = useRef(null)
   
   // Step 4: Create complete profile with retry mechanism
   const createProfile = useCallback(async (retryCount = 0) => {
@@ -348,6 +350,11 @@ const ProfileSetup = () => {
       setProcessingStep, setProcessingMessage, setErrorMessage, setErrorCode, setQualityScore, 
       mountedRef, timeoutsRef, t])
 
+  // Keep createProfileRef updated with the latest createProfile function
+  useEffect(() => {
+    createProfileRef.current = createProfile
+  }, [createProfile])
+
   // Trigger profile creation when entering step 4
   // CRITICAL: Use ref to ensure this only runs ONCE when entering step 4
   const hasTriggeredCreationRef = useRef(false)
@@ -365,16 +372,25 @@ const ProfileSetup = () => {
       return
     }
     
-    // Don't trigger if already processing, has error, or completed
-    if (processing || showError || showCompletion || !mountedRef.current) {
+    // Don't trigger if component is unmounted
+    if (!mountedRef.current) {
       return
     }
     
-    // Mark as triggered and start creation
+    // Mark as triggered BEFORE calling createProfile to prevent race conditions
     hasTriggeredCreationRef.current = true
     console.log('[PROFILE] Triggering profile creation (step 4 entered)')
-    createProfile()
-  }, [currentStep, processing, showError, showCompletion, createProfile])
+    
+    // Use setTimeout to ensure state updates are batched and prevent infinite loops
+    const timeoutId = setTimeout(() => {
+      if (mountedRef.current && currentStep === 4 && !isCreatingProfileRef.current) {
+        // Call the latest createProfile function via ref
+        createProfileRef.current?.()
+      }
+    }, 100) // Small delay to ensure all state updates are complete
+    
+    return () => clearTimeout(timeoutId)
+  }, [currentStep]) // ONLY depend on currentStep - createProfile is accessed via ref
 
   // Don't render if cancelling or unmounted
   if (isCancelling || !mountedRef.current) {
@@ -472,14 +488,39 @@ const ProfileSetup = () => {
             qualityScore={qualityScore}
             totalSamples={totalSamples}
             onBack={() => {
-              setShowError(false)
-              setErrorCode('')
+              // Abort any pending API request to prevent race conditions
+              if (abortControllerRef.current) {
+                abortControllerRef.current.abort()
+                abortControllerRef.current = null
+              }
+              // Clear all pending timeouts
+              timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
+              timeoutsRef.current = []
+              // Reset creation refs to allow re-creation when returning to step 4
+              isCreatingProfileRef.current = false
+              hasTriggeredCreationRef.current = false
+              
+              // Navigate back to step 3 first, then reset states
+              // This ensures the step change happens before state resets
               setCurrentStep(3)
+              
+              // Use requestAnimationFrame to batch state resets after navigation
+              requestAnimationFrame(() => {
+                setShowError(false)
+                setErrorCode('')
+                setErrorMessage('')
+                setProcessing(false)
+                setProcessingStep(1)
+                setProcessingMessage('')
+                setShowCompletion(false)
+              })
             }}
             onRetry={() => {
               setShowError(false)
               setErrorCode('')
-              createProfile()
+              setErrorMessage('')
+              isCreatingProfileRef.current = false
+              createProfileRef.current?.()
             }}
             onComplete={handleComplete}
           />

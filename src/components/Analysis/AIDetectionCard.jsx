@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { detectAI as detectAIAPI } from '../../services/api'
@@ -11,6 +12,18 @@ import threeDotsAnimation from '../../animation/Three dots loading.json'
 import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
 import { cn } from '../../lib/utils'
+
+// Helper function to format evidence text - convert [TAG] to "Tag:"
+const formatEvidenceText = (text) => {
+  const match = text.match(/^\[([A-Z]+)\]\s*(.*)$/)
+  if (match) {
+    const tag = match[1]
+    const content = match[2]
+    const displayTag = tag.charAt(0) + tag.slice(1).toLowerCase()
+    return `${displayTag}: ${content}`
+  }
+  return text
+}
 
 const AIDetectionCard = ({ disabled, text }) => {
   const { t } = useTranslation()
@@ -111,9 +124,19 @@ const AIDetectionCard = ({ disabled, text }) => {
         const aiScore = Math.round(apiResult.data.ai_probability || 0)
         const confidenceScore = Math.round(apiResult.data.confidence || 70)
         
-        let verdictText = apiResult.data.verdict || (aiScore < 50 ? 'Appears to be human-written' : 'Likely AI-generated')
-        verdictText = verdictText.replace('Content ', '').replace('content ', '')
-        verdictText = verdictText.charAt(0).toUpperCase() + verdictText.slice(1)
+        // Simplified verdict based on score
+        let verdictText
+        if (aiScore < 30) {
+          verdictText = t('analysis.verdictHuman', 'Human-written')
+        } else if (aiScore < 50) {
+          verdictText = t('analysis.verdictMostlyHuman', 'Mostly human')
+        } else if (aiScore < 70) {
+          verdictText = t('analysis.verdictMixed', 'Mixed content')
+        } else if (aiScore < 85) {
+          verdictText = t('analysis.verdictMostlyAI', 'Mostly AI')
+        } else {
+          verdictText = t('analysis.verdictAI', 'AI-generated')
+        }
         
         const resultData = {
           aiScore,
@@ -332,8 +355,8 @@ const AIDetectionCard = ({ disabled, text }) => {
       </div>
 
 
-      {/* Detail Modal */}
-      {showModal && (
+      {/* Detail Modal - rendered via Portal to escape sidebar container */}
+      {showModal && createPortal(
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
@@ -349,48 +372,51 @@ const AIDetectionCard = ({ disabled, text }) => {
 
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-6">
-              {/* Score Section */}
-              <div className="flex items-center justify-between p-4 bg-bg-secondary rounded-xl mb-5">
-                <div>
-                  <div className="text-sm text-text-secondary mb-1">{t('analysis.aiGenerationProbability')}</div>
-                  <div className="text-3xl font-semibold text-text-secondary">{result}%</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-text-secondary mb-1">{t('analysis.confidence')}</div>
-                  <div 
-                    className="text-3xl font-semibold"
-                    style={{ color: confidence < 60 ? '#ff9800' : confidence < 80 ? '#4285f4' : '#34a853' }}
-                  >
-                    {confidence}%
+              {/* Summary Section - Score, Verdict, Stats in one block */}
+              <div className="p-4 bg-bg-secondary rounded-xl mb-5">
+                {/* Score */}
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <div className="text-sm text-text-secondary mb-1">{t('analysis.aiGenerationProbability')}</div>
+                    <div className="text-3xl font-semibold text-text-secondary">{result}%</div>
                   </div>
-                </div>
-              </div>
-
-              {/* Verdict Section */}
-              <div className="p-3 bg-bg-secondary rounded-lg mb-4">
-                <div className="text-sm text-text-secondary mb-1">{t('analysis.conclusion')}</div>
-                <div className="text-sm font-medium text-text-primary">{verdict}</div>
-              </div>
-
-              {/* Analysis Stats */}
-              {analysisDetails && (
-                <div className="flex gap-3 flex-wrap p-3 bg-bg-secondary rounded-lg mb-4">
-                  <div className="flex items-center gap-1.5 text-xs">
-                    <span className="text-text-secondary font-medium">{t('analysis.wordCount')}</span>
-                    <span className="text-text-primary font-semibold">{analysisDetails.word_count}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs">
-                    <span className="text-text-secondary font-medium">{t('analysis.length')}</span>
-                    <span className="text-text-primary font-semibold">{analysisDetails.text_length} {t('common.characters')}</span>
-                  </div>
-                  {analysisDetails.multi_pass && (
-                    <div className="flex items-center gap-1 py-1 px-2 bg-primary/10 rounded text-primary text-2xs font-medium">
-                      <Icon name="layers" size="xs" color="primary" />
-                      {t('analysis.multiLayerAnalysis')}
+                  <div className="text-right">
+                    <div className="text-sm text-text-secondary mb-1">{t('analysis.confidence')}</div>
+                    <div 
+                      className="text-3xl font-semibold"
+                      style={{ color: confidence < 60 ? '#ff9800' : confidence < 80 ? '#4285f4' : '#34a853' }}
+                    >
+                      {confidence}%
                     </div>
-                  )}
+                  </div>
                 </div>
-              )}
+
+                {/* Verdict */}
+                <div className="pt-3 border-t border-border-light">
+                  <div className="text-sm text-text-secondary mb-1">{t('analysis.conclusion')}</div>
+                  <div className="text-sm font-medium text-text-primary">{verdict}</div>
+                </div>
+
+                {/* Analysis Stats */}
+                {analysisDetails && (
+                  <div className="flex gap-3 flex-wrap pt-3 mt-3 border-t border-border-light">
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <span className="text-text-secondary font-medium">{t('analysis.wordCount')}</span>
+                      <span className="text-text-primary font-semibold">{analysisDetails.word_count}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <span className="text-text-secondary font-medium">{t('analysis.length')}</span>
+                      <span className="text-text-primary font-semibold">{analysisDetails.text_length} {t('common.characters')}</span>
+                    </div>
+                    {analysisDetails.multi_pass && (
+                      <div className="flex items-center gap-1 py-1 px-2 bg-primary/10 rounded text-primary text-2xs font-medium">
+                        <Icon name="layers" size="xs" color="primary" />
+                        {t('analysis.multiLayerAnalysis')}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Human Indicators */}
               {humanIndicators && humanIndicators.length > 0 && (
@@ -399,10 +425,10 @@ const AIDetectionCard = ({ disabled, text }) => {
                     <Icon name="user-check" size="sm" color="primary" />
                     {t('analysis.humanIndicators')} ({humanIndicators.length})
                   </h4>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3 p-4 bg-bg-secondary rounded-xl">
                     {humanIndicators.map((item, index) => (
-                      <div key={index} className="flex items-start gap-2 py-2 px-2.5 bg-bg-secondary rounded-md text-xs leading-relaxed">
-                        <span className="flex-shrink-0 font-semibold mt-px text-success">[OK]</span>
+                      <div key={index} className="flex items-start gap-2 text-xs leading-relaxed">
+                        <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-2xs font-semibold bg-success/15 text-success">OK</span>
                         <span className="text-text-primary">{item}</span>
                       </div>
                     ))}
@@ -417,10 +443,10 @@ const AIDetectionCard = ({ disabled, text }) => {
                     <Icon name="cpu" size="sm" color="primary" />
                     {t('analysis.aiIndicators')} ({aiIndicators.length})
                   </h4>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3 p-4 bg-bg-secondary rounded-xl">
                     {aiIndicators.map((item, index) => (
-                      <div key={index} className="flex items-start gap-2 py-2 px-2.5 bg-bg-secondary rounded-md text-xs leading-relaxed">
-                        <span className="flex-shrink-0 font-semibold mt-px text-warning">⚠</span>
+                      <div key={index} className="flex items-start gap-2 text-xs leading-relaxed">
+                        <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-2xs font-semibold bg-warning/15 text-warning">⚠</span>
                         <span className="text-text-primary">{item}</span>
                       </div>
                     ))}
@@ -437,7 +463,9 @@ const AIDetectionCard = ({ disabled, text }) => {
                 {evidence && evidence.length > 0 ? (
                   <div className="flex flex-col gap-3 p-4 bg-bg-secondary rounded-xl">
                     {evidence.map((item, index) => (
-                      <p key={index} className="text-sm text-text-primary leading-relaxed m-0">{item}</p>
+                      <p key={index} className="text-xs leading-relaxed text-text-primary m-0">
+                        {formatEvidenceText(item)}
+                      </p>
                     ))}
                   </div>
                 ) : (
@@ -457,7 +485,8 @@ const AIDetectionCard = ({ disabled, text }) => {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )

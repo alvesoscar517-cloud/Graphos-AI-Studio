@@ -84,7 +84,7 @@ const Step1NameTheme = ({
                         "aspect-square bg-white/50 border border-black/8 rounded-xl",
                         "cursor-pointer transition-all duration-250 relative overflow-hidden",
                         selectedTheme === theme.id 
-                          ? "!border-text-link !bg-text-link/10 shadow-md" 
+                          ? "!border-text-link shadow-md" 
                           : "hover:bg-white/70 hover:border-black/12 hover:-translate-y-px hover:shadow-sm"
                       )}
                       data-theme={theme.id}

@@ -268,7 +268,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
                 statusColors[status].bg,
                 statusColors[status].text
               )}>
-                [{statusLabels[status]}]
+                {statusLabels[status]}
               </div>
             </div>
             <div className="flex flex-col gap-2">
@@ -301,7 +301,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
 
         {/* Footer */}
         <div className="flex items-center justify-between py-4 px-7 shrink-0">
-          <div className="flex items-center gap-2 py-2.5 px-3.5 bg-bg-secondary rounded-lg flex-1 max-w-md">
+          <div className="flex items-center gap-2 py-2.5 px-3.5 bg-bg-secondary rounded-lg">
             <img src="/icon/lightbulb.svg" alt="" width="16" height="16" className="shrink-0 opacity-60" />
             <span className="text-sm text-gray-600 leading-snug">{getPrimaryHint()}</span>
           </div>

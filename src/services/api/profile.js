@@ -189,7 +189,7 @@ export async function finalizeProfile(profileId) {
  * Uses request deduplication to prevent duplicate concurrent requests
  * @param {string} profileName 
  * @param {string} theme 
- * @param {Array<string>} samples 
+ * @param {Array<{text: string, type: string}>} samples 
  * @param {Object} options 
  * @returns {Promise<Object>}
  */
@@ -198,10 +198,18 @@ export async function createProfileComplete(profileName, theme, samples, options
     const userInfo = await getUserInfo()
     
     if (!userInfo || !userInfo.userId) {
+      console.error('[PROFILE] User not authenticated - userInfo:', userInfo)
       throw new Error('User not authenticated')
     }
     
     console.log(`[PACKAGE] Creating complete profile with ${samples.length} samples...`)
+    console.log('[PACKAGE] User info:', { userId: userInfo.userId, email: userInfo.email })
+    console.log('[PACKAGE] Request data:', { 
+      profile_name: profileName, 
+      theme, 
+      samplesCount: samples.length,
+      sampleTypes: samples.map(s => s?.type || 'unknown')
+    })
     
     // Use deduplicated request to prevent duplicate concurrent profile creation
     // This is critical to prevent multiple credits being deducted

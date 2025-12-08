@@ -303,13 +303,26 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
     console.log(`[SUCCESS] Generated ${newEmbeddings.length} new embeddings (${texts.length - newEmbeddings.length} from cache)`);
     return embeddings;
   } catch (error) {
-    console.error('[ERROR] Batch embedding generation failed:', error.message);
+    console.error('[ERROR] Batch embedding generation failed:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      stack: error.stack?.substring(0, 500)
+    });
     
-    if (error.message.includes('quota') || error.message.includes('RESOURCE_EXHAUSTED')) {
+    if (error.message?.includes('quota') || error.message?.includes('RESOURCE_EXHAUSTED') || error.code === 8) {
       throw new Error('QUOTA_EXCEEDED: Gemini API quota exhausted. Please try again later.');
     }
     
-    throw new Error(`BATCH_EMBEDDING_FAILED: ${error.message}`);
+    if (error.message?.includes('PERMISSION_DENIED') || error.code === 7) {
+      throw new Error('PERMISSION_DENIED: AI service permission error. Check service account permissions.');
+    }
+    
+    if (error.message?.includes('UNAVAILABLE') || error.code === 14) {
+      throw new Error('SERVICE_UNAVAILABLE: AI service temporarily unavailable.');
+    }
+    
+    throw new Error(`BATCH_EMBEDDING_FAILED: ${error.message || 'Unknown error'}`);
   }
 }
 

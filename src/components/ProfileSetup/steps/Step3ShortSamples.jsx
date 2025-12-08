@@ -5,7 +5,7 @@
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/utils'
 import LottieWrapper from '../LottieWrapper'
-import contactMailAnimation from '../../../animation/contact-mail.json'
+import emailAnimation from '../../../animation/Email.json'
 
 const Step3ShortSamples = ({
   animationKey,
@@ -36,7 +36,7 @@ const Step3ShortSamples = ({
         {/* Animation Container */}
         <div className="flex items-center justify-center w-full h-full p-10 box-border bg-transparent">
           <div className="!w-lottie-md !h-lottie-md max-w-full max-h-full max-lg:!w-lottie-sm max-lg:!h-lottie-sm">
-            <LottieWrapper key={`step3-${animationKey}`} animationData={contactMailAnimation} loop={true} />
+            <LottieWrapper key={`step3-${animationKey}`} animationData={emailAnimation} loop={true} />
           </div>
         </div>
         

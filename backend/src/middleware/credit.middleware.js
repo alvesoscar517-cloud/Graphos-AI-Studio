@@ -95,7 +95,15 @@ function requireCredits(featureName, costCalculator) {
     try {
       const userId = req.body.user_id || req.query.user_id;
       
+      logger.info('Credit middleware started', { 
+        featureName, 
+        userId: userId ? 'present' : 'missing',
+        hasBody: !!req.body,
+        bodyKeys: req.body ? Object.keys(req.body) : []
+      });
+      
       if (!userId) {
+        logger.warn('Credit middleware: user_id missing', { featureName });
         return res.status(401).json({ 
           success: false,
           error: localization.translate('errors.unauthorized', lang),
@@ -104,10 +112,31 @@ function requireCredits(featureName, costCalculator) {
       }
       
       // Calculate cost based on request
-      const cost = costCalculator(req);
+      let cost;
+      try {
+        cost = costCalculator(req);
+      } catch (costError) {
+        logger.error('Credit middleware: cost calculation failed', { 
+          featureName, 
+          error: costError.message 
+        });
+        throw costError;
+      }
       
       // Check if user has enough credits (but don't deduct yet!)
-      const hasEnough = await creditService.hasEnoughCredits(userId, cost);
+      logger.info('Credit middleware: checking credits', { featureName, userId, cost });
+      let hasEnough;
+      try {
+        hasEnough = await creditService.hasEnoughCredits(userId, cost);
+      } catch (creditCheckError) {
+        logger.error('Credit middleware: credit check failed', { 
+          featureName, 
+          userId,
+          error: creditCheckError.message,
+          stack: creditCheckError.stack?.substring(0, 300)
+        });
+        throw creditCheckError;
+      }
       
       if (!hasEnough) {
         const credits = await creditService.getUserCredits(userId);
@@ -211,7 +240,11 @@ function requireCredits(featureName, costCalculator) {
       
       next();
     } catch (error) {
-      logger.error('Credit middleware error', { error: error.message });
+      logger.error('Credit middleware error', { 
+        featureName,
+        error: error.message,
+        stack: error.stack?.substring(0, 500)
+      });
       
       if (error.message === 'Insufficient credits') {
         return res.status(402).json({ 
@@ -224,7 +257,8 @@ function requireCredits(featureName, costCalculator) {
       return res.status(500).json({ 
         success: false,
         error: localization.translate('errors.server_error', lang),
-        details: error.message
+        code: 'CREDIT_MIDDLEWARE_ERROR',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -303,7 +337,11 @@ const costCalculators = {
   
   profileComplete: (req) => {
     const { samples } = req.body;
-    return creditService.calculateProfileCompleteCost(samples || []);
+    if (!samples || !Array.isArray(samples)) {
+      console.warn('[CREDIT] Invalid samples in profileComplete cost calculation:', typeof samples);
+      return 0; // Will be caught by controller validation
+    }
+    return creditService.calculateProfileCompleteCost(samples);
   },
   
   // === Translation ===
