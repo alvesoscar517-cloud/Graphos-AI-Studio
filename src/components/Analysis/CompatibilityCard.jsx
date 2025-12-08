@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { useAIProcessingActions } from '@/stores'
-import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
+import { getCachedAnalysis, setCachedAnalysis, clearNoteCache } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
@@ -64,6 +65,14 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
     const cacheKey = `${currentProfile.profile_id}_${text}`
     const cached = getCachedAnalysis(currentNote.id, cacheKey, 'compatibility')
     if (cached) {
+      // Debug: Log cached data
+      console.log('[DEBUG] Loading from cache:', {
+        cachedScore: cached.score,
+        cachedDetailsKeys: cached.details ? Object.keys(cached.details).slice(0, 10) : [],
+        cachedVoiceScore: cached.details?.voice_compatibility_score,
+        cachedVectorScore: cached.details?.vector_score,
+        cachedStatisticalScore: cached.details?.statistical_score
+      })
       setScore(cached.score)
       setAnalysisDetails(cached.details)
       setTextChanged(false)
@@ -85,53 +94,33 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
       return
     }
 
-    // Check if profile is still loading (placeholder)
     if (currentProfile._isPlaceholder) {
       modal.error(t('analysis.profileLoading') || 'Profile is still loading, please wait...')
       return
     }
-
-    // Debug: Log profile info before API call
-    console.log('[DEBUG] CompatibilityCard - currentProfile:', {
-      profile_id: currentProfile.profile_id,
-      profile_name: currentProfile.profile_name,
-      isPlaceholder: currentProfile._isPlaceholder
-    })
     
     if (!currentProfile.profile_id) {
-      console.error('[ERROR] profile_id is missing from currentProfile!')
       modal.error(t('analysis.profileIdMissing') || 'Profile ID is missing')
       return
     }
-    
+
     setIsLoading(true)
     startProcessing('analyze')
     try {
       const result = await analyzeText(currentProfile.profile_id, text)
       
-      // Debug: Log full result structure
-      console.log('[DEBUG] CompatibilityCard - Full result:', {
-        success: result.success,
-        hasData: !!result.data,
-        dataKeys: result.data ? Object.keys(result.data) : [],
-        voice_compatibility_score: result.data?.voice_compatibility_score,
-        vector_score: result.data?.vector_score,
-        statistical_score: result.data?.statistical_score,
-        isVectorScoreNaN: Number.isNaN(result.data?.vector_score),
-        isStatisticalScoreNaN: Number.isNaN(result.data?.statistical_score)
-      })
+      // Debug: Log full response to check voice_compatibility_score
+      console.log('[DEBUG] Full analyze result:', result)
+      console.log('[DEBUG] result.data:', result.data)
+      console.log('[DEBUG] voice_compatibility_score:', result.data?.voice_compatibility_score)
+      console.log('[DEBUG] vector_score:', result.data?.vector_score)
+      console.log('[DEBUG] statistical_score:', result.data?.statistical_score)
       
       if (result.success && result.data) {
-        // Validate scores are valid numbers
         const rawVoiceScore = result.data.voice_compatibility_score
-        const rawVectorScore = result.data.vector_score
-        const rawStatisticalScore = result.data.statistical_score
-        
-        if (!Number.isFinite(rawVectorScore) || !Number.isFinite(rawStatisticalScore)) {
-          console.warn('[WARN] Invalid scores received:', { rawVectorScore, rawStatisticalScore })
-        }
-        
+        console.log('[DEBUG] rawVoiceScore:', rawVoiceScore, 'type:', typeof rawVoiceScore)
         const compatibilityScore = Math.round(Number.isFinite(rawVoiceScore) ? rawVoiceScore : 0)
+        console.log('[DEBUG] compatibilityScore after Math.round:', compatibilityScore)
         
         const resultData = {
           score: compatibilityScore,
@@ -167,21 +156,43 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
     }
   }
 
-  const getScoreColor = (score) => {
-    if (score >= 90) return '#34a853'
-    if (score >= 75) return '#4285f4'
-    if (score >= 60) return '#fbbc04'
-    if (score >= 40) return '#ff9800'
+  // Force recalculate - clear cache and recalculate
+  const forceRecalculate = () => {
+    if (currentNote) {
+      console.log('[DEBUG] Force recalculate - clearing cache for note:', currentNote.id)
+      clearNoteCache(currentNote.id)
+      setScore(null)
+      setAnalysisDetails(null)
+      setTextChanged(true)
+      // Trigger recalculation
+      setTimeout(() => calculateScore(), 100)
+    }
+  }
+
+  const getScoreColor = (s) => {
+    if (s >= 90) return '#34a853'
+    if (s >= 75) return '#4285f4'
+    if (s >= 60) return '#fbbc04'
+    if (s >= 40) return '#ff9800'
     return '#ea4335'
   }
 
-  const getScoreLabel = (score) => {
-    if (score >= 90) return t('analysis.veryCompatible')
-    if (score >= 75) return t('analysis.goodCompatibility')
-    if (score >= 60) return t('analysis.averageCompatibility')
-    if (score >= 40) return t('analysis.lowCompatibility')
+  const getScoreLabel = (s) => {
+    if (s >= 90) return t('analysis.veryCompatible')
+    if (s >= 75) return t('analysis.goodCompatibility')
+    if (s >= 60) return t('analysis.averageCompatibility')
+    if (s >= 40) return t('analysis.lowCompatibility')
     return t('analysis.notCompatible')
   }
+
+  const getScoreIcon = (s) => {
+    if (s >= 75) return 'check-circle'
+    if (s >= 40) return 'alert-circle'
+    return 'x-circle'
+  }
+
+  const safeScore = (val) => Number.isFinite(val) ? Math.round(val) : 0
+  const confidence = analysisDetails?.confidence
 
   return (
     <>
@@ -213,138 +224,199 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
               )}
               onClick={() => setShowResult(!showResult)}
             >
-              <img 
-                src="/icon/chevron-down.svg"
-                alt="toggle"
-                className={cn(
-                  "w-icon-md h-icon-md opacity-60 transition-all duration-300",
-                  "hover:opacity-100 icon-invert",
-                  showResult ? "rotate-180" : "rotate-0"
-                )}
+              <Icon 
+                name="chevron-down" 
+                size="md" 
+                color="muted"
+                className={cn("transition-transform duration-300", showResult && "rotate-180")}
               />
             </button>
           )}
         </div>
 
-        {/* Action Button */}
-        <button 
-          className={cn(
-            "w-full flex items-center justify-between py-2.5 px-3.5",
-            "bg-bg-secondary border border-border-light rounded-xl",
-            "text-sm font-medium text-text-primary cursor-pointer",
-            "transition-all duration-200 relative overflow-hidden",
-            "hover:border-border-hover hover:shadow-md",
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
-            isLoading && "pointer-events-none opacity-70"
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <button 
+            className={cn(
+              "flex-1 flex items-center justify-between py-2.5 px-3.5",
+              "bg-bg-secondary border border-border-light rounded-xl",
+              "text-sm font-medium text-text-primary cursor-pointer",
+              "transition-all duration-200 relative overflow-hidden",
+              "hover:border-border-hover hover:shadow-md",
+              "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+              isLoading && "pointer-events-none opacity-70"
+            )}
+            onClick={calculateScore}
+            disabled={disabled || isLoading || !textChanged}
+          >
+            {isLoading ? (
+              <LazyLottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
+            ) : (
+              <>
+                <span>{!textChanged ? t('analysis.calculated') : t('analysis.calculateScore')}</span>
+                <Icon name="arrow-right" size="md" color="muted" />
+              </>
+            )}
+          </button>
+          
+          {/* Recalculate button - only show when score exists */}
+          {score !== null && !isLoading && (
+            <button
+              className={cn(
+                "p-2.5 bg-bg-secondary border border-border-light rounded-xl",
+                "text-text-secondary cursor-pointer transition-all duration-200",
+                "hover:border-border-hover hover:text-text-primary hover:shadow-md",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
+              onClick={forceRecalculate}
+              disabled={disabled || isLoading}
+              title={t('analysis.recalculate') || 'Recalculate'}
+            >
+              <Icon name="refresh-cw" size="md" />
+            </button>
           )}
-          onClick={calculateScore}
-          disabled={disabled || isLoading || !textChanged}
-        >
-          {isLoading ? (
-            <LazyLottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
-          ) : (
-            <>
-              <span>{!textChanged ? t('analysis.calculated') : t('analysis.calculateScore')}</span>
-              <Icon name="arrow-right" size="md" color="muted" />
-            </>
-          )}
-        </button>
+        </div>
 
         {/* Result Section */}
         {score !== null && showResult && (
           <div className="mt-2 block animate-slide-down">
             <div className="flex flex-col items-center gap-2 p-0">
-              {/* Score Circle */}
-              <div className="relative w-score-circle h-score-circle flex items-center justify-center my-1">
-                <svg className="absolute top-0 left-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+              {/* Score Circle - matching AI Detection style */}
+              <div className="relative w-score-circle h-score-circle flex items-center justify-center my-3">
+                <svg 
+                  className="absolute top-0 left-0 w-full h-full -rotate-90" 
+                  viewBox="0 0 100 100"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08))' }}
+                >
                   <defs>
-                    <linearGradient id="compatibilityGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#4facfe" />
-                      <stop offset="100%" stopColor="#00d4ff" />
+                    <linearGradient id="compatibilityGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#e8f4fd" />
+                      <stop offset="100%" stopColor={getScoreColor(score)} />
                     </linearGradient>
                   </defs>
-                  <circle className="fill-none stroke-bg-tertiary stroke-[8]" cx="50" cy="50" r="45" />
                   <circle 
-                    className="fill-none stroke-text-link stroke-[8]"
-                    cx="50" cy="50" r="45"
+                    className="fill-none" 
+                    cx="50" cy="50" r="42"
+                    style={{ stroke: 'var(--color-border-light)', strokeWidth: 8 }}
+                  />
+                  <circle 
+                    className="fill-none"
+                    cx="50" cy="50" r="42"
                     style={{
-                      strokeDasharray: 282.74,
-                      strokeDashoffset: 282.74 - (score / 100) * 282.74,
-                      strokeLinecap: 'round'
+                      stroke: 'url(#compatibilityGradient)',
+                      strokeWidth: 8,
+                      strokeDasharray: 263.89,
+                      strokeDashoffset: 263.89 - (score / 100) * 263.89,
+                      strokeLinecap: 'round',
+                      transition: 'stroke-dashoffset 0.5s ease-out',
+                      filter: `drop-shadow(0 1px 3px ${getScoreColor(score)}4D)`
                     }}
                   />
-                  <circle className="fill-bg-primary" cx="50" cy="50" r="40" />
                 </svg>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-baseline justify-center gap-0.5 z-10">
-                  <div className="text-3xl font-semibold leading-none tracking-tight text-text-primary">{score}</div>
-                  <div className="text-sm font-medium leading-none text-text-secondary opacity-50">%</div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="flex items-baseline justify-center gap-0.5">
+                    <span className="text-3xl font-semibold leading-none tracking-tight text-text-primary">{score}</span>
+                    <span className="text-sm font-medium leading-none text-text-secondary opacity-60">%</span>
+                  </div>
                 </div>
               </div>
-              
+
               {/* Verdict */}
-              <div className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-bg-secondary rounded-lg text-xs font-medium text-text-primary">
-                <img 
-                  src={score >= 75 ? "/icon/check-circle.svg" : score >= 40 ? "/icon/alert-circle.svg" : "/icon/x-circle.svg"}
-                  alt="verdict" 
-                  className="w-4 h-4 opacity-80 icon-invert"
-                />
-                <span>{getScoreLabel(score)}</span>
+              <div className="w-full flex justify-center">
+                <div className="inline-flex items-center gap-2 py-2 px-3 bg-bg-secondary border border-border-light rounded-lg text-xs font-medium text-text-primary">
+                  <Icon name={getScoreIcon(score)} size="sm" color="primary" className="flex-shrink-0 -mt-px" />
+                  <span className="whitespace-nowrap leading-none">{getScoreLabel(score)}</span>
+                </div>
               </div>
 
-              {/* Breakdown */}
+              {/* Score Breakdown - Vector & Statistical */}
               {analysisDetails && (
-                <div className="w-full flex flex-col gap-2 mt-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xs text-text-secondary min-w-[55px]">{t('analysis.vector')}</span>
-                    <div className="flex-1 h-1 bg-bg-secondary rounded-sm overflow-hidden">
-                      <div className="h-full rounded-sm bg-primary" style={{ width: `${Number.isFinite(analysisDetails.vector_score) ? analysisDetails.vector_score : 0}%` }} />
-                    </div>
-                    <span className="text-xs font-semibold text-text-primary min-w-[38px] text-right">{Number.isFinite(analysisDetails.vector_score) ? Math.round(analysisDetails.vector_score) : 0}%</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xs text-text-secondary min-w-[55px]">{t('analysis.statistical')}</span>
-                    <div className="flex-1 h-1 bg-bg-secondary rounded-sm overflow-hidden">
-                      <div className="h-full rounded-sm bg-success" style={{ width: `${Number.isFinite(analysisDetails.statistical_score) ? analysisDetails.statistical_score : 0}%` }} />
-                    </div>
-                    <span className="text-xs font-semibold text-text-primary min-w-[38px] text-right">{Number.isFinite(analysisDetails.statistical_score) ? Math.round(analysisDetails.statistical_score) : 0}%</span>
-                  </div>
-                  {analysisDetails.confidence && (
-                    <div className="flex items-center gap-2 mt-1 pt-2 border-t border-dashed border-border-light">
-                      <span className="text-2xs text-text-secondary min-w-[55px]">{t('analysis.confidence')}</span>
-                      <div className="flex-1 h-1 bg-bg-secondary rounded-sm overflow-hidden">
+                <div className="w-full p-2 px-3 bg-bg-secondary rounded-lg mt-0">
+                  <div className="flex flex-col gap-3">
+                    {/* Vector Score */}
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xs text-text-secondary">{t('analysis.vector')}</span>
+                        <span className="text-xs font-semibold text-text-primary">
+                          {safeScore(analysisDetails.vector_score)}%
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
                         <div 
-                          className="h-full rounded-sm"
-                          style={{ 
-                            width: `${analysisDetails.confidence}%`,
-                            background: analysisDetails.confidence >= 70 ? '#34a853' : analysisDetails.confidence >= 50 ? '#fbbc04' : '#ea4335'
-                          }}
+                          className="h-full rounded-sm bg-gradient-to-r from-blue-400 to-blue-500 transition-all duration-500" 
+                          style={{ width: `${safeScore(analysisDetails.vector_score)}%` }} 
                         />
                       </div>
-                      <span className="text-xs font-semibold text-text-primary min-w-[38px] text-right">{Math.round(analysisDetails.confidence)}%</span>
                     </div>
-                  )}
-                  {analysisDetails.deviation_summary && analysisDetails.deviation_summary.total > 0 && (
-                    <div className="w-full mt-2 p-2 bg-bg-secondary rounded-lg">
-                      <span className="text-2xs text-text-secondary block mb-1.5">{t('analysis.styleDeviationSentences')}</span>
-                      <div className="flex flex-wrap gap-1">
-                        {analysisDetails.deviation_summary.by_severity.severe > 0 && (
-                          <span className="text-2xs py-0.5 px-1.5 rounded bg-error/15 text-error font-medium">
-                            {analysisDetails.deviation_summary.by_severity.severe} {t('analysis.severe')}
-                          </span>
-                        )}
-                        {analysisDetails.deviation_summary.by_severity.moderate > 0 && (
-                          <span className="text-2xs py-0.5 px-1.5 rounded bg-warning/15 text-warning font-medium">
-                            {analysisDetails.deviation_summary.by_severity.moderate} {t('analysis.moderate')}
-                          </span>
-                        )}
-                        {analysisDetails.deviation_summary.by_severity.mild > 0 && (
-                          <span className="text-2xs py-0.5 px-1.5 rounded bg-primary/15 text-primary font-medium">
-                            {analysisDetails.deviation_summary.by_severity.mild} {t('analysis.mild')}
-                          </span>
-                        )}
+                    {/* Statistical Score */}
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xs text-text-secondary">{t('analysis.statistical')}</span>
+                        <span className="text-xs font-semibold text-text-primary">
+                          {safeScore(analysisDetails.statistical_score)}%
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
+                        <div 
+                          className="h-full rounded-sm bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500" 
+                          style={{ width: `${safeScore(analysisDetails.statistical_score)}%` }} 
+                        />
                       </div>
                     </div>
-                  )}
+                  </div>
+                </div>
+              )}
+
+              {/* Confidence Indicator - matching AI Detection style */}
+              {confidence !== null && confidence !== undefined && (
+                <div className="w-full p-2 px-3 bg-bg-secondary rounded-lg mt-0">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-2xs font-medium text-text-secondary uppercase tracking-wide">{t('analysis.confidence')}</span>
+                    <span className="text-sm font-semibold text-text-primary">{safeScore(confidence)}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
+                    <div 
+                      className={cn(
+                        "h-full rounded-sm transition-all duration-500",
+                        confidence < 60 && "bg-gradient-to-r from-orange-500 to-red-400",
+                        confidence >= 60 && confidence < 80 && "bg-gradient-to-r from-blue-500 to-cyan-400",
+                        confidence >= 80 && "bg-gradient-to-r from-green-500 to-emerald-400"
+                      )}
+                      style={{ width: `${safeScore(confidence)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Low Confidence Warning */}
+              {confidence !== null && confidence < 60 && (
+                <div className="w-full flex items-center gap-1.5 py-1.5 px-2.5 bg-bg-secondary border border-border-light rounded-lg text-xs text-text-muted leading-normal">
+                  <Icon name="info" size="xs" color="muted" className="flex-shrink-0 opacity-50" />
+                  <span>{t('analysis.lowConfidenceWarning')}</span>
+                </div>
+              )}
+
+              {/* Deviation Summary */}
+              {analysisDetails?.deviation_summary?.total > 0 && (
+                <div className="w-full p-2 px-3 bg-bg-secondary rounded-lg">
+                  <span className="text-2xs text-text-secondary block mb-1.5">{t('analysis.styleDeviationSentences')}</span>
+                  <div className="flex flex-wrap gap-1">
+                    {analysisDetails.deviation_summary.by_severity.severe > 0 && (
+                      <span className="text-2xs py-0.5 px-1.5 rounded bg-error/15 text-error font-medium">
+                        {analysisDetails.deviation_summary.by_severity.severe} {t('analysis.severe')}
+                      </span>
+                    )}
+                    {analysisDetails.deviation_summary.by_severity.moderate > 0 && (
+                      <span className="text-2xs py-0.5 px-1.5 rounded bg-warning/15 text-warning font-medium">
+                        {analysisDetails.deviation_summary.by_severity.moderate} {t('analysis.moderate')}
+                      </span>
+                    )}
+                    {analysisDetails.deviation_summary.by_severity.mild > 0 && (
+                      <span className="text-2xs py-0.5 px-1.5 rounded bg-primary/15 text-primary font-medium">
+                        {analysisDetails.deviation_summary.by_severity.mild} {t('analysis.mild')}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -360,16 +432,15 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                 onClick={() => setShowModal(true)}
               >
                 <span>{t('common.viewDetails')}</span>
-                <img src="/icon/chevron-right.svg" alt="detail" className="w-4 h-4 opacity-60 icon-invert" />
+                <Icon name="chevron-right" size="sm" color="muted" />
               </button>
             </div>
           </div>
         )}
       </div>
 
-
-      {/* Detail Modal */}
-      {showModal && analysisDetails && (
+      {/* Detail Modal - rendered via Portal */}
+      {showModal && analysisDetails && createPortal(
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
@@ -385,87 +456,103 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
 
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-6">
-              {/* Score Section */}
-              <div className="flex items-center justify-between p-4 bg-bg-secondary rounded-xl mb-5">
-                <div>
-                  <div className="text-sm text-text-secondary mb-1">{t('analysis.compatibilityScore')}</div>
-                  <div className="text-3xl font-semibold" style={{ color: getScoreColor(score) }}>{score}%</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-text-secondary mb-1">{t('nav.profile')}</div>
-                  <div className="text-sm font-medium text-text-primary">{analysisDetails.profile_name}</div>
-                </div>
-              </div>
-
-              {/* Stats Cards */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="p-3 bg-bg-secondary rounded-lg">
-                  <div className="text-2xs text-text-secondary mb-1">{t('analysis.vectorScore')}</div>
-                  <div className="text-xl font-semibold text-text-primary">{Number.isFinite(analysisDetails.vector_score) ? Math.round(analysisDetails.vector_score) : 0}%</div>
-                  <div className="text-2xs text-text-secondary">{t('analysis.semanticSimilarity')}</div>
-                </div>
-                <div className="p-3 bg-bg-secondary rounded-lg">
-                  <div className="text-2xs text-text-secondary mb-1">{t('analysis.statisticalScore')}</div>
-                  <div className="text-xl font-semibold text-text-primary">{Number.isFinite(analysisDetails.statistical_score) ? Math.round(analysisDetails.statistical_score) : 0}%</div>
-                  <div className="text-2xs text-text-secondary">{t('analysis.structuralSimilarity')}</div>
-                </div>
-              </div>
-
-              {/* Weights */}
-              <div className="p-3 bg-bg-secondary rounded-lg mb-4">
-                <h4 className="text-sm font-semibold text-text-primary mb-3">{t('analysis.calculationWeights')}</h4>
-                <div className="flex justify-between text-xs py-1">
-                  <span className="text-text-secondary">{t('analysis.embedding')}</span>
-                  <span className="text-text-primary font-medium">{Number.isFinite(analysisDetails.embedding_weight) ? Math.round(analysisDetails.embedding_weight * 100) : 0}%</span>
-                </div>
-                <div className="flex justify-between text-xs py-1">
-                  <span className="text-text-secondary">{t('analysis.statistical')}</span>
-                  <span className="text-text-primary font-medium">{Number.isFinite(analysisDetails.statistical_weight) ? Math.round(analysisDetails.statistical_weight * 100) : 0}%</span>
-                </div>
-              </div>
-
-              {/* Info Rows */}
-              <div className="p-3 bg-bg-secondary rounded-lg mb-4 space-y-2">
-                <div className="flex items-center gap-2 text-xs">
-                  <img src="/icon/file-text.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
-                  <span className="text-text-secondary">{t('analysis.samplesUsed')}</span>
-                  <span className="ml-auto text-text-primary font-medium">{analysisDetails.samples_used}</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs">
-                  <img src="/icon/clock.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
-                  <span className="text-text-secondary">{t('analysis.processingTime')}</span>
-                  <span className="ml-auto text-text-primary font-medium">{analysisDetails.processing_time_ms}ms</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs">
-                  <img src={analysisDetails.cache_hit ? "/icon/zap.svg" : "/icon/database.svg"} alt="" className="w-4 h-4 opacity-60 icon-invert" />
-                  <span className="text-text-secondary">{t('analysis.cacheStatus')}</span>
-                  <span className="ml-auto text-text-primary font-medium">{analysisDetails.cache_hit ? t('common.cached') : t('common.fresh')}</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs">
-                  <img src="/icon/list.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
-                  <span className="text-text-secondary">{t('analysis.sentencesAnalyzed')}</span>
-                  <span className="ml-auto text-text-primary font-medium">{analysisDetails.sentence_analysis?.length || 0}</span>
-                </div>
-                {analysisDetails.deviant_sentences && analysisDetails.deviant_sentences.length > 0 && (
-                  <div className="flex items-center gap-2 text-xs">
-                    <img src="/icon/alert-triangle.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
-                    <span className="text-text-secondary">{t('analysis.deviantSentences')}</span>
-                    <span className="ml-auto text-error font-medium">{analysisDetails.deviant_sentences.length}</span>
+              {/* Summary Section */}
+              <div className="p-4 bg-fill-tertiary border border-border-light rounded-xl mb-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <div className="text-sm text-text-secondary mb-1">{t('analysis.compatibilityScore')}</div>
+                    <div className="text-3xl font-semibold" style={{ color: getScoreColor(score) }}>{score}%</div>
                   </div>
-                )}
+                  <div className="text-right">
+                    <div className="text-sm text-text-secondary mb-1">{t('analysis.confidence')}</div>
+                    <div 
+                      className="text-3xl font-semibold"
+                      style={{ color: confidence < 60 ? '#ff9800' : confidence < 80 ? '#4285f4' : '#34a853' }}
+                    >
+                      {safeScore(confidence)}%
+                    </div>
+                  </div>
+                </div>
+
+                {/* Verdict */}
+                <div className="pt-3 border-t border-border-light">
+                  <div className="text-sm text-text-secondary mb-1">{t('analysis.conclusion')}</div>
+                  <div className="text-sm font-medium text-text-primary">{getScoreLabel(score)}</div>
+                </div>
+
+                {/* Profile & Stats */}
+                <div className="flex gap-3 flex-wrap pt-3 mt-3 border-t border-border-light">
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="text-text-secondary font-medium">{t('nav.profile')}</span>
+                    <span className="text-text-primary font-semibold">{analysisDetails.profile_name}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="text-text-secondary font-medium">{t('analysis.samplesUsed')}</span>
+                    <span className="text-text-primary font-semibold">{analysisDetails.samples_used}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="text-text-secondary font-medium">{t('analysis.processingTime')}</span>
+                    <span className="text-text-primary font-semibold">{analysisDetails.processing_time_ms}ms</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Score Breakdown Cards */}
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                <div className="p-4 bg-fill-tertiary border border-border-light rounded-xl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon name="cpu" size="sm" color="primary" />
+                    <span className="text-2xs text-text-secondary">{t('analysis.vectorScore')}</span>
+                  </div>
+                  <div className="text-2xl font-semibold text-text-primary">{safeScore(analysisDetails.vector_score)}%</div>
+                  <div className="text-2xs text-text-secondary mt-1">{t('analysis.semanticSimilarity')}</div>
+                </div>
+                <div className="p-4 bg-fill-tertiary border border-border-light rounded-xl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon name="bar-chart-2" size="sm" color="primary" />
+                    <span className="text-2xs text-text-secondary">{t('analysis.statisticalScore')}</span>
+                  </div>
+                  <div className="text-2xl font-semibold text-text-primary">{safeScore(analysisDetails.statistical_score)}%</div>
+                  <div className="text-2xs text-text-secondary mt-1">{t('analysis.structuralSimilarity')}</div>
+                </div>
+              </div>
+
+              {/* Calculation Weights */}
+              <div className="mb-5">
+                <h4 className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2.5">
+                  <Icon name="sliders" size="sm" color="primary" />
+                  {t('analysis.calculationWeights')}
+                </h4>
+                <div className="flex flex-col gap-3 p-4 bg-fill-tertiary border border-border-light rounded-xl">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-text-secondary">{t('analysis.embedding')}</span>
+                    <span className="text-text-primary font-semibold">
+                      {Number.isFinite(analysisDetails.embedding_weight) ? Math.round(analysisDetails.embedding_weight * 100) : 0}%
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-text-secondary">{t('analysis.statistical')}</span>
+                    <span className="text-text-primary font-semibold">
+                      {Number.isFinite(analysisDetails.statistical_weight) ? Math.round(analysisDetails.statistical_weight * 100) : 0}%
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {/* Statistical Breakdown */}
               {analysisDetails.statistical_breakdown && (
-                <div className="p-3 bg-bg-secondary rounded-lg mb-4">
-                  <h4 className="text-sm font-semibold text-text-primary mb-3">{t('analysis.statisticalComparisonDetails')}</h4>
-                  <div className="flex flex-col gap-2">
+                <div className="mb-5">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2.5">
+                    <Icon name="pie-chart" size="sm" color="primary" />
+                    {t('analysis.statisticalComparisonDetails')}
+                  </h4>
+                  <div className="flex flex-col gap-3 p-4 bg-fill-tertiary border border-border-light rounded-xl">
                     {Object.entries(analysisDetails.statistical_breakdown).map(([key, value]) => (
                       <div className="flex items-center gap-2" key={key}>
                         <span className="text-xs text-text-secondary w-label-xl flex-shrink-0">{formatBreakdownLabel(key)}</span>
                         <div className="flex-1 h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
                           <div 
-                            className="h-full rounded-sm"
+                            className="h-full rounded-sm transition-all duration-300"
                             style={{ 
                               width: `${value}%`,
                               background: value >= 70 ? '#34a853' : value >= 50 ? '#fbbc04' : '#ea4335'
@@ -481,22 +568,25 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
 
               {/* Text Statistics */}
               {analysisDetails.statistics && (
-                <div className="p-3 bg-bg-secondary rounded-lg mb-4">
-                  <h4 className="text-sm font-semibold text-text-primary mb-3">{t('analysis.textStatistics')}</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="flex justify-between text-xs py-1">
+                <div className="mb-5">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2.5">
+                    <Icon name="file-text" size="sm" color="primary" />
+                    {t('analysis.textStatistics')}
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 p-4 bg-fill-tertiary border border-border-light rounded-xl">
+                    <div className="flex justify-between text-xs">
                       <span className="text-text-secondary">{t('analysis.avgWordLength')}</span>
                       <span className="text-text-primary font-medium">{analysisDetails.statistics.avgWordLength}</span>
                     </div>
-                    <div className="flex justify-between text-xs py-1">
+                    <div className="flex justify-between text-xs">
                       <span className="text-text-secondary">{t('analysis.avgSentenceLength')}</span>
                       <span className="text-text-primary font-medium">{analysisDetails.statistics.avgSentenceLength}</span>
                     </div>
-                    <div className="flex justify-between text-xs py-1">
+                    <div className="flex justify-between text-xs">
                       <span className="text-text-secondary">{t('analysis.vocabularyRichness')}</span>
                       <span className="text-text-primary font-medium">{analysisDetails.statistics.vocabularyRichness?.toFixed(3) || 'N/A'}</span>
                     </div>
-                    <div className="flex justify-between text-xs py-1">
+                    <div className="flex justify-between text-xs">
                       <span className="text-text-secondary">{t('analysis.readabilityScore')}</span>
                       <span className="text-text-primary font-medium">{analysisDetails.statistics.readabilityScore?.toFixed(1) || 'N/A'}</span>
                     </div>
@@ -506,9 +596,12 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
 
               {/* Confidence Factors */}
               {analysisDetails.confidence_factors && (
-                <div className="p-3 bg-bg-secondary rounded-lg">
-                  <h4 className="text-sm font-semibold text-text-primary mb-3">{t('analysis.confidenceFactors')}</h4>
-                  <div className="flex flex-col gap-1.5">
+                <div className="mb-5">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2.5">
+                    <Icon name="activity" size="sm" color="primary" />
+                    {t('analysis.confidenceFactors')}
+                  </h4>
+                  <div className="flex flex-col gap-2 p-4 bg-fill-tertiary border border-border-light rounded-xl">
                     {analysisDetails.confidence_factors.variancePenalty !== undefined && (
                       <div className="flex justify-between items-center text-xs py-1 px-2 rounded bg-error/10">
                         <span className="text-text-secondary">{t('analysis.variance')}</span>
@@ -536,9 +629,70 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                   </div>
                 </div>
               )}
+
+              {/* Deviant Sentences */}
+              {analysisDetails.deviant_sentences && analysisDetails.deviant_sentences.length > 0 && (
+                <div className="mb-5">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2.5">
+                    <Icon name="alert-triangle" size="sm" color="warning" />
+                    {t('analysis.deviantSentences')} ({analysisDetails.deviant_sentences.length})
+                  </h4>
+                  <div className="flex flex-col gap-3 p-4 bg-fill-tertiary border border-border-light rounded-xl">
+                    {analysisDetails.deviant_sentences.slice(0, 5).map((item, index) => (
+                      <div key={index} className="flex items-start gap-2 text-xs">
+                        <span className={cn(
+                          "flex-shrink-0 p-1 rounded",
+                          item.severity === 'severe' && "bg-error/15",
+                          item.severity === 'moderate' && "bg-warning/15",
+                          item.severity === 'mild' && "bg-primary/15"
+                        )}>
+                          <Icon 
+                            name="alert-circle" 
+                            size="xs" 
+                            color={item.severity === 'severe' ? 'error' : item.severity === 'moderate' ? 'warning' : 'primary'} 
+                          />
+                        </span>
+                        <span className="text-text-primary leading-normal">{item.sentence}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Analysis Info */}
+              <div className="p-4 bg-fill-tertiary border border-border-light rounded-xl space-y-2">
+                <div className="flex items-center gap-2 text-xs">
+                  <Icon name="file-text" size="xs" color="muted" />
+                  <span className="text-text-secondary">{t('analysis.samplesUsed')}</span>
+                  <span className="ml-auto text-text-primary font-medium">{analysisDetails.samples_used || 0}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <Icon name="clock" size="xs" color="muted" />
+                  <span className="text-text-secondary">{t('analysis.processingTime')}</span>
+                  <span className="ml-auto text-text-primary font-medium">{analysisDetails.processing_time_ms || 0}ms</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <Icon name={analysisDetails.cache_hit ? "zap" : "database"} size="xs" color="muted" />
+                  <span className="text-text-secondary">{t('analysis.cacheStatus')}</span>
+                  <span className="ml-auto text-text-primary font-medium">{analysisDetails.cache_hit ? t('common.cached') : t('common.fresh')}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <Icon name="list" size="xs" color="muted" />
+                  <span className="text-text-secondary">{t('analysis.sentencesAnalyzed')}</span>
+                  <span className="ml-auto text-text-primary font-medium">{analysisDetails.sentence_analysis?.length || 0}</span>
+                </div>
+                {analysisDetails.deviant_sentences && analysisDetails.deviant_sentences.length > 0 && (
+                  <div className="flex items-center gap-2 text-xs">
+                    <Icon name="alert-triangle" size="xs" color="warning" />
+                    <span className="text-text-secondary">{t('analysis.deviantSentences')}</span>
+                    <span className="ml-auto text-error font-medium">{analysisDetails.deviant_sentences.length}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )

@@ -164,7 +164,25 @@ exports.analyzeText = async (req, res) => {
       profileData = cachedData.profileData;
       sampleVectors = cachedData.sampleVectors;
       centroid = cachedData.centroid;
-    } else {
+      
+      // Debug: Log cached profile data
+      logger.info('[DEBUG] Using cached profile', {
+        profileId,
+        hasCentroid: !!centroid,
+        centroidLength: centroid?.length,
+        sampleVectorsCount: sampleVectors?.length,
+        hasProfileData: !!profileData
+      });
+      
+      // Validate cached centroid - if invalid, invalidate cache and reload
+      if (!centroid || !Array.isArray(centroid) || centroid.length === 0) {
+        logger.warn('[WARN] Invalid cached centroid, invalidating cache', { profileId });
+        cacheService.invalidateProfileCache(profileId);
+        cachedData = null; // Force reload
+      }
+    }
+    
+    if (!cachedData) {
       const profileDoc = await db.collection('voice_profiles').doc(profileId).get();
       if (!profileDoc.exists) {
         return res.status(404).json({ success: false, ...l.error('not_found') });
@@ -210,6 +228,26 @@ exports.analyzeText = async (req, res) => {
       // Use weighted centroid - long samples have higher weight
       centroid = analysisService.calculateWeightedCentroid(samplesWithType);
       
+      // Debug: Log centroid calculation result
+      logger.info('[DEBUG] Centroid calculated', {
+        profileId,
+        hasCentroid: !!centroid,
+        centroidLength: centroid?.length,
+        centroidSample: centroid?.slice(0, 3),
+        samplesWithTypeCount: samplesWithType.length,
+        firstSampleVectorLength: samplesWithType[0]?.vector?.length
+      });
+      
+      // Validate centroid before caching
+      if (!centroid || !Array.isArray(centroid) || centroid.length === 0) {
+        logger.error('[ERROR] Failed to calculate centroid', { profileId });
+        return res.status(500).json({ 
+          success: false, 
+          error: 'Failed to calculate profile centroid',
+          details: 'Profile samples may have invalid embeddings'
+        });
+      }
+      
       cacheService.setCachedProfile(profileId, {
         profileData,
         sampleVectors,
@@ -230,6 +268,19 @@ exports.analyzeText = async (req, res) => {
       Promise.resolve(analysisService.calculateStatisticsMultiLang(validText))
     ]);
 
+    // Debug: Log centroid and sentenceVectors info
+    logger.info('[DEBUG] Embedding data', {
+      hasCentroid: !!centroid,
+      centroidLength: centroid?.length,
+      centroidSample: centroid?.slice(0, 3),
+      sentenceVectorsCount: sentenceVectors?.length,
+      validSentencesCount: validSentences.length,
+      firstSentenceVectorLength: sentenceVectors?.[0]?.length,
+      firstSentenceVectorSample: sentenceVectors?.[0]?.slice(0, 3),
+      sampleVectorsCount: sampleVectors?.length,
+      firstSampleVectorLength: sampleVectors?.[0]?.length
+    });
+
     const sentenceAnalyses = [];
     const allSimilarities = [];
     const centroidSimilarities = [];
@@ -247,6 +298,18 @@ exports.analyzeText = async (req, res) => {
       const centroidSim = analysisService.calculateCosineSimilarity(sentenceVector, centroid);
       allCentroidSims.push(Number.isFinite(centroidSim) ? centroidSim : 0);
     }
+    
+    // Debug: Log allCentroidSims values
+    logger.info('[DEBUG] Centroid similarities calculated', {
+      allCentroidSimsCount: allCentroidSims.length,
+      allCentroidSimsSample: allCentroidSims.slice(0, 5),
+      allCentroidSimsMin: Math.min(...allCentroidSims),
+      allCentroidSimsMax: Math.max(...allCentroidSims),
+      allCentroidSimsAvg: allCentroidSims.length > 0 
+        ? (allCentroidSims.reduce((a, b) => a + b, 0) / allCentroidSims.length).toFixed(4) 
+        : 0,
+      zeroCount: allCentroidSims.filter(s => s === 0).length
+    });
     
     const thresholdData = analysisService.calculateDynamicThreshold(allCentroidSims);
 

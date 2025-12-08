@@ -405,7 +405,30 @@ function splitIntoSentences(text) {
 // ============================================================================
 
 function calculateCosineSimilarity(vector1, vector2) {
-  if (vector1.length !== vector2.length) return 0;
+  // Check for null/undefined vectors
+  if (!vector1 || !vector2) {
+    console.warn('[WARN] calculateCosineSimilarity: null/undefined vector', { 
+      hasVector1: !!vector1, 
+      hasVector2: !!vector2 
+    });
+    return 0;
+  }
+  
+  if (!Array.isArray(vector1) || !Array.isArray(vector2)) {
+    console.warn('[WARN] calculateCosineSimilarity: non-array vector', { 
+      vector1Type: typeof vector1, 
+      vector2Type: typeof vector2 
+    });
+    return 0;
+  }
+  
+  if (vector1.length !== vector2.length) {
+    console.warn('[WARN] calculateCosineSimilarity: length mismatch', { 
+      vector1Length: vector1.length, 
+      vector2Length: vector2.length 
+    });
+    return 0;
+  }
 
   let dotProduct = 0;
   let norm1 = 0;
