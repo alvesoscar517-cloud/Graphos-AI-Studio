@@ -376,19 +376,33 @@ exports.createProfileComplete = async (req, res) => {
     logger.info('User validated', { userId });
 
     // Rate limiting: Check profiles created in last 24 hours
+    // Note: This query requires a composite index on voice_profiles (userId ASC, createdAt ASC)
     const rateLimitTime = new Date(Date.now() - PROFILE_RATE_LIMIT_HOURS * 60 * 60 * 1000);
-    const recentProfilesSnapshot = await db.collection('voice_profiles')
-      .where('userId', '==', userId)
-      .where('createdAt', '>', rateLimitTime)
-      .get();
+    try {
+      const recentProfilesSnapshot = await db.collection('voice_profiles')
+        .where('userId', '==', userId)
+        .where('createdAt', '>', rateLimitTime)
+        .get();
 
-    if (recentProfilesSnapshot.size >= PROFILE_RATE_LIMIT_COUNT) {
-      logger.warn('Rate limit exceeded', { userId, count: recentProfilesSnapshot.size });
-      return res.status(429).json({
-        success: false,
-        error: `Reached limit of creating ${PROFILE_RATE_LIMIT_COUNT} profiles in ${PROFILE_RATE_LIMIT_HOURS} hours. Please try again later.`,
-        error_code: 'RATE_LIMIT_EXCEEDED'
-      });
+      if (recentProfilesSnapshot.size >= PROFILE_RATE_LIMIT_COUNT) {
+        logger.warn('Rate limit exceeded', { userId, count: recentProfilesSnapshot.size });
+        return res.status(429).json({
+          success: false,
+          error: `Reached limit of creating ${PROFILE_RATE_LIMIT_COUNT} profiles in ${PROFILE_RATE_LIMIT_HOURS} hours. Please try again later.`,
+          error_code: 'RATE_LIMIT_EXCEEDED'
+        });
+      }
+    } catch (rateLimitError) {
+      // If index doesn't exist yet, log warning and continue
+      // The index should be created via: firebase deploy --only firestore:indexes
+      if (rateLimitError.code === 9 || rateLimitError.message?.includes('index')) {
+        logger.warn('Rate limit check skipped - Firestore index not ready', { 
+          userId,
+          error: rateLimitError.message 
+        });
+      } else {
+        throw rateLimitError;
+      }
     }
 
     // Check for duplicate profile name

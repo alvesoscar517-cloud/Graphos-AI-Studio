@@ -419,6 +419,19 @@ async function startServer() {
       } catch (envError) {
         console.warn('[STARTUP] ⚠ Environment config from Firestore failed, using process.env:', envError.message);
       }
+      
+      // Ensure Firestore indexes exist (async, non-blocking)
+      try {
+        const firestoreIndexService = require('./src/services/firestoreIndex.service');
+        // Run in background, don't block startup
+        firestoreIndexService.ensureIndexes().then(() => {
+          console.log('[STARTUP] ✓ Firestore indexes checked/created');
+        }).catch(indexError => {
+          console.warn('[STARTUP] ⚠ Firestore index check failed:', indexError.message);
+        });
+      } catch (indexError) {
+        console.warn('[STARTUP] ⚠ Could not load firestoreIndex service:', indexError.message);
+      }
       console.log('');
       console.log('========================================================');
       console.log('   Graphos AI Studio - Backend Server v2.1');
