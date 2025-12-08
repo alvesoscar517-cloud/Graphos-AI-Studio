@@ -675,7 +675,7 @@ export const useProfileSetup = () => {
       if (similarity > SIMILARITY_THRESHOLD) {
         const confirmed = await modal.confirm(
           `This sample is ${Math.round(similarity * 100)}% similar to sample #${i + 1}. Continue?`,
-          '[SIMILAR SAMPLE]',
+          'Similar Sample',
           { type: 'question', forceLight: true, confirmText: isEditingMode ? 'Update' : 'Add Sample', cancelText: 'Cancel' }
         )
         if (!confirmed) return

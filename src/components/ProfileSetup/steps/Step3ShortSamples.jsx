@@ -29,6 +29,27 @@ const Step3ShortSamples = ({
   const { t } = useTranslation()
   const canAddMore = !isEditingMode && samples.length < MAX_SAMPLES
   const isValidWordCount = shortTextWordCount >= MIN_SAMPLE_WORDS && shortTextWordCount <= MAX_SAMPLE_WORDS
+  const isTooShort = shortText.trim() && shortTextWordCount < MIN_SAMPLE_WORDS
+  const isTooLong = shortTextWordCount > MAX_SAMPLE_WORDS
+  
+  // Get validation message for button
+  const getButtonText = () => {
+    if (isTooShort) {
+      const wordsNeeded = MIN_SAMPLE_WORDS - shortTextWordCount
+      return `${t('profileSetup.tooShort') || 'Too short'} (${wordsNeeded} ${t('common.words')} ${t('common.more') || 'more'})`
+    }
+    if (isTooLong) {
+      const wordsOver = shortTextWordCount - MAX_SAMPLE_WORDS
+      return `${t('profileSetup.tooLong') || 'Too long'} (${wordsOver} ${t('common.words')} ${t('common.over') || 'over'})`
+    }
+    if (isEditingMode) {
+      return t('common.save')
+    }
+    if (samples.length >= MAX_SAMPLES) {
+      return `${t('common.done')} ${MAX_SAMPLES}`
+    }
+    return t('common.submit')
+  }
 
   return (
     <div className="block animate-fade-in-slow h-[calc(100%-100px)] relative">
@@ -57,18 +78,36 @@ const Step3ShortSamples = ({
                 placeholder={samples.length >= MAX_SAMPLES && !isEditingMode 
                   ? `${t('profile.selected')} ${MAX_SAMPLES} ${t('common.samples')}` 
                   : t('profileSetup.pasteYourText')}
-                rows="8"
+                rows={8}
                 value={shortText}
                 onChange={(e) => setShortText(e.target.value)}
                 disabled={samples.length >= MAX_SAMPLES && !isEditingMode}
                 className={cn(
                   "w-full max-w-form py-4 px-4 text-md",
-                  "border border-gray-200 rounded-xl font-sans resize-none",
+                  "border rounded-xl font-sans resize-none",
                   "transition-all duration-200 bg-white/70 leading-relaxed scrollbar-hidden",
-                  "focus:outline-none focus:border-gray-400 focus:bg-white",
-                  "disabled:bg-bg-hover disabled:cursor-not-allowed"
+                  "focus:outline-none focus:bg-white",
+                  "disabled:bg-bg-hover disabled:cursor-not-allowed",
+                  // Border color based on validation
+                  isTooShort || isTooLong 
+                    ? "border-amber-400 focus:border-amber-500" 
+                    : isValidWordCount && shortText.trim()
+                      ? "border-green-400 focus:border-green-500"
+                      : "border-gray-200 focus:border-gray-400"
                 )}
               />
+              
+              {/* Word count indicator */}
+              {shortText.trim() && (
+                <div className={cn(
+                  "absolute bottom-14 right-2 text-xs font-medium px-2 py-1 rounded",
+                  isTooShort ? "text-amber-600 bg-amber-50" :
+                  isTooLong ? "text-red-600 bg-red-50" :
+                  "text-green-600 bg-green-50"
+                )}>
+                  {shortTextWordCount} / {MIN_SAMPLE_WORDS}-{MAX_SAMPLE_WORDS} {t('common.words')}
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex gap-2 mt-3 justify-end">
@@ -97,29 +136,42 @@ const Step3ShortSamples = ({
                   className={cn(
                     "py-2.5 px-5 text-sm font-semibold border border-transparent rounded-lg",
                     "cursor-pointer transition-all duration-200 inline-flex items-center gap-2",
-                    "bg-text-link text-white border-text-link",
+                    // Error state styling
+                    (isTooShort || isTooLong) 
+                      ? "bg-amber-500 text-white border-amber-500 opacity-90"
+                      : "bg-text-link text-white border-text-link",
                     "hover:enabled:bg-primary hover:enabled:border-primary",
-                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                    "disabled:cursor-not-allowed",
+                    // Only reduce opacity if not showing error
+                    !(isTooShort || isTooLong) && "disabled:opacity-50"
                   )}
                   disabled={!shortText.trim() || !canAddMore && !isEditingMode || !isValidWordCount}
                   onClick={onAddSample}
                 >
-                  {isEditingMode ? (
-                    <>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                      {t('common.save')}
-                    </>
+                  {/* Icon based on state */}
+                  {isTooShort ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                  ) : isTooLong ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="15" y1="9" x2="9" y2="15"></line>
+                      <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                  ) : isEditingMode ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
                   ) : (
-                    <>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                      </svg>
-                      {samples.length >= MAX_SAMPLES ? `${t('common.done')} ${MAX_SAMPLES}` : t('common.submit')}
-                    </>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
                   )}
+                  {getButtonText()}
                 </button>
               </div>
             </div>

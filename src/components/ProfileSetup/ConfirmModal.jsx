@@ -63,28 +63,28 @@ const ConfirmModal = ({
     >
       <div 
         className={cn(
-          "bg-white rounded-3xl max-w-modal-sm w-11/12 py-6 px-7",
-          "shadow-modal",
+          "bg-white rounded-2xl max-w-md w-[90%] py-5 px-6",
+          "shadow-xl",
           "animate-scale-in"
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-start gap-3 mb-5">
           <div className={cn(
-            "w-14 h-14 rounded-full flex items-center justify-center shrink-0",
+            "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
             iconBgColors[type]
           )}>
             <img 
               src={`/icon/${icon}.svg`} 
               alt={type} 
-              className={cn("w-7 h-7", iconFilterClasses[type])}
+              className={cn("w-5 h-5", iconFilterClasses[type])}
             />
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-text-primary m-0 mb-1.5 leading-tight">
+          <div className="flex-1 min-w-0 pt-1">
+            <h3 className="text-base font-semibold text-text-primary m-0 mb-1 leading-tight">
               {title}
             </h3>
-            <p className="text-sm text-text-secondary m-0 leading-normal">
+            <p className="text-sm text-text-secondary m-0 leading-relaxed">
               {message}
             </p>
           </div>

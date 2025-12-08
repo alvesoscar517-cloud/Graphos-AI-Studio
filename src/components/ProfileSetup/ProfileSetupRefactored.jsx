@@ -516,6 +516,7 @@ const ProfileSetup = () => {
               })
             }}
             onRetry={() => {
+              // Retry with current data
               setShowError(false)
               setErrorCode('')
               setErrorMessage('')

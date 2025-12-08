@@ -324,7 +324,54 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
 // Rate limit constants
 const PROFILE_RATE_LIMIT_HOURS = 24;
 const PROFILE_RATE_LIMIT_COUNT = 5;
-const SAMPLE_SIMILARITY_THRESHOLD = 0.92;
+
+// Similarity thresholds for detecting duplicate samples
+// Uses dual-check: embedding similarity AND text similarity must both be high
+const EMBEDDING_SIMILARITY_THRESHOLD = 0.92; // Semantic similarity via embeddings
+const TEXT_SIMILARITY_THRESHOLD = 0.60; // Lexical similarity via text comparison
+
+/**
+ * Calculate text similarity using Jaccard coefficient on word n-grams
+ * More accurate than pure embedding similarity for detecting actual duplicates
+ * @param {string} text1 
+ * @param {string} text2 
+ * @returns {number} Similarity score 0-1
+ */
+function calculateTextSimilarity(text1, text2) {
+  // Normalize texts
+  const normalize = (text) => text.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').trim();
+  const t1 = normalize(text1);
+  const t2 = normalize(text2);
+  
+  // Get words
+  const words1 = t1.split(/\s+/).filter(w => w.length > 0);
+  const words2 = t2.split(/\s+/).filter(w => w.length > 0);
+  
+  if (words1.length === 0 || words2.length === 0) return 0;
+  
+  // Create word bigrams for better accuracy
+  const getBigrams = (words) => {
+    const bigrams = new Set();
+    for (let i = 0; i < words.length - 1; i++) {
+      bigrams.add(`${words[i]} ${words[i + 1]}`);
+    }
+    // Also add individual words
+    words.forEach(w => bigrams.add(w));
+    return bigrams;
+  };
+  
+  const set1 = getBigrams(words1);
+  const set2 = getBigrams(words2);
+  
+  // Calculate Jaccard similarity
+  let intersection = 0;
+  set1.forEach(item => {
+    if (set2.has(item)) intersection++;
+  });
+  
+  const union = set1.size + set2.size - intersection;
+  return union === 0 ? 0 : intersection / union;
+}
 
 exports.createProfileComplete = async (req, res) => {
   const l = createLocalizer(req);
@@ -467,12 +514,46 @@ exports.createProfileComplete = async (req, res) => {
     }
 
     // Step 2.5: Cross-sample similarity check (prevent duplicate/near-duplicate samples)
+    // Uses DUAL-CHECK: both embedding similarity AND text similarity must be high
+    // This prevents false positives where texts have same style but different content
     const similarPairs = [];
     for (let i = 0; i < embeddings.length; i++) {
       for (let j = i + 1; j < embeddings.length; j++) {
-        const similarity = analysisService.calculateCosineSimilarity(embeddings[i], embeddings[j]);
-        if (similarity > SAMPLE_SIMILARITY_THRESHOLD) {
-          similarPairs.push({ i: i + 1, j: j + 1, similarity: Math.round(similarity * 100) });
+        const embeddingSimilarity = analysisService.calculateCosineSimilarity(embeddings[i], embeddings[j]);
+        
+        // Only check text similarity if embedding similarity is high
+        if (embeddingSimilarity > EMBEDDING_SIMILARITY_THRESHOLD) {
+          const textSimilarity = calculateTextSimilarity(samples[i].text, samples[j].text);
+          
+          // Both must be high to be considered duplicate
+          if (textSimilarity > TEXT_SIMILARITY_THRESHOLD) {
+            const sampleI = samples[i];
+            const sampleJ = samples[j];
+            const typeI = sampleI.type === 'long' ? 'Long Text' : 'Short Sample';
+            const typeJ = sampleJ.type === 'long' ? 'Long Text' : 'Short Sample';
+            
+            similarPairs.push({ 
+              i: i + 1, 
+              j: j + 1, 
+              embeddingSimilarity: Math.round(embeddingSimilarity * 100),
+              textSimilarity: Math.round(textSimilarity * 100),
+              typeI,
+              typeJ
+            });
+            
+            logger.info('Duplicate detected', {
+              pair: `${i + 1}-${j + 1}`,
+              embeddingSim: Math.round(embeddingSimilarity * 100),
+              textSim: Math.round(textSimilarity * 100)
+            });
+          } else {
+            // High embedding but low text similarity = different content, same style (OK)
+            logger.info('High embedding but different text content (allowed)', {
+              pair: `${i + 1}-${j + 1}`,
+              embeddingSim: Math.round(embeddingSimilarity * 100),
+              textSim: Math.round(textSimilarity * 100)
+            });
+          }
         }
       }
     }
@@ -480,9 +561,18 @@ exports.createProfileComplete = async (req, res) => {
     if (similarPairs.length > 0) {
       const firstPair = similarPairs[0];
       logger.warn('Similar samples detected', { userId, similarPairs });
+      
+      // Build descriptive error message
+      let errorMsg;
+      if (firstPair.typeI === firstPair.typeJ) {
+        errorMsg = `Two ${firstPair.typeI}s (#${firstPair.i} and #${firstPair.j}) are too similar (${firstPair.embeddingSimilarity}% semantic, ${firstPair.textSimilarity}% text). Please provide more diverse content.`;
+      } else {
+        errorMsg = `${firstPair.typeI} #${firstPair.i} and ${firstPair.typeJ} #${firstPair.j} are too similar (${firstPair.embeddingSimilarity}% semantic, ${firstPair.textSimilarity}% text). Please provide more diverse content.`;
+      }
+      
       return res.status(400).json({
         success: false,
-        error: `Sample #${firstPair.i} and #${firstPair.j} are too similar (${firstPair.similarity}%). Please provide more diverse content.`,
+        error: errorMsg,
         error_code: 'SIMILAR_SAMPLES',
         similar_pairs: similarPairs
       });
