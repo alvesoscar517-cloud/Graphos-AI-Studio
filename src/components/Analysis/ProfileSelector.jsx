@@ -106,7 +106,11 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
               {currentProfile?.profile_name || t('profile.noProfile')}
             </h3>
             <p className="text-xs text-text-secondary m-0">
-              {currentProfile ? t('profile.textSamples', { count: currentProfile.sample_count || 0 }) : t('profile.clickToSelect')}
+              {currentProfile 
+                ? (currentProfile._isPlaceholder 
+                    ? t('common.loading') 
+                    : t('profile.textSamples', { count: currentProfile.sample_count || 0 }))
+                : t('profile.clickToSelect')}
             </p>
           </div>
         </div>
@@ -213,8 +217,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                       className={cn(
                         "bg-bg-secondary border border-border-light rounded-xl",
                         "p-4 cursor-pointer transition-all duration-200",
-                        "hover:border-border-hover hover:shadow-sm",
-                        currentProfile?.profile_id === profile.profile_id && "border-accent"
+                        "hover:border-border-hover hover:shadow-sm"
                       )}
                       onClick={() => handleSelectProfile(profile)}
                     >

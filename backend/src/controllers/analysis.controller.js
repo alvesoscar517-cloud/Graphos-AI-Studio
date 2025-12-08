@@ -172,6 +172,15 @@ exports.analyzeText = async (req, res) => {
 
       profileData = profileDoc.data();
 
+      // Debug: Log profile data structure
+      logger.info('[DEBUG] Profile data loaded', {
+        profileId,
+        status: profileData.status,
+        hasStatisticalFeatures: !!profileData.statisticalFeatures,
+        statisticalFeaturesKeys: profileData.statisticalFeatures ? Object.keys(profileData.statisticalFeatures) : [],
+        hasVoiceProfile: !!profileData.voiceProfile
+      });
+
       if (profileData.status !== 'ready') {
         return res.status(400).json({ success: false, ...l.error('invalid_input'), details: l.t('voice_profile.not_found') });
       }
@@ -229,8 +238,14 @@ exports.analyzeText = async (req, res) => {
     const allCentroidSims = [];
     for (let idx = 0; idx < validSentences.length; idx++) {
       const sentenceVector = sentenceVectors[idx];
+      // Skip if sentence vector is missing or invalid
+      if (!sentenceVector || !Array.isArray(sentenceVector) || sentenceVector.length === 0) {
+        logger.warn('[WARN] Missing sentence vector at index', { idx, sentence: validSentences[idx]?.substring(0, 50) });
+        allCentroidSims.push(0);
+        continue;
+      }
       const centroidSim = analysisService.calculateCosineSimilarity(sentenceVector, centroid);
-      allCentroidSims.push(centroidSim);
+      allCentroidSims.push(Number.isFinite(centroidSim) ? centroidSim : 0);
     }
     
     const thresholdData = analysisService.calculateDynamicThreshold(allCentroidSims);
@@ -240,25 +255,37 @@ exports.analyzeText = async (req, res) => {
       const sentenceVector = sentenceVectors[idx];
 
       const centroidSimilarity = allCentroidSims[idx];
-      centroidSimilarities.push(centroidSimilarity);
+      centroidSimilarities.push(Number.isFinite(centroidSimilarity) ? centroidSimilarity : 0);
 
-      const similarities = sampleVectors
-        .map(sampleVec => analysisService.calculateCosineSimilarity(sentenceVector, sampleVec))
-        .sort((a, b) => b - a)
-        .slice(0, 10);
+      // Skip similarity calculation if sentence vector is invalid
+      let avgSimilarity = 0;
+      if (sentenceVector && Array.isArray(sentenceVector) && sentenceVector.length > 0) {
+        const similarities = sampleVectors
+          .map(sampleVec => {
+            const sim = analysisService.calculateCosineSimilarity(sentenceVector, sampleVec);
+            return Number.isFinite(sim) ? sim : 0;
+          })
+          .sort((a, b) => b - a)
+          .slice(0, 10);
 
-      const avgSimilarity = similarities.reduce((a, b) => a + b, 0) / similarities.length;
+        avgSimilarity = similarities.length > 0 
+          ? similarities.reduce((a, b) => a + b, 0) / similarities.length 
+          : 0;
+      }
       allSimilarities.push(avgSimilarity);
 
       // Use new severity-based deviation detection
       const severity = analysisService.getDeviationSeverity(centroidSimilarity, thresholdData);
       const isDeviant = severity !== null;
 
+      const safeAvgSimilarity = Number.isFinite(avgSimilarity) ? avgSimilarity : 0;
+      const safeCentroidSimilarity = Number.isFinite(centroidSimilarity) ? centroidSimilarity : 0;
+      
       sentenceAnalyses.push({
         sentence,
         index: idx,
-        similarityScore: parseFloat(avgSimilarity.toFixed(3)),
-        centroidSimilarity: parseFloat(centroidSimilarity.toFixed(3)),
+        similarityScore: parseFloat(safeAvgSimilarity.toFixed(3)),
+        centroidSimilarity: parseFloat(safeCentroidSimilarity.toFixed(3)),
         isDeviant,
         deviationSeverity: severity // 'mild', 'moderate', 'severe', or null
       });
@@ -272,6 +299,17 @@ exports.analyzeText = async (req, res) => {
     const statisticalResult = analysisService.compareStatisticalFeatures(textFeatures, profileData.statisticalFeatures);
     const statisticalScore = typeof statisticalResult === 'object' ? statisticalResult.score : statisticalResult;
     const statisticalBreakdown = typeof statisticalResult === 'object' ? statisticalResult.breakdown : null;
+
+    // Debug: Log score calculations
+    logger.info('[DEBUG] Score calculations', {
+      centroidSimilaritiesCount: centroidSimilarities.length,
+      centroidSimilaritiesSample: centroidSimilarities.slice(0, 3),
+      vectorScore,
+      statisticalResult: typeof statisticalResult === 'object' ? statisticalResult : { score: statisticalResult },
+      statisticalScore,
+      hasProfileStatisticalFeatures: !!profileData.statisticalFeatures,
+      textFeaturesKeys: Object.keys(textFeatures || {})
+    });
 
     const sampleCount = sampleVectors.length;
     const embeddingWeight = Math.min(0.8, 0.5 + (sampleCount / 100) * 0.3);
@@ -397,13 +435,18 @@ exports.analyzeText = async (req, res) => {
     // Localize benchmark comparison
     const localizedBenchmark = l.localizeBenchmark(benchmarkComparison);
 
+    // Ensure scores are valid numbers (not NaN or Infinity)
+    const safeVoiceCompatibility = Number.isFinite(voiceCompatibility) ? voiceCompatibility : 0;
+    const safeVectorScore = Number.isFinite(vectorScore) ? vectorScore : 0;
+    const safeStatisticalScore = Number.isFinite(statisticalScore) ? statisticalScore : 50;
+
     const result = {
       success: true,
-      voice_compatibility_score: parseFloat(voiceCompatibility.toFixed(2)),
+      voice_compatibility_score: parseFloat(safeVoiceCompatibility.toFixed(2)),
       voice_match_level: voiceMatchInfo.level,
       voice_match_message: voiceMatchInfo.message,
-      vector_score: parseFloat(vectorScore.toFixed(2)),
-      statistical_score: parseFloat(statisticalScore.toFixed(2)),
+      vector_score: parseFloat(safeVectorScore.toFixed(2)),
+      statistical_score: parseFloat(safeStatisticalScore.toFixed(2)),
       statistical_breakdown: statisticalBreakdown,
       confidence: confidenceResult.confidence,
       confidence_level: confidenceInfo.level,

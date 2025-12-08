@@ -17,7 +17,7 @@ import {
   clearActiveProfile 
 } from '../utils/authStorage'
 
-const ProfileContext = createContext()
+const ProfileContext = createContext(null)
 
 export const useProfiles = () => {
   const context = useContext(ProfileContext)
@@ -47,8 +47,29 @@ export const ProfileProvider = ({ children }) => {
 
   // Get current profile from state + profiles array
   const currentProfile = useMemo(() => {
-    if (!activeProfileId || profiles.length === 0) return null
-    return profiles.find(p => p.profile_id === activeProfileId) || null
+    if (!activeProfileId) return null
+    if (profiles.length === 0) {
+      // Profiles not loaded yet, but we have activeProfileId from storage
+      // Return a minimal profile object to prevent UI showing "No Profile"
+      const storedProfile = getStorageActiveProfile()
+      if (storedProfile.id && storedProfile.name) {
+        console.log('[PROFILE] Using stored profile while loading:', storedProfile.name)
+        return {
+          profile_id: storedProfile.id,
+          profile_name: storedProfile.name,
+          _isPlaceholder: true // Flag to indicate this is temporary
+        }
+      }
+      return null
+    }
+    const found = profiles.find(p => p.profile_id === activeProfileId)
+    if (!found && activeProfileId) {
+      // Profile was deleted or not found, clear storage
+      console.log('[PROFILE] Stored profile not found in list, clearing')
+      clearActiveProfile()
+      return null
+    }
+    return found || null
   }, [profiles, activeProfileId])
 
   // Select profile

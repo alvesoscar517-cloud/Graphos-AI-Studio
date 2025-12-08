@@ -118,8 +118,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
                   className={cn(
                     "bg-bg-primary border border-border-light rounded-xl",
                     "p-4 cursor-pointer transition-all duration-200 relative flex flex-col gap-2.5",
-                    "hover:border-border-hover hover:shadow-sm",
-                    selectedModel === model.id && "border-accent"
+                    "hover:border-border-hover hover:shadow-sm"
                   )}
                   onClick={() => handleSelectModel(model)}
                 >
@@ -132,21 +131,21 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
                       <h3 className="text-md font-semibold text-text-primary m-0 mb-1 flex items-center gap-2">
                         {model.name}
                         {selectedModel === model.id && (
-                          <span className="inline-flex items-center gap-1 py-0.5 px-2 bg-primary/10 text-primary rounded-md text-2xs font-semibold uppercase tracking-wide">
+                          <span className="inline-flex items-center gap-0.5 py-0.5 px-1.5 bg-primary/15 text-primary rounded-md text-[9px] font-medium uppercase">
                             {t('model.inUse')}
                           </span>
                         )}
                       </h3>
-                      <div className="flex items-center gap-1.5 text-2xs text-text-secondary">
-                        <Icon name="gauge" alt="speed" size="sm" color="muted" />
-                        <span>{model.speed}</span>
+                      <div className="flex items-center gap-1 text-[11px] text-text-secondary">
+                        <Icon name="gauge" alt="speed" size="xs" color="muted" />
+                        <span className="leading-none">{model.speed}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Description */}
-                  <div className="flex items-start gap-2.5 text-xs text-text-secondary leading-relaxed py-2.5 px-3 bg-bg-secondary rounded-lg">
-                    <Icon name="info" alt="info" size="sm" color="muted" className="flex-shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-2 text-xs text-text-secondary leading-relaxed py-2.5 px-3 bg-bg-secondary rounded-lg">
+                    <Icon name="info" alt="info" size="xs" color="muted" className="flex-shrink-0 mt-[3px]" />
                     <span>{model.description}</span>
                   </div>
 

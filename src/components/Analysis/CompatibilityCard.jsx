@@ -85,11 +85,17 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
       return
     }
 
+    // Check if profile is still loading (placeholder)
+    if (currentProfile._isPlaceholder) {
+      modal.error(t('analysis.profileLoading') || 'Profile is still loading, please wait...')
+      return
+    }
+
     // Debug: Log profile info before API call
     console.log('[DEBUG] CompatibilityCard - currentProfile:', {
       profile_id: currentProfile.profile_id,
       profile_name: currentProfile.profile_name,
-      fullProfile: currentProfile
+      isPlaceholder: currentProfile._isPlaceholder
     })
     
     if (!currentProfile.profile_id) {
@@ -103,8 +109,29 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
     try {
       const result = await analyzeText(currentProfile.profile_id, text)
       
+      // Debug: Log full result structure
+      console.log('[DEBUG] CompatibilityCard - Full result:', {
+        success: result.success,
+        hasData: !!result.data,
+        dataKeys: result.data ? Object.keys(result.data) : [],
+        voice_compatibility_score: result.data?.voice_compatibility_score,
+        vector_score: result.data?.vector_score,
+        statistical_score: result.data?.statistical_score,
+        isVectorScoreNaN: Number.isNaN(result.data?.vector_score),
+        isStatisticalScoreNaN: Number.isNaN(result.data?.statistical_score)
+      })
+      
       if (result.success && result.data) {
-        const compatibilityScore = Math.round(result.data.voice_compatibility_score || 0)
+        // Validate scores are valid numbers
+        const rawVoiceScore = result.data.voice_compatibility_score
+        const rawVectorScore = result.data.vector_score
+        const rawStatisticalScore = result.data.statistical_score
+        
+        if (!Number.isFinite(rawVectorScore) || !Number.isFinite(rawStatisticalScore)) {
+          console.warn('[WARN] Invalid scores received:', { rawVectorScore, rawStatisticalScore })
+        }
+        
+        const compatibilityScore = Math.round(Number.isFinite(rawVoiceScore) ? rawVoiceScore : 0)
         
         const resultData = {
           score: compatibilityScore,
@@ -270,16 +297,16 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                   <div className="flex items-center gap-2">
                     <span className="text-2xs text-text-secondary min-w-[55px]">{t('analysis.vector')}</span>
                     <div className="flex-1 h-1 bg-bg-secondary rounded-sm overflow-hidden">
-                      <div className="h-full rounded-sm bg-primary" style={{ width: `${analysisDetails.vector_score}%` }} />
+                      <div className="h-full rounded-sm bg-primary" style={{ width: `${Number.isFinite(analysisDetails.vector_score) ? analysisDetails.vector_score : 0}%` }} />
                     </div>
-                    <span className="text-xs font-semibold text-text-primary min-w-[38px] text-right">{Math.round(analysisDetails.vector_score)}%</span>
+                    <span className="text-xs font-semibold text-text-primary min-w-[38px] text-right">{Number.isFinite(analysisDetails.vector_score) ? Math.round(analysisDetails.vector_score) : 0}%</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-2xs text-text-secondary min-w-[55px]">{t('analysis.statistical')}</span>
                     <div className="flex-1 h-1 bg-bg-secondary rounded-sm overflow-hidden">
-                      <div className="h-full rounded-sm bg-success" style={{ width: `${analysisDetails.statistical_score}%` }} />
+                      <div className="h-full rounded-sm bg-success" style={{ width: `${Number.isFinite(analysisDetails.statistical_score) ? analysisDetails.statistical_score : 0}%` }} />
                     </div>
-                    <span className="text-xs font-semibold text-text-primary min-w-[38px] text-right">{Math.round(analysisDetails.statistical_score)}%</span>
+                    <span className="text-xs font-semibold text-text-primary min-w-[38px] text-right">{Number.isFinite(analysisDetails.statistical_score) ? Math.round(analysisDetails.statistical_score) : 0}%</span>
                   </div>
                   {analysisDetails.confidence && (
                     <div className="flex items-center gap-2 mt-1 pt-2 border-t border-dashed border-border-light">
@@ -374,12 +401,12 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="p-3 bg-bg-secondary rounded-lg">
                   <div className="text-2xs text-text-secondary mb-1">{t('analysis.vectorScore')}</div>
-                  <div className="text-xl font-semibold text-text-primary">{Math.round(analysisDetails.vector_score)}%</div>
+                  <div className="text-xl font-semibold text-text-primary">{Number.isFinite(analysisDetails.vector_score) ? Math.round(analysisDetails.vector_score) : 0}%</div>
                   <div className="text-2xs text-text-secondary">{t('analysis.semanticSimilarity')}</div>
                 </div>
                 <div className="p-3 bg-bg-secondary rounded-lg">
                   <div className="text-2xs text-text-secondary mb-1">{t('analysis.statisticalScore')}</div>
-                  <div className="text-xl font-semibold text-text-primary">{Math.round(analysisDetails.statistical_score)}%</div>
+                  <div className="text-xl font-semibold text-text-primary">{Number.isFinite(analysisDetails.statistical_score) ? Math.round(analysisDetails.statistical_score) : 0}%</div>
                   <div className="text-2xs text-text-secondary">{t('analysis.structuralSimilarity')}</div>
                 </div>
               </div>
@@ -389,11 +416,11 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                 <h4 className="text-sm font-semibold text-text-primary mb-3">{t('analysis.calculationWeights')}</h4>
                 <div className="flex justify-between text-xs py-1">
                   <span className="text-text-secondary">{t('analysis.embedding')}</span>
-                  <span className="text-text-primary font-medium">{Math.round(analysisDetails.embedding_weight * 100)}%</span>
+                  <span className="text-text-primary font-medium">{Number.isFinite(analysisDetails.embedding_weight) ? Math.round(analysisDetails.embedding_weight * 100) : 0}%</span>
                 </div>
                 <div className="flex justify-between text-xs py-1">
                   <span className="text-text-secondary">{t('analysis.statistical')}</span>
-                  <span className="text-text-primary font-medium">{Math.round(analysisDetails.statistical_weight * 100)}%</span>
+                  <span className="text-text-primary font-medium">{Number.isFinite(analysisDetails.statistical_weight) ? Math.round(analysisDetails.statistical_weight * 100) : 0}%</span>
                 </div>
               </div>
 

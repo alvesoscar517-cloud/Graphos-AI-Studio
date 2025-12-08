@@ -73,6 +73,11 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
       modal.error(t('analysis.currentNoteNotFound'))
       return
     }
+    // Check if profile is still loading (placeholder)
+    if (currentProfile._isPlaceholder) {
+      modal.error(t('analysis.profileLoading') || 'Profile is still loading, please wait...')
+      return
+    }
     
     setIsLoading(true)
     startProcessing('analyze')
