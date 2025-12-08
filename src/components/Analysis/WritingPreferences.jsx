@@ -89,8 +89,8 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange }
       </div>
 
       {isDisabled && (
-        <div className="flex items-start gap-2 py-2.5 px-3 bg-warning/10 border border-warning/20 rounded-lg text-xs text-warning mb-1">
-          <Icon name="alert-circle" alt={t('common.info')} size="md" color="warning" themed={false} className="shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 py-2.5 px-3 bg-bg-secondary border border-border-light rounded-xl text-xs text-text-secondary mb-1">
+          <Icon name="alert-circle" alt={t('common.info')} size="md" color="muted" className="shrink-0 mt-0.5" />
           <span>{t('writingPreferences.selectProfileNotice')}</span>
         </div>
       )}
@@ -177,7 +177,11 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange }
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2.5 pl-7">
+            <div 
+              className="flex items-center gap-2.5 pl-7"
+              onPointerDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+            >
               <input
                 type="range"
                 min="20"
@@ -185,7 +189,7 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange }
                 step="5"
                 value={localPreferences.targetAIProbability}
                 onChange={(e) => handleSliderChange('targetAIProbability', parseInt(e.target.value))}
-                className="flex-1 h-1.5 slider-primary"
+                className="flex-1 h-1.5 slider-primary touch-none"
                 disabled={isDisabled}
               />
               <span className="text-sm font-semibold text-primary min-w-[40px] text-right">{localPreferences.targetAIProbability}%</span>
@@ -196,7 +200,7 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange }
 
       {/* Info box */}
       {localPreferences.useAntiAIDetection && !isDisabled && (
-        <div className="flex items-start gap-2 py-2.5 px-3 bg-primary/5 border border-primary/20 rounded-lg mt-1">
+        <div className="flex items-start gap-2 py-2.5 px-3 bg-bg-secondary border border-border-light rounded-xl mt-1">
           <Icon name="info" alt={t('common.info')} size="sm" color="muted" className="shrink-0 mt-0.5" />
           <div className="text-xs text-text-secondary leading-relaxed">
             {t('writingPreferences.antiAIInfo')}

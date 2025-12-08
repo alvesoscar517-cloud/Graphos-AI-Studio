@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { motion } from 'framer-motion'
 import { useNotes } from '../../contexts/NotesContext'
 import { useWorkspace } from '../../contexts/WorkspaceContext'
 import { useUser, useAuthMethod, useHasGoogleLinked, useAuth } from '../../stores/authStore'
@@ -9,6 +10,7 @@ import modal from '../../utils/modal'
 
 import LinkGooglePrompt from '../Auth/LinkGooglePrompt'
 import { cn } from '../../lib/utils'
+import { createPortal } from 'react-dom'
 
 // Helper function to highlight search text
 const HighlightText = ({ text, searchTerm, regex }) => {
@@ -458,15 +460,36 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           <div className="flex items-center justify-between py-4 pr-0 bg-bg-tertiary w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] max-md:flex-col max-md:items-start max-md:p-3 max-md:pr-4 max-md:gap-3">
             <div className="flex items-center gap-4 max-md:w-full max-md:flex-col max-md:items-start max-md:gap-3">
               <h2 className="text-xl font-normal text-text-primary m-0">{t('history.title')}</h2>
-              <div className="flex gap-1 bg-bg-secondary p-1 rounded-lg max-md:w-full">
+              <div className="relative grid grid-cols-3 p-1 rounded-xl bg-bg-secondary border border-border-light max-md:w-full">
+                {/* Sliding Glass Indicator */}
+                <motion.div
+                  className={cn(
+                    "absolute top-1 bottom-1 rounded-lg",
+                    "bg-fill-tertiary border border-border-light",
+                    "shadow-sm backdrop-blur-sm",
+                    "col-span-1"
+                  )}
+                  initial={false}
+                  animate={{
+                    left: filterType === 'all' ? '4px' 
+                      : filterType === 'text' ? 'calc(33.33% + 1px)' 
+                      : 'calc(66.66% - 2px)',
+                  }}
+                  style={{ width: 'calc(33.33% - 3px)' }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 30
+                  }}
+                />
                 {['all', 'text', 'chat'].map(type => (
                   <button 
                     key={type}
                     className={cn(
-                      "bg-transparent border-none py-1.5 px-4 rounded-md text-sm font-medium text-text-secondary cursor-pointer transition-all duration-200",
-                      "hover:bg-bg-hover",
-                      "max-md:flex-1 max-md:text-center",
-                      filterType === type && "bg-bg-primary text-text-primary shadow-xs"
+                      "bg-transparent border-none py-1.5 px-5 rounded-lg z-10 text-sm font-medium cursor-pointer transition-colors duration-200 text-center",
+                      filterType === type 
+                        ? "text-text-primary" 
+                        : "text-text-muted hover:text-text-secondary"
                     )}
                     onClick={() => setFilterType(type)}
                   >

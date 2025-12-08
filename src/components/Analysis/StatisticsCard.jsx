@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
+import { useAIProcessingActions } from '@/stores'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import LazyLottie from '../Common/LazyLottie'
@@ -20,6 +21,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
   const [showResult, setShowResult] = useState(true)
   const [textChanged, setTextChanged] = useState(true)
   const { currentNote } = useNotes()
+  const { startProcessing, stopProcessing } = useAIProcessingActions()
 
   useEffect(() => {
     setStats(null)
@@ -73,6 +75,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
     }
     
     setIsLoading(true)
+    startProcessing('analyze')
     try {
       const result = await analyzeText(currentProfile.profile_id, text)
       
@@ -125,6 +128,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
       setSuggestions([])
     } finally {
       setIsLoading(false)
+      stopProcessing()
     }
   }
 

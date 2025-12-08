@@ -7,7 +7,7 @@
  * New code should import directly from '@/hooks/queries/useProfiles'
  */
 
-import { createContext, useContext, useCallback, useMemo } from 'react'
+import { createContext, useContext, useCallback, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useProfilesQuery, useCreateProfile, useUpdateProfile, useDeleteProfile } from '../hooks/queries/useProfiles'
 import { queryKeys } from '../lib/queryKeys'
@@ -30,6 +30,9 @@ export const useProfiles = () => {
 export const ProfileProvider = ({ children }) => {
   const queryClient = useQueryClient()
   
+  // Track active profile ID in state to trigger re-renders
+  const [activeProfileId, setActiveProfileId] = useState(() => getStorageActiveProfile().id)
+  
   // Use TanStack Query for profiles
   const { 
     data: profiles = [], 
@@ -42,12 +45,11 @@ export const ProfileProvider = ({ children }) => {
   const updateProfileMutation = useUpdateProfile()
   const deleteProfileMutation = useDeleteProfile()
 
-  // Get current profile from secure storage
+  // Get current profile from state + profiles array
   const currentProfile = useMemo(() => {
-    const { id: activeProfileId } = getStorageActiveProfile()
     if (!activeProfileId || profiles.length === 0) return null
     return profiles.find(p => p.profile_id === activeProfileId) || null
-  }, [profiles])
+  }, [profiles, activeProfileId])
 
   // Select profile
   const selectProfile = useCallback((profile) => {
@@ -55,13 +57,12 @@ export const ProfileProvider = ({ children }) => {
     
     if (profile) {
       setStorageActiveProfile(profile.profile_id, profile.profile_name)
+      setActiveProfileId(profile.profile_id)
     } else {
       clearActiveProfile()
+      setActiveProfileId(null)
     }
-    
-    // Force re-render by invalidating query
-    queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })
-  }, [queryClient])
+  }, [])
 
   // Load profiles (backward compatible - now just refetches)
   const loadProfiles = useCallback((force = false) => {
@@ -94,15 +95,15 @@ export const ProfileProvider = ({ children }) => {
       await deleteProfileMutation.mutateAsync(profileId)
       
       // Clear selection if deleted profile was active
-      const { id: activeId } = getStorageActiveProfile()
-      if (activeId === profileId) {
+      if (activeProfileId === profileId) {
         clearActiveProfile()
+        setActiveProfileId(null)
       }
     } catch (error) {
       console.error('[FAIL] Error deleting profile:', error)
       throw error
     }
-  }, [deleteProfileMutation])
+  }, [deleteProfileMutation, activeProfileId])
 
   // Update profile
   const updateProfile = useCallback(async (profileId, data) => {

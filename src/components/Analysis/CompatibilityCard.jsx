@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
+import { useAIProcessingActions } from '@/stores'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import Icon from '../Common/Icon'
@@ -12,6 +13,7 @@ import { cn } from '../../lib/utils'
 
 const CompatibilityCard = ({ disabled, currentProfile, text }) => {
   const { t } = useTranslation()
+  const { startProcessing, stopProcessing } = useAIProcessingActions()
 
   const formatBreakdownLabel = (key) => {
     const labels = {
@@ -82,8 +84,22 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
       modal.error(t('analysis.currentNoteNotFound'))
       return
     }
+
+    // Debug: Log profile info before API call
+    console.log('[DEBUG] CompatibilityCard - currentProfile:', {
+      profile_id: currentProfile.profile_id,
+      profile_name: currentProfile.profile_name,
+      fullProfile: currentProfile
+    })
+    
+    if (!currentProfile.profile_id) {
+      console.error('[ERROR] profile_id is missing from currentProfile!')
+      modal.error(t('analysis.profileIdMissing') || 'Profile ID is missing')
+      return
+    }
     
     setIsLoading(true)
+    startProcessing('analyze')
     try {
       const result = await analyzeText(currentProfile.profile_id, text)
       
@@ -120,6 +136,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
       setAnalysisDetails(null)
     } finally {
       setIsLoading(false)
+      stopProcessing()
     }
   }
 

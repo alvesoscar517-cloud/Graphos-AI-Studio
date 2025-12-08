@@ -86,13 +86,13 @@ const SettingsPopup = ({ onClose }) => {
                 onClick={() => handleThemeSelect(option.value)}
               >
                 <div className={cn(
-                  "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                  "w-5 h-5 rounded-full border-2 shrink-0 relative",
                   themeMode === option.value 
                     ? "border-text-primary" 
                     : "border-text-muted"
                 )}>
                   {themeMode === option.value && (
-                    <div className="w-2 h-2 rounded-full bg-text-primary" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                   )}
                 </div>
                 <Icon name={option.icon} size="md" />

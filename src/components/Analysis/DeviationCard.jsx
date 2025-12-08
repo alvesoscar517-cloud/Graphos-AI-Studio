@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
+import { useAIProcessingActions } from '@/stores'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import LazyLottie from '../Common/LazyLottie'
@@ -18,6 +19,7 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
   const [showResult, setShowResult] = useState(true)
   const [textChanged, setTextChanged] = useState(true)
   const { currentNote } = useNotes()
+  const { startProcessing, stopProcessing } = useAIProcessingActions()
 
   // Single useEffect to handle cache loading - avoid duplicate calls
   useEffect(() => {
@@ -47,6 +49,7 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
     }
     
     setIsLoading(true)
+    startProcessing('analyze')
     try {
       const progressToast = modal.toast(t('analysis.analyzing'), t('analysis.checkingStyleSuggestions'), 'info', { duration: 0 })
       const result = await analyzeText(currentProfile.profile_id, text)
@@ -81,6 +84,7 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
       modal.error(localizedError || t('analysis.analysisFailed'))
     } finally {
       setIsLoading(false)
+      stopProcessing()
     }
   }
 

@@ -15,6 +15,7 @@ import apiClient from '@/services/api/client'
 export function useProfilesQuery(options = {}) {
   const queryClient = useQueryClient()
   const unsubscribeRef = useRef(null)
+  const hasSetupRealtimeRef = useRef(false)
 
   const query = useQuery({
     queryKey: queryKeys.profiles.list(),
@@ -22,18 +23,23 @@ export function useProfilesQuery(options = {}) {
       const profiles = await loadProfilesAPI()
       return profiles || []
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes - profiles don't change often
-    refetchOnWindowFocus: false, // Disable to reduce API calls, realtime handles updates
+    staleTime: 2 * 60 * 1000, // 2 minutes - reduced to ensure fresher data
+    refetchOnWindowFocus: true, // Enable to catch updates when returning to tab
     refetchOnReconnect: true,
+    refetchOnMount: 'always', // Always refetch when component mounts to ensure fresh data
     ...options,
   })
 
   // Subscribe to real-time profile updates
   useEffect(() => {
+    // Prevent duplicate setup
+    if (hasSetupRealtimeRef.current) return
+    
     const setupRealtime = async () => {
       try {
         const { default: realtimeService } = await import('@/services/realtimeService')
 
+        // Subscribe to profile events
         unsubscribeRef.current = realtimeService.subscribe('profile', (data) => {
           console.log('[REALTIME] Profile update received:', data)
           // Invalidate to refetch on any profile change
@@ -41,6 +47,8 @@ export function useProfilesQuery(options = {}) {
             queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })
           }
         })
+        
+        hasSetupRealtimeRef.current = true
       } catch (err) {
         console.warn('Could not setup realtime profile updates:', err.message)
       }
@@ -53,6 +61,7 @@ export function useProfilesQuery(options = {}) {
         unsubscribeRef.current()
         unsubscribeRef.current = null
       }
+      hasSetupRealtimeRef.current = false
     }
   }, [queryClient])
 

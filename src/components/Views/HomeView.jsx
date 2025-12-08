@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { loadProfiles, getProfileDetails } from '../../services/api'
-import { getCachedProfiles, setCachedProfiles, checkCacheInvalidation } from '../../utils/profileCache'
+import { getProfileDetails } from '../../services/api'
 import { getCachedProfileDetail, setCachedProfileDetail } from '../../utils/profileDetailCache'
+import { useProfilesQuery } from '../../hooks/queries/useProfiles'
+import { useProfiles } from '../../contexts/ProfileContext'
 import ProfileCarousel from './Home/ProfileCarousel'
 import ProfileDetailPopup from '../Popups/ProfileDetailPopup'
 import modal from '../../utils/modal'
@@ -12,35 +13,12 @@ import { cn } from '../../lib/utils'
 const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [profiles, setProfiles] = useState([])
-  const [loading, setLoading] = useState(true)
   const [selectedProfile, setSelectedProfile] = useState(null)
   const [showDetailPopup, setShowDetailPopup] = useState(false)
+  const { selectProfile } = useProfiles()
   
-  useEffect(() => {
-    loadProfilesData()
-  }, [])
-
-  const loadProfilesData = async () => {
-    try {
-      checkCacheInvalidation()
-      const cached = getCachedProfiles()
-      if (cached) {
-        setProfiles(cached)
-        setLoading(false)
-        return
-      }
-      setLoading(true)
-      const data = await loadProfiles()
-      setProfiles(data)
-      setCachedProfiles(data)
-    } catch (error) {
-      console.error('Error loading profiles:', error)
-      modal.error(t('home.unableToLoadProfiles'))
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Use TanStack Query with realtime updates instead of manual cache
+  const { data: profiles = [], isLoading: loading } = useProfilesQuery()
 
   const handleSelectProfile = async (profile) => {
     try {
@@ -61,17 +39,13 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
   }
 
   const handleUseProfile = (profile) => {
-    localStorage.setItem('activeProfileId', profile.profile_id)
-    localStorage.setItem('activeProfileName', profile.profile_name)
-    modal.toast(t('home.profileSelected'), profile.profile_name, 'success')
+    selectProfile(profile)
     setShowDetailPopup(false)
     onViewChange('aistudio-editor', { createNew: true })
   }
 
   const handleUseProfileFromCard = (profile) => {
-    localStorage.setItem('activeProfileId', profile.profile_id)
-    localStorage.setItem('activeProfileName', profile.profile_name)
-    modal.toast(t('home.profileSelected'), profile.profile_name, 'success')
+    selectProfile(profile)
     onViewChange('aistudio-editor', { createNew: true })
   }
   

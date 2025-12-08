@@ -213,7 +213,6 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
           </div>
           <div className="flex items-center gap-1.5 text-text-muted text-xs">
             <img src="/icon/credit-card.svg" alt="Card" title={t('billing.creditDebitCard')} className="w-3.5 h-3.5 opacity-50 icon-invert" />
-            <span className="opacity-30">•</span>
             <span className="opacity-70">{t('billing.paymentMethods')}</span>
           </div>
         </div>

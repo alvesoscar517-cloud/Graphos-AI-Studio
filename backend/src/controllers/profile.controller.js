@@ -880,6 +880,7 @@ exports.getProfiles = async (req, res) => {
         sample_count: profileData.samplesCount || 0, // Use stored count instead of querying
         quality_score: profileData.qualityScore || null,
         quality_rating: profileData.qualityRating || null,
+        voice_profile: profileData.voiceProfile || null, // Include voice profile for UI display
         created_at: profileData.createdAt?.toDate().toISOString()
       };
     });

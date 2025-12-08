@@ -21,6 +21,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
   const { selectedModel, setSelectedModel, writingPreferences, setWritingPreferences } = useRewrite()
   const [mode, setMode] = useState('analysis') // 'analysis' or 'rewrite'
   const [isDragging, setIsDragging] = useState(false)
+  const [isInteractingWithSlider, setIsInteractingWithSlider] = useState(false)
 
   // Notify parent when mode changes
   const handleModeChange = (newMode) => {
@@ -36,6 +37,17 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
 
   const hasText = currentNote && currentNote.content && currentNote.content.trim().length > 0
   const hasProfile = currentProfile !== null
+
+  // Handle pointer down to detect slider interaction
+  const handlePointerDown = (e) => {
+    if (e.target.tagName === 'INPUT' && e.target.type === 'range') {
+      setIsInteractingWithSlider(true)
+    }
+  }
+
+  const handlePointerUp = () => {
+    setIsInteractingWithSlider(false)
+  }
 
   return (
     <motion.aside 
@@ -59,7 +71,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
         damping: 30,
         mass: 0.8
       }}
-      drag={hidden ? false : "x"}
+      drag={hidden || isInteractingWithSlider ? false : "x"}
       dragConstraints={{ left: 0, right: 300 }}
       dragElastic={0.15}
       dragMomentum={false}
@@ -68,6 +80,9 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
         setIsDragging(false)
         if (info.offset.x > 80 && !hidden) onClose?.()
       }}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
       style={{
         pointerEvents: hidden ? 'none' : 'auto',
         overflow: hidden ? 'hidden' : undefined,
@@ -76,18 +91,33 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     >
       {/* Header */}
       <div className="flex items-center gap-2 py-3 px-4 h-14 justify-start shrink-0">
-        {/* Mode Toggle */}
-        <div className="flex gap-1 bg-bg-tertiary/80 backdrop-blur-sm p-1 rounded-xl flex-1 border border-border-light">
+        {/* Mode Toggle - Glass Slider */}
+        <div className="relative flex p-1 rounded-xl flex-1 bg-bg-secondary border border-border-light">
+          {/* Sliding Glass Indicator */}
+          <motion.div
+            className={cn(
+              "absolute top-1 bottom-1 rounded-lg",
+              "bg-fill-tertiary border border-border-light",
+              "shadow-sm backdrop-blur-sm"
+            )}
+            initial={false}
+            animate={{
+              left: mode === 'analysis' ? '4px' : '50%',
+              width: 'calc(50% - 4px)'
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 400,
+              damping: 30
+            }}
+          />
+          
           <button 
             className={cn(
-              "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2",
-              "border-none rounded-lg cursor-pointer",
-              "text-xs font-normal text-text-secondary",
-              "transition-all duration-200",
-              "hover:text-text-primary",
-              mode === 'analysis' 
-                ? "bg-primary/20 text-primary shadow-sm border border-primary/30" 
-                : "bg-transparent"
+              "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 z-10",
+              "bg-transparent border-none rounded-lg cursor-pointer",
+              "text-xs font-medium transition-colors duration-200",
+              mode === 'analysis' ? "text-text-primary" : "text-text-muted hover:text-text-secondary"
             )}
             onClick={() => handleModeChange('analysis')}
           >
@@ -95,21 +125,17 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
               name="bar-chart-4" 
               alt={t('rightSidebar.analysis')} 
               size="sm"
-              color={mode === 'analysis' ? 'primary' : 'muted'}
-              themed={mode !== 'analysis'}
+              color="muted"
+              themed
             />
             <span>{t('rightSidebar.analysis')}</span>
           </button>
           <button 
             className={cn(
-              "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2",
-              "border-none rounded-lg cursor-pointer",
-              "text-xs font-normal text-text-secondary",
-              "transition-all duration-200",
-              "hover:text-text-primary",
-              mode === 'rewrite' 
-                ? "bg-primary/20 text-primary shadow-sm border border-primary/30" 
-                : "bg-transparent"
+              "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 z-10",
+              "bg-transparent border-none rounded-lg cursor-pointer",
+              "text-xs font-medium transition-colors duration-200",
+              mode === 'rewrite' ? "text-text-primary" : "text-text-muted hover:text-text-secondary"
             )}
             onClick={() => handleModeChange('rewrite')}
           >
@@ -117,8 +143,8 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
               name="pen" 
               alt={t('rightSidebar.rewrite')} 
               size="sm"
-              color={mode === 'rewrite' ? 'primary' : 'muted'}
-              themed={mode !== 'rewrite'}
+              color="muted"
+              themed
             />
             <span>{t('rightSidebar.rewrite')}</span>
           </button>

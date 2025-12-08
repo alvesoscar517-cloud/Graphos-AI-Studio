@@ -89,19 +89,21 @@ const UserProfilePopup = ({ onClose }) => {
           />
         </div>
 
-        <div className="h-px bg-border-light" />
-        
-        <button 
-          onClick={handleSignOut}
-          className={cn(
-            "w-full bg-none border-none py-3.5 px-5 text-center text-xs",
-            "text-text-primary cursor-pointer font-medium",
-            "hover:bg-bg-hover"
-          )}
-        >
-          {t('auth.signOut')}
-        </button>
-        <div className="h-px bg-border-light" />
+        <div className="px-5 pb-4">
+          <button 
+            onClick={handleSignOut}
+            className={cn(
+              "w-full py-2.5 px-4 rounded-lg text-sm font-medium",
+              "bg-transparent border border-border-light",
+              "text-text-secondary cursor-pointer",
+              "hover:bg-bg-hover hover:text-text-primary hover:border-border-hover",
+              "transition-colors flex items-center justify-center gap-2"
+            )}
+          >
+            <Icon name="log-out" size="sm" />
+            {t('auth.signOut')}
+          </button>
+        </div>
         <div className="py-2 px-5 text-center text-[10px] text-text-muted">
           <a href="#" className="text-text-muted no-underline hover:underline">
             {t('auth.privacyPolicy')}

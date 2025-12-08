@@ -7,9 +7,11 @@
  */
 import { useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '../../lib/utils'
 import { createProfileComplete } from '../../services/api'
 import { clearAllProfileDetailCaches } from '../../utils/profileDetailCache'
+import { queryKeys } from '../../lib/queryKeys'
 import useProfileSetup, { getDraftTimeAgo } from './hooks/useProfileSetup'
 import { Step1NameTheme, Step2LongText, Step3ShortSamples, Step4Processing } from './steps'
 import PasteTextModal from './PasteTextModal'
@@ -60,6 +62,7 @@ const useForceLightMode = () => {
 
 const ProfileSetup = () => {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
   
   // Force light mode for this feature - dark mode is not supported
   useForceLightMode()
@@ -239,6 +242,9 @@ const ProfileSetup = () => {
         }
         
         clearAllProfileDetailCaches()
+        
+        // Invalidate TanStack Query cache to ensure HomeView shows new profile
+        queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })
         
         // Step 3: Finalizing
         setProcessingStep(3)

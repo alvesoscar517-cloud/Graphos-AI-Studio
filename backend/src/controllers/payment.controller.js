@@ -325,7 +325,7 @@ async function handleOrderCreated(data, customData) {
       const totalCredits = foundPkg.credits + foundPkg.bonus;
       await autoNotification.sendPurchaseNotification(
         userId,
-        orderData.variantName || orderData.productName || packageId,
+        foundPkg.description || orderData.variantName || orderData.productName || packageId,
         totalCredits,
         newCredits.balance || newCredits
       );

@@ -125,16 +125,33 @@ exports.analyzeText = async (req, res) => {
   try {
     const { profile_id, text, user_id, use_cache = true } = req.body;
 
+    // Debug: Log incoming request
+    logger.info('[DEBUG] analyzeText request received', {
+      profile_id,
+      profile_id_type: typeof profile_id,
+      has_profile_id: !!profile_id,
+      text_length: text?.length,
+      user_id
+    });
+
     const profileId = validateProfileId(profile_id);
     const validText = validateText(text, 10, 20000);
 
     if (use_cache) {
       const cachedResult = cacheService.getCachedAnalysis(profileId, validText);
       if (cachedResult) {
-        logger.info('Analysis cache hit', { profileId });
-        // Localize cached result
+        logger.info('Analysis cache hit', { 
+          profileId,
+          cachedHasSuccess: cachedResult.success,
+          cachedKeys: Object.keys(cachedResult).slice(0, 10)
+        });
+        // Localize cached result and ensure success flag is present
         const localizedResult = l.localizeResult(cachedResult);
-        return res.json({ ...localizedResult, cache_hit: true });
+        return res.json({ 
+          success: true, // Ensure success flag is always present
+          ...localizedResult, 
+          cache_hit: true 
+        });
       }
     }
 

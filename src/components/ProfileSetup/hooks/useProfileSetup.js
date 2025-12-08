@@ -4,7 +4,9 @@
  */
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { splitTextIntoChunks, validateSampleText } from '../../../utils/textSplitter'
+import { queryKeys } from '../../../lib/queryKeys'
 import modal from '../../../utils/modal'
 
 // Constants
@@ -252,6 +254,7 @@ export const detectDuplicates = (chunks, existingChunks = []) => {
  */
 export const useProfileSetup = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [currentStep, setCurrentStep] = useState(1)
   const [animationKey, setAnimationKey] = useState(0)
   const mountedRef = useRef(true)
@@ -753,11 +756,19 @@ export const useProfileSetup = () => {
     // Clear draft on successful completion
     clearDraft()
     
+    // Set active profile
     localStorage.setItem('activeProfileId', profileData.profileId)
     localStorage.setItem('activeProfileName', profileData.name)
+    
+    // Invalidate TanStack Query cache to force refetch on HomeView
+    // This ensures the new profile appears immediately even if realtime hasn't synced yet
+    queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })
+    
+    // Also keep legacy flag for backward compatibility
     localStorage.setItem('profileCacheInvalidated', 'true')
+    
     navigate('/')
-  }, [profileData.profileId, profileData.name, navigate])
+  }, [profileData.profileId, profileData.name, navigate, queryClient])
 
   // Restore draft
   const handleRestoreDraft = useCallback(async () => {

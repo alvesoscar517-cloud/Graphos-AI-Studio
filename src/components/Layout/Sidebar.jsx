@@ -64,8 +64,8 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
         "bg-bg-tertiary",
         "border-r border-separator",
         "flex flex-col overflow-y-auto overflow-x-hidden scrollbar-thin",
-        "h-screen touch-pan-y shrink-0",
-        isDragging ? "z-[100] shadow-xl" : "z-sidebar"
+        "h-screen touch-pan-y shrink-0 relative",
+        isDragging ? "z-[100] shadow-xl" : "z-[50]"
       )}
       initial={false}
       animate={{ 
@@ -75,8 +75,8 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
       }}
       transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.8 }}
       drag={hidden ? false : "x"}
-      dragConstraints={{ left: -220, right: 0 }}
-      dragElastic={0.15}
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.2}
       dragMomentum={false}
       onDragStart={() => setIsDragging(true)}
       onDragEnd={(_, info) => {
@@ -85,6 +85,7 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
       }}
       style={{ 
         pointerEvents: hidden ? 'none' : 'auto',
+        overflow: hidden ? 'hidden' : undefined,
         minWidth: isDragging ? 220 : undefined
       }}
     >

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { detectAI as detectAIAPI } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
+import { useAIProcessingActions } from '@/stores'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import { handleCreditError } from '../../utils/creditHandler'
@@ -41,6 +42,7 @@ const AIDetectionCard = ({ disabled, text }) => {
   const [textChanged, setTextChanged] = useState(true)
   const [analysisDetails, setAnalysisDetails] = useState(null)
   const { currentNote } = useNotes()
+  const { startProcessing, stopProcessing } = useAIProcessingActions()
 
   useEffect(() => {
     setResult(null)
@@ -117,6 +119,7 @@ const AIDetectionCard = ({ disabled, text }) => {
     }
     
     setIsLoading(true)
+    startProcessing('detect')
     try {
       const apiResult = await detectAIAPI(text)
       
@@ -184,6 +187,7 @@ const AIDetectionCard = ({ disabled, text }) => {
       setAnalysisDetails(null)
     } finally {
       setIsLoading(false)
+      stopProcessing()
     }
   }
 
@@ -265,6 +269,12 @@ const AIDetectionCard = ({ disabled, text }) => {
                   viewBox="0 0 100 100"
                   style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08))' }}
                 >
+                  <defs>
+                    <linearGradient id="aiDetectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#e8f4fd" />
+                      <stop offset="100%" stopColor="#4285f4" />
+                    </linearGradient>
+                  </defs>
                   {/* Background circle - transparent fill */}
                   <circle 
                     className="fill-none" 
@@ -279,7 +289,7 @@ const AIDetectionCard = ({ disabled, text }) => {
                     className="fill-none"
                     cx="50" cy="50" r="42"
                     style={{
-                      stroke: 'var(--color-text-link)',
+                      stroke: 'url(#aiDetectionGradient)',
                       strokeWidth: 8,
                       strokeDasharray: 263.89,
                       strokeDashoffset: 263.89 - (result / 100) * 263.89,
@@ -298,12 +308,14 @@ const AIDetectionCard = ({ disabled, text }) => {
               </div>
               
               {/* Verdict */}
-              <div className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-bg-secondary rounded-lg text-xs font-medium text-text-primary">
-                <Icon 
-                  name={result < 30 ? "shield-check" : result < 50 ? "check-circle" : result < 70 ? "alert-circle" : "alert-triangle"} 
-                  size="sm" color="primary" className="flex-shrink-0 -mt-px"
-                />
-                <span className="whitespace-nowrap flex-shrink-0 leading-none">{verdict}</span>
+              <div className="w-full flex justify-center">
+                <div className="inline-flex items-center gap-2 py-2 px-3 bg-bg-secondary border border-border-light rounded-lg text-xs font-medium text-text-primary">
+                  <Icon 
+                    name={result < 30 ? "shield-check" : result < 50 ? "check-circle" : result < 70 ? "alert-circle" : "alert-triangle"} 
+                    size="sm" color="primary" className="flex-shrink-0 -mt-px"
+                  />
+                  <span className="whitespace-nowrap leading-none">{verdict}</span>
+                </div>
               </div>
               
               {/* Confidence Indicator */}
@@ -329,8 +341,8 @@ const AIDetectionCard = ({ disabled, text }) => {
               
               {/* Low Confidence Warning */}
               {confidence !== null && confidence < 60 && (
-                <div className="w-full flex items-center gap-2 py-2 px-3 bg-warning/10 border border-warning/30 rounded-lg text-2xs text-warning leading-relaxed">
-                  <Icon name="alert-circle" size="sm" color="warning" className="flex-shrink-0" />
+                <div className="w-full flex items-center gap-1.5 py-1.5 px-2.5 bg-bg-secondary border border-border-light rounded-lg text-xs text-text-muted leading-normal">
+                  <Icon name="info" size="xs" color="muted" className="flex-shrink-0 opacity-50" />
                   <span>{t('analysis.lowConfidenceWarning')}</span>
                 </div>
               )}
@@ -373,7 +385,7 @@ const AIDetectionCard = ({ disabled, text }) => {
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-6">
               {/* Summary Section - Score, Verdict, Stats in one block */}
-              <div className="p-4 bg-bg-secondary rounded-xl mb-5">
+              <div className="p-4 bg-fill-tertiary border border-border-light rounded-xl mb-5">
                 {/* Score */}
                 <div className="flex items-center justify-between mb-4">
                   <div>
@@ -425,11 +437,13 @@ const AIDetectionCard = ({ disabled, text }) => {
                     <Icon name="user-check" size="sm" color="primary" />
                     {t('analysis.humanIndicators')} ({humanIndicators.length})
                   </h4>
-                  <div className="flex flex-col gap-3 p-4 bg-bg-secondary rounded-xl">
+                  <div className="flex flex-col gap-3 p-4 bg-fill-tertiary border border-border-light rounded-xl">
                     {humanIndicators.map((item, index) => (
-                      <div key={index} className="flex items-start gap-2 text-xs leading-relaxed">
-                        <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-2xs font-semibold bg-success/15 text-success">OK</span>
-                        <span className="text-text-primary">{item}</span>
+                      <div key={index} className="flex items-center gap-2 text-xs">
+                        <span className="flex-shrink-0 p-1 rounded bg-success/15">
+                          <Icon name="check" size="xs" color="success" />
+                        </span>
+                        <span className="text-text-primary leading-normal">{item}</span>
                       </div>
                     ))}
                   </div>
@@ -443,11 +457,13 @@ const AIDetectionCard = ({ disabled, text }) => {
                     <Icon name="cpu" size="sm" color="primary" />
                     {t('analysis.aiIndicators')} ({aiIndicators.length})
                   </h4>
-                  <div className="flex flex-col gap-3 p-4 bg-bg-secondary rounded-xl">
+                  <div className="flex flex-col gap-3 p-4 bg-fill-tertiary border border-border-light rounded-xl">
                     {aiIndicators.map((item, index) => (
-                      <div key={index} className="flex items-start gap-2 text-xs leading-relaxed">
-                        <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-2xs font-semibold bg-warning/15 text-warning">⚠</span>
-                        <span className="text-text-primary">{item}</span>
+                      <div key={index} className="flex items-center gap-2 text-xs">
+                        <span className="flex-shrink-0 p-1 rounded bg-warning/15">
+                          <Icon name="alert-triangle" size="xs" color="warning" />
+                        </span>
+                        <span className="text-text-primary leading-normal">{item}</span>
                       </div>
                     ))}
                   </div>
@@ -461,7 +477,7 @@ const AIDetectionCard = ({ disabled, text }) => {
                   {t('analysis.analysisEvidence')}
                 </h4>
                 {evidence && evidence.length > 0 ? (
-                  <div className="flex flex-col gap-3 p-4 bg-bg-secondary rounded-xl">
+                  <div className="flex flex-col gap-3 p-4 bg-fill-tertiary border border-border-light rounded-xl">
                     {evidence.map((item, index) => (
                       <p key={index} className="text-xs leading-relaxed text-text-primary m-0">
                         {formatEvidenceText(item)}

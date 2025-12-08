@@ -27,6 +27,13 @@
   --color-accent: #0071E3;
   --color-accent-hover: #0077ED;
   
+  /* Shimmer effect colors - Light Mode (sweep effect like Facebook/LinkedIn) */
+  --shimmer-base-color: rgba(60, 60, 67, 0.6);
+  --shimmer-highlight-color: rgba(0, 113, 227, 1);
+  /* Legacy variables for compatibility */
+  --shimmer-color-start: rgba(60, 60, 67, 0.6);
+  --shimmer-color-mid: rgba(0, 113, 227, 1);
+  
   /* Apple Label Colors - Light Mode (Text) */
   --color-label-primary: rgba(0, 0, 0, 1);
   --color-label-secondary: rgba(60, 60, 67, 0.6);
@@ -420,6 +427,13 @@
   --color-accent: #0071E3;
   --color-accent-hover: #0077ED;
   
+  /* Shimmer effect colors - Dark Mode (sweep effect like Facebook/LinkedIn) */
+  --shimmer-base-color: rgba(235, 235, 245, 0.7);
+  --shimmer-highlight-color: #4da6ff;
+  /* Legacy variables for compatibility */
+  --shimmer-color-start: rgba(235, 235, 245, 0.7);
+  --shimmer-color-mid: #4da6ff;
+  
   /* Apple Label Colors - Dark Mode (Text) */
   --color-label-primary: rgba(255, 255, 255, 1);
   --color-label-secondary: rgba(235, 235, 245, 0.6);
@@ -533,6 +547,17 @@
   to { transform: scale(1); opacity: 1; }
 }
 
+/* Shimmer sweep effect - ánh sáng quét từ trái sang phải (kiểu Facebook/LinkedIn/YouTube) */
+@keyframes shimmer-sweep {
+  0% { 
+    background-position: 100% center; 
+  }
+  100% { 
+    background-position: -100% center; 
+  }
+}
+
+/* Legacy shimmer animation for compatibility */
 @keyframes shimmer {
   0% { background-position: 100% center; }
   100% { background-position: -100% center; }
@@ -827,10 +852,10 @@
 }
 
 .toolbar-btn.active {
-  background-color: rgba(59, 130, 246, 0.1);
+  background-color: transparent;
   border-color: var(--color-primary);
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .toolbar-btn.danger {
@@ -1497,7 +1522,7 @@
 }
 
 .dark .toolbar-btn.active {
-  background-color: rgba(10, 132, 255, 0.15);
+  background-color: transparent;
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
@@ -2257,3 +2282,22 @@
 .filter-yellow-to-blue {
   filter: hue-rotate(180deg) saturate(1.1);
 }
+
+/* ============================================
+   Z-Index Utility Classes
+   ============================================ */
+.z-base { z-index: var(--z-base); }
+.z-dropdown { z-index: var(--z-dropdown); }
+.z-sticky { z-index: var(--z-sticky); }
+.z-fixed { z-index: var(--z-fixed); }
+.z-sidebar { z-index: var(--z-sidebar); }
+.z-toolbar { z-index: var(--z-toolbar); }
+.z-menu-backdrop { z-index: var(--z-menu-backdrop); }
+.z-menu { z-index: var(--z-menu); }
+.z-popup { z-index: var(--z-popup); }
+.z-popup-submenu { z-index: var(--z-popup-submenu); }
+.z-modal-backdrop { z-index: var(--z-modal-backdrop); }
+.z-modal { z-index: var(--z-modal); }
+.z-modal-nested { z-index: var(--z-modal-nested); }
+.z-overlay-high { z-index: var(--z-overlay-high); }
+.z-toast { z-index: var(--z-toast); }

@@ -17,6 +17,20 @@ export async function analyzeText(profileId, text, options = {}) {
   const endpoint = 'analyze'
   perfMonitor.start(endpoint)
   
+  // Debug: Log incoming parameters
+  console.log('[DEBUG] analyzeText called with:', {
+    profileId,
+    profileIdType: typeof profileId,
+    textLength: text?.length,
+    hasProfileId: !!profileId
+  })
+  
+  // Validate profileId
+  if (!profileId) {
+    console.error('[ERROR] analyzeText: profileId is missing or undefined!')
+    throw new AnalysisError('Profile ID is required for analysis')
+  }
+  
   try {
     // Validate text before sending
     const validation = validateTextBeforeAI(text, 'gemini-2.5-flash', { task: 'analyze' })
@@ -30,11 +44,27 @@ export async function analyzeText(profileId, text, options = {}) {
       console.warn('[WARNING] Warnings:', validation.warnings)
     }
     
-    // Use deduplicated request to prevent duplicate concurrent analysis calls
-    const { data } = await apiClient.postDeduplicated('/analyze', {
+    // Debug: Log request payload
+    const requestPayload = {
       profile_id: profileId,
       text: text,
       text_stats: validation.stats
+    }
+    console.log('[DEBUG] Sending analyze request:', {
+      profile_id: requestPayload.profile_id,
+      textLength: requestPayload.text?.length
+    })
+    
+    // Use deduplicated request to prevent duplicate concurrent analysis calls
+    const { data } = await apiClient.postDeduplicated('/analyze', requestPayload)
+    
+    // Debug: Log response data
+    console.log('[DEBUG] Analyze response:', {
+      success: data.success,
+      hasData: !!data,
+      keys: data ? Object.keys(data).slice(0, 10) : [],
+      error: data?.error,
+      cache_hit: data?.cache_hit
     })
     
     if (!data.success) {

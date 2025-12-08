@@ -42,52 +42,59 @@ const AIStudioEditorEnhanced = ({
   const prevContentRef = useRef(null)
   const prevNoteIdRef = useRef(null)
 
-  // TEMPORARILY DISABLED - Auto-generate title effect
-  // This effect was causing potential infinite loops
-  // TODO: Re-enable after fixing the root cause
-  /*
+  // Auto-generate title when user types/pastes content
   useEffect(() => {
     const note = currentNoteRef.current
-    const noteId = note?.id
-    const content = note?.content?.trim() || ''
+    if (!note) return
     
-    // Skip if note ID or content hasn't actually changed
+    const noteId = note.id
+    const content = note.content?.trim() || ''
+    
+    // Skip if note ID hasn't changed but content is the same
     if (prevNoteIdRef.current === noteId && prevContentRef.current === content) {
       return
     }
+    
+    // Update refs
     prevNoteIdRef.current = noteId
     prevContentRef.current = content
     
-    if (!note || note.userEditedTitle || note.titleGenerated || note.title !== 'Untitled') {
+    // Skip if title already generated or user edited
+    if (note.userEditedTitle || note.titleGenerated || note.title !== 'Untitled') {
       return
     }
     
-    if (!content || content.length < 20 || isGeneratingTitleRef.current) {
+    // Need at least 15 characters to generate title
+    if (!content || content.length < 15 || isGeneratingTitleRef.current) {
       return
     }
 
+    // Clear any pending timeout
     if (titleGenerationTimeoutRef.current) {
       clearTimeout(titleGenerationTimeoutRef.current)
     }
 
-    // Generate title from first characters (no AI call)
+    // Generate title after short delay (500ms for quick response)
     titleGenerationTimeoutRef.current = setTimeout(() => {
       const currentNoteNow = currentNoteRef.current
-      if (isGeneratingTitleRef.current || !currentNoteNow) return
+      if (!currentNoteNow || currentNoteNow.id !== noteId) return
+      if (isGeneratingTitleRef.current) return
       if (currentNoteNow.title !== 'Untitled' || currentNoteNow.userEditedTitle || currentNoteNow.titleGenerated) return
       
       isGeneratingTitleRef.current = true
       try {
         const currentContent = currentNoteNow.content?.trim() || ''
+        if (currentContent.length < 15) return
+        
         const firstSentence = currentContent.split(/[.!?。\n]/)[0]?.trim() || currentContent
         const newTitle = truncateTitleByWords(firstSentence, 7)
-        if (newTitle) {
+        if (newTitle && newTitle.length > 0) {
           updateNoteRef.current(currentNoteNow.id, { title: newTitle, titleGenerated: true })
         }
       } finally {
         isGeneratingTitleRef.current = false
       }
-    }, 1500)
+    }, 500)
 
     return () => {
       if (titleGenerationTimeoutRef.current) {
@@ -95,7 +102,6 @@ const AIStudioEditorEnhanced = ({
       }
     }
   }, [currentNote?.content, currentNote?.id])
-  */
 
   // Track previous externalAnalysisData to avoid duplicate processing
   const prevAnalysisDataRef = useRef(null)

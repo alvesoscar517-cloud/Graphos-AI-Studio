@@ -13,6 +13,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
   const { currentProfile, selectProfile } = useProfiles()
   const { modelSettings, updateModelSettings } = useWorkspace()
   const [isDragging, setIsDragging] = useState(false)
+  const [isInteractingWithSlider, setIsInteractingWithSlider] = useState(false)
 
   const chatSettings = modelSettings.chatSettings || {}
 
@@ -107,7 +108,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
         damping: 30,
         mass: 0.8
       }}
-      drag={hidden ? false : "x"}
+      drag={hidden || isInteractingWithSlider ? false : "x"}
       dragConstraints={{ left: 0, right: 300 }}
       dragElastic={0.15}
       dragMomentum={false}
@@ -116,6 +117,14 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
         setIsDragging(false)
         if (info.offset.x > 80 && !hidden) onClose?.()
       }}
+      onPointerDown={(e) => {
+        const target = e.target
+        if (target instanceof HTMLInputElement && target.type === 'range') {
+          setIsInteractingWithSlider(true)
+        }
+      }}
+      onPointerUp={() => setIsInteractingWithSlider(false)}
+      onPointerLeave={() => setIsInteractingWithSlider(false)}
       style={{
         pointerEvents: hidden ? 'none' : 'auto',
         overflow: hidden ? 'hidden' : undefined,
@@ -193,10 +202,10 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
 
           {!currentProfile && (
             <div className={cn(
-              "flex items-start gap-2 py-2.5 px-3 mt-1 rounded-lg text-xs",
-              "bg-warning/10 border border-warning/20 text-warning"
+              "flex items-start gap-2 py-2.5 px-3 mt-1 rounded-xl text-xs",
+              "bg-bg-secondary border border-border-light text-text-secondary"
             )}>
-              <Icon name="alert-circle" size="sm" color="warning" className="shrink-0 mt-0.5" />
+              <Icon name="alert-circle" size="sm" color="muted" className="shrink-0 mt-0.5" />
               <span>{t('workspace.selectProfileNotice')}</span>
             </div>
           )}
@@ -242,8 +251,10 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
                 type="range" min="20" max="50" step="5"
                 value={chatSettings.targetAIProbability || 35}
                 onChange={(e) => handleSettingChange('targetAIProbability', parseInt(e.target.value))}
+                onPointerDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
                 className={cn(
-                  "w-full h-1 rounded appearance-none cursor-pointer",
+                  "w-full h-1 rounded appearance-none cursor-pointer touch-none",
                   "bg-bg-tertiary",
                   "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4",
                   "[&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-full",
@@ -266,18 +277,40 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
             <span>{t('workspace.responseStyle')}</span>
           </div>
           
+          {/* Length - Glass Slider */}
           <div className="flex flex-col gap-1.5">
             <span className="text-xs text-text-secondary">{t('workspace.length')}</span>
-            <div className="flex gap-1 p-1 rounded-lg bg-bg-secondary border border-border-light">
+            <div className="relative flex p-1 rounded-xl bg-bg-secondary border border-border-light">
+              {/* Sliding Glass Indicator */}
+              <motion.div
+                className={cn(
+                  "absolute top-1 bottom-1 rounded-lg",
+                  "bg-fill-tertiary border border-border-light",
+                  "shadow-sm backdrop-blur-sm"
+                )}
+                initial={false}
+                animate={{
+                  left: (chatSettings.responseStyle || 'balanced') === 'concise' ? '4px' 
+                      : (chatSettings.responseStyle || 'balanced') === 'balanced' ? 'calc(33.33% + 2px)' 
+                      : 'calc(66.66%)',
+                  width: 'calc(33.33% - 4px)'
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 30
+                }}
+              />
               {responseStyles.map((style) => (
                 <button
                   key={style.value}
                   className={cn(
-                    "flex-1 py-2 px-3 bg-transparent border-none rounded-md",
-                    "text-xs font-medium text-text-secondary cursor-pointer whitespace-nowrap",
-                    "transition-all duration-200",
-                    "hover:text-text-primary hover:bg-bg-tertiary",
-                    (chatSettings.responseStyle || 'balanced') === style.value && "bg-bg-primary text-primary shadow-sm"
+                    "flex-1 py-2 px-2 bg-transparent border-none rounded-lg z-10",
+                    "text-xs font-medium cursor-pointer whitespace-nowrap",
+                    "transition-colors duration-200",
+                    (chatSettings.responseStyle || 'balanced') === style.value 
+                      ? "text-text-primary" 
+                      : "text-text-muted hover:text-text-secondary"
                   )}
                   onClick={() => handleSettingChange('responseStyle', style.value)}
                 >
@@ -287,18 +320,40 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
             </div>
           </div>
 
+          {/* Creativity - Glass Slider */}
           <div className="flex flex-col gap-1.5">
             <span className="text-xs text-text-secondary">{t('workspace.creativity')}</span>
-            <div className="flex gap-1 p-1 rounded-lg bg-bg-secondary border border-border-light">
+            <div className="relative flex p-1 rounded-xl bg-bg-secondary border border-border-light">
+              {/* Sliding Glass Indicator */}
+              <motion.div
+                className={cn(
+                  "absolute top-1 bottom-1 rounded-lg",
+                  "bg-fill-tertiary border border-border-light",
+                  "shadow-sm backdrop-blur-sm"
+                )}
+                initial={false}
+                animate={{
+                  left: (chatSettings.creativityLevel || 'medium') === 'low' ? '4px' 
+                      : (chatSettings.creativityLevel || 'medium') === 'medium' ? 'calc(33.33% + 2px)' 
+                      : 'calc(66.66%)',
+                  width: 'calc(33.33% - 4px)'
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 30
+                }}
+              />
               {creativityLevels.map((level) => (
                 <button
                   key={level.value}
                   className={cn(
-                    "flex-1 py-2 px-3 bg-transparent border-none rounded-md",
-                    "text-xs font-medium text-text-secondary cursor-pointer whitespace-nowrap",
-                    "transition-all duration-200",
-                    "hover:text-text-primary hover:bg-bg-tertiary",
-                    (chatSettings.creativityLevel || 'medium') === level.value && "bg-bg-primary text-primary shadow-sm"
+                    "flex-1 py-2 px-2 bg-transparent border-none rounded-lg z-10",
+                    "text-xs font-medium cursor-pointer whitespace-nowrap",
+                    "transition-colors duration-200",
+                    (chatSettings.creativityLevel || 'medium') === level.value 
+                      ? "text-text-primary" 
+                      : "text-text-muted hover:text-text-secondary"
                   )}
                   onClick={() => {
                     handleSettingChange('creativityLevel', level.value)

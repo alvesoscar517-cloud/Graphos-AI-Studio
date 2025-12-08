@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/utils'
-import { Icon } from '../../Common'
 
 const ProfileCard = ({ profile, onSelect, onUse }) => {
   const { t } = useTranslation()
@@ -16,12 +15,12 @@ const ProfileCard = ({ profile, onSelect, onUse }) => {
       'technical': 'code',
       'other': 'more-horizontal'
     }
-    return themeIcons[theme] || 'user-round'
+    return themeIcons[theme] || 'fingerprint'
   }
   
   const formatNumber = (num) => {
     if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
-    return num.toString()
+    return num?.toString() || '0'
   }
 
   const formatDate = (dateString) => {
@@ -43,62 +42,62 @@ const ProfileCard = ({ profile, onSelect, onUse }) => {
     <div 
       className={cn(
         "flex-[0_0_calc(33.333%-14px)] min-w-0 p-5 cursor-pointer relative overflow-hidden",
-        "bg-bg-secondary rounded-md shadow-card",
+        "bg-bg-secondary border border-border-light rounded-xl",
         "transition-all duration-200",
-        "hover:shadow-md hover:bg-bg-hover",
+        "hover:shadow-md hover:border-border-hover hover:bg-bg-hover",
         "group"
       )}
       onClick={() => onSelect(profile)}
     >
-      {/* Header */}
+      {/* Header with Icon */}
       <div className="flex items-start justify-between mb-4">
-        <div className={cn(
-          "w-12 h-12 rounded-md flex items-center justify-center shrink-0",
-          "bg-fill-tertiary",
-          "transition-all duration-200",
-          "group-hover:bg-fill-secondary group-hover:scale-105"
-        )}>
-          <Icon 
-            name={getThemeIcon(profile.theme)} 
-            size="lg" 
-            color="primary"
-            className="group-hover:opacity-90 group-hover:scale-105 transition-all duration-200"
+        <div className="card-icon group-hover:scale-105">
+          <img 
+            src={`/icon/${getThemeIcon(profile.theme)}.svg`} 
+            alt="" 
+            className="w-6 h-6 filter-icon-primary group-hover:opacity-100"
           />
         </div>
       </div>
       
       {/* Title */}
-      <h4 className="text-callout font-semibold text-text-primary mb-2 leading-tight">
+      <h4 className="text-base font-semibold text-text-primary mb-2 leading-tight line-clamp-1">
         {profile.profile_name}
       </h4>
       
       {/* Meta */}
-      <div className="flex items-center gap-3 mb-4 text-caption1 text-label-secondary">
+      <div className="flex items-center gap-3 mb-4 text-xs text-text-muted">
         <div className="flex items-center gap-1.5">
-          <Icon name="file-text" size="sm" color="muted" />
+          <img src="/icon/file-text.svg" alt="" className="w-3.5 h-3.5 opacity-50 icon-invert" />
           <span>{profile.sample_count || 0} {t('common.samples')}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Icon name="type" size="sm" color="muted" />
+          <img src="/icon/type.svg" alt="" className="w-3.5 h-3.5 opacity-50 icon-invert" />
           <span>{formatNumber(profile.total_words || 0)} {t('common.words')}</span>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="flex flex-col gap-0.5 p-3 bg-fill-quaternary rounded-sm">
-          <span className="text-caption2 text-label-tertiary uppercase tracking-wider font-semibold">
+        <div className={cn(
+          "flex flex-col gap-0.5 p-3",
+          "bg-fill-tertiary border border-border-light rounded-lg"
+        )}>
+          <span className="text-[10px] text-text-muted uppercase tracking-wider font-medium">
             {t('profile.score')}
           </span>
-          <span className="text-title3 font-semibold text-text-primary">
+          <span className="text-lg font-semibold text-text-primary">
             {profile.quality_score || profile.qualityScore || 'N/A'}
           </span>
         </div>
-        <div className="flex flex-col gap-0.5 p-3 bg-fill-quaternary rounded-sm">
-          <span className="text-caption2 text-label-tertiary uppercase tracking-wider font-semibold">
+        <div className={cn(
+          "flex flex-col gap-0.5 p-3",
+          "bg-fill-tertiary border border-border-light rounded-lg"
+        )}>
+          <span className="text-[10px] text-text-muted uppercase tracking-wider font-medium">
             {t('analysis.avgSentence')}
           </span>
-          <span className="text-title3 font-semibold text-text-primary">
+          <span className="text-lg font-semibold text-text-primary">
             {profile.statistics?.avg_sentence_length?.toFixed(0) || 
              profile.avg_sentence_length?.toFixed(0) || '0'}
           </span>
@@ -107,26 +106,34 @@ const ProfileCard = ({ profile, onSelect, onUse }) => {
 
       {/* Tags */}
       <div className="flex flex-wrap gap-2 mb-4">
-        <span className="badge badge-info">
-          <Icon name="briefcase" size="xs" color="muted" />
+        <span className={cn(
+          "inline-flex items-center gap-1 py-1 px-2.5 rounded-md text-xs font-medium",
+          "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+        )}>
+          <img src="/icon/briefcase.svg" alt="" className="w-3 h-3 opacity-70 icon-invert" />
           {t('profile.office')}
         </span>
-        <span className="badge badge-success">
-          <Icon name="user" size="xs" color="muted" />
+        <span className={cn(
+          "inline-flex items-center gap-1 py-1 px-2.5 rounded-md text-xs font-medium",
+          "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+        )}>
+          <img src="/icon/user.svg" alt="" className="w-3 h-3 opacity-70 icon-invert" />
           {t('profile.personal')}
         </span>
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-4 border-t border-separator">
-        <span className="text-caption1 text-label-secondary flex items-center gap-1.5">
-          <Icon name="clock" size="sm" color="muted" />
+      <div className="flex items-center justify-between pt-4 border-t border-border-light">
+        <span className="text-xs text-text-muted flex items-center gap-1.5">
+          <img src="/icon/clock.svg" alt="" className="w-3.5 h-3.5 opacity-50 icon-invert" />
           {formatDate(profile.created_at)}
         </span>
         <button 
           className={cn(
-            "btn btn-primary py-1.5 px-4 text-caption1",
-            "flex items-center gap-1.5"
+            "flex items-center gap-1.5 py-1.5 px-4 rounded-lg",
+            "bg-accent text-white text-xs font-medium",
+            "transition-all duration-200",
+            "hover:bg-accent-hover hover:shadow-sm"
           )}
           onClick={(e) => {
             e.stopPropagation()
@@ -134,7 +141,7 @@ const ProfileCard = ({ profile, onSelect, onUse }) => {
             else onSelect(profile)
           }}
         >
-          <Icon name="play" size="sm" />
+          <img src="/icon/play.svg" alt="" className="w-3.5 h-3.5 invert" />
           {t('common.use')}
         </button>
       </div>

@@ -24,7 +24,6 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
   const handleSelectProfile = (profile) => {
     onProfileSelect(profile)
     setShowModal(false)
-    modal.toast(t('profile.profileSelected'), profile.profile_name, 'success')
   }
 
   const handleDeleteProfile = async (e, profileId) => {
@@ -38,7 +37,6 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
     if (confirmed) {
       const result = await deleteProfileAPI(profileId)
       if (result.success) {
-        modal.toast(t('profile.profileDeleted'), '', 'success')
         removeProfile(profileId)
         invalidateProfileDetailCache(profileId)
         if (currentProfile && currentProfile.profile_id === profileId) {
@@ -100,7 +98,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
             <img 
               src={`/icon/${getThemeIcon(currentProfile?.theme)}.svg`} 
               alt="Profile" 
-              className="w-7 h-7 opacity-80 icon-invert"
+              className="w-7 h-7 filter-icon-primary"
             />
           </div>
           <div className="flex flex-col gap-1 w-full">
@@ -176,7 +174,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
             </div>
 
             {/* Profiles List */}
-            <div className="flex-1 overflow-y-auto px-4 pb-4">
+            <div className="flex-1 overflow-y-auto px-6 pb-4">
               {loading ? (
                 <div className="flex flex-col items-center justify-center h-full">
                   <div className="w-8 h-8 border-2 border-border-light border-t-primary rounded-full animate-spin" />
@@ -196,7 +194,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                     <button 
                       className={cn(
                         "inline-flex items-center gap-2 py-2.5 px-4",
-                        "bg-primary text-white text-sm font-medium rounded-lg",
+                        "bg-primary text-white text-sm font-medium rounded-xl",
                         "border-none cursor-pointer transition-all duration-200",
                         "hover:bg-primary-hover"
                       )}
@@ -213,80 +211,56 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                     <div 
                       key={profile.profile_id}
                       className={cn(
-                        "bg-bg-primary border border-border-light rounded-xl",
+                        "bg-bg-secondary border border-border-light rounded-xl",
                         "p-4 cursor-pointer transition-all duration-200",
                         "hover:border-border-hover hover:shadow-sm",
-                        currentProfile?.profile_id === profile.profile_id && "border-accent bg-primary/5"
+                        currentProfile?.profile_id === profile.profile_id && "border-accent"
                       )}
                       onClick={() => handleSelectProfile(profile)}
                     >
                       {/* Card Header */}
-                      <div className="flex items-start gap-3">
-                        <div className="card-icon !w-10 !h-10">
+                      <div className="flex items-center gap-3">
+                        <div className="card-icon !w-10 !h-10 shrink-0">
                           <img 
                             src={`/icon/${getThemeIcon(profile.theme)}.svg`} 
                             alt={profile.profile_name} 
-                            className="w-5 h-5 opacity-80 icon-invert"
+                            className="w-5 h-5 filter-icon-primary"
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap mb-1">
-                            <h3 className="text-sm font-medium text-text-primary m-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-sm font-semibold text-text-primary m-0 truncate">
                               {profile.profile_name}
                             </h3>
                             {currentProfile?.profile_id === profile.profile_id ? (
-                              <span className="text-2xs py-0.5 px-2 bg-primary text-white rounded font-medium">
-                                {t('profile.selected')}
+                              <span className="text-[10px] py-0.5 px-2 bg-primary/15 text-primary rounded-md font-medium shrink-0">
+                                {t('model.inUse')}
                               </span>
                             ) : profile.status === 'ready' ? (
-                              <span className="text-2xs py-0.5 px-2 bg-success/15 text-success rounded font-medium">
+                              <span className="text-[10px] py-0.5 px-2 bg-success/15 text-success rounded-md font-medium shrink-0">
                                 {t('profile.ready').toUpperCase()}
                               </span>
                             ) : (
-                              <span className="text-2xs py-0.5 px-2 bg-warning/15 text-warning rounded font-medium">
+                              <span className="text-[10px] py-0.5 px-2 bg-warning/15 text-warning rounded-md font-medium shrink-0">
                                 {t('profile.processing').toUpperCase()}
                               </span>
                             )}
-                            {(profile.quality_score || profile.qualityScore) && (
-                              <span className={cn(
-                                "text-2xs py-0.5 px-2 rounded font-medium",
-                                (profile.quality_rating || profile.qualityRating) === 'excellent' && "bg-success/15 text-success",
-                                (profile.quality_rating || profile.qualityRating) === 'good' && "bg-primary/15 text-primary",
-                                (profile.quality_rating || profile.qualityRating) === 'ok' && "bg-warning/15 text-warning",
-                                !(profile.quality_rating || profile.qualityRating) && "bg-gray-500/15 text-text-secondary"
-                              )}>
-                                {profile.quality_score || profile.qualityScore}/100
-                              </span>
-                            )}
                           </div>
-                          <div className="flex items-center gap-2 flex-wrap text-xs text-text-secondary">
-                            <span className="flex items-center gap-1">
-                              <Icon name="file-text" alt={t('common.samples')} size="sm" color="muted" />
-                              {profile.sample_count || 0} {t('common.samples')}
+                          {(profile.quality_score || profile.qualityScore) && (
+                            <span className={cn(
+                              "text-sm font-semibold",
+                              (profile.quality_rating || profile.qualityRating) === 'excellent' && "text-success",
+                              (profile.quality_rating || profile.qualityRating) === 'good' && "text-primary",
+                              (profile.quality_rating || profile.qualityRating) === 'ok' && "text-warning",
+                              !(profile.quality_rating || profile.qualityRating) && "text-text-secondary"
+                            )}>
+                              {profile.quality_score || profile.qualityScore}/100
                             </span>
-                            {profile.statistics?.totalWords && (
-                              <>
-                                <span>•</span>
-                                <span className="flex items-center gap-1">
-                                  <Icon name="type" alt={t('common.words')} size="sm" color="muted" />
-                                  {profile.statistics.totalWords.toLocaleString()} {t('common.words')}
-                                </span>
-                              </>
-                            )}
-                            {profile.created_at && (
-                              <>
-                                <span>•</span>
-                                <span className="flex items-center gap-1">
-                                  <Icon name="calendar" alt={t('profile.createdDate')} size="sm" color="muted" />
-                                  {new Date(profile.created_at).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                                </span>
-                              </>
-                            )}
-                          </div>
+                          )}
                         </div>
                         <button 
                           className={cn(
-                            "p-2 bg-transparent border-none rounded-lg cursor-pointer",
+                            "p-2 bg-transparent border-none rounded-lg cursor-pointer shrink-0",
                             "opacity-40 transition-all duration-200",
                             "hover:opacity-100 hover:bg-error/10"
                           )}
@@ -298,17 +272,30 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                         </button>
                       </div>
                       
+                      {/* Meta info */}
+                      <div className="flex items-center gap-2 mt-2 text-xs text-text-muted">
+                        <span className="flex items-center gap-1">
+                          <Icon name="file-text" alt={t('common.samples')} size="xs" color="muted" />
+                          {profile.sample_count || 0} {t('common.samples')}
+                        </span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <Icon name="calendar" alt={t('profile.createdDate')} size="xs" color="muted" />
+                          {profile.created_at ? new Date(profile.created_at).toLocaleDateString() : 'N/A'}
+                        </span>
+                      </div>
+                      
                       {/* Card Body - Tags */}
-                      <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border-light">
-                        <span className="flex items-center gap-1.5 text-2xs py-1 px-2 bg-bg-secondary rounded text-text-secondary">
+                      <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-border-light">
+                        <span className="flex items-center gap-1 text-[10px] py-1 px-2 bg-fill-tertiary border border-border-light rounded-md text-text-secondary">
                           <Icon name="mic" alt={t('profile.tone')} size="xs" color="muted" />
                           {profile.voice_profile?.tone ? t(`tones.${profile.voice_profile.tone}`, { defaultValue: profile.voice_profile.tone }) : 'N/A'}
                         </span>
-                        <span className="flex items-center gap-1.5 text-2xs py-1 px-2 bg-bg-secondary rounded text-text-secondary">
+                        <span className="flex items-center gap-1 text-[10px] py-1 px-2 bg-fill-tertiary border border-border-light rounded-md text-text-secondary">
                           <Icon name="award" alt={t('profile.formalityLevel')} size="xs" color="muted" />
-                          {t('profile.formalityLevel')}: {profile.voice_profile?.formality_level || 'N/A'}/10
+                          {profile.voice_profile?.formality_level || 'N/A'}/10
                         </span>
-                        <span className="flex items-center gap-1.5 text-2xs py-1 px-2 bg-bg-secondary rounded text-text-secondary">
+                        <span className="flex items-center gap-1 text-[10px] py-1 px-2 bg-fill-tertiary border border-border-light rounded-md text-text-secondary">
                           <Icon name="bar-chart" alt={t('profile.sentenceLength')} size="xs" color="muted" />
                           {profile.voice_profile?.sentence_patterns?.typical_length ? t(`sentenceLengths.${profile.voice_profile.sentence_patterns.typical_length}`, { defaultValue: profile.voice_profile.sentence_patterns.typical_length }) : 'N/A'}
                         </span>
