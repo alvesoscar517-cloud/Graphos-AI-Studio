@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { useAIProcessingActions } from '@/stores'
-import { getCachedAnalysis, setCachedAnalysis, clearNoteCache } from '../../services/analysisCache'
+import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
@@ -116,14 +116,6 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
         const cacheKey = `${currentProfile.profile_id}_${text}`
         setCachedAnalysis(currentNote.id, cacheKey, 'compatibility', resultData)
         setTextChanged(false)
-        
-        const cacheStatus = result.data.cache_hit ? t('common.cached') : t('common.fresh')
-        const processingTime = result.data.processing_time_ms || 0
-        modal.toast(
-          t('analysis.calculationComplete'), 
-          `${t('profile.score')}: ${compatibilityScore}% | ${cacheStatus} | ${processingTime}ms`, 
-          'success'
-        )
       } else {
         throw new Error(result.error || t('analysis.calculationFailed'))
       }
@@ -136,18 +128,6 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
     } finally {
       setIsLoading(false)
       stopProcessing()
-    }
-  }
-
-  // Force recalculate - clear cache and recalculate
-  const forceRecalculate = () => {
-    if (currentNote) {
-      clearNoteCache(currentNote.id)
-      setScore(null)
-      setAnalysisDetails(null)
-      setTextChanged(true)
-      // Trigger recalculation
-      setTimeout(() => calculateScore(), 100)
     }
   }
 
@@ -217,47 +197,29 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
-          <button 
-            className={cn(
-              "flex-1 flex items-center justify-between py-2.5 px-3.5",
-              "bg-bg-secondary border border-border-light rounded-xl",
-              "text-sm font-medium text-text-primary cursor-pointer",
-              "transition-all duration-200 relative overflow-hidden",
-              "hover:border-border-hover hover:shadow-md",
-              "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
-              isLoading && "pointer-events-none opacity-70"
-            )}
-            onClick={calculateScore}
-            disabled={disabled || isLoading || !textChanged}
-          >
-            {isLoading ? (
-              <LazyLottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
-            ) : (
-              <>
-                <span>{!textChanged ? t('analysis.calculated') : t('analysis.calculateScore')}</span>
-                <Icon name="arrow-right" size="md" color="muted" />
-              </>
-            )}
-          </button>
-          
-          {/* Recalculate button - only show when score exists */}
-          {score !== null && !isLoading && (
-            <button
-              className={cn(
-                "p-2.5 bg-bg-secondary border border-border-light rounded-xl",
-                "text-text-secondary cursor-pointer transition-all duration-200",
-                "hover:border-border-hover hover:text-text-primary hover:shadow-md",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
-              onClick={forceRecalculate}
-              disabled={disabled || isLoading}
-              title={t('analysis.recalculate') || 'Recalculate'}
-            >
-              <Icon name="refresh-cw" size="md" />
-            </button>
+        {/* Action Button */}
+        <button 
+          className={cn(
+            "w-full flex items-center justify-between py-2.5 px-3.5",
+            "bg-bg-secondary border border-border-light rounded-xl",
+            "text-sm font-medium text-text-primary cursor-pointer",
+            "transition-all duration-200 relative overflow-hidden",
+            "hover:border-border-hover hover:shadow-md",
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+            isLoading && "pointer-events-none opacity-70"
           )}
-        </div>
+          onClick={calculateScore}
+          disabled={disabled || isLoading || !textChanged}
+        >
+          {isLoading ? (
+            <LazyLottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
+          ) : (
+            <>
+              <span>{!textChanged ? t('analysis.calculated') : t('analysis.calculateScore')}</span>
+              <Icon name="arrow-right" size="md" color="muted" />
+            </>
+          )}
+        </button>
 
         {/* Result Section */}
         {score !== null && showResult && (
@@ -272,8 +234,9 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                 >
                   <defs>
                     <linearGradient id="compatibilityGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#e8f4fd" />
-                      <stop offset="100%" stopColor={getScoreColor(score)} />
+                      <stop offset="0%" stopColor="#93c5fd" />
+                      <stop offset="50%" stopColor="#3b82f6" />
+                      <stop offset="100%" stopColor="#2563eb" />
                     </linearGradient>
                   </defs>
                   <circle 
@@ -291,7 +254,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                       strokeDashoffset: 263.89 - (score / 100) * 263.89,
                       strokeLinecap: 'round',
                       transition: 'stroke-dashoffset 0.5s ease-out',
-                      filter: `drop-shadow(0 1px 3px ${getScoreColor(score)}4D)`
+                      filter: 'drop-shadow(0 1px 3px rgba(66, 133, 244, 0.3))'
                     }}
                   />
                 </svg>
@@ -352,20 +315,22 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
               {/* Confidence Indicator - matching AI Detection style */}
               {confidence !== null && confidence !== undefined && (
                 <div className="w-full p-2 px-3 bg-bg-secondary rounded-lg mt-0">
-                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-2xs font-medium text-text-secondary uppercase tracking-wide">{t('analysis.confidence')}</span>
-                    <span className="text-sm font-semibold text-text-primary">{safeScore(confidence)}%</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
-                    <div 
-                      className={cn(
-                        "h-full rounded-sm transition-all duration-500",
-                        confidence < 60 && "bg-gradient-to-r from-orange-500 to-red-400",
-                        confidence >= 60 && confidence < 80 && "bg-gradient-to-r from-blue-500 to-cyan-400",
-                        confidence >= 80 && "bg-gradient-to-r from-green-500 to-emerald-400"
-                      )}
-                      style={{ width: `${safeScore(confidence)}%` }}
-                    />
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xs text-text-secondary">{t('analysis.confidence')}</span>
+                      <span className="text-xs font-semibold text-text-primary">{safeScore(confidence)}%</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
+                      <div 
+                        className={cn(
+                          "h-full rounded-sm transition-all duration-500",
+                          confidence < 60 && "bg-gradient-to-r from-orange-500 to-red-400",
+                          confidence >= 60 && confidence < 80 && "bg-gradient-to-r from-blue-500 to-cyan-400",
+                          confidence >= 80 && "bg-gradient-to-r from-green-500 to-emerald-400"
+                        )}
+                        style={{ width: `${safeScore(confidence)}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
@@ -382,19 +347,19 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
               {analysisDetails?.deviation_summary?.total > 0 && (
                 <div className="w-full p-2 px-3 bg-bg-secondary rounded-lg">
                   <span className="text-2xs text-text-secondary block mb-1.5">{t('analysis.styleDeviationSentences')}</span>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1.5">
                     {analysisDetails.deviation_summary.by_severity.severe > 0 && (
-                      <span className="text-2xs py-0.5 px-1.5 rounded bg-error/15 text-error font-medium">
+                      <span className="text-2xs py-1 px-2 rounded-md bg-error/15 text-error font-medium">
                         {analysisDetails.deviation_summary.by_severity.severe} {t('analysis.severe')}
                       </span>
                     )}
                     {analysisDetails.deviation_summary.by_severity.moderate > 0 && (
-                      <span className="text-2xs py-0.5 px-1.5 rounded bg-warning/15 text-warning font-medium">
+                      <span className="text-2xs py-1 px-2 rounded-md bg-warning/15 text-warning font-medium">
                         {analysisDetails.deviation_summary.by_severity.moderate} {t('analysis.moderate')}
                       </span>
                     )}
                     {analysisDetails.deviation_summary.by_severity.mild > 0 && (
-                      <span className="text-2xs py-0.5 px-1.5 rounded bg-primary/15 text-primary font-medium">
+                      <span className="text-2xs py-1 px-2 rounded-md bg-primary/15 text-primary font-medium">
                         {analysisDetails.deviation_summary.by_severity.mild} {t('analysis.mild')}
                       </span>
                     )}
@@ -585,25 +550,25 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                   </h4>
                   <div className="flex flex-col gap-2 p-4 bg-fill-tertiary border border-border-light rounded-xl">
                     {analysisDetails.confidence_factors.variancePenalty !== undefined && (
-                      <div className="flex justify-between items-center text-xs py-1 px-2 rounded bg-error/10">
+                      <div className="flex justify-between items-center text-xs py-2 px-3 rounded-lg bg-error/10">
                         <span className="text-text-secondary">{t('analysis.variance')}</span>
                         <span className="text-error font-semibold">-{analysisDetails.confidence_factors.variancePenalty.toFixed(1)}%</span>
                       </div>
                     )}
                     {analysisDetails.confidence_factors.sampleBonus !== undefined && (
-                      <div className="flex justify-between items-center text-xs py-1 px-2 rounded bg-success/10">
+                      <div className="flex justify-between items-center text-xs py-2 px-3 rounded-lg bg-success/10">
                         <span className="text-text-secondary">{t('analysis.profileSamples')}</span>
                         <span className="text-success font-semibold">+{analysisDetails.confidence_factors.sampleBonus.toFixed(1)}%</span>
                       </div>
                     )}
                     {analysisDetails.confidence_factors.sentenceBonus !== undefined && (
-                      <div className="flex justify-between items-center text-xs py-1 px-2 rounded bg-success/10">
+                      <div className="flex justify-between items-center text-xs py-2 px-3 rounded-lg bg-success/10">
                         <span className="text-text-secondary">{t('analysis.analyzedSentences')}</span>
                         <span className="text-success font-semibold">+{analysisDetails.confidence_factors.sentenceBonus.toFixed(1)}%</span>
                       </div>
                     )}
                     {analysisDetails.confidence_factors.meanCertainty !== undefined && (
-                      <div className="flex justify-between items-center text-xs py-1 px-2 rounded bg-success/10">
+                      <div className="flex justify-between items-center text-xs py-2 px-3 rounded-lg bg-success/10">
                         <span className="text-text-secondary">{t('analysis.clarity')}</span>
                         <span className="text-success font-semibold">+{analysisDetails.confidence_factors.meanCertainty.toFixed(1)}%</span>
                       </div>
@@ -623,7 +588,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
                     {analysisDetails.deviant_sentences.slice(0, 5).map((item, index) => (
                       <div key={index} className="flex items-start gap-2 text-xs">
                         <span className={cn(
-                          "flex-shrink-0 p-1 rounded",
+                          "flex-shrink-0 p-1 rounded-md",
                           item.severity === 'severe' && "bg-error/15",
                           item.severity === 'moderate' && "bg-warning/15",
                           item.severity === 'mild' && "bg-primary/15"

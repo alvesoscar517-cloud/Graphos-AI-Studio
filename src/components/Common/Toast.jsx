@@ -57,6 +57,8 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
           "hover:bg-fill-tertiary"
         )}
         onClick={onClose}
+        data-tooltip="Close"
+        data-tooltip-position="left"
       >
         <img src="/icon/x.svg" alt="Close" className="w-4 h-4 block icon-invert" />
       </button>

@@ -88,12 +88,12 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
     <motion.aside 
       className={cn(
         "bg-bg-tertiary",
-        "border-l border-separator",
         "overflow-y-auto overflow-x-hidden flex flex-col",
-        "h-screen shrink-0",
+        "h-full shrink-0",
         "touch-pan-y overscroll-contain scrollbar-none",
-        "absolute right-0 top-0 bottom-0",
+        
         "max-md:w-full",
+        "rounded-md", // Floating panel effect
         isDragging ? "z-[100] shadow-xl" : "z-sidebar"
       )}
       initial={false}
@@ -251,8 +251,21 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
                 type="range" min="20" max="50" step="5"
                 value={chatSettings.targetAIProbability || 35}
                 onChange={(e) => handleSettingChange('targetAIProbability', parseInt(e.target.value))}
-                onPointerDown={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
+                onPointerDown={(e) => {
+                  e.stopPropagation()
+                  setIsInteractingWithSlider(true)
+                }}
+                onPointerUp={() => setIsInteractingWithSlider(false)}
+                onTouchStart={(e) => {
+                  e.stopPropagation()
+                  setIsInteractingWithSlider(true)
+                }}
+                onTouchEnd={() => setIsInteractingWithSlider(false)}
+                onMouseDown={(e) => {
+                  e.stopPropagation()
+                  setIsInteractingWithSlider(true)
+                }}
+                onMouseUp={() => setIsInteractingWithSlider(false)}
                 className={cn(
                   "w-full h-1 rounded appearance-none cursor-pointer touch-none",
                   "bg-bg-tertiary",

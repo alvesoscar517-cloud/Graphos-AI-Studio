@@ -1124,6 +1124,141 @@ exports.iterativeHumanize = async (req, res) => {
 };
 
 // ============================================================================
+// ASYNC ITERATIVE HUMANIZE - START JOB
+// ============================================================================
+
+exports.startIterativeHumanize = async (req, res) => {
+  const l = createLocalizer(req);
+  
+  try {
+    const { 
+      profile_id, 
+      text, 
+      user_id,
+      max_iterations = 3,
+      target_probability = 35,
+      model: requestedModel = 'gemini-2.0-flash-exp'
+    } = req.body;
+
+    // Validate model
+    const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
+
+    if (!profile_id || !text) {
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
+    }
+
+    // Verify profile exists
+    const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
+    if (!profileDoc.exists) {
+      return res.status(404).json({ success: false, ...l.error('not_found') });
+    }
+
+    const profileData = profileDoc.data();
+    const voiceProfile = profileData.voiceProfile || profileData.promptableSummary;
+
+    if (!voiceProfile) {
+      return res.status(400).json({
+        success: false,
+        ...l.error('invalid_input'),
+        details: l.t('voice_profile.not_found')
+      });
+    }
+
+    // Create async job
+    const humanizeJobService = require('../services/humanizeJob.service');
+    const jobInfo = await humanizeJobService.createJob({
+      profileId: profile_id,
+      text,
+      userId: user_id,
+      maxIterations: Math.min(max_iterations, 5),
+      targetProbability: Math.max(target_probability, 20),
+      model,
+      creditCost: req.creditCost || 0,
+      creditsBefore: req.creditsBefore
+    });
+
+    logger.info('Async humanize job started', { 
+      jobId: jobInfo.jobId, 
+      profileId: profile_id,
+      textLength: text.length 
+    });
+
+    res.json({
+      success: true,
+      job_id: jobInfo.jobId,
+      status: jobInfo.status,
+      estimated_time: jobInfo.estimatedTime,
+      message: l.t('humanize.job_started') || 'Humanization job started'
+    });
+  } catch (error) {
+    console.error('[ERROR] Start iterative humanize error:', error);
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
+  }
+};
+
+// ============================================================================
+// ASYNC ITERATIVE HUMANIZE - GET JOB STATUS
+// ============================================================================
+
+exports.getHumanizeJobStatus = async (req, res) => {
+  const l = createLocalizer(req);
+  
+  try {
+    const { job_id } = req.params;
+
+    if (!job_id) {
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
+    }
+
+    const humanizeJobService = require('../services/humanizeJob.service');
+    const job = await humanizeJobService.getJob(job_id);
+
+    if (!job) {
+      return res.status(404).json({ 
+        success: false, 
+        ...l.error('not_found'),
+        message: 'Job not found or expired'
+      });
+    }
+
+    // Build response based on status
+    const response = {
+      success: true,
+      job_id: job.jobId,
+      status: job.status,
+      progress: job.progress,
+      created_at: job.createdAt,
+      updated_at: job.updatedAt
+    };
+
+    if (job.status === humanizeJobService.JOB_STATUS.COMPLETED && job.result) {
+      response.result = {
+        original_text: job.result.originalText,
+        rewritten_text: job.result.rewrittenText,
+        iterations_used: job.result.iterationsUsed,
+        final_ai_probability: job.result.finalAIProbability,
+        verdict: l.verdict(job.result.finalAIProbability),
+        confidence: job.result.confidence,
+        reached_target: job.result.reachedTarget,
+        improved: job.result.improved,
+        warning: job.result.warning,
+        profile_name: job.result.profileName,
+        processing_time_ms: job.result.processingTimeMs
+      };
+    }
+
+    if (job.status === humanizeJobService.JOB_STATUS.FAILED) {
+      response.error = job.error;
+    }
+
+    res.json(response);
+  } catch (error) {
+    console.error('[ERROR] Get humanize job status error:', error);
+    res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
+  }
+};
+
+// ============================================================================
 // TRANSLATE TEXT
 // ============================================================================
 

@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useWorkspace } from '../../contexts/WorkspaceContext'
 import WorkspaceDefault from './Workspace/WorkspaceDefault'
 import WorkspaceChat from './Workspace/WorkspaceChat'
-import WorkspaceSidebar from './Workspace/WorkspaceSidebar'
 import SharedChatInput from './Workspace/SharedChatInput'
 import { cn } from '../../lib/utils'
 
@@ -14,6 +13,12 @@ const WorkspaceView = ({
 }) => {
   const { currentConversation, sendMessage, isLoading, clearConversation } = useWorkspace()
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [quickActionPrompt, setQuickActionPrompt] = useState('')
+
+  // Handle quick action click - set prompt to input
+  const handleQuickAction = useCallback((prompt) => {
+    setQuickActionPrompt(prompt)
+  }, [])
 
   const handleStartChat = () => {
     // Clear current conversation to return to default interface
@@ -46,32 +51,27 @@ const WorkspaceView = ({
       {showDefaultView ? (
         <>
           <div 
-            className="absolute inset-0 z-base transition-[padding] duration-sidebar ease-smooth"
-            style={{
-              paddingRight: rightSidebarHidden ? 0 : '300px'
-            }}
+            className="absolute inset-0 z-base"
           >
             <WorkspaceDefault 
               onToggleLeftSidebar={onToggleLeftSidebar}
               onToggleRightSidebar={onToggleRightSidebar}
               rightSidebarHidden={rightSidebarHidden}
-            />
-            
-            {/* Shared Input - centered when no conversation */}
-            <SharedChatInput
-              onSendMessage={handleSendMessage}
-              disabled={isLoading || isTransitioning}
-              isCentered={true}
-              autoFocus={true}
-              rightSidebarHidden={rightSidebarHidden}
+              onQuickAction={handleQuickAction}
+              chatInput={
+                <SharedChatInput
+                  onSendMessage={handleSendMessage}
+                  disabled={isLoading || isTransitioning}
+                  isCentered={true}
+                  isInline={true}
+                  autoFocus={true}
+                  rightSidebarHidden={rightSidebarHidden}
+                  initialMessage={quickActionPrompt}
+                />
+              }
             />
           </div>
-          {/* Show sidebar even on default screen */}
-          <WorkspaceSidebar 
-            hidden={rightSidebarHidden} 
-            onClose={onToggleRightSidebar}
-            onNewChat={handleStartChat}
-          />
+          {/* WorkspaceSidebar is now rendered in MainLayout */}
         </>
       ) : (
         <>

@@ -91,6 +91,8 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
             className="bg-transparent border-none w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer opacity-50 hover:opacity-100 transition-opacity"
             onClick={onClose}
             aria-label={t('common.close')}
+            data-tooltip={t('common.close')}
+            data-tooltip-position="bottom"
           >
             <img src="/icon/x.svg" alt="" className="w-icon-lg h-icon-lg icon-invert" />
           </button>
@@ -104,6 +106,8 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
             <button 
               className="bg-transparent border-none w-6 h-6 rounded flex items-center justify-center cursor-pointer opacity-60 hover:opacity-100"
               onClick={() => createCheckout.reset()}
+              data-tooltip={t('common.close')}
+              data-tooltip-position="left"
             >
               <img src="/icon/x.svg" alt="" className="w-3.5 h-3.5" />
             </button>
@@ -142,12 +146,11 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                     )}
                     
                     <div className={cn(
-                      "flex flex-col items-center gap-2.5 mb-3.5 pt-1",
-                      pkg.popular && "pt-3",
+                      "flex flex-col items-center gap-2.5 mb-3.5 pt-3",
                       "max-sm:flex-row max-sm:mb-0 max-sm:!pt-0 max-sm:flex-1"
                     )}>
-                      <div className="w-9 h-9 rounded-lg bg-fill-tertiary border border-border-light flex items-center justify-center max-sm:w-8 max-sm:h-8">
-                        <img src={`/icon/${pkg.icon || 'zap'}.svg`} alt="" className="w-icon-lg h-icon-lg opacity-80 icon-invert" />
+                      <div className="w-10 h-10 flex items-center justify-center max-sm:w-9 max-sm:h-9">
+                        <img src={`/icon/${pkg.icon || 'zap'}.svg`} alt="" className="w-8 h-8" />
                       </div>
                       <h3 className="m-0 text-sm font-semibold text-text-primary">{pkg.description}</h3>
                     </div>

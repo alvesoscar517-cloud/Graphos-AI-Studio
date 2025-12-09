@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { motion, MotionConfig } from 'framer-motion'
 import LazyLottie from '../Common/LazyLottie'
-import { rewriteTextStream, iterativeHumanize } from '../../services/api'
+import { rewriteTextStream, startIterativeHumanize, pollHumanizeJob } from '../../services/api'
 import { useRewrite, useAIProcessingActions } from '@/stores'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import { handleCreditError } from '../../utils/creditHandler'
@@ -53,7 +53,7 @@ const RewriteToolbar = ({
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { selectedModel, writingPreferences } = useRewrite()
-  const { startProcessing, stopProcessing } = useAIProcessingActions()
+  const { startProcessing, startStreaming, stopProcessing, setHumanizeProgress } = useAIProcessingActions()
   const [isLoading, setIsLoading] = useState(false)
   const fileInputRef = useRef(null)
 
@@ -72,15 +72,14 @@ const RewriteToolbar = ({
     const useIterative = writingPreferences?.useIterativeRefinement
     
     if (useIterative) {
-      // Use iterative humanization (non-streaming)
-      console.log('[LAUNCH] Starting iterative humanization...')
+      // Use async iterative humanization
+      console.log('[LAUNCH] Starting async iterative humanization...')
       setIsLoading(true)
-      startProcessing('rewrite')
-      
-      const loadingModal = modal.loading(t('rewrite.humanizing'))
+      startProcessing('humanize') // Use 'humanize' type to show progress on editor
       
       try {
-        const result = await iterativeHumanize(
+        // Start async job
+        const startResult = await startIterativeHumanize(
           currentProfile.profile_id,
           originalText,
           {
@@ -90,12 +89,27 @@ const RewriteToolbar = ({
           }
         )
         
-        loadingModal.close()
+        if (!startResult.success) {
+          throw new Error(startResult.error || t('rewrite.humanizationFailed'))
+        }
+        
+        console.log('[LAUNCH] Job started:', startResult.jobId, 'Estimated:', startResult.estimatedTime?.display)
+        
+        // Poll for result with progress updates
+        const result = await pollHumanizeJob(startResult.jobId, {
+          onProgress: (progress) => {
+            console.log('[PROGRESS]', progress)
+            // Update store with progress for editor overlay
+            setHumanizeProgress(progress.progress)
+          },
+          pollInterval: 1500,
+          maxWaitTime: 300000 // 5 minutes
+        })
         
         if (result.success && result.data) {
           onTextChange(result.data.rewritten_text)
           
-          const emoji = result.data.reached_target ? '[SUCCESS]' : '[WARNING]'
+          const emoji = result.data.reached_target ? '✓' : '⚠'
           modal.success(
             `${emoji} ${t('rewrite.completedIterations', { count: result.data.iterations_used })}\n` +
             `${t('rewrite.aiProbability', { percent: result.data.final_ai_probability })}\n` +
@@ -106,7 +120,6 @@ const RewriteToolbar = ({
           throw new Error(result.error || t('rewrite.humanizationFailed'))
         }
       } catch (error) {
-        loadingModal.close()
         console.error('[FAIL] Error in iterative humanize:', error)
         
         // Check if it's a credit error first
@@ -119,6 +132,7 @@ const RewriteToolbar = ({
         onTextChange(originalText)
       } finally {
         setIsLoading(false)
+        setHumanizeProgress(null)
         stopProcessing()
       }
       return
@@ -166,7 +180,8 @@ const RewriteToolbar = ({
           // First chunk - clear editor
           if (!hasStartedStreaming) {
             hasStartedStreaming = true
-            console.log('[SYNC] First chunk - clearing editor')
+            console.log('[SYNC] First chunk - clearing editor, stopping shimmer')
+            startStreaming() // Stop shimmer effect when streaming starts
             onTextChange('') // Clear old text immediately
             displayedText = ''
           }
@@ -336,61 +351,63 @@ const RewriteToolbar = ({
         transition={{ duration: 0.25, ease: 'easeOut' }}
       >
         <div className="rewrite-toolbar-container pointer-events-auto rounded-2xl overflow-hidden backdrop-blur-xl md:max-w-[calc(100vw-32px)]">
-          <div className="p-1.5 flex items-center gap-1.5 md:p-[5px] md:gap-[5px]">
-            {/* Main Rewrite Button */}
-            <Button
-              onClick={handleRewrite}
-              disabled={disabled || isLoading || !text || !currentProfile}
-              ariaLabel={t('rewrite.rewriteText')}
-              active={isLoading}
-              variant={writingPreferences?.useIterativeRefinement ? 'primary' : ''}
-            >
-              <img 
-                src={writingPreferences?.useIterativeRefinement ? '/icon/user-check.svg' : '/icon/pen.svg'} 
-                alt={t('rewrite.rewrite')} 
-                className={cn(
-                  "w-icon-md h-icon-md shrink-0 opacity-55 transition-opacity duration-150",
-                  "group-hover:not-disabled:opacity-85 icon-invert",
+          <div className="p-1.5 flex flex-col gap-1.5 md:p-[5px] md:gap-[5px]">
+            <div className="flex items-center gap-1.5 md:gap-[5px]">
+              {/* Main Rewrite Button */}
+              <Button
+                onClick={handleRewrite}
+                disabled={disabled || isLoading || !text || !currentProfile}
+                ariaLabel={t('rewrite.rewriteText')}
+                active={isLoading}
+                variant={writingPreferences?.useIterativeRefinement ? 'primary' : ''}
+              >
+                <img 
+                  src={writingPreferences?.useIterativeRefinement ? '/icon/user-check.svg' : '/icon/pen.svg'} 
+                  alt={t('rewrite.rewrite')} 
+                  className={cn(
+                    "w-icon-md h-icon-md shrink-0 opacity-55 transition-opacity duration-150",
+                    "group-hover:not-disabled:opacity-85 icon-invert",
+                    isLoading && "invisible",
+                    writingPreferences?.useIterativeRefinement && "invert opacity-90"
+                  )}
+                />
+                <span className={cn(
+                  "text-sm leading-tight font-medium opacity-85 tracking-tight transition-opacity duration-150",
+                  "group-hover:not-disabled:opacity-100",
                   isLoading && "invisible",
-                  writingPreferences?.useIterativeRefinement && "invert opacity-90"
+                  writingPreferences?.useIterativeRefinement && "opacity-100"
+                )}>{rewriteLabel}</span>
+                {isLoading && (
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+                    <LazyLottie 
+                      animationData={threeDotsAnimation} 
+                      loop={true}
+                      style={{ width: 40, height: 16 }}
+                    />
+                  </div>
                 )}
-              />
-              <span className={cn(
-                "text-sm leading-tight font-medium opacity-85 tracking-tight transition-opacity duration-150",
-                "group-hover:not-disabled:opacity-100",
-                isLoading && "invisible",
-                writingPreferences?.useIterativeRefinement && "opacity-100"
-              )}>{rewriteLabel}</span>
-              {isLoading && (
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-                  <LazyLottie 
-                    animationData={threeDotsAnimation} 
-                    loop={true}
-                    style={{ width: 40, height: 16 }}
-                  />
-                </div>
-              )}
-            </Button>
-            
-            {/* Upload Button */}
-            <Button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={disabled || isLoading}
-              ariaLabel={t('rewrite.uploadFile')}
-            >
-              <img 
-                src="/icon/upload.svg" 
-                alt={t('common.upload')} 
-                className={cn(
-                  "w-icon-md h-icon-md shrink-0 opacity-55 transition-opacity duration-150",
-                  "group-hover:not-disabled:opacity-85 icon-invert"
-                )}
-              />
-              <span className={cn(
-                "text-sm leading-tight font-medium opacity-85 tracking-tight transition-opacity duration-150",
-                "group-hover:not-disabled:opacity-100"
-              )}>{t('common.upload')}</span>
-            </Button>
+              </Button>
+              
+              {/* Upload Button */}
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={disabled || isLoading}
+                ariaLabel={t('rewrite.uploadFile')}
+              >
+                <img 
+                  src="/icon/upload.svg" 
+                  alt={t('common.upload')} 
+                  className={cn(
+                    "w-icon-md h-icon-md shrink-0 opacity-55 transition-opacity duration-150",
+                    "group-hover:not-disabled:opacity-85 icon-invert"
+                  )}
+                />
+                <span className={cn(
+                  "text-sm leading-tight font-medium opacity-85 tracking-tight transition-opacity duration-150",
+                  "group-hover:not-disabled:opacity-100"
+                )}>{t('common.upload')}</span>
+              </Button>
+            </div>
           </div>
         </div>
         

@@ -1,107 +1,44 @@
-// Tooltip system
+// Simple tooltip system - replaces browser native tooltips
 let currentTooltip = null
 let tooltipTimeout = null
 
-export function showTooltip(element, text, position = 'bottom') {
+export function showTooltip(element, text) {
   hideTooltip()
+  if (!text || !element) return
   
   tooltipTimeout = setTimeout(() => {
-    // Kiểm tra element còn tồn tại không
-    if (!element || !element.parentNode) {
-      return
-    }
+    if (!element || !document.body.contains(element)) return
+    
     const tooltip = document.createElement('div')
     tooltip.className = 'tooltip'
     tooltip.textContent = text
-    
-    // Add to body temporarily to measure
     document.body.appendChild(tooltip)
     
     const rect = element.getBoundingClientRect()
     const tooltipRect = tooltip.getBoundingClientRect()
-    const gap = 8
+    
+    // Simple positioning: below element, centered
+    let top = rect.bottom + 6
+    let left = rect.left + rect.width / 2 - tooltipRect.width / 2
+    
+    // Keep within viewport
     const margin = 8
-    
-    let top, left, finalPosition = position
-    
-    // Calculate position based on preference
-    const positions = {
-      bottom: {
-        top: rect.bottom + gap,
-        left: rect.left + rect.width / 2 - tooltipRect.width / 2
-      },
-      top: {
-        top: rect.top - tooltipRect.height - gap,
-        left: rect.left + rect.width / 2 - tooltipRect.width / 2
-      },
-      right: {
-        top: rect.top + rect.height / 2 - tooltipRect.height / 2,
-        left: rect.right + gap
-      },
-      left: {
-        top: rect.top + rect.height / 2 - tooltipRect.height / 2,
-        left: rect.left - tooltipRect.width - gap
-      }
+    if (left < margin) left = margin
+    if (left + tooltipRect.width > window.innerWidth - margin) {
+      left = window.innerWidth - tooltipRect.width - margin
     }
     
-    // Try preferred position first
-    let pos = positions[position] || positions.bottom
-    top = pos.top
-    left = pos.left
-    finalPosition = position
-    
-    // Smart repositioning if out of bounds
-    const viewportWidth = window.innerWidth
-    const viewportHeight = window.innerHeight
-    
-    // Check horizontal bounds
-    if (left < margin) {
-      left = margin
-    } else if (left + tooltipRect.width > viewportWidth - margin) {
-      left = viewportWidth - tooltipRect.width - margin
+    // If no space below, show above
+    if (top + tooltipRect.height > window.innerHeight - margin) {
+      top = rect.top - tooltipRect.height - 6
     }
     
-    // Check vertical bounds and try alternative positions
-    if (top < margin) {
-      // Try bottom if top is too high
-      if (position !== 'bottom') {
-        const bottomPos = positions.bottom
-        if (bottomPos.top + tooltipRect.height <= viewportHeight - margin) {
-          top = bottomPos.top
-          finalPosition = 'bottom'
-        } else {
-          top = margin
-        }
-      } else {
-        top = margin
-      }
-    } else if (top + tooltipRect.height > viewportHeight - margin) {
-      // Try top if bottom is too low
-      if (position !== 'top') {
-        const topPos = positions.top
-        if (topPos.top >= margin) {
-          top = topPos.top
-          finalPosition = 'top'
-        } else {
-          top = viewportHeight - tooltipRect.height - margin
-        }
-      } else {
-        top = viewportHeight - tooltipRect.height - margin
-      }
-    }
-    
-    // Apply position class for arrow styling
-    tooltip.className = `tooltip tooltip-${finalPosition}`
-    tooltip.style.top = `${Math.round(top)}px`
-    tooltip.style.left = `${Math.round(left)}px`
-    
+    tooltip.style.top = Math.round(top) + 'px'
+    tooltip.style.left = Math.round(left) + 'px'
     currentTooltip = tooltip
     
-    // Trigger animation
     requestAnimationFrame(() => {
-      if (currentTooltip === tooltip) {
-        tooltip.classList.add('show')
-      }
+      if (currentTooltip === tooltip) tooltip.classList.add('show')
     })
   }, 400)
 }
@@ -111,73 +48,44 @@ export function hideTooltip() {
     clearTimeout(tooltipTimeout)
     tooltipTimeout = null
   }
-  
   if (currentTooltip) {
-    currentTooltip.classList.remove('show')
+    const t = currentTooltip
+    currentTooltip = null
+    t.classList.remove('show')
     setTimeout(() => {
-      if (currentTooltip && currentTooltip.parentNode) {
-        try {
-          currentTooltip.parentNode.removeChild(currentTooltip)
-        } catch (e) {
-          // Element already removed
-        }
-      }
-      currentTooltip = null
+      if (t.parentNode) t.parentNode.removeChild(t)
     }, 150)
   }
 }
 
-const tooltipElements = new WeakSet()
+const initialized = new WeakSet()
 
 export function initTooltips() {
-  document.querySelectorAll('[data-tooltip]').forEach(element => {
-    // Skip if already initialized
-    if (tooltipElements.has(element)) {
-      return
+  document.querySelectorAll('[data-tooltip]').forEach((el) => {
+    if (initialized.has(el)) return
+    initialized.add(el)
+    
+    // Remove title attribute to prevent browser tooltip
+    if (el.hasAttribute('title')) {
+      el.removeAttribute('title')
     }
     
-    tooltipElements.add(element)
-    
-    const handleMouseEnter = () => {
-      const text = element.getAttribute('data-tooltip')
-      const position = element.getAttribute('data-tooltip-position') || 'bottom'
-      if (text) {
-        showTooltip(element, text, position)
-      }
-    }
-    
-    const handleMouseLeave = () => {
-      hideTooltip()
-    }
-    
-    const handleClick = () => {
-      hideTooltip()
-    }
-    
-    element.addEventListener('mouseenter', handleMouseEnter)
-    element.addEventListener('mouseleave', handleMouseLeave)
-    element.addEventListener('click', handleClick)
+    el.addEventListener('mouseenter', () => {
+      const text = el.getAttribute('data-tooltip')
+      if (text) showTooltip(el, text)
+    })
+    el.addEventListener('mouseleave', hideTooltip)
+    el.addEventListener('click', hideTooltip)
   })
 }
 
-// Auto-initialize tooltips
+// Auto-init and watch for new elements
 if (typeof window !== 'undefined') {
-  // Initial setup
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTooltips)
-  } else {
+  const init = () => {
     initTooltips()
+    new MutationObserver(() => initTooltips()).observe(document.body, { childList: true, subtree: true })
   }
   
-  // Watch for dynamically added elements
-  const observer = new MutationObserver(() => {
-    initTooltips()
-  })
-  
-  if (document.body) {
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    })
-  }
+  if (document.body) init()
+  else document.addEventListener('DOMContentLoaded', init)
 }

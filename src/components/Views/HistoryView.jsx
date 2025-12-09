@@ -368,7 +368,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
               "p-1 bg-transparent border-none cursor-pointer rounded",
               "opacity-40 transition-all duration-200 flex items-center justify-center",
               "w-7 h-7 shrink-0",
-              "hover:opacity-100 hover:bg-error/10"
+              "hover:opacity-100 hover:bg-fill-tertiary"
             )}
             onClick={(e) => { e.stopPropagation(); handleDeleteItem(item) }}
             data-tooltip={t('common.delete')}
@@ -418,7 +418,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
             </span>
           </div>
           <button 
-            className="p-1 bg-transparent border-none cursor-pointer rounded opacity-40 transition-all duration-200 flex items-center justify-center w-7 h-7 shrink-0 hover:opacity-100 hover:bg-error/10"
+            className="p-1 bg-transparent border-none cursor-pointer rounded opacity-40 transition-all duration-200 flex items-center justify-center w-7 h-7 shrink-0 hover:opacity-100 hover:bg-fill-tertiary"
             onClick={(e) => { e.stopPropagation(); handleDeleteItem(item) }}
             data-tooltip={t('common.delete')}
             data-tooltip-position="left"
@@ -457,7 +457,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         {/* Content */}
         <div className="flex-1 flex flex-col items-center p-0 w-full overflow-hidden bg-bg-tertiary">
           {/* Header */}
-          <div className="flex items-center justify-between py-4 pr-0 bg-bg-tertiary w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] max-md:flex-col max-md:items-start max-md:p-3 max-md:pr-4 max-md:gap-3">
+          <div className="flex items-center justify-between py-2 pr-0 bg-bg-tertiary w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] max-md:flex-col max-md:items-start max-md:p-3 max-md:pr-4 max-md:gap-3">
             <div className="flex items-center gap-4 max-md:w-full max-md:flex-col max-md:items-start max-md:gap-3">
               <h2 className="text-xl font-normal text-text-primary m-0">{t('history.title')}</h2>
               <div className="relative grid grid-cols-3 p-1 rounded-xl bg-bg-secondary border border-border-light max-md:w-full">
@@ -631,7 +631,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           )}
 
           {/* Table Container */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] pr-0 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent min-h-0 max-md:pr-0">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] pr-0 scrollbar-thin-hover min-h-0 max-md:pr-0">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-10 px-5 text-center min-h-96 flex-1">
                 <p className="text-sm text-text-secondary mb-8 leading-relaxed max-w-modal-sm">{t('history.loadingFromDrive')}</p>

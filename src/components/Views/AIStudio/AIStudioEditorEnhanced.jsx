@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNotes } from '../../../contexts/NotesContext'
 import { useAIProcessing } from '@/stores'
-import { useProfiles } from '../../../contexts/ProfileContext'
+import modal from '../../../utils/modal'
 
 import { truncateTitleByWords } from '../../../utils/titleUtils'
-import TextHighlightEditor from '../../Analysis/TextHighlightEditor'
+import TiptapEditor from '../../Editor/TiptapEditor'
+import EditorToolbar from '../../Editor/EditorToolbar'
 import EditTitleModal from '../../Common/EditTitleModal'
 import TokenBadge from '../../Common/TokenBadge'
 import { cn } from '../../../lib/utils'
@@ -20,7 +21,6 @@ const AIStudioEditorEnhanced = ({
   const { t } = useTranslation()
   const { currentNote, updateNote } = useNotes()
   const { isProcessing } = useAIProcessing()
-  const { currentProfile } = useProfiles()
   
   const [analysis, setAnalysis] = useState(null)
   const [showHighlights, setShowHighlights] = useState(true)
@@ -30,6 +30,8 @@ const AIStudioEditorEnhanced = ({
   const [isTypingTitle, setIsTypingTitle] = useState(false)
   const titleGenerationTimeoutRef = useRef(null)
   const isGeneratingTitleRef = useRef(false)
+  const fileInputRef = useRef(null)
+  const [tiptapEditor, setTiptapEditor] = useState(null)
 
   // Store currentNote and updateNote in refs to avoid dependency issues
   const currentNoteRef = useRef(currentNote)
@@ -173,6 +175,97 @@ const AIStudioEditorEnhanced = ({
     }
   }
 
+  // File upload handler
+  const handleFileUpload = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const validTypes = [
+      'text/plain',
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword'
+    ]
+
+    const fileName = file.name.toLowerCase()
+    const isValidType = validTypes.includes(file.type) || 
+                       fileName.endsWith('.txt') || 
+                       fileName.endsWith('.pdf') || 
+                       fileName.endsWith('.docx') || 
+                       fileName.endsWith('.doc')
+
+    if (!isValidType) {
+      modal.error(t('rewrite.onlyTxtPdfDocx'))
+      return
+    }
+
+    const loadingModal = modal.loading(t('rewrite.readingFile'))
+
+    try {
+      let extractedText = ''
+
+      if (file.type === 'text/plain' || fileName.endsWith('.txt')) {
+        extractedText = await file.text()
+      } else if (file.type === 'application/pdf' || fileName.endsWith('.pdf')) {
+        try {
+          const pdfjsModule = await import('pdfjs-dist')
+          const pdfjsLib = pdfjsModule.default || pdfjsModule
+          
+          if (pdfjsLib.GlobalWorkerOptions) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`
+          }
+          
+          const arrayBuffer = await file.arrayBuffer()
+          const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer })
+          const pdf = await loadingTask.promise
+          
+          let fullText = ''
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i)
+            const textContent = await page.getTextContent()
+            const pageText = textContent.items.map(item => 'str' in item ? item.str : '').join(' ')
+            fullText += pageText + '\n\n'
+          }
+          
+          extractedText = fullText.trim()
+        } catch (pdfError) {
+          console.error('PDF parsing error:', pdfError)
+          loadingModal.close()
+          modal.error(t('rewrite.unableToReadPdf') + ' ' + pdfError.message)
+          return
+        }
+      } else if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
+        try {
+          const mammothModule = await import('mammoth')
+          const mammoth = mammothModule.default || mammothModule
+          const arrayBuffer = await file.arrayBuffer()
+          const result = await mammoth.extractRawText({ arrayBuffer })
+          extractedText = result.value
+        } catch (docxError) {
+          console.error('DOCX parsing error:', docxError)
+          loadingModal.close()
+          modal.error(t('rewrite.unableToReadDocx') + ' ' + docxError.message)
+          return
+        }
+      }
+
+      loadingModal.close()
+
+      if (extractedText && currentNote) {
+        updateNote(currentNote.id, { content: extractedText })
+        modal.success(t('rewrite.fileContentLoaded'))
+      } else {
+        modal.error(t('rewrite.unableToExtractContent'))
+      }
+    } catch (error) {
+      loadingModal.close()
+      console.error('Error reading file:', error)
+      modal.error(t('rewrite.unableToReadFile') + ' ' + error.message)
+    }
+
+    event.target.value = ''
+  }
+
   useEffect(() => {
     if (analysis && currentNote?.content) {
       const originalLength = analysis.sentence_analysis?.reduce(
@@ -193,51 +286,71 @@ const AIStudioEditorEnhanced = ({
       "h-full w-full box-border"
     )}>
       <header className={cn(
-        "flex items-center gap-2 py-2 px-4",
+        "flex flex-col",
         "border-b border-border-light",
-        "bg-bg-tertiary h-14 shrink-0"
+        "bg-bg-tertiary shrink-0"
       )}>
-        <button 
-          className={cn(
-            "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
-            "w-8 h-8 shrink-0 flex items-center justify-center",
-            "transition-colors duration-200",
-            "hover:bg-bg-hover"
-          )}
-          onClick={onToggleLeftSidebar}
-          data-tooltip={t('common.menu')} 
-          data-tooltip-position="right"
-        >
-          <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
-        </button>
-        
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <div 
-            className="text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-xl shrink-0"
-            title={currentNote?.title || ''}
-          >
-            {displayTitle || t('editor.untitled')}
-          </div>
+        {/* Top row - title and actions */}
+        <div className="flex items-center gap-2 py-2 px-4 h-14">
           <button 
             className={cn(
-              "bg-transparent border-none p-1.5 cursor-pointer rounded-md shrink-0",
-              "flex items-center justify-center opacity-50 transition-all duration-200",
-              "hover:opacity-100 hover:bg-bg-hover hover:scale-110",
-              "disabled:opacity-30 disabled:cursor-not-allowed"
+              "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+              "w-8 h-8 shrink-0 flex items-center justify-center",
+              "transition-colors duration-200",
+              "hover:bg-bg-hover"
             )}
-            onClick={handleEditClick}
-            data-tooltip={t('common.edit')}
-            data-tooltip-position="bottom"
-            disabled={isTypingTitle}
+            onClick={onToggleLeftSidebar}
+            data-tooltip={t('common.menu')} 
+            data-tooltip-position="right"
           >
-            <img src="/icon/pencil.svg" alt={t('common.edit')} className="w-3.5 h-3.5 icon-invert" />
+            <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
           </button>
           
-          <TokenBadge text={currentNote?.content || ''} />
-        </div>
-        
-        <div className="flex items-center gap-1">
-          {hasHighlights && showHighlights && (
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div 
+              className="text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-xl shrink-0"
+              title={currentNote?.title || ''}
+            >
+              {displayTitle || t('editor.untitled')}
+            </div>
+            <button 
+              className={cn(
+                "bg-transparent border-none p-1.5 cursor-pointer rounded-md shrink-0",
+                "flex items-center justify-center opacity-50 transition-all duration-200",
+                "hover:opacity-100 hover:bg-bg-hover hover:scale-110",
+                "disabled:opacity-30 disabled:cursor-not-allowed"
+              )}
+              onClick={handleEditClick}
+              data-tooltip={t('common.edit')}
+              data-tooltip-position="bottom"
+              disabled={isTypingTitle}
+            >
+              <img src="/icon/pencil.svg" alt={t('common.edit')} className="w-3.5 h-3.5 icon-invert" />
+            </button>
+            
+            <TokenBadge text={currentNote?.content || ''} />
+          </div>
+          
+          <div className="flex items-center gap-1">
+            {hasHighlights && showHighlights && (
+              <button 
+                className={cn(
+                  "flex items-center gap-1.5 py-1.5 px-3.5",
+                  "bg-transparent text-text-primary",
+                  "border border-border-light",
+                  "rounded-pill text-sm font-medium cursor-pointer",
+                  "transition-all duration-200",
+                  "hover:bg-bg-hover",
+                  "hover:border-border-hover"
+                )}
+                onClick={() => setShowHighlights(false)}
+                data-tooltip={t('common.hide')}
+              >
+                <img src="/icon/eye-off.svg" alt={t('common.hide')} className="w-4 h-4 opacity-70 icon-invert" />
+                <span>{t('common.done')}</span>
+              </button>
+            )}
+
             <button 
               className={cn(
                 "flex items-center gap-1.5 py-1.5 px-3.5",
@@ -248,40 +361,62 @@ const AIStudioEditorEnhanced = ({
                 "hover:bg-bg-hover",
                 "hover:border-border-hover"
               )}
-              onClick={() => setShowHighlights(false)}
-              data-tooltip={t('common.hide')}
+              onClick={onCreateNote}
+              data-tooltip={t('common.new')}
             >
-              <img src="/icon/eye-off.svg" alt={t('common.hide')} className="w-4 h-4 opacity-70 icon-invert" />
-              <span>{t('common.done')}</span>
+              <img src="/icon/plus.svg" alt={t('common.new')} className="w-4 h-4 opacity-70 icon-invert" />
+              <span>{t('common.new')}</span>
             </button>
-          )}
-
-          <button 
-            className={cn(
-              "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
-              "w-8 h-8 flex items-center justify-center",
-              "transition-colors duration-200",
-              "hover:bg-bg-hover"
-            )}
-            onClick={onCreateNote}
-            data-tooltip={t('common.new')}
-          >
-            <img src="/icon/plus.svg" alt={t('common.new')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
-          </button>
-          {rightSidebarHidden && (
             <button 
               className={cn(
-                "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
-                "w-8 h-8 flex items-center justify-center",
-                "transition-colors duration-200",
-                "hover:bg-bg-hover"
+                "flex items-center gap-1.5 py-1.5 px-3.5",
+                "bg-transparent text-text-primary",
+                "border border-border-light",
+                "rounded-pill text-sm font-medium cursor-pointer",
+                "transition-all duration-200",
+                "hover:bg-bg-hover",
+                "hover:border-border-hover"
               )}
-              onClick={onToggleRightSidebar}
-              data-tooltip={t('nav.sidebar')}
+              onClick={() => fileInputRef.current?.click()}
+              data-tooltip={t('common.upload')}
             >
-              <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+              <img src="/icon/upload.svg" alt={t('common.upload')} className="w-4 h-4 opacity-70 icon-invert" />
+              <span>{t('common.upload')}</span>
             </button>
-          )}
+            {rightSidebarHidden && (
+              <button 
+                className={cn(
+                  "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+                  "w-8 h-8 flex items-center justify-center",
+                  "transition-colors duration-200",
+                  "hover:bg-bg-hover"
+                )}
+                onClick={onToggleRightSidebar}
+                data-tooltip={t('nav.sidebar')}
+              >
+                <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+              </button>
+            )}
+            
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".txt,.pdf,.docx,.doc"
+              onChange={handleFileUpload}
+              style={{ display: 'none' }}
+            />
+          </div>
+        </div>
+
+        {/* Toolbar row */}
+        <div className="px-4 pb-2">
+          <EditorToolbar 
+            editor={tiptapEditor}
+            visible={!isProcessing}
+            disabled={isProcessing}
+            className="border-none shadow-none rounded-lg"
+          />
         </div>
       </header>
 
@@ -290,16 +425,17 @@ const AIStudioEditorEnhanced = ({
         "bg-bg-tertiary",
         "overflow-hidden h-full w-full box-border"
       )}>
-        <TextHighlightEditor
+        <TiptapEditor
           value={currentNote?.content || ''}
           onChange={handleContentChange}
           analysis={analysis}
           disabled={isProcessing}
+          isProcessing={isProcessing}
           placeholder={t('editor.enterYourText')}
           showHighlights={showHighlights}
           onHighlightsChange={setHasHighlights}
-          showRewriteToolbar={true}
-          currentProfile={currentProfile}
+          showToolbar={false}
+          onEditorReady={setTiptapEditor}
         />
       </div>
 

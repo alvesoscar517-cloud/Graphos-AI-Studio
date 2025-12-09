@@ -5,6 +5,8 @@ import EmailLoginForm from './EmailLoginForm'
 import EmailRegisterForm from './EmailRegisterFormV2'
 import OTPVerification from './OTPVerification'
 import ForgotPassword from './ForgotPasswordV2'
+import LazyLottie from '../Common/LazyLottie'
+import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
 
 const LoginOverlay = () => {
@@ -259,10 +261,15 @@ const LoginOverlay = () => {
   const renderAuthContent = () => {
     if (authLoading) {
       return (
-        <>
+        <div className="flex flex-col items-center justify-center">
           <h2 className="text-2xl font-semibold text-gray-900 mb-2 tracking-tight">{t('auth.checking')}</h2>
-          <p className="text-md text-gray-400 leading-relaxed mb-8">{t('auth.pleaseWait')}</p>
-        </>
+          <LazyLottie 
+            animationData={threeDotsAnimation} 
+            loop={true}
+            style={{ width: 60, height: 40 }}
+          />
+          <p className="text-md text-gray-400 leading-relaxed">{t('auth.pleaseWait')}</p>
+        </div>
       )
     }
 

@@ -65,12 +65,10 @@ export default function ConfirmDialog({
 }) {
   const handleConfirm = async () => {
     await onConfirm?.()
-    onOpenChange?.(false)
   }
 
   const handleCancel = () => {
     onCancel?.()
-    onOpenChange?.(false)
   }
 
   return (

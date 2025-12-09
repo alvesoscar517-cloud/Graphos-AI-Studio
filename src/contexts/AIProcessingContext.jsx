@@ -18,11 +18,13 @@ const AIProcessingContext = createContext()
 export const useAIProcessing = () => {
   // Use Zustand store directly for better performance
   const isProcessing = useAIProcessingStore((state) => state.isProcessing)
+  const isStreaming = useAIProcessingStore((state) => state.isStreaming)
   const processingType = useAIProcessingStore((state) => state.processingType)
   const startProcessing = useAIProcessingStore((state) => state.startProcessing)
+  const startStreaming = useAIProcessingStore((state) => state.startStreaming)
   const stopProcessing = useAIProcessingStore((state) => state.stopProcessing)
 
-  return { isProcessing, processingType, startProcessing, stopProcessing }
+  return { isProcessing, isStreaming, processingType, startProcessing, startStreaming, stopProcessing }
 }
 
 /**

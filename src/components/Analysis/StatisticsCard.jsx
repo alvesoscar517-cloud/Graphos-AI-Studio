@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
@@ -231,31 +232,31 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
         {stats && showResult && (
           <div className="mt-2 block animate-slide-down">
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-2 gap-2">
               <div className="stat-box">
                 <div className="stat-box-icon">
-                  <Icon name="book-open" size="md" color="primary" />
+                  <Icon name="book-open" size="lg" color="primary" />
                 </div>
-                <span className="stat-box-label">{t('analysis.readability').toUpperCase()}</span>
+                <span className="stat-box-label">{t('analysis.readability')}</span>
                 <span className="stat-box-value">{stats.readabilityScore}</span>
               </div>
               <div className="stat-box">
                 <div className="stat-box-icon">
-                  <Icon name="align-left" size="md" color="primary" />
+                  <Icon name="align-left" size="lg" color="primary" />
                 </div>
                 <span className="stat-box-label">{t('analysis.avgSentence')}</span>
                 <span className="stat-box-value">{stats.avgSentenceLength}</span>
               </div>
               <div className="stat-box">
                 <div className="stat-box-icon">
-                  <Icon name="zap" size="md" color="primary" />
+                  <Icon name="zap" size="lg" color="primary" />
                 </div>
-                <span className="stat-box-label">{t('analysis.vocabulary').toUpperCase()}</span>
+                <span className="stat-box-label">{t('analysis.vocabulary')}</span>
                 <span className="stat-box-value">{stats.vocabularyRichness}%</span>
               </div>
               <div className="stat-box">
                 <div className="stat-box-icon">
-                  <Icon name="type" size="md" color="primary" />
+                  <Icon name="type" size="lg" color="primary" />
                 </div>
                 <span className="stat-box-label">{t('analysis.totalWords')}</span>
                 <span className="stat-box-value">{stats.totalWords}</span>
@@ -264,14 +265,9 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
 
             {/* Suggestions Preview */}
             {suggestions.length > 0 && (
-              <div className="mt-2 p-2 bg-bg-secondary rounded-lg">
-                <div className="flex items-center gap-2 text-xs text-text-secondary mb-1">
-                  <Icon name="lightbulb" size="sm" color="primary" />
-                  <span>{suggestions.length} {t('analysis.suggestions')}</span>
-                </div>
-                <div className="text-xs text-text-primary truncate">
-                  {suggestions[0]?.message?.substring(0, 80)}...
-                </div>
+              <div className="mt-2 py-2.5 px-3 bg-bg-primary border border-border-light rounded-xl flex items-center gap-2">
+                <Icon name="lightbulb" size="sm" color="primary" />
+                <span className="text-sm text-text-primary font-medium">{suggestions.length} {t('analysis.suggestions')}</span>
               </div>
             )}
 
@@ -293,8 +289,8 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
         )}
       </div>
 
-      {/* Detail Modal */}
-      {showModal && stats && (
+      {/* Detail Modal - rendered via Portal to escape sidebar container */}
+      {showModal && stats && createPortal(
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
@@ -311,7 +307,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-6">
               {/* Readability Score */}
-              <div className="flex items-center justify-between p-4 bg-bg-secondary rounded-xl mb-5">
+              <div className="flex items-center justify-between p-4 bg-fill-tertiary border border-border-light rounded-xl mb-5">
                 <div>
                   <div className="text-sm text-text-secondary mb-1">{t('analysis.readability')}</div>
                   <div className="text-3xl font-semibold" style={{ color: getReadabilityColor(stats.readabilityScore) }}>{stats.readabilityScore}</div>
@@ -326,19 +322,19 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
 
               {/* Stats Grid */}
               <div className="grid grid-cols-4 gap-3 mb-4">
-                <div className="p-3 bg-bg-secondary rounded-lg text-center">
+                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center">
                   <div className="text-2xs text-text-secondary mb-1">{t('analysis.words')}</div>
                   <div className="text-xl font-semibold text-text-primary">{stats.totalWords}</div>
                 </div>
-                <div className="p-3 bg-bg-secondary rounded-lg text-center">
+                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center">
                   <div className="text-2xs text-text-secondary mb-1">{t('analysis.sentences')}</div>
                   <div className="text-xl font-semibold text-text-primary">{stats.totalSentences}</div>
                 </div>
-                <div className="p-3 bg-bg-secondary rounded-lg text-center">
+                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center">
                   <div className="text-2xs text-text-secondary mb-1">{t('analysis.paragraphs')}</div>
                   <div className="text-xl font-semibold text-text-primary">{stats.totalParagraphs || 1}</div>
                 </div>
-                <div className="p-3 bg-bg-secondary rounded-lg text-center">
+                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center">
                   <div className="text-2xs text-text-secondary mb-1">{t('analysis.transitions')}</div>
                   <div className="text-xl font-semibold text-text-primary">{stats.transitionWordCount || 0}</div>
                 </div>
@@ -346,45 +342,49 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
 
               {/* Benchmark Comparison */}
               {benchmarkData && benchmarkData.comparison && (
-                <div className="p-3 bg-bg-secondary rounded-lg mb-4">
+                <div className="p-4 bg-fill-tertiary border border-border-light rounded-xl mb-5">
                   <h4 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
                     <Icon name="bar-chart-2" size="sm" color="primary" />
                     {t('analysis.benchmarkComparison')} ({benchmarkData.styleType})
                   </h4>
                   <div className="flex flex-col gap-2">
-                    {Object.entries(benchmarkData.comparison).map(([key, data]) => (
-                      <div key={key} className="flex items-center gap-2">
-                        <span className="text-xs text-text-secondary w-label-lg flex-shrink-0">{getBenchmarkLabel(key)}</span>
-                        <div className="flex-1 h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
-                          <div 
-                            className={cn("h-full rounded-sm", data.status === 'good' ? 'bg-success' : data.status === 'warning' ? 'bg-warning' : 'bg-error')}
-                            style={{ width: `${Math.min(100, data.benchmarkScore)}%` }}
-                          />
+                    {Object.entries(benchmarkData.comparison).map(([key, data]) => {
+                      const score = data.benchmarkScore
+                      const barColor = score >= 70 ? 'bg-success' : score >= 50 ? 'bg-warning' : 'bg-error'
+                      return (
+                        <div key={key} className="flex items-center gap-2">
+                          <span className="text-xs text-text-secondary w-label-lg flex-shrink-0">{getBenchmarkLabel(key)}</span>
+                          <div className="flex-1 h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
+                            <div 
+                              className={cn("h-full rounded-sm", barColor)}
+                              style={{ width: `${Math.min(100, score)}%` }}
+                            />
+                          </div>
+                          <span className="text-xs font-semibold text-text-primary w-10 text-right">{Math.round(score)}%</span>
                         </div>
-                        <span className="text-xs font-semibold text-text-primary w-10 text-right">{Math.round(data.benchmarkScore)}%</span>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               )}
 
               {/* Suggestions */}
               {suggestions.length > 0 && (
-                <div className="p-3 bg-bg-secondary rounded-lg mb-4">
+                <div className="p-4 bg-fill-tertiary border border-border-light rounded-xl mb-5">
                   <h4 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
                     <Icon name="lightbulb" size="sm" color="primary" />
                     {t('analysis.improvementSuggestions')} ({suggestions.length})
                   </h4>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3">
                     {suggestions.map((suggestion, index) => (
-                      <div key={index} className={cn("p-2 rounded-lg", suggestion.status === 'low' ? 'bg-error/10' : 'bg-success/10')}>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={cn("text-2xs py-0.5 px-1.5 rounded font-medium", suggestion.status === 'low' ? 'bg-error/20 text-error' : 'bg-success/20 text-success')}>
+                      <div key={index} className={cn("p-3 rounded-xl", suggestion.status === 'low' ? 'bg-error/10' : 'bg-success/10')}>
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className={cn("text-2xs py-0.5 px-2 rounded-full font-medium", suggestion.status === 'low' ? 'bg-error/20 text-error' : 'bg-success/20 text-success')}>
                             {suggestion.status === 'low' ? `↓ ${t('analysis.low')}` : `↑ ${t('analysis.high')}`}
                           </span>
                           <span className="text-xs font-medium text-text-primary">{getBenchmarkLabel(suggestion.metric)}</span>
                         </div>
-                        <p className="text-xs text-text-secondary m-0">{suggestion.message}</p>
+                        <p className="text-xs text-text-secondary m-0 leading-relaxed">{suggestion.message}</p>
                       </div>
                     ))}
                   </div>
@@ -392,7 +392,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
               )}
 
               {/* Readability Explanation */}
-              <div className="p-3 bg-bg-secondary rounded-lg">
+              <div className="p-4 bg-fill-tertiary border border-border-light rounded-xl">
                 <h4 className="text-sm font-semibold text-text-primary mb-2">{t('analysis.readabilityExplanation')}</h4>
                 <div className="text-xs text-text-secondary space-y-1">
                   <p className="m-0"><strong>80-100:</strong> {t('analysis.veryEasyToRead')}</p>
@@ -406,7 +406,8 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )

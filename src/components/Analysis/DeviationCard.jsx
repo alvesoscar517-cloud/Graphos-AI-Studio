@@ -150,60 +150,101 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
       {/* Result Section */}
       {analysisData && showResult && (
         <div className="mt-2 block animate-slide-down">
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-1.5">
-            <div className="stat-box">
-              <div className="stat-box-icon">
-                <Icon name="target" size="md" color="primary" />
+          <div className="flex flex-col items-center gap-2 p-0">
+            {/* Score Circle - matching system design */}
+            <div className="relative w-score-circle h-score-circle flex items-center justify-center my-3">
+              <svg 
+                className="absolute top-0 left-0 w-full h-full -rotate-90" 
+                viewBox="0 0 100 100"
+                style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08))' }}
+              >
+                <defs>
+                  <linearGradient id="deviationGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#93c5fd" />
+                    <stop offset="50%" stopColor="#3b82f6" />
+                    <stop offset="100%" stopColor="#2563eb" />
+                  </linearGradient>
+                </defs>
+                <circle 
+                  className="fill-none" 
+                  cx="50" cy="50" r="42"
+                  style={{ stroke: 'var(--color-border-light)', strokeWidth: 8 }}
+                />
+                <circle 
+                  className="fill-none"
+                  cx="50" cy="50" r="42"
+                  style={{
+                    stroke: 'url(#deviationGradient)',
+                    strokeWidth: 8,
+                    strokeDasharray: 263.89,
+                    strokeDashoffset: 263.89 - (analysisData.voice_compatibility_score / 100) * 263.89,
+                    strokeLinecap: 'round',
+                    transition: 'stroke-dashoffset 0.5s ease-out',
+                    filter: 'drop-shadow(0 1px 3px rgba(66, 133, 244, 0.3))'
+                  }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex items-baseline justify-center gap-0.5">
+                  <span className="text-2xl font-semibold leading-none tracking-tight text-text-primary">{analysisData.voice_compatibility_score}</span>
+                  <span className="text-xs font-medium leading-none text-text-secondary opacity-60">%</span>
+                </div>
               </div>
-              <span className="stat-box-label">{t('analysis.compatibility').toUpperCase()}</span>
-              <span className="stat-box-value">{analysisData.voice_compatibility_score}%</span>
             </div>
-            <div className="stat-box">
-              <div className="stat-box-icon">
-                <Icon name="alert-circle" size="md" color="primary" />
+
+            {/* Verdict Label */}
+            <div className="w-full flex justify-center">
+              <div className="inline-flex items-center gap-2 py-2 px-3 bg-bg-secondary border border-border-light rounded-lg text-xs font-medium text-text-primary">
+                <Icon name="target" size="sm" color="primary" className="flex-shrink-0 -mt-px" />
+                <span className="whitespace-nowrap leading-none">{t('analysis.compatibility')}</span>
               </div>
-              <span className="stat-box-label">{t('analysis.sentencesWithSuggestions')}</span>
-              <span className="stat-box-value">
-                {analysisData.sentence_suggestions ? Object.keys(analysisData.sentence_suggestions).filter(key => analysisData.sentence_suggestions[key].issues_found > 0).length : 0}
+            </div>
+
+            {/* Sentences with Suggestions */}
+            <div className="w-full p-2 px-3 bg-bg-secondary rounded-lg">
+              <span className="text-2xs text-text-secondary block mb-1.5">{t('analysis.suggestions')}</span>
+              <span className="text-2xs py-1 px-2 rounded-md bg-primary/15 text-primary font-medium">
+                {analysisData.sentence_suggestions ? Object.keys(analysisData.sentence_suggestions).filter(key => analysisData.sentence_suggestions[key].issues_found > 0).length : 0} {t('analysis.sentences')}
               </span>
             </div>
-          </div>
 
-          {deviations.length > 0 ? (
-            <>
-              {/* Severity Summary */}
-              {analysisData.deviation_summary && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
+            {/* Severity Summary */}
+            {deviations.length > 0 && analysisData.deviation_summary && (
+              <div className="w-full p-2 px-3 bg-bg-secondary rounded-lg">
+                <span className="text-2xs text-text-secondary block mb-1.5">{t('analysis.bySeverity')}</span>
+                <div className="flex flex-wrap gap-1.5">
                   {analysisData.deviation_summary.by_severity?.severe > 0 && (
-                    <span className="text-2xs py-1 px-2 rounded bg-error/15 text-error font-medium">
+                    <span className="text-2xs py-1 px-2 rounded-md bg-error/15 text-error font-medium">
                       {analysisData.deviation_summary.by_severity.severe} {t('analysis.severe')}
                     </span>
                   )}
                   {analysisData.deviation_summary.by_severity?.moderate > 0 && (
-                    <span className="text-2xs py-1 px-2 rounded bg-warning/15 text-warning font-medium">
+                    <span className="text-2xs py-1 px-2 rounded-md bg-warning/15 text-warning font-medium">
                       {analysisData.deviation_summary.by_severity.moderate} {t('analysis.moderate')}
                     </span>
                   )}
                   {analysisData.deviation_summary.by_severity?.mild > 0 && (
-                    <span className="text-2xs py-1 px-2 rounded bg-primary/15 text-primary font-medium">
+                    <span className="text-2xs py-1 px-2 rounded-md bg-primary/15 text-primary font-medium">
                       {analysisData.deviation_summary.by_severity.mild} {t('analysis.mild')}
                     </span>
                   )}
                 </div>
-              )}
-              
-              <div className="flex items-center gap-2 mt-2 p-2 bg-bg-secondary rounded-lg text-xs text-text-secondary">
-                <Icon name="mouse-pointer" size="sm" color="muted" />
+              </div>
+            )}
+
+            {/* Hint or Success Message */}
+            {deviations.length > 0 ? (
+              <div className="w-full flex items-center gap-1.5 py-1.5 px-2.5 bg-bg-secondary border border-border-light rounded-lg text-xs text-text-muted leading-normal">
+                <Icon name="mouse-pointer" size="xs" color="muted" className="flex-shrink-0 opacity-50" />
                 <span>{t('analysis.clickHighlightedSentences')}</span>
               </div>
-            </>
-          ) : (
-            <div className="flex items-center gap-2 mt-2 p-2 bg-success/10 rounded-lg text-xs text-success">
-              <Icon name="check-circle" size="sm" color="success" />
-              <span>{t('analysis.textMatchesStyle')}</span>
-            </div>
-          )}
+            ) : (
+              <div className="w-full flex items-center gap-2 py-2 px-3 bg-success/10 rounded-lg text-xs text-success">
+                <Icon name="check-circle" size="sm" color="success" />
+                <span>{t('analysis.textMatchesStyle')}</span>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -54,6 +54,14 @@ async function apiCall(endpoint, options = {}) {
   return data;
 }
 
+// Helper to create clean query params (filters out undefined/null/empty values)
+function createQueryParams(params = {}) {
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(([_, v]) => v !== undefined && v !== null && v !== '')
+  );
+  return new URLSearchParams(cleanParams);
+}
+
 // ============================================================================
 // AUTHENTICATION (Legacy - kept for backward compatibility)
 // ============================================================================
@@ -402,7 +410,7 @@ export const logsApi = {
 export const activityLogsApi = {
   // Get all activity logs (admin overview)
   getAll: async (params = {}) => {
-    const queryParams = new URLSearchParams(params);
+    const queryParams = createQueryParams(params);
     return apiCall(`/api/admin/activity-logs?${queryParams}`);
   },
 
@@ -413,25 +421,25 @@ export const activityLogsApi = {
 
   // Get user activity logs
   getUserLogs: async (userId, params = {}) => {
-    const queryParams = new URLSearchParams(params);
+    const queryParams = createQueryParams(params);
     return apiCall(`/api/admin/activity-logs/user/${userId}?${queryParams}`);
   },
 
   // Get user activity summary
   getUserSummary: async (userId, params = {}) => {
-    const queryParams = new URLSearchParams(params);
+    const queryParams = createQueryParams(params);
     return apiCall(`/api/admin/activity-logs/user/${userId}/summary?${queryParams}`);
   },
 
   // Get user credit transactions
   getUserCredits: async (userId, params = {}) => {
-    const queryParams = new URLSearchParams(params);
+    const queryParams = createQueryParams(params);
     return apiCall(`/api/admin/activity-logs/user/${userId}/credits?${queryParams}`);
   },
 
   // Get user feature usage
   getUserFeatures: async (userId, params = {}) => {
-    const queryParams = new URLSearchParams(params);
+    const queryParams = createQueryParams(params);
     return apiCall(`/api/admin/activity-logs/user/${userId}/features?${queryParams}`);
   },
 
@@ -441,6 +449,11 @@ export const activityLogsApi = {
       method: 'POST',
       body: JSON.stringify({ daysToKeep }),
     });
+  },
+
+  // Debug endpoint to check collection status
+  debug: async () => {
+    return apiCall('/api/admin/activity-logs/debug');
   },
 };
 

@@ -48,7 +48,7 @@ const DevModeToggle = () => {
           "hover:scale-110 hover:shadow-glow-purple-lg"
         )}
         onClick={() => setIsOpen(!isOpen)}
-        title={t('devMode.devModeSettings')}
+        data-tooltip={t('devMode.devModeSettings')}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="16 18 22 12 16 6"></polyline>

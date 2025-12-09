@@ -191,7 +191,7 @@ const Step3ShortSamples = ({
                 )}
                 onClick={() => onNavigateSample('prev')}
                 disabled={samples.length === 0}
-                title={t('profileSetup.viewPreviousSample')}
+                data-tooltip={t('profileSetup.viewPreviousSample')}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="15 18 9 12 15 6"></polyline>
@@ -254,7 +254,7 @@ const Step3ShortSamples = ({
                 )}
                 onClick={() => onNavigateSample('next')}
                 disabled={samples.length === 0}
-                title={t('profileSetup.viewNextSample')}
+                data-tooltip={t('profileSetup.viewNextSample')}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="9 18 15 12 9 6"></polyline>

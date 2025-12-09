@@ -257,7 +257,7 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                   <button 
                     className="notif-item-delete"
                     onClick={(e) => handleDelete(e, notif.id)}
-                    title={t('common.delete')}
+                    data-tooltip={t('common.delete')}
                   >
                     <img src="/icon/x.svg" alt={t('common.delete')} />
                   </button>
@@ -359,6 +359,8 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                     e.currentTarget.style.transform = 'scale(1)';
                     e.currentTarget.style.borderColor = 'var(--color-border-light)';
                   }}
+                  data-tooltip={t('common.close')}
+                  data-tooltip-position="bottom"
                 >
                   <img src="/icon/x.svg" alt={t('common.close')} className="icon-invert" style={{ 
                     width: '14px', 

@@ -585,7 +585,7 @@ const ProfileSetup = () => {
               {t('profileSetup.restore')}
             </button>
           </div>
-          <button className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-600 transition-all" onClick={handleDiscardDraft} aria-label={t('common.close')}>
+          <button className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-600 transition-all" onClick={handleDiscardDraft} aria-label={t('common.close')} data-tooltip={t('common.close')}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
@@ -596,7 +596,7 @@ const ProfileSetup = () => {
 
       {/* Auto-save indicator */}
       {lastSavedAt && currentStep < 4 && (
-        <div className="fixed bottom-6 right-6 z-modal-backdrop flex items-center gap-1.5 py-1.5 px-3 bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 text-xs text-gray-600" title={t('profileSetup.autoSavingDraft')}>
+        <div className="fixed bottom-6 right-6 z-modal-backdrop flex items-center gap-1.5 py-1.5 px-3 bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 text-xs text-gray-600" data-tooltip={t('profileSetup.autoSavingDraft')}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-success">
             <polyline points="20 6 9 17 4 12"/>
           </svg>

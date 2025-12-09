@@ -115,10 +115,6 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
     <>
       <div 
         className="flex flex-col flex-1 h-full bg-bg-tertiary overflow-hidden"
-        style={{
-          marginRight: rightSidebarHidden ? 0 : '300px',
-          transition: 'margin-right 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}
       >
         {/* Header */}
         <div className="flex items-center gap-2 py-2 px-4 border-b border-border-light bg-bg-tertiary h-14 shrink-0">

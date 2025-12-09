@@ -1,8 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import { useUser } from '../../../stores/authStore'
 import { cn } from '../../../lib/utils'
+import QuickActions from './QuickActions'
 
-const WorkspaceDefault = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden }) => {
+const WorkspaceDefault = ({ 
+  onToggleLeftSidebar, 
+  onToggleRightSidebar, 
+  rightSidebarHidden, 
+  onQuickAction,
+  chatInput // Render prop for SharedChatInput
+}) => {
   const { t } = useTranslation()
   const user = useUser() // Use Zustand store directly
 
@@ -47,13 +54,18 @@ const WorkspaceDefault = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSide
         )}
       </div>
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 pb-40 relative">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl max-md:text-2xl font-normal text-text-primary m-0">
-            {t('workspace.hello', { name: user?.name || user?.email?.split('@')[0] || 'friend' })}
-          </h1>
-        </div>
+      {/* Content - Flexbox centered layout with equal spacing */}
+      <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6">
+        {/* Title */}
+        <h1 className="text-4xl max-md:text-2xl font-normal text-text-primary m-0 text-center">
+          {t('workspace.hello', { name: user?.name || user?.email?.split('@')[0] || 'friend' })}
+        </h1>
+        
+        {/* Search Input - rendered via prop */}
+        {chatInput}
+        
+        {/* Quick Actions */}
+        <QuickActions onActionClick={onQuickAction} />
       </div>
     </div>
   )

@@ -10,10 +10,10 @@ import { getUserInfo } from '@/services/api'
 
 // Default packages với variant IDs
 const DEFAULT_PACKAGES = [
-  { id: 'basic', credits: 100, price: 4.99, bonus: 0, totalCredits: 100, description: 'Basic', icon: 'zap' },
-  { id: 'pro', credits: 500, price: 19.99, bonus: 50, totalCredits: 550, description: 'Pro', popular: true, icon: 'star' },
-  { id: 'pro_plus', credits: 1500, price: 49.99, bonus: 300, totalCredits: 1800, description: 'Pro+', icon: 'award' },
-  { id: 'power', credits: 5000, price: 149.99, bonus: 1500, totalCredits: 6500, description: 'Power', icon: 'rocket' }
+  { id: 'basic', credits: 100, price: 4.99, bonus: 0, totalCredits: 100, description: 'Basic', icon: 'crown-basic' },
+  { id: 'pro', credits: 500, price: 19.99, bonus: 50, totalCredits: 550, description: 'Pro', popular: true, icon: 'crown-pro' },
+  { id: 'pro_plus', credits: 1500, price: 49.99, bonus: 300, totalCredits: 1800, description: 'Pro+', icon: 'crown-pro-plus' },
+  { id: 'power', credits: 5000, price: 149.99, bonus: 1500, totalCredits: 6500, description: 'Power', icon: 'crown-ultimate' }
 ]
 
 /**

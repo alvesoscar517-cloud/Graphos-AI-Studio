@@ -62,9 +62,9 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
     <motion.aside 
       className={cn(
         "bg-bg-tertiary",
-        "border-r border-separator",
         "flex flex-col overflow-y-auto overflow-x-hidden scrollbar-thin",
-        "h-screen touch-pan-y shrink-0 relative",
+        "h-full touch-pan-y shrink-0 relative",
+        "rounded-md", // Floating panel effect
         isDragging ? "z-[100] shadow-xl" : "z-[50]"
       )}
       initial={false}
@@ -100,12 +100,10 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
           "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
           "text-text-primary text-body cursor-pointer relative my-0.5",
           "transition-all duration-200",
-          "focus:outline-none", 
-          currentView === 'home' 
-            ? "bg-system-blue text-white font-medium" 
-            : "hover:bg-fill-tertiary"
+          "focus:outline-none hover:bg-fill-tertiary", 
+          currentView === 'home' && "bg-fill-secondary"
         )} onClick={(e) => { e.preventDefault(); onViewChange('home') }}>
-          <Icon name="home" alt={t('nav.home')} size="lg" className={currentView === 'home' ? 'brightness-0 invert' : ''} />
+          <Icon name="home" alt={t('nav.home')} size="lg" />
           <span>{t('nav.home')}</span>
         </a>
 
@@ -116,12 +114,10 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
               "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
               "text-text-primary text-body cursor-pointer relative my-0.5",
               "transition-all duration-200",
-              "focus:outline-none",
-              isAIStudioActive 
-                ? "bg-system-blue text-white font-medium" 
-                : "hover:bg-fill-tertiary"
+              "focus:outline-none hover:bg-fill-tertiary",
+              isAIStudioActive && "bg-fill-secondary"
             )} onClick={(e) => { e.preventDefault(); onViewChange('aistudio-editor', { createNew: true }) }}>
-              <Icon name="play" alt={t('nav.aiStudio')} size="lg" className={isAIStudioActive ? 'brightness-0 invert' : ''} />
+              <Icon name="play" alt={t('nav.aiStudio')} size="lg" />
               <span>{t('nav.aiStudio')}</span>
             </a>
           );
@@ -131,12 +127,10 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
           "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
           "text-text-primary text-body cursor-pointer relative my-0.5",
           "transition-all duration-200",
-          "focus:outline-none", 
-          currentView === 'workspace' 
-            ? "bg-system-blue text-white font-medium" 
-            : "hover:bg-fill-tertiary"
+          "focus:outline-none hover:bg-fill-tertiary", 
+          currentView === 'workspace' && "bg-fill-secondary"
         )} onClick={(e) => { e.preventDefault(); onViewChange('workspace') }}>
-          <Icon name="message-square" alt={t('nav.aiWorkspace')} size="lg" className={currentView === 'workspace' ? 'brightness-0 invert' : ''} />
+          <Icon name="message-square" alt={t('nav.aiWorkspace')} size="lg" />
           <span>{t('nav.aiWorkspace')}</span>
         </a>
 

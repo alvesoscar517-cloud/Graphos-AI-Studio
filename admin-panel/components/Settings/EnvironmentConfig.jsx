@@ -126,7 +126,13 @@ export default function EnvironmentConfig() {
   };
 
   const handleDeleteCustomVariable = async (target, key) => {
-    if (!confirm(`Delete custom variable ${key}?`)) return;
+    const confirmed = await notify.confirm({
+      title: 'Delete Variable',
+      message: `Delete custom variable "${key}"?`,
+      confirmText: 'Delete',
+      type: 'danger'
+    });
+    if (!confirmed) return;
     
     try {
       const response = await envConfigApi.deleteCustomVariable(target, key);

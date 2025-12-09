@@ -271,8 +271,9 @@ const AIDetectionCard = ({ disabled, text }) => {
                 >
                   <defs>
                     <linearGradient id="aiDetectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#e8f4fd" />
-                      <stop offset="100%" stopColor="#4285f4" />
+                      <stop offset="0%" stopColor="#93c5fd" />
+                      <stop offset="50%" stopColor="#3b82f6" />
+                      <stop offset="100%" stopColor="#2563eb" />
                     </linearGradient>
                   </defs>
                   {/* Background circle - transparent fill */}
@@ -321,20 +322,22 @@ const AIDetectionCard = ({ disabled, text }) => {
               {/* Confidence Indicator */}
               {confidence !== null && (
                 <div className="w-full p-2 px-3 bg-bg-secondary rounded-lg mt-0">
-                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-2xs font-medium text-text-secondary uppercase tracking-wide">{t('analysis.confidence')}</span>
-                    <span className="text-sm font-semibold text-text-primary">{confidence}%</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
-                    <div 
-                      className={cn(
-                        "h-full rounded-sm transition-all duration-500",
-                        confidence < 60 && "bg-gradient-to-r from-orange-500 to-red-400",
-                        confidence >= 60 && confidence < 80 && "bg-gradient-to-r from-blue-500 to-cyan-400",
-                        confidence >= 80 && "bg-gradient-to-r from-green-500 to-emerald-400"
-                      )}
-                      style={{ width: `${confidence}%` }}
-                    />
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xs text-text-secondary">{t('analysis.confidence')}</span>
+                      <span className="text-xs font-semibold text-text-primary">{confidence}%</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
+                      <div 
+                        className={cn(
+                          "h-full rounded-sm transition-all duration-500",
+                          confidence < 60 && "bg-gradient-to-r from-orange-500 to-red-400",
+                          confidence >= 60 && confidence < 80 && "bg-gradient-to-r from-blue-500 to-cyan-400",
+                          confidence >= 80 && "bg-gradient-to-r from-green-500 to-emerald-400"
+                        )}
+                        style={{ width: `${confidence}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
               )}

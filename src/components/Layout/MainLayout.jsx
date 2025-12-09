@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Sidebar from './Sidebar'
 import MainContent from './MainContent'
 import RightSidebar from './RightSidebar'
+import WorkspaceSidebar from '../Views/Workspace/WorkspaceSidebar'
 import { useNotes } from '../../contexts/NotesContext'
 import { cn } from '../../lib/utils'
 
@@ -36,7 +37,10 @@ const MainLayout = () => {
     : (rightSidebarHidden || !shouldShowRightSidebar)
 
   return (
-    <div className={cn("flex h-screen w-full overflow-hidden bg-bg-secondary")}>
+    <div className={cn(
+      "flex h-screen w-full overflow-hidden bg-bg-secondary",
+      "p-1.5 gap-1.5" // Floating panels effect (6px)
+    )}>
       <Sidebar 
         hidden={leftSidebarHidden}
         currentView={currentView}
@@ -53,14 +57,21 @@ const MainLayout = () => {
         analysisData={analysisData}
         rewriteMode={rewriteMode}
       />
-      {/* Only show RightSidebar for aistudio-editor, not for workspace */}
-      {currentView !== 'workspace' && (
+      {/* Show RightSidebar for aistudio-editor */}
+      {currentView === 'aistudio-editor' && (
         <RightSidebar 
           hidden={rightSidebarHidden || !shouldShowRightSidebar}
           onClose={() => setRightSidebarHidden(true)}
           onHighlightSentence={setHighlightedSentence}
           onAnalysisComplete={setAnalysisData}
           onModeChange={(mode) => setRewriteMode(mode === 'rewrite')}
+        />
+      )}
+      {/* Show WorkspaceSidebar for workspace */}
+      {currentView === 'workspace' && (
+        <WorkspaceSidebar 
+          hidden={rightSidebarHidden}
+          onClose={() => setRightSidebarHidden(true)}
         />
       )}
     </div>

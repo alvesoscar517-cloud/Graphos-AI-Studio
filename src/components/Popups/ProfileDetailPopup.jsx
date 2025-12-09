@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 
@@ -78,8 +79,8 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
     "flex flex-col gap-1 transition-all duration-200"
   )
 
-  return (
-    <div className="fixed inset-0 bg-black/75 backdrop-blur-lg flex items-center justify-center z-modal p-5 animate-fade-in">
+  return createPortal(
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-lg flex items-center justify-center z-overlay-high p-5 animate-fade-in">
       <div 
         ref={popupRef}
         className={cn(
@@ -369,7 +370,8 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 

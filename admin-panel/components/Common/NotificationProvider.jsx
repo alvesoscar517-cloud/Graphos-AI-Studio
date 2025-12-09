@@ -26,12 +26,24 @@ export function NotificationProvider({ children }) {
       
       {/* Render confirm dialog */}
       {notification.confirmDialog && (
-        <ConfirmDialog {...notification.confirmDialog} />
+        <ConfirmDialog 
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) notification.confirmDialog.onCancel?.();
+          }}
+          {...notification.confirmDialog} 
+        />
       )}
       
       {/* Render prompt dialog */}
       {notification.promptDialog && (
-        <PromptDialog {...notification.promptDialog} />
+        <PromptDialog 
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) notification.promptDialog.onCancel?.();
+          }}
+          {...notification.promptDialog} 
+        />
       )}
     </NotificationContext.Provider>
   );

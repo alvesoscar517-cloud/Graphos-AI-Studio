@@ -11,50 +11,50 @@ import { Select } from '../ui/select';
 import { DatePicker } from '../ui/date-picker';
 import { cn } from '@/lib/utils';
 
-// All activity types configuration
-const ACTIVITY_CONFIG = {
+// Activity types configuration
+const ACTIVITY_TYPES = {
   // Authentication
-  login: { label: 'Login', icon: 'log-in.svg', color: 'bg-success' },
-  register: { label: 'Register', icon: 'user-plus.svg', color: 'bg-info' },
-  verify_email: { label: 'Verify Email', icon: 'mail.svg', color: 'bg-success' },
-  forgot_password: { label: 'Forgot Password', icon: 'key.svg', color: 'bg-warning' },
-  reset_password: { label: 'Reset Password', icon: 'refresh-cw.svg', color: 'bg-info' },
-  change_password: { label: 'Change Password', icon: 'lock.svg', color: 'bg-warning' },
-  delete_account: { label: 'Delete Account', icon: 'user-x.svg', color: 'bg-destructive' },
+  login: { label: 'Login', icon: 'log-in.svg' },
+  register: { label: 'Register', icon: 'user-plus.svg' },
+  verify_email: { label: 'Verify Email', icon: 'mail.svg' },
+  forgot_password: { label: 'Forgot Password', icon: 'key.svg' },
+  reset_password: { label: 'Reset Password', icon: 'refresh-cw.svg' },
+  change_password: { label: 'Change Password', icon: 'lock.svg' },
+  delete_account: { label: 'Delete Account', icon: 'user-x.svg' },
   // Profile operations
-  profile_create: { label: 'Create Profile', icon: 'folder-plus.svg', color: 'bg-info' },
-  profile_update: { label: 'Update Profile', icon: 'edit.svg', color: 'bg-warning' },
-  profile_delete: { label: 'Delete Profile', icon: 'trash-2.svg', color: 'bg-destructive' },
-  profile_sample_add: { label: 'Add Sample', icon: 'file-plus.svg', color: 'bg-purple-500' },
-  profile_finalize: { label: 'Finalize Profile', icon: 'check-circle.svg', color: 'bg-success' },
+  profile_create: { label: 'Create Profile', icon: 'folder-plus.svg' },
+  profile_update: { label: 'Update Profile', icon: 'edit.svg' },
+  profile_delete: { label: 'Delete Profile', icon: 'trash-2.svg' },
+  profile_sample_add: { label: 'Add Sample', icon: 'file-plus.svg' },
+  profile_finalize: { label: 'Finalize Profile', icon: 'check-circle.svg' },
   // Analysis operations
-  ai_detection: { label: 'AI Detection', icon: 'search.svg', color: 'bg-orange-500' },
-  text_analysis: { label: 'Text Analysis', icon: 'bar-chart.svg', color: 'bg-indigo-500' },
-  check_humanization: { label: 'Check Humanization', icon: 'shield.svg', color: 'bg-emerald-500' },
+  ai_detection: { label: 'AI Detection', icon: 'search.svg' },
+  text_analysis: { label: 'Text Analysis', icon: 'bar-chart.svg' },
+  check_humanization: { label: 'Check Humanization', icon: 'shield.svg' },
   // Rewrite operations
-  text_rewrite: { label: 'Text Rewrite', icon: 'edit-3.svg', color: 'bg-pink-500' },
-  humanize: { label: 'Humanize', icon: 'user.svg', color: 'bg-cyan-500' },
-  iterative_humanize: { label: 'Iterative Humanize', icon: 'repeat.svg', color: 'bg-teal-500' },
+  text_rewrite: { label: 'Text Rewrite', icon: 'edit-3.svg' },
+  humanize: { label: 'Humanize', icon: 'user.svg' },
+  iterative_humanize: { label: 'Iterative Humanize', icon: 'repeat.svg' },
   // Chat operations
-  chat_message: { label: 'Chat', icon: 'message-circle.svg', color: 'bg-violet-500' },
-  chat_humanized: { label: 'Chat Humanized', icon: 'message-square.svg', color: 'bg-amber-600' },
-  conversation_summarize: { label: 'Summarize', icon: 'file-text.svg', color: 'bg-slate-500' },
+  chat_message: { label: 'Chat', icon: 'message-circle.svg' },
+  chat_humanized: { label: 'Chat Humanized', icon: 'message-square.svg' },
+  conversation_summarize: { label: 'Summarize', icon: 'file-text.svg' },
   // Translation & File
-  translation: { label: 'Translation', icon: 'globe.svg', color: 'bg-sky-500' },
-  file_upload: { label: 'Upload File', icon: 'upload.svg', color: 'bg-lime-500' },
+  translation: { label: 'Translation', icon: 'globe.svg' },
+  file_upload: { label: 'Upload File', icon: 'upload.svg' },
   // Credit operations
-  credit_purchase: { label: 'Purchase Credits', icon: 'credit-card.svg', color: 'bg-success' },
-  credit_deduct: { label: 'Use Credits', icon: 'minus-circle.svg', color: 'bg-destructive' },
-  credits_added: { label: 'Credits Added', icon: 'plus-circle.svg', color: 'bg-success' },
-  credit_bonus: { label: 'Bonus Credits', icon: 'gift.svg', color: 'bg-warning' },
+  credit_purchase: { label: 'Purchase Credits', icon: 'credit-card.svg' },
+  credit_deduct: { label: 'Use Credits', icon: 'minus-circle.svg' },
+  credits_added: { label: 'Credits Added', icon: 'plus-circle.svg' },
+  credit_bonus: { label: 'Bonus Credits', icon: 'gift.svg' },
   // Account operations
-  account_locked: { label: 'Account Locked', icon: 'lock.svg', color: 'bg-destructive' },
-  account_unlocked: { label: 'Account Unlocked', icon: 'unlock.svg', color: 'bg-success' },
+  account_locked: { label: 'Account Locked', icon: 'lock.svg' },
+  account_unlocked: { label: 'Account Unlocked', icon: 'unlock.svg' },
   // Notification
-  notification_received: { label: 'Notification', icon: 'bell.svg', color: 'bg-info' }
+  notification_received: { label: 'Notification', icon: 'bell.svg' }
 };
 
-const getActivityConfig = (type) => ACTIVITY_CONFIG[type] || { label: type, icon: 'activity.svg', color: 'bg-muted' };
+const getActivityConfig = (type) => ACTIVITY_TYPES[type] || { label: type, icon: 'activity.svg' };
 
 export default function UserLogs() {
   const { userId } = useParams();
@@ -120,7 +120,11 @@ export default function UserLogs() {
     }
   };
 
-  const formatTimestamp = (timestamp) => new Date(timestamp).toLocaleString('en-US');
+  const formatTime = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + 
+           ', ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  };
 
   if (loading) return <LoadingScreen />;
 
@@ -154,7 +158,7 @@ export default function UserLogs() {
           onChange={(e) => setFilter({ ...filter, type: e.target.value })}
           options={[
             { value: 'all', label: 'All Activities' },
-            ...Object.entries(ACTIVITY_CONFIG).map(([key, config]) => ({
+            ...Object.entries(ACTIVITY_TYPES).map(([key, config]) => ({
               value: key,
               label: config.label
             }))
@@ -191,7 +195,7 @@ export default function UserLogs() {
         )}
       </div>
 
-      {/* Logs */}
+      {/* Logs Table */}
       <Card className="mt-4 overflow-hidden">
         {logsLoading && logs.length === 0 ? (
           <div className="flex items-center justify-center py-16">
@@ -205,134 +209,81 @@ export default function UserLogs() {
           </div>
         ) : (
           <>
-            <div className="divide-y divide-border">
-              {logs.map((log) => {
-                const config = getActivityConfig(log.type);
-                return (
-                  <div key={log.id} className="flex items-start gap-4 p-4 hover:bg-surface-secondary transition-colors">
-                    <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center shrink-0', config.color)}>
-                      <img src={`/icon/${config.icon}`} alt="" className="w-5 h-5 icon-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-medium text-primary">{config.label}</span>
-                        <span className="text-xs text-muted">{formatTimestamp(log.timestamp)}</span>
-                      </div>
-
-                      {/* Credits Info */}
-                      {log.creditsUsed !== undefined && log.creditsUsed !== 0 && (
-                        <div className="flex items-center gap-2 mt-1">
-                          <span
-                            className={cn(
-                              'text-xs font-medium px-2 py-0.5 rounded',
-                              log.creditsUsed > 0 ? 'bg-destructive/10 text-destructive' : 'bg-success/10 text-success'
-                            )}
-                          >
-                            {log.creditsUsed > 0 ? `-${log.creditsUsed.toFixed(2)}` : `+${Math.abs(log.creditsUsed).toFixed(2)}`} credits
-                          </span>
-                          {log.creditsBefore !== undefined && log.creditsAfter !== undefined && (
-                            <span className="text-xs text-muted">
-                              ({log.creditsBefore.toFixed(2)} → {log.creditsAfter.toFixed(2)})
-                            </span>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border bg-surface-secondary">
+                    <th className="p-3 text-left text-xs font-medium text-muted uppercase">Activity</th>
+                    <th className="p-3 text-right text-xs font-medium text-muted uppercase">Credits</th>
+                    <th className="p-3 text-left text-xs font-medium text-muted uppercase">Details</th>
+                    <th className="p-3 text-right text-xs font-medium text-muted uppercase">Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logs.map((log) => {
+                    const config = getActivityConfig(log.type);
+                    return (
+                      <tr key={log.id} className="border-b border-border hover:bg-surface-secondary transition-colors">
+                        <td className="p-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-surface-secondary flex items-center justify-center shrink-0">
+                              <img src={`/icon/${config.icon}`} alt="" className="w-4 h-4 icon-dark" />
+                            </div>
+                            <span className="text-sm font-medium text-primary">{config.label}</span>
+                          </div>
+                        </td>
+                        <td className="p-3 text-right">
+                          {log.creditsUsed !== undefined && log.creditsUsed !== 0 ? (
+                            <div>
+                              <span className={cn(
+                                "text-sm font-medium",
+                                log.creditsUsed > 0 ? "text-primary" : "text-muted"
+                              )}>
+                                {log.creditsUsed > 0 ? `-${log.creditsUsed.toFixed(2)}` : `+${Math.abs(log.creditsUsed).toFixed(2)}`}
+                              </span>
+                              {log.creditsBefore !== undefined && log.creditsAfter !== undefined && (
+                                <div className="text-xs text-muted">
+                                  {log.creditsBefore.toFixed(0)} → {log.creditsAfter.toFixed(0)}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-sm text-muted">—</span>
                           )}
-                        </div>
-                      )}
-
-                      {/* Metadata */}
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {log.wordCount && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-surface-secondary text-muted">{log.wordCount} words</span>
-                        )}
-                        {log.inputLength && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-surface-secondary text-muted">{log.inputLength} chars input</span>
-                        )}
-                        {log.outputLength && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-surface-secondary text-muted">{log.outputLength} chars output</span>
-                        )}
-                        {log.aiProbability !== undefined && (
-                          <span className={cn(
-                            "text-xs px-2 py-0.5 rounded",
-                            log.aiProbability > 0.7 ? "bg-destructive/10 text-destructive" : 
-                            log.aiProbability > 0.3 ? "bg-warning/10 text-warning" : "bg-success/10 text-success"
-                          )}>
-                            AI: {(log.aiProbability * 100).toFixed(0)}%
+                        </td>
+                        <td className="p-3">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+                            {log.wordCount && <span>{log.wordCount} words</span>}
+                            {log.inputLength && <span>{log.inputLength} chars</span>}
+                            {log.duration && <span>{log.duration}ms</span>}
+                            {log.model && <span>{log.model}</span>}
+                            {log.profileName && <span>{log.profileName}</span>}
+                            {log.profileId && !log.profileName && <span>Profile: {log.profileId.substring(0, 8)}...</span>}
+                            {log.aiProbability !== undefined && <span>AI: {(log.aiProbability * 100).toFixed(0)}%</span>}
+                            {log.voiceCompatibility !== undefined && <span>Voice: {(log.voiceCompatibility * 100).toFixed(0)}%</span>}
+                            {log.iterations && <span>{log.iterations} iterations</span>}
+                            {log.sourceLang && log.targetLang && <span>{log.sourceLang} → {log.targetLang}</span>}
+                            {log.fileName && <span>{log.fileName}</span>}
+                            {log.messagesCount && <span>{log.messagesCount} messages</span>}
+                            {log.ip && <span>IP: {log.ip}</span>}
+                            {log.source && <span>{log.source}</span>}
+                            {log.feature && <span>{log.feature}</span>}
+                            {log.error && <span className="text-destructive">{log.error}</span>}
+                            {!log.wordCount && !log.inputLength && !log.duration && !log.model && !log.profileName && !log.profileId && log.aiProbability === undefined && !log.ip && !log.source && !log.feature && !log.error && (
+                              <span>—</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-3 text-right">
+                          <span className="text-xs text-muted whitespace-nowrap">
+                            {formatTime(log.timestamp)}
                           </span>
-                        )}
-                        {log.isAuthentic !== undefined && (
-                          <span className={cn(
-                            "text-xs px-2 py-0.5 rounded",
-                            log.isAuthentic ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
-                          )}>
-                            {log.isAuthentic ? 'Authentic' : 'Not Authentic'}
-                          </span>
-                        )}
-                        {log.voiceCompatibility !== undefined && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-info/10 text-info">
-                            Voice: {(log.voiceCompatibility * 100).toFixed(0)}%
-                          </span>
-                        )}
-                        {log.iterations && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-surface-secondary text-muted">{log.iterations} iterations</span>
-                        )}
-                        {log.reachedTarget !== undefined && (
-                          <span className={cn(
-                            "text-xs px-2 py-0.5 rounded",
-                            log.reachedTarget ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
-                          )}>
-                            {log.reachedTarget ? 'Target Reached' : 'Target Not Reached'}
-                          </span>
-                        )}
-                        {log.model && <span className="text-xs px-2 py-0.5 rounded bg-purple-500/10 text-purple-600">{log.model}</span>}
-                        {log.feature && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-surface-secondary text-muted">{log.feature}</span>
-                        )}
-                        {log.duration && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-surface-secondary text-muted">{log.duration}ms</span>
-                        )}
-                        {log.profileName && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-info/10 text-info">{log.profileName}</span>
-                        )}
-                        {log.profileId && !log.profileName && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-info/10 text-info">
-                            Profile: {log.profileId.substring(0, 8)}...
-                          </span>
-                        )}
-                        {log.sourceLang && log.targetLang && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-sky-500/10 text-sky-600">
-                            {log.sourceLang} → {log.targetLang}
-                          </span>
-                        )}
-                        {log.fileName && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-surface-secondary text-muted">{log.fileName}</span>
-                        )}
-                        {log.messagesCount && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-surface-secondary text-muted">{log.messagesCount} messages</span>
-                        )}
-                        {log.overallRisk && (
-                          <span className={cn(
-                            "text-xs px-2 py-0.5 rounded",
-                            log.overallRisk === 'high' ? "bg-destructive/10 text-destructive" :
-                            log.overallRisk === 'medium' ? "bg-warning/10 text-warning" : "bg-success/10 text-success"
-                          )}>
-                            Risk: {log.overallRisk}
-                          </span>
-                        )}
-                        {log.ip && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-surface-secondary text-muted">IP: {log.ip}</span>
-                        )}
-                        {log.source && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-surface-secondary text-muted">{log.source}</span>
-                        )}
-                        {log.reason && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-warning/10 text-warning">{log.reason}</span>
-                        )}
-                      </div>
-
-                      {log.error && <div className="text-xs text-destructive mt-1">{log.error}</div>}
-                    </div>
-                  </div>
-                );
-              })}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
 
             {pagination.hasMore && (

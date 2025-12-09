@@ -26,4 +26,8 @@ router.post('/translate', creditMiddleware.translation, analysisController.trans
 router.post('/check-humanization', creditMiddleware.checkHumanization, analysisController.checkHumanization);
 router.post('/iterative-humanize', creditMiddleware.iterativeHumanize, analysisController.iterativeHumanize);
 
+// === Async Humanization (for long-running operations) ===
+router.post('/iterative-humanize/start', creditMiddleware.iterativeHumanize, analysisController.startIterativeHumanize);
+router.get('/iterative-humanize/status/:job_id', analysisController.getHumanizeJobStatus);
+
 module.exports = router;

@@ -1,9 +1,15 @@
+// @ts-nocheck
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useNotes } from '../../contexts/NotesContext'
 import { useProfiles } from '../../contexts/ProfileContext'
-import { useRewrite } from '@/stores'
+import { useRewrite, useAIProcessingActions, useAIProcessing } from '@/stores'
+import { rewriteTextStream, startIterativeHumanize, pollHumanizeJob } from '../../services/api'
+import { getLocalizedContentError } from '../../utils/errorMessages'
+import { handleCreditError } from '../../utils/creditHandler'
+import modal from '../../utils/modal'
 import ProfileSelector from '../Analysis/ProfileSelector'
 import CompatibilityCard from '../Analysis/CompatibilityCard'
 import AIDetectionCard from '../Analysis/AIDetectionCard'
@@ -12,16 +18,22 @@ import StatisticsCard from '../Analysis/StatisticsCard'
 import ModelSelector from '../Analysis/ModelSelector'
 import WritingPreferences from '../Analysis/WritingPreferences'
 import Icon from '../Common/Icon'
+import LazyLottie from '../Common/LazyLottie'
+import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
 
 const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => {
   const { t } = useTranslation()
-  const { currentNote } = useNotes()
+  const navigate = useNavigate()
+  const { currentNote, updateNote } = useNotes()
   const { currentProfile, selectProfile } = useProfiles()
   const { selectedModel, setSelectedModel, writingPreferences, setWritingPreferences } = useRewrite()
+  const { startProcessing, startStreaming, stopProcessing, setHumanizeProgress } = useAIProcessingActions()
+  const { isProcessing } = useAIProcessing()
   const [mode, setMode] = useState('analysis') // 'analysis' or 'rewrite'
   const [isDragging, setIsDragging] = useState(false)
   const [isInteractingWithSlider, setIsInteractingWithSlider] = useState(false)
+  const [isRewriting, setIsRewriting] = useState(false)
 
   // Notify parent when mode changes
   const handleModeChange = (newMode) => {
@@ -38,6 +50,174 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
   const hasText = currentNote && currentNote.content && currentNote.content.trim().length > 0
   const hasProfile = currentProfile !== null
 
+  // Rewrite handler
+  const handleRewrite = async () => {
+    const text = currentNote?.content
+    if (!text || text.trim().length === 0) {
+      modal.alert(t('rewrite.pleaseEnterTextFirst'), t('rewrite.noText'))
+      return
+    }
+
+    if (!currentProfile || isRewriting) return
+    
+    const originalText = text
+    const useIterative = writingPreferences?.useIterativeRefinement
+    
+    if (useIterative) {
+      console.log('[LAUNCH] Starting async iterative humanization...')
+      setIsRewriting(true)
+      startProcessing('humanize') // Use 'humanize' type to show progress on editor
+      
+      try {
+        // Start async job
+        const startResult = await startIterativeHumanize(
+          currentProfile.profile_id,
+          originalText,
+          {
+            maxIterations: 3,
+            targetProbability: writingPreferences?.targetAIProbability || 35,
+            model: selectedModel
+          }
+        )
+        
+        if (!startResult.success) {
+          throw new Error(startResult.error || t('rewrite.humanizationFailed'))
+        }
+        
+        console.log('[LAUNCH] Job started:', startResult.jobId, 'Estimated:', startResult.estimatedTime?.display)
+        
+        // Poll for result with progress updates
+        const result = await pollHumanizeJob(startResult.jobId, {
+          onProgress: (progress) => {
+            console.log('[PROGRESS]', progress)
+            // Update store with progress for editor overlay
+            setHumanizeProgress(progress.progress)
+          },
+          pollInterval: 1500,
+          maxWaitTime: 300000 // 5 minutes
+        })
+        
+        if (result.success && result.data) {
+          updateNote(currentNote.id, { content: result.data.rewritten_text })
+          
+          const emoji = result.data.reached_target ? '✓' : '⚠'
+          modal.success(
+            `${emoji} ${t('rewrite.completedIterations', { count: result.data.iterations_used })}\n` +
+            `${t('rewrite.aiProbability', { percent: result.data.final_ai_probability })}\n` +
+            (result.data.warning || ''),
+            t('rewrite.humanizationComplete')
+          )
+        } else {
+          throw new Error(result.error || t('rewrite.humanizationFailed'))
+        }
+      } catch (error) {
+        console.error('[FAIL] Error in iterative humanize:', error)
+        
+        const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+        
+        if (!wasCreditError) {
+          const localizedError = getLocalizedContentError(error.message, t)
+          modal.error(localizedError || t('rewrite.humanizationFailed'))
+        }
+      } finally {
+        setIsRewriting(false)
+        setHumanizeProgress(null)
+        stopProcessing()
+      }
+      return
+    }
+    
+    // Standard streaming rewrite
+    console.log('[LAUNCH] Starting rewrite process...')
+    setIsRewriting(true)
+    startProcessing('rewrite')
+    
+    try {
+      let fullText = ''
+      let displayedText = ''
+      let hasStartedStreaming = false
+      let chunkCount = 0
+      let isAnimating = false
+      
+      const animateText = () => {
+        if (displayedText.length < fullText.length) {
+          const remaining = fullText.length - displayedText.length
+          const charsToAdd = Math.max(1, Math.min(3, Math.ceil(remaining / 20)))
+          
+          displayedText = fullText.substring(0, displayedText.length + charsToAdd)
+          updateNote(currentNote.id, { content: displayedText })
+          
+          requestAnimationFrame(animateText)
+        } else {
+          isAnimating = false
+        }
+      }
+      
+      await rewriteTextStream(
+        currentProfile.profile_id,
+        originalText,
+        selectedModel,
+        writingPreferences,
+        (chunk) => {
+          chunkCount++
+          console.log(`[PACKAGE] Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
+          
+          if (!hasStartedStreaming) {
+            hasStartedStreaming = true
+            console.log('[SYNC] First chunk - clearing editor, stopping shimmer')
+            startStreaming() // Stop shimmer effect when streaming starts
+            updateNote(currentNote.id, { content: '' })
+            displayedText = ''
+          }
+          
+          fullText += chunk
+          
+          if (!isAnimating) {
+            isAnimating = true
+            animateText()
+          }
+          
+          console.log(`✍️ Buffer: ${fullText.length} chars, Displayed: ${displayedText.length} chars`)
+        }
+      )
+      
+      const waitForAnimation = () => {
+        return new Promise((resolve) => {
+          const checkAnimation = () => {
+            if (!isAnimating && displayedText.length >= fullText.length) {
+              resolve()
+            } else {
+              requestAnimationFrame(checkAnimation)
+            }
+          }
+          checkAnimation()
+        })
+      }
+      
+      await waitForAnimation()
+      
+      console.log(`[SUCCESS] Rewrite completed successfully - ${chunkCount} chunks received`)
+      
+    } catch (error) {
+      console.error('[FAIL] Error rewriting:', error)
+      
+      const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+      
+      if (!wasCreditError) {
+        const localizedError = getLocalizedContentError(error.message, t)
+        modal.error(localizedError || t('rewrite.rewriteFailed'))
+      }
+      updateNote(currentNote.id, { content: originalText })
+    } finally {
+      setIsRewriting(false)
+      stopProcessing()
+    }
+  }
+
+  const rewriteLabel = writingPreferences?.useIterativeRefinement 
+    ? t('rewrite.humanize') 
+    : t('rewrite.rewrite')
+
   // Handle pointer down to detect slider interaction
   const handlePointerDown = (e) => {
     if (e.target.tagName === 'INPUT' && e.target.type === 'range') {
@@ -53,10 +233,10 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     <motion.aside 
       className={cn(
         "bg-bg-tertiary",
-        "border-l border-separator",
         "overflow-y-auto overflow-x-hidden flex flex-col",
-        "h-screen shrink-0",
+        "h-full shrink-0",
         "touch-pan-y overscroll-contain scrollbar-none",
+        "rounded-md", // Floating panel effect
         isDragging ? "z-[100] shadow-xl" : "z-sidebar"
       )}
       initial={false}
@@ -210,7 +390,42 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
               currentProfile={currentProfile}
               preferences={writingPreferences}
               onPreferencesChange={setWritingPreferences}
+              onSliderInteraction={setIsInteractingWithSlider}
             />
+            
+            {/* Rewrite Button */}
+            <div className="flex flex-col gap-2">
+              <button
+                className={cn(
+                  "w-full flex items-center justify-center gap-2 py-3 px-4",
+                  "rounded-xl font-semibold text-sm cursor-pointer",
+                  "transition-all duration-200",
+                  "bg-fill-tertiary text-blue-600 border border-border-light",
+                  "hover:bg-bg-hover hover:border-border-hover",
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                )}
+                onClick={handleRewrite}
+                disabled={!hasText || !hasProfile || isRewriting || isProcessing}
+              >
+                {isRewriting ? (
+                  // @ts-ignore - LazyLottie props are correct
+                  <LazyLottie 
+                    animationData={threeDotsAnimation} 
+                    loop={true}
+                    style={{ width: 40, height: 16 }}
+                  />
+                ) : (
+                  <>
+                    <img 
+                      src={`/icon/${writingPreferences?.useIterativeRefinement ? "user-check" : "pen"}.svg`}
+                      alt={rewriteLabel}
+                      className="w-4 h-4 filter-icon-primary"
+                    />
+                    <span>{rewriteLabel}</span>
+                  </>
+                )}
+              </button>
+            </div>
           </>
         )}
       </div>

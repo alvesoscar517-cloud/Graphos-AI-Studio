@@ -49,16 +49,12 @@ const EditTitleModal = ({ isOpen, currentTitle, onSave, onClose, maxLength = 100
 
   return (
     <div 
-      className={cn(
-        "modal-overlay",
-        "flex items-center justify-center z-menu",
-        "animate-fade-in-fast"
-      )}
+      className="fixed inset-0 flex items-center justify-center z-menu"
       onClick={handleOverlayClick}
     >
       <div className={cn(
-        "modal-content rounded-3xl",
-        "w-full max-w-modal-sm m-4 overflow-hidden p-6",
+        "bg-bg-primary border border-border-light rounded-2xl shadow-popup",
+        "w-full max-w-md m-4 overflow-hidden p-5",
         "animate-slide-up-fast"
       )}>
         {/* Header */}
@@ -78,11 +74,10 @@ const EditTitleModal = ({ isOpen, currentTitle, onSave, onClose, maxLength = 100
             type="text"
             className={cn(
               "w-full py-3 px-3.5 text-sm rounded-xl outline-none box-border",
-              "border-2 border-border",
+              "border border-border-light",
               "bg-bg-secondary",
               "text-text-primary",
-              "placeholder:text-text-muted",
-              "focus:border-accent"
+              "placeholder:text-text-muted"
             )}
             value={title}
             onChange={(e) => setTitle(e.target.value)}

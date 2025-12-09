@@ -16,7 +16,7 @@ const DialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'fixed inset-0 z-50 bg-black/40 backdrop-blur-[8px]',
+      'fixed inset-0 z-[9998] bg-black/40 backdrop-blur-[8px]',
       'data-[state=open]:animate-in data-[state=closed]:animate-out',
       'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       'duration-200',
@@ -27,13 +27,21 @@ const DialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
-const DialogContent = React.forwardRef(({ className, children, ...props }, ref) => (
-  <DialogPortal>
+const DialogContent = React.forwardRef(({ className, children, container, ...props }, ref) => {
+  // Find the shadow root container for admin panel
+  // Try shadow-container first (inside Shadow DOM), then admin-root, then body
+  const portalContainer = container || 
+    document.getElementById('shadow-container') || 
+    document.getElementById('admin-root') || 
+    document.body;
+  
+  return (
+  <DialogPortal container={portalContainer}>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%]',
+        'fixed left-[50%] top-[50%] z-[9999] w-full max-w-lg translate-x-[-50%] translate-y-[-50%]',
         'bg-surface/95 backdrop-blur-xl border border-border/30 rounded-2xl shadow-modal p-7',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
@@ -54,7 +62,8 @@ const DialogContent = React.forwardRef(({ className, children, ...props }, ref) 
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
-))
+  );
+})
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 

@@ -211,3 +211,116 @@ export async function iterativeHumanize(profileId, text, options = {}) {
     return { success: false, error: error.message }
   }
 }
+
+/**
+ * Start async iterative humanize job
+ * @param {string} profileId 
+ * @param {string} text 
+ * @param {Object} options - { maxIterations, targetProbability, model }
+ * @returns {Promise<Object>} - { success, jobId, estimatedTime }
+ */
+export async function startIterativeHumanize(profileId, text, options = {}) {
+  try {
+    const validation = validateTextBeforeAI(text, options.model || 'gemini-2.0-flash-exp', { task: 'rewrite' })
+    if (!validation.valid) {
+      return { 
+        success: false, 
+        error: validation.errors.join(', '),
+        validationFailed: true
+      }
+    }
+    
+    const { data } = await apiClient.post('/analysis/iterative-humanize/start', {
+      profile_id: profileId,
+      text: text,
+      max_iterations: options.maxIterations || 3,
+      target_probability: options.targetProbability || 35,
+      model: options.model || 'gemini-2.0-flash-exp'
+    })
+    
+    return { 
+      success: data.success, 
+      jobId: data.job_id,
+      estimatedTime: data.estimated_time,
+      error: data.error 
+    }
+  } catch (error) {
+    console.error('Error starting iterative humanize:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+/**
+ * Get humanize job status
+ * @param {string} jobId 
+ * @returns {Promise<Object>}
+ */
+export async function getHumanizeJobStatus(jobId) {
+  try {
+    const { data } = await apiClient.get(`/analysis/iterative-humanize/status/${jobId}`)
+    return { 
+      success: data.success, 
+      data,
+      error: data.error 
+    }
+  } catch (error) {
+    console.error('Error getting humanize job status:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+/**
+ * Poll humanize job until completion
+ * @param {string} jobId 
+ * @param {Object} options - { onProgress, pollInterval, maxWaitTime }
+ * @returns {Promise<Object>}
+ */
+export async function pollHumanizeJob(jobId, options = {}) {
+  const { 
+    onProgress = () => {}, 
+    pollInterval = 2000, 
+    maxWaitTime = 300000 // 5 minutes max
+  } = options
+  
+  const startTime = Date.now()
+  
+  while (Date.now() - startTime < maxWaitTime) {
+    const result = await getHumanizeJobStatus(jobId)
+    
+    if (!result.success) {
+      return result
+    }
+    
+    const { data } = result
+    
+    // Call progress callback
+    onProgress({
+      status: data.status,
+      progress: data.progress,
+      jobId: data.job_id
+    })
+    
+    // Check if completed or failed
+    if (data.status === 'completed') {
+      return {
+        success: true,
+        data: data.result
+      }
+    }
+    
+    if (data.status === 'failed') {
+      return {
+        success: false,
+        error: data.error || 'Job failed'
+      }
+    }
+    
+    // Wait before next poll
+    await new Promise(resolve => setTimeout(resolve, pollInterval))
+  }
+  
+  return {
+    success: false,
+    error: 'Job timed out'
+  }
+}

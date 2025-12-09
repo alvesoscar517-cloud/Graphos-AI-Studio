@@ -34,7 +34,9 @@ export {
   useAIProcessingStore,
   useAIProcessing,
   useIsProcessing,
+  useIsStreaming,
   useProcessingType,
+  useHumanizeProgress,
   useAIProcessingActions,
 } from './aiProcessingStore'
 export {

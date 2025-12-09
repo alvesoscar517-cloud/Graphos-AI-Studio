@@ -34,8 +34,15 @@ const DevModeToggle = () => {
     devLog('Verbose logging:', DEV_CONFIG.VERBOSE_LOGGING)
   }
 
-  const handleReset = () => {
-    if (confirm('Reset dev environment? This will delete test profile and reload the page.')) {
+  const handleReset = async () => {
+    const { default: notify } = await import('../../utils/modal')
+    const confirmed = await notify.confirm({
+      title: 'Reset Environment',
+      message: 'Reset dev environment? This will delete test profile and reload the page.',
+      confirmText: 'Reset',
+      type: 'warning'
+    })
+    if (confirmed) {
       resetDevEnvironment()
       setTimeout(() => window.location.reload(), 500)
     }

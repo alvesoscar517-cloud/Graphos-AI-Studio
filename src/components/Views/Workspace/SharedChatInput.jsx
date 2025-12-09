@@ -6,14 +6,16 @@ const SharedChatInput = ({
   onSendMessage, 
   disabled, 
   isCentered = false,
+  isInline = false, // New prop: render inline without absolute positioning
   placeholder,
   autoFocus = false,
   rightSidebarHidden = false,
-  leftSidebarHidden = false
+  leftSidebarHidden = false,
+  initialMessage = ''
 }) => {
   const { t } = useTranslation()
   const defaultPlaceholder = placeholder || t('workspace.askAnything')
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState(initialMessage)
   const [showSendBtn, setShowSendBtn] = useState(false)
   const textareaRef = useRef(null)
   const fileInputRef = useRef(null)
@@ -21,6 +23,18 @@ const SharedChatInput = ({
   useEffect(() => {
     setShowSendBtn(message.trim().length > 0)
   }, [message])
+
+  // Update message when initialMessage changes (from quick actions)
+  useEffect(() => {
+    if (initialMessage) {
+      setMessage(initialMessage)
+      // Focus textarea and move cursor to end
+      if (textareaRef.current) {
+        textareaRef.current.focus()
+        textareaRef.current.setSelectionRange(initialMessage.length, initialMessage.length)
+      }
+    }
+  }, [initialMessage])
 
   // Auto-resize textarea (1 line default, max 3 lines)
   useEffect(() => {
@@ -58,24 +72,26 @@ const SharedChatInput = ({
   return (
     <div 
       className={cn(
-        "absolute left-0 right-0 z-sidebar pointer-events-none",
-        isCentered ? [
-          "top-1/2 -translate-y-1/2 px-6",
-          "transition-all duration-600 ease-smooth"
+        isInline ? [
+          // Inline mode: no absolute positioning, used inside flex container
+          "w-full max-w-2xl"
         ] : [
-          "fixed bottom-0 translate-y-0 p-4 bg-transparent",
-          "animate-slide-to-bottom"
-        ],
-        "max-md:px-4 max-md:p-3"
+          // Absolute/Fixed positioning mode
+          "absolute left-0 right-0 z-sidebar pointer-events-none",
+          isCentered ? [
+            "top-1/2 -translate-y-1/2 px-6",
+            "transition-all duration-600 ease-smooth"
+          ] : [
+            "fixed bottom-0 translate-y-0 p-4 bg-transparent",
+            "animate-slide-to-bottom"
+          ],
+          "max-md:px-4 max-md:p-3"
+        ]
       )}
-      style={{
-        marginLeft: leftSidebarHidden ? 0 : (isCentered ? 0 : '238px'),
-        marginRight: rightSidebarHidden ? 0 : '300px',
-        transition: 'margin 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
-      }}
     >
       <div className={cn(
-        "mx-auto pointer-events-auto max-w-2xl"
+        "pointer-events-auto",
+        !isInline && "mx-auto max-w-2xl"
       )}>
         <div className={cn(
           "flex items-center gap-2 rounded-3xl py-2.5 px-4 min-h-12",

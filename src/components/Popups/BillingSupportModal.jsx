@@ -139,7 +139,7 @@ const BillingSupportModal = ({ onClose }) => {
               <p className="m-0 mt-0.5 text-sm text-text-secondary">{t('billing.readyToSupport')}</p>
             </div>
           </div>
-          <button className="bg-transparent border-none cursor-pointer p-2 rounded-lg flex items-center justify-center transition-colors duration-200 hover:bg-bg-hover" onClick={onClose}>
+          <button className="bg-transparent border-none cursor-pointer p-2 rounded-lg flex items-center justify-center transition-colors duration-200 hover:bg-bg-hover" onClick={onClose} data-tooltip={t('common.close')}>
             <Icon name="x" alt={t('common.close')} size="lg" color="muted" />
           </button>
         </div>

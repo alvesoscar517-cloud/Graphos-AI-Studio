@@ -125,7 +125,8 @@
     "change_type_vocabulary": "Điều chỉnh từ vựng",
     "change_type_structure": "Sửa đổi cấu trúc",
     "change_type_tone": "Điều chỉnh giọng điệu",
-    "change_type_flow": "Cải thiện mạch văn"
+    "change_type_flow": "Cải thiện mạch văn",
+    "job_started": "Đã bắt đầu tác vụ nhân hóa"
   },
 
   "errors": {

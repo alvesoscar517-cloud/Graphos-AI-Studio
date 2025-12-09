@@ -9,6 +9,16 @@ import { cn } from '../../../lib/utils'
 const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile, loading }) => {
   const { t } = useTranslation()
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [loadingProfileId, setLoadingProfileId] = useState(null)
+
+  const handleSelectProfile = async (profile) => {
+    setLoadingProfileId(profile.profile_id)
+    try {
+      await onSelectProfile(profile)
+    } finally {
+      setLoadingProfileId(null)
+    }
+  }
 
   const handlePrev = () => {
     setCurrentIndex(prev => Math.max(0, prev - 1))
@@ -80,9 +90,9 @@ const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile, loading }) =
       ) : profiles.length === 0 ? (
         <EmptyProfileCard />
       ) : (
-        <div className="relative overflow-hidden p-0">
+        <div className="relative overflow-visible">
           <div 
-            className="flex gap-5 transition-transform duration-400 ease-smooth will-change-transform"
+            className="flex gap-5 transition-transform duration-400 ease-smooth will-change-transform pb-2"
             style={{ 
               transform: `translateX(-${currentIndex * (100 / 3)}%)`
             }}
@@ -91,8 +101,9 @@ const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile, loading }) =
               <ProfileCard 
                 key={profile.profile_id}
                 profile={profile}
-                onSelect={onSelectProfile}
+                onSelect={handleSelectProfile}
                 onUse={onUseProfile}
+                isLoading={loadingProfileId === profile.profile_id}
               />
             ))}
           </div>

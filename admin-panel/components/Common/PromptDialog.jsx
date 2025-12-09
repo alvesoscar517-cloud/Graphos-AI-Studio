@@ -1,6 +1,13 @@
-import { createPortal } from 'react-dom';
 import { useState, useEffect, useRef } from 'react';
-// CSS migrated to Tailwind
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 export default function PromptDialog({ 
   title, 
@@ -9,66 +16,73 @@ export default function PromptDialog({
   defaultValue = '',
   confirmText = 'Confirm', 
   cancelText = 'Cancel',
+  open = true,
+  onOpenChange,
   onConfirm, 
   onCancel 
 }) {
   const [value, setValue] = useState(defaultValue);
-  const portalContainerRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
-    // Find the shadow root container or use document.body as fallback
-    const shadowContainer = document.querySelector('#admin-root') || document.body;
-    portalContainerRef.current = shadowContainer;
-  }, []);
+    setValue(defaultValue);
+  }, [defaultValue]);
+
+  useEffect(() => {
+    // Auto focus input when dialog opens
+    if (open && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [open]);
 
   const handleConfirm = () => {
-    onConfirm(value);
+    onConfirm?.(value);
+    onOpenChange?.(false);
   };
 
-  const handleKeyPress = (e) => {
+  const handleCancel = () => {
+    onCancel?.();
+    onOpenChange?.(false);
+  };
+
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleConfirm();
     }
   };
 
-  const dialogContent = (
-    <div className="prompt-overlay" onClick={onCancel}>
-      <div className="prompt-dialog" onClick={(e) => e.stopPropagation()}>
-        <div className="prompt-icon-wrapper">
-          <div className="prompt-icon">
-            <img src="/icon/edit.svg" alt="Prompt" />
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader className="items-center text-center">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2 bg-info/10 text-info">
+            <img src="/icon/edit.svg" alt="" className="w-6 h-6" />
           </div>
+          <DialogTitle>{title}</DialogTitle>
+          {message && <DialogDescription>{message}</DialogDescription>}
+        </DialogHeader>
+        
+        <div className="mt-4">
+          <input
+            ref={inputRef}
+            type="text"
+            className="w-full px-3 py-2 rounded-lg border border-border/50 bg-surface-secondary text-primary placeholder:text-muted focus:outline-none focus:bg-surface transition-colors"
+            placeholder={placeholder}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
         </div>
-        <h2 className="prompt-title">{title}</h2>
-        {message && <p className="prompt-message">{message}</p>}
-        <input
-          type="text"
-          className="prompt-input"
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyPress={handleKeyPress}
-          autoFocus
-        />
-        <div className="prompt-actions">
-          <button className="btn-prompt-cancel" onClick={onCancel}>
+
+        <DialogFooter className="sm:justify-center gap-3 mt-4">
+          <Button variant="secondary" onClick={handleCancel}>
             {cancelText}
-          </button>
-          <button className="btn-prompt-ok" onClick={handleConfirm}>
+          </Button>
+          <Button onClick={handleConfirm}>
             {confirmText}
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
-
-  // If we're in Shadow DOM, render directly instead of using portal
-  if (portalContainerRef.current && portalContainerRef.current.id === 'admin-root') {
-    return dialogContent;
-  }
-
-  // Fallback to portal for non-shadow DOM
-  return portalContainerRef.current 
-    ? createPortal(dialogContent, portalContainerRef.current)
-    : dialogContent;
 }

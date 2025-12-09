@@ -125,7 +125,8 @@
     "change_type_vocabulary": "Vocabulary adjustment",
     "change_type_structure": "Structure modification",
     "change_type_tone": "Tone adjustment",
-    "change_type_flow": "Flow improvement"
+    "change_type_flow": "Flow improvement",
+    "job_started": "Humanization job started"
   },
 
   "errors": {
