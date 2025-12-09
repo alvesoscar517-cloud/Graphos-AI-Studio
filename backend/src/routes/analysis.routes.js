@@ -27,7 +27,10 @@ router.post('/check-humanization', creditMiddleware.checkHumanization, analysisC
 router.post('/iterative-humanize', creditMiddleware.iterativeHumanize, analysisController.iterativeHumanize);
 
 // === Async Humanization (for long-running operations) ===
-router.post('/iterative-humanize/start', creditMiddleware.iterativeHumanize, analysisController.startIterativeHumanize);
+// Note: Credits are deducted AFTER job completion based on actual iterations used
+// No credit middleware here - handled in humanizeJob.service.js
+router.post('/iterative-humanize/start', analysisController.startIterativeHumanize);
 router.get('/iterative-humanize/status/:job_id', analysisController.getHumanizeJobStatus);
+router.get('/iterative-humanize/stream/:job_id', analysisController.streamHumanizeJobResult);
 
 module.exports = router;

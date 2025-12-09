@@ -214,7 +214,7 @@ export async function iterativeHumanize(profileId, text, options = {}) {
 
 /**
  * Start async iterative humanize job
- * @param {string} profileId 
+ * @param {string|null} profileId - Profile ID (optional, null for generic humanization)
  * @param {string} text 
  * @param {Object} options - { maxIterations, targetProbability, model }
  * @returns {Promise<Object>} - { success, jobId, estimatedTime }
@@ -230,13 +230,20 @@ export async function startIterativeHumanize(profileId, text, options = {}) {
       }
     }
     
-    const { data } = await apiClient.post('/analysis/iterative-humanize/start', {
-      profile_id: profileId,
+    // Build request body - profile_id is optional
+    const requestBody = {
       text: text,
       max_iterations: options.maxIterations || 3,
       target_probability: options.targetProbability || 35,
       model: options.model || 'gemini-2.0-flash-exp'
-    })
+    }
+    
+    // Only include profile_id if provided
+    if (profileId) {
+      requestBody.profile_id = profileId
+    }
+    
+    const { data } = await apiClient.post('/analysis/iterative-humanize/start', requestBody)
     
     return { 
       success: data.success, 
@@ -316,6 +323,151 @@ export async function pollHumanizeJob(jobId, options = {}) {
     }
     
     // Wait before next poll
+    await new Promise(resolve => setTimeout(resolve, pollInterval))
+  }
+  
+  return {
+    success: false,
+    error: 'Job timed out'
+  }
+}
+
+/**
+ * Stream humanize job result
+ * Streams the completed job result text for smooth UI transition
+ * @param {string} jobId 
+ * @param {Function} onChunk - Callback for each text chunk
+ * @param {Function} onComplete - Callback when streaming completes with metadata
+ * @returns {Promise<void>}
+ */
+export async function streamHumanizeJobResult(jobId, onChunk, onComplete = () => {}) {
+  try {
+    const headers = await getAuthHeaders()
+    
+    const response = await fetch(`${CONFIG.API_BASE_URL}/analysis/iterative-humanize/stream/${jobId}`, {
+      method: 'GET',
+      headers
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+    
+    while (true) {
+      const { done, value } = await reader.read()
+      
+      if (done) {
+        break
+      }
+      
+      buffer += decoder.decode(value, { stream: true })
+      
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || ''
+      
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6).trim()
+          
+          if (data === '[DONE]') {
+            return
+          }
+          
+          if (data) {
+            try {
+              const json = JSON.parse(data)
+              if (json.chunk) {
+                onChunk(json.chunk)
+              } else if (json.done) {
+                // Streaming complete with metadata
+                onComplete({
+                  iterationsUsed: json.iterations_used,
+                  finalAIProbability: json.final_ai_probability,
+                  reachedTarget: json.reached_target,
+                  creditsUsed: json.credits_used
+                })
+              } else if (json.error) {
+                throw new Error(json.error)
+              }
+            } catch (e) {
+              if (e.message !== 'Unexpected end of JSON input') {
+                console.warn('[WARNING] Failed to parse JSON:', data, e)
+              }
+            }
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('[FAIL] Error streaming humanize result:', error)
+    throw error
+  }
+}
+
+/**
+ * Poll humanize job and stream result when completed
+ * Combines polling for progress with streaming for final result
+ * @param {string} jobId 
+ * @param {Object} options - { onProgress, onChunk, onComplete, pollInterval, maxWaitTime }
+ * @returns {Promise<Object>}
+ */
+export async function pollAndStreamHumanizeJob(jobId, options = {}) {
+  const { 
+    onProgress = () => {}, 
+    onChunk = () => {},
+    onComplete = () => {},
+    pollInterval = 2000, 
+    maxWaitTime = 300000
+  } = options
+  
+  const startTime = Date.now()
+  
+  while (Date.now() - startTime < maxWaitTime) {
+    const result = await getHumanizeJobStatus(jobId)
+    
+    if (!result.success) {
+      return result
+    }
+    
+    const { data } = result
+    
+    onProgress({
+      status: data.status,
+      progress: data.progress,
+      jobId: data.job_id
+    })
+    
+    // When completed, stream the result
+    if (data.status === 'completed') {
+      try {
+        await streamHumanizeJobResult(jobId, onChunk, onComplete)
+        return {
+          success: true,
+          data: data.result,
+          streamed: true
+        }
+      } catch (streamError) {
+        console.warn('[WARNING] Streaming failed, falling back to direct result:', streamError)
+        // Fallback to direct result if streaming fails
+        return {
+          success: true,
+          data: data.result,
+          streamed: false
+        }
+      }
+    }
+    
+    if (data.status === 'failed') {
+      return {
+        success: false,
+        error: data.error || 'Job failed'
+      }
+    }
+    
     await new Promise(resolve => setTimeout(resolve, pollInterval))
   }
   

@@ -1129,6 +1129,7 @@ exports.iterativeHumanize = async (req, res) => {
 
 exports.startIterativeHumanize = async (req, res) => {
   const l = createLocalizer(req);
+  const creditService = require('../services/credit.service');
   
   try {
     const { 
@@ -1140,47 +1141,82 @@ exports.startIterativeHumanize = async (req, res) => {
       model: requestedModel = 'gemini-2.0-flash-exp'
     } = req.body;
 
-    // Validate model
-    const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
-
-    if (!profile_id || !text) {
-      return res.status(400).json({ success: false, ...l.error('invalid_input') });
-    }
-
-    // Verify profile exists
-    const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
-    if (!profileDoc.exists) {
-      return res.status(404).json({ success: false, ...l.error('not_found') });
-    }
-
-    const profileData = profileDoc.data();
-    const voiceProfile = profileData.voiceProfile || profileData.promptableSummary;
-
-    if (!voiceProfile) {
-      return res.status(400).json({
-        success: false,
-        ...l.error('invalid_input'),
-        details: l.t('voice_profile.not_found')
+    // Validate user_id
+    if (!user_id) {
+      return res.status(401).json({ 
+        success: false, 
+        error: l.t('errors.unauthorized'),
+        code: 'USER_ID_REQUIRED'
       });
     }
 
-    // Create async job
+    // Validate model
+    const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
+
+    // Text is required, profile_id is optional (for generic humanization)
+    if (!text) {
+      return res.status(400).json({ success: false, ...l.error('invalid_input'), details: 'Text is required' });
+    }
+
+    // Check if user has enough credits (estimate based on max iterations)
+    // Actual cost will be calculated based on iterations used
+    const estimatedCost = creditService.calculateIterativeHumanizeCost(text, max_iterations);
+    const hasEnough = await creditService.hasEnoughCredits(user_id, estimatedCost);
+    
+    if (!hasEnough) {
+      const credits = await creditService.getUserCredits(user_id);
+      return res.status(402).json({ 
+        success: false,
+        error: l.t('credits.insufficient'),
+        code: 'INSUFFICIENT_CREDITS',
+        required: estimatedCost,
+        available: credits.balance,
+        shortfall: estimatedCost - credits.balance
+      });
+    }
+
+    // Verify profile exists if provided
+    if (profile_id) {
+      const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
+      if (!profileDoc.exists) {
+        return res.status(404).json({ success: false, ...l.error('not_found') });
+      }
+
+      const profileData = profileDoc.data();
+      const voiceProfile = profileData.voiceProfile || profileData.promptableSummary;
+
+      if (!voiceProfile) {
+        return res.status(400).json({
+          success: false,
+          ...l.error('invalid_input'),
+          details: l.t('voice_profile.not_found')
+        });
+      }
+    }
+
+    // Get current credits for tracking
+    const userCredits = await creditService.getUserCredits(user_id);
+
+    // Create async job - credits will be deducted after completion
+    // profile_id can be null for generic humanization
     const humanizeJobService = require('../services/humanizeJob.service');
     const jobInfo = await humanizeJobService.createJob({
-      profileId: profile_id,
+      profileId: profile_id || null,
       text,
       userId: user_id,
       maxIterations: Math.min(max_iterations, 5),
       targetProbability: Math.max(target_probability, 20),
       model,
-      creditCost: req.creditCost || 0,
-      creditsBefore: req.creditsBefore
+      // Pass credit info for deduction after completion
+      creditsBefore: userCredits.balance,
+      estimatedCost
     });
 
     logger.info('Async humanize job started', { 
       jobId: jobInfo.jobId, 
       profileId: profile_id,
-      textLength: text.length 
+      textLength: text.length,
+      estimatedCost
     });
 
     res.json({
@@ -1188,6 +1224,7 @@ exports.startIterativeHumanize = async (req, res) => {
       job_id: jobInfo.jobId,
       status: jobInfo.status,
       estimated_time: jobInfo.estimatedTime,
+      estimated_cost: estimatedCost,
       message: l.t('humanize.job_started') || 'Humanization job started'
     });
   } catch (error) {
@@ -1243,18 +1280,107 @@ exports.getHumanizeJobStatus = async (req, res) => {
         improved: job.result.improved,
         warning: job.result.warning,
         profile_name: job.result.profileName,
-        processing_time_ms: job.result.processingTimeMs
+        processing_time_ms: job.result.processingTimeMs,
+        // Credit info
+        credits_used: job.result.creditsUsed || job.actualCost,
+        credits_remaining: job.result.creditsRemaining
       };
     }
 
     if (job.status === humanizeJobService.JOB_STATUS.FAILED) {
       response.error = job.error;
+      // No credits deducted on failure
+      response.credits_used = 0;
     }
 
     res.json(response);
   } catch (error) {
     console.error('[ERROR] Get humanize job status error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
+  }
+};
+
+// ============================================================================
+// ASYNC ITERATIVE HUMANIZE - STREAM RESULT
+// Streams the completed job result text for smooth UI transition
+// ============================================================================
+
+exports.streamHumanizeJobResult = async (req, res) => {
+  const l = createLocalizer(req);
+  
+  try {
+    const { job_id } = req.params;
+
+    if (!job_id) {
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
+    }
+
+    const humanizeJobService = require('../services/humanizeJob.service');
+    const job = await humanizeJobService.getJob(job_id);
+
+    if (!job) {
+      return res.status(404).json({ 
+        success: false, 
+        ...l.error('not_found'),
+        message: 'Job not found or expired'
+      });
+    }
+
+    // Only stream if job is completed
+    if (job.status !== humanizeJobService.JOB_STATUS.COMPLETED || !job.result) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Job not completed yet',
+        status: job.status
+      });
+    }
+
+    const rewrittenText = job.result.rewrittenText;
+    
+    // Set up SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    // Stream text in chunks to simulate typing effect
+    const chunkSize = 15; // Characters per chunk
+    const delayMs = 20; // Delay between chunks
+    
+    for (let i = 0; i < rewrittenText.length; i += chunkSize) {
+      const chunk = rewrittenText.substring(i, i + chunkSize);
+      res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
+      
+      // Small delay for natural typing effect
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+
+    // Send completion signal with metadata
+    res.write(`data: ${JSON.stringify({ 
+      done: true,
+      iterations_used: job.result.iterationsUsed,
+      final_ai_probability: job.result.finalAIProbability,
+      reached_target: job.result.reachedTarget,
+      credits_used: job.result.creditsUsed || job.actualCost
+    })}\n\n`);
+    
+    res.write('data: [DONE]\n\n');
+    res.end();
+
+    logger.info('Humanize job result streamed', { 
+      jobId: job_id, 
+      textLength: rewrittenText.length 
+    });
+  } catch (error) {
+    console.error('[ERROR] Stream humanize job result error:', error);
+    
+    // If headers not sent yet, send JSON error
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
+    } else {
+      // If streaming already started, send error in stream format
+      res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+      res.end();
+    }
   }
 };
 

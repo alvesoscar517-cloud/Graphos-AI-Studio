@@ -7,6 +7,11 @@
  * 2. Processing in background with progress updates
  * 3. Client polls for status/result
  * 
+ * Credit handling:
+ * - Credits are checked before job starts (in controller)
+ * - Credits are deducted ONLY after successful completion
+ * - Cost is calculated based on ACTUAL iterations used, not max
+ * 
  * @module services/humanizeJob
  */
 
@@ -14,6 +19,7 @@ const { v4: uuidv4 } = require('uuid');
 const cache = require('./cache.service');
 const humanizeService = require('./humanize.service');
 const geminiService = require('./gemini.service');
+const creditService = require('./credit.service');
 const logger = require('../utils/logger');
 const { db, FieldValue } = require('../config/firebase');
 const activityLogService = require('./activityLog.service');
@@ -54,8 +60,8 @@ async function createJob(params) {
     maxIterations = 3,
     targetProbability = 35,
     model = 'gemini-2.0-flash-exp',
-    creditCost = 0,
-    creditsBefore = 0
+    creditsBefore = 0,
+    estimatedCost = 0
   } = params;
 
   const jobId = uuidv4();
@@ -70,8 +76,11 @@ async function createJob(params) {
     maxIterations: Math.min(maxIterations, MAX_ITERATIONS),
     targetProbability: Math.max(targetProbability, MIN_TARGET_PROBABILITY),
     model,
-    creditCost,
+    // Credit tracking - will be calculated after completion
     creditsBefore,
+    estimatedCost,
+    actualCost: null, // Set after completion
+    creditsDeducted: false,
     progress: {
       currentIteration: 0,
       totalIterations: maxIterations,
@@ -165,38 +174,47 @@ async function processJob(jobId) {
       status: JOB_STATUS.PROCESSING,
       progress: {
         ...job.progress,
-        currentStep: 'loading_profile'
+        currentStep: job.profileId ? 'loading_profile' : 'rewriting'
       }
     });
 
-    // Load profile
-    const profileDoc = await db.collection('voice_profiles').doc(job.profileId).get();
-    if (!profileDoc.exists) {
-      throw new Error('Profile not found');
-    }
-
-    const profileData = profileDoc.data();
-    const voiceProfile = profileData.voiceProfile || profileData.promptableSummary;
-
-    if (!voiceProfile) {
-      throw new Error('Voice profile not found');
-    }
-
-    // Get sample text for few-shot learning
+    let voiceProfile = null;
+    let profileData = null;
     let sampleText = null;
-    try {
-      const samplesSnapshot = await db.collection('voice_profiles')
-        .doc(job.profileId)
-        .collection('samples')
-        .where('type', '==', 'long')
-        .limit(1)
-        .get();
-      
-      if (!samplesSnapshot.empty) {
-        sampleText = samplesSnapshot.docs[0].data().text;
+
+    // Load profile if provided, otherwise use generic humanization
+    if (job.profileId) {
+      const profileDoc = await db.collection('voice_profiles').doc(job.profileId).get();
+      if (!profileDoc.exists) {
+        throw new Error('Profile not found');
       }
-    } catch (e) {
-      logger.warn('Could not fetch sample text', { error: e.message });
+
+      profileData = profileDoc.data();
+      voiceProfile = profileData.voiceProfile || profileData.promptableSummary;
+
+      // Get sample text for few-shot learning
+      try {
+        const samplesSnapshot = await db.collection('voice_profiles')
+          .doc(job.profileId)
+          .collection('samples')
+          .where('type', '==', 'long')
+          .limit(1)
+          .get();
+        
+        if (!samplesSnapshot.empty) {
+          sampleText = samplesSnapshot.docs[0].data().text;
+        }
+      } catch (e) {
+        logger.warn('Could not fetch sample text', { error: e.message });
+      }
+    } else {
+      // Generic humanization without profile
+      voiceProfile = {
+        tone: 'natural',
+        formality_level: 5,
+        description: 'Write in a natural, human-like style with varied sentence structures and authentic voice.'
+      };
+      logger.info('Using generic humanization (no profile)', { jobId });
     }
 
     // Run iterative refinement with progress updates
@@ -214,6 +232,50 @@ async function processJob(jobId) {
 
     const processingTime = Date.now() - startTime;
 
+    // Calculate actual cost based on iterations used
+    const actualCost = calculateActualCost(job.text, result.iterations, job.model);
+    let creditsAfter = job.creditsBefore;
+
+    // Deduct credits only on success
+    if (job.userId && actualCost > 0) {
+      try {
+        await creditService.deductCredits(
+          job.userId,
+          actualCost,
+          'iterative_humanize',
+          {
+            jobId,
+            iterations: result.iterations,
+            async: true
+          }
+        );
+        
+        // Track usage
+        await creditService.trackFeatureUsage(
+          job.userId,
+          'iterative_humanize',
+          actualCost,
+          { jobId, iterations: result.iterations }
+        );
+        
+        creditsAfter = job.creditsBefore - actualCost;
+        
+        logger.info('Credits deducted for humanize job', {
+          jobId,
+          userId: job.userId,
+          actualCost,
+          iterations: result.iterations,
+          creditsAfter
+        });
+      } catch (creditError) {
+        logger.error('Failed to deduct credits for humanize job', {
+          jobId,
+          error: creditError.message
+        });
+        // Continue - don't fail the job because of credit deduction error
+      }
+    }
+
     // Update user stats
     if (job.userId) {
       await db.collection('users').doc(job.userId).update({
@@ -230,8 +292,9 @@ async function processJob(jobId) {
         reachedTarget: result.reachedTarget,
         duration: processingTime,
         model: job.model,
-        creditsUsed: job.creditCost,
+        creditsUsed: actualCost,
         creditsBefore: job.creditsBefore,
+        creditsAfter,
         async: true
       });
     }
@@ -239,6 +302,8 @@ async function processJob(jobId) {
     // Mark job as completed
     await updateJob(jobId, {
       status: JOB_STATUS.COMPLETED,
+      actualCost,
+      creditsDeducted: true,
       result: {
         originalText: job.text,
         rewrittenText: result.text,
@@ -248,8 +313,10 @@ async function processJob(jobId) {
         reachedTarget: result.reachedTarget,
         improved: result.improved,
         warning: result.warning,
-        profileName: profileData.name,
-        processingTimeMs: processingTime
+        profileName: profileData?.name || 'Generic',
+        processingTimeMs: processingTime,
+        creditsUsed: actualCost,
+        creditsRemaining: creditsAfter
       },
       progress: {
         currentIteration: result.iterations,
@@ -364,6 +431,41 @@ async function runIterativeRefinement(jobId, originalText, voiceProfile, context
 // ============================================================================
 
 /**
+ * Calculate actual cost based on iterations used
+ * This is called AFTER job completion to charge only for actual work done
+ * 
+ * @param {string} text - Original text
+ * @param {number} iterationsUsed - Actual iterations completed
+ * @param {string} model - Model used
+ * @returns {number} Actual credit cost
+ */
+function calculateActualCost(text, iterationsUsed, model) {
+  // Get pricing config
+  const pricing = require('../config/pricing');
+  const featureConfig = pricing.FEATURE_COSTS['iterative_humanize'];
+  
+  if (!featureConfig) {
+    logger.warn('iterative_humanize pricing config not found, using default');
+    return 3 + (iterationsUsed * 1.5); // Fallback
+  }
+  
+  const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
+  
+  // Calculate cost: base + (per iteration * actual iterations) + (per word * words)
+  let cost = featureConfig.baseCost || 3;
+  cost += (featureConfig.perIterationCost || 1.5) * iterationsUsed;
+  cost += (featureConfig.perWordCost || 0.0008) * wordCount;
+  
+  // Apply max cost cap
+  if (featureConfig.maxCost) {
+    cost = Math.min(cost, featureConfig.maxCost);
+  }
+  
+  // Round to 2 decimal places
+  return Math.round(cost * 100) / 100;
+}
+
+/**
  * Calculate estimated processing time
  * @param {number} textLength - Text length in characters
  * @param {number} maxIterations - Max iterations
@@ -403,5 +505,6 @@ module.exports = {
   getJob,
   updateJob,
   JOB_STATUS,
-  calculateEstimatedTime
+  calculateEstimatedTime,
+  calculateActualCost
 };

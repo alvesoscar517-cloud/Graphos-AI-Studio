@@ -971,6 +971,8 @@
     "targetAIProbability": "Target AI Probability",
     "refineUntilBelow": "Refine until AI detection is below {{percent}}%",
     "antiAIInfo": "Anti-AI Detection applies advanced rules to make your text indistinguishable from human writing, including natural contractions, varied sentence lengths, and avoiding AI-typical phrases.",
+    "iterativeRefinementInfo": "This feature rewrites your text multiple times, checking AI probability after each iteration until it reaches your target. May take 30-90 seconds depending on text length and model. Credits are charged based on actual iterations used.",
+    "worksWithoutProfile": "Works without a profile for generic humanization.",
     "new": "NEW",
     "beta": "BETA",
     "selectProfileNotice": "Select a profile to enable writing style customization"

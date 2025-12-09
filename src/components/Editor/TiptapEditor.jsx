@@ -16,7 +16,7 @@ import DeviationHighlightExtension from './extensions/DeviationHighlightExtensio
 import LazyLottie from '../Common/LazyLottie'
 import sparklesAnimation from '../../animation/Sparkles Loop Loader AI.json'
 import { useTranslation } from 'react-i18next'
-import { useIsStreaming, useHumanizeProgress, useProcessingType } from '@/stores'
+import { useIsStreaming } from '@/stores'
 import { cn } from '../../lib/utils'
 import { serializeToPlainText, parseFromPlainText } from './utils/serialization'
 import SuggestionTooltip from '../Analysis/SuggestionTooltip'
@@ -43,35 +43,6 @@ function TiptapEditorComponent({
 }, ref) {
   const { t } = useTranslation()
   const isStreaming = useIsStreaming()
-  const humanizeProgress = useHumanizeProgress()
-  const processingType = useProcessingType()
-  
-  // Get progress text for humanize
-  const getHumanizeProgressText = () => {
-    if (!humanizeProgress || processingType !== 'humanize') return null
-    const { currentStep, currentIteration, totalIterations, aiProbability } = humanizeProgress
-    
-    switch (currentStep) {
-      case 'queued':
-        return t('rewrite.humanizeProgress.queued')
-      case 'loading_profile':
-        return t('rewrite.humanizeProgress.loading_profile')
-      case 'rewriting':
-        return t('rewrite.humanizeProgress.rewriting', { current: currentIteration, total: totalIterations })
-      case 'checking':
-        return aiProbability 
-          ? `${t('rewrite.humanizeProgress.checking')} (${aiProbability}%)`
-          : t('rewrite.humanizeProgress.checking')
-      case 'completed':
-        return t('rewrite.humanizeProgress.completed')
-      case 'failed':
-        return t('rewrite.humanizeProgress.failed')
-      default:
-        return t('rewrite.humanizing')
-    }
-  }
-  
-  const humanizeProgressText = getHumanizeProgressText()
   const [activeTooltip, setActiveTooltip] = useState(null)
   const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set())
   const [undoStack, setUndoStack] = useState([])
@@ -290,26 +261,13 @@ function TiptapEditorComponent({
 
         {/* AI Processing overlay with sparkles animation */}
         {isProcessing && !isStreaming && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none">
+          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
             <div className="absolute inset-0 bg-bg-tertiary/30 backdrop-blur-[1px]" />
             <LazyLottie 
               animationData={sparklesAnimation} 
               loop={true} 
               style={{ width: 240, height: 240, position: 'relative', zIndex: 1 }} 
             />
-            {/* Humanize progress text */}
-            {humanizeProgressText && (
-              <div className="relative z-10 -mt-8 text-center">
-                <p className="text-sm text-text-secondary font-medium animate-pulse">
-                  {humanizeProgressText}
-                </p>
-                {humanizeProgress?.aiProbability && (
-                  <p className="text-xs text-text-muted mt-1">
-                    AI: {humanizeProgress.aiProbability}%
-                  </p>
-                )}
-              </div>
-            )}
           </div>
         )}
 

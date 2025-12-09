@@ -212,12 +212,23 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
         )}
       </div>
 
-      {/* Info box */}
-      {localPreferences.useAntiAIDetection && !isDisabled && (
+      {/* Info box for Anti-AI Detection */}
+      {localPreferences.useAntiAIDetection && !localPreferences.useIterativeRefinement && !isDisabled && (
         <div className="flex items-start gap-2 py-2.5 px-3 bg-bg-secondary border border-border-light rounded-xl mt-1">
           <Icon name="info" alt={t('common.info')} size="sm" color="muted" className="shrink-0 mt-0.5" />
           <div className="text-xs text-text-secondary leading-relaxed">
             {t('writingPreferences.antiAIInfo')}
+          </div>
+        </div>
+      )}
+
+      {/* Info box for Iterative Refinement - shows even without profile */}
+      {localPreferences.useIterativeRefinement && (
+        <div className="flex items-start gap-2 py-2.5 px-3 bg-bg-secondary border border-border-light rounded-xl mt-1">
+          <Icon name="info" alt={t('common.info')} size="sm" color="muted" className="shrink-0 mt-0.5" />
+          <div className="text-xs text-text-secondary leading-relaxed">
+            {t('writingPreferences.iterativeRefinementInfo')}
+            {isDisabled && ` ${t('writingPreferences.worksWithoutProfile')}`}
           </div>
         </div>
       )}
