@@ -22,13 +22,15 @@ export default function ConfirmDialog({
   return createPortal(
     <div 
       className={cn(
-        "modal-overlay p-5"
+        "modal-overlay p-5",
+        "max-md:p-3 max-md:items-end"
       )}
       onClick={onCancel}
     >
       <div 
         className={cn(
-          "modal-content p-6 max-w-modal-sm w-full text-center"
+          "modal-content p-6 max-w-modal-sm w-full text-center",
+          "max-md:max-w-full max-md:rounded-t-2xl max-md:rounded-b-none max-md:p-5"
         )}
         onClick={(e) => e.stopPropagation()}
       >

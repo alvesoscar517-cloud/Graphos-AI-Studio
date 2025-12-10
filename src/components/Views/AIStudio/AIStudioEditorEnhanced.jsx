@@ -291,7 +291,7 @@ const AIStudioEditorEnhanced = ({
         "bg-bg-tertiary shrink-0"
       )}>
         {/* Top row - title and actions */}
-        <div className="flex items-center gap-2 py-2 px-4 h-14">
+        <div className="flex items-center gap-2 py-2 px-4 h-14 max-md:px-3 max-md:gap-1">
           <button 
             className={cn(
               "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
@@ -306,9 +306,12 @@ const AIStudioEditorEnhanced = ({
             <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
           </button>
           
-          <div className="flex items-center gap-2 min-w-0 flex-1">
+          <div className="flex items-center gap-2 min-w-0 flex-1 max-md:gap-1">
             <div 
-              className="text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-xl shrink-0"
+              className={cn(
+                "text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default shrink-0",
+                "max-w-xl max-lg:max-w-xs max-md:max-w-[120px] max-md:text-xs max-md:px-1"
+              )}
               title={currentNote?.title || ''}
             >
               {displayTitle || t('editor.untitled')}
@@ -328,7 +331,9 @@ const AIStudioEditorEnhanced = ({
               <img src="/icon/pencil.svg" alt={t('common.edit')} className="w-3.5 h-3.5 icon-invert" />
             </button>
             
-            <TokenBadge text={currentNote?.content || ''} />
+            <div className="max-lg:hidden">
+              <TokenBadge text={currentNote?.content || ''} />
+            </div>
           </div>
           
           <div className="flex items-center gap-1">
@@ -341,13 +346,16 @@ const AIStudioEditorEnhanced = ({
                   "rounded-pill text-sm font-medium cursor-pointer",
                   "transition-all duration-200",
                   "hover:bg-bg-hover",
-                  "hover:border-border-hover"
+                  "hover:border-border-hover",
+                  "max-lg:py-1 max-lg:px-2.5",
+                  "max-md:px-2"
                 )}
                 onClick={() => setShowHighlights(false)}
                 data-tooltip={t('common.hide')}
+                data-tooltip-collapsed={t('common.done')}
               >
-                <img src="/icon/eye-off.svg" alt={t('common.hide')} className="w-4 h-4 opacity-70 icon-invert" />
-                <span>{t('common.done')}</span>
+                <img src="/icon/eye-off.svg" alt={t('common.hide')} className="w-4 h-4 opacity-70 icon-invert max-md:w-3.5 max-md:h-3.5" />
+                <span className="max-md:hidden">{t('common.done')}</span>
               </button>
             )}
 
@@ -359,13 +367,16 @@ const AIStudioEditorEnhanced = ({
                 "rounded-pill text-sm font-medium cursor-pointer",
                 "transition-all duration-200",
                 "hover:bg-bg-hover",
-                "hover:border-border-hover"
+                "hover:border-border-hover",
+                "max-lg:py-1 max-lg:px-2.5",
+                "max-md:px-2"
               )}
               onClick={onCreateNote}
               data-tooltip={t('common.new')}
+              data-tooltip-collapsed={t('common.new')}
             >
-              <img src="/icon/plus.svg" alt={t('common.new')} className="w-4 h-4 opacity-70 icon-invert" />
-              <span>{t('common.new')}</span>
+              <img src="/icon/plus.svg" alt={t('common.new')} className="w-4 h-4 opacity-70 icon-invert max-md:w-3.5 max-md:h-3.5" />
+              <span className="max-md:hidden">{t('common.new')}</span>
             </button>
             <button 
               className={cn(
@@ -375,13 +386,16 @@ const AIStudioEditorEnhanced = ({
                 "rounded-pill text-sm font-medium cursor-pointer",
                 "transition-all duration-200",
                 "hover:bg-bg-hover",
-                "hover:border-border-hover"
+                "hover:border-border-hover",
+                "max-lg:py-1 max-lg:px-2.5",
+                "max-md:px-2"
               )}
               onClick={() => fileInputRef.current?.click()}
               data-tooltip={t('common.upload')}
+              data-tooltip-collapsed={t('common.upload')}
             >
-              <img src="/icon/upload.svg" alt={t('common.upload')} className="w-4 h-4 opacity-70 icon-invert" />
-              <span>{t('common.upload')}</span>
+              <img src="/icon/upload.svg" alt={t('common.upload')} className="w-4 h-4 opacity-70 icon-invert max-md:w-3.5 max-md:h-3.5" />
+              <span className="max-md:hidden">{t('common.upload')}</span>
             </button>
             {rightSidebarHidden && (
               <button 

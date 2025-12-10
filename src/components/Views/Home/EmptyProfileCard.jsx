@@ -32,24 +32,37 @@ const EmptyProfileCard = () => {
     <div className="w-full">
       <div className={cn(
         "bg-bg-secondary border border-border-light rounded-2xl",
-        "p-8 overflow-hidden"
+        "p-8 overflow-hidden transition-all duration-300",
+        "max-lg:p-6 max-md:p-5 max-sm:p-4"
       )}>
-        <div className="flex items-center gap-4 max-md:flex-col">
+        <div className="flex items-center gap-6 max-lg:gap-4 max-md:flex-col max-md:text-center">
           {/* Left Content */}
           <div className="flex-1 min-w-0">
-            <div className="mb-6">
-              <h3 className="text-2xl font-normal text-text-primary leading-tight">
+            <div className="mb-6 max-md:mb-4 max-sm:mb-3">
+              <h3 className={cn(
+                "text-2xl font-normal text-text-primary leading-tight",
+                "max-lg:text-xl max-md:text-lg max-sm:text-base"
+              )}>
                 {t('home.welcomeTo')}<br />
                 <span className="bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-400 bg-clip-text text-transparent"><span className="font-bold">Graphos</span> AI Studio</span>
               </h3>
             </div>
 
-            <div className="flex items-center gap-3 mb-6">
-              <div className="card-icon !w-11 !h-11 shrink-0">
-                <img src="/icon/fingerprint.svg" alt="Fingerprint" className="w-5 h-5 opacity-70 icon-invert" />
+            <div className={cn(
+              "flex items-center gap-3 mb-6",
+              "max-lg:gap-2.5 max-md:flex-col max-md:mb-4 max-sm:mb-3"
+            )}>
+              <div className={cn(
+                "card-icon !w-11 !h-11 shrink-0 transition-all duration-200",
+                "max-lg:!w-10 max-lg:!h-10 max-sm:!w-9 max-sm:!h-9"
+              )}>
+                <img src="/icon/fingerprint.svg" alt="Fingerprint" className="w-5 h-5 opacity-70 icon-invert max-lg:w-4 max-lg:h-4 max-sm:w-3.5 max-sm:h-3.5" />
               </div>
-              <div className="bg-fill-tertiary rounded-xl px-4 py-2.5">
-                <p className="text-lg text-text-muted m-0">
+              <div className="bg-fill-tertiary rounded-xl px-4 py-2.5 max-lg:px-3 max-lg:py-2 max-sm:px-2.5 max-sm:py-1.5 max-md:w-full">
+                <p className={cn(
+                  "text-lg text-text-muted m-0 min-h-[1.5em]",
+                  "max-lg:text-base max-md:text-sm max-sm:text-xs"
+                )}>
                   <TextScramble key={currentPhraseIndex}>
                     {phrases[currentPhraseIndex]}
                   </TextScramble>
@@ -63,22 +76,28 @@ const EmptyProfileCard = () => {
                 "bg-accent text-white border-none",
                 "text-sm font-medium cursor-pointer",
                 "transition-all duration-200",
-                "hover:bg-accent-hover hover:-translate-y-0.5 hover:shadow-lg"
+                "hover:bg-accent-hover hover:-translate-y-0.5 hover:shadow-lg",
+                "max-lg:py-2.5 max-lg:px-4 max-lg:text-[13px]",
+                "max-md:w-full max-md:justify-center",
+                "max-sm:py-2 max-sm:px-3 max-sm:text-xs max-sm:gap-1.5"
               )}
               onClick={handleCreateProfile}
             >
-              <img src="/icon/plus-circle.svg" alt="" className="w-5 h-5 invert" />
+              <img src="/icon/plus-circle.svg" alt="" className="w-5 h-5 invert max-lg:w-4 max-lg:h-4 max-sm:w-3.5 max-sm:h-3.5" />
               <span>{t('home.createFirstProfile')}</span>
-              <img src="/icon/arrow-right.svg" alt="" className="w-4 h-4 invert ml-1" />
+              <img src="/icon/arrow-right.svg" alt="" className="w-4 h-4 invert ml-1 max-lg:w-3.5 max-lg:h-3.5 max-sm:w-3 max-sm:h-3" />
             </button>
           </div>
 
-          {/* Right Animation - shifted left via CSS */}
+          {/* Right Animation - responsive sizing */}
           <div className={cn(
             "empty-profile-animation",
             "shrink-0",
             "flex items-center justify-center",
-            "bg-fill-tertiary rounded-3xl p-6"
+            "bg-fill-tertiary rounded-3xl p-6 transition-all duration-300",
+            "max-lg:p-4 max-lg:rounded-2xl",
+            "max-md:p-5 max-md:w-full max-md:max-w-[200px]",
+            "max-sm:p-4 max-sm:max-w-[160px] max-sm:rounded-xl"
           )}>
             <LottieAnimation 
               animationPath="/animation/FaceID.json"

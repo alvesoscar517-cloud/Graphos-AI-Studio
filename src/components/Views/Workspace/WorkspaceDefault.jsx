@@ -55,14 +55,16 @@ const WorkspaceDefault = ({
       </div>
 
       {/* Content - Flexbox centered layout with equal spacing */}
-      <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6">
+      <div className="flex-1 flex flex-col items-center justify-center gap-5 px-4 max-w-3xl mx-auto w-full">
         {/* Title */}
-        <h1 className="text-4xl max-md:text-2xl font-normal text-text-primary m-0 text-center">
+        <h1 className="text-3xl font-normal text-text-primary m-0 text-center">
           {t('workspace.hello', { name: user?.name || user?.email?.split('@')[0] || 'friend' })}
         </h1>
         
         {/* Search Input - rendered via prop */}
-        {chatInput}
+        <div className="w-full">
+          {chatInput}
+        </div>
         
         {/* Quick Actions */}
         <QuickActions onActionClick={onQuickAction} />

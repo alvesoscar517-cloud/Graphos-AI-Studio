@@ -9,6 +9,8 @@
 /* eslint-disable no-undef */
 // @ts-nocheck - Credential Management API types not fully supported
 
+import { logger } from './logger'
+
 /**
  * Kiểm tra browser có hỗ trợ Credential Management API không
  * @returns {boolean}
@@ -29,7 +31,7 @@ export function isCredentialAPISupported() {
  */
 export async function saveCredentials(email, password, name = '') {
   if (!isCredentialAPISupported()) {
-    console.log('[CredentialManager] API not supported')
+    logger.credential('API not supported')
     return false
   }
 
@@ -42,11 +44,11 @@ export async function saveCredentials(email, password, name = '') {
     })
 
     await navigator.credentials.store(credential)
-    console.log('[CredentialManager] Credentials saved')
+    logger.credential('Credentials saved')
     return true
   } catch (error) {
     // User có thể từ chối lưu - không phải lỗi
-    console.log('[CredentialManager] Save skipped:', error?.message || error)
+    logger.credential('Save skipped:', error?.message || error)
     return false
   }
 }
@@ -83,7 +85,7 @@ export async function getStoredCredentials(mediation = 'optional') {
     
     return null
   } catch (error) {
-    console.log('[CredentialManager] Get failed:', error?.message || error)
+    logger.credential('Get failed:', error?.message || error)
     return null
   }
 }
@@ -99,9 +101,9 @@ export async function preventAutoSignIn() {
 
   try {
     await navigator.credentials.preventSilentAccess()
-    console.log('[CredentialManager] Silent access prevented')
+    logger.credential('Silent access prevented')
   } catch (error) {
-    console.log('[CredentialManager] Prevent silent access failed:', error.message)
+    logger.credential('Prevent silent access failed:', error.message)
   }
 }
 

@@ -83,32 +83,32 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
   }
 
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-2 w-full">
       {/* Header */}
-      <div className="flex items-center gap-1.5 px-1 mb-1">
+      <div className="flex items-center gap-1.5 px-1 mb-0.5">
         <Icon name="sliders" alt={t('writingPreferences.advancedOptions')} size="xs" color="muted" />
         <h4 className="font-medium text-text-muted m-0 tracking-wide uppercase" style={{ fontSize: '10px' }}>{t('writingPreferences.advancedOptions')}</h4>
       </div>
 
       {isProfileDisabled && (
-        <div className="flex items-start gap-2 py-2.5 px-3 bg-bg-secondary border border-border-light rounded-xl text-xs text-text-secondary mb-1">
-          <Icon name="alert-circle" alt={t('common.info')} size="md" color="muted" className="shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 py-2 px-2.5 bg-bg-secondary border border-border-light rounded-xl text-[11px] text-text-secondary mb-1">
+          <Icon name="alert-circle" alt={t('common.info')} size="sm" color="muted" className="shrink-0 mt-0.5" />
           <span>{t('writingPreferences.selectProfileNotice')}</span>
         </div>
       )}
 
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1">
         {preferenceItems.map((item) => (
           <div key={item.key} className={cn(
-            "flex items-center justify-between gap-3 py-2.5 px-3",
+            "flex items-center justify-between gap-2 py-2 px-2.5",
             "bg-bg-secondary border border-border-light rounded-xl",
             isProfileDisabled && "opacity-50 pointer-events-none"
           )}>
-            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-              <Icon name={item.icon.replace('/icon/', '').replace('.svg', '')} alt={item.title} size="lg" color="muted" themed className="shrink-0" />
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <Icon name={item.icon.replace('/icon/', '').replace('.svg', '')} alt={item.title} size="md" color="muted" themed className="shrink-0" />
               <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                <div className="text-sm font-medium text-text-primary leading-tight flex items-center gap-1.5">{item.title}</div>
-                <div className="text-xs text-text-secondary leading-tight whitespace-nowrap overflow-hidden text-ellipsis">{item.description}</div>
+                <div className="text-xs font-medium text-text-primary leading-tight flex items-center gap-1.5">{item.title}</div>
+                <div className="text-[11px] text-text-secondary leading-tight whitespace-nowrap overflow-hidden text-ellipsis">{item.description}</div>
               </div>
             </div>
             <label className="toggle-switch">
@@ -127,25 +127,25 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
       </div>
 
       {/* Humanization Section */}
-      <div className="flex items-center gap-1.5 px-1 mb-1 mt-3">
+      <div className="flex items-center gap-1.5 px-1 mb-0.5 mt-2">
         <Icon name="user-check" alt={t('writingPreferences.humanization')} size="xs" color="muted" />
         <h4 className="font-medium text-text-muted m-0 tracking-wide uppercase" style={{ fontSize: '10px' }}>{t('writingPreferences.humanization')}</h4>
       </div>
 
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1">
         {/* Anti-AI Detection - works without profile */}
         <div className={cn(
-          "flex items-center justify-between gap-3 py-2.5 px-3",
+          "flex items-center justify-between gap-2 py-2 px-2.5",
           "bg-bg-secondary border border-border-light rounded-xl"
         )}>
-          <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <Icon name="shield" alt={antiAIDetectionItem.title} size="lg" color="muted" themed className="shrink-0" />
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Icon name="shield" alt={antiAIDetectionItem.title} size="md" color="muted" themed className="shrink-0" />
             <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-              <div className="text-sm font-medium text-text-primary leading-tight flex items-center gap-1.5">
+              <div className="text-xs font-medium text-text-primary leading-tight flex items-center gap-1">
                 {antiAIDetectionItem.title}
-                <span className="text-[9px] font-medium py-px px-1 bg-primary/15 text-primary rounded">{antiAIDetectionItem.badge}</span>
+                <span className="text-[8px] font-medium py-px px-1 bg-primary/15 text-primary rounded">{antiAIDetectionItem.badge}</span>
               </div>
-              <div className="text-xs text-text-secondary leading-tight whitespace-nowrap overflow-hidden text-ellipsis">{antiAIDetectionItem.description}</div>
+              <div className="text-[11px] text-text-secondary leading-tight whitespace-nowrap overflow-hidden text-ellipsis">{antiAIDetectionItem.description}</div>
             </div>
           </div>
           <label className="toggle-switch">
@@ -162,17 +162,17 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
 
         {/* Iterative Refinement - works without profile, switches between Rewrite and Humanize */}
         <div className={cn(
-          "flex items-center justify-between gap-3 py-2.5 px-3",
+          "flex items-center justify-between gap-2 py-2 px-2.5",
           "bg-bg-secondary border border-border-light rounded-xl"
         )}>
-          <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <Icon name="refresh-cw" alt={iterativeRefinementItem.title} size="lg" color="muted" themed className="shrink-0" />
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Icon name="refresh-cw" alt={iterativeRefinementItem.title} size="md" color="muted" themed className="shrink-0" />
             <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-              <div className="text-sm font-medium text-text-primary leading-tight flex items-center gap-1.5">
+              <div className="text-xs font-medium text-text-primary leading-tight flex items-center gap-1">
                 {iterativeRefinementItem.title}
-                <span className="text-[9px] font-medium py-px px-1 bg-primary/15 text-primary rounded">{iterativeRefinementItem.badge}</span>
+                <span className="text-[8px] font-medium py-px px-1 bg-primary/15 text-primary rounded">{iterativeRefinementItem.badge}</span>
               </div>
-              <div className="text-xs text-text-secondary leading-tight whitespace-nowrap overflow-hidden text-ellipsis">{iterativeRefinementItem.description}</div>
+              <div className="text-[11px] text-text-secondary leading-tight whitespace-nowrap overflow-hidden text-ellipsis">{iterativeRefinementItem.description}</div>
             </div>
           </div>
           <label className="toggle-switch">
@@ -190,10 +190,10 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
         {/* Target AI Probability Slider */}
         {localPreferences.useIterativeRefinement && (
           <div className={cn(
-            "flex flex-col gap-2 py-2.5 px-3",
+            "flex flex-col gap-1.5 py-2 px-2.5",
             "bg-bg-secondary border border-border-light rounded-xl"
           )}>
-            <div className="flex justify-between items-center text-xs">
+            <div className="flex justify-between items-center text-[11px]">
               <span className="text-text-primary font-medium">{t('writingPreferences.targetAIProbability')}</span>
               <span className="text-primary font-semibold">{localPreferences.targetAIProbability}%</span>
             </div>
@@ -238,9 +238,9 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
 
       {/* Info box for Anti-AI Detection */}
       {localPreferences.useAntiAIDetection && !localPreferences.useIterativeRefinement && (
-        <div className="flex items-start gap-2 py-2.5 px-3 bg-bg-secondary border border-border-light rounded-xl mt-1">
+        <div className="flex items-start gap-2 py-2 px-2.5 bg-bg-secondary border border-border-light rounded-xl mt-1">
           <Icon name="info" alt={t('common.info')} size="sm" color="muted" className="shrink-0 mt-0.5" />
-          <div className="text-xs text-text-secondary leading-relaxed">
+          <div className="text-[11px] text-text-secondary leading-relaxed">
             {t('writingPreferences.antiAIInfo')}
             {isProfileDisabled && ` ${t('writingPreferences.worksWithoutProfile')}`}
           </div>
@@ -249,9 +249,9 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
 
       {/* Info box for Iterative Refinement */}
       {localPreferences.useIterativeRefinement && (
-        <div className="flex items-start gap-2 py-2.5 px-3 bg-bg-secondary border border-border-light rounded-xl mt-1">
+        <div className="flex items-start gap-2 py-2 px-2.5 bg-bg-secondary border border-border-light rounded-xl mt-1">
           <Icon name="info" alt={t('common.info')} size="sm" color="muted" className="shrink-0 mt-0.5" />
-          <div className="text-xs text-text-secondary leading-relaxed">
+          <div className="text-[11px] text-text-secondary leading-relaxed">
             {t('writingPreferences.iterativeRefinementInfo')}
             {isProfileDisabled && ` ${t('writingPreferences.worksWithoutProfile')}`}
           </div>
@@ -260,9 +260,9 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
 
       {/* Warning when no profile and all humanization features disabled */}
       {isProfileDisabled && !localPreferences.useAntiAIDetection && !localPreferences.useIterativeRefinement && (
-        <div className="flex items-start gap-2 py-2.5 px-3 bg-bg-secondary border border-border-light rounded-xl mt-1">
+        <div className="flex items-start gap-2 py-2 px-2.5 bg-bg-secondary border border-border-light rounded-xl mt-1">
           <Icon name="alert-circle" alt={t('common.info')} size="sm" color="muted" className="shrink-0 mt-0.5" />
-          <div className="text-xs text-text-secondary leading-relaxed">
+          <div className="text-[11px] text-text-secondary leading-relaxed">
             {t('writingPreferences.enableFeatureOrSelectProfile')}
           </div>
         </div>
@@ -272,9 +272,9 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
       {!isProfileDisabled && !localPreferences.useAntiAIDetection && !localPreferences.useIterativeRefinement && 
        !localPreferences.useVocabularyPreferences && !localPreferences.useKeyCharacteristics && 
        !localPreferences.useSentencePatterns && !localPreferences.useRewriteInstructions && (
-        <div className="flex items-start gap-2 py-2.5 px-3 bg-bg-secondary border border-border-light rounded-xl mt-1">
+        <div className="flex items-start gap-2 py-2 px-2.5 bg-bg-secondary border border-border-light rounded-xl mt-1">
           <Icon name="alert-circle" alt={t('common.info')} size="sm" color="muted" className="shrink-0 mt-0.5" />
-          <div className="text-xs text-text-secondary leading-relaxed">
+          <div className="text-[11px] text-text-secondary leading-relaxed">
             {t('writingPreferences.enableAtLeastOneFeature')}
           </div>
         </div>

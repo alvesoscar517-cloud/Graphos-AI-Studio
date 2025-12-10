@@ -3,6 +3,8 @@
  * Functions to detect and clean corrupted localStorage data
  */
 
+import { logger } from './logger'
+
 /**
  * Check if a localStorage item is valid JSON
  */
@@ -34,14 +36,14 @@ export function cleanCorruptedStorage() {
   
   keysToCheck.forEach(key => {
     if (!isValidJSON(key)) {
-      console.warn(`🧹 Removing corrupted localStorage item: ${key}`)
+      logger.storage(`🧹 Removing corrupted localStorage item: ${key}`)
       localStorage.removeItem(key)
       cleaned++
     }
   })
   
   if (cleaned > 0) {
-    console.log(`[SUCCESS] Cleaned ${cleaned} corrupted localStorage items`)
+    logger.success(`Cleaned ${cleaned} corrupted localStorage items`)
   }
   
   return cleaned
@@ -56,7 +58,7 @@ export function safeGetJSON(key, defaultValue = null) {
     if (!item) return defaultValue
     return JSON.parse(item)
   } catch (e) {
-    console.warn(`Failed to parse localStorage item "${key}":`, e.message)
+    logger.warn(`Failed to parse localStorage item "${key}":`, e.message)
     localStorage.removeItem(key)
     return defaultValue
   }
@@ -70,7 +72,7 @@ export function safeSetJSON(key, value) {
     localStorage.setItem(key, JSON.stringify(value))
     return true
   } catch (e) {
-    console.error(`Failed to save to localStorage "${key}":`, e.message)
+    logger.error(`Failed to save to localStorage "${key}":`, e.message)
     return false
   }
 }
@@ -79,10 +81,10 @@ export function safeSetJSON(key, value) {
  * Initialize storage cleanup on app start
  */
 export function initStorageCleanup() {
-  console.log('[SEARCH] Checking localStorage for corrupted data...')
+  logger.storage('Checking localStorage for corrupted data...')
   const cleaned = cleanCorruptedStorage()
   
   if (cleaned === 0) {
-    console.log('[SUCCESS] localStorage is clean')
+    logger.success('localStorage is clean')
   }
 }

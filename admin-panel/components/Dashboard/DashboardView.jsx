@@ -212,7 +212,7 @@ export default function DashboardView() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         icon="layout-dashboard.svg"
         title="Dashboard"
@@ -236,28 +236,28 @@ export default function DashboardView() {
             <div 
               key={alert.id}
               className={cn(
-                "flex items-center gap-3 p-3 rounded-lg border animate-in slide-in-from-top-2 duration-300",
+                "flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg border animate-in slide-in-from-top-2 duration-300",
                 alert.type === 'user' && "bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800",
                 alert.type === 'order' && "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800"
               )}
             >
               <div className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center",
+                "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
                 alert.type === 'user' && "bg-blue-100 dark:bg-blue-900",
                 alert.type === 'order' && "bg-green-100 dark:bg-green-900"
               )}>
                 <img src={`/icon/${alert.icon}`} alt="" className="w-4 h-4" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-primary">{alert.title}</p>
+                <p className="text-sm font-medium text-primary truncate">{alert.title}</p>
                 <p className="text-xs text-muted truncate">{alert.message}</p>
               </div>
-              <Button variant="ghost" size="sm" onClick={alert.action}>
+              <Button variant="ghost" size="sm" onClick={alert.action} className="hidden sm:flex">
                 View
               </Button>
               <button 
                 onClick={() => dismissAlert(alert.id)}
-                className="p-1 hover:bg-surface-secondary rounded"
+                className="p-1 hover:bg-surface-secondary rounded flex-shrink-0"
               >
                 <img src="/icon/x.svg" alt="Dismiss" className="w-4 h-4 icon-gray" />
               </button>
@@ -266,8 +266,8 @@ export default function DashboardView() {
         </div>
       )}
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+      {/* Stats Grid - Responsive */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-4 sm:mt-6">
         <StatsCard
           icon="users.svg"
           title="Total Users"
@@ -300,23 +300,23 @@ export default function DashboardView() {
         />
       </div>
 
-      {/* Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      {/* Sections - Responsive */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
         {/* Recent Activities */}
-        <Card className="p-6">
-          <div className="flex items-center gap-2.5 mb-5">
-            <img src="/icon/clock.svg" alt="Activity" className="w-5 h-5 icon-dark" />
-            <h2 className="text-[17px] font-semibold text-primary tracking-[-0.015em]">Recent Activities</h2>
+        <Card className="p-4 sm:p-6">
+          <div className="flex items-center gap-2 sm:gap-2.5 mb-4 sm:mb-5">
+            <img src="/icon/clock.svg" alt="Activity" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
+            <h2 className="text-[15px] sm:text-[17px] font-semibold text-primary tracking-[-0.015em]">Recent Activities</h2>
           </div>
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-2 sm:gap-2.5">
             {activities.map((activity, index) => (
-              <div key={activity.id || index} className="flex items-center gap-3.5 p-3.5 rounded-xl bg-surface-secondary/60 transition-colors duration-150 hover:bg-surface-secondary">
-                <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center flex-shrink-0 shadow-xs">
+              <div key={activity.id || index} className="flex items-center gap-3 sm:gap-3.5 p-3 sm:p-3.5 rounded-xl bg-surface-secondary/60 transition-colors duration-150 hover:bg-surface-secondary">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface flex items-center justify-center flex-shrink-0 shadow-xs">
                   <img src={`/icon/${getActivityIcon(activity.action)}`} alt={activity.action} className="w-4 h-4 icon-dark" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-medium text-primary">{getActivityTitle(activity)}</p>
-                  <p className="text-[12px] text-muted mt-0.5">{formatTimeAgo(activity.timestamp)}</p>
+                  <p className="text-[13px] sm:text-[14px] font-medium text-primary truncate">{getActivityTitle(activity)}</p>
+                  <p className="text-[11px] sm:text-[12px] text-muted mt-0.5">{formatTimeAgo(activity.timestamp)}</p>
                 </div>
               </div>
             ))}

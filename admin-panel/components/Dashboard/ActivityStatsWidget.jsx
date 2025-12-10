@@ -93,41 +93,41 @@ export default function ActivityStatsWidget() {
   }
 
   return (
-    <Card className="p-6">
+    <Card className="p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className="flex items-center gap-2">
-          <img src="/icon/activity.svg" alt="Activity" className="w-5 h-5 icon-dark" />
-          <h3 className="text-lg font-semibold text-primary">Activity Statistics</h3>
+          <img src="/icon/activity.svg" alt="Activity" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
+          <h3 className="text-base sm:text-lg font-semibold text-primary">Activity Statistics</h3>
         </div>
         <Select
           value={String(days)}
           onChange={(e) => setDays(parseInt(e.target.value))}
           options={timeRangeOptions}
-          className="w-28"
+          className="w-24 sm:w-28"
         />
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="p-3 rounded-lg bg-surface-secondary text-center">
-          <div className="text-xl font-bold text-primary">{stats.totalActivities.toLocaleString()}</div>
-          <div className="text-xs text-muted mt-1">Total Activities</div>
+      {/* Summary Cards - Responsive */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
+        <div className="p-2 sm:p-3 rounded-lg bg-surface-secondary text-center">
+          <div className="text-lg sm:text-xl font-bold text-primary">{stats.totalActivities.toLocaleString()}</div>
+          <div className="text-[10px] sm:text-xs text-muted mt-0.5 sm:mt-1 truncate">Activities</div>
         </div>
-        <div className="p-3 rounded-lg bg-surface-secondary text-center">
-          <div className="text-xl font-bold text-primary">{stats.totalCreditsUsed.toFixed(1)}</div>
-          <div className="text-xs text-muted mt-1">Credits Used</div>
+        <div className="p-2 sm:p-3 rounded-lg bg-surface-secondary text-center">
+          <div className="text-lg sm:text-xl font-bold text-primary">{stats.totalCreditsUsed.toFixed(1)}</div>
+          <div className="text-[10px] sm:text-xs text-muted mt-0.5 sm:mt-1 truncate">Credits</div>
         </div>
-        <div className="p-3 rounded-lg bg-surface-secondary text-center">
-          <div className="text-xl font-bold text-primary">{stats.uniqueUsers}</div>
-          <div className="text-xs text-muted mt-1">Active Users</div>
+        <div className="p-2 sm:p-3 rounded-lg bg-surface-secondary text-center">
+          <div className="text-lg sm:text-xl font-bold text-primary">{stats.uniqueUsers}</div>
+          <div className="text-[10px] sm:text-xs text-muted mt-0.5 sm:mt-1 truncate">Users</div>
         </div>
       </div>
 
-      {/* Activity Trend Chart */}
-      <div className="mb-6">
-        <h4 className="text-sm font-medium text-primary mb-3">Activity Trends</h4>
-        <div className="flex items-end gap-0.5 h-24">
+      {/* Activity Trend Chart - Responsive */}
+      <div className="mb-4 sm:mb-6">
+        <h4 className="text-xs sm:text-sm font-medium text-primary mb-2 sm:mb-3">Activity Trends</h4>
+        <div className="flex items-end gap-0.5 h-20 sm:h-24">
           {(() => {
             // Fill missing days with 0
             const filledTrend = [];
@@ -171,9 +171,9 @@ export default function ActivityStatsWidget() {
         </div>
       </div>
 
-      {/* Feature Usage */}
-      <div className="mb-6">
-        <h4 className="text-sm font-medium text-primary mb-3">Top Features</h4>
+      {/* Feature Usage - Responsive */}
+      <div className="mb-4 sm:mb-6">
+        <h4 className="text-xs sm:text-sm font-medium text-primary mb-2 sm:mb-3">Top Features</h4>
         {stats.featureUsage?.length > 0 ? (
           <div className="flex flex-col gap-2">
             {stats.featureUsage.slice(0, 5).map((feature, index) => {
@@ -205,9 +205,9 @@ export default function ActivityStatsWidget() {
         )}
       </div>
 
-      {/* Top Users */}
+      {/* Top Users - Responsive */}
       <div>
-        <h4 className="text-sm font-medium text-primary mb-3">Top Active Users</h4>
+        <h4 className="text-xs sm:text-sm font-medium text-primary mb-2 sm:mb-3">Top Active Users</h4>
         {stats.topUsers?.length > 0 ? (
           <div className="flex flex-col gap-2">
             {stats.topUsers.slice(0, 5).map((user, index) => (

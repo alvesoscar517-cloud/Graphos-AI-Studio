@@ -256,28 +256,29 @@ export default function SettingsView() {
 
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         icon="settings.svg"
         title="System Settings"
         subtitle="Manage system configuration"
         actions={
-          <Button onClick={handleSave} loading={saving}>
+          <Button onClick={handleSave} loading={saving} size="sm">
             <img src="/icon/save.svg" alt="" className="w-4 h-4 icon-white" />
-            {saving ? 'Saving...' : 'Save Changes'}
+            <span className="hidden sm:inline">{saving ? 'Saving...' : 'Save Changes'}</span>
+            <span className="sm:hidden">{saving ? 'Saving' : 'Save'}</span>
           </Button>
         }
       />
 
-      <div className="flex gap-6 mt-6">
-        {/* Sidebar Tabs */}
-        <div className="w-48 shrink-0">
-          <div className="flex flex-col gap-1">
+      <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 mt-4 sm:mt-6">
+        {/* Sidebar Tabs - Horizontal scroll on mobile, vertical on desktop */}
+        <div className="lg:w-48 lg:shrink-0">
+          <div className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible scrollbar-hide pb-2 lg:pb-0">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-left",
+                  "flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2 lg:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all text-left whitespace-nowrap",
                   activeTab === tab.id
                     ? "bg-primary text-primary-foreground"
                     : "text-muted hover:bg-surface-secondary hover:text-primary"
@@ -285,14 +286,14 @@ export default function SettingsView() {
                 onClick={() => setActiveTab(tab.id)}
               >
                 <img src={`/icon/${tab.icon}`} alt="" className={cn("w-4 h-4", activeTab === tab.id ? "icon-white" : "icon-gray")} />
-                {tab.label}
+                <span className="hidden sm:inline lg:inline">{tab.label}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Account */}
           {activeTab === 'account' && (
             <Card className="p-6">

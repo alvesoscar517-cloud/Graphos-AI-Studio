@@ -115,7 +115,10 @@ const BillingSupportModal = ({ onClose }) => {
 
   return createPortal(
     <div 
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-toast animate-fade-in"
+      className={cn(
+        "fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-toast animate-fade-in",
+        "p-4 max-md:p-3 max-md:items-end"
+      )}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
@@ -123,13 +126,14 @@ const BillingSupportModal = ({ onClose }) => {
       <div 
         ref={modalRef} 
         className={cn(
-          "bg-bg-primary rounded-2xl w-[90%] max-w-[600px] max-h-[90vh]",
+          "bg-bg-primary rounded-2xl w-full max-w-[600px] max-h-[90vh]",
           "flex flex-col overflow-hidden shadow-modal",
-          "animate-slide-up"
+          "animate-slide-up",
+          "max-md:max-w-full max-md:max-h-[85vh] max-md:rounded-t-2xl max-md:rounded-b-none"
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between py-5 px-6 shrink-0">
+        <div className="flex items-center justify-between py-5 px-6 shrink-0 max-md:py-4 max-md:px-4">
           <div className="flex items-center gap-3">
             <div className="card-icon !w-10 !h-10">
               <Icon name="dollar-sign" alt={t('settings.billingSupport')} size="lg" color="muted" />
@@ -144,9 +148,9 @@ const BillingSupportModal = ({ onClose }) => {
           </button>
         </div>
 
-        <div className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-none">
+        <div className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-none max-md:px-4 max-md:pb-4">
           {/* Info Cards */}
-          <div className="grid grid-cols-3 gap-2 mb-6">
+          <div className="grid grid-cols-3 gap-2 mb-6 max-sm:grid-cols-1">
             {[
               { icon: '/icon/clock.svg', title: t('billing.responseTime'), value: '< 24h' },
               { icon: '/icon/users.svg', title: t('billing.supportTeam'), value: t('billing.available') },
@@ -290,7 +294,7 @@ const BillingSupportModal = ({ onClose }) => {
               </div>
             )}
 
-            <div className="flex gap-3 justify-end mt-6">
+            <div className="flex gap-3 justify-end mt-6 flex-col sm:flex-row">
               <button 
                 type="button" 
                 className="py-3 px-6 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200 border border-border bg-bg-secondary text-text-primary hover:bg-bg-hover hover:border-accent hover:-translate-y-px"

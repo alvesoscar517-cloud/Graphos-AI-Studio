@@ -269,9 +269,8 @@ class ModalSystem {
           if (oldModal.parentNode) {
             oldModal.parentNode.removeChild(oldModal)
           }
-        } catch (error) {
+        } catch {
           // Ignore errors if node was already removed
-          console.debug('Modal already removed:', error)
         }
       }, 200)
     }

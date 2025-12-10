@@ -147,56 +147,57 @@ export default function SupportDetail() {
   };
 
   if (loading) return <LoadingScreen />;
-  if (!ticket) return <div className="p-6 text-center text-muted">Ticket not found</div>;
+  if (!ticket) return <div className="p-4 sm:p-6 text-center text-muted">Ticket not found</div>;
 
   const displayTitle = translatedTitle || ticket.title;
   const displayContent = translatedContent || ticket.content;
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate('/support')}>
-            <img src="/icon/arrow-left.svg" alt="" className="w-4 h-4" /> Back
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/support')}>
+            <img src="/icon/arrow-left.svg" alt="" className="w-4 h-4" />
+            <span className="hidden sm:inline">Back</span>
           </Button>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-surface-secondary rounded-lg flex items-center justify-center">
-              <img src="/icon/headphones.svg" alt="" className="w-5 h-5 icon-dark" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-surface-secondary rounded-lg flex items-center justify-center flex-shrink-0">
+              <img src="/icon/headphones.svg" alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
             </div>
-            <h1 className="text-xl font-semibold text-primary">Ticket #{ticket.id.substring(0, 8)}</h1>
+            <h1 className="text-base sm:text-xl font-semibold text-primary truncate">Ticket #{ticket.id.substring(0, 8)}</h1>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="p-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <Card className="p-4 sm:p-6">
             {/* Meta */}
-            <div className="flex flex-wrap items-center gap-3 mb-4 pb-4 border-b border-border">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-border">
               <Badge variant={ticket.type === 'billing_support' ? 'warning' : 'info'}>
                 {ticket.type === 'billing_support' ? 'Billing' : 'Feedback'}
               </Badge>
               <Badge variant={ticket.priority === 'high' ? 'error' : ticket.priority === 'medium' ? 'warning' : 'default'}>
                 {ticket.priority}
               </Badge>
-              <span className="text-xs text-muted flex items-center gap-1">
-                <img src="/icon/user.svg" alt="" className="w-3 h-3" />
+              <span className="text-xs text-muted flex items-center gap-1 truncate max-w-[120px] sm:max-w-none" title={ticket.userName || 'Anonymous'}>
+                <img src="/icon/user.svg" alt="" className="w-3 h-3 flex-shrink-0" />
                 {ticket.userName || 'Anonymous'}
               </span>
-              <span className="text-xs text-muted flex items-center gap-1">
-                <img src="/icon/mail.svg" alt="" className="w-3 h-3" />
+              <span className="text-xs text-muted flex items-center gap-1 truncate max-w-[150px] sm:max-w-none" title={ticket.userEmail}>
+                <img src="/icon/mail.svg" alt="" className="w-3 h-3 flex-shrink-0" />
                 {ticket.userEmail}
               </span>
               <span className="text-xs text-muted flex items-center gap-1">
-                <img src="/icon/calendar.svg" alt="" className="w-3 h-3" />
+                <img src="/icon/calendar.svg" alt="" className="w-3 h-3 flex-shrink-0" />
                 {new Date(ticket.createdAt).toLocaleDateString()}
               </span>
             </div>
 
             {/* Title */}
-            <h2 className="text-xl font-semibold text-primary mb-4">
+            <h2 className="text-base sm:text-xl font-semibold text-primary mb-3 sm:mb-4">
               {displayTitle}
               {currentTranslateLang && (
                 <span className="ml-2 text-xs font-normal text-info">
@@ -206,10 +207,10 @@ export default function SupportDetail() {
             </h2>
 
             {/* Content */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
+            <div className="mb-3 sm:mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                 <span className="text-xs font-medium text-muted uppercase">Message</span>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   {currentTranslateLang && (
                     <button className="text-xs text-muted hover:text-primary" onClick={() => { setTranslatedTitle(''); setTranslatedContent(''); setCurrentTranslateLang(''); }}>
                       ↩ Original
@@ -223,7 +224,7 @@ export default function SupportDetail() {
                   </button>
                 </div>
               </div>
-              <div className="p-4 bg-surface-secondary rounded-lg text-sm text-primary leading-relaxed whitespace-pre-wrap">
+              <div className="p-3 sm:p-4 bg-surface-secondary rounded-lg text-xs sm:text-sm text-primary leading-relaxed whitespace-pre-wrap break-words overflow-hidden">
                 {displayContent}
               </div>
             </div>
@@ -231,13 +232,13 @@ export default function SupportDetail() {
             {/* Images */}
             {ticket.images?.length > 0 && (
               <div>
-                <h4 className="text-sm font-medium text-primary mb-2">Attachments ({ticket.images.length})</h4>
-                <div className="flex gap-2 flex-wrap">
+                <h4 className="text-xs sm:text-sm font-medium text-primary mb-2">Attachments ({ticket.images.length})</h4>
+                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
                   {ticket.images.map((img, i) => (
-                    <div key={i} className="w-20 h-20 rounded-lg overflow-hidden cursor-pointer relative group" onClick={() => setLightboxImage(img)}>
+                    <div key={i} className="aspect-square rounded-lg overflow-hidden cursor-pointer relative group" onClick={() => setLightboxImage(img)}>
                       <img src={img} alt="" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                        <img src="/icon/zoom-in.svg" alt="" className="w-6 h-6 icon-white" />
+                        <img src="/icon/zoom-in.svg" alt="" className="w-5 h-5 sm:w-6 sm:h-6 icon-white" />
                       </div>
                     </div>
                   ))}
@@ -247,52 +248,52 @@ export default function SupportDetail() {
           </Card>
 
           {/* Replies */}
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
-              <img src="/icon/message-circle.svg" alt="" className="w-5 h-5 icon-dark" />
+          <Card className="p-4 sm:p-6">
+            <h3 className="text-base sm:text-lg font-semibold text-primary mb-3 sm:mb-4 flex items-center gap-2">
+              <img src="/icon/message-circle.svg" alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
               Replies ({ticket.replies?.length || 0})
             </h3>
 
             {ticket.replies?.length > 0 && (
-              <div className="space-y-4 mb-6">
+              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
                 {ticket.replies.map((reply) => (
-                  <div key={reply.id} className={cn("p-4 rounded-lg", reply.from === 'admin' ? "bg-surface-secondary" : "bg-surface-tertiary")}>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                        <img src={`/icon/${reply.from === 'admin' ? 'shield' : 'user'}.svg`} alt="" className="w-4 h-4" />
+                  <div key={reply.id} className={cn("p-3 sm:p-4 rounded-lg", reply.from === 'admin' ? "bg-surface-secondary" : "bg-surface-tertiary")}>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 mb-2">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-primary">
+                        <img src={`/icon/${reply.from === 'admin' ? 'shield' : 'user'}.svg`} alt="" className="w-3 h-3 sm:w-4 sm:h-4" />
                         {reply.from === 'admin' ? 'Admin' : ticket.userName}
                       </div>
                       <span className="text-xs text-muted">{new Date(reply.timestamp).toLocaleString()}</span>
                     </div>
-                    <p className="text-sm text-secondary">{reply.message}</p>
+                    <p className="text-xs sm:text-sm text-secondary break-words">{reply.message}</p>
                   </div>
                 ))}
               </div>
             )}
 
             <form onSubmit={handleReply}>
-              <h4 className="text-sm font-medium text-primary mb-2">Send reply</h4>
+              <h4 className="text-xs sm:text-sm font-medium text-primary mb-2">Send reply</h4>
               <textarea
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
                 placeholder="Enter reply..."
-                rows={4}
+                rows={3}
                 maxLength={2000}
-                className="w-full p-3 border border-border/50 bg-surface-secondary rounded-lg text-sm resize-none focus:outline-none focus:bg-surface transition-colors"
+                className="w-full p-2 sm:p-3 border border-border/50 bg-surface-secondary rounded-lg text-xs sm:text-sm resize-none focus:outline-none focus:bg-surface transition-colors"
               />
-              <div className="flex items-center justify-between mt-3">
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2 text-sm cursor-pointer">
-                    <input type="checkbox" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} className="w-4 h-4" />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                  <label className="flex items-center gap-2 text-xs sm:text-sm cursor-pointer">
+                    <input type="checkbox" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} className="w-3 h-3 sm:w-4 sm:h-4" />
                     Send email
                   </label>
-                  <label className="flex items-center gap-2 text-sm cursor-pointer">
-                    <input type="checkbox" checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} className="w-4 h-4" />
+                  <label className="flex items-center gap-2 text-xs sm:text-sm cursor-pointer">
+                    <input type="checkbox" checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} className="w-3 h-3 sm:w-4 sm:h-4" />
                     In-app notification
                   </label>
                 </div>
-                <Button type="submit" loading={sending}>
-                  <img src="/icon/send.svg" alt="" className="w-4 h-4 icon-white" />
+                <Button type="submit" size="sm" loading={sending} className="w-full sm:w-auto">
+                  <img src="/icon/send.svg" alt="" className="w-3 h-3 sm:w-4 sm:h-4 icon-white" />
                   {sending ? 'Sending...' : 'Send'}
                 </Button>
               </div>
@@ -301,9 +302,9 @@ export default function SupportDetail() {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
-          <Card className="p-6">
-            <h3 className="text-sm font-medium text-primary mb-4">Status</h3>
+        <div className="space-y-4 sm:space-y-6">
+          <Card className="p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-medium text-primary mb-3 sm:mb-4">Status</h3>
             <Select
               value={ticket.status}
               onChange={(e) => handleStatusChange(e.target.value)}
@@ -316,20 +317,24 @@ export default function SupportDetail() {
             />
           </Card>
 
-          <Card className="p-6">
-            <h3 className="text-sm font-medium text-primary mb-4">Quick Actions</h3>
-            <div className="space-y-2">
-              <Button variant="secondary" className="w-full justify-start" onClick={() => handleStatusChange('in_progress')} disabled={ticket.status === 'in_progress' || updatingStatus} loading={updatingStatus}>
-                <img src="/icon/clock.svg" alt="" className="w-4 h-4 icon-dark" /> In Progress
+          <Card className="p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-medium text-primary mb-3 sm:mb-4">Quick Actions</h3>
+            <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
+              <Button variant="secondary" size="sm" className="w-full justify-start text-xs sm:text-sm" onClick={() => handleStatusChange('in_progress')} disabled={ticket.status === 'in_progress' || updatingStatus} loading={updatingStatus}>
+                <img src="/icon/clock.svg" alt="" className="w-3 h-3 sm:w-4 sm:h-4 icon-dark flex-shrink-0" />
+                <span className="truncate">In Progress</span>
               </Button>
-              <Button variant="secondary" className="w-full justify-start" onClick={() => handleStatusChange('resolved')} disabled={ticket.status === 'resolved' || updatingStatus} loading={updatingStatus}>
-                <img src="/icon/check-circle.svg" alt="" className="w-4 h-4 icon-dark" /> Resolved
+              <Button variant="secondary" size="sm" className="w-full justify-start text-xs sm:text-sm" onClick={() => handleStatusChange('resolved')} disabled={ticket.status === 'resolved' || updatingStatus} loading={updatingStatus}>
+                <img src="/icon/check-circle.svg" alt="" className="w-3 h-3 sm:w-4 sm:h-4 icon-dark flex-shrink-0" />
+                <span className="truncate">Resolved</span>
               </Button>
-              <Button variant="secondary" className="w-full justify-start" onClick={() => handleStatusChange('closed')} disabled={ticket.status === 'closed' || updatingStatus} loading={updatingStatus}>
-                <img src="/icon/x-circle.svg" alt="" className="w-4 h-4 icon-dark" /> Close
+              <Button variant="secondary" size="sm" className="w-full justify-start text-xs sm:text-sm" onClick={() => handleStatusChange('closed')} disabled={ticket.status === 'closed' || updatingStatus} loading={updatingStatus}>
+                <img src="/icon/x-circle.svg" alt="" className="w-3 h-3 sm:w-4 sm:h-4 icon-dark flex-shrink-0" />
+                <span className="truncate">Close</span>
               </Button>
-              <Button variant="destructive" className="w-full justify-start" onClick={handleDelete} disabled={deleting} loading={deleting}>
-                <img src="/icon/trash-2.svg" alt="" className="w-4 h-4 icon-white" /> Delete
+              <Button variant="destructive" size="sm" className="w-full justify-start text-xs sm:text-sm" onClick={handleDelete} disabled={deleting} loading={deleting}>
+                <img src="/icon/trash-2.svg" alt="" className="w-3 h-3 sm:w-4 sm:h-4 icon-white flex-shrink-0" />
+                <span className="truncate">Delete</span>
               </Button>
             </div>
           </Card>

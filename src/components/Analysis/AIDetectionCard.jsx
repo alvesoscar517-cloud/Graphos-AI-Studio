@@ -195,20 +195,20 @@ const AIDetectionCard = ({ disabled, text }) => {
     <>
       {/* Main Card */}
       <div className={cn(
-        "p-4 border border-border-light rounded-xl",
+        "p-3 border border-border-light rounded-xl",
         "bg-bg-secondary transition-all duration-200",
         "hover:shadow-md"
       )}>
         {/* Header */}
-        <div className="flex items-center gap-4 mb-3 relative">
-          <div className="card-icon">
+        <div className="flex items-center gap-3 mb-2 relative">
+          <div className="card-icon !w-10 !h-10">
             <Icon name="shield-check" size="lg" color="primary" />
           </div>
-          <div className="flex-1">
-            <h4 className="text-sm font-medium text-text-primary m-0 mb-0.5">
+          <div className="flex-1 min-w-0">
+            <h4 className="text-xs font-medium text-text-primary m-0 mb-0.5">
               {t('analysis.aiDetection')}
             </h4>
-            <p className="text-xs text-text-secondary m-0">
+            <p className="text-[11px] text-text-secondary m-0">
               {t('analysis.content')}
             </p>
           </div>

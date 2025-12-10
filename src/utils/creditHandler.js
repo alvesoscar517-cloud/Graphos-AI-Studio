@@ -4,6 +4,7 @@
  */
 
 import modal from './modal'
+import { logger } from './logger'
 
 /**
  * Check if response is a credit error
@@ -142,7 +143,7 @@ export function showCreditPreview(operation, cost) {
   };
 
   const name = operationNames[operation] || operation;
-  console.log(`[Credit] ${name}: ~${cost.toFixed(2)} credits`);
+  logger.credit(`${name}: ~${cost.toFixed(2)} credits`);
 }
 
 /**

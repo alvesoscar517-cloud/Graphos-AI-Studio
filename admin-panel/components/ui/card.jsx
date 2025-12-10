@@ -10,7 +10,7 @@ function Card({ className, children, ...props }) {
   return (
     <div
       className={cn(
-        'bg-surface rounded-2xl border border-border/40 shadow-sm',
+        'bg-surface rounded-xl sm:rounded-2xl border border-border/40 shadow-sm',
         'transition-shadow duration-[250ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]',
         className
       )}

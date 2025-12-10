@@ -76,83 +76,85 @@ export default function OrdersView() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         icon="dollar-sign.svg"
         title="Orders & Revenue"
         subtitle="Manage orders, subscriptions and revenue analytics"
       />
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-        <TabsList>
-          <TabsTrigger value="orders" className="gap-2">
+      {/* Tabs - Scrollable on mobile */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4 sm:mt-6">
+        <TabsList className="overflow-x-auto scrollbar-hide flex-nowrap">
+          <TabsTrigger value="orders" className="gap-1.5 sm:gap-2 whitespace-nowrap">
             <img src="/icon/shopping-cart.svg" alt="" className="w-4 h-4" />
-            Orders
+            <span className="hidden sm:inline">Orders</span>
+            <span className="sm:hidden">Orders</span>
           </TabsTrigger>
-          <TabsTrigger value="subscriptions" className="gap-2">
+          <TabsTrigger value="subscriptions" className="gap-1.5 sm:gap-2 whitespace-nowrap">
             <img src="/icon/repeat.svg" alt="" className="w-4 h-4" />
-            Subscriptions
+            <span className="hidden sm:inline">Subscriptions</span>
+            <span className="sm:hidden">Subs</span>
           </TabsTrigger>
-          <TabsTrigger value="revenue" className="gap-2">
+          <TabsTrigger value="revenue" className="gap-1.5 sm:gap-2 whitespace-nowrap">
             <img src="/icon/trending-up.svg" alt="" className="w-4 h-4" />
-            Revenue
+            <span>Revenue</span>
           </TabsTrigger>
-          <TabsTrigger value="profit" className="gap-2">
+          <TabsTrigger value="profit" className="gap-1.5 sm:gap-2 whitespace-nowrap">
             <img src="/icon/calculator.svg" alt="" className="w-4 h-4" />
-            Profit
+            <span>Profit</span>
           </TabsTrigger>
         </TabsList>
       </Tabs>
 
-      {/* Orders Tab */}
+      {/* Orders Tab - Responsive */}
       {activeTab === 'orders' && (
         <Card className={cn("mt-4 overflow-hidden transition-opacity duration-200", loading && "opacity-60")}>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[600px]">
               <thead>
                 <tr className="border-b border-border bg-surface-secondary">
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Order ID</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">User</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Product</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Amount</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Status</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Date</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap">Order ID</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap">User</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap hidden sm:table-cell">Product</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap">Amount</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap">Status</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap hidden md:table-cell">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.length === 0 ? (
-                  <tr><td colSpan="6" className="p-8 text-center text-muted">No orders found</td></tr>
+                  <tr><td colSpan="6" className="p-6 sm:p-8 text-center text-muted text-sm">No orders found</td></tr>
                 ) : (
                   orders.map(order => (
                     <tr key={order.id} className="border-b border-border hover:bg-surface-secondary transition-colors">
-                      <td className="p-3 text-sm font-mono text-muted">
-                        #{order.orderId?.toString().slice(-8) || order.id.slice(0, 8)}
+                      <td className="p-2 sm:p-3 text-xs sm:text-sm font-mono text-muted">
+                        #{order.orderId?.toString().slice(-6) || order.id.slice(0, 6)}
                       </td>
-                      <td className="p-3">
-                        <div className="text-sm text-primary">{order.customerEmail || 'N/A'}</div>
+                      <td className="p-2 sm:p-3">
+                        <div className="text-xs sm:text-sm text-primary truncate max-w-[120px] sm:max-w-none">{order.customerEmail || 'N/A'}</div>
                         {order.userId && (
                           <button 
-                            className="text-xs text-info hover:underline"
+                            className="text-[10px] sm:text-xs text-info hover:underline"
                             onClick={() => navigate(`/users/${order.userId}`)}
                           >
-                            View User
+                            View
                           </button>
                         )}
                       </td>
-                      <td className="p-3">
-                        <div className="text-sm font-medium text-primary">{order.productName || order.packageId || 'N/A'}</div>
-                        {order.variantName && <div className="text-xs text-muted">{order.variantName}</div>}
+                      <td className="p-2 sm:p-3 hidden sm:table-cell">
+                        <div className="text-xs sm:text-sm font-medium text-primary truncate max-w-[150px]">{order.productName || order.packageId || 'N/A'}</div>
+                        {order.variantName && <div className="text-[10px] sm:text-xs text-muted truncate">{order.variantName}</div>}
                       </td>
-                      <td className="p-3 text-lg font-semibold text-primary">
+                      <td className="p-2 sm:p-3 text-sm sm:text-lg font-semibold text-primary whitespace-nowrap">
                         {order.totalFormatted || formatCurrency(order.total || 0)}
                       </td>
-                      <td className="p-3">
+                      <td className="p-2 sm:p-3">
                         <Badge variant={getStatusVariant(order.status || 'paid')}>
                           {order.status || 'paid'}
                         </Badge>
                       </td>
-                      <td className="p-3 text-sm text-muted">
+                      <td className="p-2 sm:p-3 text-xs sm:text-sm text-muted hidden md:table-cell whitespace-nowrap">
                         {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
                       </td>
                     </tr>

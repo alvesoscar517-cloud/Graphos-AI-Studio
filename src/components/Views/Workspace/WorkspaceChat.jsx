@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import { truncateTitleByWords } from '../../../utils/titleUtils'
+import { cn } from '../../../lib/utils'
 import ChatMessage from './ChatMessage'
-
 import EditTitleModal from '../../Common/EditTitleModal'
 import LazyLottie from '../../Common/LazyLottie'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
@@ -227,12 +227,12 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
       {/* Scroll to Bottom Button */}
       {showScrollButton && (
         <button 
-          className="scroll-to-bottom-btn"
+          className="absolute bottom-24 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-bg-primary border border-border-light shadow-md flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-bg-hover hover:shadow-lg z-10"
           onClick={scrollToBottom}
           data-tooltip={t('workspace.scrollDown')}
           data-tooltip-position="top"
         >
-          <img src="/icon/arrow-down.svg" alt={t('workspace.scrollDown')} />
+          <img src="/icon/arrow-down.svg" alt={t('workspace.scrollDown')} className="w-4 h-4 opacity-60 icon-invert" />
         </button>
       )}
 

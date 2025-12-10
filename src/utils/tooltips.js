@@ -2,12 +2,46 @@
 let currentTooltip = null
 let tooltipTimeout = null
 
-export function showTooltip(element, text) {
+// Check if element has visible text (not hidden by CSS or React conditional rendering)
+function hasVisibleText(element) {
+  // Check for CSS-hidden text spans (responsive hiding)
+  const textSpan = element.querySelector('[class*="max-xl:hidden"], [class*="max-lg:hidden"], [class*="max-md:hidden"]')
+  if (textSpan) {
+    const style = window.getComputedStyle(textSpan)
+    return style.display !== 'none'
+  }
+  
+  // Check if element has any visible text content (for React conditional rendering)
+  // Look for direct text nodes or spans without hidden classes
+  const hasDirectText = Array.from(element.childNodes).some(node => 
+    node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0
+  )
+  if (hasDirectText) return true
+  
+  // Check for visible span children (not icons/images)
+  const visibleSpans = element.querySelectorAll('span:not([class*="hidden"])')
+  for (const span of visibleSpans) {
+    const style = window.getComputedStyle(span)
+    if (style.display !== 'none' && span.textContent.trim().length > 0) {
+      return true
+    }
+  }
+  
+  return false
+}
+
+export function showTooltip(element, text, isCollapsible = false) {
   hideTooltip()
   if (!text || !element) return
   
+  // For collapsible tooltips, only show when text is hidden
+  if (isCollapsible && hasVisibleText(element)) return
+  
   tooltipTimeout = setTimeout(() => {
     if (!element || !document.body.contains(element)) return
+    
+    // Re-check for collapsible tooltips (in case window was resized)
+    if (isCollapsible && hasVisibleText(element)) return
     
     const tooltip = document.createElement('div')
     tooltip.className = 'tooltip'
@@ -61,6 +95,7 @@ export function hideTooltip() {
 const initialized = new WeakSet()
 
 export function initTooltips() {
+  // Regular tooltips - always show
   document.querySelectorAll('[data-tooltip]').forEach((el) => {
     if (initialized.has(el)) return
     initialized.add(el)
@@ -73,6 +108,23 @@ export function initTooltips() {
     el.addEventListener('mouseenter', () => {
       const text = el.getAttribute('data-tooltip')
       if (text) showTooltip(el, text)
+    })
+    el.addEventListener('mouseleave', hideTooltip)
+    el.addEventListener('click', hideTooltip)
+  })
+  
+  // Collapsible tooltips - only show when text is hidden (responsive)
+  document.querySelectorAll('[data-tooltip-collapsed]').forEach((el) => {
+    if (initialized.has(el)) return
+    initialized.add(el)
+    
+    if (el.hasAttribute('title')) {
+      el.removeAttribute('title')
+    }
+    
+    el.addEventListener('mouseenter', () => {
+      const text = el.getAttribute('data-tooltip-collapsed')
+      if (text) showTooltip(el, text, true)
     })
     el.addEventListener('mouseleave', hideTooltip)
     el.addEventListener('click', hideTooltip)

@@ -29,7 +29,8 @@ export default function PromptDialog({
     <div 
       className={cn(
         "fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-modal-nested p-5",
-        "animate-fade-in"
+        "animate-fade-in",
+        "max-md:p-3 max-md:items-end"
       )}
       onClick={onCancel}
     >
@@ -37,7 +38,8 @@ export default function PromptDialog({
         className={cn(
           "bg-bg-secondary rounded-2xl p-8 max-w-modal-sm w-full",
           "shadow-modal text-center",
-          "animate-slide-up"
+          "animate-slide-up",
+          "max-md:max-w-full max-md:rounded-t-2xl max-md:rounded-b-none max-md:p-5"
         )}
         onClick={(e) => e.stopPropagation()}
       >

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from './Sidebar'
 import MainContent from './MainContent'
 import RightSidebar from './RightSidebar'
@@ -6,9 +6,50 @@ import WorkspaceSidebar from '../Views/Workspace/WorkspaceSidebar'
 import { useNotes } from '../../contexts/NotesContext'
 import { cn } from '../../lib/utils'
 
+// Breakpoints for responsive behavior
+const BREAKPOINT_MOBILE = 768
+const BREAKPOINT_TABLET = 1024
+
 const MainLayout = () => {
   const [leftSidebarHidden, setLeftSidebarHidden] = useState(false)
   const [rightSidebarHidden, setRightSidebarHidden] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
+
+  // Detect screen size and auto-adjust sidebars with debounce
+  useEffect(() => {
+    let resizeTimeout
+    
+    const checkScreenSize = () => {
+      const width = window.innerWidth
+      const mobile = width < BREAKPOINT_MOBILE
+      const tablet = width >= BREAKPOINT_MOBILE && width < BREAKPOINT_TABLET
+      
+      setIsMobile(mobile)
+      setIsTablet(tablet)
+      
+      // Auto-hide right sidebar on mobile
+      if (mobile) {
+        setRightSidebarHidden(true)
+      }
+      // Auto-collapse left sidebar on tablet
+      if (tablet && !leftSidebarHidden) {
+        // Let Sidebar component handle collapse state
+      }
+    }
+    
+    const handleResize = () => {
+      clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(checkScreenSize, 100)
+    }
+    
+    checkScreenSize()
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      clearTimeout(resizeTimeout)
+    }
+  }, [leftSidebarHidden])
   const [currentView, setCurrentView] = useState('home') // Default open Home
   const [highlightedSentence, setHighlightedSentence] = useState(null) // NEW: For highlighting sentence in editor
   const [analysisData, setAnalysisData] = useState(null) // NEW: For inline highlighting

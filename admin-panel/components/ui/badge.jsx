@@ -20,7 +20,7 @@ function Badge({ variant = 'default', className, children, ...props }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center px-3 py-1.5 rounded-full text-[12px] font-semibold tracking-[-0.01em]',
+        'inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-[12px] font-semibold tracking-[-0.01em] whitespace-nowrap',
         badgeVariants[variant],
         className
       )}

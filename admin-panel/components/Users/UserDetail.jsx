@@ -191,52 +191,52 @@ export default function UserDetail() {
   if (!user) return <div className="p-6 text-destructive">User not found</div>;
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         icon="user.svg"
         title="User Details"
         actions={
           <button
             onClick={() => navigate('/users')}
-            className="flex items-center gap-2 px-3 py-2 text-muted hover:text-primary hover:bg-surface-secondary rounded-lg transition-colors"
+            className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-muted hover:text-primary hover:bg-surface-secondary rounded-lg transition-colors"
           >
             <img src="/icon/arrow-left.svg" alt="" className="w-4 h-4 icon-gray" />
-            <span className="text-sm">Back to Users</span>
+            <span className="text-xs sm:text-sm">Back</span>
           </button>
         }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
         {/* Basic Information */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <img src="/icon/user.svg" alt="" className="w-5 h-5 icon-dark" />
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+            <img src="/icon/user.svg" alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
             Basic Information
           </h2>
-          <div className="flex flex-col items-center mb-6">
-            <div className="w-20 h-20 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-3xl font-bold">
+          <div className="flex flex-col items-center mb-4 sm:mb-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl sm:text-3xl font-bold">
               {user.name?.charAt(0).toUpperCase() || '?'}
             </div>
           </div>
-          <div className="space-y-3">
-            <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-muted">Name</span>
-              <span className="font-medium">{user.name || 'N/A'}</span>
+          <div className="space-y-2 sm:space-y-3">
+            <div className="flex justify-between items-center py-2 border-b border-border gap-2">
+              <span className="text-muted text-sm flex-shrink-0">Name</span>
+              <span className="font-medium text-sm truncate">{user.name || 'N/A'}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-muted">Email</span>
-              <span className="font-medium">{user.email || 'N/A'}</span>
+            <div className="flex justify-between items-center py-2 border-b border-border gap-2">
+              <span className="text-muted text-sm flex-shrink-0">Email</span>
+              <span className="font-medium text-sm truncate">{user.email || 'N/A'}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-muted">ID</span>
-              <span className="font-mono text-xs bg-surface-secondary px-2 py-1 rounded">{user.id}</span>
+            <div className="flex justify-between items-center py-2 border-b border-border gap-2">
+              <span className="text-muted text-sm flex-shrink-0">ID</span>
+              <span className="font-mono text-[10px] sm:text-xs bg-surface-secondary px-1.5 sm:px-2 py-0.5 sm:py-1 rounded truncate max-w-[120px] sm:max-w-none">{user.id}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-muted">Created</span>
-              <span className="font-medium">{new Date(user.createdAt).toLocaleString('en-US')}</span>
+            <div className="flex justify-between items-center py-2 border-b border-border gap-2">
+              <span className="text-muted text-sm flex-shrink-0">Created</span>
+              <span className="font-medium text-xs sm:text-sm">{new Date(user.createdAt).toLocaleDateString('en-US')}</span>
             </div>
-            <div className="flex justify-between py-2">
-              <span className="text-muted">Status</span>
+            <div className="flex justify-between items-center py-2 gap-2">
+              <span className="text-muted text-sm flex-shrink-0">Status</span>
               <StatusBadge status={user.locked ? 'suspended' : 'active'}>
                 {user.locked ? 'Locked' : 'Active'}
               </StatusBadge>
@@ -245,86 +245,94 @@ export default function UserDetail() {
         </Card>
 
         {/* Credits */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <img src="/icon/dollar-sign.svg" alt="" className="w-5 h-5 icon-dark" />
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+            <img src="/icon/dollar-sign.svg" alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
             Credits
           </h2>
-          <div className="text-center mb-6">
-            <div className="text-4xl font-bold text-primary">{user.credits?.balance || 0}</div>
-            <div className="text-muted text-sm">Available Credits</div>
+          <div className="text-center mb-4 sm:mb-6">
+            <div className="text-2xl sm:text-4xl font-bold text-primary truncate" title={user.credits?.balance || 0}>
+              {Math.round((user.credits?.balance || 0) * 100) / 100}
+            </div>
+            <div className="text-muted text-xs sm:text-sm">Available Credits</div>
           </div>
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="text-center p-3 bg-surface-secondary rounded-lg">
-              <div className="text-xl font-semibold text-success">{user.credits?.purchased || 0}</div>
-              <div className="text-xs text-muted">Purchased</div>
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6">
+            <div className="text-center p-2 sm:p-3 bg-surface-secondary rounded-lg overflow-hidden">
+              <div className="text-base sm:text-xl font-semibold text-success truncate" title={user.credits?.purchased || 0}>
+                {Math.round(user.credits?.purchased || 0)}
+              </div>
+              <div className="text-[10px] sm:text-xs text-muted">Purchased</div>
             </div>
-            <div className="text-center p-3 bg-surface-secondary rounded-lg">
-              <div className="text-xl font-semibold text-info">{user.credits?.bonus || 0}</div>
-              <div className="text-xs text-muted">Bonus</div>
+            <div className="text-center p-2 sm:p-3 bg-surface-secondary rounded-lg overflow-hidden">
+              <div className="text-base sm:text-xl font-semibold text-info truncate" title={user.credits?.bonus || 0}>
+                {Math.round(user.credits?.bonus || 0)}
+              </div>
+              <div className="text-[10px] sm:text-xs text-muted">Bonus</div>
             </div>
-            <div className="text-center p-3 bg-surface-secondary rounded-lg">
-              <div className="text-xl font-semibold text-muted">{user.credits?.used || 0}</div>
-              <div className="text-xs text-muted">Used</div>
+            <div className="text-center p-2 sm:p-3 bg-surface-secondary rounded-lg overflow-hidden">
+              <div className="text-base sm:text-xl font-semibold text-muted truncate" title={user.credits?.used || 0}>
+                {Math.round((user.credits?.used || 0) * 100) / 100}
+              </div>
+              <div className="text-[10px] sm:text-xs text-muted">Used</div>
             </div>
           </div>
-          <Button variant="secondary" className="w-full" onClick={() => setShowCreditsModal(true)}>
+          <Button variant="secondary" className="w-full" size="sm" onClick={() => setShowCreditsModal(true)}>
             <img src="/icon/plus-circle.svg" alt="" className="w-4 h-4 icon-dark" />
             Adjust Credits
           </Button>
         </Card>
 
         {/* Usage Statistics */}
-        <Card className="p-6 lg:col-span-2">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <img src="/icon/bar-chart-2.svg" alt="" className="w-5 h-5 icon-dark" />
+        <Card className="p-4 sm:p-6 lg:col-span-2">
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+            <img src="/icon/bar-chart-2.svg" alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
             Usage Statistics
           </h2>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="flex items-center gap-4 p-4 bg-surface-secondary rounded-lg">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <img src="/icon/folder.svg" alt="" className="w-6 h-6 icon-dark" />
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-surface-secondary rounded-lg">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <img src="/icon/folder.svg" alt="" className="w-5 h-5 sm:w-6 sm:h-6 icon-dark" />
               </div>
-              <div>
-                <div className="text-2xl font-bold">{user.usage?.profilesCount || 0}</div>
-                <div className="text-sm text-muted">Profiles</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 p-4 bg-surface-secondary rounded-lg">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <img src="/icon/search.svg" alt="" className="w-6 h-6 icon-dark" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{user.usage?.analysesCount || 0}</div>
-                <div className="text-sm text-muted">Analyses</div>
+              <div className="text-center sm:text-left">
+                <div className="text-xl sm:text-2xl font-bold">{user.usage?.profilesCount || 0}</div>
+                <div className="text-xs sm:text-sm text-muted">Profiles</div>
               </div>
             </div>
-            <div className="flex items-center gap-4 p-4 bg-surface-secondary rounded-lg">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <img src="/icon/edit.svg" alt="" className="w-6 h-6 icon-dark" />
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-surface-secondary rounded-lg">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <img src="/icon/search.svg" alt="" className="w-5 h-5 sm:w-6 sm:h-6 icon-dark" />
               </div>
-              <div>
-                <div className="text-2xl font-bold">{user.usage?.rewritesCount || 0}</div>
-                <div className="text-sm text-muted">Rewrites</div>
+              <div className="text-center sm:text-left">
+                <div className="text-xl sm:text-2xl font-bold">{user.usage?.analysesCount || 0}</div>
+                <div className="text-xs sm:text-sm text-muted">Analyses</div>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-surface-secondary rounded-lg">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <img src="/icon/edit.svg" alt="" className="w-5 h-5 sm:w-6 sm:h-6 icon-dark" />
+              </div>
+              <div className="text-center sm:text-left">
+                <div className="text-xl sm:text-2xl font-bold">{user.usage?.rewritesCount || 0}</div>
+                <div className="text-xs sm:text-sm text-muted">Rewrites</div>
               </div>
             </div>
           </div>
         </Card>
 
         {/* Writing Profiles */}
-        <Card className="p-6 lg:col-span-2">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <img src="/icon/folder.svg" alt="" className="w-5 h-5 icon-dark" />
+        <Card className="p-4 sm:p-6 lg:col-span-2">
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+            <img src="/icon/folder.svg" alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
             Writing Profiles ({user.profiles?.length || 0})
           </h2>
           {user.profiles && user.profiles.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {user.profiles.map(profile => (
-                <div key={profile.id} className="flex items-center gap-3 p-3 bg-surface-secondary rounded-lg">
-                  <img src="/icon/file-text.svg" alt="" className="w-5 h-5 icon-gray" />
-                  <div className="flex-1">
-                    <div className="font-medium">{profile.name}</div>
-                    <div className="flex items-center gap-2 text-xs text-muted">
+                <div key={profile.id} className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 bg-surface-secondary rounded-lg">
+                  <img src="/icon/file-text.svg" alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-gray flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm truncate">{profile.name}</div>
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-muted">
                       <Badge variant={profile.status === 'ready' ? 'success' : 'warning'}>
                         {profile.status === 'ready' ? 'Ready' : 'Processing'}
                       </Badge>
@@ -335,51 +343,59 @@ export default function UserDetail() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-muted">
-              <img src="/icon/inbox.svg" alt="" className="w-12 h-12 mx-auto mb-2 icon-gray" />
-              <p>User has not created any profiles yet</p>
+            <div className="text-center py-6 sm:py-8 text-muted">
+              <img src="/icon/inbox.svg" alt="" className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 icon-gray" />
+              <p className="text-xs sm:text-sm">User has not created any profiles yet</p>
             </div>
           )}
         </Card>
 
         {/* Actions */}
-        <Card className="p-6 lg:col-span-2">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <img src="/icon/zap.svg" alt="" className="w-5 h-5 icon-dark" />
+        <Card className="p-4 sm:p-6 lg:col-span-2">
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+            <img src="/icon/zap.svg" alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
             Actions
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <Button variant="secondary" onClick={() => setShowEditModal(true)}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+            <Button variant="secondary" size="sm" onClick={() => setShowEditModal(true)}>
               <img src="/icon/edit.svg" alt="" className="w-4 h-4 icon-dark" />
-              Edit User
+              <span className="hidden sm:inline">Edit User</span>
+              <span className="sm:hidden">Edit</span>
             </Button>
-            <Button variant="success" onClick={() => setShowCreditsModal(true)}>
+            <Button variant="success" size="sm" onClick={() => setShowCreditsModal(true)}>
               <img src="/icon/dollar-sign.svg" alt="" className="w-4 h-4 icon-white" />
-              Adjust Credits
+              <span className="hidden sm:inline">Adjust Credits</span>
+              <span className="sm:hidden">Credits</span>
             </Button>
-            <Button variant="secondary" onClick={() => setShowNotificationModal(true)}>
+            <Button variant="secondary" size="sm" onClick={() => setShowNotificationModal(true)}>
               <img src="/icon/bell.svg" alt="" className="w-4 h-4 icon-dark" />
-              Send Notification
+              <span className="hidden sm:inline">Send Notification</span>
+              <span className="sm:hidden">Notify</span>
             </Button>
-            <Button variant="secondary" onClick={() => navigate(`/users/${id}/profiles`)}>
+            <Button variant="secondary" size="sm" onClick={() => navigate(`/users/${id}/profiles`)}>
               <img src="/icon/folder.svg" alt="" className="w-4 h-4 icon-dark" />
-              Manage Profiles
+              <span className="hidden sm:inline">Manage Profiles</span>
+              <span className="sm:hidden">Profiles</span>
             </Button>
-            <Button variant="secondary" onClick={() => navigate(`/users/${id}/logs`)}>
+            <Button variant="secondary" size="sm" onClick={() => navigate(`/users/${id}/logs`)}>
               <img src="/icon/activity.svg" alt="" className="w-4 h-4 icon-dark" />
-              Activity Logs
+              <span className="hidden sm:inline">Activity Logs</span>
+              <span className="sm:hidden">Logs</span>
             </Button>
-            <Button variant="secondary" onClick={() => navigate(`/users/${id}/credits`)}>
+            <Button variant="secondary" size="sm" onClick={() => navigate(`/users/${id}/credits`)}>
               <img src="/icon/credit-card.svg" alt="" className="w-4 h-4 icon-dark" />
-              Credit Details
+              <span className="hidden sm:inline">Credit Details</span>
+              <span className="sm:hidden">Details</span>
             </Button>
-            <Button variant="secondary" onClick={handleLockUser} disabled={lockingUser} loading={lockingUser}>
+            <Button variant="secondary" size="sm" onClick={handleLockUser} disabled={lockingUser} loading={lockingUser}>
               <img src={`/icon/${user.locked ? 'unlock' : 'lock'}.svg`} alt="" className="w-4 h-4 icon-dark" />
-              {user.locked ? 'Unlock' : 'Lock'} Account
+              <span className="hidden sm:inline">{user.locked ? 'Unlock' : 'Lock'} Account</span>
+              <span className="sm:hidden">{user.locked ? 'Unlock' : 'Lock'}</span>
             </Button>
-            <Button variant="destructive" onClick={handleDeleteUser} disabled={deletingUser} loading={deletingUser}>
+            <Button variant="destructive" size="sm" onClick={handleDeleteUser} disabled={deletingUser} loading={deletingUser}>
               <img src="/icon/trash-2.svg" alt="" className="w-4 h-4 icon-white" />
-              Delete User
+              <span className="hidden sm:inline">Delete User</span>
+              <span className="sm:hidden">Delete</span>
             </Button>
           </div>
         </Card>
@@ -519,8 +535,8 @@ export default function UserDetail() {
             </div>
             <div className="p-4 space-y-4">
               <div className="flex justify-between items-center p-3 bg-surface-secondary rounded-lg">
-                <span className="text-muted">Current Balance:</span>
-                <span className="text-xl font-bold">{user.credits?.balance || 0} credits</span>
+                <span className="text-muted text-sm">Current Balance:</span>
+                <span className="text-lg sm:text-xl font-bold truncate ml-2">{Math.round((user.credits?.balance || 0) * 100) / 100} credits</span>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Action Type</label>
@@ -575,12 +591,12 @@ export default function UserDetail() {
                 />
               </div>
               <div className="flex justify-between items-center p-3 bg-surface-secondary rounded-lg">
-                <span className="text-muted">New Balance:</span>
-                <span className={`text-xl font-bold ${creditsData.type === 'add' ? 'text-success' : 'text-destructive'}`}>
-                  {creditsData.type === 'add' 
+                <span className="text-muted text-sm">New Balance:</span>
+                <span className={`text-lg sm:text-xl font-bold truncate ml-2 ${creditsData.type === 'add' ? 'text-success' : 'text-destructive'}`}>
+                  {Math.round((creditsData.type === 'add' 
                     ? (user.credits?.balance || 0) + (creditsData.amount || 0)
                     : Math.max(0, (user.credits?.balance || 0) - (creditsData.amount || 0))
-                  } credits
+                  ) * 100) / 100} credits
                 </span>
               </div>
             </div>

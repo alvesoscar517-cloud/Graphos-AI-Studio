@@ -142,11 +142,14 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         data: conv
       })
     })
+    // Debug log
+    console.log('[HistoryView] allItems:', items.length, 'drive:', items.filter(i => i.source === 'drive').length, 'local:', items.filter(i => i.source === 'local').length)
     return items
   }, [notes, conversations])
 
   const filteredItems = useMemo(() => {
-    return allItems.filter(item => {
+    console.log('[HistoryView] Filtering with filterSource:', filterSource)
+    const result = allItems.filter(item => {
       const matchesSearch = !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesType = filterType === 'all' || 
                          (filterType === 'text' && item.type === 'text') ||
@@ -156,6 +159,8 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                            (filterSource === 'local' && item.source === 'local')
       return matchesSearch && matchesType && matchesSource
     })
+    console.log('[HistoryView] filteredItems count:', result.length)
+    return result
   }, [allItems, searchTerm, filterType, filterSource])
 
   const sortedItems = useMemo(() => {
@@ -340,7 +345,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
             />
           </td>
         )}
-        <td className="py-2.5 pr-3 border-b border-border-light text-text-primary align-middle text-sm h-11 pl-4 min-w-52">
+        <td className="py-2.5 pr-3 border-b border-border-light text-text-primary align-middle text-sm h-11 pl-4 min-w-40">
           <div className="flex items-center gap-3 font-normal text-text-primary overflow-hidden">
             <img 
               src={item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg"} 
@@ -354,10 +359,10 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         </td>
         {!isMobile && (
           <>
-            <td className="w-36 whitespace-nowrap text-left pl-4 pr-4 py-2.5 border-b border-border-light align-middle text-sm h-11">
+            <td className="w-28 whitespace-nowrap text-left pl-4 pr-4 py-2.5 border-b border-border-light align-middle text-sm h-11 max-xl:hidden">
               <span className="text-text-secondary text-sm">{item.type === 'chat' ? t('history.chat') : t('history.text')}</span>
             </td>
-            <td className="w-36 whitespace-nowrap text-left pl-4 pr-4 py-2.5 border-b border-border-light align-middle text-sm h-11">
+            <td className="w-28 whitespace-nowrap text-left pl-4 pr-4 py-2.5 border-b border-border-light align-middle text-sm h-11 max-lg:hidden">
               <span className="inline-flex items-center gap-1.5 text-sm text-text-secondary">
                 {item.source === 'drive' ? (
                   <>
@@ -374,10 +379,10 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
             </td>
           </>
         )}
-        <td className="w-40 whitespace-nowrap text-left pl-4 pr-4 py-2.5 border-b border-border-light align-middle text-sm h-11">
+        <td className="w-32 whitespace-nowrap text-left pl-4 pr-4 py-2.5 border-b border-border-light align-middle text-sm h-11">
           <span className="text-text-secondary text-sm">{formatTimeAgo(item.updated)}</span>
         </td>
-        <td className="w-16 text-right pr-4 py-2.5 border-b border-border-light align-middle text-sm h-11">
+        <td className="w-12 text-right pr-4 py-2.5 border-b border-border-light align-middle text-sm h-11">
           <button 
             className={cn(
               "p-1 bg-transparent border-none cursor-pointer rounded",
@@ -472,16 +477,16 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         {/* Content */}
         <div className="flex-1 flex flex-col items-center p-0 w-full overflow-hidden bg-bg-tertiary">
           {/* Header */}
-          <div className="flex items-center justify-between py-2 pr-0 bg-bg-tertiary w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] max-md:flex-col max-md:items-start max-md:p-3 max-md:pr-4 max-md:gap-3">
-            <div className="flex items-center gap-4 max-md:w-full max-md:flex-col max-md:items-start max-md:gap-3">
-              <h2 className="text-xl font-normal text-text-primary m-0">{t('history.title')}</h2>
-              <div className="relative grid grid-cols-3 p-1 rounded-xl bg-bg-secondary border border-border-light max-md:w-full">
-                {/* Sliding Glass Indicator */}
+          <div className="flex items-center justify-between py-2 pr-0 bg-bg-tertiary w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] max-lg:flex-wrap max-lg:gap-3 max-md:flex-col max-md:items-start max-md:p-3 max-md:pr-4 max-md:gap-3">
+            <div className="flex items-center gap-4 shrink-0 max-md:w-full max-md:flex-col max-md:items-start max-md:gap-3">
+              <h2 className="text-xl font-normal text-text-primary m-0 whitespace-nowrap">{t('history.title')}</h2>
+              <div className="relative grid grid-cols-3 p-1 rounded-full bg-bg-secondary border border-border-light max-md:w-full">
+                {/* Sliding Pill Indicator */}
                 <motion.div
                   className={cn(
-                    "absolute top-1 bottom-1 rounded-lg",
-                    "bg-fill-tertiary border border-border-light",
-                    "shadow-sm backdrop-blur-sm",
+                    "absolute top-1 bottom-1 rounded-full",
+                    "bg-bg-primary border border-border-light",
+                    "shadow-sm",
                     "col-span-1"
                   )}
                   initial={false}
@@ -501,7 +506,8 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                   <button 
                     key={type}
                     className={cn(
-                      "bg-transparent border-none py-1.5 px-5 rounded-lg z-10 text-sm font-medium cursor-pointer transition-colors duration-200 text-center",
+                      "bg-transparent border-none py-1.5 px-5 rounded-full z-10 text-sm font-medium cursor-pointer transition-colors duration-200 text-center whitespace-nowrap",
+                      "max-lg:px-3 max-lg:text-xs",
                       filterType === type 
                         ? "text-text-primary" 
                         : "text-text-muted hover:text-text-secondary"
@@ -513,31 +519,33 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                 ))}
               </div>
             </div>
-            <div className="flex items-center gap-4 ml-auto max-md:w-full max-md:flex-col max-md:gap-3">
+            <div className="flex items-center gap-3 ml-auto flex-1 justify-end flex-wrap max-md:w-full max-md:flex-col max-md:gap-3">
               {!isMobile && (
                 <>
                   <button 
-                    className="flex items-center gap-2 py-2 px-4 bg-transparent border border-border-hover rounded-lg cursor-pointer text-sm text-text-secondary font-normal transition-all duration-200 hover:text-text-primary hover:border-text-primary hover:bg-bg-tertiary"
+                    className="flex items-center gap-2 py-2 px-3 bg-transparent border border-border-hover rounded-lg cursor-pointer text-sm text-text-secondary font-normal transition-all duration-200 hover:text-text-primary hover:border-text-primary hover:bg-bg-tertiary whitespace-nowrap shrink-0"
                     onClick={handleOpenInDrive}
+                    data-tooltip-collapsed={t('history.openInDrive')}
                   >
                     <img src="/icon/google-drive-svgrepo-com.svg" alt={t('history.openInDrive')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
-                    <span>{t('history.openInDrive')}</span>
+                    <span className="max-xl:hidden">{t('history.openInDrive')}</span>
                   </button>
                   <button 
                     className={cn(
-                      "flex items-center gap-2 py-2 px-4 bg-transparent border border-border-hover rounded-lg cursor-pointer text-sm text-text-secondary font-normal transition-all duration-200",
+                      "flex items-center gap-2 py-2 px-3 bg-transparent border border-border-hover rounded-lg cursor-pointer text-sm text-text-secondary font-normal transition-all duration-200 whitespace-nowrap shrink-0",
                       "hover:text-text-primary hover:border-text-primary hover:bg-bg-tertiary",
                       isSyncing && "[&_img]:animate-spin"
                     )}
                     onClick={handleSyncNotes}
                     disabled={isSyncing}
+                    data-tooltip-collapsed={t('history.sync')}
                   >
                     <img src="/icon/refresh-cw.svg" alt={t('history.sync')} className="w-icon-lg h-icon-lg opacity-60 transition-transform duration-600 icon-invert" />
-                    <span>{t('history.sync')}</span>
+                    <span className="max-xl:hidden">{t('history.sync')}</span>
                   </button>
                 </>
               )}
-              <div className="flex items-center gap-2 py-2 px-4 bg-transparent border border-border-hover rounded-lg min-w-60 max-w-xs max-md:w-full max-md:min-w-0 max-md:max-w-none">
+              <div className="flex items-center gap-2 py-2 px-3 bg-transparent border border-border-hover rounded-lg min-w-40 max-w-xs flex-1 max-md:w-full max-md:min-w-0 max-md:max-w-none">
                 <img src="/icon/search.svg" alt={t('common.search')} className="w-icon-lg h-icon-lg opacity-60 shrink-0 icon-invert" />
                 <input 
                   ref={searchInputRef}
@@ -551,9 +559,9 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
             </div>
           </div>
 
-          {/* Toolbar */}
-          {sortedItems.length > 0 && (
-            <div className="flex items-center justify-between py-2 px-4 pr-0 bg-bg-tertiary/80 backdrop-blur-md w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] gap-3 relative z-dropdown max-md:p-3 max-md:pr-4 max-md:flex-col max-md:items-stretch">
+          {/* Toolbar - always show when there are items in allItems */}
+          {allItems.length > 0 && (
+            <div className="flex items-center justify-between py-2 px-4 pr-0 bg-bg-tertiary/80 backdrop-blur-md w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] gap-3 relative z-dropdown max-lg:flex-wrap max-md:p-3 max-md:pr-4 max-md:flex-col max-md:items-stretch">
               <div className="flex items-center gap-2 flex-wrap relative z-base max-md:w-full">
                 {isSelectionMode ? (
                   <>
@@ -571,75 +579,78 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                   </>
                 ) : (
                   <>
-                    <button className="toolbar-btn max-md:flex-1" onClick={() => setIsSelectionMode(true)}>
+                    <button 
+                      className="toolbar-btn max-md:flex-1 max-lg:px-2" 
+                      onClick={() => setIsSelectionMode(true)}
+                      data-tooltip-collapsed={t('common.select')}
+                    >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 stroke-text-secondary">
                         <polyline points="9 11 12 14 22 4"></polyline>
                         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                       </svg>
-                      {t('common.select')}
+                      <span className="max-xl:hidden">{t('common.select')}</span>
                     </button>
-                    <div className="w-px h-6 bg-border mx-1 shrink-0" />
+                    <div className="w-px h-6 bg-border mx-1 shrink-0 max-lg:hidden" />
                     {['updated', 'name', 'type'].map(sort => (
                       <button 
                         key={sort}
-                        className={cn("toolbar-btn", sortBy === sort && "active")}
+                        className={cn("toolbar-btn max-lg:px-2", sortBy === sort && "active")}
                         onClick={() => toggleSortOrder(sort)}
+                        data-tooltip-collapsed={sort === 'updated' ? t('history.date') : sort === 'name' ? t('history.name') : t('history.type')}
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn("shrink-0", sortBy === sort ? "stroke-primary" : "stroke-text-secondary")}>
                           {sort === 'updated' && <><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></>}
                           {sort === 'name' && <path d="M4 7h16M4 12h16M4 17h10"></path>}
                           {sort === 'type' && <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></>}
                         </svg>
-                        {sort === 'updated' ? t('history.date') : sort === 'name' ? t('history.name') : t('history.type')} {sortBy === sort && (sortOrder === 'asc' ? '↑' : '↓')}
+                        <span className="max-xl:hidden">{sort === 'updated' ? t('history.date') : sort === 'name' ? t('history.name') : t('history.type')}</span> {sortBy === sort && (sortOrder === 'asc' ? '↑' : '↓')}
                       </button>
                     ))}
-                    <div className="w-px h-6 bg-border mx-1 shrink-0" />
+                    <div className="w-px h-6 bg-border mx-1 shrink-0 max-lg:hidden" />
                     <div className="relative inline-block" ref={sourceDropdownRef}>
                       <button 
-                        className="toolbar-btn min-w-36"
-                        onClick={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect()
-                          setSourceDropdownPosition({ x: rect.left, y: rect.bottom + 4, width: rect.width })
+                        className="toolbar-btn min-w-28 max-lg:min-w-0 max-lg:px-2"
+                        onClick={() => {
+                          console.log('[HistoryView] Toggle dropdown, current:', isSourceDropdownOpen)
                           setIsSourceDropdownOpen(!isSourceDropdownOpen)
                         }}
                       >
-                        <span>{filterSource === 'all' ? t('history.allSources') : filterSource === 'drive' ? t('history.driveOnly') : t('history.localOnly')}</span>
+                        <span className="max-xl:hidden">{filterSource === 'all' ? t('history.allSources') : filterSource === 'drive' ? t('history.driveOnly') : t('history.localOnly')}</span>
+                        <span className="xl:hidden">{filterSource === 'all' ? t('history.all') : filterSource === 'drive' ? t('history.drive') : t('history.local')}</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn("shrink-0 opacity-60 transition-transform duration-200 stroke-text-secondary", isSourceDropdownOpen && "rotate-180")}>
                           <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                       </button>
-                      {isSourceDropdownOpen && createPortal(
-                        <>
-                          <div className="fixed inset-0 z-modal-backdrop bg-transparent" onClick={() => setIsSourceDropdownOpen(false)} />
-                          <div 
-                            className="fixed bg-bg-secondary border border-border rounded-lg shadow-lg z-modal animate-fade-in overflow-hidden"
-                            style={{ left: `${sourceDropdownPosition.x}px`, top: `${sourceDropdownPosition.y}px`, minWidth: `${sourceDropdownPosition.width}px` }}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {['all', 'drive', 'local'].map((source, index, arr) => (
-                              <button 
-                                key={source}
-                                className={cn(
-                                  "block w-full py-2.5 px-4 bg-transparent border-none text-left text-sm text-text-secondary cursor-pointer transition-all duration-100 font-normal",
-                                  "hover:bg-bg-tertiary hover:text-text-primary",
-                                  filterSource === source && "bg-primary/10 text-primary font-medium hover:bg-primary/15",
-                                  index === 0 && "rounded-t-lg",
-                                  index === arr.length - 1 && "rounded-b-lg"
-                                )}
-                                onClick={(e) => { e.stopPropagation(); setFilterSource(source); setIsSourceDropdownOpen(false) }}
-                              >
-                                {source === 'all' ? t('history.allSources') : source === 'drive' ? t('history.driveOnly') : t('history.localOnly')}
-                              </button>
-                            ))}
-                          </div>
-                        </>,
-                        document.body
+                      {isSourceDropdownOpen && (
+                        <div 
+                          className="absolute top-full left-0 mt-1 bg-bg-secondary border border-border rounded-lg shadow-lg z-[100] animate-fade-in overflow-hidden min-w-full"
+                        >
+                          {['all', 'drive', 'local'].map((source, index, arr) => (
+                            <button 
+                              key={source}
+                              className={cn(
+                                "block w-full py-2.5 px-4 bg-transparent border-none text-left text-sm text-text-secondary cursor-pointer transition-all duration-100 font-normal whitespace-nowrap",
+                                "hover:bg-bg-tertiary hover:text-text-primary",
+                                filterSource === source && "bg-primary/10 text-primary font-medium hover:bg-primary/15",
+                                index === 0 && "rounded-t-lg",
+                                index === arr.length - 1 && "rounded-b-lg"
+                              )}
+                              onClick={() => { 
+                                console.log('[HistoryView] Setting filterSource to:', source);
+                                setFilterSource(source); 
+                                setIsSourceDropdownOpen(false) 
+                              }}
+                            >
+                              {source === 'all' ? t('history.allSources') : source === 'drive' ? t('history.driveOnly') : t('history.localOnly')}
+                            </button>
+                          ))}
+                        </div>
                       )}
                     </div>
                   </>
                 )}
               </div>
-              <div className="flex items-center gap-3 max-md:w-full max-md:justify-between">
+              <div className="flex items-center gap-3 shrink-0 max-md:w-full max-md:justify-between">
                 <span className="text-sm text-text-secondary font-medium whitespace-nowrap">{sortedItems.length} {t('common.items')}</span>
               </div>
             </div>
@@ -669,7 +680,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                 </button>
               </div>
             ) : sortedItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10 px-5 text-center min-h-96 flex-1">
+              <div className="absolute inset-0 flex flex-col items-center justify-center py-10 px-5 text-center">
                 <img src="/icon/message-square.svg" alt={t('history.noItems')} className="w-20 h-20 opacity-20 mb-6 grayscale icon-invert" />
                 <h3 className="text-xl font-medium text-text-primary mb-2">{t('history.noItems')}</h3>
                 <p className="text-sm text-text-secondary mb-8 leading-relaxed max-w-modal-sm">
@@ -696,11 +707,11 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                 <thead className="sticky top-0 bg-bg-tertiary/80 backdrop-blur-md z-base border-b border-border-light">
                   <tr>
                     {isSelectionMode && <th className="w-10 pl-4"></th>}
-                    <th className="text-left py-2.5 pr-3 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10 pl-4 min-w-52">{t('history.name')}</th>
-                    <th className="w-36 text-left py-2.5 pl-4 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10">{t('history.type')}</th>
-                    <th className="w-36 text-left py-2.5 pl-4 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10">{t('history.source')}</th>
-                    <th className="w-40 text-left py-2.5 pl-4 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10">{t('history.updated')}</th>
-                    <th className="w-16 text-right py-2.5 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10"></th>
+                    <th className="text-left py-2.5 pr-3 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10 pl-4 min-w-40">{t('history.name')}</th>
+                    <th className="w-28 text-left py-2.5 pl-4 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10 max-xl:hidden">{t('history.type')}</th>
+                    <th className="w-28 text-left py-2.5 pl-4 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10 max-lg:hidden">{t('history.source')}</th>
+                    <th className="w-32 text-left py-2.5 pl-4 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10">{t('history.updated')}</th>
+                    <th className="w-12 text-right py-2.5 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10"></th>
                   </tr>
                 </thead>
                 <tbody>

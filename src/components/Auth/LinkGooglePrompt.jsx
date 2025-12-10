@@ -18,14 +18,18 @@ const LinkGooglePrompt = ({ onLink, onClose }) => {
 
   return createPortal(
     <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center p-5 animate-fade-in"
+      className={cn(
+        "fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center p-5 animate-fade-in",
+        "max-md:p-3 max-md:items-end"
+      )}
       style={{ zIndex: 999999 }}
       onClick={onClose}
     >
       <div 
         className={cn(
-          "bg-bg-primary rounded-xl p-6 w-[380px] text-center relative",
-          "shadow-modal animate-slide-up border border-border-light"
+          "bg-bg-primary rounded-xl p-6 w-full max-w-[380px] text-center relative",
+          "shadow-modal animate-slide-up border border-border-light",
+          "max-md:max-w-full max-md:rounded-t-xl max-md:rounded-b-none max-md:p-5"
         )}
         onClick={(e) => e.stopPropagation()}
       >

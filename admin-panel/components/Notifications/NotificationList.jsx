@@ -136,110 +136,111 @@ export default function NotificationList() {
   });
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         icon="bell.svg"
         title="Notifications"
         subtitle="Manage notifications sent to users"
         actions={
-          <Button onClick={() => navigate('/notifications/new')}>
+          <Button onClick={() => navigate('/notifications/new')} size="sm">
             <img src="/icon/plus.svg" alt="" className="w-4 h-4 icon-white" />
-            New Notification
+            <span className="hidden sm:inline">New Notification</span>
+            <span className="sm:hidden">New</span>
           </Button>
         }
       />
 
-      {/* Filter Tabs */}
-      <Tabs value={filter} onValueChange={setFilter} className="mt-6">
-        <div className="flex items-center justify-between">
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="draft">Draft</TabsTrigger>
-            <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
-            <TabsTrigger value="sent">Sent</TabsTrigger>
+      {/* Filter Tabs - Responsive */}
+      <Tabs value={filter} onValueChange={setFilter} className="mt-4 sm:mt-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <TabsList className="overflow-x-auto scrollbar-hide">
+            <TabsTrigger value="all" className="text-xs sm:text-sm">All</TabsTrigger>
+            <TabsTrigger value="draft" className="text-xs sm:text-sm">Draft</TabsTrigger>
+            <TabsTrigger value="scheduled" className="text-xs sm:text-sm">Scheduled</TabsTrigger>
+            <TabsTrigger value="sent" className="text-xs sm:text-sm">Sent</TabsTrigger>
           </TabsList>
-          <span className="text-sm text-muted">
+          <span className="text-xs sm:text-sm text-muted">
             {filteredNotifications.length} notification{filteredNotifications.length !== 1 ? 's' : ''}
           </span>
         </div>
       </Tabs>
 
-      {/* Content */}
+      {/* Content - Responsive */}
       {isInitialLoading ? (
-        <div className="flex items-center justify-center py-16 mt-4">
+        <div className="flex items-center justify-center py-12 sm:py-16 mt-4">
           <div className="w-8 h-8 border-2 border-surface-secondary border-t-primary rounded-full animate-spin" />
         </div>
       ) : filteredNotifications.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 bg-surface rounded-xl border border-border mt-4">
-          <img src="/icon/inbox.svg" alt="" className="w-12 h-12 icon-gray mb-4" />
-          <p className="text-sm text-muted mb-4">No notifications yet</p>
-          <Button onClick={() => navigate('/notifications/new')}>
+        <div className="flex flex-col items-center justify-center py-12 sm:py-16 bg-surface rounded-xl border border-border mt-4 px-4">
+          <img src="/icon/inbox.svg" alt="" className="w-10 h-10 sm:w-12 sm:h-12 icon-gray mb-3 sm:mb-4" />
+          <p className="text-xs sm:text-sm text-muted mb-3 sm:mb-4 text-center">No notifications yet</p>
+          <Button size="sm" onClick={() => navigate('/notifications/new')}>
             Create First Notification
           </Button>
         </div>
       ) : (
         <Card className={cn("mt-4 overflow-hidden transition-opacity duration-200", loading && "opacity-60")}>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[500px]">
               <thead>
                 <tr className="border-b border-border bg-surface-secondary">
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase w-12">Type</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Content</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Languages</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Status</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Stats</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Created</th>
-                  <th className="p-3 w-16"></th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase w-10 sm:w-12">Type</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase">Content</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase hidden md:table-cell">Languages</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase">Status</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase hidden sm:table-cell">Stats</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase hidden lg:table-cell">Created</th>
+                  <th className="p-2 sm:p-3 w-10 sm:w-16"></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredNotifications.map(notif => (
-                  <tr key={notif.id} className="border-b border-border hover:bg-surface-secondary transition-colors">
-                    <td className="p-3">
-                      <div className="w-9 h-9 bg-surface-secondary rounded-lg flex items-center justify-center">
-                        <img src={`/icon/${getTypeIcon(notif.type)}`} alt={notif.type} className="w-4 h-4 icon-gray" />
+                  <tr key={notif.id} className="border-b border-border hover:bg-surface-secondary transition-colors cursor-pointer" onClick={() => navigate(`/notifications/${notif.id}`)}>
+                    <td className="p-2 sm:p-3">
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 bg-surface-secondary rounded-lg flex items-center justify-center">
+                        <img src={`/icon/${getTypeIcon(notif.type)}`} alt={notif.type} className="w-3.5 h-3.5 sm:w-4 sm:h-4 icon-gray" />
                       </div>
                     </td>
-                    <td className="p-3">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-sm font-medium text-primary">
+                    <td className="p-2 sm:p-3">
+                      <div className="flex flex-col gap-0.5 sm:gap-1">
+                        <span className="text-xs sm:text-sm font-medium text-primary truncate max-w-[150px] sm:max-w-[250px]">
                           {notif.translations?.en?.title || notif.content?.title || 'No Title'}
                         </span>
-                        <span className="text-xs text-muted max-w-[300px] truncate">
+                        <span className="text-[10px] sm:text-xs text-muted max-w-[150px] sm:max-w-[300px] truncate">
                           {notif.translations?.en?.message || notif.content?.message || 'No Content'}
                         </span>
                       </div>
                     </td>
-                    <td className="p-3">
+                    <td className="p-2 sm:p-3 hidden md:table-cell">
                       <div className="flex gap-1 flex-wrap">
-                        <span className="px-2 py-0.5 bg-primary text-primary-foreground rounded text-xxs font-medium">EN</span>
-                        {notif.targetLanguages?.slice(0, 3).map(lang => (
-                          <span key={lang} className="px-2 py-0.5 bg-surface-secondary rounded text-xxs font-medium text-muted">
+                        <span className="px-1.5 sm:px-2 py-0.5 bg-primary text-primary-foreground rounded text-[9px] sm:text-xxs font-medium">EN</span>
+                        {notif.targetLanguages?.slice(0, 2).map(lang => (
+                          <span key={lang} className="px-1.5 sm:px-2 py-0.5 bg-surface-secondary rounded text-[9px] sm:text-xxs font-medium text-muted">
                             {lang.toUpperCase()}
                           </span>
                         ))}
-                        {notif.targetLanguages?.length > 3 && (
-                          <span className="px-2 py-0.5 bg-surface-secondary rounded text-xxs font-medium text-muted">
-                            +{notif.targetLanguages.length - 3}
+                        {notif.targetLanguages?.length > 2 && (
+                          <span className="px-1.5 sm:px-2 py-0.5 bg-surface-secondary rounded text-[9px] sm:text-xxs font-medium text-muted">
+                            +{notif.targetLanguages.length - 2}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="p-3">
+                    <td className="p-2 sm:p-3">
                       <Badge variant={getStatusVariant(notif.status)}>
                         {notif.status || 'draft'}
                       </Badge>
                     </td>
-                    <td className="p-3">
-                      <div className="flex flex-col gap-0.5 text-xs text-muted">
+                    <td className="p-2 sm:p-3 hidden sm:table-cell">
+                      <div className="flex flex-col gap-0.5 text-[10px] sm:text-xs text-muted">
                         <span>{notif.stats?.sent || 0} sent</span>
                         <span>{notif.stats?.read || 0} read</span>
                       </div>
                     </td>
-                    <td className="p-3 text-sm text-muted">
+                    <td className="p-2 sm:p-3 text-xs sm:text-sm text-muted hidden lg:table-cell whitespace-nowrap">
                       {formatDate(notif.createdAt)}
                     </td>
-                    <td className="p-3">
+                    <td className="p-2 sm:p-3" onClick={(e) => e.stopPropagation()}>
                       <ActionsDropdown 
                         onRowClick={() => navigate(`/notifications/${notif.id}`)}
                         showMenu={false}

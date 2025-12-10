@@ -87,25 +87,25 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
       <div 
         className={cn(
           "bg-bg-secondary border border-border-light rounded-xl",
-          "py-4 px-[18px] pb-3 cursor-pointer transition-all duration-200",
+          "py-3 px-3 pb-2 cursor-pointer transition-all duration-200",
           "flex flex-col items-center text-center gap-1",
           "hover:border-border-hover hover:shadow-md"
         )}
         onClick={handleClick}
       >
-        <div className="flex flex-col items-center gap-2 w-full">
-          <div className="card-icon !w-14 !h-14">
+        <div className="flex flex-col items-center gap-1.5 w-full">
+          <div className="card-icon !w-12 !h-12">
             <img 
               src={`/icon/${getThemeIcon(currentProfile?.theme)}.svg`} 
               alt="Profile" 
-              className="w-7 h-7 filter-icon-primary"
+              className="w-6 h-6 filter-icon-primary"
             />
           </div>
-          <div className="flex flex-col gap-1 w-full">
-            <h3 className="text-sm font-medium text-text-primary m-0 leading-tight">
+          <div className="flex flex-col gap-0.5 w-full">
+            <h3 className="text-xs font-medium text-text-primary m-0 leading-tight">
               {currentProfile?.profile_name || t('profile.noProfile')}
             </h3>
-            <p className="text-xs text-text-secondary m-0">
+            <p className="text-[11px] text-text-secondary m-0">
               {currentProfile 
                 ? (currentProfile._isPlaceholder 
                     ? t('common.loading') 
@@ -114,7 +114,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
             </p>
           </div>
         </div>
-        <Icon name="chevron-down" size="md" color="muted" />
+        <Icon name="chevron-down" size="sm" color="muted" />
       </div>
 
       {/* Modal */}
@@ -126,7 +126,8 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
           <div 
             className={cn(
               "bg-bg-primary rounded-3xl w-full max-w-md h-[520px]",
-              "flex flex-col shadow-modal animate-slide-up"
+              "flex flex-col shadow-modal animate-slide-up",
+              "max-md:max-w-[calc(100%-32px)] max-md:h-[80vh] max-md:max-h-[520px] max-md:rounded-2xl"
             )}
             onClick={(e) => e.stopPropagation()}
           >

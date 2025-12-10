@@ -81,34 +81,44 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
         <div className={cn(
           "text-left mb-6 flex flex-col gap-0.5",
           "w-[80%] mx-auto",
-          "max-lg:w-[90%] max-md:w-[95%] max-md:px-4"
+          "transition-all duration-300",
+          "max-lg:w-[90%] max-md:w-[95%] max-md:px-4",
+          "max-sm:mb-4"
         )}>
-          <h2 className="text-4xl font-normal text-text-primary mb-0">
+          <h2 className="text-4xl font-normal text-text-primary mb-0 max-md:text-3xl max-sm:text-2xl">
             <span className="font-bold">Graphos</span> AI Studio
           </h2>
-          <p className="text-sm text-text-muted font-normal mb-0 flex items-center justify-between gap-4 leading-relaxed">
-            <span>{t('home.heroSubtitle')}</span>
+          <div className="flex items-center justify-between gap-4 max-md:flex-col max-md:items-start max-md:gap-3 max-sm:gap-2">
+            <p className="text-sm text-text-muted font-normal mb-0 leading-relaxed max-sm:text-xs">
+              {t('home.heroSubtitle')}
+            </p>
             <button 
               className={cn(
                 "flex items-center gap-2 bg-transparent border border-border-light",
                 "py-2 px-5 rounded-pill cursor-pointer text-base text-text-primary font-medium",
-                "ml-auto shrink-0 h-fit leading-relaxed transition-all duration-200",
-                "hover:bg-bg-secondary hover:shadow-sm"
+                "shrink-0 h-fit leading-relaxed transition-all duration-200",
+                "hover:bg-bg-secondary hover:shadow-sm",
+                "max-lg:py-1.5 max-lg:px-4 max-lg:text-sm",
+                "max-md:w-full max-md:justify-center",
+                "max-sm:py-1.5 max-sm:px-3 max-sm:text-xs max-sm:gap-1.5"
               )}
               onClick={handleCreateProfile}
             >
-              <img src="/icon/plus.svg" alt="Plus" className="w-icon-xl h-icon-xl opacity-80 icon-invert" />
+              <img src="/icon/plus.svg" alt="Plus" className="w-icon-xl h-icon-xl opacity-80 icon-invert max-lg:w-icon-lg max-lg:h-icon-lg max-sm:w-4 max-sm:h-4" />
               <span>{t('home.newProfile')}</span>
             </button>
-          </p>
+          </div>
         </div>
 
         {/* Quick Actions */}
         <div className={cn(
           "grid grid-cols-3 gap-4 mb-14",
           "w-[80%] mx-auto",
-          "max-lg:w-[90%] max-lg:grid-cols-2",
-          "max-md:w-[95%] max-md:px-4 max-md:grid-cols-1 max-md:gap-3"
+          "transition-all duration-300",
+          "max-xl:gap-3",
+          "max-lg:w-[90%] max-lg:grid-cols-3",
+          "max-md:w-[95%] max-md:px-4 max-md:grid-cols-1 max-md:gap-3 max-md:mb-10",
+          "max-sm:mb-8 max-sm:gap-2.5"
         )}>
           {[
             { icon: '/icon/user-round.svg', title: t('home.createStyleProfile'), onClick: handleCreateProfile },
@@ -122,14 +132,31 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
                 "bg-bg-secondary border border-border-light rounded-xl",
                 "transition-all duration-200",
                 "hover:shadow-md hover:border-border-hover hover:bg-bg-hover",
-                "group"
+                "group",
+                "max-xl:gap-3 max-xl:py-2.5 max-xl:px-4",
+                "max-lg:flex-col max-lg:text-center max-lg:py-4 max-lg:px-3 max-lg:gap-2",
+                "max-md:flex-row max-md:text-left max-md:py-3 max-md:px-4 max-md:gap-3",
+                "max-sm:py-2.5 max-sm:px-3 max-sm:gap-2.5 max-sm:rounded-lg"
               )}
               onClick={action.onClick}
             >
-              <div className="card-icon !w-12 !h-12 group-hover:scale-105">
-                <img src={action.icon} alt="" className="w-6 h-6 opacity-70 icon-invert group-hover:opacity-100" />
+              <div className={cn(
+                "card-icon !w-12 !h-12 group-hover:scale-105 shrink-0 transition-transform duration-200",
+                "max-xl:!w-10 max-xl:!h-10",
+                "max-lg:!w-11 max-lg:!h-11",
+                "max-sm:!w-9 max-sm:!h-9"
+              )}>
+                <img src={action.icon} alt="" className={cn(
+                  "w-6 h-6 opacity-70 icon-invert group-hover:opacity-100",
+                  "max-xl:w-5 max-xl:h-5",
+                  "max-sm:w-4 max-sm:h-4"
+                )} />
               </div>
-              <h3 className="text-sm font-medium text-text-primary">{action.title}</h3>
+              <h3 className={cn(
+                "text-sm font-medium text-text-primary",
+                "max-lg:text-xs max-lg:leading-tight",
+                "max-sm:text-[11px]"
+              )}>{action.title}</h3>
             </div>
           ))}
         </div>
@@ -137,12 +164,15 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
         {/* What's New */}
         <div className={cn(
           "mb-14 w-[80%] mx-auto",
-          "max-lg:w-[90%] max-md:w-[95%] max-md:px-4"
+          "transition-all duration-300",
+          "max-lg:w-[90%] max-lg:mb-10",
+          "max-md:w-[95%] max-md:px-4 max-md:mb-8",
+          "max-sm:mb-6"
         )}>
-          <h3 className="text-xl font-normal text-text-primary mb-6">
+          <h3 className="text-xl font-normal text-text-primary mb-6 max-md:text-lg max-md:mb-4 max-sm:text-base max-sm:mb-3">
             {t('home.featuredFeatures')}
           </h3>
-          <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
+          <div className="grid grid-cols-2 gap-4 max-lg:gap-3 max-md:grid-cols-1 max-sm:gap-2.5">
             {[
               { icon: '/icon/fingerprint.svg', title: t('home.styleRefinement'), desc: t('home.styleRefinementDesc'), onClick: handleCreateProfile },
               { icon: '/icon/shield-check.svg', title: t('home.aiDetection'), desc: t('home.aiDetectionDesc'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) },
@@ -156,16 +186,32 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
                   "bg-bg-secondary border border-border-light rounded-xl",
                   "transition-all duration-200",
                   "hover:shadow-md hover:border-border-hover hover:bg-bg-hover",
-                  "group"
+                  "group",
+                  "max-xl:gap-3 max-xl:py-3 max-xl:px-4",
+                  "max-md:py-3 max-md:px-4",
+                  "max-sm:py-2.5 max-sm:px-3 max-sm:gap-2.5 max-sm:rounded-lg"
                 )}
                 onClick={item.onClick}
               >
-                <div className="card-icon !w-12 !h-12 shrink-0 group-hover:scale-105">
-                  <img src={item.icon} alt="" className="w-6 h-6 opacity-70 icon-invert group-hover:opacity-100" />
+                <div className={cn(
+                  "card-icon !w-12 !h-12 shrink-0 group-hover:scale-105 transition-transform duration-200",
+                  "max-xl:!w-10 max-xl:!h-10",
+                  "max-sm:!w-9 max-sm:!h-9"
+                )}>
+                  <img src={item.icon} alt="" className={cn(
+                    "w-6 h-6 opacity-70 icon-invert group-hover:opacity-100",
+                    "max-xl:w-5 max-xl:h-5",
+                    "max-sm:w-4 max-sm:h-4"
+                  )} />
                 </div>
-                <div className="flex flex-col gap-1 flex-1 min-w-0">
-                  <h4 className="text-sm font-medium text-text-primary m-0">{item.title}</h4>
-                  <p className="text-sm text-text-muted leading-relaxed m-0">{item.desc}</p>
+                <div className="flex flex-col gap-1 flex-1 min-w-0 max-xl:gap-0.5 max-sm:gap-0">
+                  <h4 className="text-sm font-medium text-text-primary m-0 max-xl:text-xs max-sm:text-[11px]">{item.title}</h4>
+                  <p className={cn(
+                    "text-sm text-text-muted leading-relaxed m-0",
+                    "max-xl:text-xs max-xl:leading-snug",
+                    "max-lg:line-clamp-2",
+                    "max-sm:text-[10px] max-sm:leading-tight"
+                  )}>{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -176,7 +222,10 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
         <div className={cn(
           "min-h-52 mb-12",
           "w-[80%] mx-auto",
-          "max-lg:w-[90%] max-md:w-[95%] max-md:px-4"
+          "transition-all duration-300",
+          "max-lg:w-[90%] max-lg:mb-10 max-lg:min-h-44",
+          "max-md:w-[95%] max-md:px-4 max-md:mb-8 max-md:min-h-40",
+          "max-sm:min-h-36 max-sm:mb-6"
         )}>
           <ProfileCarousel 
             profiles={profiles}

@@ -1,8 +1,8 @@
 // @ts-nocheck
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useNotes } from '../../contexts/NotesContext'
 import { useProfiles } from '../../contexts/ProfileContext'
 import { useRewrite, useAIProcessingActions, useAIProcessing } from '@/stores'
@@ -22,6 +22,14 @@ import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
 
+// Breakpoints for responsive behavior
+const BREAKPOINT_MOBILE = 768
+const BREAKPOINT_TABLET = 1024
+
+// Sidebar widths
+const WIDTH_DESKTOP = 300
+const WIDTH_TABLET = 280
+
 const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -35,6 +43,34 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
   const [isInteractingWithSlider, setIsInteractingWithSlider] = useState(false)
   const [isRewriting, setIsRewriting] = useState(false)
   const [humanizeProgress, setHumanizeProgress] = useState(null) // Local state for progress display
+  const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
+
+  // Detect screen size for responsive behavior
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const width = window.innerWidth
+      setIsMobile(width < BREAKPOINT_MOBILE)
+      setIsTablet(width >= BREAKPOINT_MOBILE && width < BREAKPOINT_TABLET)
+    }
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
+
+  // Auto-close sidebar on mobile when hidden prop changes
+  useEffect(() => {
+    if (isMobile && !hidden) {
+      // Add body scroll lock when sidebar is open on mobile
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = ''
+      }
+    }
+  }, [isMobile, hidden])
+
+  // Calculate sidebar width based on screen size
+  const sidebarWidth = isMobile ? '100%' : isTablet ? WIDTH_TABLET : WIDTH_DESKTOP
 
   // Notify parent when mode changes
   const handleModeChange = (newMode) => {
@@ -338,60 +374,82 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     setIsInteractingWithSlider(false)
   }
 
+  // Mobile overlay backdrop
+  const MobileBackdrop = () => (
+    <motion.div
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[99]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    />
+  )
+
   return (
-    <motion.aside 
-      className={cn(
-        "bg-bg-tertiary",
-        "overflow-y-auto overflow-x-hidden flex flex-col",
-        "h-full shrink-0",
-        "touch-pan-y overscroll-contain scrollbar-none",
-        "rounded-md", // Floating panel effect
-        isDragging ? "z-[100] shadow-xl" : "z-sidebar"
-      )}
-      initial={false}
-      animate={{
-        width: hidden ? 0 : 300,
-        opacity: hidden ? 0 : 1,
-        x: 0
-      }}
-      transition={{
-        type: "spring",
-        stiffness: 300,
-        damping: 30,
-        mass: 0.8
-      }}
-      drag={hidden || isInteractingWithSlider ? false : "x"}
-      dragConstraints={{ left: 0, right: 300 }}
-      dragElastic={0.15}
-      dragMomentum={false}
-      onDragStart={() => setIsDragging(true)}
-      onDragEnd={(_, info) => {
-        setIsDragging(false)
-        if (info.offset.x > 80 && !hidden) onClose?.()
-      }}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
-      style={{
-        pointerEvents: hidden ? 'none' : 'auto',
-        overflow: hidden ? 'hidden' : undefined,
-        minWidth: isDragging ? 300 : undefined
-      }}
-    >
+    <>
+      {/* Mobile backdrop */}
+      <AnimatePresence>
+        {isMobile && !hidden && <MobileBackdrop />}
+      </AnimatePresence>
+
+      <motion.aside 
+        className={cn(
+          "bg-bg-tertiary",
+          "overflow-y-auto overflow-x-hidden flex flex-col",
+          "h-full shrink-0",
+          "touch-pan-y overscroll-contain scrollbar-none",
+          "rounded-md", // Floating panel effect
+          isDragging ? "z-[100] shadow-xl" : "z-sidebar",
+          // Mobile: full width overlay from right
+          isMobile && "fixed inset-y-0 right-0 rounded-none shadow-2xl z-[100] max-w-[85vw]"
+        )}
+        initial={false}
+        animate={{
+          width: hidden ? 0 : sidebarWidth,
+          opacity: hidden ? 0 : 1,
+          x: isMobile && hidden ? '100%' : 0
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 30,
+          mass: 0.8
+        }}
+        drag={hidden || isInteractingWithSlider || isMobile ? false : "x"}
+        dragConstraints={{ left: 0, right: 300 }}
+        dragElastic={0.15}
+        dragMomentum={false}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={(_, info) => {
+          setIsDragging(false)
+          if (info.offset.x > 80 && !hidden) onClose?.()
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
+        style={{
+          pointerEvents: hidden ? 'none' : 'auto',
+          overflow: hidden ? 'hidden' : undefined,
+          minWidth: isDragging ? WIDTH_DESKTOP : undefined
+        }}
+      >
       {/* Header */}
-      <div className="flex items-center gap-2 py-3 px-4 h-14 justify-start shrink-0">
-        {/* Mode Toggle - Glass Slider */}
-        <div className="relative flex p-1 rounded-xl flex-1 bg-bg-secondary border border-border-light">
-          {/* Sliding Glass Indicator */}
+      <div className={cn(
+        "flex items-center gap-2 py-3 px-4 h-14 justify-start shrink-0",
+        isMobile && "px-3"
+      )}>
+        {/* Mode Toggle - Pill Slider */}
+        <div className="relative flex p-1 rounded-full flex-1 bg-bg-secondary border border-border-light">
+          {/* Sliding Pill Indicator */}
           <motion.div
             className={cn(
-              "absolute top-1 bottom-1 rounded-lg",
-              "bg-fill-tertiary border border-border-light",
-              "shadow-sm backdrop-blur-sm"
+              "absolute top-1 bottom-1 rounded-full",
+              "bg-bg-primary border border-border-light",
+              "shadow-sm"
             )}
             initial={false}
             animate={{
-              left: mode === 'analysis' ? '4px' : '50%',
+              left: mode === 'analysis' ? '4px' : 'calc(50% + 0px)',
               width: 'calc(50% - 4px)'
             }}
             transition={{
@@ -404,9 +462,10 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           <button 
             className={cn(
               "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 z-10",
-              "bg-transparent border-none rounded-lg cursor-pointer",
+              "bg-transparent border-none rounded-full cursor-pointer",
               "text-xs font-medium transition-colors duration-200",
-              mode === 'analysis' ? "text-text-primary" : "text-text-muted hover:text-text-secondary"
+              mode === 'analysis' ? "text-text-primary" : "text-text-muted hover:text-text-secondary",
+              isMobile && "py-2"
             )}
             onClick={() => handleModeChange('analysis')}
           >
@@ -422,9 +481,10 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           <button 
             className={cn(
               "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 z-10",
-              "bg-transparent border-none rounded-lg cursor-pointer",
+              "bg-transparent border-none rounded-full cursor-pointer",
               "text-xs font-medium transition-colors duration-200",
-              mode === 'rewrite' ? "text-text-primary" : "text-text-muted hover:text-text-secondary"
+              mode === 'rewrite' ? "text-text-primary" : "text-text-muted hover:text-text-secondary",
+              isMobile && "py-2"
             )}
             onClick={() => handleModeChange('rewrite')}
           >
@@ -457,7 +517,10 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       </div>
 
       {/* Settings Panel */}
-      <div className="flex flex-col gap-5 p-4 flex-1 overflow-y-auto overflow-x-hidden">
+      <div className={cn(
+        "flex flex-col gap-4 p-4 flex-1 overflow-y-auto overflow-x-hidden",
+        isMobile && "gap-3 p-3"
+      )}>
         <ProfileSelector 
           currentProfile={currentProfile}
           onProfileSelect={handleProfileSelect}
@@ -558,6 +621,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
         )}
       </div>
     </motion.aside>
+    </>
   )
 }
 

@@ -1,4 +1,6 @@
 // Profile cache management
+import { logger } from './logger'
+
 let profilesCache = {
   data: null,
   timestamp: null,
@@ -12,24 +14,24 @@ export function getCachedProfiles() {
 
   const now = Date.now()
   if (now - profilesCache.timestamp > profilesCache.expiryTime) {
-    console.log('⏰ Profile cache expired')
+    logger.cache('Profile cache expired')
     return null
   }
 
-  console.log('[SUCCESS] Using cached profiles')
+  logger.cache('Using cached profiles')
   return profilesCache.data
 }
 
 export function setCachedProfiles(profiles) {
   profilesCache.data = profiles
   profilesCache.timestamp = Date.now()
-  console.log('[SAVE] Cached profiles:', profiles.length)
+  logger.cache(`Cached ${profiles.length} profiles`)
 }
 
 export function clearProfileCache() {
   profilesCache.data = null
   profilesCache.timestamp = null
-  console.log('[TRASH] Profile cache cleared')
+  logger.cache('Profile cache cleared')
 }
 
 // Check if cache should be invalidated (after creating new profile)
@@ -37,7 +39,7 @@ export function checkCacheInvalidation() {
   if (localStorage.getItem('profileCacheInvalidated') === 'true') {
     clearProfileCache()
     localStorage.removeItem('profileCacheInvalidated')
-    console.log('[SUCCESS] Profile cache invalidated after profile creation')
+    logger.cache('Profile cache invalidated after profile creation')
     return true
   }
   return false

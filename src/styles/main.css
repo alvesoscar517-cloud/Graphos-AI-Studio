@@ -1132,6 +1132,7 @@
   align-items: center;
   justify-content: center;
   z-index: 10001;
+  padding: 16px;
   animation: overlay-fade-in 0.2s var(--ease-apple);
 }
 
@@ -1139,7 +1140,7 @@
 .modal-content {
   background-color: var(--color-bg-primary);
   border-radius: var(--radius-3xl);
-  width: 90%;
+  width: 100%;
   max-width: 650px;
   max-height: 85vh;
   overflow: hidden;
@@ -1147,6 +1148,21 @@
   flex-direction: column;
   box-shadow: var(--shadow-modal);
   animation: modal-slide-up 0.3s var(--ease-apple);
+}
+
+/* Modal responsive - Mobile */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+  
+  .modal-content {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    margin-bottom: 0;
+  }
 }
 
 

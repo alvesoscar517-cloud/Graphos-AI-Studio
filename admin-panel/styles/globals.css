@@ -369,7 +369,16 @@
 }
 
 /* ============================================
-   ADMIN LAYOUT - Apple Design
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+/* 
+  Mobile: < 640px (sm)
+  Tablet: 640px - 1024px (md, lg)
+  Desktop: > 1024px (xl, 2xl)
+*/
+
+/* ============================================
+   ADMIN LAYOUT - Apple Design with Responsive
    ============================================ */
 .admin-layout {
   display: flex;
@@ -385,6 +394,7 @@
   transition: margin-left 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
+/* Desktop: sidebar always visible */
 .admin-main.admin-sidebar-open {
   margin-left: 260px;
 }
@@ -393,9 +403,208 @@
   margin-left: 72px;
 }
 
+/* Tablet & Mobile: no margin, sidebar overlays */
+@media (max-width: 1024px) {
+  .admin-main.admin-sidebar-open,
+  .admin-main.admin-sidebar-closed {
+    margin-left: 0;
+  }
+}
+
 .admin-content {
   flex: 1;
   overflow-y: auto;
+}
+
+/* Mobile content padding adjustment */
+@media (max-width: 640px) {
+  .admin-content {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+@utility container-responsive {
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  @utility container-responsive {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@utility grid-responsive-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  @utility grid-responsive-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@utility grid-responsive-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  @utility grid-responsive-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  @utility grid-responsive-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@utility grid-responsive-4 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  @utility grid-responsive-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  @utility grid-responsive-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Mobile-first table wrapper */
+@utility table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Stack on mobile utility */
+@utility stack-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  @utility stack-mobile {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* Hide on mobile */
+@utility hide-mobile {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  @utility hide-mobile {
+    display: block;
+  }
+}
+
+/* Show only on mobile */
+@utility show-mobile {
+  display: block;
+}
+
+@media (min-width: 640px) {
+  @utility show-mobile {
+    display: none;
+  }
+}
+
+/* Responsive text sizes */
+@utility text-responsive-title {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  @utility text-responsive-title {
+    font-size: 24px;
+  }
+}
+
+@utility text-responsive-heading {
+  font-size: 17px;
+  line-height: 1.24;
+}
+
+@media (min-width: 640px) {
+  @utility text-responsive-heading {
+    font-size: 20px;
+  }
+}
+
+/* Responsive padding */
+@utility p-responsive {
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  @utility p-responsive {
+    padding: 1.5rem;
+  }
+}
+
+@utility px-responsive {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  @utility px-responsive {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Responsive gap */
+@utility gap-responsive {
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  @utility gap-responsive {
+    gap: 1.5rem;
+  }
+}
+
+/* ============================================
+   MOBILE SIDEBAR OVERLAY
+   ============================================ */
+.admin-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 250ms ease, visibility 250ms ease;
+}
+
+.admin-sidebar-overlay.visible {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* ============================================
@@ -408,6 +617,13 @@
   justify-content: center;
   min-height: 400px;
   gap: 20px;
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .admin-loading {
+    min-height: 400px;
+  }
 }
 
 .admin-spinner {
@@ -423,6 +639,7 @@
   font-size: 15px;
   color: var(--color-muted);
   letter-spacing: -0.01em;
+  text-align: center;
 }
 
 @keyframes spin {

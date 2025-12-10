@@ -158,7 +158,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
       className={cn(
         "fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-toast p-5",
         "animate-overlay-fade",
-        "max-sm:p-0"
+        "max-md:p-3 max-md:items-end"
       )}
       onClick={onClose}
     >
@@ -168,7 +168,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
           "border border-border rounded-2xl max-w-[820px] w-full max-h-[85vh]",
           "overflow-hidden flex flex-col shadow-modal",
           "animate-modal-slide",
-          "max-sm:max-w-full max-sm:max-h-full max-sm:rounded-none max-sm:h-full"
+          "max-md:max-w-full max-md:max-h-[90vh] max-md:rounded-t-2xl max-md:rounded-b-none"
         )}
         onClick={(e) => e.stopPropagation()}
       >

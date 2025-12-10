@@ -136,10 +136,10 @@ export default function AdminLogin() {
   // Login icon component
   const LoginIcon = ({ icon, isSetup = false }) => (
     <div className={cn(
-      "w-[72px] h-[72px] mx-auto mb-7 rounded-[22px] flex items-center justify-center shadow-lg",
+      "w-[60px] h-[60px] sm:w-[72px] sm:h-[72px] mx-auto mb-5 sm:mb-7 rounded-[18px] sm:rounded-[22px] flex items-center justify-center shadow-lg",
       isSetup ? "bg-secondary" : "bg-primary"
     )}>
-      <img src={icon} alt="" className="w-9 h-9 icon-white" />
+      <img src={icon} alt="" className="w-7 h-7 sm:w-9 sm:h-9 icon-white" />
     </div>
   );
 
@@ -156,15 +156,15 @@ export default function AdminLogin() {
     return (
       <div 
         ref={vantaRef} 
-        className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
+        className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #0071E3 0%, #5856D6 100%)' }}
       >
         
-        <Card className="w-full max-w-[440px] p-10 relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">
-          <div className="text-center mb-10">
+        <Card className="w-full max-w-[440px] p-6 sm:p-10 relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">
+          <div className="text-center mb-6 sm:mb-10">
             <LoginIcon icon="/icon/settings.svg" isSetup />
-            <h1 className="text-[28px] font-semibold text-primary tracking-[-0.022em] mb-2">Initial Setup</h1>
-            <p className="text-muted text-[15px]">Create your admin account to get started</p>
+            <h1 className="text-[24px] sm:text-[28px] font-semibold text-primary tracking-[-0.022em] mb-2">Initial Setup</h1>
+            <p className="text-muted text-[14px] sm:text-[15px]">Create your admin account to get started</p>
           </div>
 
           <form onSubmit={handleSetup} className="flex flex-col gap-6">
@@ -240,15 +240,15 @@ export default function AdminLogin() {
   return (
     <div 
       ref={vantaRef} 
-      className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #0071E3 0%, #5856D6 100%)' }}
     >
       
-      <Card className="w-full max-w-[440px] p-10 relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">
-        <div className="text-center mb-10">
+      <Card className="w-full max-w-[440px] p-6 sm:p-10 relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">
+        <div className="text-center mb-6 sm:mb-10">
           <LoginIcon icon="/icon/shield-check.svg" />
-          <h1 className="text-[28px] font-semibold text-primary tracking-[-0.022em] mb-2">Admin Panel</h1>
-          <p className="text-muted text-[15px]">Login to manage the system</p>
+          <h1 className="text-[24px] sm:text-[28px] font-semibold text-primary tracking-[-0.022em] mb-2">Admin Panel</h1>
+          <p className="text-muted text-[14px] sm:text-[15px]">Login to manage the system</p>
         </div>
 
         <form onSubmit={loginForm.handleSubmit} className="flex flex-col gap-5">

@@ -84,7 +84,7 @@ export default function SupportList() {
   });
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         icon="headphones.svg"
         title="Support & Feedback"
@@ -98,44 +98,45 @@ export default function SupportList() {
               notify.error('Export error');
             }
           }}>
-            <img src="/icon/download.svg" alt="" className="w-4 h-4 icon-dark" /> Export
+            <img src="/icon/download.svg" alt="" className="w-4 h-4 icon-dark" />
+            <span className="hidden sm:inline">Export</span>
           </Button>
         }
       />
 
-      {/* Stats */}
+      {/* Stats - Responsive */}
       {statistics && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-4 sm:mt-6">
           {[
             { label: 'Total', value: statistics.total, icon: 'inbox.svg' },
             { label: 'Open', value: statistics.open, icon: 'circle-dot.svg' },
             { label: 'Feedback', value: statistics.feedback, icon: 'message-square.svg' },
             { label: 'Billing', value: statistics.billing, icon: 'dollar-sign.svg' }
           ].map((stat, i) => (
-            <Card key={i} className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-surface-secondary flex items-center justify-center">
-                <img src={`/icon/${stat.icon}`} alt="" className="w-5 h-5 icon-gray" />
+            <Card key={i} className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-surface-secondary flex items-center justify-center flex-shrink-0">
+                <img src={`/icon/${stat.icon}`} alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-gray" />
               </div>
-              <div>
-                <div className="text-xl font-bold text-primary">{stat.value}</div>
-                <div className="text-xs text-muted">{stat.label}</div>
+              <div className="min-w-0">
+                <div className="text-lg sm:text-xl font-bold text-primary">{stat.value}</div>
+                <div className="text-[10px] sm:text-xs text-muted">{stat.label}</div>
               </div>
             </Card>
           ))}
         </div>
       )}
 
-      {/* Tabs Filter */}
-      <Tabs value={filterStatus} onValueChange={setFilterStatus} className="mt-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <TabsList>
-            <TabsTrigger value="all">Tất cả</TabsTrigger>
-            <TabsTrigger value="open">Mới</TabsTrigger>
-            <TabsTrigger value="in_progress">Đang xử lý</TabsTrigger>
-            <TabsTrigger value="resolved">Đã xử lý</TabsTrigger>
-            <TabsTrigger value="closed">Đã đóng</TabsTrigger>
+      {/* Tabs Filter - Responsive */}
+      <Tabs value={filterStatus} onValueChange={setFilterStatus} className="mt-4 sm:mt-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <TabsList className="overflow-x-auto scrollbar-hide flex-nowrap">
+            <TabsTrigger value="all" className="whitespace-nowrap text-xs sm:text-sm">All</TabsTrigger>
+            <TabsTrigger value="open" className="whitespace-nowrap text-xs sm:text-sm">New</TabsTrigger>
+            <TabsTrigger value="in_progress" className="whitespace-nowrap text-xs sm:text-sm">In Progress</TabsTrigger>
+            <TabsTrigger value="resolved" className="whitespace-nowrap text-xs sm:text-sm">Resolved</TabsTrigger>
+            <TabsTrigger value="closed" className="whitespace-nowrap text-xs sm:text-sm">Closed</TabsTrigger>
           </TabsList>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
@@ -144,14 +145,14 @@ export default function SupportList() {
                 { value: 'feedback', label: 'Feedback' },
                 { value: 'billing_support', label: 'Billing' }
               ]}
-              className="w-36"
+              className="w-28 sm:w-36"
             />
-            <span className="text-sm text-muted">{filteredTickets.length} tickets</span>
+            <span className="text-xs sm:text-sm text-muted whitespace-nowrap">{filteredTickets.length} tickets</span>
           </div>
         </div>
       </Tabs>
 
-      {/* Table */}
+      {/* Table - Responsive */}
       {isInitialLoading ? (
         <div className="mt-4">
           <SkeletonTable rows={8} columns={7} />
@@ -159,47 +160,47 @@ export default function SupportList() {
       ) : (
         <Card className={cn("mt-4 overflow-hidden transition-opacity duration-200", loading && "opacity-60")}>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[600px]">
               <thead>
                 <tr className="border-b border-border bg-surface-secondary">
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">ID</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Type</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Title</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Sender</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Priority</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Status</th>
-                  <th className="p-3 text-left text-xs font-medium text-muted uppercase">Created</th>
-                  <th className="p-3 w-20"></th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap hidden sm:table-cell">ID</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap">Type</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap">Title</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap hidden md:table-cell">Sender</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap hidden lg:table-cell">Priority</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap">Status</th>
+                  <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap hidden md:table-cell">Created</th>
+                  <th className="p-2 sm:p-3 w-12 sm:w-20"></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredTickets.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="p-8 text-center text-muted">No tickets</td>
+                    <td colSpan="8" className="p-6 sm:p-8 text-center text-muted text-sm">No tickets</td>
                   </tr>
                 ) : (
                   filteredTickets.map(ticket => (
-                    <tr key={ticket.id} className={cn("border-b border-border hover:bg-surface-secondary transition-colors", ticket.status === 'open' && "bg-surface-tertiary")}>
-                      <td className="p-3 text-sm font-mono text-muted">#{ticket.id.substring(0, 8)}</td>
-                      <td className="p-3"><Badge variant="default">{getTypeLabel(ticket.type)}</Badge></td>
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-primary truncate max-w-[200px]">{ticket.title}</span>
+                    <tr key={ticket.id} className={cn("border-b border-border hover:bg-surface-secondary transition-colors cursor-pointer", ticket.status === 'open' && "bg-surface-tertiary")} onClick={() => navigate(`/support/${ticket.id}`)}>
+                      <td className="p-2 sm:p-3 text-xs sm:text-sm font-mono text-muted hidden sm:table-cell">#{ticket.id.substring(0, 6)}</td>
+                      <td className="p-2 sm:p-3"><Badge variant="default">{getTypeLabel(ticket.type)}</Badge></td>
+                      <td className="p-2 sm:p-3">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <span className="text-xs sm:text-sm font-medium text-primary truncate max-w-[120px] sm:max-w-[200px]">{ticket.title}</span>
                           {ticket.replies?.length > 0 && (
-                            <span className="text-xs text-muted flex items-center gap-1">
+                            <span className="text-[10px] sm:text-xs text-muted flex items-center gap-0.5">
                               <img src="/icon/message-circle.svg" alt="" className="w-3 h-3" /> {ticket.replies.length}
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="p-3">
-                        <div className="text-sm text-primary">{ticket.userName}</div>
-                        <div className="text-xs text-muted">{ticket.userEmail}</div>
+                      <td className="p-2 sm:p-3 hidden md:table-cell">
+                        <div className="text-xs sm:text-sm text-primary truncate max-w-[120px]">{ticket.userName}</div>
+                        <div className="text-[10px] sm:text-xs text-muted truncate max-w-[120px]">{ticket.userEmail}</div>
                       </td>
-                      <td className="p-3"><PriorityBadge priority={ticket.priority} /></td>
-                      <td className="p-3"><Badge variant={getStatusVariant(ticket.status)}>{getStatusLabel(ticket.status)}</Badge></td>
-                      <td className="p-3 text-sm text-muted">{new Date(ticket.createdAt).toLocaleDateString('en-US')}</td>
-                      <td className="p-3">
+                      <td className="p-2 sm:p-3 hidden lg:table-cell"><PriorityBadge priority={ticket.priority} /></td>
+                      <td className="p-2 sm:p-3"><Badge variant={getStatusVariant(ticket.status)}>{getStatusLabel(ticket.status)}</Badge></td>
+                      <td className="p-2 sm:p-3 text-xs sm:text-sm text-muted hidden md:table-cell whitespace-nowrap">{new Date(ticket.createdAt).toLocaleDateString('en-US')}</td>
+                      <td className="p-2 sm:p-3" onClick={(e) => e.stopPropagation()}>
                         <ActionsDropdown 
                           onRowClick={() => navigate(`/support/${ticket.id}`)}
                           showMenu={false}

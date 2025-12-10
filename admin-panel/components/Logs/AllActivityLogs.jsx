@@ -156,7 +156,7 @@ export default function AllActivityLogs() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         icon="activity.svg"
         title="Activity Logs"
@@ -164,114 +164,121 @@ export default function AllActivityLogs() {
         actions={
           <Button variant="secondary" size="sm" onClick={handleCleanup} disabled={cleaning} loading={cleaning}>
             <img src="/icon/trash-2.svg" alt="" className="w-4 h-4 icon-dark" />
-            Clean Up Old Logs
+            <span className="hidden sm:inline">Clean Up Old Logs</span>
+            <span className="sm:hidden">Clean</span>
           </Button>
         }
       />
 
-      {/* Stats Summary */}
+      {/* Stats Summary - Responsive */}
       {!statsLoading && stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-          <Card className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-surface-secondary flex items-center justify-center">
-              <img src="/icon/activity.svg" alt="" className="w-5 h-5 icon-dark" />
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-4 sm:mt-6">
+          <Card className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-surface-secondary flex items-center justify-center flex-shrink-0">
+              <img src="/icon/activity.svg" alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
             </div>
-            <div>
-              <div className="text-xl font-bold text-primary">{stats.totalActivities.toLocaleString()}</div>
-              <div className="text-xs text-muted">Activities (7 days)</div>
-            </div>
-          </Card>
-          <Card className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-surface-secondary flex items-center justify-center">
-              <img src="/icon/credit-card.svg" alt="" className="w-5 h-5 icon-dark" />
-            </div>
-            <div>
-              <div className="text-xl font-bold text-primary">{stats.totalCreditsUsed.toFixed(1)}</div>
-              <div className="text-xs text-muted">Credits Used</div>
+            <div className="min-w-0">
+              <div className="text-lg sm:text-xl font-bold text-primary">{stats.totalActivities.toLocaleString()}</div>
+              <div className="text-[10px] sm:text-xs text-muted truncate">Activities (7d)</div>
             </div>
           </Card>
-          <Card className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-surface-secondary flex items-center justify-center">
-              <img src="/icon/users.svg" alt="" className="w-5 h-5 icon-dark" />
+          <Card className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-surface-secondary flex items-center justify-center flex-shrink-0">
+              <img src="/icon/credit-card.svg" alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
             </div>
-            <div>
-              <div className="text-xl font-bold text-primary">{stats.uniqueUsers}</div>
-              <div className="text-xs text-muted">Active Users</div>
+            <div className="min-w-0">
+              <div className="text-lg sm:text-xl font-bold text-primary">{stats.totalCreditsUsed.toFixed(1)}</div>
+              <div className="text-[10px] sm:text-xs text-muted truncate">Credits Used</div>
+            </div>
+          </Card>
+          <Card className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-surface-secondary flex items-center justify-center flex-shrink-0">
+              <img src="/icon/users.svg" alt="" className="w-4 h-4 sm:w-5 sm:h-5 icon-dark" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-lg sm:text-xl font-bold text-primary">{stats.uniqueUsers}</div>
+              <div className="text-[10px] sm:text-xs text-muted truncate">Active Users</div>
             </div>
           </Card>
         </div>
       )}
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mt-6">
-        <Select
-          value={filter.type}
-          onChange={(e) => setFilter({...filter, type: e.target.value})}
-          options={[
-            { value: 'all', label: 'All Types' },
-            ...Object.entries(ACTIVITY_TYPES).map(([key, config]) => ({ value: key, label: config.label }))
-          ]}
-          className="w-44"
-        />
-        <Input
-          placeholder="User ID..."
-          value={filter.userId}
-          onChange={(e) => setFilter({...filter, userId: e.target.value})}
-          containerClassName="w-40"
-        />
-        <div className="w-40">
-          <DatePicker
-            value={filter.startDate}
-            onChange={(date) => setFilter({...filter, startDate: date})}
-            placeholder="Start date"
-            maxDate={filter.endDate || undefined}
+      {/* Filters - Responsive */}
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3 mt-4 sm:mt-6">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
+          <Select
+            value={filter.type}
+            onChange={(e) => setFilter({...filter, type: e.target.value})}
+            options={[
+              { value: 'all', label: 'All Types' },
+              ...Object.entries(ACTIVITY_TYPES).map(([key, config]) => ({ value: key, label: config.label }))
+            ]}
+            className="w-full sm:w-44"
+          />
+          <Input
+            placeholder="User ID..."
+            value={filter.userId}
+            onChange={(e) => setFilter({...filter, userId: e.target.value})}
+            containerClassName="w-full sm:w-40"
           />
         </div>
-        <div className="w-40">
-          <DatePicker
-            value={filter.endDate}
-            onChange={(date) => setFilter({...filter, endDate: date})}
-            placeholder="End date"
-            minDate={filter.startDate || undefined}
-          />
+        <div className="flex flex-wrap gap-2 sm:gap-3">
+          <div className="w-[calc(50%-4px)] sm:w-40">
+            <DatePicker
+              value={filter.startDate}
+              onChange={(date) => setFilter({...filter, startDate: date})}
+              placeholder="Start date"
+              maxDate={filter.endDate || undefined}
+            />
+          </div>
+          <div className="w-[calc(50%-4px)] sm:w-40">
+            <DatePicker
+              value={filter.endDate}
+              onChange={(date) => setFilter({...filter, endDate: date})}
+              placeholder="End date"
+              minDate={filter.startDate || undefined}
+            />
+          </div>
         </div>
-        <Button variant="secondary" onClick={handleFilter} disabled={filtering} loading={filtering}>
-          <img src="/icon/filter.svg" alt="" className="w-4 h-4 icon-dark" />
-          Filter
-        </Button>
-        {(filter.startDate || filter.endDate) && (
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => setFilter({...filter, startDate: null, endDate: null})}
-          >
-            Clear dates
+        <div className="flex gap-2">
+          <Button variant="secondary" size="sm" onClick={handleFilter} disabled={filtering} loading={filtering} className="flex-1 sm:flex-none">
+            <img src="/icon/filter.svg" alt="" className="w-4 h-4 icon-dark" />
+            Filter
           </Button>
-        )}
+          {(filter.startDate || filter.endDate) && (
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setFilter({...filter, startDate: null, endDate: null})}
+            >
+              Clear
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* Logs Table */}
+      {/* Logs Table - Responsive */}
       <Card className="mt-4 overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center py-16">
+          <div className="flex items-center justify-center py-12 sm:py-16">
             <div className="w-8 h-8 border-2 border-surface-secondary border-t-primary rounded-full animate-spin" />
           </div>
         ) : logs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <img src="/icon/inbox.svg" alt="" className="w-12 h-12 icon-gray mb-4" />
-            <p className="text-sm text-muted">No activity logs</p>
+          <div className="flex flex-col items-center justify-center py-12 sm:py-16">
+            <img src="/icon/inbox.svg" alt="" className="w-10 h-10 sm:w-12 sm:h-12 icon-gray mb-3 sm:mb-4" />
+            <p className="text-xs sm:text-sm text-muted">No activity logs</p>
           </div>
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[500px]">
                 <thead>
                   <tr className="border-b border-border bg-surface-secondary">
-                    <th className="p-3 text-left text-xs font-medium text-muted uppercase">Type</th>
-                    <th className="p-3 text-left text-xs font-medium text-muted uppercase">User</th>
-                    <th className="p-3 text-right text-xs font-medium text-muted uppercase">Credits</th>
-                    <th className="p-3 text-left text-xs font-medium text-muted uppercase">Details</th>
-                    <th className="p-3 text-right text-xs font-medium text-muted uppercase">Time</th>
+                    <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap">Type</th>
+                    <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap">User</th>
+                    <th className="p-2 sm:p-3 text-right text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap">Credits</th>
+                    <th className="p-2 sm:p-3 text-left text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap hidden md:table-cell">Details</th>
+                    <th className="p-2 sm:p-3 text-right text-[10px] sm:text-xs font-medium text-muted uppercase whitespace-nowrap">Time</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -282,46 +289,46 @@ export default function AllActivityLogs() {
                       key={log.id} 
                       className="border-b border-border hover:bg-surface-secondary transition-colors"
                     >
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-surface-secondary flex items-center justify-center shrink-0">
-                            <img src={`/icon/${config.icon}`} alt="" className="w-4 h-4 icon-dark" />
+                      <td className="p-2 sm:p-3">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-surface-secondary flex items-center justify-center shrink-0">
+                            <img src={`/icon/${config.icon}`} alt="" className="w-3.5 h-3.5 sm:w-4 sm:h-4 icon-dark" />
                           </div>
-                          <span className="text-sm font-medium text-primary">
+                          <span className="text-xs sm:text-sm font-medium text-primary truncate max-w-[80px] sm:max-w-none">
                             {config.label}
                           </span>
                         </div>
                       </td>
-                      <td className="p-3">
+                      <td className="p-2 sm:p-3">
                         <button 
-                          className="text-sm text-muted hover:text-primary hover:underline transition-colors"
+                          className="text-xs sm:text-sm text-muted hover:text-primary hover:underline transition-colors"
                           onClick={() => navigate(`/users/${log.userId}/credits`)}
                         >
                           <SimpleTooltip content={log.userId}>
-                            <span>{log.userId.substring(0, 12)}...</span>
+                            <span>{log.userId.substring(0, 8)}...</span>
                           </SimpleTooltip>
                         </button>
                       </td>
-                      <td className="p-3 text-right">
+                      <td className="p-2 sm:p-3 text-right">
                         {log.creditsUsed !== undefined && log.creditsUsed !== 0 ? (
                           <span className={cn(
-                            "text-sm font-medium",
+                            "text-xs sm:text-sm font-medium",
                             log.creditsUsed > 0 ? "text-primary" : "text-muted"
                           )}>
                             {log.creditsUsed > 0 ? `-${log.creditsUsed.toFixed(2)}` : `+${Math.abs(log.creditsUsed).toFixed(2)}`}
                           </span>
                         ) : (
-                          <span className="text-sm text-muted">—</span>
+                          <span className="text-xs sm:text-sm text-muted">—</span>
                         )}
                       </td>
-                      <td className="p-3">
-                        <div className="flex items-center gap-2 text-xs text-muted">
+                      <td className="p-2 sm:p-3 hidden md:table-cell">
+                        <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-muted flex-wrap">
                           {log.wordCount && <span>{log.wordCount} words</span>}
                           {log.inputLength && <span>{log.inputLength} chars</span>}
                           {log.duration && <span>{log.duration}ms</span>}
-                          {log.model && <span>{log.model}</span>}
+                          {log.model && <span className="truncate max-w-[60px]">{log.model}</span>}
                           {log.feature && <span>{log.feature}</span>}
-                          {log.profileName && <span>{log.profileName}</span>}
+                          {log.profileName && <span className="truncate max-w-[80px]">{log.profileName}</span>}
                           {log.aiProbability !== undefined && (
                             <span>AI: {(log.aiProbability * 100).toFixed(0)}%</span>
                           )}
@@ -330,8 +337,8 @@ export default function AllActivityLogs() {
                           )}
                         </div>
                       </td>
-                      <td className="p-3 text-right">
-                        <span className="text-xs text-muted whitespace-nowrap">
+                      <td className="p-2 sm:p-3 text-right">
+                        <span className="text-[10px] sm:text-xs text-muted whitespace-nowrap">
                           {formatTime(log.timestamp)}
                         </span>
                       </td>
@@ -343,8 +350,8 @@ export default function AllActivityLogs() {
             </div>
             
             {pagination.hasMore && (
-              <div className="p-4 border-t border-border">
-                <Button variant="secondary" className="w-full" onClick={() => loadLogs(true)}>
+              <div className="p-3 sm:p-4 border-t border-border">
+                <Button variant="secondary" size="sm" className="w-full" onClick={() => loadLogs(true)}>
                   Load More
                 </Button>
               </div>

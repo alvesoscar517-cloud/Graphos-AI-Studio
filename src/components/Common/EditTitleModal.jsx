@@ -49,13 +49,17 @@ const EditTitleModal = ({ isOpen, currentTitle, onSave, onClose, maxLength = 100
 
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center z-menu"
+      className={cn(
+        "fixed inset-0 flex items-center justify-center z-menu bg-black/50 backdrop-blur-sm",
+        "max-md:items-end max-md:p-3"
+      )}
       onClick={handleOverlayClick}
     >
       <div className={cn(
         "bg-bg-primary border border-border-light rounded-2xl shadow-popup",
         "w-full max-w-md m-4 overflow-hidden p-5",
-        "animate-slide-up-fast"
+        "animate-slide-up-fast",
+        "max-md:max-w-full max-md:m-0 max-md:rounded-t-2xl max-md:rounded-b-none"
       )}>
         {/* Header */}
         <div className="flex items-center gap-2.5 text-md font-medium text-text-primary mb-4">

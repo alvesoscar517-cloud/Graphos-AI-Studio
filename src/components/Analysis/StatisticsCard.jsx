@@ -176,17 +176,17 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
   return (
     <>
       <div className={cn(
-        "p-4 border border-border-light rounded-xl",
+        "p-3 border border-border-light rounded-xl",
         "bg-bg-secondary transition-all duration-200 hover:shadow-md"
       )}>
         {/* Header */}
-        <div className="flex items-center gap-4 mb-3 relative">
-          <div className="card-icon">
+        <div className="flex items-center gap-3 mb-2 relative">
+          <div className="card-icon !w-10 !h-10">
             <Icon name="bar-chart-4" size="lg" color="primary" />
           </div>
           <div className="flex-1">
-            <h4 className="text-sm font-medium text-text-primary m-0 mb-0.5">{t('analysis.statistics')}</h4>
-            <p className="text-xs text-text-secondary m-0">{t('analysis.detailedAnalysis')}</p>
+            <h4 className="text-xs font-medium text-text-primary m-0 mb-0.5">{t('analysis.statistics')}</h4>
+            <p className="text-[11px] text-text-secondary m-0">{t('analysis.detailedAnalysis')}</p>
           </div>
           {stats && (
             <button 
@@ -232,31 +232,31 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
         {stats && showResult && (
           <div className="mt-2 block animate-slide-down">
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="stat-box">
+            <div className="grid grid-cols-2 gap-1.5">
+              <div className="stat-box p-2">
                 <div className="stat-box-icon">
-                  <Icon name="book-open" size="lg" color="primary" />
+                  <Icon name="book-open" size="md" color="primary" />
                 </div>
                 <span className="stat-box-label">{t('analysis.readability')}</span>
                 <span className="stat-box-value">{stats.readabilityScore}</span>
               </div>
-              <div className="stat-box">
+              <div className="stat-box p-2">
                 <div className="stat-box-icon">
-                  <Icon name="align-left" size="lg" color="primary" />
+                  <Icon name="align-left" size="md" color="primary" />
                 </div>
                 <span className="stat-box-label">{t('analysis.avgSentence')}</span>
                 <span className="stat-box-value">{stats.avgSentenceLength}</span>
               </div>
-              <div className="stat-box">
+              <div className="stat-box p-2">
                 <div className="stat-box-icon">
-                  <Icon name="zap" size="lg" color="primary" />
+                  <Icon name="zap" size="md" color="primary" />
                 </div>
                 <span className="stat-box-label">{t('analysis.vocabulary')}</span>
                 <span className="stat-box-value">{stats.vocabularyRichness}%</span>
               </div>
-              <div className="stat-box">
+              <div className="stat-box p-2">
                 <div className="stat-box-icon">
-                  <Icon name="type" size="lg" color="primary" />
+                  <Icon name="type" size="md" color="primary" />
                 </div>
                 <span className="stat-box-label">{t('analysis.totalWords')}</span>
                 <span className="stat-box-value">{stats.totalWords}</span>
@@ -305,9 +305,9 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 max-md:p-4">
               {/* Readability Score */}
-              <div className="flex items-center justify-between p-4 bg-fill-tertiary border border-border-light rounded-xl mb-5">
+              <div className="flex items-center justify-between p-4 bg-fill-tertiary border border-border-light rounded-xl mb-5 max-md:p-3 max-md:mb-4 max-md:flex-col max-md:gap-3">
                 <div>
                   <div className="text-sm text-text-secondary mb-1">{t('analysis.readability')}</div>
                   <div className="text-3xl font-semibold" style={{ color: getReadabilityColor(stats.readabilityScore) }}>{stats.readabilityScore}</div>
@@ -321,22 +321,22 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-4 gap-3 mb-4">
-                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center">
+              <div className="grid grid-cols-4 gap-3 mb-4 max-md:grid-cols-2 max-md:gap-2">
+                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center max-md:p-2">
                   <div className="text-2xs text-text-secondary mb-1">{t('analysis.words')}</div>
-                  <div className="text-xl font-semibold text-text-primary">{stats.totalWords}</div>
+                  <div className="text-xl font-semibold text-text-primary max-md:text-lg">{stats.totalWords}</div>
                 </div>
-                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center">
+                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center max-md:p-2">
                   <div className="text-2xs text-text-secondary mb-1">{t('analysis.sentences')}</div>
-                  <div className="text-xl font-semibold text-text-primary">{stats.totalSentences}</div>
+                  <div className="text-xl font-semibold text-text-primary max-md:text-lg">{stats.totalSentences}</div>
                 </div>
-                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center">
+                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center max-md:p-2">
                   <div className="text-2xs text-text-secondary mb-1">{t('analysis.paragraphs')}</div>
-                  <div className="text-xl font-semibold text-text-primary">{stats.totalParagraphs || 1}</div>
+                  <div className="text-xl font-semibold text-text-primary max-md:text-lg">{stats.totalParagraphs || 1}</div>
                 </div>
-                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center">
+                <div className="p-3 bg-fill-tertiary border border-border-light rounded-xl text-center max-md:p-2">
                   <div className="text-2xs text-text-secondary mb-1">{t('analysis.transitions')}</div>
-                  <div className="text-xl font-semibold text-text-primary">{stats.transitionWordCount || 0}</div>
+                  <div className="text-xl font-semibold text-text-primary max-md:text-lg">{stats.transitionWordCount || 0}</div>
                 </div>
               </div>
 

@@ -100,7 +100,10 @@ const FeedbackModal = ({ onClose }) => {
 
   return createPortal(
     <div 
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-toast animate-fade-in"
+      className={cn(
+        "fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-toast animate-fade-in",
+        "p-4 max-md:p-3 max-md:items-end"
+      )}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
@@ -108,13 +111,14 @@ const FeedbackModal = ({ onClose }) => {
       <div 
         ref={modalRef} 
         className={cn(
-          "bg-bg-primary rounded-2xl w-[90%] max-w-[550px] max-h-[90vh]",
+          "bg-bg-primary rounded-2xl w-full max-w-[550px] max-h-[90vh]",
           "flex flex-col overflow-hidden shadow-modal",
-          "animate-slide-up"
+          "animate-slide-up",
+          "max-md:max-w-full max-md:max-h-[85vh] max-md:rounded-t-2xl max-md:rounded-b-none"
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between py-5 px-6 shrink-0">
+        <div className="flex items-center justify-between py-5 px-6 shrink-0 max-md:py-4 max-md:px-4">
           <div className="flex items-center gap-3">
             <div className="card-icon !w-10 !h-10">
               <Icon name="message-square" alt={t('feedback.sendFeedback')} size="lg" color="muted" />
@@ -133,7 +137,7 @@ const FeedbackModal = ({ onClose }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="pt-2 pb-6 px-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-none">
+        <form onSubmit={handleSubmit(onSubmit)} className="pt-2 pb-6 px-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-none max-md:px-4 max-md:pb-4">
           <div className="mb-5">
             <label className="block mb-2.5 text-sm font-semibold text-text-primary tracking-tight">
               {t('feedback.title')}

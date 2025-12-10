@@ -3,6 +3,8 @@
  * Caches full profile details to avoid repeated API calls
  */
 
+import { logger } from './logger'
+
 const CACHE_KEY_PREFIX = 'profile_detail_'
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
@@ -29,10 +31,10 @@ export function getCachedProfileDetail(profileId) {
       return null
     }
 
-    console.log(`[SUCCESS] Using cached profile detail for: ${profileId}`)
+    logger.cache(`Using cached profile detail for: ${profileId}`)
     return data
   } catch (error) {
-    console.error('Error reading profile detail cache:', error)
+    logger.error('Error reading profile detail cache:', error)
     return null
   }
 }
@@ -51,9 +53,9 @@ export function setCachedProfileDetail(profileId, profileData) {
     }
     
     localStorage.setItem(cacheKey, JSON.stringify(cacheData))
-    console.log(`[SAVED] Cached profile detail for: ${profileId}`)
+    logger.cache(`Saved profile detail for: ${profileId}`)
   } catch (error) {
-    console.error('Error setting profile detail cache:', error)
+    logger.error('Error setting profile detail cache:', error)
   }
 }
 
@@ -65,9 +67,9 @@ export function clearCachedProfileDetail(profileId) {
   try {
     const cacheKey = CACHE_KEY_PREFIX + profileId
     localStorage.removeItem(cacheKey)
-    console.log(`[CLEARED] Cache cleared for profile: ${profileId}`)
+    logger.cache(`Cache cleared for profile: ${profileId}`)
   } catch (error) {
-    console.error('Error clearing profile detail cache:', error)
+    logger.error('Error clearing profile detail cache:', error)
   }
 }
 
@@ -86,9 +88,9 @@ export function clearAllProfileDetailCaches() {
       }
     })
     
-    console.log(`[CLEARED] Cleared ${cleared} profile detail caches`)
+    logger.cache(`Cleared ${cleared} profile detail caches`)
   } catch (error) {
-    console.error('Error clearing all profile detail caches:', error)
+    logger.error('Error clearing all profile detail caches:', error)
   }
 }
 
@@ -126,7 +128,7 @@ export function getProfileDetailCacheInfo(profileId) {
       isValid: remaining > 0
     }
   } catch (error) {
-    console.error('Error getting cache info:', error)
+    logger.error('Error getting cache info:', error)
     return null
   }
 }

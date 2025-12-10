@@ -38,16 +38,16 @@ const QuickActions = ({ onActionClick, disabled = false }) => {
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
+    <div className="flex flex-wrap items-center justify-center gap-1.5">
       {actions.map((action) => (
         <button
           key={action.id}
           onClick={() => handleClick(action)}
           disabled={disabled}
           className={cn(
-            "inline-flex items-center gap-2 py-2 px-4 rounded-full",
+            "inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full",
             "bg-bg-secondary border border-border-light",
-            "text-sm font-medium text-text-secondary",
+            "text-xs font-medium text-text-secondary",
             "transition-all duration-200",
             "hover:bg-bg-hover hover:border-border-hover hover:text-text-primary",
             "hover:shadow-sm",
@@ -58,7 +58,7 @@ const QuickActions = ({ onActionClick, disabled = false }) => {
           <img 
             src={action.icon} 
             alt="" 
-            className="w-4 h-4 opacity-60 icon-invert" 
+            className="w-3.5 h-3.5 opacity-60 icon-invert" 
           />
           <span>{action.label}</span>
         </button>

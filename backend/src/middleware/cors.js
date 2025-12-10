@@ -36,10 +36,12 @@ function isOriginAllowed(origin) {
   // Allow requests with no origin (same-origin, Postman, etc.)
   if (!origin) return true;
   
-  // DEVELOPMENT: Allow ALL localhost ports for easier testing
-  // TODO: Remove or restrict this in production after testing
-  if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
-    return true;
+  // DEVELOPMENT ONLY: Allow localhost ports for testing
+  // In production, this is skipped - only configured origins are allowed
+  if (!config.IS_PRODUCTION) {
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      return true;
+    }
   }
   
   const allowedOrigins = getAllowedOrigins();

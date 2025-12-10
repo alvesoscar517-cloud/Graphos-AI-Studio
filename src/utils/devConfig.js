@@ -77,7 +77,7 @@ export function saveTestProfile(profile) {
   
   // Validate profile before saving
   if (!profile || typeof profile !== 'object') {
-    console.error('Invalid profile object:', profile)
+    devLog('Invalid profile object:', profile)
     return
   }
   

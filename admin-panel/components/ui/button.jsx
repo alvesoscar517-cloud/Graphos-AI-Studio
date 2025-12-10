@@ -11,9 +11,10 @@ const buttonVariants = {
     success: 'bg-success text-success-foreground hover:bg-success/90 shadow-sm',
   },
   size: {
-    sm: 'h-[34px] px-3.5 text-[13px] gap-1.5',
-    md: 'h-[42px] px-5 text-[15px] gap-2',
-    lg: 'h-[50px] px-7 text-[17px] gap-2.5',
+    xs: 'h-[28px] sm:h-[30px] px-2 sm:px-2.5 text-[11px] sm:text-[12px] gap-1',
+    sm: 'h-[32px] sm:h-[34px] px-2.5 sm:px-3.5 text-[12px] sm:text-[13px] gap-1 sm:gap-1.5',
+    md: 'h-[38px] sm:h-[42px] px-4 sm:px-5 text-[14px] sm:text-[15px] gap-1.5 sm:gap-2',
+    lg: 'h-[44px] sm:h-[50px] px-5 sm:px-7 text-[15px] sm:text-[17px] gap-2 sm:gap-2.5',
   },
 }
 

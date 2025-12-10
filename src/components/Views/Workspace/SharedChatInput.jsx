@@ -70,23 +70,24 @@ const SharedChatInput = ({
   }
 
   return (
-    <div className="w-full">
+    <div className={cn("w-full", isCentered && "max-w-2xl mx-auto")}>
       <div className={cn(
-          "flex items-center gap-2 rounded-3xl py-2.5 px-4 min-h-12",
-          "bg-bg-primary border border-border-hover",
+          "flex items-center gap-2 rounded-2xl py-2 px-3 min-h-11",
+          "bg-bg-primary border border-border-light",
           "shadow-sm",
           !isCentered && [
             "bg-bg-primary/95",
             "backdrop-blur-md"
           ],
-          "transition-all duration-200"
+          "transition-all duration-200",
+          "hover:border-border-hover focus-within:border-border-hover"
         )}>
           <button 
             type="button"
             className={cn(
-              "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+              "p-1 bg-transparent border-none cursor-pointer rounded-full",
               "flex items-center justify-center shrink-0",
-              "opacity-70 transition-opacity duration-200",
+              "opacity-60 transition-opacity duration-200",
               "hover:opacity-100",
               "disabled:opacity-30 disabled:cursor-not-allowed"
             )}
@@ -95,21 +96,20 @@ const SharedChatInput = ({
             data-tooltip={t('common.attach')}
             data-tooltip-position="top"
           >
-            <img src="/icon/paperclip.svg" alt={t('common.attach')} className="w-5 h-5 opacity-70 icon-invert" />
+            <img src="/icon/paperclip.svg" alt={t('common.attach')} className="w-4.5 h-4.5 opacity-70 icon-invert" />
           </button>
 
           <textarea
             ref={textareaRef}
             className={cn(
               "flex-1 border-none bg-transparent resize-none",
-              "text-text-primary",
-              "py-1.5 px-1 outline-none",
-              "min-h-6 max-h-20",
+              "text-text-primary text-sm",
+              "py-1 px-1 outline-none",
+              "min-h-5 max-h-16",
               "overflow-y-auto scrollbar-none",
               "font-[Google_Sans,Roboto,sans-serif]",
               "placeholder:text-text-muted placeholder:opacity-60",
-              "leading-normal",
-              !isCentered ? "text-sm" : "text-md"
+              "leading-normal"
             )}
             placeholder={defaultPlaceholder}
             value={message}
@@ -124,7 +124,7 @@ const SharedChatInput = ({
             <button 
               type="button"
               className={cn(
-                "w-8 h-8 rounded-full border-none cursor-pointer shrink-0",
+                "w-7 h-7 rounded-full border-none cursor-pointer shrink-0",
                 "flex items-center justify-center relative p-0",
                 "bg-primary text-white",
                 "transition-colors duration-200",
@@ -137,8 +137,8 @@ const SharedChatInput = ({
               data-tooltip-position="top"
             >
               <svg 
-                width="18" 
-                height="18" 
+                width="16" 
+                height="16" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 stroke="currentColor" 

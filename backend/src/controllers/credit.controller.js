@@ -85,8 +85,9 @@ exports.purchaseCreditPackage = async (req, res) => {
       return res.status(400).json({ success: false, ...l.error('invalid_input'), details: 'Invalid package_id' });
     }
     
-    // TODO: Process payment with payment_method
-    // For now, we'll simulate successful payment
+    // NOTE: Payment processing is handled via Lemon Squeezy webhooks
+    // This endpoint is called after successful payment confirmation
+    // See: payment.controller.js for webhook handling
     
     const totalCredits = pkg.credits + pkg.bonus;
     

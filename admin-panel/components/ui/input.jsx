@@ -40,7 +40,7 @@ const Input = forwardRef(({
         id={inputId}
         type={type}
         className={cn(
-          'w-full px-4 py-3 rounded-xl border border-border/40 bg-surface-secondary text-primary text-[15px]',
+          'w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border border-border/40 bg-surface-secondary text-primary text-[14px] sm:text-[15px]',
           'transition-all duration-[250ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]',
           'placeholder:text-muted/70',
           'hover:bg-surface hover:border-border/60',

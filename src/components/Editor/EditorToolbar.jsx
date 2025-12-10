@@ -23,13 +23,14 @@ const ToolbarButton = ({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "flex items-center justify-center",
+        "flex items-center justify-center shrink-0",
         "w-7 h-7 rounded-md",
         "bg-transparent border-none cursor-pointer",
         "transition-all duration-150",
         "hover:bg-bg-hover",
         "disabled:opacity-40 disabled:cursor-not-allowed",
         isActive && "bg-primary/15 text-primary",
+        "max-md:w-6 max-md:h-6",
         className
       )}
       data-tooltip={tooltip || label}
@@ -48,7 +49,7 @@ const ToolbarButton = ({
  * ToolbarDivider - Vertical divider between button groups
  */
 const ToolbarDivider = () => (
-  <div className="w-px h-4 bg-border-light mx-1.5 shrink-0" />
+  <div className="w-px h-4 bg-border-light mx-1.5 shrink-0 max-md:mx-1 max-md:h-3" />
 )
 
 /**
@@ -171,7 +172,7 @@ const ToolbarDropdown = ({
   }, [])
 
   return (
-    <div ref={dropdownRef} className="relative" style={{ overflow: 'visible' }}>
+    <div ref={dropdownRef} className="relative shrink-0" style={{ overflow: 'visible' }}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -183,13 +184,14 @@ const ToolbarDropdown = ({
           "transition-all duration-150",
           "hover:bg-bg-hover",
           "disabled:opacity-40 disabled:cursor-not-allowed",
-          "text-xs font-medium text-text-secondary"
+          "text-xs font-medium text-text-secondary",
+          "max-md:h-6 max-md:px-1.5 max-md:text-[11px]"
         )}
         data-tooltip={tooltip || label}
         data-tooltip-position="bottom"
       >
         {icon && <Icon name={icon} size="sm" color="muted" />}
-        <span className="max-w-16 truncate">{value || label}</span>
+        <span className="max-w-16 truncate max-md:max-w-12">{value || label}</span>
         <Icon name="chevron-down" size="xs" color="muted" />
       </button>
       
@@ -426,6 +428,7 @@ const EditorToolbar = ({
         "flex items-center justify-start gap-0.5 px-3 py-1.5",
         "bg-fill-tertiary rounded-2xl",
         "overflow-x-auto scrollbar-hidden",
+        "max-md:px-2 max-md:py-1 max-md:rounded-xl max-md:gap-0",
         className
       )}
     >
