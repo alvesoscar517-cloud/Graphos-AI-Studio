@@ -340,7 +340,7 @@ router.post('/rewrite',
 router.post('/rewrite_stream', 
   deprecationWarning('/analysis/rewrite-stream'),
   optionalAuth, checkLocked, activityLoggerMiddleware,
-  validators.rewriteText, creditMiddleware.textRewrite, 
+  validators.rewriteTextStream, creditMiddleware.textRewrite, 
   asyncHandler(analysisController.rewriteTextStream)
 );
 

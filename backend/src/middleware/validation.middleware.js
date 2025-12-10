@@ -449,6 +449,17 @@ const validators = {
     text: { required: true, type: 'string', minLength: 50, maxLength: 20000 },
     max_iterations: { type: 'number', min: 1, max: 5, default: 3 },
     target_probability: { type: 'number', min: 10, max: 50, default: 35 }
+  }),
+  
+  // Rewrite Stream (profile_id optional for generic humanization)
+  rewriteTextStream: validate({
+    profile_id: { type: 'string', minLength: 10, maxLength: 50 }, // Optional
+    text: { required: true, type: 'string', minLength: 10, maxLength: 20000 },
+    model: { 
+      type: 'enum', 
+      values: SCHEMAS.model.allowedValues, 
+      default: SCHEMAS.model.default 
+    }
   })
 };
 

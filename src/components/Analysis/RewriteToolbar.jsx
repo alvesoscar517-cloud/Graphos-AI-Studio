@@ -276,7 +276,7 @@ const RewriteToolbar = ({
       }
       
       await rewriteTextStream(
-        currentProfile.profile_id,
+        currentProfile?.profile_id || null,
         originalText,
         selectedModel,
         writingPreferences,

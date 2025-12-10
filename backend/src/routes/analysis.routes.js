@@ -7,6 +7,7 @@ const express = require('express');
 const router = express.Router();
 const analysisController = require('../controllers/analysis.controller');
 const creditMiddleware = require('../middleware/credit.middleware');
+const { validators } = require('../middleware/validation.middleware');
 
 // === Detection ===
 router.post('/authenticate', creditMiddleware.aiDetection, analysisController.authenticateContent);
@@ -16,8 +17,8 @@ router.post('/analyze', creditMiddleware.textAnalysis, analysisController.analyz
 router.post('/suggest-improvements', creditMiddleware.improvementSuggestions, analysisController.suggestImprovements);
 
 // === Rewrite (with credit middleware) ===
-router.post('/rewrite', creditMiddleware.textRewrite, analysisController.rewriteText);
-router.post('/rewrite-stream', creditMiddleware.textRewrite, analysisController.rewriteTextStream);
+router.post('/rewrite', validators.rewriteText, creditMiddleware.textRewrite, analysisController.rewriteText);
+router.post('/rewrite-stream', validators.rewriteTextStream, creditMiddleware.textRewrite, analysisController.rewriteTextStream);
 
 // === Translation (with credit middleware) ===
 router.post('/translate', creditMiddleware.translation, analysisController.translateText);
