@@ -15,20 +15,45 @@ const { createLocalizer } = require('../utils/localized-messages.util');
 
 /**
  * Get all available credit packages
+ * Includes first purchase bonus info for eligible users
  */
 exports.getCreditPackages = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const packages = Object.entries(CREDIT_PACKAGES).map(([key, pkg]) => ({
-      id: key,
-      ...pkg,
-      totalCredits: pkg.credits + pkg.bonus
-    }));
+    const { user_id } = req.query;
+    
+    // Check if user is eligible for first purchase bonus
+    let isFirstPurchaseEligible = false;
+    
+    if (user_id) {
+      const ordersSnapshot = await db.collection('orders')
+        .where('userId', '==', user_id)
+        .limit(1)
+        .get();
+      
+      isFirstPurchaseEligible = ordersSnapshot.empty;
+    }
+    
+    const packages = Object.entries(CREDIT_PACKAGES).map(([key, pkg]) => {
+      const baseTotal = pkg.credits + pkg.bonus;
+      // First purchase: Double the credits (x2)
+      const firstPurchaseBonus = isFirstPurchaseEligible ? baseTotal : 0;
+      
+      return {
+        id: key,
+        ...pkg,
+        totalCredits: baseTotal,
+        // First purchase bonus info
+        firstPurchaseBonus,
+        totalWithFirstPurchase: baseTotal + firstPurchaseBonus
+      };
+    });
     
     res.json({
       success: true,
       packages,
+      isFirstPurchaseEligible,
       language: l.lang
     });
   } catch (error) {

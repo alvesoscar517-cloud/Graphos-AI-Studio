@@ -205,6 +205,7 @@ exports.handleWebhook = async (req, res) => {
 
 /**
  * Handle order created - Add credits to user
+ * Includes first purchase bonus (x2 credits) for new members
  */
 async function handleOrderCreated(data, customData) {
   const attrs = data.attributes;
@@ -237,6 +238,16 @@ async function handleOrderCreated(data, customData) {
     }
   }
 
+  // Check if this is user's first purchase (for bonus)
+  let isFirstPurchase = false;
+  if (userId) {
+    const existingOrders = await db.collection('orders')
+      .where('userId', '==', userId)
+      .limit(1)
+      .get();
+    isFirstPurchase = existingOrders.empty;
+  }
+
   // Save order record
   const orderData = {
     orderId: data.id,
@@ -252,6 +263,7 @@ async function handleOrderCreated(data, customData) {
     currency: attrs.currency,
     packageId,
     refunded: false,
+    isFirstPurchase, // Track first purchase
     createdAt: new Date(attrs.created_at),
     updatedAt: new Date()
   };
@@ -262,12 +274,18 @@ async function handleOrderCreated(data, customData) {
 
   // Add credits if package exists
   if (userId && foundPkg) {
-    const totalCredits = foundPkg.credits + foundPkg.bonus;
+    const baseCredits = foundPkg.credits + foundPkg.bonus;
+    // First purchase bonus: Double the credits (x2)
+    const firstPurchaseBonus = isFirstPurchase ? baseCredits : 0;
+    const totalCredits = baseCredits + firstPurchaseBonus;
     
-    await creditService.addCredits(userId, totalCredits, 'purchase', {
+    await creditService.addCredits(userId, totalCredits, isFirstPurchase ? 'first_purchase' : 'purchase', {
       orderId: data.id,
       package: packageId,
-      price: foundPkg.price
+      price: foundPkg.price,
+      baseCredits,
+      firstPurchaseBonus,
+      isFirstPurchase
     });
 
     // Get updated credit balance
@@ -290,11 +308,21 @@ async function handleOrderCreated(data, customData) {
       packageName: foundPkg.name || packageId,
       price: foundPkg.price,
       priceFormatted: attrs.total_formatted,
+      isFirstPurchase,
+      firstPurchaseBonus,
       timestamp: new Date(),
       createdAt: new Date()
     });
 
-    logger.info('Credits added from order', { userId, credits: totalCredits, orderId: data.id, packageId });
+    logger.info('Credits added from order', { 
+      userId, 
+      baseCredits,
+      firstPurchaseBonus,
+      totalCredits, 
+      orderId: data.id, 
+      packageId,
+      isFirstPurchase 
+    });
   } else {
     logger.warn('Could not add credits - package not found', { 
       userId, 

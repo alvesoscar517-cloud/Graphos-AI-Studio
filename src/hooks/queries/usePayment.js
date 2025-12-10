@@ -18,20 +18,30 @@ const DEFAULT_PACKAGES = [
 
 /**
  * Fetch credit packages
+ * Includes first purchase bonus info for eligible users
  */
-export function usePackages() {
+export function usePackages(userId) {
   return useQuery({
-    queryKey: queryKeys.payment.packages(),
+    queryKey: queryKeys.payment.packages(userId),
     queryFn: async () => {
-      const { data } = await apiClient.get('/api/credits/packages')
+      const params = userId ? { user_id: userId } : {}
+      const { data } = await apiClient.get('/api/credits/packages', { params })
+      
+      const result = {
+        packages: DEFAULT_PACKAGES,
+        isFirstPurchaseEligible: false
+      }
+      
       if (data.packages?.length > 0) {
         const defaultMap = DEFAULT_PACKAGES.reduce((acc, pkg) => ({ ...acc, [pkg.id]: pkg }), {})
-        return data.packages.map((pkg) => ({ ...defaultMap[pkg.id], ...pkg }))
+        result.packages = data.packages.map((pkg) => ({ ...defaultMap[pkg.id], ...pkg }))
       }
-      return DEFAULT_PACKAGES
+      
+      result.isFirstPurchaseEligible = data.isFirstPurchaseEligible || false
+      return result
     },
-    staleTime: 30 * 60 * 1000, // 30 minutes
-    placeholderData: DEFAULT_PACKAGES,
+    staleTime: 5 * 60 * 1000, // 5 minutes (shorter for first purchase check)
+    placeholderData: { packages: DEFAULT_PACKAGES, isFirstPurchaseEligible: false },
   })
 }
 

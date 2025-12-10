@@ -90,8 +90,10 @@
   "ai_detection": {
     "title": "Pengesanan Kandungan AI",
     "result_human": "Teks ini kelihatan seperti ditulis oleh manusia",
-    "result_ai": "Teks ini kelihatan seperti dijana oleh AI",
+    "result_mostly_human": "Kebanyakannya ditulis oleh manusia dengan sedikit corak AI",
     "result_mixed": "Teks ini menunjukkan isyarat bercampur (mungkin dibantu AI)",
+    "result_likely_ai": "Teks ini berkemungkinan dijana oleh AI",
+    "result_ai": "Teks ini kelihatan seperti dijana oleh AI",
     "result_uncertain": "Tidak dapat menentukan dengan yakin",
     "evidence_title": "Bukti",
     "human_indicators_title": "Penunjuk Manusia",
@@ -123,7 +125,8 @@
     "change_type_vocabulary": "Pelarasan kosa kata",
     "change_type_structure": "Pengubahsuaian struktur",
     "change_type_tone": "Pelarasan nada",
-    "change_type_flow": "Peningkatan aliran"
+    "change_type_flow": "Peningkatan aliran",
+    "job_started": "Tugas humanisasi dimulakan"
   },
 
   "errors": {
@@ -153,7 +156,38 @@
     "auth_required": "Pengesahan diperlukan",
     "session_expired": "Sesi telah tamat. Sila log masuk semula.",
     "invalid_token": "Token pengesahan tidak sah",
-    "token_expired": "Token pengesahan telah tamat tempoh"
+    "token_expired": "Token pengesahan telah tamat tempoh",
+    "friendly": {
+      "timeout": "Permintaan mengambil masa lebih lama daripada biasa. Sila cuba lagi.",
+      "temporary_issue": "Kami sedang mengalami masalah sementara. Sila cuba lagi sebentar.",
+      "connection": "Masalah sambungan dikesan. Sila semak internet anda dan cuba lagi.",
+      "auth_required": "Sila log masuk untuk meneruskan.",
+      "session_expired": "Sesi anda telah tamat. Sila log masuk semula untuk meneruskan.",
+      "forbidden": "Anda tidak mempunyai kebenaran untuk melakukan tindakan ini.",
+      "too_many_requests": "Anda menghantar terlalu banyak permintaan. Sila tunggu {{seconds}} saat.",
+      "service_busy": "Perkhidmatan kami sedang sibuk. Sila cuba lagi dalam {{seconds}} saat.",
+      "insufficient_credits": "Anda memerlukan {{required}} kredit tetapi hanya mempunyai {{available}}. Sila beli lebih banyak kredit untuk meneruskan.",
+      "invalid_input": "Maklumat yang anda berikan tidak sah. Sila semak dan cuba lagi.",
+      "file_too_large": "Fail terlalu besar. Sila gunakan fail yang lebih kecil.",
+      "invalid_file_type": "Jenis fail ini tidak disokong. Sila gunakan format fail yang berbeza.",
+      "not_found": "Item yang anda cari tidak dapat ditemui.",
+      "generic": "Sesuatu telah berlaku. Sila cuba lagi."
+    }
+  },
+
+  "actions": {
+    "try_again": "Cuba lagi",
+    "try_again_later": "Cuba lagi kemudian",
+    "check_connection": "Semak sambungan anda",
+    "sign_in": "Log masuk",
+    "sign_in_again": "Log masuk semula",
+    "contact_support": "Hubungi sokongan",
+    "wait_and_retry": "Tunggu dan cuba lagi",
+    "purchase_credits": "Beli kredit",
+    "check_input": "Semak input anda",
+    "reduce_file_size": "Gunakan fail yang lebih kecil",
+    "check_file_type": "Gunakan jenis fail yang disokong",
+    "go_back": "Kembali"
   },
 
   "success": {
@@ -177,9 +211,7 @@
     "purchase_success": "Berjaya membeli {{amount}} kredit",
     "deducted": "{{amount}} kredit ditolak untuk {{action}}",
     "insufficient": "Kredit tidak mencukupi. Anda memerlukan {{required}} kredit tetapi mempunyai {{available}}.",
-    "free_tier": "Peringkat percuma: {{used}}/{{limit}} analisis digunakan",
-    "unlimited": "Pelan tanpa had aktif",
-    "expires": "Kredit luput pada {{date}}"
+    "free_tier": "Peringkat percuma: {{used}}/{{limit}} analisis digunakan"
   },
 
   "notifications": {

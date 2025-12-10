@@ -334,35 +334,36 @@ export function recommendModel(text, options = {}) {
 
 // ============================================================================
 // FEATURE COSTS (synced with backend/src/config/pricing.js)
+// Updated: Dec 2025 - removed maxCost for fair linear pricing
 // ============================================================================
 
 const FEATURE_COSTS = {
-  // Detection & Analysis
-  'ai_detection': { baseCost: 2, perWordCost: 0.001, maxCost: 10 },
-  'text_analysis': { baseCost: 3, perSentenceCost: 0.3, maxCost: 20 },
-  'improvement_suggestions': { baseCost: 1, perSentenceCost: 0.5, maxCost: 10 },
+  // Detection & Analysis (maxCost removed for linear scaling)
+  'ai_detection': { baseCost: 2, perWordCost: 0.001 },
+  'text_analysis': { baseCost: 2, perWordCost: 0.002 },
+  'improvement_suggestions': { baseCost: 0.5, perWordCost: 0.001 },
   
-  // Rewrite & Humanization (reduced costs)
-  'text_rewrite': { baseCost: 1.5, perWordCost: 0.0008, maxCost: 12, modelMultiplier: true },
-  'iterative_humanize': { baseCost: 3, perIterationCost: 1.5, perWordCost: 0.0008, maxCost: 15 },
-  'check_humanization': { baseCost: 1.5, perWordCost: 0.0008, maxCost: 6 },
+  // Rewrite & Humanization (updated costs, maxCost removed)
+  'text_rewrite': { baseCost: 1.5, perWordCost: 0.0008, modelMultiplier: true },
+  'iterative_humanize': { baseCost: 2, perIterationCost: 1.0, perWordCost: 0.0005 },
+  'check_humanization': { baseCost: 1, perWordCost: 0.0005 },
   
   // Chat
-  'chat_message': { baseCost: 1, perWordCost: 0.0008, maxCost: 8, modelMultiplier: true },
-  'chat_humanized': { baseCost: 2, perWordCost: 0.001, maxCost: 12, modelMultiplier: true },
-  'conversation_summarize': { baseCost: 1, perMessageCost: 0.1, maxCost: 5 },
+  'chat_message': { baseCost: 1, perWordCost: 0.0008, modelMultiplier: true },
+  'chat_humanized': { baseCost: 2, perWordCost: 0.001, modelMultiplier: true },
+  'conversation_summarize': { baseCost: 1, perMessageCost: 0.1 },
   
   // Translation
-  'translation': { baseCost: 1, perWordCost: 0.001, maxCost: 10 },
+  'translation': { baseCost: 1, perWordCost: 0.001 },
   
   // Profile (reduced costs for better onboarding)
-  'profile_sample_add': { baseCost: 0.3, perWordCost: 0.0002, maxCost: 1.5 },
-  'profile_samples_batch': { baseCost: 0.5, perSampleCost: 0.3, maxCost: 8 },
-  'profile_complete': { baseCost: 5, perSampleCost: 0.5, maxCost: 15 },
-  'voice_profile_generation': { baseCost: 5, perSampleCost: 0.5, maxCost: 15 },
+  'profile_sample_add': { baseCost: 0.3, perWordCost: 0.0002 },
+  'profile_samples_batch': { baseCost: 0.5, perSampleCost: 0.3 },
+  'profile_complete': { baseCost: 5, perSampleCost: 0.5 },
+  'voice_profile_generation': { baseCost: 5, perSampleCost: 0.5 },
   
   // File upload
-  'file_upload_image': { baseCost: 1, maxCost: 3 }
+  'file_upload_image': { baseCost: 1 }
 }
 
 const MODEL_MULTIPLIERS = {
@@ -415,10 +416,8 @@ export function calculateFeatureCost(feature, params = {}) {
     cost *= multiplier
   }
   
-  // Cap at max cost
-  if (config.maxCost) {
-    cost = Math.min(cost, config.maxCost)
-  }
+  // NOTE: maxCost cap removed (Dec 2025) - cost now scales linearly with text length
+  // This is fairer for both users (short text = low cost) and developers (long text = appropriate cost)
   
   return Math.round(cost * 100) / 100
 }
@@ -436,7 +435,8 @@ export function estimateCreditsForTask(text, task, options = {}) {
     
     case 'analyze':
     case 'text_analysis':
-      return calculateFeatureCost('text_analysis', { sentenceCount: stats.sentences })
+      // Updated: Dec 2025 - now uses wordCount instead of sentenceCount
+      return calculateFeatureCost('text_analysis', { wordCount: stats.words })
     
     case 'rewrite':
     case 'text_rewrite':
@@ -474,7 +474,8 @@ export function estimateCreditsForTask(text, task, options = {}) {
     
     case 'suggestions':
     case 'improvement_suggestions':
-      return calculateFeatureCost('improvement_suggestions', { sentenceCount: 1 })
+      // Updated: Dec 2025 - now uses wordCount instead of sentenceCount
+      return calculateFeatureCost('improvement_suggestions', { wordCount: stats.words })
     
     default:
       return 1
@@ -491,10 +492,17 @@ export function estimateCreditsForTask(text, task, options = {}) {
 export function estimateCredits(text, model = DEFAULT_MODEL, task = 'rewrite') {
   const stats = getTextStats(text)
   const totalCredits = estimateCreditsForTask(text, task, { model })
+  const modelLimits = MODEL_LIMITS[model] || MODEL_LIMITS[DEFAULT_MODEL]
+  
+  // Calculate input/output credits based on model pricing
+  const inputCredits = (stats.tokens / 1000) * (modelLimits.creditsPerKInput || 0.5)
+  const outputCredits = (Math.ceil(stats.tokens * 1.1) / 1000) * (modelLimits.creditsPerKOutput || 1.0)
   
   return {
     inputTokens: stats.tokens,
     outputTokens: Math.ceil(stats.tokens * 1.1),
+    inputCredits: Math.round(inputCredits * 100) / 100,
+    outputCredits: Math.round(outputCredits * 100) / 100,
     totalCredits,
     display: totalCredits < 0.1 
       ? '< 0.1' 

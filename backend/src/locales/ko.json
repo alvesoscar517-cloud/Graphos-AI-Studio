@@ -90,8 +90,10 @@
   "ai_detection": {
     "title": "AI 콘텐츠 감지",
     "result_human": "이 텍스트는 사람이 쓴 것으로 보입니다",
-    "result_ai": "이 텍스트는 AI가 생성한 것으로 보입니다",
+    "result_mostly_human": "대부분 사람이 작성했으며 약간의 AI 패턴 있음",
     "result_mixed": "이 텍스트는 혼합된 신호를 보입니다 (AI 보조 가능성 있음)",
+    "result_likely_ai": "이 텍스트는 AI가 생성했을 가능성이 높습니다",
+    "result_ai": "이 텍스트는 AI가 생성한 것으로 보입니다",
     "result_uncertain": "확실하게 판단할 수 없습니다",
     "evidence_title": "증거",
     "human_indicators_title": "사람 작성 지표",
@@ -123,7 +125,8 @@
     "change_type_vocabulary": "어휘 조정",
     "change_type_structure": "구조 수정",
     "change_type_tone": "어조 조정",
-    "change_type_flow": "흐름 개선"
+    "change_type_flow": "흐름 개선",
+    "job_started": "휴머나이제이션 작업 시작됨"
   },
 
   "errors": {
@@ -153,7 +156,38 @@
     "auth_required": "인증이 필요합니다",
     "session_expired": "세션이 만료되었습니다. 다시 로그인해 주세요.",
     "invalid_token": "유효하지 않은 인증 토큰",
-    "token_expired": "인증 토큰이 만료되었습니다"
+    "token_expired": "인증 토큰이 만료되었습니다",
+    "friendly": {
+      "timeout": "요청이 예상보다 오래 걸리고 있습니다. 다시 시도해 주세요.",
+      "temporary_issue": "일시적인 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+      "connection": "연결 문제가 감지되었습니다. 인터넷을 확인하고 다시 시도해 주세요.",
+      "auth_required": "계속하려면 로그인해 주세요.",
+      "session_expired": "세션이 만료되었습니다. 계속하려면 다시 로그인해 주세요.",
+      "forbidden": "이 작업을 수행할 권한이 없습니다.",
+      "too_many_requests": "요청이 너무 많습니다. {{seconds}}초 기다려 주세요.",
+      "service_busy": "서비스가 현재 바쁩니다. {{seconds}}초 후에 다시 시도해 주세요.",
+      "insufficient_credits": "{{required}} 크레딧이 필요하지만 {{available}}만 있습니다. 계속하려면 크레딧을 구매해 주세요.",
+      "invalid_input": "제공된 정보가 유효하지 않습니다. 확인하고 다시 시도해 주세요.",
+      "file_too_large": "파일이 너무 큽니다. 더 작은 파일을 사용해 주세요.",
+      "invalid_file_type": "이 파일 형식은 지원되지 않습니다. 다른 형식을 사용해 주세요.",
+      "not_found": "찾고 있는 항목을 찾을 수 없습니다.",
+      "generic": "문제가 발생했습니다. 다시 시도해 주세요."
+    }
+  },
+
+  "actions": {
+    "try_again": "다시 시도",
+    "try_again_later": "나중에 다시 시도",
+    "check_connection": "연결 확인",
+    "sign_in": "로그인",
+    "sign_in_again": "다시 로그인",
+    "contact_support": "지원팀 문의",
+    "wait_and_retry": "기다렸다가 다시 시도",
+    "purchase_credits": "크레딧 구매",
+    "check_input": "입력 확인",
+    "reduce_file_size": "더 작은 파일 사용",
+    "check_file_type": "지원되는 형식 사용",
+    "go_back": "뒤로 가기"
   },
 
   "success": {
@@ -177,9 +211,7 @@
     "purchase_success": "{{amount}} 크레딧 구매 성공",
     "deducted": "{{action}} 작업을 위해 {{amount}} 크레딧 차감",
     "insufficient": "크레딧이 부족합니다. {{required}} 크레딧이 필요하지만 {{available}} 크레딧만 있습니다.",
-    "free_tier": "무료 플랜: {{used}}/{{limit}} 분석 사용됨",
-    "unlimited": "무제한 플랜 활성",
-    "expires": "크레딧 만료일: {{date}}"
+    "free_tier": "무료 플랜: {{used}}/{{limit}} 분석 사용됨"
   },
 
   "notifications": {

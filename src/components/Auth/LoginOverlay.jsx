@@ -5,7 +5,7 @@ import EmailLoginForm from './EmailLoginForm'
 import EmailRegisterForm from './EmailRegisterFormV2'
 import OTPVerification from './OTPVerification'
 import ForgotPassword from './ForgotPasswordV2'
-import LazyLottie from '../Common/LazyLottie'
+import Lottie from 'lottie-react'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
 
@@ -263,7 +263,7 @@ const LoginOverlay = () => {
       return (
         <div className="flex flex-col items-center justify-center">
           <h2 className="text-2xl font-semibold text-gray-900 mb-2 tracking-tight">{t('auth.checking')}</h2>
-          <LazyLottie 
+          <Lottie 
             animationData={threeDotsAnimation} 
             loop={true}
             style={{ width: 60, height: 40 }}

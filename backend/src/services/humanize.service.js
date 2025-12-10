@@ -19,47 +19,115 @@ const vertexAI = getVertexAI();
 // ANTI-AI DETECTION CONSTANTS
 // ============================================================================
 
+// Import language processor for language-specific patterns
+const languageProcessor = require('./languageProcessor.service');
+
 /**
  * Common AI phrases to avoid - these are red flags for AI detection
+ * Now dynamically loaded from languageProcessor for all 15 languages
  */
 const AI_PHRASES_TO_AVOID = {
   en: [
-    // Hedging phrases
     "it's important to note", "it should be noted", "it is worth mentioning",
     "it is essential to", "it is crucial to", "it is vital to",
     "one might argue", "it could be argued", "it can be said",
-    // Transition overuse
     "furthermore", "moreover", "additionally", "consequently",
     "subsequently", "nevertheless", "nonetheless", "hence", "thus",
     "in addition to this", "on the other hand", "in light of",
-    // Formal fillers
     "in today's world", "in this day and age", "at the end of the day",
     "first and foremost", "last but not least", "needless to say",
-    // AI-specific patterns
     "as an ai", "i cannot", "i'm unable to", "i don't have the ability",
     "delve into", "dive into", "unpack", "leverage", "utilize",
     "facilitate", "implement", "comprehensive", "robust",
-    // Conclusion patterns
     "in conclusion", "to summarize", "in summary", "to sum up",
     "all in all", "overall", "ultimately"
   ],
   vi: [
-    // Formal phrases
-    "it is important to note", "it is crucial", "it is essential",
-    "it cannot be denied", "it is clear", "it is obvious",
-    // Transition overuse
-    "however", "moreover", "besides", "therefore", "thus",
-    "nevertheless", "although", "yet", "but",
-    // Formal fillers
-    "in today's world", "in the current context",
-    "first of all", "last but not least",
-    // Conclusion patterns
-    "in summary", "in conclusion", "to summarize", "overall"
+    'điều quan trọng cần lưu ý', 'cần lưu ý rằng', 'kết luận',
+    'tóm tắt', 'tóm lại', 'với tư cách là ai', 'tôi không thể',
+    'đáng chú ý là', 'có thể lập luận rằng', 'điều cần thiết là',
+    'trong thế giới ngày nay', 'trong thời đại này', 'cuối cùng thì',
+    'không cần phải nói', 'trước hết', 'cuối cùng nhưng không kém phần quan trọng',
+    'tuy nhiên', 'hơn nữa', 'do đó', 'vì vậy', 'ngoài ra', 'bên cạnh đó'
+  ],
+  zh: [
+    '值得注意的是', '需要指出的是', '总而言之', '综上所述',
+    '作为人工智能', '我无法', '我很抱歉', '在当今世界', '在这个时代',
+    '不言而喻', '毋庸置疑', '首先', '最后但同样重要的是',
+    '此外', '因此', '然而', '综上所述', '总而言之'
+  ],
+  ja: [
+    '注目すべきは', '指摘すべきは', '結論として', '要約すると',
+    'AIとして', '私にはできません', '申し訳ありません',
+    '今日の世界では', 'この時代において', '結局のところ',
+    '言うまでもなく', '何よりもまず', '最後になりましたが',
+    'したがって', 'さらに', 'しかしながら', '結論として'
+  ],
+  ko: [
+    '주목할 점은', '지적해야 할 것은', '결론적으로', '요약하자면',
+    'AI로서', '저는 할 수 없습니다', '죄송합니다',
+    '오늘날의 세계에서', '이 시대에', '결국',
+    '말할 필요도 없이', '무엇보다도', '마지막으로 중요한 것은',
+    '따라서', '게다가', '그러나', '결론적으로'
+  ],
+  fr: [
+    'il est important de noter', 'il convient de souligner', 'en conclusion',
+    'pour résumer', 'en résumé', 'en tant qu\'IA', 'je ne peux pas',
+    'dans le monde d\'aujourd\'hui', 'à notre époque', 'en fin de compte',
+    'il va sans dire', 'avant tout', 'dernier point mais non des moindres'
+  ],
+  de: [
+    'es ist wichtig zu beachten', 'es sollte beachtet werden', 'zusammenfassend',
+    'um zusammenzufassen', 'als KI', 'ich kann nicht', 'ich entschuldige mich',
+    'in der heutigen Welt', 'in dieser Zeit', 'letztendlich',
+    'es versteht sich von selbst', 'vor allem', 'nicht zuletzt'
+  ],
+  es: [
+    'es importante señalar', 'cabe destacar', 'en conclusión',
+    'para resumir', 'en resumen', 'como IA', 'no puedo', 'me disculpo',
+    'en el mundo actual', 'en esta época', 'al final del día',
+    'no hace falta decir', 'ante todo', 'por último pero no menos importante'
+  ],
+  pt: [
+    'é importante notar', 'vale ressaltar', 'em conclusão',
+    'para resumir', 'em resumo', 'como IA', 'não posso', 'peço desculpas',
+    'no mundo atual', 'nesta época', 'no final das contas'
+  ],
+  it: [
+    'è importante notare', 'va sottolineato', 'in conclusione',
+    'per riassumere', 'in sintesi', 'come IA', 'non posso', 'mi scuso',
+    'nel mondo di oggi', 'alla fine dei conti'
+  ],
+  ru: [
+    'важно отметить', 'следует подчеркнуть', 'в заключение',
+    'подводя итог', 'резюмируя', 'как ИИ', 'я не могу', 'приношу извинения',
+    'в современном мире', 'в наше время', 'в конечном счёте'
+  ],
+  ar: [
+    'من المهم ملاحظة', 'تجدر الإشارة إلى', 'في الختام',
+    'للتلخيص', 'باختصار', 'كذكاء اصطناعي', 'لا أستطيع', 'أعتذر',
+    'في عالم اليوم', 'في هذا العصر', 'في نهاية المطاف'
+  ],
+  th: [
+    'สิ่งสำคัญที่ต้องทราบ', 'ควรสังเกตว่า', 'โดยสรุป',
+    'สรุปได้ว่า', 'กล่าวโดยสรุป', 'ในฐานะ AI', 'ฉันไม่สามารถ', 'ขออภัย',
+    'ในโลกปัจจุบัน', 'ในยุคนี้', 'ท้ายที่สุดแล้ว'
+  ],
+  id: [
+    'penting untuk dicatat', 'perlu diperhatikan', 'kesimpulannya',
+    'untuk meringkas', 'singkatnya', 'sebagai AI', 'saya tidak bisa', 'mohon maaf',
+    'di dunia saat ini', 'di era ini', 'pada akhirnya'
+  ],
+  ms: [
+    'penting untuk diambil perhatian', 'perlu dinyatakan', 'kesimpulannya',
+    'untuk merumuskan', 'ringkasnya', 'sebagai AI', 'saya tidak boleh', 'mohon maaf',
+    'dalam dunia hari ini', 'pada zaman ini', 'akhirnya'
   ]
 };
 
 /**
- * Human-like markers to encourage
+ * Human-like markers to encourage - now supports all 15 languages
+ * Uses languageProcessor.getHumanizationPatterns() for language-specific patterns
  */
 const HUMAN_MARKERS = {
   en: {
@@ -79,13 +147,152 @@ const HUMAN_MARKERS = {
     fillers: ["actually", "basically", "honestly", "literally", "obviously", "clearly"],
     starters: ["And", "But", "So", "Well", "Now", "Look", "See", "Thing is"],
     opinions: ["I think", "I believe", "I feel", "In my opinion", "To me", "Personally"]
-  },
-  vi: {
-    fillers: ["actually", "basically", "honestly", "clearly", "truly"],
-    starters: ["And", "But", "So", "Overall", "Really", "Well"],
-    opinions: ["I think", "I believe", "I feel", "personally", "to me"]
   }
 };
+
+/**
+ * Get human markers for a specific language
+ * @param {string} lang - Language code
+ * @returns {Object} - Human markers for the language
+ */
+function getHumanMarkersForLanguage(lang) {
+  // If we have predefined markers, use them
+  if (HUMAN_MARKERS[lang]) {
+    return HUMAN_MARKERS[lang];
+  }
+  
+  // Otherwise, get from languageProcessor
+  const patterns = languageProcessor.getHumanizationPatterns(lang);
+  return {
+    contractions: languageProcessor.getContractions(lang).map(c => [c, c]), // No expansion for non-English
+    fillers: patterns.fillers || [],
+    starters: patterns.starters || [],
+    opinions: patterns.opinions || [],
+    particles: patterns.particles || [],
+    informalMarkers: patterns.informalMarkers || []
+  };
+}
+
+// ============================================================================
+// CONTENT LANGUAGE DETECTION
+// ============================================================================
+
+/**
+ * Detect the language of the content text
+ * Uses languageProcessor's detection which supports all 15 languages
+ * @param {string} text - Text to analyze
+ * @returns {string} - Detected language code
+ */
+function detectContentLanguage(text) {
+  return languageProcessor.detectLanguage(text);
+}
+
+/**
+ * Get language-specific humanization instructions for AI prompt
+ * @param {string} lang - Language code
+ * @returns {string} - Language-specific instructions
+ */
+function getLanguageSpecificInstructions(lang) {
+  const patterns = languageProcessor.getHumanizationPatterns(lang);
+  const config = languageProcessor.getConfig(lang);
+  
+  const instructions = {
+    vi: `
+VIETNAMESE-SPECIFIC RULES:
+- Add sentence-final particles naturally: ${patterns.particles.slice(0, 5).join(', ')}
+- Use Vietnamese fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Start some sentences with: ${patterns.starters.slice(0, 4).join(', ')}
+- Preserve all Vietnamese diacritics (à, á, ả, ã, ạ, etc.)
+- Use informal markers where appropriate: ${patterns.informalMarkers.slice(0, 4).join(', ')}
+- Avoid overly formal Sino-Vietnamese words when casual tone is needed`,
+
+    zh: `
+CHINESE-SPECIFIC RULES:
+- Add modal particles naturally: ${patterns.particles.slice(0, 5).join(', ')}
+- Use colloquial fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Include personal opinions: ${patterns.opinions.slice(0, 3).join(', ')}
+- Use appropriate punctuation (。！？)
+- Avoid overly formal written Chinese when casual tone is needed`,
+
+    ja: `
+JAPANESE-SPECIFIC RULES:
+- Add sentence-ending particles: ${patterns.particles.slice(0, 5).join(', ')}
+- Use appropriate keigo level based on context
+- Include fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Mix formal and casual forms naturally
+- Avoid overly stiff or robotic keigo`,
+
+    ko: `
+KOREAN-SPECIFIC RULES:
+- Use appropriate speech level (반말/존댓말)
+- Add sentence-ending particles: ${patterns.particles.slice(0, 5).join(', ')}
+- Include fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Use informal markers: ${patterns.informalMarkers.slice(0, 4).join(', ')}`,
+
+    th: `
+THAI-SPECIFIC RULES:
+- Add polite particles appropriately: ${patterns.particles.slice(0, 5).join(', ')}
+- Use fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Include informal markers: ${patterns.informalMarkers.slice(0, 4).join(', ')}`,
+
+    ar: `
+ARABIC-SPECIFIC RULES:
+- Use colloquial expressions where appropriate
+- Add particles: ${patterns.particles.slice(0, 4).join(', ')}
+- Include fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Handle RTL text properly`,
+
+    fr: `
+FRENCH-SPECIFIC RULES:
+- Use contractions naturally: j', l', d', n', c', s', qu'
+- Add fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Include informal expressions: ${patterns.informalMarkers.slice(0, 4).join(', ')}`,
+
+    de: `
+GERMAN-SPECIFIC RULES:
+- Use modal particles: ${patterns.particles.slice(0, 5).join(', ')}
+- Add fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Include informal markers: ${patterns.informalMarkers.slice(0, 4).join(', ')}`,
+
+    es: `
+SPANISH-SPECIFIC RULES:
+- Use contractions: al, del
+- Add fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Include informal expressions: ${patterns.informalMarkers.slice(0, 4).join(', ')}`,
+
+    pt: `
+PORTUGUESE-SPECIFIC RULES:
+- Use contractions naturally: do, da, no, na, ao, pelo
+- Add particles: ${patterns.particles.slice(0, 4).join(', ')}
+- Include fillers: ${patterns.fillers.slice(0, 4).join(', ')}`,
+
+    it: `
+ITALIAN-SPECIFIC RULES:
+- Use contractions: l', d', un', dell', all'
+- Add particles: ${patterns.particles.slice(0, 4).join(', ')}
+- Include fillers: ${patterns.fillers.slice(0, 4).join(', ')}`,
+
+    ru: `
+RUSSIAN-SPECIFIC RULES:
+- Use particles: ${patterns.particles.slice(0, 5).join(', ')}
+- Add fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Include informal markers: ${patterns.informalMarkers.slice(0, 4).join(', ')}`,
+
+    id: `
+INDONESIAN-SPECIFIC RULES:
+- Use particles: ${patterns.particles.slice(0, 5).join(', ')}
+- Add fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Include informal markers: ${patterns.informalMarkers.slice(0, 4).join(', ')}`,
+
+    ms: `
+MALAY-SPECIFIC RULES:
+- Use particles: ${patterns.particles.slice(0, 5).join(', ')}
+- Add fillers: ${patterns.fillers.slice(0, 4).join(', ')}
+- Include informal markers: ${patterns.informalMarkers.slice(0, 4).join(', ')}`
+  };
+
+  return instructions[lang] || '';
+}
 
 // ============================================================================
 // ENHANCED PROMPT BUILDER
@@ -221,6 +428,7 @@ REWRITTEN TEXT (output ONLY the rewritten text):
 
 /**
  * Build enhanced rewrite prompt with anti-AI detection rules
+ * Now supports all 15 languages with language-specific humanization patterns
  * @param {string} originalText - Text to rewrite
  * @param {Object} voiceProfile - Voice profile object
  * @param {string} sampleText - Sample text from user's writing (for few-shot)
@@ -228,53 +436,55 @@ REWRITTEN TEXT (output ONLY the rewritten text):
  * @returns {string} - Enhanced prompt
  */
 function buildEnhancedRewritePrompt(originalText, voiceProfile, sampleText = null, options = {}) {
-  const lang = analysisService.detectLanguage(originalText);
+  // Detect content language (not UI language)
+  const lang = detectContentLanguage(originalText);
   const aiPhrases = AI_PHRASES_TO_AVOID[lang] || AI_PHRASES_TO_AVOID.en;
   const writingPreferences = options.writingPreferences || {};
+  const languageInstructions = getLanguageSpecificInstructions(lang);
+  const langConfig = languageProcessor.getConfig(lang);
   
   // Build voice profile description based on writing preferences
   const voiceDescription = buildVoiceDescription(voiceProfile, writingPreferences);
+  
+  console.log(`[HUMANIZE] Detected content language: ${lang} (${langConfig.name})`);
 
-  // Build the enhanced prompt
+  // Build the enhanced prompt with language-specific rules
   let prompt = `You are an expert ghostwriter who must rewrite text to PERFECTLY match a specific human's writing style. Your goal is to make the output COMPLETELY INDISTINGUISHABLE from human writing.
+
+IMPORTANT: The text is in ${langConfig.name} (${langConfig.nativeName}). You MUST output in the SAME language.
 
 ═══════════════════════════════════════════════════════════════
 CRITICAL ANTI-AI DETECTION RULES (MUST FOLLOW):
 ═══════════════════════════════════════════════════════════════
 
-1. BANNED PHRASES - NEVER use these AI-typical phrases:
-   ${aiPhrases.slice(0, 15).map(p => `"${p}"`).join(', ')}
+1. BANNED PHRASES - NEVER use these AI-typical phrases in ${langConfig.name}:
+   ${aiPhrases.slice(0, 12).map(p => `"${p}"`).join(', ')}
 
 2. SENTENCE VARIATION - Mix sentence lengths naturally:
-   - Include some short punchy sentences (3-8 words)
-   - Include some medium sentences (10-18 words)
-   - Occasionally use longer sentences (20-30 words)
+   - Include some short punchy sentences
+   - Include some medium sentences
+   - Occasionally use longer sentences
    - NEVER have 3+ sentences of similar length in a row
 
-3. CONTRACTIONS - Use contractions naturally (${lang === 'vi' ? 'if applicable' : '60-70% of the time'}):
-   - "do not" → "don't", "it is" → "it's", "cannot" → "can't"
-   - Mix contracted and non-contracted forms
-
-4. NATURAL IMPERFECTIONS - Include human-like patterns:
-   - Start some sentences with "And", "But", "So" (if style allows)
+3. NATURAL IMPERFECTIONS - Include human-like patterns:
    - Use occasional sentence fragments for emphasis
-   - Include "..." for trailing thoughts (sparingly)
    - Don't over-explain or be too comprehensive
+   - Add natural pauses and rhythm
 
-5. AVOID PERFECT STRUCTURE:
+4. AVOID PERFECT STRUCTURE:
    - Don't use perfect parallel structure in every list
    - Vary paragraph lengths
    - Don't always have intro-body-conclusion in every section
 
-6. PERSONAL VOICE - Add authenticity markers:
-   - Include opinion phrases: "I think", "honestly", "to be fair"
+5. PERSONAL VOICE - Add authenticity markers:
    - Show personality through word choice
    - Don't be overly neutral or balanced on everything
 
-7. TRANSITION VARIETY:
+6. TRANSITION VARIETY:
    - Don't overuse formal transitions
-   - Use simple connectors: "and", "but", "so", "then"
+   - Use simple connectors natural to ${langConfig.name}
    - Sometimes skip transitions entirely between related ideas
+${languageInstructions}
 
 ═══════════════════════════════════════════════════════════════
 TARGET VOICE PROFILE:
@@ -725,6 +935,11 @@ module.exports = {
   buildRefinementContext,
   injectHumanImperfections,
   addContractions,
+  
+  // Language-aware functions
+  detectContentLanguage,
+  getLanguageSpecificInstructions,
+  getHumanMarkersForLanguage,
   
   // Constants
   AI_PHRASES_TO_AVOID,

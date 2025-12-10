@@ -710,6 +710,50 @@
   }
 }
 
+/* Workspace chat scrollbar - simple auto-hide on hover */
+/* Override global scrollbar:none with higher specificity */
+.workspace-scrollbar {
+  /* Firefox */
+  scrollbar-width: thin !important;
+  scrollbar-color: transparent transparent !important;
+}
+
+/* Show scrollbar on hover - Firefox */
+.workspace-scrollbar:hover {
+  scrollbar-color: var(--color-border) transparent !important;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.workspace-scrollbar::-webkit-scrollbar {
+  display: block !important;
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.workspace-scrollbar::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.workspace-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent !important;
+  border-radius: 9999px !important;
+  border: 2px solid transparent !important;
+  background-clip: content-box !important;
+}
+
+/* Show scrollbar thumb on container hover */
+.workspace-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: var(--color-border) !important;
+}
+
+.workspace-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-border-hover) !important;
+}
+
+.workspace-scrollbar::-webkit-scrollbar-thumb:active {
+  background-color: var(--color-border-hover) !important;
+}
+
 /* Text truncation utilities */
 @utility line-clamp-2 {
   display: -webkit-box;

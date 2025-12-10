@@ -56,7 +56,7 @@ export const queryKeys = {
     subscription: () => [...queryKeys.payment.all, 'subscription'],
     history: () => [...queryKeys.payment.all, 'history'],
     plans: () => [...queryKeys.payment.all, 'plans'],
-    packages: () => [...queryKeys.payment.all, 'packages'],
+    packages: (userId) => [...queryKeys.payment.all, 'packages', userId],
   },
 
   // Feedback

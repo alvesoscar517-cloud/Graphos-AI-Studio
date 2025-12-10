@@ -385,7 +385,15 @@ export const WorkspaceProvider = ({ children }) => {
       }
 
       // Prepare messages for API (include attachments)
-      const apiMessages = updatedMessages.map(m => ({
+      // Optimization: If we have a summary, only send recent messages
+      // Backend will use summary for context, reducing bandwidth and tokens
+      const MAX_MESSAGES_TO_SEND = 10
+      const hasSummary = !!conversation?.summary
+      const messagesToSend = hasSummary && updatedMessages.length > MAX_MESSAGES_TO_SEND
+        ? updatedMessages.slice(-MAX_MESSAGES_TO_SEND)
+        : updatedMessages
+      
+      const apiMessages = messagesToSend.map(m => ({
         role: m.role,
         content: m.content,
         attachments: m.attachments?.map(a => ({
@@ -394,6 +402,10 @@ export const WorkspaceProvider = ({ children }) => {
           name: a.name
         }))
       }))
+      
+      if (hasSummary && updatedMessages.length > MAX_MESSAGES_TO_SEND) {
+        console.log(`[OPTIMIZE] Sending ${messagesToSend.length}/${updatedMessages.length} messages (has summary)`)
+      }
 
       // Use humanized or standard chat based on settings
       if (useHumanizedChat) {
@@ -632,18 +644,62 @@ export const WorkspaceProvider = ({ children }) => {
     await sendMessage(lastUserMessage.content, lastUserMessage.attachments || [])
   }, [currentConversation, sendMessage])
 
-  // Sync to Drive (placeholder)
+  // Sync to Drive
   const syncConversationsToDrive = useCallback(async () => {
     if (!user) {
       throw new Error('User not authenticated')
     }
 
     try {
-      console.log('📤 Drive sync for conversations not yet implemented')
-      console.log(`   Would sync ${conversations.length} conversations`)
-      return { synced: 0, message: 'Drive sync coming soon' }
+      const { syncConversationsToDrive: syncToDrive } = await import('../services/drive')
+      
+      // Only sync conversations with content
+      const conversationsToSync = conversations.filter(c => 
+        c.messages && c.messages.length > 0
+      )
+      
+      const result = await syncToDrive(conversationsToSync)
+      console.log(`📤 Synced ${result.synced} conversations to Drive`)
+      return result
     } catch (error) {
       console.error('Failed to sync conversations to Drive:', error)
+      throw error
+    }
+  }, [user, conversations])
+
+  // Load from Drive
+  const loadConversationsFromDrive = useCallback(async () => {
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+
+    try {
+      const { loadConversationsFromDrive: loadFromDrive } = await import('../services/drive')
+      const driveConversations = await loadFromDrive()
+      
+      // Merge with local conversations (Drive takes precedence for same ID)
+      const localIds = new Set(conversations.map(c => c.id))
+      const newFromDrive = driveConversations.filter(c => !localIds.has(c.id))
+      
+      // Update existing conversations if Drive version is newer
+      const merged = conversations.map(local => {
+        const driveVersion = driveConversations.find(d => d.id === local.id)
+        if (driveVersion && new Date(driveVersion.updated) > new Date(local.updated)) {
+          return { ...driveVersion, driveId: driveVersion.driveId }
+        }
+        return local
+      })
+      
+      // Add new conversations from Drive
+      const allConversations = [...merged, ...newFromDrive]
+        .sort((a, b) => new Date(b.updated) - new Date(a.updated))
+      
+      setConversations(allConversations)
+      console.log(`📥 Loaded ${driveConversations.length} conversations from Drive, ${newFromDrive.length} new`)
+      
+      return { loaded: driveConversations.length, new: newFromDrive.length }
+    } catch (error) {
+      console.error('Failed to load conversations from Drive:', error)
       throw error
     }
   }, [user, conversations])
@@ -664,6 +720,7 @@ export const WorkspaceProvider = ({ children }) => {
     updateModelSettings,
     updateConversationTitle,
     syncConversationsToDrive,
+    loadConversationsFromDrive,
     retryLastMessage
   }
 

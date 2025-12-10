@@ -63,18 +63,18 @@ const MODEL_COSTS = {
 
 const FEATURE_COSTS = {
   // ============================================================================
-  // AI CONTENT DETECTION
+  // AI CONTENT DETECTION (Updated: Dec 2025 - removed maxCost for fair pricing)
   // ============================================================================
   'ai_detection': {
     baseCost: 2,
     perWordCost: 0.001,
-    maxCost: 10,
+    // maxCost removed - cost scales linearly with text length
     description: 'AI content detection (single pass)'
   },
   'ai_detection_enhanced': {
     baseCost: 3,
     perWordCost: 0.0015,
-    maxCost: 15,
+    // maxCost removed - cost scales linearly with text length
     description: 'AI content detection (multi-pass)'
   },
   
@@ -123,59 +123,59 @@ const FEATURE_COSTS = {
   },
   
   // ============================================================================
-  // TEXT ANALYSIS
+  // TEXT ANALYSIS (Updated: Dec 2025 - removed maxCost for fair pricing)
   // ============================================================================
   'text_analysis': {
-    baseCost: 3,
-    perSentenceCost: 0.3,
-    maxCost: 20,
+    baseCost: 2,
+    perWordCost: 0.002,
+    // maxCost removed - cost scales linearly with text length
     description: 'Text analysis with embeddings'
   },
   'improvement_suggestions': {
-    baseCost: 1,
-    perSentenceCost: 0.5,
-    maxCost: 10,
+    baseCost: 0.5,
+    perWordCost: 0.001,
+    // maxCost removed - cost scales linearly with text length
     description: 'Improvement suggestions'
   },
   
   // ============================================================================
-  // TEXT REWRITING & HUMANIZATION
+  // TEXT REWRITING & HUMANIZATION (Updated: Dec 2025 - removed maxCost for fair pricing)
   // ============================================================================
   'text_rewrite': {
     baseCost: 1.5,
     perWordCost: 0.0008,
-    maxCost: 12,
+    // maxCost removed - cost scales linearly with text length
     modelMultiplier: true,
     description: 'Text rewriting'
   },
   'iterative_humanize': {
-    baseCost: 3,
-    perIterationCost: 1.5,
-    perWordCost: 0.0008,
-    maxCost: 15,
+    baseCost: 2,
+    perIterationCost: 1.0,
+    perWordCost: 0.0005,
+    // maxCost removed - cost scales linearly with text length and iterations
     description: 'Iterative humanization'
   },
   'check_humanization': {
-    baseCost: 1.5,
-    perWordCost: 0.0008,
-    maxCost: 6,
+    baseCost: 1,
+    perWordCost: 0.0005,
+    // maxCost removed - cost scales linearly with text length
     description: 'Humanization check'
   },
   
   // ============================================================================
-  // CHAT OPERATIONS
+  // CHAT OPERATIONS (Updated: Dec 2025 - removed maxCost for fair pricing)
   // ============================================================================
   'chat_message': {
     baseCost: 1,
     perWordCost: 0.0008,
-    maxCost: 8,
+    // maxCost removed - cost scales linearly with text length
     modelMultiplier: true,
     description: 'Chat message'
   },
   'chat_humanized': {
     baseCost: 2,
     perWordCost: 0.001,
-    maxCost: 12,
+    // maxCost removed - cost scales linearly with text length
     modelMultiplier: true,
     description: 'Humanized chat message'
   },
@@ -187,12 +187,12 @@ const FEATURE_COSTS = {
   },
   
   // ============================================================================
-  // TRANSLATION
+  // TRANSLATION (Updated: Dec 2025 - removed maxCost for fair pricing)
   // ============================================================================
   'translation': {
     baseCost: 1,
     perWordCost: 0.001,
-    maxCost: 10,
+    // maxCost removed - cost scales linearly with text length
     description: 'Text translation'
   },
   
@@ -213,39 +213,40 @@ const FEATURE_COSTS = {
 
 // ============================================================================
 // CREDIT PACKAGES (One-time purchase)
-// Pricing strategy: ~$0.02-0.03 per credit, better value for larger packages
+// Pricing strategy: Better value for larger packages
+// Updated: Dec 2025 - Increased credits and bonuses for better user value
 // ============================================================================
 
 // Use getter function to always get latest variant IDs from config
 function getCreditPackages() {
   return {
     'basic': {
-      credits: 150,
+      credits: 200,
       price: 4.99,
-      bonus: 15,                     // +10% bonus = 165 total
+      bonus: 30,                     // +15% bonus = 230 total
       description: 'Basic',
-      variantId: envConfig.get('LS_VARIANT_BASIC') || null    // ~$0.03/credit
+      variantId: envConfig.get('LS_VARIANT_BASIC') || null    // ~$0.022/credit
     },
     'pro': {
-      credits: 500,
+      credits: 600,
       price: 14.99,
-      bonus: 100,                    // +20% bonus = 600 total
+      bonus: 150,                    // +25% bonus = 750 total
       description: 'Pro',
-      variantId: envConfig.get('LS_VARIANT_PRO') || null      // ~$0.025/credit
+      variantId: envConfig.get('LS_VARIANT_PRO') || null      // ~$0.020/credit
     },
     'pro_plus': {
-      credits: 1500,
+      credits: 1800,
       price: 39.99,
-      bonus: 450,                    // +30% bonus = 1950 total
+      bonus: 540,                    // +30% bonus = 2340 total
       description: 'Pro Plus',
-      variantId: envConfig.get('LS_VARIANT_PRO_PLUS') || null // ~$0.02/credit
+      variantId: envConfig.get('LS_VARIANT_PRO_PLUS') || null // ~$0.017/credit
     },
     'power': {
-      credits: 5000,
+      credits: 6000,
       price: 99.99,
-      bonus: 2000,                   // +40% bonus = 7000 total
+      bonus: 2400,                   // +40% bonus = 8400 total
       description: 'Power',
-      variantId: envConfig.get('LS_VARIANT_POWER') || null    // ~$0.014/credit
+      variantId: envConfig.get('LS_VARIANT_POWER') || null    // ~$0.012/credit
     }
   };
 }
@@ -345,10 +346,9 @@ function calculateFeatureCost(featureName, params = {}) {
     }
   }
   
-  // Cap at max cost
-  if (feature.maxCost) {
-    cost = Math.min(cost, feature.maxCost);
-  }
+  // NOTE: maxCost cap removed (Dec 2025) - cost now scales linearly with text length
+  // This is fairer for both users (short text = low cost) and developers (long text = appropriate cost)
+  // Old code: if (feature.maxCost) { cost = Math.min(cost, feature.maxCost); }
   
   // Round to 2 decimal places
   return Math.round(cost * 100) / 100;

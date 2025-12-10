@@ -436,6 +436,8 @@ async function runIterativeRefinement(jobId, originalText, voiceProfile, context
  * Calculate actual cost based on iterations used
  * This is called AFTER job completion to charge only for actual work done
  * 
+ * Updated: Dec 2025 - removed maxCost cap for fair pricing
+ * 
  * @param {string} text - Original text
  * @param {number} iterationsUsed - Actual iterations completed
  * @param {string} model - Model used
@@ -448,20 +450,18 @@ function calculateActualCost(text, iterationsUsed, model) {
   
   if (!featureConfig) {
     logger.warn('iterative_humanize pricing config not found, using default');
-    return 3 + (iterationsUsed * 1.5); // Fallback
+    return 2 + (iterationsUsed * 1.0); // Updated fallback values
   }
   
   const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
   
   // Calculate cost: base + (per iteration * actual iterations) + (per word * words)
-  let cost = featureConfig.baseCost || 3;
-  cost += (featureConfig.perIterationCost || 1.5) * iterationsUsed;
-  cost += (featureConfig.perWordCost || 0.0008) * wordCount;
+  let cost = featureConfig.baseCost || 2;
+  cost += (featureConfig.perIterationCost || 1.0) * iterationsUsed;
+  cost += (featureConfig.perWordCost || 0.0005) * wordCount;
   
-  // Apply max cost cap
-  if (featureConfig.maxCost) {
-    cost = Math.min(cost, featureConfig.maxCost);
-  }
+  // NOTE: maxCost cap removed (Dec 2025) - cost now scales linearly
+  // This is fairer for both users and developers
   
   // Round to 2 decimal places
   return Math.round(cost * 100) / 100;

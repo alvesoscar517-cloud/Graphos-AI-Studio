@@ -2,12 +2,20 @@
  * Auto Notification Service
  * Automatically sends notifications for important user events
  * 
+ * Business Model: Credits-based (no subscription)
+ * - Users buy credits packages
+ * - Credits never expire
+ * - No recurring subscriptions
+ * 
  * Events:
  * - First login (welcome + free credits info)
  * - Purchase completed (credits added)
- * - Subscription created/renewed
+ * - First purchase bonus (detailed breakdown)
  * - Low credits warning
  * - Profile created
+ * - First analysis completed
+ * - Re-engagement (inactive users)
+ * - New feature announcements
  * 
  * Supported Languages: en, vi, zh, ja, ko, fr, de, es, pt, it, ru, ar, th, id, ms
  */
@@ -353,85 +361,253 @@ const NOTIFICATION_TEMPLATES = {
     ctaAction: { type: 'view', action: 'aistudio-editor' }
   },
 
-  // Credits expiring warning
-  CREDITS_EXPIRING: {
-    type: 'warning',
+  // First purchase with bonus - detailed breakdown
+  FIRST_PURCHASE_BONUS: {
+    type: 'success',
     priority: 'high',
     translations: {
       en: {
-        title: 'Credits Expiring Soon',
-        message: 'Your {credits} credits will expire in {days} days. Use them before they expire!',
-        cta: 'Use Now'
+        title: 'Welcome Bonus Applied!',
+        message: 'You purchased {packageName} and received {baseCredits} credits + {bonusCredits} bonus credits = {totalCredits} total credits!',
+        cta: 'Start Using'
       },
       vi: {
-        title: 'Credits sắp hết hạn',
-        message: '{credits} credits của bạn sẽ hết hạn sau {days} ngày. Hãy sử dụng trước khi hết hạn!',
-        cta: 'Sử dụng ngay'
+        title: 'Đã áp dụng khuyến mãi chào mừng!',
+        message: 'Bạn đã mua {packageName} và nhận được {baseCredits} credits + {bonusCredits} credits khuyến mãi = {totalCredits} credits tổng cộng!',
+        cta: 'Bắt đầu sử dụng'
       },
       zh: {
-        title: '积分即将过期',
-        message: '您的 {credits} 积分将在 {days} 天后过期。请在过期前使用！',
-        cta: '立即使用'
+        title: '欢迎奖励已发放！',
+        message: '您购买了 {packageName}，获得 {baseCredits} 积分 + {bonusCredits} 奖励积分 = 共 {totalCredits} 积分！',
+        cta: '开始使用'
       },
       ja: {
-        title: 'クレジット有効期限間近',
-        message: '{credits} クレジットが {days} 日後に期限切れになります。期限前にご利用ください！',
-        cta: '今すぐ使う'
+        title: 'ウェルカムボーナス適用！',
+        message: '{packageName} を購入し、{baseCredits} クレジット + {bonusCredits} ボーナスクレジット = 合計 {totalCredits} クレジットを獲得！',
+        cta: '使い始める'
       },
       ko: {
-        title: '크레딧 만료 임박',
-        message: '{credits} 크레딧이 {days}일 후에 만료됩니다. 만료 전에 사용하세요!',
-        cta: '지금 사용'
+        title: '환영 보너스 적용!',
+        message: '{packageName}을(를) 구매하고 {baseCredits} 크레딧 + {bonusCredits} 보너스 크레딧 = 총 {totalCredits} 크레딧을 받았습니다!',
+        cta: '사용 시작'
       },
       fr: {
-        title: 'Crédits bientôt expirés',
-        message: 'Vos {credits} crédits expireront dans {days} jours. Utilisez-les avant qu\'ils n\'expirent !',
-        cta: 'Utiliser maintenant'
+        title: 'Bonus de bienvenue appliqué !',
+        message: 'Vous avez acheté {packageName} et reçu {baseCredits} crédits + {bonusCredits} crédits bonus = {totalCredits} crédits au total !',
+        cta: 'Commencer'
       },
       de: {
-        title: 'Credits laufen bald ab',
-        message: 'Ihre {credits} Credits verfallen in {days} Tagen. Nutzen Sie sie, bevor sie ablaufen!',
-        cta: 'Jetzt verwenden'
+        title: 'Willkommensbonus angewendet!',
+        message: 'Sie haben {packageName} gekauft und {baseCredits} Credits + {bonusCredits} Bonus-Credits = insgesamt {totalCredits} Credits erhalten!',
+        cta: 'Jetzt starten'
       },
       es: {
-        title: 'Créditos por expirar',
-        message: 'Tus {credits} créditos expirarán en {days} días. ¡Úsalos antes de que expiren!',
-        cta: 'Usar ahora'
+        title: '¡Bono de bienvenida aplicado!',
+        message: 'Compraste {packageName} y recibiste {baseCredits} créditos + {bonusCredits} créditos de bonificación = ¡{totalCredits} créditos en total!',
+        cta: 'Empezar a usar'
       },
       pt: {
-        title: 'Créditos expirando em breve',
-        message: 'Seus {credits} créditos expirarão em {days} dias. Use-os antes que expirem!',
-        cta: 'Usar agora'
+        title: 'Bônus de boas-vindas aplicado!',
+        message: 'Você comprou {packageName} e recebeu {baseCredits} créditos + {bonusCredits} créditos de bônus = {totalCredits} créditos no total!',
+        cta: 'Começar a usar'
       },
       it: {
-        title: 'Crediti in scadenza',
-        message: 'I tuoi {credits} crediti scadranno tra {days} giorni. Usali prima che scadano!',
-        cta: 'Usa ora'
+        title: 'Bonus di benvenuto applicato!',
+        message: 'Hai acquistato {packageName} e ricevuto {baseCredits} crediti + {bonusCredits} crediti bonus = {totalCredits} crediti totali!',
+        cta: 'Inizia a usare'
       },
       ru: {
-        title: 'Срок действия кредитов истекает',
-        message: 'Ваши {credits} кредитов истекут через {days} дней. Используйте их до истечения срока!',
-        cta: 'Использовать'
+        title: 'Приветственный бонус применён!',
+        message: 'Вы приобрели {packageName} и получили {baseCredits} кредитов + {bonusCredits} бонусных кредитов = всего {totalCredits} кредитов!',
+        cta: 'Начать использовать'
       },
       ar: {
-        title: 'الرصيد على وشك الانتهاء',
-        message: 'سينتهي رصيدك البالغ {credits} خلال {days} أيام. استخدمه قبل انتهاء صلاحيته!',
-        cta: 'استخدم الآن'
+        title: 'تم تطبيق مكافأة الترحيب!',
+        message: 'اشتريت {packageName} وحصلت على {baseCredits} رصيد + {bonusCredits} رصيد مكافأة = {totalCredits} رصيد إجمالي!',
+        cta: 'ابدأ الاستخدام'
       },
       th: {
-        title: 'เครดิตใกล้หมดอายุ',
-        message: 'เครดิต {credits} ของคุณจะหมดอายุใน {days} วัน ใช้ก่อนหมดอายุ!',
-        cta: 'ใช้เลย'
+        title: 'ใช้โบนัสต้อนรับแล้ว!',
+        message: 'คุณซื้อ {packageName} และได้รับ {baseCredits} เครดิต + {bonusCredits} เครดิตโบนัส = รวม {totalCredits} เครดิต!',
+        cta: 'เริ่มใช้งาน'
       },
       id: {
-        title: 'Kredit Akan Kedaluwarsa',
-        message: '{credits} kredit Anda akan kedaluwarsa dalam {days} hari. Gunakan sebelum kedaluwarsa!',
-        cta: 'Gunakan Sekarang'
+        title: 'Bonus Selamat Datang Diterapkan!',
+        message: 'Anda membeli {packageName} dan menerima {baseCredits} kredit + {bonusCredits} kredit bonus = total {totalCredits} kredit!',
+        cta: 'Mulai Gunakan'
       },
       ms: {
-        title: 'Kredit Akan Tamat Tempoh',
-        message: '{credits} kredit anda akan tamat tempoh dalam {days} hari. Gunakan sebelum tamat tempoh!',
-        cta: 'Guna Sekarang'
+        title: 'Bonus Selamat Datang Digunakan!',
+        message: 'Anda membeli {packageName} dan menerima {baseCredits} kredit + {bonusCredits} kredit bonus = jumlah {totalCredits} kredit!',
+        cta: 'Mula Guna'
+      }
+    },
+    ctaAction: { type: 'view', action: 'aistudio-editor' }
+  },
+
+  // First analysis completed
+  FIRST_ANALYSIS_COMPLETED: {
+    type: 'success',
+    priority: 'medium',
+    translations: {
+      en: {
+        title: 'First Analysis Complete!',
+        message: 'Great job! You completed your first text analysis. Try our other features like AI Detection and Humanization.',
+        cta: 'Explore More'
+      },
+      vi: {
+        title: 'Phân tích đầu tiên hoàn tất!',
+        message: 'Tuyệt vời! Bạn đã hoàn thành phân tích văn bản đầu tiên. Hãy thử các tính năng khác như Phát hiện AI và Nhân hóa nhé.',
+        cta: 'Khám phá thêm'
+      },
+      zh: {
+        title: '首次分析完成！',
+        message: '太棒了！您完成了第一次文本分析。试试我们的其他功能，如AI检测和人性化处理。',
+        cta: '探索更多'
+      },
+      ja: {
+        title: '初回分析完了！',
+        message: 'お疲れ様です！初めてのテキスト分析が完了しました。AI検出やヒューマナイズなど、他の機能もお試しください。',
+        cta: 'もっと探索'
+      },
+      ko: {
+        title: '첫 분석 완료!',
+        message: '잘하셨어요! 첫 텍스트 분석을 완료했습니다. AI 감지 및 휴머나이제이션과 같은 다른 기능도 사용해 보세요.',
+        cta: '더 탐색하기'
+      },
+      fr: {
+        title: 'Première analyse terminée !',
+        message: 'Bravo ! Vous avez terminé votre première analyse de texte. Essayez nos autres fonctionnalités comme la détection IA et l\'humanisation.',
+        cta: 'Explorer plus'
+      },
+      de: {
+        title: 'Erste Analyse abgeschlossen!',
+        message: 'Gut gemacht! Sie haben Ihre erste Textanalyse abgeschlossen. Probieren Sie unsere anderen Funktionen wie KI-Erkennung und Humanisierung.',
+        cta: 'Mehr entdecken'
+      },
+      es: {
+        title: '¡Primer análisis completado!',
+        message: '¡Buen trabajo! Completaste tu primer análisis de texto. Prueba nuestras otras funciones como Detección de IA y Humanización.',
+        cta: 'Explorar más'
+      },
+      pt: {
+        title: 'Primeira análise concluída!',
+        message: 'Ótimo trabalho! Você concluiu sua primeira análise de texto. Experimente nossos outros recursos como Detecção de IA e Humanização.',
+        cta: 'Explorar mais'
+      },
+      it: {
+        title: 'Prima analisi completata!',
+        message: 'Ottimo lavoro! Hai completato la tua prima analisi del testo. Prova le altre funzionalità come Rilevamento IA e Umanizzazione.',
+        cta: 'Esplora di più'
+      },
+      ru: {
+        title: 'Первый анализ завершён!',
+        message: 'Отлично! Вы завершили свой первый анализ текста. Попробуйте другие функции, такие как обнаружение ИИ и гуманизация.',
+        cta: 'Узнать больше'
+      },
+      ar: {
+        title: 'اكتمل التحليل الأول!',
+        message: 'عمل رائع! لقد أكملت أول تحليل نصي. جرب ميزاتنا الأخرى مثل كشف الذكاء الاصطناعي والأنسنة.',
+        cta: 'استكشف المزيد'
+      },
+      th: {
+        title: 'วิเคราะห์ครั้งแรกเสร็จสิ้น!',
+        message: 'เยี่ยมมาก! คุณวิเคราะห์ข้อความครั้งแรกเสร็จแล้ว ลองฟีเจอร์อื่นๆ เช่น ตรวจจับ AI และ Humanization',
+        cta: 'สำรวจเพิ่มเติม'
+      },
+      id: {
+        title: 'Analisis Pertama Selesai!',
+        message: 'Kerja bagus! Anda menyelesaikan analisis teks pertama. Coba fitur lain seperti Deteksi AI dan Humanisasi.',
+        cta: 'Jelajahi Lebih'
+      },
+      ms: {
+        title: 'Analisis Pertama Selesai!',
+        message: 'Bagus! Anda telah menyelesaikan analisis teks pertama. Cuba ciri lain seperti Pengesanan AI dan Humanisasi.',
+        cta: 'Terokai Lagi'
+      }
+    },
+    ctaAction: { type: 'view', action: 'aistudio-editor' }
+  },
+
+  // Re-engagement notification
+  RE_ENGAGEMENT: {
+    type: 'info',
+    priority: 'low',
+    translations: {
+      en: {
+        title: 'We Miss You!',
+        message: 'You still have {credits} credits available. Come back and continue improving your writing!',
+        cta: 'Continue Writing'
+      },
+      vi: {
+        title: 'Chúng tôi nhớ bạn!',
+        message: 'Bạn vẫn còn {credits} credits. Quay lại và tiếp tục cải thiện bài viết của bạn nhé!',
+        cta: 'Tiếp tục viết'
+      },
+      zh: {
+        title: '我们想念您！',
+        message: '您还有 {credits} 积分可用。回来继续提升您的写作吧！',
+        cta: '继续写作'
+      },
+      ja: {
+        title: 'お待ちしています！',
+        message: 'まだ {credits} クレジットが残っています。戻って執筆を続けましょう！',
+        cta: '執筆を続ける'
+      },
+      ko: {
+        title: '보고 싶어요!',
+        message: '아직 {credits} 크레딧이 남아 있습니다. 돌아와서 글쓰기를 계속하세요!',
+        cta: '글쓰기 계속'
+      },
+      fr: {
+        title: 'Vous nous manquez !',
+        message: 'Vous avez encore {credits} crédits disponibles. Revenez et continuez à améliorer votre écriture !',
+        cta: 'Continuer à écrire'
+      },
+      de: {
+        title: 'Wir vermissen Sie!',
+        message: 'Sie haben noch {credits} Credits verfügbar. Kommen Sie zurück und verbessern Sie Ihr Schreiben!',
+        cta: 'Weiter schreiben'
+      },
+      es: {
+        title: '¡Te extrañamos!',
+        message: 'Todavía tienes {credits} créditos disponibles. ¡Vuelve y sigue mejorando tu escritura!',
+        cta: 'Seguir escribiendo'
+      },
+      pt: {
+        title: 'Sentimos sua falta!',
+        message: 'Você ainda tem {credits} créditos disponíveis. Volte e continue melhorando sua escrita!',
+        cta: 'Continuar escrevendo'
+      },
+      it: {
+        title: 'Ci manchi!',
+        message: 'Hai ancora {credits} crediti disponibili. Torna e continua a migliorare la tua scrittura!',
+        cta: 'Continua a scrivere'
+      },
+      ru: {
+        title: 'Мы скучаем по вам!',
+        message: 'У вас ещё есть {credits} кредитов. Возвращайтесь и продолжайте улучшать своё письмо!',
+        cta: 'Продолжить писать'
+      },
+      ar: {
+        title: 'نفتقدك!',
+        message: 'لا يزال لديك {credits} رصيد متاح. عد واستمر في تحسين كتابتك!',
+        cta: 'استمر في الكتابة'
+      },
+      th: {
+        title: 'เราคิดถึงคุณ!',
+        message: 'คุณยังมี {credits} เครดิตเหลืออยู่ กลับมาพัฒนาการเขียนของคุณต่อนะ!',
+        cta: 'เขียนต่อ'
+      },
+      id: {
+        title: 'Kami Merindukanmu!',
+        message: 'Anda masih memiliki {credits} kredit tersedia. Kembali dan terus tingkatkan tulisan Anda!',
+        cta: 'Lanjut Menulis'
+      },
+      ms: {
+        title: 'Kami Rindu Anda!',
+        message: 'Anda masih mempunyai {credits} kredit tersedia. Kembali dan terus tingkatkan penulisan anda!',
+        cta: 'Terus Menulis'
       }
     },
     ctaAction: { type: 'view', action: 'aistudio-editor' }
@@ -687,21 +863,7 @@ async function sendProfileCreatedNotification(userId, profileName) {
   }
 }
 
-/**
- * Send credits expiring warning
- */
-async function sendCreditsExpiringWarning(userId, credits, daysUntilExpiry) {
-  try {
-    const notification = createFromTemplate('CREDITS_EXPIRING', { 
-      credits, 
-      days: daysUntilExpiry 
-    });
-    return await sendToUser(userId, notification);
-  } catch (error) {
-    console.error('[AUTO-NOTIF] Send credits expiring warning error:', error);
-    return null;
-  }
-}
+
 
 /**
  * Send new feature announcement to all users
@@ -754,13 +916,111 @@ async function sendNewFeatureAnnouncement(featureName, description, targetView =
   }
 }
 
+// Import localization service for number formatting
+const localizationService = require('./localization.service');
+
+/**
+ * Send first purchase bonus notification with detailed breakdown
+ */
+async function sendFirstPurchaseBonusNotification(userId, packageName, baseCredits, bonusCredits, userLang = 'en') {
+  try {
+    const totalCredits = baseCredits + bonusCredits;
+    
+    // Format numbers according to user's locale
+    const formattedBase = localizationService.formatNumber(baseCredits, userLang);
+    const formattedBonus = localizationService.formatNumber(bonusCredits, userLang);
+    const formattedTotal = localizationService.formatNumber(totalCredits, userLang);
+    
+    const notification = createFromTemplate('FIRST_PURCHASE_BONUS', {
+      packageName,
+      baseCredits: formattedBase,
+      bonusCredits: formattedBonus,
+      totalCredits: formattedTotal
+    });
+    return await sendToUser(userId, notification);
+  } catch (error) {
+    console.error('[AUTO-NOTIF] Send first purchase bonus notification error:', error);
+    return null;
+  }
+}
+
+
+
+/**
+ * Send first analysis completed notification
+ */
+async function sendFirstAnalysisNotification(userId) {
+  try {
+    // Check if user already received this notification
+    const existingSnapshot = await db.collection('user_notifications')
+      .where('userId', '==', userId)
+      .where('autoGenerated', '==', true)
+      .where('type', '==', 'success')
+      .limit(10)
+      .get();
+
+    // Check if any existing notification is for first analysis
+    const alreadySent = existingSnapshot.docs.some(doc => {
+      const data = doc.data();
+      return data.translations?.en?.title?.includes('First Analysis');
+    });
+
+    if (alreadySent) {
+      console.log(`[AUTO-NOTIF] User ${userId} already received first analysis notification`);
+      return null;
+    }
+
+    const notification = createFromTemplate('FIRST_ANALYSIS_COMPLETED', {});
+    return await sendToUser(userId, notification);
+  } catch (error) {
+    console.error('[AUTO-NOTIF] Send first analysis notification error:', error);
+    return null;
+  }
+}
+
+/**
+ * Send re-engagement notification for inactive users
+ */
+async function sendReEngagementNotification(userId, remainingCredits, userLang = 'en') {
+  try {
+    // Check if already sent recently (within 7 days)
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const existingSnapshot = await db.collection('user_notifications')
+      .where('userId', '==', userId)
+      .where('type', '==', 'info')
+      .where('createdAt', '>', sevenDaysAgo)
+      .limit(1)
+      .get();
+
+    if (!existingSnapshot.empty) {
+      return null; // Already sent recently
+    }
+
+    const formattedCredits = localizationService.formatNumber(remainingCredits, userLang);
+    const notification = createFromTemplate('RE_ENGAGEMENT', { credits: formattedCredits });
+    return await sendToUser(userId, notification);
+  } catch (error) {
+    console.error('[AUTO-NOTIF] Send re-engagement notification error:', error);
+    return null;
+  }
+}
+
+
+
 module.exports = {
+  // Core notification functions
   sendWelcomeNotification,
   sendPurchaseNotification,
   sendLowCreditsWarning,
   sendProfileCreatedNotification,
-  sendCreditsExpiringWarning,
   sendNewFeatureAnnouncement,
+  
+  // Enhanced notification functions
+  sendFirstPurchaseBonusNotification,
+  sendFirstAnalysisNotification,
+  sendReEngagementNotification,
+  
+  // Utilities
   NOTIFICATION_TEMPLATES,
   createFromTemplate,
   sendToUser

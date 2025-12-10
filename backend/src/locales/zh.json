@@ -90,8 +90,10 @@
   "ai_detection": {
     "title": "AI 内容检测",
     "result_human": "这段文本看似由人类撰写",
-    "result_ai": "这段文本看似由 AI 生成",
+    "result_mostly_human": "主要由人类撰写，带有少量AI痕迹",
     "result_mixed": "这段文本显示混合信号（可能有 AI 辅助）",
+    "result_likely_ai": "这段文本很可能由AI生成",
+    "result_ai": "这段文本看似由 AI 生成",
     "result_uncertain": "无法确信地判断",
     "evidence_title": "证据",
     "human_indicators_title": "人类特征指标",
@@ -123,7 +125,8 @@
     "change_type_vocabulary": "词汇调整",
     "change_type_structure": "结构修改",
     "change_type_tone": "语气调整",
-    "change_type_flow": "流畅度改进"
+    "change_type_flow": "流畅度改进",
+    "job_started": "人性化任务已开始"
   },
 
   "errors": {
@@ -153,7 +156,38 @@
     "auth_required": "需要身份验证",
     "session_expired": "会话已过期。请重新登录。",
     "invalid_token": "身份验证令牌无效",
-    "token_expired": "身份验证令牌已过期"
+    "token_expired": "身份验证令牌已过期",
+    "friendly": {
+      "timeout": "请求时间比预期长。请重试。",
+      "temporary_issue": "我们遇到了临时问题。请稍后再试。",
+      "connection": "检测到连接问题。请检查您的网络并重试。",
+      "auth_required": "请登录以继续。",
+      "session_expired": "您的会话已过期。请重新登录以继续。",
+      "forbidden": "您没有权限执行此操作。",
+      "too_many_requests": "您发送的请求太多。请等待 {{seconds}} 秒。",
+      "service_busy": "服务当前繁忙。请在 {{seconds}} 秒后重试。",
+      "insufficient_credits": "您需要 {{required}} 积分，但只有 {{available}}。请充值以继续。",
+      "invalid_input": "您提供的信息无效。请检查并重试。",
+      "file_too_large": "文件太大。请使用较小的文件。",
+      "invalid_file_type": "不支持此文件类型。请使用其他格式。",
+      "not_found": "找不到您要查找的项目。",
+      "generic": "出了点问题。请重试。"
+    }
+  },
+
+  "actions": {
+    "try_again": "重试",
+    "try_again_later": "稍后重试",
+    "check_connection": "检查连接",
+    "sign_in": "登录",
+    "sign_in_again": "重新登录",
+    "contact_support": "联系支持",
+    "wait_and_retry": "等待并重试",
+    "purchase_credits": "购买积分",
+    "check_input": "检查输入",
+    "reduce_file_size": "使用较小的文件",
+    "check_file_type": "使用支持的文件类型",
+    "go_back": "返回"
   },
 
   "success": {
@@ -177,9 +211,7 @@
     "purchase_success": "成功购买 {{amount}} 积分",
     "deducted": "已扣除 {{amount}} 积分用于 {{action}}",
     "insufficient": "积分不足。您需要 {{required}} 积分，但现有 {{available}}。",
-    "free_tier": "免费套餐：已使用 {{used}}/{{limit}} 次分析",
-    "unlimited": "无限套餐已激活",
-    "expires": "积分将于 {{date}} 到期"
+    "free_tier": "免费套餐：已使用 {{used}}/{{limit}} 次分析"
   },
 
   "notifications": {

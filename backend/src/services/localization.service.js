@@ -1,6 +1,7 @@
 /**
  * Localization Service
  * Handles translation and localized content delivery
+ * Enhanced with locale-aware formatting for 15 languages
  */
 
 const fs = require('fs');
@@ -8,6 +9,116 @@ const path = require('path');
 
 const LOCALES_DIR = path.join(__dirname, '../locales');
 const DEFAULT_LANGUAGE = 'en';
+
+// Supported languages (15)
+const SUPPORTED_LANGUAGES = ['en', 'vi', 'zh', 'ja', 'ko', 'fr', 'de', 'es', 'pt', 'it', 'ru', 'ar', 'th', 'id', 'ms'];
+
+// Locale mappings for Intl API
+const LOCALE_MAPPINGS = {
+  en: 'en-US',
+  vi: 'vi-VN',
+  zh: 'zh-CN',
+  ja: 'ja-JP',
+  ko: 'ko-KR',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  es: 'es-ES',
+  pt: 'pt-BR',
+  it: 'it-IT',
+  ru: 'ru-RU',
+  ar: 'ar-SA',
+  th: 'th-TH',
+  id: 'id-ID',
+  ms: 'ms-MY'
+};
+
+// Default currency by locale
+const DEFAULT_CURRENCIES = {
+  en: 'USD',
+  vi: 'VND',
+  zh: 'CNY',
+  ja: 'JPY',
+  ko: 'KRW',
+  fr: 'EUR',
+  de: 'EUR',
+  es: 'EUR',
+  pt: 'BRL',
+  it: 'EUR',
+  ru: 'RUB',
+  ar: 'SAR',
+  th: 'THB',
+  id: 'IDR',
+  ms: 'MYR'
+};
+
+// Pluralization rules by language
+// Categories: zero, one, two, few, many, other
+const PLURAL_RULES = {
+  // English: one, other
+  en: (n) => n === 1 ? 'one' : 'other',
+  // Vietnamese: other (no plural forms)
+  vi: () => 'other',
+  // Chinese: other (no plural forms)
+  zh: () => 'other',
+  // Japanese: other (no plural forms)
+  ja: () => 'other',
+  // Korean: other (no plural forms)
+  ko: () => 'other',
+  // French: one (0-1), other
+  fr: (n) => (n === 0 || n === 1) ? 'one' : 'other',
+  // German: one, other
+  de: (n) => n === 1 ? 'one' : 'other',
+  // Spanish: one, other
+  es: (n) => n === 1 ? 'one' : 'other',
+  // Portuguese: one, other
+  pt: (n) => n === 1 ? 'one' : 'other',
+  // Italian: one, other
+  it: (n) => n === 1 ? 'one' : 'other',
+  // Russian: one, few, many, other (complex rules)
+  ru: (n) => {
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return 'one';
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'few';
+    if (mod10 === 0 || (mod10 >= 5 && mod10 <= 9) || (mod100 >= 11 && mod100 <= 14)) return 'many';
+    return 'other';
+  },
+  // Arabic: zero, one, two, few, many, other (most complex)
+  ar: (n) => {
+    if (n === 0) return 'zero';
+    if (n === 1) return 'one';
+    if (n === 2) return 'two';
+    const mod100 = n % 100;
+    if (mod100 >= 3 && mod100 <= 10) return 'few';
+    if (mod100 >= 11 && mod100 <= 99) return 'many';
+    return 'other';
+  },
+  // Thai: other (no plural forms)
+  th: () => 'other',
+  // Indonesian: other (no plural forms)
+  id: () => 'other',
+  // Malay: other (no plural forms)
+  ms: () => 'other'
+};
+
+// Duration unit translations
+const DURATION_UNITS = {
+  en: { hours: 'hours', hour: 'hour', minutes: 'minutes', minute: 'minute', seconds: 'seconds', second: 'second' },
+  vi: { hours: 'giờ', hour: 'giờ', minutes: 'phút', minute: 'phút', seconds: 'giây', second: 'giây' },
+  zh: { hours: '小时', hour: '小时', minutes: '分钟', minute: '分钟', seconds: '秒', second: '秒' },
+  ja: { hours: '時間', hour: '時間', minutes: '分', minute: '分', seconds: '秒', second: '秒' },
+  ko: { hours: '시간', hour: '시간', minutes: '분', minute: '분', seconds: '초', second: '초' },
+  fr: { hours: 'heures', hour: 'heure', minutes: 'minutes', minute: 'minute', seconds: 'secondes', second: 'seconde' },
+  de: { hours: 'Stunden', hour: 'Stunde', minutes: 'Minuten', minute: 'Minute', seconds: 'Sekunden', second: 'Sekunde' },
+  es: { hours: 'horas', hour: 'hora', minutes: 'minutos', minute: 'minuto', seconds: 'segundos', second: 'segundo' },
+  pt: { hours: 'horas', hour: 'hora', minutes: 'minutos', minute: 'minuto', seconds: 'segundos', second: 'segundo' },
+  it: { hours: 'ore', hour: 'ora', minutes: 'minuti', minute: 'minuto', seconds: 'secondi', second: 'secondo' },
+  ru: { hours: 'часов', hour: 'час', minutes: 'минут', minute: 'минута', seconds: 'секунд', second: 'секунда', hours_few: 'часа', minutes_few: 'минуты', seconds_few: 'секунды' },
+  ar: { hours: 'ساعات', hour: 'ساعة', minutes: 'دقائق', minute: 'دقيقة', seconds: 'ثواني', second: 'ثانية' },
+  th: { hours: 'ชั่วโมง', hour: 'ชั่วโมง', minutes: 'นาที', minute: 'นาที', seconds: 'วินาที', second: 'วินาที' },
+  id: { hours: 'jam', hour: 'jam', minutes: 'menit', minute: 'menit', seconds: 'detik', second: 'detik' },
+  ms: { hours: 'jam', hour: 'jam', minutes: 'minit', minute: 'minit', seconds: 'saat', second: 'saat' }
+};
 
 class LocalizationService {
   constructor() {
@@ -185,7 +296,299 @@ class LocalizationService {
     this.loadLocale(DEFAULT_LANGUAGE);
     console.log('[LOCALE] All locales reloaded');
   }
+
+  // ============================================================================
+  // LOCALE-AWARE FORMATTING FUNCTIONS
+  // ============================================================================
+
+  /**
+   * Get the full locale string for Intl API
+   * @param {string} lang - Language code
+   * @returns {string} - Full locale string (e.g., 'en-US')
+   */
+  getLocaleString(lang) {
+    return LOCALE_MAPPINGS[lang] || LOCALE_MAPPINGS[DEFAULT_LANGUAGE];
+  }
+
+  /**
+   * Format a number according to locale conventions
+   * @param {number} value - Number to format
+   * @param {string} lang - Language code
+   * @param {Object} options - Intl.NumberFormat options
+   * @returns {string} - Formatted number
+   */
+  formatNumber(value, lang = DEFAULT_LANGUAGE, options = {}) {
+    try {
+      const locale = this.getLocaleString(lang);
+      const formatter = new Intl.NumberFormat(locale, {
+        maximumFractionDigits: options.decimals ?? 2,
+        minimumFractionDigits: options.minDecimals ?? 0,
+        useGrouping: options.useGrouping !== false,
+        ...options
+      });
+      return formatter.format(value);
+    } catch (error) {
+      console.error(`[LOCALE] formatNumber error for ${lang}:`, error.message);
+      return String(value);
+    }
+  }
+
+  /**
+   * Format a date according to locale conventions
+   * @param {Date|string|number} date - Date to format
+   * @param {string} lang - Language code
+   * @param {string|Object} format - Format preset ('short', 'medium', 'long', 'full') or Intl options
+   * @returns {string} - Formatted date
+   */
+  formatDate(date, lang = DEFAULT_LANGUAGE, format = 'medium') {
+    try {
+      const locale = this.getLocaleString(lang);
+      const dateObj = date instanceof Date ? date : new Date(date);
+      
+      if (isNaN(dateObj.getTime())) {
+        return String(date);
+      }
+
+      let options;
+      if (typeof format === 'string') {
+        // Preset formats
+        switch (format) {
+          case 'short':
+            options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+            break;
+          case 'medium':
+            options = { year: 'numeric', month: 'short', day: 'numeric' };
+            break;
+          case 'long':
+            options = { year: 'numeric', month: 'long', day: 'numeric' };
+            break;
+          case 'full':
+            options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            break;
+          case 'time':
+            options = { hour: '2-digit', minute: '2-digit' };
+            break;
+          case 'datetime':
+            options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            break;
+          default:
+            options = { year: 'numeric', month: 'short', day: 'numeric' };
+        }
+      } else {
+        options = format;
+      }
+
+      const formatter = new Intl.DateTimeFormat(locale, options);
+      return formatter.format(dateObj);
+    } catch (error) {
+      console.error(`[LOCALE] formatDate error for ${lang}:`, error.message);
+      return String(date);
+    }
+  }
+
+  /**
+   * Format currency according to locale conventions
+   * @param {number} amount - Amount to format
+   * @param {string} lang - Language code
+   * @param {string} currency - Currency code (defaults to locale's currency)
+   * @returns {string} - Formatted currency
+   */
+  formatCurrency(amount, lang = DEFAULT_LANGUAGE, currency = null) {
+    try {
+      const locale = this.getLocaleString(lang);
+      const currencyCode = currency || DEFAULT_CURRENCIES[lang] || 'USD';
+      
+      const formatter = new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: currencyCode,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      });
+      
+      return formatter.format(amount);
+    } catch (error) {
+      console.error(`[LOCALE] formatCurrency error for ${lang}:`, error.message);
+      return `${amount} ${currency || 'USD'}`;
+    }
+  }
+
+  /**
+   * Format duration in human-readable form
+   * @param {number} seconds - Duration in seconds
+   * @param {string} lang - Language code
+   * @param {Object} options - Options { showSeconds: boolean, compact: boolean }
+   * @returns {string} - Formatted duration (e.g., "2 hours 30 minutes")
+   */
+  formatDuration(seconds, lang = DEFAULT_LANGUAGE, options = {}) {
+    try {
+      const { showSeconds = true, compact = false } = options;
+      const units = DURATION_UNITS[lang] || DURATION_UNITS[DEFAULT_LANGUAGE];
+      const parts = [];
+
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = Math.floor(seconds % 60);
+
+      if (hours > 0) {
+        const hourUnit = this._getDurationUnit(hours, 'hour', lang, units);
+        parts.push(compact ? `${hours}${units.hour.charAt(0)}` : `${hours} ${hourUnit}`);
+      }
+
+      if (minutes > 0) {
+        const minuteUnit = this._getDurationUnit(minutes, 'minute', lang, units);
+        parts.push(compact ? `${minutes}${units.minute.charAt(0)}` : `${minutes} ${minuteUnit}`);
+      }
+
+      if ((showSeconds && secs > 0) || parts.length === 0) {
+        const secondUnit = this._getDurationUnit(secs, 'second', lang, units);
+        parts.push(compact ? `${secs}${units.second.charAt(0)}` : `${secs} ${secondUnit}`);
+      }
+
+      return parts.join(' ');
+    } catch (error) {
+      console.error(`[LOCALE] formatDuration error for ${lang}:`, error.message);
+      return `${seconds}s`;
+    }
+  }
+
+  /**
+   * Get the correct duration unit based on count and language
+   * @private
+   */
+  _getDurationUnit(count, unit, lang, units) {
+    // For languages with simple plural (or no plural)
+    if (['vi', 'zh', 'ja', 'ko', 'th', 'id', 'ms'].includes(lang)) {
+      return units[unit];
+    }
+
+    // For Russian with complex plural
+    if (lang === 'ru') {
+      const pluralForm = PLURAL_RULES.ru(count);
+      if (pluralForm === 'one') return units[unit];
+      if (pluralForm === 'few') return units[`${unit}s_few`] || units[`${unit}s`];
+      return units[`${unit}s`];
+    }
+
+    // For other languages (simple one/other)
+    return count === 1 ? units[unit] : units[`${unit}s`];
+  }
+
+  /**
+   * Pluralize a translation key based on count
+   * @param {string} key - Base translation key (should have .zero, .one, .two, .few, .many, .other variants)
+   * @param {number} count - Count for pluralization
+   * @param {string} lang - Language code
+   * @param {Object} params - Additional interpolation parameters
+   * @returns {string} - Pluralized and translated string
+   */
+  pluralize(key, count, lang = DEFAULT_LANGUAGE, params = {}) {
+    try {
+      const pluralRule = PLURAL_RULES[lang] || PLURAL_RULES[DEFAULT_LANGUAGE];
+      const pluralForm = pluralRule(count);
+      
+      // Try specific plural form first, then fall back to 'other', then base key
+      const pluralKey = `${key}.${pluralForm}`;
+      const otherKey = `${key}.other`;
+      
+      let translation;
+      if (this.hasTranslation(pluralKey, lang)) {
+        translation = this.translate(pluralKey, lang, { count, ...params });
+      } else if (this.hasTranslation(otherKey, lang)) {
+        translation = this.translate(otherKey, lang, { count, ...params });
+      } else {
+        // Fall back to base key with count
+        translation = this.translate(key, lang, { count, ...params });
+      }
+      
+      return translation;
+    } catch (error) {
+      console.error(`[LOCALE] pluralize error for ${lang}:`, error.message);
+      return this.translate(key, lang, { count, ...params });
+    }
+  }
+
+  /**
+   * Format percentage according to locale
+   * @param {number} value - Value (0-100 or 0-1 based on isDecimal)
+   * @param {string} lang - Language code
+   * @param {Object} options - { isDecimal: boolean, decimals: number }
+   * @returns {string} - Formatted percentage
+   */
+  formatPercentage(value, lang = DEFAULT_LANGUAGE, options = {}) {
+    try {
+      const locale = this.getLocaleString(lang);
+      const { isDecimal = false, decimals = 0 } = options;
+      
+      const percentValue = isDecimal ? value : value / 100;
+      
+      const formatter = new Intl.NumberFormat(locale, {
+        style: 'percent',
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+      
+      return formatter.format(percentValue);
+    } catch (error) {
+      console.error(`[LOCALE] formatPercentage error for ${lang}:`, error.message);
+      return `${value}%`;
+    }
+  }
+
+  /**
+   * Get list of missing translation keys for a language compared to default
+   * @param {string} lang - Language code to check
+   * @returns {Array<string>} - List of missing keys
+   */
+  getMissingKeys(lang) {
+    this.loadLocale(lang);
+    this.loadLocale(DEFAULT_LANGUAGE);
+    
+    const defaultKeys = this._getAllKeys(this.locales[DEFAULT_LANGUAGE]);
+    const langKeys = new Set(this._getAllKeys(this.locales[lang] || {}));
+    
+    return defaultKeys.filter(key => !langKeys.has(key));
+  }
+
+  /**
+   * Get all keys from an object recursively
+   * @private
+   */
+  _getAllKeys(obj, prefix = '') {
+    const keys = [];
+    for (const [key, value] of Object.entries(obj)) {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        keys.push(...this._getAllKeys(value, fullKey));
+      } else {
+        keys.push(fullKey);
+      }
+    }
+    return keys;
+  }
+
+  /**
+   * Check if a language is supported
+   * @param {string} lang - Language code
+   * @returns {boolean}
+   */
+  isSupported(lang) {
+    return SUPPORTED_LANGUAGES.includes(lang);
+  }
+
+  /**
+   * Get supported languages list
+   * @returns {Array<string>}
+   */
+  getSupportedLanguages() {
+    return [...SUPPORTED_LANGUAGES];
+  }
 }
+
+// Export constants for external use
+module.exports.SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
+module.exports.LOCALE_MAPPINGS = LOCALE_MAPPINGS;
+module.exports.DEFAULT_CURRENCIES = DEFAULT_CURRENCIES;
+module.exports.PLURAL_RULES = PLURAL_RULES;
 
 // Export singleton instance
 module.exports = new LocalizationService();

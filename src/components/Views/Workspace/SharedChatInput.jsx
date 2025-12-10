@@ -70,7 +70,7 @@ const SharedChatInput = ({
   }
 
   return (
-    <div className="w-full max-w-3xl">
+    <div className="w-full">
       <div className={cn(
           "flex items-center gap-2 rounded-3xl py-2.5 px-4 min-h-12",
           "bg-bg-primary border border-border-hover",

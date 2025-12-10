@@ -90,8 +90,10 @@
   "ai_detection": {
     "title": "AIコンテンツ検出",
     "result_human": "このテキストは人間が書いたものと思われます",
-    "result_ai": "このテキストはAIによって生成されたものと思われます",
+    "result_mostly_human": "主に人間が書いたもので、わずかなAIパターンあり",
     "result_mixed": "このテキストは混合シグナルを示しています（AI支援の可能性あり）",
+    "result_likely_ai": "このテキストはAI生成の可能性が高い",
+    "result_ai": "このテキストはAIによって生成されたものと思われます",
     "result_uncertain": "確信を持って判定できません",
     "evidence_title": "根拠",
     "human_indicators_title": "人間らしさの指標",
@@ -123,7 +125,8 @@
     "change_type_vocabulary": "語彙の調整",
     "change_type_structure": "構造の修正",
     "change_type_tone": "トーンの調整",
-    "change_type_flow": "流れの改善"
+    "change_type_flow": "流れの改善",
+    "job_started": "ヒューマナイズジョブを開始しました"
   },
 
   "errors": {
@@ -153,7 +156,38 @@
     "auth_required": "認証が必要です",
     "session_expired": "セッションの有効期限が切れました。再度ログインしてください。",
     "invalid_token": "無効な認証トークンです",
-    "token_expired": "認証トークンの有効期限が切れました"
+    "token_expired": "認証トークンの有効期限が切れました",
+    "friendly": {
+      "timeout": "リクエストに予想以上の時間がかかっています。もう一度お試しください。",
+      "temporary_issue": "一時的な問題が発生しています。しばらくしてからもう一度お試しください。",
+      "connection": "接続の問題が検出されました。インターネット接続を確認してもう一度お試しください。",
+      "auth_required": "続行するにはログインしてください。",
+      "session_expired": "セッションの有効期限が切れました。続行するには再度ログインしてください。",
+      "forbidden": "この操作を実行する権限がありません。",
+      "too_many_requests": "リクエストが多すぎます。{{seconds}}秒お待ちください。",
+      "service_busy": "サービスが混雑しています。{{seconds}}秒後にもう一度お試しください。",
+      "insufficient_credits": "{{required}}クレジットが必要ですが、{{available}}しかありません。続行するにはクレジットを購入してください。",
+      "invalid_input": "入力された情報が無効です。確認してもう一度お試しください。",
+      "file_too_large": "ファイルが大きすぎます。小さいファイルをお使いください。",
+      "invalid_file_type": "このファイル形式はサポートされていません。別の形式をお使いください。",
+      "not_found": "お探しのアイテムが見つかりませんでした。",
+      "generic": "問題が発生しました。もう一度お試しください。"
+    }
+  },
+
+  "actions": {
+    "try_again": "再試行",
+    "try_again_later": "後で再試行",
+    "check_connection": "接続を確認",
+    "sign_in": "ログイン",
+    "sign_in_again": "再度ログイン",
+    "contact_support": "サポートに連絡",
+    "wait_and_retry": "待ってから再試行",
+    "purchase_credits": "クレジットを購入",
+    "check_input": "入力を確認",
+    "reduce_file_size": "小さいファイルを使用",
+    "check_file_type": "サポートされている形式を使用",
+    "go_back": "戻る"
   },
 
   "success": {
@@ -177,9 +211,7 @@
     "purchase_success": "{{amount}}クレジットを正常に購入しました",
     "deducted": "{{action}}のために{{amount}}クレジットが差し引かれました",
     "insufficient": "クレジットが不足しています。{{required}}クレジット必要ですが、{{available}}しかありません。",
-    "free_tier": "無料プラン：{{used}}/{{limit}}回の分析を使用済み",
-    "unlimited": "無制限プランが有効です",
-    "expires": "クレジットの有効期限：{{date}}"
+    "free_tier": "無料プラン：{{used}}/{{limit}}回の分析を使用済み"
   },
 
   "notifications": {

@@ -156,7 +156,38 @@
     "auth_required": "Authentication required",
     "session_expired": "Session has expired. Please login again.",
     "invalid_token": "Invalid authentication token",
-    "token_expired": "Authentication token has expired"
+    "token_expired": "Authentication token has expired",
+    "friendly": {
+      "timeout": "The request is taking longer than expected. Please try again.",
+      "temporary_issue": "We're experiencing temporary issues. Please try again in a moment.",
+      "connection": "Connection issue detected. Please check your internet and try again.",
+      "auth_required": "Please sign in to continue.",
+      "session_expired": "Your session has expired. Please sign in again to continue.",
+      "forbidden": "You don't have permission to perform this action.",
+      "too_many_requests": "You're sending too many requests. Please wait {{seconds}} seconds.",
+      "service_busy": "Our service is currently busy. Please try again in {{seconds}} seconds.",
+      "insufficient_credits": "You need {{required}} credits but only have {{available}}. Please purchase more credits to continue.",
+      "invalid_input": "The information you provided is not valid. Please check and try again.",
+      "file_too_large": "The file is too large. Please use a smaller file.",
+      "invalid_file_type": "This file type is not supported. Please use a different file format.",
+      "not_found": "The item you're looking for could not be found.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+
+  "actions": {
+    "try_again": "Try again",
+    "try_again_later": "Try again later",
+    "check_connection": "Check your connection",
+    "sign_in": "Sign in",
+    "sign_in_again": "Sign in again",
+    "contact_support": "Contact support",
+    "wait_and_retry": "Wait and try again",
+    "purchase_credits": "Purchase credits",
+    "check_input": "Check your input",
+    "reduce_file_size": "Use a smaller file",
+    "check_file_type": "Use a supported file type",
+    "go_back": "Go back"
   },
 
   "success": {
@@ -180,9 +211,7 @@
     "purchase_success": "Successfully purchased {{amount}} credits",
     "deducted": "{{amount}} credits deducted for {{action}}",
     "insufficient": "Insufficient credits. You need {{required}} credits but have {{available}}.",
-    "free_tier": "Free tier: {{used}}/{{limit}} analyses used",
-    "unlimited": "Unlimited plan active",
-    "expires": "Credits expire on {{date}}"
+    "free_tier": "Free tier: {{used}}/{{limit}} analyses used"
   },
 
   "notifications": {

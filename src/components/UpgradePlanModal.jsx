@@ -1,23 +1,78 @@
 /**
  * UpgradePlanModal Component
  * Uses TanStack Query for packages fetching and checkout
+ * Includes first purchase bonus (x2 credits) for new members
+ * Displays local currency estimates based on user's language
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { usePayment } from '../contexts/PaymentContext';
 import { usePackages, useCreateCheckout } from '@/hooks/queries';
 import { useToasts } from '@/stores/uiStore';
+import { useUser } from '@/stores/authStore';
 import { cn } from '../lib/utils';
+
+// Currency mapping by language code with exchange rates (approximate, updated periodically)
+const CURRENCY_CONFIG = {
+  vi: { currency: 'VND', rate: 25400, symbol: '₫', position: 'after', largeNumber: true },
+  ja: { currency: 'JPY', rate: 154, symbol: '¥', position: 'before', largeNumber: false },
+  ko: { currency: 'KRW', rate: 1380, symbol: '₩', position: 'before', largeNumber: true },
+  zh: { currency: 'CNY', rate: 7.25, symbol: '¥', position: 'before', largeNumber: false },
+  'zh-CN': { currency: 'CNY', rate: 7.25, symbol: '¥', position: 'before', largeNumber: false },
+  th: { currency: 'THB', rate: 35.5, symbol: '฿', position: 'before', largeNumber: false },
+  id: { currency: 'IDR', rate: 16200, symbol: 'Rp', position: 'before', largeNumber: true },
+  hi: { currency: 'INR', rate: 84, symbol: '₹', position: 'before', largeNumber: false },
+  ru: { currency: 'RUB', rate: 103, symbol: '₽', position: 'after', largeNumber: false },
+  ar: { currency: 'SAR', rate: 3.75, symbol: 'ر.س', position: 'after', largeNumber: false },
+  de: { currency: 'EUR', rate: 0.92, symbol: '€', position: 'after', largeNumber: false },
+  fr: { currency: 'EUR', rate: 0.92, symbol: '€', position: 'after', largeNumber: false },
+  es: { currency: 'EUR', rate: 0.92, symbol: '€', position: 'after', largeNumber: false },
+  it: { currency: 'EUR', rate: 0.92, symbol: '€', position: 'after', largeNumber: false },
+  pt: { currency: 'BRL', rate: 6.1, symbol: 'R$', position: 'before', largeNumber: false },
+  en: null, // USD - no conversion needed
+};
+
+/**
+ * Format local currency with smart display for large numbers
+ * For currencies like VND, IDR, KRW - shows abbreviated format with smaller trailing zeros
+ */
+const formatLocalCurrency = (usdPrice, langCode) => {
+  const config = CURRENCY_CONFIG[langCode];
+  if (!config) return null;
+  
+  const localPrice = Math.round(usdPrice * config.rate);
+  
+  let formattedPrice;
+  if (config.largeNumber) {
+    // For large number currencies (VND, IDR, KRW)
+    // Round to nearest thousand for cleaner display
+    const roundedPrice = Math.round(localPrice / 1000) * 1000;
+    const mainPart = Math.floor(roundedPrice / 1000);
+    formattedPrice = { main: mainPart.toLocaleString(), suffix: '.000' };
+  } else {
+    formattedPrice = { main: localPrice.toLocaleString(), suffix: '' };
+  }
+  
+  return {
+    ...config,
+    price: localPrice,
+    formatted: formattedPrice
+  };
+};
 
 const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
   const { t } = useTranslation();
   const [loadingPackageId, setLoadingPackageId] = useState(null);
   const { startPolling } = usePayment();
   const { showError } = useToasts();
+  const user = useUser();
+  const userId = user?.userId || user?.id;
 
-  // TanStack Query hooks
-  const { data: packages = [], isLoading: packagesLoading } = usePackages();
+  // TanStack Query hooks - pass userId to check first purchase eligibility
+  const { data: packagesData, isLoading: packagesLoading } = usePackages(userId);
+  const packages = packagesData?.packages || [];
+  const isFirstPurchaseEligible = packagesData?.isFirstPurchaseEligible || false;
   const createCheckout = useCreateCheckout();
 
   useEffect(() => {
@@ -57,8 +112,44 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
     }
   };
 
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language?.split('-')[0] || 'en';
+  
+  // Check if we should show local currency
+  const showLocalCurrency = useMemo(() => {
+    return currentLang !== 'en' && CURRENCY_CONFIG[currentLang];
+  }, [currentLang]);
+
   const formatPrice = (price) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(price);
   const getBonusPercent = (pkg) => pkg.bonus > 0 ? Math.round((pkg.bonus / pkg.credits) * 100) : null;
+  
+  // Format local price with smart display
+  const renderLocalPrice = (usdPrice, isLarge = false) => {
+    const localData = formatLocalCurrency(usdPrice, i18n.language) || formatLocalCurrency(usdPrice, currentLang);
+    if (!localData) return null;
+    
+    const { symbol, position, formatted } = localData;
+    
+    if (isLarge) {
+      return (
+        <span className="text-2xl font-bold text-text-primary tracking-tight max-sm:text-xl">
+          ~{position === 'before' && symbol}
+          {formatted.main}
+          {formatted.suffix && <span className="text-base opacity-60">{formatted.suffix}</span>}
+          {position === 'after' && symbol}
+        </span>
+      );
+    }
+    
+    return (
+      <span className="text-xs text-text-muted">
+        ~{position === 'before' && symbol}
+        {formatted.main}
+        {formatted.suffix && <span className="text-[10px] opacity-70">{formatted.suffix}</span>}
+        {position === 'after' && symbol}
+      </span>
+    );
+  };
 
   if (!isOpen) return null;
 
@@ -114,6 +205,20 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
           </div>
         )}
 
+        {/* First Purchase Banner */}
+        {isFirstPurchaseEligible && (
+          <div className="mx-6 mb-2 p-3 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border border-amber-500/30 rounded-xl">
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-xl">🎉</span>
+              <div className="text-center">
+                <span className="text-sm font-bold text-amber-400">{t('billing.firstPurchaseTitle', 'WELCOME OFFER')}</span>
+                <span className="text-sm text-amber-300/90 ml-2">{t('billing.firstPurchaseDesc', 'Double credits on your first purchase!')}</span>
+              </div>
+              <span className="text-xl">🎁</span>
+            </div>
+          </div>
+        )}
+
         {/* Content */}
         <div className="p-6 overflow-y-auto flex-1 max-sm:p-3.5">
           {packagesLoading ? (
@@ -124,20 +229,32 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
             <div className="grid grid-cols-4 gap-3.5 max-[900px]:grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2.5">
               {packages.map((pkg) => {
                 const bonusPercent = getBonusPercent(pkg);
+                const displayCredits = isFirstPurchaseEligible ? pkg.totalWithFirstPurchase : pkg.totalCredits;
                 return (
                   <div
                     key={pkg.id}
                     className={cn(
                       "bg-bg-secondary border border-border-light rounded-xl py-5 px-4 flex flex-col items-center relative",
                       "transition-colors hover:border-border-hover",
-                      pkg.popular && "border-primary/30",
+                      isFirstPurchaseEligible && "border-amber-500/30",
                       "max-sm:flex-row max-sm:flex-wrap max-sm:p-3.5 max-sm:gap-2.5"
                     )}
                   >
-                    {pkg.popular && (
+                    {/* First Purchase x2 Badge */}
+                    {isFirstPurchaseEligible && (
+                      <div className={cn(
+                        "absolute -top-2.5 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-none",
+                        "py-1 px-2 rounded-lg text-xs font-bold uppercase tracking-wide shadow-lg",
+                        "max-sm:static max-sm:order-[-1]"
+                      )}>
+                        x2
+                      </div>
+                    )}
+                    
+                    {pkg.popular && !isFirstPurchaseEligible && (
                       <div className={cn(
                         "absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-white border-none",
-                        "py-1 px-2.5 rounded text-xs font-semibold flex items-center gap-1 uppercase tracking-wide",
+                        "py-1 px-2.5 rounded-lg text-xs font-semibold flex items-center gap-1 uppercase tracking-wide",
                         "max-sm:static max-sm:translate-x-0 max-sm:w-full max-sm:justify-center max-sm:order-[-1] max-sm:mb-1"
                       )}>
                         <img src="/icon/tags.svg" alt="" className="w-3 h-3 brightness-0 invert" />
@@ -156,25 +273,46 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                     </div>
 
                     <div className="text-center mb-3.5 max-sm:mb-0">
-                      <span className="text-2xl font-bold text-text-primary tracking-tight max-sm:text-xl">{formatPrice(pkg.price)}</span>
+                      {showLocalCurrency ? (
+                        renderLocalPrice(pkg.price, true)
+                      ) : (
+                        <span className="text-2xl font-bold text-text-primary tracking-tight max-sm:text-xl">{formatPrice(pkg.price)}</span>
+                      )}
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5 mb-2.5 max-sm:flex-row max-sm:w-full max-sm:justify-between max-sm:mb-1.5">
                       <div className="flex items-center gap-1.5 text-text-primary">
                         <img src="/icon/coins.svg" alt="" className="w-3.5 h-3.5 opacity-60 icon-invert" />
-                        <strong className="text-base font-semibold">{pkg.totalCredits.toLocaleString()}</strong>
+                        {isFirstPurchaseEligible ? (
+                          <>
+                            <span className="text-xs text-text-muted line-through">{pkg.totalCredits.toLocaleString()}</span>
+                            <strong className="text-base font-semibold text-amber-400">{displayCredits.toLocaleString()}</strong>
+                          </>
+                        ) : (
+                          <strong className="text-base font-semibold">{displayCredits.toLocaleString()}</strong>
+                        )}
                         <span className="text-sm text-text-secondary">{t('billing.credits')}</span>
                       </div>
-                      {bonusPercent && (
+                      {isFirstPurchaseEligible ? (
+                        <div className="inline-flex items-center gap-1 py-0.5 px-2 bg-amber-500/20 rounded text-xs font-semibold text-amber-400">
+                          <span>+{pkg.firstPurchaseBonus?.toLocaleString()} {t('billing.bonus')}</span>
+                        </div>
+                      ) : bonusPercent ? (
                         <div className="inline-flex items-center gap-1 py-0.5 px-2 bg-success/10 rounded text-xs font-semibold text-success">
                           <img src="/icon/gift.svg" alt="" className="w-icon-2xs h-icon-2xs" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(70%) saturate(459%) hue-rotate(93deg) brightness(95%) contrast(92%)' }} />
                           <span>+{bonusPercent}% {t('billing.bonus')}</span>
                         </div>
-                      )}
+                      ) : null}
                     </div>
 
                     <div className="text-center mb-3.5 max-sm:hidden">
-                      <span className="text-xs text-text-muted">{formatPrice(pkg.price / pkg.totalCredits)}{t('billing.perCredit')}</span>
+                      {showLocalCurrency ? (
+                        <span className="text-xs text-text-muted">
+                          {renderLocalPrice(pkg.price / pkg.totalCredits)}{t('billing.perCredit')}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-text-muted">{formatPrice(pkg.price / pkg.totalCredits)}{t('billing.perCredit')}</span>
+                      )}
                     </div>
 
                     <button

@@ -156,7 +156,38 @@
     "auth_required": "Yêu cầu xác thực",
     "session_expired": "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.",
     "invalid_token": "Mã xác thực không hợp lệ",
-    "token_expired": "Mã xác thực đã hết hạn"
+    "token_expired": "Mã xác thực đã hết hạn",
+    "friendly": {
+      "timeout": "Yêu cầu đang mất nhiều thời gian hơn dự kiến. Vui lòng thử lại nhé.",
+      "temporary_issue": "Chúng tôi đang gặp sự cố tạm thời. Vui lòng thử lại sau giây lát.",
+      "connection": "Phát hiện sự cố kết nối. Vui lòng kiểm tra internet và thử lại.",
+      "auth_required": "Vui lòng đăng nhập để tiếp tục.",
+      "session_expired": "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.",
+      "forbidden": "Bạn không có quyền thực hiện thao tác này.",
+      "too_many_requests": "Bạn đang gửi quá nhiều yêu cầu. Vui lòng đợi {{seconds}} giây nhé.",
+      "service_busy": "Dịch vụ đang bận. Vui lòng thử lại sau {{seconds}} giây.",
+      "insufficient_credits": "Bạn cần {{required}} credits nhưng chỉ còn {{available}}. Vui lòng nạp thêm để tiếp tục.",
+      "invalid_input": "Thông tin bạn cung cấp không hợp lệ. Vui lòng kiểm tra và thử lại.",
+      "file_too_large": "Tệp quá lớn. Vui lòng sử dụng tệp nhỏ hơn.",
+      "invalid_file_type": "Loại tệp này không được hỗ trợ. Vui lòng sử dụng định dạng khác.",
+      "not_found": "Không tìm thấy mục bạn đang tìm kiếm.",
+      "generic": "Đã có lỗi xảy ra. Vui lòng thử lại nhé."
+    }
+  },
+
+  "actions": {
+    "try_again": "Thử lại",
+    "try_again_later": "Thử lại sau",
+    "check_connection": "Kiểm tra kết nối",
+    "sign_in": "Đăng nhập",
+    "sign_in_again": "Đăng nhập lại",
+    "contact_support": "Liên hệ hỗ trợ",
+    "wait_and_retry": "Đợi và thử lại",
+    "purchase_credits": "Nạp thêm credits",
+    "check_input": "Kiểm tra thông tin",
+    "reduce_file_size": "Dùng tệp nhỏ hơn",
+    "check_file_type": "Dùng định dạng được hỗ trợ",
+    "go_back": "Quay lại"
   },
 
   "success": {
@@ -180,9 +211,7 @@
     "purchase_success": "Đã mua thành công {{amount}} tín dụng",
     "deducted": "Đã trừ {{amount}} tín dụng cho {{action}}",
     "insufficient": "Không đủ tín dụng. Bạn cần {{required}} tín dụng nhưng chỉ có {{available}}.",
-    "free_tier": "Gói miễn phí: Đã sử dụng {{used}}/{{limit}} lần phân tích",
-    "unlimited": "Gói không giới hạn đang hoạt động",
-    "expires": "Tín dụng hết hạn vào {{date}}"
+    "free_tier": "Gói miễn phí: Đã sử dụng {{used}}/{{limit}} lần phân tích"
   },
 
   "notifications": {

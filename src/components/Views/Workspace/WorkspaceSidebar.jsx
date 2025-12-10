@@ -152,10 +152,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
         </button>
       </div>
 
-      <div className={cn(
-        "flex-1 overflow-y-auto p-4 flex flex-col gap-5",
-        "scrollbar-hidden"
-      )}>
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-5 scrollbar-none">
         <ProfileSelector currentProfile={currentProfile} onProfileSelect={handleProfileSelect} />
         <ModelSelector selectedModel={modelSettings.model || 'gemini-2.0-flash-exp'} onModelSelect={handleModelSelect} />
 

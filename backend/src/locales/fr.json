@@ -90,8 +90,10 @@
   "ai_detection": {
     "title": "Détection de contenu IA",
     "result_human": "Ce texte semble avoir été écrit par un humain",
-    "result_ai": "Ce texte semble être généré par une IA",
+    "result_mostly_human": "Principalement écrit par un humain avec quelques traces d'IA",
     "result_mixed": "Ce texte montre des signaux mixtes (possiblement assisté par IA)",
+    "result_likely_ai": "Ce texte est probablement généré par une IA",
+    "result_ai": "Ce texte semble être généré par une IA",
     "result_uncertain": "Impossible de déterminer avec certitude",
     "evidence_title": "Preuves",
     "human_indicators_title": "Indicateurs humains",
@@ -123,7 +125,8 @@
     "change_type_vocabulary": "Ajustement du vocabulaire",
     "change_type_structure": "Modification de la structure",
     "change_type_tone": "Ajustement du ton",
-    "change_type_flow": "Amélioration du flux"
+    "change_type_flow": "Amélioration du flux",
+    "job_started": "Tâche d'humanisation démarrée"
   },
 
   "errors": {
@@ -153,7 +156,38 @@
     "auth_required": "Authentification requise",
     "session_expired": "La session a expiré. Veuillez vous reconnecter.",
     "invalid_token": "Jeton d'authentification invalide",
-    "token_expired": "Le jeton d'authentification a expiré"
+    "token_expired": "Le jeton d'authentification a expiré",
+    "friendly": {
+      "timeout": "La demande prend plus de temps que prévu. Veuillez réessayer.",
+      "temporary_issue": "Nous rencontrons des problèmes temporaires. Veuillez réessayer dans un moment.",
+      "connection": "Problème de connexion détecté. Veuillez vérifier votre internet et réessayer.",
+      "auth_required": "Veuillez vous connecter pour continuer.",
+      "session_expired": "Votre session a expiré. Veuillez vous reconnecter pour continuer.",
+      "forbidden": "Vous n'avez pas la permission d'effectuer cette action.",
+      "too_many_requests": "Vous envoyez trop de demandes. Veuillez attendre {{seconds}} secondes.",
+      "service_busy": "Notre service est actuellement occupé. Veuillez réessayer dans {{seconds}} secondes.",
+      "insufficient_credits": "Vous avez besoin de {{required}} crédits mais n'en avez que {{available}}. Veuillez acheter plus de crédits pour continuer.",
+      "invalid_input": "Les informations fournies ne sont pas valides. Veuillez vérifier et réessayer.",
+      "file_too_large": "Le fichier est trop volumineux. Veuillez utiliser un fichier plus petit.",
+      "invalid_file_type": "Ce type de fichier n'est pas pris en charge. Veuillez utiliser un autre format.",
+      "not_found": "L'élément que vous recherchez est introuvable.",
+      "generic": "Une erreur s'est produite. Veuillez réessayer."
+    }
+  },
+
+  "actions": {
+    "try_again": "Réessayer",
+    "try_again_later": "Réessayer plus tard",
+    "check_connection": "Vérifier la connexion",
+    "sign_in": "Se connecter",
+    "sign_in_again": "Se reconnecter",
+    "contact_support": "Contacter le support",
+    "wait_and_retry": "Attendre et réessayer",
+    "purchase_credits": "Acheter des crédits",
+    "check_input": "Vérifier les informations",
+    "reduce_file_size": "Utiliser un fichier plus petit",
+    "check_file_type": "Utiliser un format pris en charge",
+    "go_back": "Retour"
   },
 
   "success": {
@@ -177,9 +211,7 @@
     "purchase_success": "Achat de {{amount}} crédits réussi",
     "deducted": "{{amount}} crédits déduits pour {{action}}",
     "insufficient": "Crédits insuffisants. Vous avez besoin de {{required}} crédits mais vous en avez {{available}}.",
-    "free_tier": "Niveau gratuit : {{used}}/{{limit}} analyses utilisées",
-    "unlimited": "Plan illimité actif",
-    "expires": "Les crédits expirent le {{date}}"
+    "free_tier": "Niveau gratuit : {{used}}/{{limit}} analyses utilisées"
   },
 
   "notifications": {

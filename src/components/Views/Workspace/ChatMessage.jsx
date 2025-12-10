@@ -54,7 +54,7 @@ const ChatMessage = ({ message }) => {
             "py-3 px-4 rounded-2xl break-words",
             "bg-bg-secondary border border-border-light"
           )}>
-            <p className="m-0 leading-relaxed text-sm whitespace-pre-wrap text-text-primary">
+            <p className="m-0 leading-[1.6] text-base whitespace-pre-wrap text-text-primary">
               {message.content}
             </p>
             
@@ -93,7 +93,7 @@ const ChatMessage = ({ message }) => {
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2.5">
                     <Icon name={getErrorIcon().replace('/icon/', '').replace('.svg', '')} size="md" color="error" className="shrink-0" />
-                    <span className="text-sm leading-relaxed text-error">
+                    <span className="text-base leading-[1.6] text-error">
                       {message.content}
                     </span>
                   </div>
@@ -117,23 +117,25 @@ const ChatMessage = ({ message }) => {
             ) : (
               <>
                 <div className={cn(
-                  "text-sm leading-relaxed text-text-primary",
+                  "text-base leading-[1.6] text-text-primary",
                   "will-change-contents",
                   "[contain:layout_style]",
                   "[-webkit-font-smoothing:antialiased]",
                   "[-moz-osx-font-smoothing:grayscale]",
                   "[text-rendering:optimizeSpeed]",
-                  // Markdown styles
-                  "[&_p]:m-0 [&_p]:mb-2 [&_p:last-child]:mb-0",
-                  "[&_code]:bg-bg-tertiary [&_code]:py-0.5 [&_code]:px-1.5 [&_code]:rounded [&_code]:font-mono [&_code]:text-sm",
-                  "[&_pre]:bg-bg-tertiary [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-2",
+                  // Markdown styles - matching AI Studio TiptapEditor
+                  "[&_p]:m-0 [&_p]:mb-4 [&_p:last-child]:mb-0",
+                  "[&_code]:bg-bg-secondary [&_code]:py-0.5 [&_code]:px-1.5 [&_code]:rounded [&_code]:font-mono [&_code]:text-[0.875em]",
+                  "[&_pre]:bg-bg-secondary [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-4",
                   "[&_pre_code]:bg-transparent [&_pre_code]:p-0",
                   "[&_ul]:my-2 [&_ul]:pl-6 [&_ol]:my-2 [&_ol]:pl-6",
                   "[&_li]:my-1",
                   "[&_strong]:font-semibold",
                   "[&_em]:italic",
-                  "[&_a]:underline",
-                  "[&_blockquote]:border-l-4 [&_blockquote]:border-border-light [&_blockquote]:pl-3 [&_blockquote]:my-2"
+                  "[&_a]:text-primary [&_a]:underline",
+                  "[&_blockquote]:border-l-3 [&_blockquote]:border-primary [&_blockquote]:pl-4 [&_blockquote]:my-4 [&_blockquote]:text-text-secondary [&_blockquote]:italic",
+                  // Hide horizontal rules (---) from AI responses
+                  "[&_hr]:hidden"
                 )}>
                   <ReactMarkdown>{message.content}</ReactMarkdown>
                 </div>

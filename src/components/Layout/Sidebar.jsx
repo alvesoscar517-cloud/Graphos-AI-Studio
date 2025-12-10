@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { useUser } from '../../stores/authStore'
 import { useNotes } from '../../contexts/NotesContext'
+import { useWorkspace } from '../../contexts/WorkspaceContext'
 import { useUnreadCount } from '../../stores/notificationStore'
 import { truncateTitleByWords } from '../../utils/titleUtils'
 import { cn } from '../../lib/utils'
@@ -27,33 +28,75 @@ const NotificationBadge = () => {
 }
 
 
+const MAX_VISIBLE_ITEMS = 5
+
 const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
   const { t } = useTranslation()
   const user = useUser() // Use Zustand store directly
   const { getVisibleNotes, loadNote, deleteNote, currentNote } = useNotes()
+  const { conversations, loadConversation, deleteConversation, currentConversation } = useWorkspace()
   const [showNotifications, setShowNotifications] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showUserProfile, setShowUserProfile] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
 
-  const visibleNotes = getVisibleNotes()
   const truncateTitle = (title) => truncateTitleByWords(title, 7)
 
-  const handleNoteClick = (note) => {
-    loadNote(note.id)
-    onViewChange('aistudio-editor')
+  // Combine notes and conversations into a single list sorted by updated time
+  const recentItems = useMemo(() => {
+    const visibleNotes = getVisibleNotes()
+    
+    // Map notes to unified format
+    const noteItems = visibleNotes.map(note => ({
+      id: note.id,
+      title: note.title,
+      updated: new Date(note.updated),
+      type: 'note', // AI Studio note
+      source: 'aistudio'
+    }))
+
+    // Map conversations to unified format (only those with content)
+    const conversationItems = conversations
+      .filter(conv => conv.messages?.length > 0 || (conv.title && conv.title !== 'New Chat'))
+      .map(conv => ({
+        id: conv.id,
+        title: conv.title || 'New Chat',
+        updated: new Date(conv.updated || conv.created),
+        type: 'chat', // AI Workspace conversation
+        source: 'workspace'
+      }))
+
+    // Combine and sort by updated time (most recent first)
+    const combined = [...noteItems, ...conversationItems]
+      .sort((a, b) => b.updated - a.updated)
+      .slice(0, MAX_VISIBLE_ITEMS)
+
+    return combined
+  }, [getVisibleNotes, conversations])
+
+  const handleItemClick = (item) => {
+    if (item.source === 'aistudio') {
+      loadNote(item.id)
+      onViewChange('aistudio-editor')
+    } else if (item.source === 'workspace') {
+      loadConversation(item.id)
+      onViewChange('workspace')
+    }
   }
 
-  const handleDeleteNote = async (e, noteId) => {
+  const handleDeleteItem = async (e, item) => {
     e.stopPropagation()
-    const note = visibleNotes.find(n => n.id === noteId)
     const confirmed = await modal.confirm(
-      t('sidebar.confirmDeleteNote', { title: note?.title }),
+      t('sidebar.confirmDeleteNote', { title: item.title }),
       t('sidebar.confirmDelete'),
       { confirmText: t('common.delete'), danger: true }
     )
     if (confirmed) {
-      deleteNote(noteId)
+      if (item.source === 'aistudio') {
+        deleteNote(item.id)
+      } else if (item.source === 'workspace') {
+        deleteConversation(item.id)
+      }
       modal.toast(t('sidebar.noteDeleted'), '', 'success')
     }
   }
@@ -108,7 +151,7 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
         </a>
 
         {(() => {
-          const isAIStudioActive = currentView === 'aistudio-editor' && (!currentNote || !visibleNotes.some(n => n.id === currentNote?.id));
+          const isAIStudioActive = currentView === 'aistudio-editor' && (!currentNote || !recentItems.some(item => item.source === 'aistudio' && item.id === currentNote?.id));
           return (
             <a href="#" className={cn(
               "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
@@ -123,16 +166,23 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
           );
         })()}
 
-        <a href="#" className={cn(
-          "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
-          "text-text-primary text-body cursor-pointer relative my-0.5",
-          "transition-all duration-200",
-          "focus:outline-none hover:bg-fill-tertiary", 
-          currentView === 'workspace' && "bg-fill-secondary"
-        )} onClick={(e) => { e.preventDefault(); onViewChange('workspace') }}>
-          <Icon name="message-square" alt={t('nav.aiWorkspace')} size="lg" />
-          <span>{t('nav.aiWorkspace')}</span>
-        </a>
+        {(() => {
+          // AI Workspace is active only when in workspace view AND no conversation from history is selected
+          const isWorkspaceActive = currentView === 'workspace' && 
+            (!currentConversation || !recentItems.some(item => item.source === 'workspace' && item.id === currentConversation?.id));
+          return (
+            <a href="#" className={cn(
+              "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
+              "text-text-primary text-body cursor-pointer relative my-0.5",
+              "transition-all duration-200",
+              "focus:outline-none hover:bg-fill-tertiary", 
+              isWorkspaceActive && "bg-fill-secondary"
+            )} onClick={(e) => { e.preventDefault(); onViewChange('workspace') }}>
+              <Icon name="message-square" alt={t('nav.aiWorkspace')} size="lg" />
+              <span>{t('nav.aiWorkspace')}</span>
+            </a>
+          );
+        })()}
 
         <div className="flex items-center gap-3 py-2.5 px-3 mt-1 text-text-secondary text-body">
           <Icon name="clock" alt="History" size="lg" color="muted" />
@@ -140,25 +190,40 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
         </div>
 
         <div className="mb-0.5 pl-0 bg-transparent" id="notesList">
-          {visibleNotes.map(note => (
-            <div key={note.id} className={cn(
-              "cursor-pointer relative flex items-center justify-between gap-2",
-              "py-2.5 px-3 my-0.5 rounded-2xl bg-transparent transition-all duration-200",
-              "text-body leading-snug group hover:bg-fill-tertiary",
-              currentNote?.id === note.id && currentView === 'aistudio-editor' && "bg-fill-tertiary"
-            )} onClick={() => handleNoteClick(note)}>
-              <span className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis text-body text-text-secondary leading-tight font-normal">
-                {truncateTitle(note.title)}
-              </span>
-              <button className={cn(
-                "bg-transparent border-none p-1 cursor-pointer rounded-sm",
-                "opacity-0 invisible shrink-0 transition-all duration-150",
-                "group-hover:opacity-60 group-hover:visible hover:!opacity-100 hover:bg-fill-secondary"
-              )} onClick={(e) => handleDeleteNote(e, note.id)}>
-                <Icon name="trash" alt={t('common.delete')} size="sm" />
-              </button>
-            </div>
-          ))}
+          {recentItems.map(item => {
+            const isActive = item.source === 'aistudio' 
+              ? (currentNote?.id === item.id && currentView === 'aistudio-editor')
+              : (currentConversation?.id === item.id && currentView === 'workspace')
+            
+            return (
+              <div key={`${item.source}-${item.id}`} className={cn(
+                "cursor-pointer relative flex items-center justify-between gap-2",
+                "py-2.5 px-3 my-0.5 rounded-2xl bg-transparent transition-all duration-200",
+                "text-body leading-snug group hover:bg-fill-tertiary",
+                isActive && "bg-fill-tertiary"
+              )} onClick={() => handleItemClick(item)}>
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <Icon 
+                    name={item.source === 'workspace' ? 'message-square' : 'file-text'} 
+                    alt={item.source === 'workspace' ? t('nav.aiWorkspace') : t('nav.aiStudio')} 
+                    size="sm" 
+                    color="muted"
+                    className="shrink-0"
+                  />
+                  <span className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis text-body text-text-secondary leading-tight font-normal">
+                    {truncateTitle(item.title)}
+                  </span>
+                </div>
+                <button className={cn(
+                  "bg-transparent border-none p-1 cursor-pointer rounded-sm",
+                  "opacity-0 invisible shrink-0 transition-all duration-150",
+                  "group-hover:opacity-60 group-hover:visible hover:!opacity-100 hover:bg-fill-secondary"
+                )} onClick={(e) => handleDeleteItem(e, item)}>
+                  <Icon name="trash" alt={t('common.delete')} size="sm" />
+                </button>
+              </div>
+            )
+          })}
         </div>
 
         <a href="#" className={cn(

@@ -90,8 +90,10 @@
   "ai_detection": {
     "title": "KI-Inhaltserkennung",
     "result_human": "Dieser Text scheint von einem Menschen geschrieben zu sein",
-    "result_ai": "Dieser Text scheint KI-generiert zu sein",
+    "result_mostly_human": "Hauptsächlich von Menschen geschrieben mit geringen KI-Mustern",
     "result_mixed": "Dieser Text zeigt gemischte Signale (möglicherweise KI-unterstützt)",
+    "result_likely_ai": "Dieser Text ist wahrscheinlich KI-generiert",
+    "result_ai": "Dieser Text scheint KI-generiert zu sein",
     "result_uncertain": "Kann nicht mit Sicherheit bestimmt werden",
     "evidence_title": "Beweise",
     "human_indicators_title": "Menschliche Indikatoren",
@@ -123,7 +125,8 @@
     "change_type_vocabulary": "Wortschatzanpassung",
     "change_type_structure": "Strukturmodifikation",
     "change_type_tone": "Tonanpassung",
-    "change_type_flow": "Flussverbesserung"
+    "change_type_flow": "Flussverbesserung",
+    "job_started": "Humanisierungsaufgabe gestartet"
   },
 
   "errors": {
@@ -153,7 +156,38 @@
     "auth_required": "Authentifizierung erforderlich",
     "session_expired": "Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
     "invalid_token": "Ungültiges Authentifizierungs-Token",
-    "token_expired": "Authentifizierungs-Token ist abgelaufen"
+    "token_expired": "Authentifizierungs-Token ist abgelaufen",
+    "friendly": {
+      "timeout": "Die Anfrage dauert länger als erwartet. Bitte versuchen Sie es erneut.",
+      "temporary_issue": "Wir haben vorübergehende Probleme. Bitte versuchen Sie es in einem Moment erneut.",
+      "connection": "Verbindungsproblem erkannt. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+      "auth_required": "Bitte melden Sie sich an, um fortzufahren.",
+      "session_expired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an, um fortzufahren.",
+      "forbidden": "Sie haben keine Berechtigung, diese Aktion auszuführen.",
+      "too_many_requests": "Sie senden zu viele Anfragen. Bitte warten Sie {{seconds}} Sekunden.",
+      "service_busy": "Unser Service ist derzeit ausgelastet. Bitte versuchen Sie es in {{seconds}} Sekunden erneut.",
+      "insufficient_credits": "Sie benötigen {{required}} Credits, haben aber nur {{available}}. Bitte kaufen Sie mehr Credits, um fortzufahren.",
+      "invalid_input": "Die angegebenen Informationen sind ungültig. Bitte überprüfen Sie sie und versuchen Sie es erneut.",
+      "file_too_large": "Die Datei ist zu groß. Bitte verwenden Sie eine kleinere Datei.",
+      "invalid_file_type": "Dieser Dateityp wird nicht unterstützt. Bitte verwenden Sie ein anderes Format.",
+      "not_found": "Das gesuchte Element konnte nicht gefunden werden.",
+      "generic": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut."
+    }
+  },
+
+  "actions": {
+    "try_again": "Erneut versuchen",
+    "try_again_later": "Später erneut versuchen",
+    "check_connection": "Verbindung überprüfen",
+    "sign_in": "Anmelden",
+    "sign_in_again": "Erneut anmelden",
+    "contact_support": "Support kontaktieren",
+    "wait_and_retry": "Warten und erneut versuchen",
+    "purchase_credits": "Credits kaufen",
+    "check_input": "Eingabe überprüfen",
+    "reduce_file_size": "Kleinere Datei verwenden",
+    "check_file_type": "Unterstütztes Format verwenden",
+    "go_back": "Zurück"
   },
 
   "success": {
@@ -177,9 +211,7 @@
     "purchase_success": "Erfolgreich {{amount}} Credits gekauft",
     "deducted": "{{amount}} Credits für {{action}} abgezogen",
     "insufficient": "Unzureichendes Guthaben. Sie benötigen {{required}} Credits, haben aber {{available}}.",
-    "free_tier": "Kostenlose Stufe: {{used}}/{{limit}} Analysen verwendet",
-    "unlimited": "Unbegrenzter Plan aktiv",
-    "expires": "Guthaben läuft am {{date}} ab"
+    "free_tier": "Kostenlose Stufe: {{used}}/{{limit}} Analysen verwendet"
   },
 
   "notifications": {

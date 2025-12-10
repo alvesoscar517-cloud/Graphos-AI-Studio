@@ -89,7 +89,15 @@ const LANGUAGE_CONFIGS = {
       "they've", "i'll", "you'll", "he'll", "she'll", "we'll", "they'll",
       "i'd", "you'd", "he'd", "she'd", "we'd", "they'd", "couldn't",
       "wouldn't", "shouldn't", "hasn't", "haven't", "hadn't"
-    ]
+    ],
+    // Humanization patterns for natural-sounding text
+    humanization: {
+      particles: [],
+      fillers: ['actually', 'basically', 'honestly', 'literally', 'obviously', 'clearly', 'you know', 'I mean'],
+      starters: ['And', 'But', 'So', 'Well', 'Now', 'Look', 'See', 'Thing is', 'Honestly', 'Actually'],
+      informalMarkers: ['gonna', 'wanna', 'gotta', 'kinda', 'sorta', 'yeah', 'nope', 'cool', 'awesome'],
+      opinions: ['I think', 'I believe', 'I feel', 'In my opinion', 'To me', 'Personally', 'If you ask me']
+    }
   },
 
   // ============================================================================
@@ -168,7 +176,15 @@ const LANGUAGE_CONFIGS = {
       'trong thế giới ngày nay', 'trong thời đại này', 'cuối cùng thì',
       'không cần phải nói', 'trước hết', 'cuối cùng nhưng không kém phần quan trọng'
     ],
-    contractions: [] // Vietnamese doesn't use contractions like English
+    contractions: [],
+    // Vietnamese humanization patterns - sentence-final particles and informal markers
+    humanization: {
+      particles: ['à', 'nhé', 'nha', 'ạ', 'nhỉ', 'đấy', 'thôi', 'mà', 'chứ', 'đi', 'cơ', 'kìa'],
+      fillers: ['thực ra', 'nói chung', 'kiểu như', 'cơ bản là', 'đại khái', 'nói thật', 'thật sự'],
+      starters: ['Nói thật', 'Thực ra', 'Mình nghĩ', 'Theo mình', 'Cá nhân mình', 'Nói chung là', 'Ờ thì'],
+      informalMarkers: ['ok', 'oke', 'ờ', 'ừ', 'ngon', 'tuyệt', 'xịn', 'chất', 'hay', 'được'],
+      opinions: ['mình nghĩ', 'theo mình', 'cá nhân mình thấy', 'mình thấy', 'với mình thì']
+    }
   },
 
   // ============================================================================
@@ -234,7 +250,15 @@ const LANGUAGE_CONFIGS = {
       '不言而喻', '毋庸置疑', '首先', '最后但同样重要的是',
       '深入探讨', '全面分析', '系统阐述'
     ],
-    contractions: []
+    contractions: [],
+    // Chinese humanization patterns - modal particles and informal expressions
+    humanization: {
+      particles: ['吧', '呢', '啊', '嘛', '呀', '哦', '哈', '啦', '嗯', '哎'],
+      fillers: ['其实', '说实话', '基本上', '大概', '反正', '总之', '怎么说呢'],
+      starters: ['说实话', '其实', '我觉得', '个人认为', '老实说', '坦白讲'],
+      informalMarkers: ['挺', '蛮', '超', '特别', '真的', '确实', '没错'],
+      opinions: ['我觉得', '我认为', '依我看', '在我看来', '个人觉得']
+    }
   },
 
   // ============================================================================
@@ -300,7 +324,16 @@ const LANGUAGE_CONFIGS = {
       '言うまでもなく', '何よりもまず', '最後になりましたが',
       '深く掘り下げる', '詳しく分析する', '包括的に検討する'
     ],
-    contractions: []
+    contractions: [],
+    // Japanese humanization patterns - sentence-ending particles and keigo levels
+    humanization: {
+      particles: ['ね', 'よ', 'な', 'かな', 'けど', 'さ', 'わ', 'の', 'って', 'じゃん'],
+      fillers: ['まあ', 'ちょっと', '実は', '正直', 'なんか', 'やっぱり', 'とりあえず'],
+      starters: ['正直', '実は', '個人的には', '思うに', 'まあ', 'ぶっちゃけ'],
+      informalMarkers: ['めっちゃ', 'すごい', 'マジ', 'ほんと', 'やばい', 'ウケる'],
+      opinions: ['思うんだけど', '個人的には', '私的には', 'なんとなく'],
+      formalityLevels: ['casual', 'polite', 'formal', 'keigo']
+    }
   },
 
   // ============================================================================
@@ -366,7 +399,16 @@ const LANGUAGE_CONFIGS = {
       '말할 필요도 없이', '무엇보다도', '마지막으로 중요한 것은',
       '깊이 파고들다', '자세히 분석하다', '포괄적으로 검토하다'
     ],
-    contractions: []
+    contractions: [],
+    // Korean humanization patterns - speech levels and sentence-ending particles
+    humanization: {
+      particles: ['요', '네', '죠', '거든요', '잖아요', '는데요', '군요', '네요'],
+      fillers: ['사실', '솔직히', '그냥', '좀', '뭐', '아무튼', '어쨌든'],
+      starters: ['솔직히', '사실', '개인적으로', '제 생각에는', '글쎄요', '음'],
+      informalMarkers: ['대박', '짱', '완전', '진짜', '헐', '오', '와'],
+      opinions: ['제 생각에는', '개인적으로', '솔직히 말하면', '저는'],
+      speechLevels: ['반말', '존댓말', '격식체']
+    }
   },
 
   // ============================================================================
@@ -432,7 +474,15 @@ const LANGUAGE_CONFIGS = {
       'il va sans dire', 'avant tout', 'dernier point mais non des moindres',
       'approfondir', 'explorer', 'analyser en détail'
     ],
-    contractions: ["j'", "l'", "d'", "n'", "c'", "s'", "qu'", "m'", "t'"]
+    contractions: ["j'", "l'", "d'", "n'", "c'", "s'", "qu'", "m'", "t'"],
+    // French humanization patterns
+    humanization: {
+      particles: [],
+      fillers: ['en fait', 'bon', 'ben', 'bref', 'quoi', 'enfin', 'genre', 'du coup'],
+      starters: ['Bon', 'Bref', 'En fait', 'Franchement', 'Honnêtement', 'Perso'],
+      informalMarkers: ['super', 'génial', 'cool', 'sympa', 'top', 'nickel', 'chouette'],
+      opinions: ['je pense que', 'à mon avis', 'personnellement', 'pour moi', 'je trouve que']
+    }
   },
 
   // ============================================================================
@@ -498,7 +548,15 @@ const LANGUAGE_CONFIGS = {
       'es versteht sich von selbst', 'vor allem', 'nicht zuletzt',
       'vertiefen', 'eingehend analysieren', 'umfassend untersuchen'
     ],
-    contractions: []
+    contractions: [],
+    // German humanization patterns
+    humanization: {
+      particles: ['halt', 'eben', 'doch', 'mal', 'ja', 'schon', 'wohl'],
+      fillers: ['also', 'na ja', 'eigentlich', 'sozusagen', 'quasi', 'irgendwie'],
+      starters: ['Also', 'Na ja', 'Ehrlich gesagt', 'Ich meine', 'Naja'],
+      informalMarkers: ['cool', 'geil', 'krass', 'mega', 'hammer', 'super', 'echt'],
+      opinions: ['ich denke', 'meiner Meinung nach', 'ich finde', 'für mich', 'persönlich']
+    }
   },
 
   // ============================================================================
@@ -564,7 +622,15 @@ const LANGUAGE_CONFIGS = {
       'no hace falta decir', 'ante todo', 'por último pero no menos importante',
       'profundizar en', 'explorar', 'analizar en detalle'
     ],
-    contractions: ['al', 'del']
+    contractions: ['al', 'del'],
+    // Spanish humanization patterns
+    humanization: {
+      particles: ['pues', 'vaya', 'oye', 'mira', 'venga'],
+      fillers: ['bueno', 'pues', 'o sea', 'es que', 'vamos', 'a ver', 'la verdad'],
+      starters: ['Bueno', 'Pues', 'Mira', 'Oye', 'La verdad', 'Sinceramente'],
+      informalMarkers: ['genial', 'guay', 'mola', 'flipar', 'tío', 'vale', 'súper'],
+      opinions: ['yo creo que', 'en mi opinión', 'para mí', 'personalmente', 'pienso que']
+    }
   },
 
   // ============================================================================
@@ -630,7 +696,15 @@ const LANGUAGE_CONFIGS = {
       'escusado será dizer', 'antes de mais nada', 'por último mas não menos importante',
       'aprofundar', 'explorar', 'analisar em detalhe'
     ],
-    contractions: ['do', 'da', 'dos', 'das', 'no', 'na', 'nos', 'nas', 'ao', 'aos', 'pelo', 'pela']
+    contractions: ['do', 'da', 'dos', 'das', 'no', 'na', 'nos', 'nas', 'ao', 'aos', 'pelo', 'pela'],
+    // Portuguese humanization patterns
+    humanization: {
+      particles: ['né', 'sabe', 'entende', 'tá'],
+      fillers: ['tipo', 'assim', 'então', 'bom', 'olha', 'na real', 'sinceramente'],
+      starters: ['Olha', 'Bom', 'Então', 'Tipo', 'Na real', 'Sinceramente'],
+      informalMarkers: ['legal', 'bacana', 'massa', 'show', 'top', 'maneiro', 'dahora'],
+      opinions: ['eu acho que', 'na minha opinião', 'pra mim', 'pessoalmente', 'eu penso que']
+    }
   },
 
   // ============================================================================
@@ -696,7 +770,15 @@ const LANGUAGE_CONFIGS = {
       'va da sé', 'prima di tutto', 'ultimo ma non meno importante',
       'approfondire', 'esplorare', 'analizzare in dettaglio'
     ],
-    contractions: ["l'", "d'", "un'", "dell'", "all'", "nell'", "sull'"]
+    contractions: ["l'", "d'", "un'", "dell'", "all'", "nell'", "sull'"],
+    // Italian humanization patterns
+    humanization: {
+      particles: ['dai', 'beh', 'mah', 'eh', 'sai'],
+      fillers: ['cioè', 'tipo', 'insomma', 'praticamente', 'diciamo', 'ecco'],
+      starters: ['Beh', 'Insomma', 'Diciamo', 'Guarda', 'Senti', 'Onestamente'],
+      informalMarkers: ['figo', 'forte', 'ganzo', 'mitico', 'top', 'super', 'fantastico'],
+      opinions: ['secondo me', 'io penso che', 'per me', 'personalmente', 'a mio parere']
+    }
   },
 
   // ============================================================================
@@ -762,7 +844,15 @@ const LANGUAGE_CONFIGS = {
       'само собой разумеется', 'прежде всего', 'последнее но не менее важное',
       'углубиться', 'исследовать', 'детально проанализировать'
     ],
-    contractions: []
+    contractions: [],
+    // Russian humanization patterns
+    humanization: {
+      particles: ['же', 'ли', 'бы', 'ведь', 'вот', 'ну'],
+      fillers: ['ну', 'типа', 'короче', 'в общем', 'как бы', 'вроде', 'собственно'],
+      starters: ['Ну', 'Короче', 'В общем', 'Честно говоря', 'На самом деле'],
+      informalMarkers: ['круто', 'клёво', 'офигенно', 'прикольно', 'супер', 'класс'],
+      opinions: ['я думаю', 'по-моему', 'мне кажется', 'лично я', 'на мой взгляд']
+    }
   },
 
   // ============================================================================
@@ -828,7 +918,15 @@ const LANGUAGE_CONFIGS = {
       'غني عن القول', 'قبل كل شيء', 'أخيراً وليس آخراً',
       'التعمق في', 'استكشاف', 'تحليل بالتفصيل'
     ],
-    contractions: []
+    contractions: [],
+    // Arabic humanization patterns
+    humanization: {
+      particles: ['يعني', 'طيب', 'خلاص', 'بس', 'هيك'],
+      fillers: ['يعني', 'الحقيقة', 'بصراحة', 'في الواقع', 'أساساً'],
+      starters: ['بصراحة', 'الحقيقة', 'يعني', 'شوف', 'اسمع'],
+      informalMarkers: ['رائع', 'حلو', 'جميل', 'خطير', 'فظيع', 'عظيم', 'تمام'],
+      opinions: ['أعتقد', 'برأيي', 'من وجهة نظري', 'شخصياً', 'أظن']
+    }
   },
 
   // ============================================================================
@@ -894,7 +992,15 @@ const LANGUAGE_CONFIGS = {
       'ไม่ต้องพูดถึง', 'ก่อนอื่น', 'สุดท้ายแต่ไม่ท้ายสุด',
       'เจาะลึก', 'สำรวจ', 'วิเคราะห์อย่างละเอียด'
     ],
-    contractions: []
+    contractions: [],
+    // Thai humanization patterns - polite particles
+    humanization: {
+      particles: ['ครับ', 'ค่ะ', 'นะ', 'เลย', 'อ่ะ', 'จ้า', 'จ๊ะ', 'ล่ะ', 'สิ'],
+      fillers: ['จริงๆ', 'ก็', 'แบบ', 'ประมาณ', 'อะไรประมาณนี้', 'คือ'],
+      starters: ['จริงๆ แล้ว', 'พูดตรงๆ', 'ส่วนตัว', 'คือ', 'ก็'],
+      informalMarkers: ['เจ๋ง', 'โคตร', 'สุดยอด', 'เท่', 'แจ่ม', 'ดีมาก', 'เริ่ด'],
+      opinions: ['ผม/ฉันคิดว่า', 'ส่วนตัว', 'ในความเห็นของผม/ฉัน', 'รู้สึกว่า']
+    }
   },
 
   // ============================================================================
@@ -960,7 +1066,15 @@ const LANGUAGE_CONFIGS = {
       'tidak perlu dikatakan', 'pertama-tama', 'terakhir namun tidak kalah penting',
       'mendalami', 'mengeksplorasi', 'menganalisis secara detail'
     ],
-    contractions: []
+    contractions: [],
+    // Indonesian humanization patterns
+    humanization: {
+      particles: ['dong', 'sih', 'nih', 'deh', 'lho', 'kan', 'ya'],
+      fillers: ['sebenarnya', 'sebenernya', 'kayaknya', 'gitu', 'emang', 'tuh'],
+      starters: ['Jadi', 'Nah', 'Gini', 'Sebenernya', 'Jujur', 'Beneran'],
+      informalMarkers: ['keren', 'mantap', 'asik', 'gokil', 'seru', 'oke banget', 'cakep'],
+      opinions: ['gue pikir', 'menurut gue', 'kayaknya', 'rasanya', 'personally']
+    }
   },
 
   // ============================================================================
@@ -1026,7 +1140,15 @@ const LANGUAGE_CONFIGS = {
       'tidak perlu dinyatakan', 'pertama sekali', 'akhir sekali tetapi tidak kurang penting',
       'mendalami', 'meneroka', 'menganalisis secara terperinci'
     ],
-    contractions: []
+    contractions: [],
+    // Malay humanization patterns
+    humanization: {
+      particles: ['lah', 'kan', 'kot', 'je', 'tau', 'la'],
+      fillers: ['sebenarnya', 'macam', 'agaknya', 'memang', 'betul'],
+      starters: ['Jadi', 'Sebenarnya', 'Macam ni', 'Betul', 'Honestly'],
+      informalMarkers: ['best', 'power', 'gempak', 'syok', 'cool', 'okay', 'mantap'],
+      opinions: ['saya rasa', 'pada pendapat saya', 'personally', 'rasanya', 'agaknya']
+    }
   }
 };
 
@@ -1111,6 +1233,41 @@ class LanguageProcessorService {
   getContractions(lang) {
     const config = this.getConfig(lang);
     return config.contractions || [];
+  }
+
+  /**
+   * Get humanization patterns for a language
+   * @param {string} lang - Language code
+   * @returns {Object} - Humanization patterns { particles, fillers, starters, informalMarkers, opinions }
+   */
+  getHumanizationPatterns(lang) {
+    const config = this.getConfig(lang);
+    return config.humanization || {
+      particles: [],
+      fillers: [],
+      starters: [],
+      informalMarkers: [],
+      opinions: []
+    };
+  }
+
+  /**
+   * Get all humanization elements combined for a language
+   * @param {string} lang - Language code
+   * @returns {Object} - All humanization elements
+   */
+  getAllHumanizationElements(lang) {
+    const patterns = this.getHumanizationPatterns(lang);
+    return {
+      ...patterns,
+      all: [
+        ...patterns.particles,
+        ...patterns.fillers,
+        ...patterns.starters,
+        ...patterns.informalMarkers,
+        ...patterns.opinions
+      ]
+    };
   }
 
   /**

@@ -90,8 +90,10 @@
   "ai_detection": {
     "title": "Rilevamento Contenuti IA",
     "result_human": "Questo testo sembra essere scritto da un umano",
-    "result_ai": "Questo testo sembra essere generato dall'IA",
+    "result_mostly_human": "Principalmente scritto da umano con lievi pattern IA",
     "result_mixed": "Questo testo mostra segnali misti (possibilmente assistito da IA)",
+    "result_likely_ai": "Questo testo è probabilmente generato dall'IA",
+    "result_ai": "Questo testo sembra essere generato dall'IA",
     "result_uncertain": "Impossibile determinare con sicurezza",
     "evidence_title": "Prove",
     "human_indicators_title": "Indicatori Umani",
@@ -123,7 +125,8 @@
     "change_type_vocabulary": "Adattamento vocabolario",
     "change_type_structure": "Modifica struttura",
     "change_type_tone": "Adattamento tono",
-    "change_type_flow": "Miglioramento flusso"
+    "change_type_flow": "Miglioramento flusso",
+    "job_started": "Attività di umanizzazione avviata"
   },
 
   "errors": {
@@ -153,7 +156,38 @@
     "auth_required": "Autenticazione richiesta",
     "session_expired": "Sessione scaduta. Effettua nuovamente l'accesso.",
     "invalid_token": "Token di autenticazione non valido",
-    "token_expired": "Il token di autenticazione è scaduto"
+    "token_expired": "Il token di autenticazione è scaduto",
+    "friendly": {
+      "timeout": "La richiesta sta impiegando più tempo del previsto. Per favore riprova.",
+      "temporary_issue": "Stiamo riscontrando problemi temporanei. Per favore riprova tra un momento.",
+      "connection": "Rilevato problema di connessione. Per favore controlla la tua connessione internet e riprova.",
+      "auth_required": "Per favore accedi per continuare.",
+      "session_expired": "La tua sessione è scaduta. Per favore accedi di nuovo per continuare.",
+      "forbidden": "Non hai il permesso di eseguire questa azione.",
+      "too_many_requests": "Stai inviando troppe richieste. Per favore attendi {{seconds}} secondi.",
+      "service_busy": "Il nostro servizio è attualmente occupato. Per favore riprova tra {{seconds}} secondi.",
+      "insufficient_credits": "Hai bisogno di {{required}} crediti ma ne hai solo {{available}}. Per favore acquista più crediti per continuare.",
+      "invalid_input": "Le informazioni fornite non sono valide. Per favore controlla e riprova.",
+      "file_too_large": "Il file è troppo grande. Per favore usa un file più piccolo.",
+      "invalid_file_type": "Questo tipo di file non è supportato. Per favore usa un formato diverso.",
+      "not_found": "L'elemento che stai cercando non è stato trovato.",
+      "generic": "Qualcosa è andato storto. Per favore riprova."
+    }
+  },
+
+  "actions": {
+    "try_again": "Riprova",
+    "try_again_later": "Riprova più tardi",
+    "check_connection": "Controlla connessione",
+    "sign_in": "Accedi",
+    "sign_in_again": "Accedi di nuovo",
+    "contact_support": "Contatta supporto",
+    "wait_and_retry": "Attendi e riprova",
+    "purchase_credits": "Acquista crediti",
+    "check_input": "Controlla informazioni",
+    "reduce_file_size": "Usa file più piccolo",
+    "check_file_type": "Usa formato supportato",
+    "go_back": "Indietro"
   },
 
   "success": {
@@ -177,9 +211,7 @@
     "purchase_success": "Acquistati con successo {{amount}} crediti",
     "deducted": "Dedotti {{amount}} crediti per {{action}}",
     "insufficient": "Crediti insufficienti. Hai bisogno di {{required}} crediti ma ne hai {{available}}.",
-    "free_tier": "Piano gratuito: {{used}}/{{limit}} analisi usate",
-    "unlimited": "Piano illimitato attivo",
-    "expires": "I crediti scadono il {{date}}"
+    "free_tier": "Piano gratuito: {{used}}/{{limit}} analisi usate"
   },
 
   "notifications": {

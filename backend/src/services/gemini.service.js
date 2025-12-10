@@ -1,10 +1,12 @@
 /**
  * Gemini AI Service
  * Handles all AI operations: embeddings, content detection, voice analysis
+ * Enhanced with language-specific AI detection for 15 languages
  */
 
 const { helpers } = require('@google-cloud/aiplatform');
 const { getVertexAI, getAIPlatformClient, config } = require('../config/gemini');
+const languageProcessor = require('./languageProcessor.service');
 
 // Get services (lazy initialization)
 const vertexAI = getVertexAI();
@@ -673,9 +675,13 @@ function detectAIContentHeuristic(text) {
   const humanIndicators = [];
   const aiIndicators = [];
   
+  // Detect content language for language-specific analysis
+  const lang = languageProcessor.detectLanguage(text);
+  const langConfig = languageProcessor.getConfig(lang);
+  
   const textLower = text.toLowerCase();
-  const words = textLower.split(/\s+/).filter(w => w.length > 0);
-  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const words = languageProcessor.tokenize(text, lang);
+  const sentences = text.split(/[.!?。！？]+/).filter(s => s.trim().length > 0);
   
   if (words.length < 10) {
     return {
@@ -683,37 +689,37 @@ function detectAIContentHeuristic(text) {
       confidence: 20,
       evidence: ['Text too short for reliable analysis'],
       humanIndicators: [],
-      aiIndicators: []
+      aiIndicators: [],
+      detectedLanguage: lang
     };
   }
 
-  // 1. AI Phrases Detection (expanded list)
-  const aiPhrases = [
-    // Classic AI phrases
-    'it is important to note', 'it should be noted', 'in conclusion',
-    'to summarize', 'in summary', 'as an ai', 'i cannot', 'i apologize',
-    // Hedging phrases
-    'it is worth mentioning', 'one might argue', 'it is essential',
-    'it is crucial', 'it is vital', 'it is imperative',
-    // Filler phrases
-    'in today\'s world', 'in this day and age', 'at the end of the day',
-    'it goes without saying', 'needless to say', 'first and foremost',
-    'last but not least', 'in light of', 'with that being said',
-    'having said that', 'that being said',
-    // AI-specific verbs
-    'delve into', 'dive into', 'explore the', 'unpack the',
-    'leverage', 'utilize', 'facilitate', 'implement',
-    // Transition overuse
-    'furthermore', 'moreover', 'additionally', 'consequently',
-    'subsequently', 'nevertheless', 'nonetheless', 'hence', 'thus'
-  ];
-  
-  const foundPhrases = aiPhrases.filter(phrase => textLower.includes(phrase));
+  // 1. AI Phrases Detection - Language-specific
+  const aiPhrases = langConfig.aiPhrases || [];
+  const foundPhrases = aiPhrases.filter(phrase => textLower.includes(phrase.toLowerCase()));
   if (foundPhrases.length > 0) {
     const phraseScore = Math.min(foundPhrases.length * 7, 35);
     score += phraseScore;
-    aiIndicators.push(`Contains ${foundPhrases.length} typical AI phrases`);
+    aiIndicators.push(`Contains ${foundPhrases.length} typical AI phrases in ${langConfig.name}`);
     evidence.push(`AI phrases found: "${foundPhrases.slice(0, 3).join('", "')}"`);
+  }
+  
+  // 1b. Check for humanization patterns (reduces AI score)
+  const humanPatterns = languageProcessor.getHumanizationPatterns(lang);
+  if (humanPatterns.particles && humanPatterns.particles.length > 0) {
+    const foundParticles = humanPatterns.particles.filter(p => text.includes(p));
+    if (foundParticles.length > 0) {
+      score -= Math.min(foundParticles.length * 3, 15);
+      humanIndicators.push(`Uses natural ${langConfig.name} particles/markers`);
+    }
+  }
+  
+  if (humanPatterns.fillers && humanPatterns.fillers.length > 0) {
+    const foundFillers = humanPatterns.fillers.filter(f => textLower.includes(f.toLowerCase()));
+    if (foundFillers.length > 0) {
+      score -= Math.min(foundFillers.length * 2, 10);
+      humanIndicators.push(`Uses natural fillers in ${langConfig.name}`);
+    }
   }
 
   // 2. Sentence Length Uniformity

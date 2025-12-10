@@ -90,8 +90,10 @@
   "ai_detection": {
     "title": "Deteksi Konten AI",
     "result_human": "Teks ini sepertinya ditulis oleh manusia",
-    "result_ai": "Teks ini sepertinya dibuat oleh AI",
+    "result_mostly_human": "Sebagian besar ditulis manusia dengan sedikit pola AI",
     "result_mixed": "Teks ini menunjukkan sinyal campuran (mungkin dibantu AI)",
+    "result_likely_ai": "Teks ini kemungkinan besar dibuat oleh AI",
+    "result_ai": "Teks ini sepertinya dibuat oleh AI",
     "result_uncertain": "Tidak dapat menentukan dengan pasti",
     "evidence_title": "Bukti",
     "human_indicators_title": "Indikator Manusia",
@@ -123,7 +125,8 @@
     "change_type_vocabulary": "Penyesuaian kosakata",
     "change_type_structure": "Modifikasi struktur",
     "change_type_tone": "Penyesuaian nada",
-    "change_type_flow": "Peningkatan alur"
+    "change_type_flow": "Peningkatan alur",
+    "job_started": "Tugas humanisasi dimulai"
   },
 
   "errors": {
@@ -153,7 +156,38 @@
     "auth_required": "Diperlukan autentikasi",
     "session_expired": "Sesi telah berakhir. Silakan masuk lagi.",
     "invalid_token": "Token autentikasi tidak valid",
-    "token_expired": "Token autentikasi telah kedaluwarsa"
+    "token_expired": "Token autentikasi telah kedaluwarsa",
+    "friendly": {
+      "timeout": "Permintaan memakan waktu lebih lama dari biasanya. Silakan coba lagi.",
+      "temporary_issue": "Kami sedang mengalami masalah sementara. Silakan coba lagi sebentar.",
+      "connection": "Terdeteksi masalah koneksi. Silakan periksa internet Anda dan coba lagi.",
+      "auth_required": "Silakan masuk untuk melanjutkan.",
+      "session_expired": "Sesi Anda telah berakhir. Silakan masuk lagi untuk melanjutkan.",
+      "forbidden": "Anda tidak memiliki izin untuk melakukan tindakan ini.",
+      "too_many_requests": "Anda mengirim terlalu banyak permintaan. Harap tunggu {{seconds}} detik.",
+      "service_busy": "Layanan kami sedang sibuk. Silakan coba lagi dalam {{seconds}} detik.",
+      "insufficient_credits": "Anda membutuhkan {{required}} kredit tetapi hanya memiliki {{available}}. Silakan beli lebih banyak kredit untuk melanjutkan.",
+      "invalid_input": "Informasi yang Anda berikan tidak valid. Silakan periksa dan coba lagi.",
+      "file_too_large": "File terlalu besar. Silakan gunakan file yang lebih kecil.",
+      "invalid_file_type": "Jenis file ini tidak didukung. Silakan gunakan format file yang berbeda.",
+      "not_found": "Item yang Anda cari tidak dapat ditemukan.",
+      "generic": "Terjadi kesalahan. Silakan coba lagi."
+    }
+  },
+
+  "actions": {
+    "try_again": "Coba Lagi",
+    "try_again_later": "Coba lagi nanti",
+    "check_connection": "Periksa koneksi Anda",
+    "sign_in": "Masuk",
+    "sign_in_again": "Masuk lagi",
+    "contact_support": "Hubungi dukungan",
+    "wait_and_retry": "Tunggu dan coba lagi",
+    "purchase_credits": "Beli kredit",
+    "check_input": "Periksa input Anda",
+    "reduce_file_size": "Gunakan file yang lebih kecil",
+    "check_file_type": "Gunakan jenis file yang didukung",
+    "go_back": "Kembali"
   },
 
   "success": {
@@ -177,9 +211,7 @@
     "purchase_success": "Berhasil membeli {{amount}} kredit",
     "deducted": "{{amount}} kredit dipotong untuk {{action}}",
     "insufficient": "Kredit tidak cukup. Anda butuh {{required}} kredit tetapi memiliki {{available}}.",
-    "free_tier": "Paket gratis: {{used}}/{{limit}} analisis digunakan",
-    "unlimited": "Paket tanpa batas aktif",
-    "expires": "Kredit kedaluwarsa pada {{date}}"
+    "free_tier": "Paket gratis: {{used}}/{{limit}} analisis digunakan"
   },
 
   "notifications": {

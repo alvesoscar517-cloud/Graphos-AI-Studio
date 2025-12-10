@@ -251,14 +251,13 @@ function calculateAIDetectionCost(text) {
 
 /**
  * Calculate cost for text analysis
+ * Updated: Dec 2025 - now uses perWordCost instead of perSentenceCost
  */
 function calculateAnalysisCost(text) {
   const wordCount = countWords(text);
-  const sentenceCount = countSentences(text);
   
   return calculateFeatureCost('text_analysis', {
-    wordCount,
-    sentenceCount
+    wordCount
   });
 }
 
@@ -276,10 +275,16 @@ function calculateRewriteCost(text, model = 'gemini-2.0-flash-exp') {
 
 /**
  * Calculate cost for improvement suggestions
+ * Updated: Dec 2025 - now uses perWordCost instead of perSentenceCost
+ * @param {string|number} textOrWordCount - Either the text string or word count directly
  */
-function calculateSuggestionsCost(sentenceCount) {
+function calculateSuggestionsCost(textOrWordCount) {
+  const wordCount = typeof textOrWordCount === 'string' 
+    ? countWords(textOrWordCount) 
+    : textOrWordCount;
+  
   return calculateFeatureCost('improvement_suggestions', {
-    sentenceCount
+    wordCount
   });
 }
 
@@ -369,13 +374,16 @@ function calculateCheckHumanizationCost(text) {
 
 /**
  * Calculate cost for iterative humanization
+ * Updated: Dec 2025 - now uses actualIterations for fair billing
+ * @param {string} text - The text to humanize
+ * @param {number} actualIterations - Actual iterations performed (not max_iterations)
  */
-function calculateIterativeHumanizeCost(text, maxIterations = 3) {
+function calculateIterativeHumanizeCost(text, actualIterations = 1) {
   const wordCount = countWords(text);
   
   return calculateFeatureCost('iterative_humanize', {
     wordCount,
-    iterationCount: maxIterations
+    iterationCount: actualIterations
   });
 }
 

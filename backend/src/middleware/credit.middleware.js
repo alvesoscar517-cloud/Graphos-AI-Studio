@@ -282,7 +282,8 @@ const costCalculators = {
   
   improvementSuggestions: (req) => {
     const { sentence } = req.body;
-    return creditService.calculateSuggestionsCost(1);
+    // Updated: Dec 2025 - now uses word count for fair pricing
+    return creditService.calculateSuggestionsCost(sentence || '');
   },
   
   // === Rewrite & Humanization ===
@@ -297,8 +298,11 @@ const costCalculators = {
   },
   
   iterativeHumanize: (req) => {
-    const { text, max_iterations = 3 } = req.body;
-    return creditService.calculateIterativeHumanizeCost(text, max_iterations);
+    const { text, actual_iterations, max_iterations = 3 } = req.body;
+    // Updated: Dec 2025 - use actual_iterations if available, otherwise estimate with 1
+    // Actual cost will be recalculated after job completion based on real iterations
+    const iterations = actual_iterations || 1;
+    return creditService.calculateIterativeHumanizeCost(text, iterations);
   },
   
   // === Chat ===

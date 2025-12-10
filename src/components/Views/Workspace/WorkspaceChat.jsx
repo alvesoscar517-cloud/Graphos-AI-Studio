@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import { truncateTitleByWords } from '../../../utils/titleUtils'
-import useAutoScrollbar from '../../../hooks/useAutoScrollbar'
 import ChatMessage from './ChatMessage'
 
 import EditTitleModal from '../../Common/EditTitleModal'
@@ -13,18 +12,16 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
   const { t } = useTranslation()
   const { currentConversation, isLoading, updateConversationTitle, clearConversation } = useWorkspace()
   const messagesEndRef = useRef(null)
+  const messagesContainerRef = useRef(null)
   const [title, setTitle] = useState('')
-  
-  // Auto-show scrollbar khi scroll nhiều
-  const { containerRef: messagesContainerRef, scrollbarClassName } = useAutoScrollbar({
-    scrollThreshold: 50,
-    hideDelay: 1500,
-    showOnHover: true
-  })
   const [displayTitle, setDisplayTitle] = useState('')
   const [showEditTitleModal, setShowEditTitleModal] = useState(false)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [isTypingTitle, setIsTypingTitle] = useState(false)
+  
+  // Track if this is initial load from history (don't auto-scroll)
+  const isInitialLoadRef = useRef(true)
+  const prevConversationIdRef = useRef(null)
 
   const typingTimeoutRef = useRef(null)
 
@@ -74,8 +71,29 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
     }
   }, [currentConversation, isTypingTitle])
 
-  // Auto-scroll to bottom when new messages arrive
+  // Track conversation changes - mark as initial load when switching conversations
   useEffect(() => {
+    if (currentConversation?.id !== prevConversationIdRef.current) {
+      isInitialLoadRef.current = true
+      prevConversationIdRef.current = currentConversation?.id
+    }
+  }, [currentConversation?.id])
+
+  // Auto-scroll to bottom only for new messages, not when loading from history
+  useEffect(() => {
+    if (!currentConversation?.messages?.length) return
+    
+    // Skip auto-scroll on initial load from history (conversation has existing messages)
+    if (isInitialLoadRef.current) {
+      isInitialLoadRef.current = false
+      // Scroll to top instead for history
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop = 0
+      }
+      return
+    }
+    
+    // Auto-scroll for new messages
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [currentConversation?.messages])
 
@@ -169,10 +187,10 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
       {/* Messages Area */}
       <div 
         ref={messagesContainerRef}
-        className={`flex-1 overflow-y-auto px-4 py-6 ${scrollbarClassName}`}
-        style={{ paddingBottom: '80px' }}
+        className="flex-1 overflow-y-auto py-6 workspace-scrollbar"
+        style={{ paddingBottom: '100px', scrollbarGutter: 'stable' }}
       >
-        <div className="max-w-3xl mx-auto flex flex-col gap-3">
+        <div className="max-w-3xl mx-auto px-4 flex flex-col gap-6">
           {currentConversation?.messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <img src="/icon/message-circle.svg" alt="Empty" className="w-12 h-12 opacity-30 mb-4 icon-invert" />
@@ -186,7 +204,12 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
               {currentConversation.messages.map((message) => (
                 <ChatMessage key={message.id} message={message} />
               ))}
-              {isLoading && (
+              {/* Show loading only when isLoading AND last message is not streaming with content */}
+              {isLoading && (() => {
+                const lastMsg = currentConversation.messages[currentConversation.messages.length - 1]
+                const isStreamingWithContent = lastMsg?.streaming && lastMsg?.content?.length > 0
+                return !isStreamingWithContent
+              })() && (
                 <div className="flex justify-start py-2">
                   <LazyLottie 
                     animationData={threeDotsAnimation} 
@@ -214,9 +237,14 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
       )}
 
       {/* Chat Input - positioned at bottom, aligned with messages */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 pointer-events-none">
-        <div className="max-w-3xl mx-auto pointer-events-auto">
-          {chatInput}
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+        {/* Gradient fade - covers full width */}
+        <div className="h-8 bg-gradient-to-t from-bg-tertiary to-transparent" />
+        {/* Input wrapper - same width as messages area, pr-2 to match scrollbar-gutter */}
+        <div className="bg-bg-tertiary pr-2">
+          <div className="max-w-3xl mx-auto px-4 pb-4 pointer-events-auto">
+            {chatInput}
+          </div>
         </div>
       </div>
       </div>

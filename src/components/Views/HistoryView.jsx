@@ -34,7 +34,7 @@ const HighlightText = ({ text, searchTerm, regex }) => {
 const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const { t } = useTranslation()
   const { notes, loadNote, loading, syncNotes, needsReauth, deleteNote } = useNotes()
-  const { conversations, loadConversation, deleteConversation } = useWorkspace()
+  const { conversations, loadConversation, deleteConversation, syncConversationsToDrive, loadConversationsFromDrive } = useWorkspace()
   // Use Zustand stores for user data
   const user = useUser()
   const authMethod = useAuthMethod()
@@ -128,7 +128,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         title: note.title,
         type: note.type === 'chat' ? 'chat' : 'text',
         updated: note.updated,
-        source: 'drive',
+        source: note.driveId ? 'drive' : 'local',
         data: note
       })
     })
@@ -138,7 +138,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         title: conv.title,
         type: 'chat',
         updated: new Date(conv.updated),
-        source: 'workspace',
+        source: conv.driveId ? 'drive' : 'local',
         data: conv
       })
     })
@@ -153,7 +153,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                          (filterType === 'chat' && item.type === 'chat')
       const matchesSource = filterSource === 'all' ||
                            (filterSource === 'drive' && item.source === 'drive') ||
-                           (filterSource === 'local' && item.source === 'workspace')
+                           (filterSource === 'local' && item.source === 'local')
       return matchesSearch && matchesType && matchesSource
     })
   }, [allItems, searchTerm, filterType, filterSource])
@@ -274,7 +274,22 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     if (needsGoogleLink) { setLinkGoogleAction('sync'); setShowLinkGooglePrompt(true); return }
     try {
       setIsSyncing(true)
-      await syncNotes()
+      // Sync both notes and conversations
+      const [notesResult, convsResult] = await Promise.allSettled([
+        syncNotes(),
+        syncConversationsToDrive()
+      ])
+      
+      // Also load from Drive to get any new items
+      await Promise.allSettled([
+        loadConversationsFromDrive()
+      ])
+      
+      const errors = [notesResult, convsResult].filter(r => r.status === 'rejected')
+      if (errors.length > 0) {
+        console.warn('Some sync operations failed:', errors)
+      }
+      
       modal.toast(t('history.synced'), t('history.notesSynced'), 'success')
     } catch (error) {
       modal.error(t('history.unableToSync') + ': ' + error.message)

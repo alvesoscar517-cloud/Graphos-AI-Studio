@@ -827,6 +827,8 @@
     "credits": "credit",
     "bonus": "thưởng",
     "perCredit": "/credit",
+    "firstPurchaseTitle": "ƯU ĐÃI CHÀO MỪNG",
+    "firstPurchaseDesc": "Nhân đôi credit cho lần mua đầu tiên!",
     "billingIssue": "Vấn đề thanh toán",
     "paymentFailed": "Thanh toán thất bại",
     "refundRequest": "Yêu cầu hoàn tiền",
