@@ -281,6 +281,17 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
               </div>
             </div>
           )}
+
+          {/* Notice when humanization enabled without profile */}
+          {(chatSettings.humanizeResponse || chatSettings.useAntiAIDetection) && !currentProfile && (
+            <div className={cn(
+              "flex items-start gap-2 py-2.5 px-3 rounded-xl text-xs",
+              "bg-bg-secondary border border-border-light text-text-secondary"
+            )}>
+              <Icon name="info" size="sm" color="muted" className="shrink-0 mt-0.5" />
+              <span>{t('workspace.genericHumanizationNotice')}</span>
+            </div>
+          )}
         </div>
 
         {/* Response Style Section */}

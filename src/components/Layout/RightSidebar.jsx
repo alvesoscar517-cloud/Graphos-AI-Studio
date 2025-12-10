@@ -51,6 +51,19 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
   const hasText = currentNote && currentNote.content && currentNote.content.trim().length > 0
   const hasProfile = currentProfile !== null
 
+  // Check if at least one feature is enabled for rewrite/humanize
+  const hasAnyFeatureEnabled = () => {
+    const prefs = writingPreferences || {}
+    // If no profile, only anti-AI and iterative refinement matter
+    if (!hasProfile) {
+      return prefs.useAntiAIDetection || prefs.useIterativeRefinement
+    }
+    // If has profile, check all features
+    return prefs.useAntiAIDetection || prefs.useIterativeRefinement ||
+           prefs.useVocabularyPreferences || prefs.useKeyCharacteristics ||
+           prefs.useSentencePatterns || prefs.useRewriteInstructions
+  }
+
   // Get progress text for humanize
   const getProgressText = () => {
     if (!humanizeProgress) return null
@@ -84,12 +97,11 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       return
     }
 
-    // For iterative humanize or anti-AI detection, profile is optional
-    const useIterative = writingPreferences?.useIterativeRefinement
-    const useAntiAI = writingPreferences?.useAntiAIDetection
-    // If no profile and no humanization features enabled, can't rewrite
-    if (!useIterative && !useAntiAI && !currentProfile) return
+    // Check if at least one feature is enabled
+    if (!hasAnyFeatureEnabled()) return
     if (isRewriting) return
+
+    const useIterative = writingPreferences?.useIterativeRefinement
     
     const originalText = text
     
@@ -106,7 +118,8 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           {
             maxIterations: 3,
             targetProbability: writingPreferences?.targetAIProbability || 35,
-            model: selectedModel
+            model: selectedModel,
+            writingPreferences: writingPreferences
           }
         )
         
@@ -501,7 +514,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
                   "disabled:opacity-50 disabled:cursor-not-allowed"
                 )}
                 onClick={handleRewrite}
-                disabled={!hasText || (!hasProfile && !writingPreferences?.useIterativeRefinement && !writingPreferences?.useAntiAIDetection) || isRewriting || isProcessing}
+                disabled={!hasText || !hasAnyFeatureEnabled() || isRewriting || isProcessing}
               >
                 {isRewriting ? (
                   // @ts-ignore - LazyLottie props are correct

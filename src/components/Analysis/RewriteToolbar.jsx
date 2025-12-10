@@ -58,6 +58,21 @@ const RewriteToolbar = ({
   const [humanizeProgress, setHumanizeProgress] = useState(null)
   const fileInputRef = useRef(null)
 
+  const hasProfile = currentProfile !== null
+
+  // Check if at least one feature is enabled for rewrite/humanize
+  const hasAnyFeatureEnabled = () => {
+    const prefs = writingPreferences || {}
+    // If no profile, only anti-AI and iterative refinement matter
+    if (!hasProfile) {
+      return prefs.useAntiAIDetection || prefs.useIterativeRefinement
+    }
+    // If has profile, check all features
+    return prefs.useAntiAIDetection || prefs.useIterativeRefinement ||
+           prefs.useVocabularyPreferences || prefs.useKeyCharacteristics ||
+           prefs.useSentencePatterns || prefs.useRewriteInstructions
+  }
+
   // Get progress text for humanize
   const getProgressText = () => {
     if (!humanizeProgress) return null
@@ -90,13 +105,11 @@ const RewriteToolbar = ({
       return
     }
 
-    // Check if iterative refinement or anti-AI detection is enabled
-    const useIterative = writingPreferences?.useIterativeRefinement
-    const useAntiAI = writingPreferences?.useAntiAIDetection
-    
-    // For iterative humanize or anti-AI detection, profile is optional
-    if (!useIterative && !useAntiAI && !currentProfile) return
+    // Check if at least one feature is enabled
+    if (!hasAnyFeatureEnabled()) return
     if (isLoading) return
+
+    const useIterative = writingPreferences?.useIterativeRefinement
     
     const originalText = text // Save original text for error recovery
     
@@ -114,7 +127,8 @@ const RewriteToolbar = ({
           {
             maxIterations: 3,
             targetProbability: writingPreferences?.targetAIProbability || 35,
-            model: selectedModel
+            model: selectedModel,
+            writingPreferences: writingPreferences
           }
         )
         
@@ -449,7 +463,7 @@ const RewriteToolbar = ({
               {/* Main Rewrite Button */}
               <Button
                 onClick={handleRewrite}
-                disabled={disabled || isLoading || !text || (!currentProfile && !writingPreferences?.useIterativeRefinement && !writingPreferences?.useAntiAIDetection)}
+                disabled={disabled || isLoading || !text || !hasAnyFeatureEnabled()}
                 ariaLabel={t('rewrite.rewriteText')}
                 active={isLoading}
                 variant={writingPreferences?.useIterativeRefinement ? 'primary' : ''}

@@ -434,6 +434,7 @@ exports.summarizeConversation = async (req, res) => {
 /**
  * Send chat message with humanization (non-streaming)
  * Generates response and then humanizes it to match user's voice profile
+ * Profile is optional - if not provided, uses generic humanization
  */
 exports.sendMessageHumanized = async (req, res) => {
   try {
@@ -458,23 +459,20 @@ exports.sendMessageHumanized = async (req, res) => {
       });
     }
 
-    if (!profileId) {
-      return res.status(400).json({ 
-        error: 'Profile ID is required for humanized responses',
-        code: 'PROFILE_REQUIRED'
-      });
-    }
+    // Profile is optional - humanization can work without profile using generic voice
 
-    console.log(`[INFO] Humanized chat request: ${messages.length} messages, model: ${model}`);
+    console.log(`[INFO] Humanized chat request: ${messages.length} messages, model: ${model}, profileId: ${profileId || 'none'}`);
 
-    // Load profile
+    // Load profile (optional - can be null for generic humanization)
     const profile = await loadProfile(profileId);
-    if (!profile || !profile.voice_profile) {
-      return res.status(400).json({ 
-        error: 'Valid voice profile is required',
-        code: 'INVALID_PROFILE'
-      });
-    }
+    
+    // Use profile voice or generic voice
+    const voiceProfile = profile?.voice_profile || {
+      tone: 'natural',
+      formality_level: 5,
+      key_characteristics: ['clear', 'engaging', 'authentic']
+    };
+    const sampleText = profile?.sample_text || null;
 
     // Build enhanced system prompt with humanization instructions
     let enhancedSystemPrompt = buildEnhancedSystemPrompt(systemPrompt, profile, writingPreferences);
@@ -483,9 +481,9 @@ exports.sendMessageHumanized = async (req, res) => {
     if (chatSettings?.useAntiAIDetection || chatSettings?.humanizeResponse) {
       enhancedSystemPrompt = humanizeService.buildEnhancedRewritePrompt(
         enhancedSystemPrompt,
-        profile.voice_profile,
-        profile.sample_text || null,
-        { isSystemPrompt: true }
+        voiceProfile,
+        sampleText,
+        { isSystemPrompt: true, writingPreferences }
       );
     }
 
@@ -526,37 +524,74 @@ exports.sendMessageHumanized = async (req, res) => {
 
     console.log(`[INFO] Initial response generated (${text.length} chars)`);
 
-    // Apply humanization if enabled
+    // Smart humanization based on text length and settings
     let humanizationResult = null;
-    if (chatSettings?.humanizeResponse) {
-      console.log('[INFO] Applying humanization...');
+    if (chatSettings?.humanizeResponse && text.length > 100) {
+      const targetProbability = chatSettings.targetAIProbability || 35;
       
       try {
-        const humanized = await humanizeService.rewriteWithIterativeRefinement(
-          text,
-          profile.voice_profile,
-          { sampleText: profile.sample_text },
-          {
-            maxIterations: 2, // Limit iterations for chat (faster response)
-            targetProbability: chatSettings.targetAIProbability || 35,
-            model: 'gemini-2.0-flash-exp'
+        // For short responses (< 500 chars), just apply imperfection injection
+        if (text.length < 500) {
+          text = humanizeService.injectHumanImperfections(text, voiceProfile);
+          humanizationResult = { applied: true, method: 'light' };
+          console.log('[INFO] Applied light humanization for short response');
+        } else {
+          // For longer text, check AI probability first
+          console.log('[INFO] Checking AI probability...');
+          const aiCheck = await geminiService.detectAIContentEnhanced(text);
+          
+          if (aiCheck.aiProbability > targetProbability + 15) {
+            // AI probability significantly above target - do refinement
+            console.log(`[INFO] AI probability ${aiCheck.aiProbability}% > target, applying refinement...`);
+            
+            const humanized = await humanizeService.rewriteWithIterativeRefinement(
+              text,
+              voiceProfile,
+              { sampleText, writingPreferences },
+              {
+                maxIterations: 1, // Single iteration for cost efficiency
+                targetProbability,
+                model: 'gemini-2.0-flash-exp'
+              }
+            );
+            
+            text = humanized.text;
+            humanizationResult = {
+              applied: true,
+              method: 'refinement',
+              iterations: humanized.iterations,
+              beforeAI: aiCheck.aiProbability,
+              afterAI: humanized.aiProbability,
+              reachedTarget: humanized.reachedTarget
+            };
+            
+            console.log(`[SUCCESS] Humanization: ${aiCheck.aiProbability}% -> ${humanized.aiProbability}%`);
+          } else if (aiCheck.aiProbability > targetProbability) {
+            // Slightly above target - just apply imperfections
+            text = humanizeService.injectHumanImperfections(text, voiceProfile);
+            humanizationResult = { 
+              applied: true, 
+              method: 'imperfections',
+              aiProbability: aiCheck.aiProbability
+            };
+          } else {
+            // Already below target
+            humanizationResult = { 
+              applied: false, 
+              reason: 'already_human',
+              aiProbability: aiCheck.aiProbability
+            };
+            console.log(`[INFO] AI probability ${aiCheck.aiProbability}% already below target`);
           }
-        );
-        
-        text = humanized.text;
-        humanizationResult = {
-          iterations: humanized.iterations,
-          aiProbability: humanized.aiProbability,
-          reachedTarget: humanized.reachedTarget
-        };
-        
-        console.log(`[SUCCESS] Humanization complete: ${humanized.aiProbability}% AI probability`);
+        }
       } catch (humanizeError) {
-        console.error('[WARN] Humanization failed, using original response:', humanizeError.message);
+        console.error('[WARN] Humanization failed:', humanizeError.message);
+        humanizationResult = { applied: false, error: humanizeError.message };
       }
-    } else if (chatSettings?.useAntiAIDetection) {
+    } else if (chatSettings?.useAntiAIDetection && text.length > 100) {
       // Apply lighter humanization (just imperfection injection)
-      text = humanizeService.injectHumanImperfections(text, profile.voice_profile);
+      text = humanizeService.injectHumanImperfections(text, voiceProfile);
+      humanizationResult = { applied: true, method: 'anti-ai' };
     }
 
     // Log activity
@@ -622,17 +657,23 @@ exports.sendMessageHumanizedStream = async (req, res) => {
       });
     }
 
-    console.log(`[INFO] Humanized stream request: ${messages.length} messages, model: ${model}`);
+    console.log(`[INFO] Humanized stream request: ${messages.length} messages, model: ${model}, profileId: ${profileId || 'none'}`);
 
-    // Load profile
+    // Load profile (optional - can be null for generic humanization)
     const profile = await loadProfile(profileId);
+    
+    // Use profile voice or generic voice
+    const voiceProfile = profile?.voice_profile || {
+      tone: 'natural',
+      formality_level: 5,
+      key_characteristics: ['clear', 'engaging', 'authentic']
+    };
     
     // Build enhanced system prompt
     let enhancedSystemPrompt = buildEnhancedSystemPrompt(systemPrompt, profile, writingPreferences);
     
     // Add anti-AI detection rules to system prompt
-    if (profile?.voice_profile && (chatSettings?.useAntiAIDetection || chatSettings?.humanizeResponse)) {
-      const voiceProfile = profile.voice_profile;
+    if (chatSettings?.useAntiAIDetection || chatSettings?.humanizeResponse) {
       
       // Add comprehensive anti-AI instructions
       enhancedSystemPrompt += `
@@ -724,24 +765,112 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
       }
     }
 
-    // If full humanization is enabled, apply post-processing
+    // Smart humanization based on text length and settings
     let humanizationResult = null;
-    if (chatSettings?.humanizeResponse && profile?.voice_profile && fullText.length > 100) {
+    let finalText = fullText;
+    
+    if (chatSettings?.humanizeResponse && fullText.length > 100) {
       try {
-        // Apply light imperfection injection (non-blocking)
-        const humanizedText = humanizeService.injectHumanImperfections(fullText, profile.voice_profile);
+        const targetProbability = chatSettings.targetAIProbability || 35;
         
-        // If text changed, send the humanized version
-        if (humanizedText !== fullText) {
-          res.write(`data: ${JSON.stringify({ 
-            type: 'humanized',
-            text: humanizedText
-          })}\n\n`);
+        // For short responses (< 500 chars), just apply imperfection injection
+        // For longer responses, do a quick AI check first
+        if (fullText.length < 500) {
+          // Light humanization - just imperfection injection
+          finalText = humanizeService.injectHumanImperfections(fullText, voiceProfile);
+          humanizationResult = { applied: true, method: 'light' };
+          console.log('[INFO] Applied light humanization for short response');
+        } else {
+          // For longer text, check AI probability first
+          console.log('[INFO] Checking AI probability for longer response...');
+          const aiCheck = await geminiService.detectAIContentEnhanced(fullText);
+          
+          if (aiCheck.aiProbability > targetProbability + 15) {
+            // AI probability is significantly above target - do one refinement iteration
+            console.log(`[INFO] AI probability ${aiCheck.aiProbability}% > target ${targetProbability}%, applying refinement...`);
+            
+            // Send progress to client
+            res.write(`data: ${JSON.stringify({ 
+              type: 'humanizing',
+              aiProbability: aiCheck.aiProbability,
+              target: targetProbability
+            })}\n\n`);
+            
+            // Single refinement iteration (cost-effective)
+            const refinementContext = humanizeService.buildRefinementContext(
+              fullText, 
+              aiCheck.aiIndicators, 
+              aiCheck.aiProbability
+            );
+            
+            finalText = await humanizeService.rewriteWithAntiDetection(
+              fullText,
+              voiceProfile,
+              { 
+                sampleText: profile?.sample_text,
+                refinementContext,
+                writingPreferences 
+              },
+              'gemini-2.0-flash-exp' // Use fast model for refinement
+            );
+            
+            // Quick re-check (optional, for logging)
+            const recheck = await geminiService.detectAIContentEnhanced(finalText);
+            
+            humanizationResult = { 
+              applied: true, 
+              method: 'refinement',
+              iterations: 1,
+              beforeAI: aiCheck.aiProbability,
+              afterAI: recheck.aiProbability,
+              improved: recheck.aiProbability < aiCheck.aiProbability
+            };
+            
+            console.log(`[SUCCESS] Refinement complete: ${aiCheck.aiProbability}% -> ${recheck.aiProbability}%`);
+          } else if (aiCheck.aiProbability > targetProbability) {
+            // AI probability slightly above target - just apply imperfections
+            finalText = humanizeService.injectHumanImperfections(fullText, voiceProfile);
+            humanizationResult = { 
+              applied: true, 
+              method: 'imperfections',
+              aiProbability: aiCheck.aiProbability
+            };
+            console.log(`[INFO] AI probability ${aiCheck.aiProbability}% close to target, applied imperfections only`);
+          } else {
+            // Already below target - no humanization needed
+            humanizationResult = { 
+              applied: false, 
+              reason: 'already_human',
+              aiProbability: aiCheck.aiProbability
+            };
+            console.log(`[INFO] AI probability ${aiCheck.aiProbability}% already below target ${targetProbability}%`);
+          }
         }
         
-        humanizationResult = { applied: true };
+        // Send humanized text if changed
+        if (finalText !== fullText) {
+          res.write(`data: ${JSON.stringify({ 
+            type: 'humanized',
+            text: finalText
+          })}\n\n`);
+        }
       } catch (e) {
         console.warn('[WARN] Post-humanization failed:', e.message);
+        humanizationResult = { applied: false, error: e.message };
+      }
+    } else if (chatSettings?.useAntiAIDetection && fullText.length > 100) {
+      // Anti-AI detection only (no full humanization) - just apply imperfections
+      try {
+        finalText = humanizeService.injectHumanImperfections(fullText, voiceProfile);
+        if (finalText !== fullText) {
+          res.write(`data: ${JSON.stringify({ 
+            type: 'humanized',
+            text: finalText
+          })}\n\n`);
+        }
+        humanizationResult = { applied: true, method: 'anti-ai' };
+      } catch (e) {
+        console.warn('[WARN] Anti-AI imperfection injection failed:', e.message);
       }
     }
 

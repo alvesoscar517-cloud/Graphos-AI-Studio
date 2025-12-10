@@ -61,7 +61,8 @@ async function createJob(params) {
     targetProbability = 35,
     model = 'gemini-2.0-flash-exp',
     creditsBefore = 0,
-    estimatedCost = 0
+    estimatedCost = 0,
+    writingPreferences = {}
   } = params;
 
   const jobId = uuidv4();
@@ -76,6 +77,7 @@ async function createJob(params) {
     maxIterations: Math.min(maxIterations, MAX_ITERATIONS),
     targetProbability: Math.max(targetProbability, MIN_TARGET_PROBABILITY),
     model,
+    writingPreferences, // Store writing preferences for prompt building
     // Credit tracking - will be calculated after completion
     creditsBefore,
     estimatedCost,
@@ -222,7 +224,7 @@ async function processJob(jobId) {
       jobId,
       job.text,
       voiceProfile,
-      { sampleText },
+      { sampleText, writingPreferences: job.writingPreferences },
       {
         maxIterations: job.maxIterations,
         targetProbability: job.targetProbability,

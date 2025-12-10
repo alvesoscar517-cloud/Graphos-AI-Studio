@@ -92,44 +92,90 @@ const HUMAN_MARKERS = {
 // ============================================================================
 
 /**
+ * Build voice profile description based on writing preferences
+ * @param {Object} voiceProfile - Voice profile object
+ * @param {Object} writingPreferences - User's writing preferences (toggles)
+ * @returns {string} - Voice description for prompt
+ */
+function buildVoiceDescription(voiceProfile, writingPreferences = {}) {
+  // Default all preferences to true if not specified
+  const prefs = {
+    useVocabularyPreferences: writingPreferences.useVocabularyPreferences !== false,
+    useKeyCharacteristics: writingPreferences.useKeyCharacteristics !== false,
+    useSentencePatterns: writingPreferences.useSentencePatterns !== false,
+    useRewriteInstructions: writingPreferences.useRewriteInstructions !== false
+  };
+
+  // If no profile or not an object, return generic or string
+  if (!voiceProfile) {
+    return `
+TONE: natural, conversational
+FORMALITY LEVEL: 5/10
+KEY CHARACTERISTICS: clear, engaging, authentic`;
+  }
+
+  if (typeof voiceProfile !== 'object' || !voiceProfile.tone) {
+    return String(voiceProfile);
+  }
+
+  // Build description based on enabled preferences
+  let description = `
+TONE: ${voiceProfile.tone}
+FORMALITY LEVEL: ${voiceProfile.formality_level}/10`;
+
+  // Key Characteristics (controlled by useKeyCharacteristics)
+  if (prefs.useKeyCharacteristics && voiceProfile.key_characteristics?.length > 0) {
+    description += `\nKEY CHARACTERISTICS: ${voiceProfile.key_characteristics.join(', ')}`;
+  }
+
+  // Sentence Patterns (controlled by useSentencePatterns)
+  if (prefs.useSentencePatterns) {
+    if (voiceProfile.sentence_starters?.length > 0) {
+      description += `\nSENTENCE STARTERS: ${voiceProfile.sentence_starters.join(', ')}`;
+    }
+    if (voiceProfile.transition_preferences?.length > 0) {
+      description += `\nTRANSITION PREFERENCES: ${voiceProfile.transition_preferences.join(', ')}`;
+    }
+    if (voiceProfile.punctuation_style) {
+      description += `\nPUNCTUATION STYLE: ${voiceProfile.punctuation_style}`;
+    }
+    if (voiceProfile.sentence_patterns?.structure_preference) {
+      description += `\nSENTENCE STRUCTURE: ${voiceProfile.sentence_patterns.structure_preference}`;
+    }
+    if (voiceProfile.sentence_patterns?.opening_style) {
+      description += `\nOPENING STYLE: ${voiceProfile.sentence_patterns.opening_style}`;
+    }
+  }
+
+  // Vocabulary Preferences (controlled by useVocabularyPreferences)
+  if (prefs.useVocabularyPreferences && voiceProfile.vocabulary_preferences) {
+    const vocab = voiceProfile.vocabulary_preferences;
+    if (vocab.common_phrases?.length > 0) {
+      description += `\nCOMMON PHRASES: ${vocab.common_phrases.join(', ')}`;
+    }
+    if (vocab.preferred_connectors?.length > 0) {
+      description += `\nPREFERRED CONNECTORS: ${vocab.preferred_connectors.join(', ')}`;
+    }
+    if (vocab.avoid_words?.length > 0) {
+      description += `\nWORDS TO AVOID: ${vocab.avoid_words.join(', ')}`;
+    }
+  }
+
+  return description;
+}
+
+/**
  * Build simple rewrite prompt WITHOUT anti-AI detection rules
  * Used when user disables anti-AI detection
  * @param {string} originalText - Text to rewrite
  * @param {Object} voiceProfile - Voice profile object (can be null for generic)
  * @param {string} sampleText - Sample text from user's writing (for few-shot)
- * @param {Object} options - Additional options
+ * @param {Object} options - Additional options including writingPreferences
  * @returns {string} - Simple prompt
  */
 function buildSimpleRewritePrompt(originalText, voiceProfile, sampleText = null, options = {}) {
-  // Build voice profile description
-  let voiceDescription = '';
-  if (voiceProfile && typeof voiceProfile === 'object' && voiceProfile.tone) {
-    voiceDescription = `
-TONE: ${voiceProfile.tone}
-FORMALITY LEVEL: ${voiceProfile.formality_level}/10
-KEY CHARACTERISTICS: ${(voiceProfile.key_characteristics || []).join(', ')}
-SENTENCE STARTERS: ${(voiceProfile.sentence_starters || []).join(', ')}
-TRANSITION PREFERENCES: ${(voiceProfile.transition_preferences || []).join(', ')}
-PUNCTUATION STYLE: ${voiceProfile.punctuation_style || 'Standard'}`;
-
-    if (voiceProfile.vocabulary_preferences) {
-      const vocab = voiceProfile.vocabulary_preferences;
-      if (vocab.common_phrases?.length > 0) {
-        voiceDescription += `\nCOMMON PHRASES: ${vocab.common_phrases.join(', ')}`;
-      }
-      if (vocab.preferred_connectors?.length > 0) {
-        voiceDescription += `\nPREFERRED CONNECTORS: ${vocab.preferred_connectors.join(', ')}`;
-      }
-    }
-  } else if (voiceProfile) {
-    voiceDescription = String(voiceProfile);
-  } else {
-    // Generic voice profile when none provided
-    voiceDescription = `
-TONE: natural, conversational
-FORMALITY LEVEL: 5/10
-KEY CHARACTERISTICS: clear, engaging, authentic`;
-  }
+  const writingPreferences = options.writingPreferences || {};
+  const voiceDescription = buildVoiceDescription(voiceProfile, writingPreferences);
 
   let prompt = `You are an expert writer. Rewrite the following text to match the target voice profile while preserving the original meaning.
 
@@ -148,8 +194,9 @@ EXAMPLE OF THIS PERSON'S ACTUAL WRITING (MIMIC THIS STYLE):
 "${sampleText.substring(0, 1500)}"`;
   }
 
-  // Add rewrite instructions from profile if available
-  if (voiceProfile?.rewrite_instructions) {
+  // Add rewrite instructions from profile if enabled
+  const useRewriteInstructions = writingPreferences.useRewriteInstructions !== false;
+  if (useRewriteInstructions && voiceProfile?.rewrite_instructions) {
     prompt += `
 
 ═══════════════════════════════════════════════════════════════
@@ -177,41 +224,16 @@ REWRITTEN TEXT (output ONLY the rewritten text):
  * @param {string} originalText - Text to rewrite
  * @param {Object} voiceProfile - Voice profile object
  * @param {string} sampleText - Sample text from user's writing (for few-shot)
- * @param {Object} options - Additional options
+ * @param {Object} options - Additional options including writingPreferences
  * @returns {string} - Enhanced prompt
  */
 function buildEnhancedRewritePrompt(originalText, voiceProfile, sampleText = null, options = {}) {
   const lang = analysisService.detectLanguage(originalText);
   const aiPhrases = AI_PHRASES_TO_AVOID[lang] || AI_PHRASES_TO_AVOID.en;
+  const writingPreferences = options.writingPreferences || {};
   
-  // Build voice profile description
-  let voiceDescription = '';
-  if (typeof voiceProfile === 'object' && voiceProfile.tone) {
-    voiceDescription = `
-TONE: ${voiceProfile.tone}
-FORMALITY LEVEL: ${voiceProfile.formality_level}/10
-KEY CHARACTERISTICS: ${(voiceProfile.key_characteristics || []).join(', ')}
-SENTENCE STARTERS: ${(voiceProfile.sentence_starters || []).join(', ')}
-TRANSITION PREFERENCES: ${(voiceProfile.transition_preferences || []).join(', ')}
-PUNCTUATION STYLE: ${voiceProfile.punctuation_style || 'Standard'}
-SENTENCE STRUCTURE: ${voiceProfile.sentence_patterns?.structure_preference || 'varied'}
-OPENING STYLE: ${voiceProfile.sentence_patterns?.opening_style || 'Natural'}`;
-
-    if (voiceProfile.vocabulary_preferences) {
-      const vocab = voiceProfile.vocabulary_preferences;
-      if (vocab.common_phrases?.length > 0) {
-        voiceDescription += `\nCOMMON PHRASES: ${vocab.common_phrases.join(', ')}`;
-      }
-      if (vocab.preferred_connectors?.length > 0) {
-        voiceDescription += `\nPREFERRED CONNECTORS: ${vocab.preferred_connectors.join(', ')}`;
-      }
-      if (vocab.avoid_words?.length > 0) {
-        voiceDescription += `\nWORDS TO AVOID: ${vocab.avoid_words.join(', ')}`;
-      }
-    }
-  } else {
-    voiceDescription = String(voiceProfile);
-  }
+  // Build voice profile description based on writing preferences
+  const voiceDescription = buildVoiceDescription(voiceProfile, writingPreferences);
 
   // Build the enhanced prompt
   let prompt = `You are an expert ghostwriter who must rewrite text to PERFECTLY match a specific human's writing style. Your goal is to make the output COMPLETELY INDISTINGUISHABLE from human writing.
@@ -269,8 +291,9 @@ EXAMPLE OF THIS PERSON'S ACTUAL WRITING (MIMIC THIS STYLE):
 "${sampleText.substring(0, 1500)}"`;
   }
 
-  // Add rewrite instructions from profile if available
-  if (voiceProfile?.rewrite_instructions) {
+  // Add rewrite instructions from profile if enabled
+  const useRewriteInstructions = writingPreferences.useRewriteInstructions !== false;
+  if (useRewriteInstructions && voiceProfile?.rewrite_instructions) {
     prompt += `
 
 ═══════════════════════════════════════════════════════════════
@@ -488,12 +511,15 @@ async function rewriteWithAntiDetection(originalText, voiceProfile, context = {}
     // Get sample text for few-shot learning
     const sampleText = context.sampleText || voiceProfile?.sample_text || null;
     
-    // Build enhanced prompt
+    // Build enhanced prompt with writing preferences
     const prompt = buildEnhancedRewritePrompt(
       originalText, 
       voiceProfile, 
       sampleText,
-      { refinementContext: context.refinementContext }
+      { 
+        refinementContext: context.refinementContext,
+        writingPreferences: context.writingPreferences 
+      }
     );
 
     console.log(`[HUMANIZE] Generating rewrite with enhanced anti-AI prompt...`);

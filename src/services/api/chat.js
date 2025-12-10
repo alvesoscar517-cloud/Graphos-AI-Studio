@@ -57,10 +57,10 @@ function formatErrorMessage(error) {
  * @param {string} profileId 
  * @param {Object} writingPreferences 
  * @param {Function} onChunk - Called for each text chunk
- * @param {Object} options - Additional options
- * @param {Function} options.onContext - Called when context info received
- * @param {Function} options.onComplete - Called when stream completes
- * @param {string} options.conversationSummary - Existing conversation summary
+ * @param {Object} [options] - Additional options
+ * @param {Function} [options.onContext] - Called when context info received
+ * @param {Function} [options.onComplete] - Called when stream completes
+ * @param {string} [options.conversationSummary] - Existing conversation summary
  * @returns {Promise<Object>} - { success, summary, error }
  */
 export async function sendChatMessageStream(
@@ -290,7 +290,7 @@ export async function sendHumanizedChatStream(
   onChunk,
   options = {}
 ) {
-  const { onContext, onComplete, onHumanized, conversationSummary } = options
+  const { onContext, onComplete, onHumanized, onHumanizing, conversationSummary } = options
   
   try {
     console.log('📡 Sending humanized chat stream request...')
@@ -357,6 +357,9 @@ export async function sendHumanizedChatStream(
               
               if (json.type === 'context' && onContext) {
                 onContext(json)
+              } else if (json.type === 'humanizing' && onHumanizing) {
+                // Humanization in progress
+                onHumanizing(json)
               } else if (json.type === 'humanized' && onHumanized) {
                 // Received fully humanized text
                 onHumanized(json.text)

@@ -216,7 +216,7 @@ export async function iterativeHumanize(profileId, text, options = {}) {
  * Start async iterative humanize job
  * @param {string|null} profileId - Profile ID (optional, null for generic humanization)
  * @param {string} text 
- * @param {Object} options - { maxIterations, targetProbability, model }
+ * @param {Object} options - { maxIterations, targetProbability, model, writingPreferences }
  * @returns {Promise<Object>} - { success, jobId, estimatedTime }
  */
 export async function startIterativeHumanize(profileId, text, options = {}) {
@@ -235,7 +235,8 @@ export async function startIterativeHumanize(profileId, text, options = {}) {
       text: text,
       max_iterations: options.maxIterations || 3,
       target_probability: options.targetProbability || 35,
-      model: options.model || 'gemini-2.0-flash-exp'
+      model: options.model || 'gemini-2.0-flash-exp',
+      writing_preferences: options.writingPreferences || {}
     }
     
     // Only include profile_id if provided

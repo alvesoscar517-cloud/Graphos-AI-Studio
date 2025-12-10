@@ -211,6 +211,30 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
+                  {/* Clear selection option - only show when a profile is selected */}
+                  {currentProfile && !searchTerm && (
+                    <div 
+                      className={cn(
+                        "bg-bg-secondary border border-border-light rounded-xl",
+                        "p-4 cursor-pointer transition-all duration-200",
+                        "hover:border-border-hover hover:shadow-sm",
+                        "flex items-center gap-3"
+                      )}
+                      onClick={() => handleSelectProfile(null)}
+                    >
+                      <div className="card-icon !w-10 !h-10 shrink-0 bg-fill-tertiary">
+                        <Icon name="user-x" size="md" color="muted" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-text-primary m-0">
+                          {t('profile.clearSelection')}
+                        </h3>
+                        <p className="text-xs text-text-muted m-0 mt-0.5">
+                          {t('profile.clearSelectionDesc')}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   {filteredProfiles.map(profile => (
                     <div 
                       key={profile.profile_id}

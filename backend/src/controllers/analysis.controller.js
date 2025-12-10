@@ -871,7 +871,7 @@ exports.rewriteTextStream = async (req, res) => {
         text,
         voiceProfile,
         sampleText,
-        {}
+        { writingPreferences: writing_preferences }
       );
       console.log('[REWRITE] Using enhanced prompt with anti-AI detection');
     } else {
@@ -880,7 +880,7 @@ exports.rewriteTextStream = async (req, res) => {
         text,
         voiceProfile,
         sampleText,
-        {}
+        { writingPreferences: writing_preferences }
       );
       console.log('[REWRITE] Using simple prompt without anti-AI detection');
     }
@@ -1173,7 +1173,8 @@ exports.startIterativeHumanize = async (req, res) => {
       user_id,
       max_iterations = 3,
       target_probability = 35,
-      model: requestedModel = 'gemini-2.0-flash-exp'
+      model: requestedModel = 'gemini-2.0-flash-exp',
+      writing_preferences = {}
     } = req.body;
 
     // Validate user_id
@@ -1242,6 +1243,7 @@ exports.startIterativeHumanize = async (req, res) => {
       maxIterations: Math.min(max_iterations, 5),
       targetProbability: Math.max(target_probability, 20),
       model,
+      writingPreferences: writing_preferences, // Pass writing preferences for prompt building
       // Pass credit info for deduction after completion
       creditsBefore: userCredits.balance,
       estimatedCost

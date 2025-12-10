@@ -350,8 +350,9 @@ export const WorkspaceProvider = ({ children }) => {
       const useHumanizedChat = chatSettings.humanizeResponse || chatSettings.useAntiAIDetection
 
       // Import appropriate streaming function
+      // Humanized chat can work with or without profile (generic humanization)
       const { sendChatMessageStream, sendHumanizedChatStream } = await import('../services/api')
-      const streamFunction = useHumanizedChat && currentProfile ? sendHumanizedChatStream : sendChatMessageStream
+      const streamFunction = useHumanizedChat ? sendHumanizedChatStream : sendChatMessageStream
 
       let fullText = ''
       let displayedText = ''
@@ -395,14 +396,14 @@ export const WorkspaceProvider = ({ children }) => {
       }))
 
       // Use humanized or standard chat based on settings
-      if (useHumanizedChat && currentProfile) {
-        console.log('🎭 Using humanized chat with voice profile')
+      if (useHumanizedChat) {
+        console.log('🎭 Using humanized chat', currentProfile ? 'with voice profile' : 'with generic voice')
         await streamFunction(
           apiMessages,
           currentConversation?.systemPrompt || generateSystemPrompt(),
           actualModel,
           modelSettings.temperature || 0.7,
-          currentProfile.profile_id,
+          currentProfile?.profile_id || null, // Can be null for generic humanization
           modelSettings.writingPreferences || null,
           chatSettings,
           (chunk) => {
@@ -418,6 +419,10 @@ export const WorkspaceProvider = ({ children }) => {
               if (contextInfo.wasSummarized) {
                 console.log(`[NOTE] Conversation summarized (${contextInfo.summarizedCount} messages)`)
               }
+            },
+            onHumanizing: (humanizingInfo) => {
+              // Humanization in progress - show status
+              console.log(`🔄 Humanizing: AI probability ${humanizingInfo.aiProbability}% -> target ${humanizingInfo.target}%`)
             },
             onHumanized: (humanizedText) => {
               // Replace with fully humanized text

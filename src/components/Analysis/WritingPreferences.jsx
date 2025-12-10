@@ -267,6 +267,18 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
           </div>
         </div>
       )}
+
+      {/* Warning when has profile but all features disabled */}
+      {!isProfileDisabled && !localPreferences.useAntiAIDetection && !localPreferences.useIterativeRefinement && 
+       !localPreferences.useVocabularyPreferences && !localPreferences.useKeyCharacteristics && 
+       !localPreferences.useSentencePatterns && !localPreferences.useRewriteInstructions && (
+        <div className="flex items-start gap-2 py-2.5 px-3 bg-bg-secondary border border-border-light rounded-xl mt-1">
+          <Icon name="alert-circle" alt={t('common.info')} size="sm" color="muted" className="shrink-0 mt-0.5" />
+          <div className="text-xs text-text-secondary leading-relaxed">
+            {t('writingPreferences.enableAtLeastOneFeature')}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
