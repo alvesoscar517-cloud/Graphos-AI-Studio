@@ -92,6 +92,87 @@ const HUMAN_MARKERS = {
 // ============================================================================
 
 /**
+ * Build simple rewrite prompt WITHOUT anti-AI detection rules
+ * Used when user disables anti-AI detection
+ * @param {string} originalText - Text to rewrite
+ * @param {Object} voiceProfile - Voice profile object (can be null for generic)
+ * @param {string} sampleText - Sample text from user's writing (for few-shot)
+ * @param {Object} options - Additional options
+ * @returns {string} - Simple prompt
+ */
+function buildSimpleRewritePrompt(originalText, voiceProfile, sampleText = null, options = {}) {
+  // Build voice profile description
+  let voiceDescription = '';
+  if (voiceProfile && typeof voiceProfile === 'object' && voiceProfile.tone) {
+    voiceDescription = `
+TONE: ${voiceProfile.tone}
+FORMALITY LEVEL: ${voiceProfile.formality_level}/10
+KEY CHARACTERISTICS: ${(voiceProfile.key_characteristics || []).join(', ')}
+SENTENCE STARTERS: ${(voiceProfile.sentence_starters || []).join(', ')}
+TRANSITION PREFERENCES: ${(voiceProfile.transition_preferences || []).join(', ')}
+PUNCTUATION STYLE: ${voiceProfile.punctuation_style || 'Standard'}`;
+
+    if (voiceProfile.vocabulary_preferences) {
+      const vocab = voiceProfile.vocabulary_preferences;
+      if (vocab.common_phrases?.length > 0) {
+        voiceDescription += `\nCOMMON PHRASES: ${vocab.common_phrases.join(', ')}`;
+      }
+      if (vocab.preferred_connectors?.length > 0) {
+        voiceDescription += `\nPREFERRED CONNECTORS: ${vocab.preferred_connectors.join(', ')}`;
+      }
+    }
+  } else if (voiceProfile) {
+    voiceDescription = String(voiceProfile);
+  } else {
+    // Generic voice profile when none provided
+    voiceDescription = `
+TONE: natural, conversational
+FORMALITY LEVEL: 5/10
+KEY CHARACTERISTICS: clear, engaging, authentic`;
+  }
+
+  let prompt = `You are an expert writer. Rewrite the following text to match the target voice profile while preserving the original meaning.
+
+═══════════════════════════════════════════════════════════════
+TARGET VOICE PROFILE:
+═══════════════════════════════════════════════════════════════
+${voiceDescription}`;
+
+  // Add few-shot example if available
+  if (sampleText && sampleText.length > 50) {
+    prompt += `
+
+═══════════════════════════════════════════════════════════════
+EXAMPLE OF THIS PERSON'S ACTUAL WRITING (MIMIC THIS STYLE):
+═══════════════════════════════════════════════════════════════
+"${sampleText.substring(0, 1500)}"`;
+  }
+
+  // Add rewrite instructions from profile if available
+  if (voiceProfile?.rewrite_instructions) {
+    prompt += `
+
+═══════════════════════════════════════════════════════════════
+SPECIFIC REWRITE INSTRUCTIONS:
+═══════════════════════════════════════════════════════════════
+${voiceProfile.rewrite_instructions}`;
+  }
+
+  prompt += `
+
+═══════════════════════════════════════════════════════════════
+ORIGINAL TEXT TO REWRITE:
+═══════════════════════════════════════════════════════════════
+${originalText}
+
+═══════════════════════════════════════════════════════════════
+REWRITTEN TEXT (output ONLY the rewritten text):
+═══════════════════════════════════════════════════════════════`;
+
+  return prompt;
+}
+
+/**
  * Build enhanced rewrite prompt with anti-AI detection rules
  * @param {string} originalText - Text to rewrite
  * @param {Object} voiceProfile - Voice profile object
@@ -614,6 +695,7 @@ module.exports = {
   
   // Utility functions
   buildEnhancedRewritePrompt,
+  buildSimpleRewritePrompt,
   buildRefinementContext,
   injectHumanImperfections,
   addContractions,

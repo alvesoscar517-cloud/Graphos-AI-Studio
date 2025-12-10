@@ -90,11 +90,12 @@ const RewriteToolbar = ({
       return
     }
 
-    // Check if iterative refinement is enabled
+    // Check if iterative refinement or anti-AI detection is enabled
     const useIterative = writingPreferences?.useIterativeRefinement
+    const useAntiAI = writingPreferences?.useAntiAIDetection
     
-    // For iterative humanize, profile is optional
-    if (!useIterative && !currentProfile) return
+    // For iterative humanize or anti-AI detection, profile is optional
+    if (!useIterative && !useAntiAI && !currentProfile) return
     if (isLoading) return
     
     const originalText = text // Save original text for error recovery
@@ -448,7 +449,7 @@ const RewriteToolbar = ({
               {/* Main Rewrite Button */}
               <Button
                 onClick={handleRewrite}
-                disabled={disabled || isLoading || !text || (!currentProfile && !writingPreferences?.useIterativeRefinement)}
+                disabled={disabled || isLoading || !text || (!currentProfile && !writingPreferences?.useIterativeRefinement && !writingPreferences?.useAntiAIDetection)}
                 ariaLabel={t('rewrite.rewriteText')}
                 active={isLoading}
                 variant={writingPreferences?.useIterativeRefinement ? 'primary' : ''}

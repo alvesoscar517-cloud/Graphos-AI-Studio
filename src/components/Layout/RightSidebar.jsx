@@ -84,9 +84,11 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       return
     }
 
-    // For iterative humanize, profile is optional
+    // For iterative humanize or anti-AI detection, profile is optional
     const useIterative = writingPreferences?.useIterativeRefinement
-    if (!useIterative && !currentProfile) return
+    const useAntiAI = writingPreferences?.useAntiAIDetection
+    // If no profile and no humanization features enabled, can't rewrite
+    if (!useIterative && !useAntiAI && !currentProfile) return
     if (isRewriting) return
     
     const originalText = text
@@ -499,7 +501,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
                   "disabled:opacity-50 disabled:cursor-not-allowed"
                 )}
                 onClick={handleRewrite}
-                disabled={!hasText || (!hasProfile && !writingPreferences?.useIterativeRefinement) || isRewriting || isProcessing}
+                disabled={!hasText || (!hasProfile && !writingPreferences?.useIterativeRefinement && !writingPreferences?.useAntiAIDetection) || isRewriting || isProcessing}
               >
                 {isRewriting ? (
                   // @ts-ignore - LazyLottie props are correct

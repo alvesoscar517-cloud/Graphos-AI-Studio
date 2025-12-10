@@ -971,6 +971,7 @@
     "antiAIInfo": "Chống phát hiện AI áp dụng các quy tắc nâng cao để làm cho văn bản của bạn không thể phân biệt được với văn phong con người, bao gồm viết tắt tự nhiên, độ dài câu đa dạng và tránh các cụm từ điển hình của AI.",
     "iterativeRefinementInfo": "Tính năng này viết lại văn bản nhiều lần, kiểm tra xác suất AI sau mỗi lần lặp cho đến khi đạt mục tiêu. Có thể mất 30-90 giây tùy thuộc vào độ dài văn bản và mô hình. Credits được tính dựa trên số lần lặp thực tế.",
     "worksWithoutProfile": "Hoạt động mà không cần hồ sơ cho việc nhân hóa chung.",
+    "enableFeatureOrSelectProfile": "Bật Chống phát hiện AI hoặc Tinh chỉnh lặp, hoặc chọn một hồ sơ để sử dụng tính năng viết lại.",
     "new": "MỚI",
     "beta": "BETA",
     "selectProfileNotice": "Chọn một hồ sơ để kích hoạt tùy chỉnh phong cách viết"

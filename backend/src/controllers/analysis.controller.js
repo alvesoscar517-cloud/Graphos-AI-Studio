@@ -806,49 +806,84 @@ exports.rewriteTextStream = async (req, res) => {
     // Validate model
     const model = validateModel(requestedModel, 'gemini-2.5-flash');
 
-    if (!profile_id || !text) {
+    // Text is required
+    if (!text) {
       return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
 
-    const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
-    if (!profileDoc.exists) {
-      return res.status(404).json({ success: false, ...l.error('not_found') });
-    }
+    // Check if anti-AI detection is enabled (default: true)
+    const useAntiAIDetection = writing_preferences?.useAntiAIDetection !== false;
 
-    const profileData = profileDoc.data();
-    const voiceProfile = profileData.voiceProfile || profileData.promptableSummary;
-
-    // Get sample text for few-shot learning
+    // Profile is optional - if not provided, use generic voice
+    let voiceProfile = null;
+    let profileData = null;
     let sampleText = null;
-    try {
-      const samplesSnapshot = await db.collection('voice_profiles')
-        .doc(profile_id)
-        .collection('samples')
-        .where('type', '==', 'long')
-        .limit(1)
-        .get();
-      
-      if (!samplesSnapshot.empty) {
-        sampleText = samplesSnapshot.docs[0].data().text?.substring(0, 1000);
+
+    if (profile_id) {
+      const profileDoc = await db.collection('voice_profiles').doc(profile_id).get();
+      if (!profileDoc.exists) {
+        return res.status(404).json({ success: false, ...l.error('not_found') });
       }
-    } catch (e) {
-      console.log('[WARN] Could not fetch sample text:', e.message);
+
+      profileData = profileDoc.data();
+      voiceProfile = profileData.voiceProfile || profileData.promptableSummary;
+
+      // Get sample text for few-shot learning
+      try {
+        const samplesSnapshot = await db.collection('voice_profiles')
+          .doc(profile_id)
+          .collection('samples')
+          .where('type', '==', 'long')
+          .limit(1)
+          .get();
+        
+        if (!samplesSnapshot.empty) {
+          sampleText = samplesSnapshot.docs[0].data().text?.substring(0, 1000);
+        }
+      } catch (e) {
+        console.log('[WARN] Could not fetch sample text:', e.message);
+      }
+    } else {
+      // Generic voice profile when no profile provided
+      voiceProfile = {
+        tone: 'natural',
+        formality_level: 5,
+        key_characteristics: ['clear', 'engaging', 'authentic'],
+        sentence_starters: [],
+        transition_preferences: [],
+        punctuation_style: 'Standard'
+      };
+      console.log('[REWRITE] Using generic voice profile (no profile_id provided)');
     }
 
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    // Import humanize service for enhanced prompt
+    // Import humanize service for prompt building
     const humanizeService = require('../services/humanize.service');
     
-    // Build enhanced prompt with anti-AI detection rules
-    const prompt = humanizeService.buildEnhancedRewritePrompt(
-      text,
-      voiceProfile,
-      sampleText,
-      {}
-    );
+    // Build prompt based on anti-AI detection setting
+    let prompt;
+    if (useAntiAIDetection) {
+      // Build enhanced prompt with anti-AI detection rules
+      prompt = humanizeService.buildEnhancedRewritePrompt(
+        text,
+        voiceProfile,
+        sampleText,
+        {}
+      );
+      console.log('[REWRITE] Using enhanced prompt with anti-AI detection');
+    } else {
+      // Build simple prompt without anti-AI detection rules
+      prompt = humanizeService.buildSimpleRewritePrompt(
+        text,
+        voiceProfile,
+        sampleText,
+        {}
+      );
+      console.log('[REWRITE] Using simple prompt without anti-AI detection');
+    }
 
     const modelName = model || 'gemini-2.5-flash';
     const generativeModel = geminiService.vertexAI.getGenerativeModel({ 
