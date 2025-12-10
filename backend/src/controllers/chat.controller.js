@@ -257,10 +257,27 @@ exports.sendMessageStream = async (req, res) => {
 
     let totalChars = 0;
     for await (const chunk of streamResult.stream) {
-      const chunkText = chunk.text();
-      if (chunkText) {
-        totalChars += chunkText.length;
-        res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+      try {
+        // Try different ways to extract text from chunk (same as analysis controller)
+        let chunkText = null;
+        
+        if (typeof chunk.text === 'function') {
+          chunkText = chunk.text();
+        } else if (chunk.candidates && chunk.candidates[0]) {
+          const candidate = chunk.candidates[0];
+          if (candidate.content && candidate.content.parts && candidate.content.parts[0]) {
+            chunkText = candidate.content.parts[0].text;
+          }
+        } else if (chunk.text) {
+          chunkText = chunk.text;
+        }
+        
+        if (chunkText) {
+          totalChars += chunkText.length;
+          res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+        }
+      } catch (chunkError) {
+        console.error('[ERROR] Error processing chunk:', chunkError);
       }
     }
 
@@ -293,6 +310,13 @@ exports.sendMessageStream = async (req, res) => {
 
   } catch (error) {
     console.error('[ERROR] Chat stream error:', error);
+    console.error('[ERROR] Chat stream error details:', {
+      message: error.message,
+      code: error.code,
+      status: error.status,
+      details: error.details,
+      stack: error.stack?.substring(0, 500)
+    });
     const formattedError = formatError(error);
     res.write(`data: ${JSON.stringify({ 
       error: formattedError.message,
@@ -757,11 +781,28 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
     let fullText = '';
     
     for await (const chunk of streamResult.stream) {
-      const chunkText = chunk.text();
-      if (chunkText) {
-        totalChars += chunkText.length;
-        fullText += chunkText;
-        res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+      try {
+        // Try different ways to extract text from chunk (same as analysis controller)
+        let chunkText = null;
+        
+        if (typeof chunk.text === 'function') {
+          chunkText = chunk.text();
+        } else if (chunk.candidates && chunk.candidates[0]) {
+          const candidate = chunk.candidates[0];
+          if (candidate.content && candidate.content.parts && candidate.content.parts[0]) {
+            chunkText = candidate.content.parts[0].text;
+          }
+        } else if (chunk.text) {
+          chunkText = chunk.text;
+        }
+        
+        if (chunkText) {
+          totalChars += chunkText.length;
+          fullText += chunkText;
+          res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+        }
+      } catch (chunkError) {
+        console.error('[ERROR] Error processing chunk:', chunkError);
       }
     }
 

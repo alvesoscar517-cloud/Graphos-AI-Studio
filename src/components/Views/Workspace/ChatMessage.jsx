@@ -42,7 +42,7 @@ const ChatMessage = ({ message }) => {
 
   return (
     <div className={cn(
-      "flex w-full mb-6 animate-message-in",
+      "flex w-full animate-message-in",
       isUser ? "justify-end" : "justify-start"
     )}>
       <div className={cn(
@@ -91,7 +91,7 @@ const ChatMessage = ({ message }) => {
                 "rounded-xl p-4"
               )}>
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-start gap-2.5">
+                  <div className="flex items-center gap-2.5">
                     <Icon name={getErrorIcon().replace('/icon/', '').replace('.svg', '')} size="md" color="error" className="shrink-0" />
                     <span className="text-sm leading-relaxed text-error">
                       {message.content}

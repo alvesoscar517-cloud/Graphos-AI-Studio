@@ -159,9 +159,18 @@ function estimateConversationTokens(messages, systemPrompt) {
  */
 function formatError(error) {
   const message = error.message || 'Unknown error';
+  const errorCode = error.code || '';
+  
+  // Log full error for debugging
+  console.error('[formatError] Processing error:', {
+    message,
+    code: errorCode,
+    name: error.name,
+    details: error.details
+  });
   
   // Quota errors
-  if (message.includes('quota') || message.includes('RESOURCE_EXHAUSTED')) {
+  if (message.includes('quota') || message.includes('RESOURCE_EXHAUSTED') || errorCode === 8) {
     return {
       code: 'QUOTA_EXCEEDED',
       message: 'API quota exceeded. Please try again later.',
@@ -175,6 +184,33 @@ function formatError(error) {
       code: 'RATE_LIMITED',
       message: 'Too many requests. Please slow down.',
       retryAfter: 10
+    };
+  }
+  
+  // Permission errors
+  if (message.includes('PERMISSION_DENIED') || message.includes('permission') || errorCode === 7) {
+    return {
+      code: 'PERMISSION_DENIED',
+      message: 'AI service permission error. Check service account.',
+      retryAfter: 0
+    };
+  }
+  
+  // Authentication errors
+  if (message.includes('UNAUTHENTICATED') || message.includes('credentials') || errorCode === 16) {
+    return {
+      code: 'AUTH_ERROR',
+      message: 'AI service authentication failed. Check credentials.',
+      retryAfter: 0
+    };
+  }
+  
+  // Service unavailable
+  if (message.includes('UNAVAILABLE') || message.includes('unavailable') || errorCode === 14) {
+    return {
+      code: 'SERVICE_UNAVAILABLE',
+      message: 'AI service temporarily unavailable. Please try again.',
+      retryAfter: 30
     };
   }
   
@@ -205,11 +241,12 @@ function formatError(error) {
     };
   }
   
-  // Default error
+  // Default error - include original message for debugging
   return {
     code: 'INTERNAL_ERROR',
-    message: 'An error occurred. Please try again.',
-    retryAfter: 5
+    message: `Something went wrong. Please try again.`,
+    retryAfter: 5,
+    debug: process.env.NODE_ENV !== 'production' ? message : undefined
   };
 }
 

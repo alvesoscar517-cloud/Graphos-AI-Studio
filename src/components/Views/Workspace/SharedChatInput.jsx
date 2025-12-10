@@ -70,30 +70,8 @@ const SharedChatInput = ({
   }
 
   return (
-    <div 
-      className={cn(
-        isInline ? [
-          // Inline mode: no absolute positioning, used inside flex container
-          "w-full max-w-2xl"
-        ] : [
-          // Absolute/Fixed positioning mode
-          "absolute left-0 right-0 z-sidebar pointer-events-none",
-          isCentered ? [
-            "top-1/2 -translate-y-1/2 px-6",
-            "transition-all duration-600 ease-smooth"
-          ] : [
-            "fixed bottom-0 translate-y-0 p-4 bg-transparent",
-            "animate-slide-to-bottom"
-          ],
-          "max-md:px-4 max-md:p-3"
-        ]
-      )}
-    >
+    <div className="w-full max-w-3xl">
       <div className={cn(
-        "pointer-events-auto",
-        !isInline && "mx-auto max-w-2xl"
-      )}>
-        <div className={cn(
           "flex items-center gap-2 rounded-3xl py-2.5 px-4 min-h-12",
           "bg-bg-primary border border-border-hover",
           "shadow-sm",
@@ -123,14 +101,15 @@ const SharedChatInput = ({
           <textarea
             ref={textareaRef}
             className={cn(
-              "flex-1 border-none bg-transparent resize-none self-center",
-              "text-md text-text-primary",
-              "py-0 px-1 outline-none",
-              "min-h-6 max-h-20 leading-6",
+              "flex-1 border-none bg-transparent resize-none",
+              "text-text-primary",
+              "py-1.5 px-1 outline-none",
+              "min-h-6 max-h-20",
               "overflow-y-auto scrollbar-none",
               "font-[Google_Sans,Roboto,sans-serif]",
               "placeholder:text-text-muted placeholder:opacity-60",
-              !isCentered && "text-sm"
+              "leading-normal",
+              !isCentered ? "text-sm" : "text-md"
             )}
             placeholder={defaultPlaceholder}
             value={message}
@@ -174,15 +153,14 @@ const SharedChatInput = ({
             </button>
           )}
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept="image/*,.pdf,.txt,.doc,.docx,.csv,.json"
-            className="hidden"
-            onChange={handleFileSelect}
-          />
-        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*,.pdf,.txt,.doc,.docx,.csv,.json"
+          className="hidden"
+          onChange={handleFileSelect}
+        />
       </div>
     </div>
   )

@@ -74,23 +74,21 @@ const WorkspaceView = ({
           {/* WorkspaceSidebar is now rendered in MainLayout */}
         </>
       ) : (
-        <>
-          <WorkspaceChat 
-            onToggleLeftSidebar={onToggleLeftSidebar}
-            onToggleRightSidebar={onToggleRightSidebar}
-            rightSidebarHidden={rightSidebarHidden}
-          />
-          
-          {/* Shared Input - bottom when in conversation */}
-          <SharedChatInput
-            onSendMessage={handleSendMessage}
-            disabled={isLoading}
-            isCentered={false}
-            autoFocus={false}
-            rightSidebarHidden={rightSidebarHidden}
-            leftSidebarHidden={leftSidebarHidden}
-          />
-        </>
+        <WorkspaceChat 
+          onToggleLeftSidebar={onToggleLeftSidebar}
+          onToggleRightSidebar={onToggleRightSidebar}
+          rightSidebarHidden={rightSidebarHidden}
+          chatInput={
+            <SharedChatInput
+              onSendMessage={handleSendMessage}
+              disabled={isLoading}
+              isCentered={false}
+              autoFocus={false}
+              rightSidebarHidden={rightSidebarHidden}
+              leftSidebarHidden={leftSidebarHidden}
+            />
+          }
+        />
       )}
     </div>
   )

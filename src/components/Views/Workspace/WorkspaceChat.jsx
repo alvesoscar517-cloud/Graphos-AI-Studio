@@ -4,13 +4,12 @@ import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import { truncateTitleByWords } from '../../../utils/titleUtils'
 import useAutoScrollbar from '../../../hooks/useAutoScrollbar'
 import ChatMessage from './ChatMessage'
-import WorkspaceSidebar from './WorkspaceSidebar'
 
 import EditTitleModal from '../../Common/EditTitleModal'
 import LazyLottie from '../../Common/LazyLottie'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
 
-const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden }) => {
+const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden, chatInput }) => {
   const { t } = useTranslation()
   const { currentConversation, isLoading, updateConversationTitle, clearConversation } = useWorkspace()
   const messagesEndRef = useRef(null)
@@ -170,34 +169,36 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
       {/* Messages Area */}
       <div 
         ref={messagesContainerRef}
-        className={`workspace-messages ${scrollbarClassName}`}
+        className={`flex-1 overflow-y-auto px-4 py-6 ${scrollbarClassName}`}
         style={{ paddingBottom: '80px' }}
       >
-        {currentConversation?.messages.length === 0 ? (
-          <div className="workspace-empty">
-            <img src="/icon/message-circle.svg" alt="Empty" className="workspace-empty-icon" />
-            <h3 className="workspace-empty-title">{t('workspace.startConversation')}</h3>
-            <p className="workspace-empty-desc">
-              {t('workspace.askAnythingAI')}
-            </p>
-          </div>
-        ) : (
-          <>
-            {currentConversation.messages.map((message) => (
-              <ChatMessage key={message.id} message={message} />
-            ))}
-            {isLoading && (
-              <div className="workspace-loading">
-                <LazyLottie 
-                  animationData={threeDotsAnimation} 
-                  loop={true}
-                  style={{ width: 60, height: 40 }}
-                />
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </>
-        )}
+        <div className="max-w-3xl mx-auto flex flex-col gap-3">
+          {currentConversation?.messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <img src="/icon/message-circle.svg" alt="Empty" className="w-12 h-12 opacity-30 mb-4 icon-invert" />
+              <h3 className="text-lg font-medium text-text-primary mb-2">{t('workspace.startConversation')}</h3>
+              <p className="text-sm text-text-secondary">
+                {t('workspace.askAnythingAI')}
+              </p>
+            </div>
+          ) : (
+            <>
+              {currentConversation.messages.map((message) => (
+                <ChatMessage key={message.id} message={message} />
+              ))}
+              {isLoading && (
+                <div className="flex justify-start py-2">
+                  <LazyLottie 
+                    animationData={threeDotsAnimation} 
+                    loop={true}
+                    style={{ width: 50, height: 30 }}
+                  />
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </>
+          )}
+        </div>
       </div>
 
       {/* Scroll to Bottom Button */}
@@ -211,14 +212,14 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
           <img src="/icon/arrow-down.svg" alt={t('workspace.scrollDown')} />
         </button>
       )}
-      </div>
 
-      {/* Right Sidebar */}
-      <WorkspaceSidebar 
-        hidden={rightSidebarHidden} 
-        onClose={onToggleRightSidebar}
-        onNewChat={clearConversation}
-      />
+      {/* Chat Input - positioned at bottom, aligned with messages */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 pointer-events-none">
+        <div className="max-w-3xl mx-auto pointer-events-auto">
+          {chatInput}
+        </div>
+      </div>
+      </div>
 
       {/* Edit Title Modal */}
       <EditTitleModal
