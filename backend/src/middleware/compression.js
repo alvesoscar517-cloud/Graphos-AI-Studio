@@ -67,6 +67,12 @@ function shouldCompress(req, res) {
     return false;
   }
   
+  // Don't compress SSE/streaming responses
+  const contentType = res.getHeader('Content-Type');
+  if (contentType && contentType.includes('text/event-stream')) {
+    return false;
+  }
+  
   // Use default compression filter
   return compression.filter(req, res);
 }
@@ -135,8 +141,23 @@ function brotliCompressionMiddleware(req, res, next) {
     const originalEnd = res.end.bind(res);
     
     let chunks = [];
+    let headersSent = false;
+    let isStreaming = false;
+    
+    // Track if headers are sent (streaming mode)
+    const originalFlushHeaders = res.flushHeaders.bind(res);
+    res.flushHeaders = function() {
+      headersSent = true;
+      isStreaming = true;
+      return originalFlushHeaders();
+    };
     
     res.write = function(chunk, encoding, callback) {
+      // If streaming (headers already sent), write directly without buffering
+      if (isStreaming || headersSent || res.headersSent) {
+        return originalWrite(chunk, encoding, callback);
+      }
+      
       if (chunk) {
         chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, encoding));
       }
@@ -145,6 +166,11 @@ function brotliCompressionMiddleware(req, res, next) {
     };
     
     res.end = function(chunk, encoding, callback) {
+      // If streaming, end directly without compression
+      if (isStreaming || headersSent || res.headersSent) {
+        return originalEnd(chunk, encoding, callback);
+      }
+      
       if (chunk) {
         chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, encoding));
       }
@@ -214,6 +240,24 @@ function smartCompressionMiddleware(req, res, next) {
   
   // Skip if client requests no compression
   if (req.headers['x-no-compression']) {
+    return next();
+  }
+  
+  // Skip compression for SSE/streaming endpoints
+  // These endpoints set Content-Type: text/event-stream
+  const streamingPaths = [
+    // Chat streaming
+    '/api/chat/stream',
+    '/api/chat/humanized/stream',
+    // Analysis/Rewrite streaming
+    '/api/analysis/rewrite-stream',
+    '/api/analysis/iterative-humanize/stream',
+    // Profile creation streaming
+    '/create_profile_complete/stream',
+    // Realtime events
+    '/api/realtime/events'
+  ];
+  if (streamingPaths.some(path => req.path.includes(path) || req.path.endsWith('/stream'))) {
     return next();
   }
   

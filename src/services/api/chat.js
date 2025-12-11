@@ -134,17 +134,21 @@ export async function sendChatMessageStream(
     let buffer = ''
     let summary = null
     let outputTokens = 0
+    let chunkCount = 0
     
     while (true) {
       const { done, value } = await reader.read()
       
       if (done) {
-        console.log('📡 Stream ended')
+        console.log('📡 Stream ended, total chunks received:', chunkCount)
+        console.log('📡 Remaining buffer:', buffer)
         break
       }
       
       // Decode chunk and add to buffer
-      buffer += decoder.decode(value, { stream: true })
+      const decoded = decoder.decode(value, { stream: true })
+      buffer += decoded
+      console.log('📡 Raw chunk received:', decoded.substring(0, 100))
       
       // Process complete lines
       const lines = buffer.split('\n')
@@ -165,6 +169,7 @@ export async function sendChatMessageStream(
           if (data) {
             try {
               const json = JSON.parse(data)
+              console.log('📡 Parsed JSON type:', json.type || (json.chunk ? 'chunk' : 'unknown'))
               
               // Handle different message types
               if (json.type === 'context' && onContext) {
@@ -173,6 +178,7 @@ export async function sendChatMessageStream(
                 summary = json.summary
                 outputTokens = json.outputTokens
               } else if (json.chunk) {
+                chunkCount++
                 onChunk(json.chunk)
               } else if (json.error) {
                 console.error('[FAIL] Server error:', json.error)
