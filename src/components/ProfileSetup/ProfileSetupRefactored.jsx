@@ -155,11 +155,7 @@ const ProfileSetup = () => {
   // Ref to store the latest createProfile function
   const createProfileRef = useRef(null)
   
-  // Reasoning state for streaming
-  const [reasoning, setReasoning] = useState('')
-  const [reasoningStartTime, setReasoningStartTime] = useState(null)
-  
-  // Step 4: Create complete profile with streaming and reasoning
+  // Step 4: Create complete profile with streaming
   const createProfile = useCallback(async (retryCount = 0) => {
     // CRITICAL: Prevent duplicate/concurrent profile creation
     if (!mountedRef.current) return
@@ -186,8 +182,6 @@ const ProfileSetup = () => {
     setShowCompletion(false)
     setProcessingStep(1)
     setProcessingMessage(t('profileSetupErrors.preparingData'))
-    setReasoning('')
-    setReasoningStartTime(Date.now())
 
     try {
       // Prepare all samples
@@ -221,11 +215,6 @@ const ProfileSetup = () => {
               if (mountedRef.current) {
                 setProcessingStep(step)
                 setProcessingMessage(message)
-              }
-            },
-            onReasoning: (content) => {
-              if (mountedRef.current) {
-                setReasoning(prev => prev + content)
               }
             },
             onComplete: (result) => {
@@ -493,8 +482,6 @@ const ProfileSetup = () => {
             errorCode={errorCode}
             qualityScore={qualityScore}
             totalSamples={totalSamples}
-            reasoning={reasoning}
-            reasoningStartTime={reasoningStartTime}
             onBack={() => {
               // Abort any pending API request to prevent race conditions
               if (abortControllerRef.current) {
@@ -521,8 +508,6 @@ const ProfileSetup = () => {
                 setProcessingStep(1)
                 setProcessingMessage('')
                 setShowCompletion(false)
-                setReasoning('')
-                setReasoningStartTime(null)
               })
             }}
             onRetry={() => {
@@ -530,8 +515,6 @@ const ProfileSetup = () => {
               setShowError(false)
               setErrorCode('')
               setErrorMessage('')
-              setReasoning('')
-              setReasoningStartTime(null)
               isCreatingProfileRef.current = false
               createProfileRef.current?.()
             }}

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, MotionConfig } from 'framer-motion'
 import LazyLottie from '../Common/LazyLottie'
 import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
-import { useRewrite, useAIProcessingActions, useReasoning } from '@/stores'
+import { useRewrite, useAIProcessingActions } from '@/stores'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import { handleCreditError } from '../../utils/creditHandler'
 import modal from '../../utils/modal'
@@ -53,8 +53,7 @@ const RewriteToolbar = ({
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { selectedModel, writingPreferences } = useRewrite()
-  const { startProcessing, startStreaming, stopProcessing, appendReasoning, completeReasoning, clearReasoning } = useAIProcessingActions()
-  const reasoning = useReasoning()
+  const { startProcessing, startStreaming, stopProcessing } = useAIProcessingActions()
   const [isLoading, setIsLoading] = useState(false)
   const fileInputRef = useRef(null)
 
@@ -92,10 +91,7 @@ const RewriteToolbar = ({
       // Use async iterative humanization
       console.log('[LAUNCH] Starting async iterative humanization...')
       setIsLoading(true)
-      startProcessing('humanize') // Use 'humanize' type to show reasoning on editor
-      
-      // Clear editor content to show reasoning
-      onTextChange('')
+      startProcessing('humanize')
       
       try {
         // Start async job - profile_id is optional for generic humanization
@@ -134,28 +130,15 @@ const RewriteToolbar = ({
           }
         }
         
-        // Track last reasoning to avoid duplicates
-        let lastReasoning = ''
-        
         // Poll for progress, then stream result when completed
         const result = await pollAndStreamHumanizeJob(startResult.jobId, {
           onProgress: (progress) => {
             console.log('[PROGRESS]', progress)
-            // Stream reasoning content if available and new
-            if (progress.progress?.reasoning && progress.progress.reasoning !== lastReasoning) {
-              // Append only the new part
-              const newContent = progress.progress.reasoning.substring(lastReasoning.length)
-              if (newContent) {
-                appendReasoning(newContent)
-              }
-              lastReasoning = progress.progress.reasoning
-            }
           },
           onChunk: (chunk) => {
             if (!hasStartedStreaming) {
               hasStartedStreaming = true
-              console.log('[SYNC] First chunk - completing reasoning, starting stream')
-              completeReasoning()
+              console.log('[SYNC] First chunk - starting stream')
               startStreaming()
               onTextChange('')
               displayedText = ''
@@ -193,7 +176,6 @@ const RewriteToolbar = ({
           await waitForAnimation()
         } else if (result.success && result.data) {
           // Fallback if streaming didn't work
-          completeReasoning()
           startStreaming()
           onTextChange(result.data.rewritten_text)
         }
@@ -217,7 +199,6 @@ const RewriteToolbar = ({
       } finally {
         setIsLoading(false)
         stopProcessing()
-        clearReasoning()
       }
       return
     }
@@ -226,9 +207,6 @@ const RewriteToolbar = ({
     console.log('[LAUNCH] Starting rewrite process...')
     setIsLoading(true)
     startProcessing('rewrite')
-    
-    // Clear editor content to show reasoning
-    onTextChange('')
     
     try {
       let fullText = '' // Complete text buffer
@@ -261,21 +239,19 @@ const RewriteToolbar = ({
         selectedModel,
         writingPreferences,
         (chunk, type) => {
-          // Handle reasoning chunks
+          // Skip reasoning chunks - feature removed
           if (type === 'reasoning') {
-            appendReasoning(chunk)
             return
           }
           
           chunkCount++
           console.log(`[PACKAGE] Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
           
-          // First content chunk - complete reasoning and start streaming
+          // First content chunk - start streaming
           if (!hasStartedStreaming) {
             hasStartedStreaming = true
-            console.log('[SYNC] First chunk - completing reasoning, starting stream')
-            completeReasoning()
-            startStreaming() // Stop reasoning display when streaming starts
+            console.log('[SYNC] First chunk - starting stream')
+            startStreaming()
             onTextChange('') // Clear old text immediately
             displayedText = ''
           }
@@ -328,7 +304,6 @@ const RewriteToolbar = ({
     } finally {
       setIsLoading(false)
       stopProcessing()
-      clearReasoning()
     }
   }
 

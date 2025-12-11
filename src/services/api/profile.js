@@ -260,16 +260,16 @@ export async function createProfileComplete(profileName, theme, samples, options
 }
 
 /**
- * Create profile with streaming progress and reasoning
+ * Create profile with streaming progress
  * @param {string} profileName 
  * @param {string} theme 
  * @param {Array<{text: string, type: string}>} samples 
- * @param {Object} callbacks - { onStep, onReasoning, onComplete, onError }
+ * @param {Object} callbacks - { onStep, onComplete, onError }
  * @param {Object} options - { signal }
  * @returns {Promise<Object>}
  */
 export async function createProfileCompleteStream(profileName, theme, samples, callbacks = {}, options = {}) {
-  const { onStep, onReasoning, onComplete, onError } = callbacks
+  const { onStep, onComplete, onError } = callbacks
   
   try {
     const userInfo = await getUserInfo()
@@ -334,8 +334,6 @@ export async function createProfileCompleteStream(profileName, theme, samples, c
               
               if (json.type === 'step' && onStep) {
                 onStep(json.step, json.message)
-              } else if (json.type === 'reasoning' && onReasoning) {
-                onReasoning(json.content)
               } else if (json.type === 'complete') {
                 result = {
                   success: true,

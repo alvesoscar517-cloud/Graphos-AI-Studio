@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNotes } from '../../contexts/NotesContext'
 import { useProfiles } from '../../contexts/ProfileContext'
-import { useRewrite, useAIProcessingActions, useAIProcessing, useReasoning } from '@/stores'
+import { useRewrite, useAIProcessingActions, useAIProcessing } from '@/stores'
 import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import { handleCreditError } from '../../utils/creditHandler'
@@ -37,9 +37,8 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
   const { currentNote, updateNote } = useNotes()
   const { currentProfile, selectProfile } = useProfiles()
   const { selectedModel, setSelectedModel, writingPreferences, setWritingPreferences } = useRewrite()
-  const { startProcessing, startStreaming, stopProcessing, appendReasoning, completeReasoning, clearReasoning } = useAIProcessingActions()
+  const { startProcessing, startStreaming, stopProcessing } = useAIProcessingActions()
   const { isProcessing } = useAIProcessing()
-  const reasoning = useReasoning()
   const [mode, setMode] = useState('analysis') // 'analysis' or 'rewrite'
   const [isDragging, setIsDragging] = useState(false)
   const [isInteractingWithSlider, setIsInteractingWithSlider] = useState(false)
@@ -120,12 +119,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     if (useIterative) {
       console.log('[LAUNCH] Starting async iterative humanization...')
       setIsRewriting(true)
-      console.log('[LAUNCH] Calling startProcessing("humanize")...')
-      startProcessing('humanize') // Use 'humanize' type to show progress on editor
-      console.log('[LAUNCH] startProcessing called, reasoning should be active now')
-      
-      // Clear editor content to show reasoning
-      updateNote(currentNote.id, { content: '' })
+      startProcessing('humanize')
       
       try {
         // Start async job - profile_id is optional for generic humanization
@@ -164,32 +158,17 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           }
         }
         
-        // Track last reasoning to avoid duplicates
-        let lastReasoning = ''
-        
         // Poll for progress, then stream result when completed
         const result = await pollAndStreamHumanizeJob(startResult.jobId, {
           onProgress: (progress) => {
             console.log('[PROGRESS]', progress)
-            console.log('[PROGRESS] Has reasoning:', !!progress.progress?.reasoning, 'Length:', progress.progress?.reasoning?.length || 0)
-            // Stream reasoning content if available and new
-            if (progress.progress?.reasoning && progress.progress.reasoning !== lastReasoning) {
-              // Append only the new part
-              const newContent = progress.progress.reasoning.substring(lastReasoning.length)
-              console.log('[REASONING] Appending new content:', newContent.substring(0, 50) + '...')
-              if (newContent) {
-                appendReasoning(newContent)
-              }
-              lastReasoning = progress.progress.reasoning
-            }
           },
           onChunk: (chunk) => {
-            // First chunk - complete reasoning and start streaming
+            // First chunk - start streaming
             if (!hasStartedStreaming) {
               hasStartedStreaming = true
-              console.log('[SYNC] First chunk - completing reasoning, starting stream')
-              completeReasoning()
-              startStreaming() // Stop reasoning display
+              console.log('[SYNC] First chunk - starting stream')
+              startStreaming()
               updateNote(currentNote.id, { content: '' })
               displayedText = ''
             }
@@ -226,7 +205,6 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           await waitForAnimation()
         } else if (result.success && result.data) {
           // Fallback if streaming didn't work - direct update
-          completeReasoning()
           startStreaming()
           updateNote(currentNote.id, { content: result.data.rewritten_text })
         }
@@ -249,7 +227,6 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       } finally {
         setIsRewriting(false)
         stopProcessing()
-        clearReasoning()
       }
       return
     }
@@ -258,9 +235,6 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     console.log('[LAUNCH] Starting rewrite process...')
     setIsRewriting(true)
     startProcessing('rewrite')
-    
-    // Clear editor content to show reasoning
-    updateNote(currentNote.id, { content: '' })
     
     try {
       let fullText = ''
@@ -289,9 +263,8 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
         selectedModel,
         writingPreferences,
         (chunk, type) => {
-          // Handle reasoning chunks
+          // Skip reasoning chunks - feature removed
           if (type === 'reasoning') {
-            appendReasoning(chunk)
             return
           }
           
@@ -300,9 +273,8 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           
           if (!hasStartedStreaming) {
             hasStartedStreaming = true
-            console.log('[SYNC] First chunk - completing reasoning, starting stream')
-            completeReasoning()
-            startStreaming() // Stop reasoning display when streaming starts
+            console.log('[SYNC] First chunk - starting stream')
+            startStreaming()
             updateNote(currentNote.id, { content: '' })
             displayedText = ''
           }
@@ -350,7 +322,6 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     } finally {
       setIsRewriting(false)
       stopProcessing()
-      clearReasoning()
     }
   }
 

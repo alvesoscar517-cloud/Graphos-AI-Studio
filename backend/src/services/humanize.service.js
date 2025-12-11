@@ -1056,7 +1056,6 @@ module.exports = {
   // Utility functions
   buildEnhancedRewritePrompt,
   buildSimpleRewritePrompt,
-  buildRewritePromptWithReasoning,
   buildRefinementContext,
   injectHumanImperfections,
   addContractions,

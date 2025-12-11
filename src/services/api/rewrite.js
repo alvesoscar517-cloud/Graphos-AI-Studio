@@ -70,12 +70,12 @@ async function getAuthHeaders() {
 }
 
 /**
- * Streaming rewrite with model selection and reasoning support
+ * Streaming rewrite with model selection
  * @param {string} profileId 
  * @param {string} text 
  * @param {string} model 
  * @param {Object} writingPreferences 
- * @param {Function} onChunk - Callback (chunk, type) where type is 'reasoning' or 'content'
+ * @param {Function} onChunk - Callback for each text chunk
  * @returns {Promise<void>}
  */
 export async function rewriteTextStream(profileId, text, model, writingPreferences, onChunk) {
@@ -90,7 +90,7 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
     
     const userInfo = await getUserInfo()
     const headers = await getAuthHeaders()
-    console.log('📡 Sending rewrite_stream request with reasoning...')
+    console.log('📡 Sending rewrite_stream request...')
     
     const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite_stream`, {
       method: 'POST',
@@ -100,8 +100,7 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
         text: text,
         model: model,
         writing_preferences: writingPreferences,
-        user_id: userInfo?.userId,
-        include_reasoning: true // Request reasoning in response
+        user_id: userInfo?.userId
       })
     })
     
@@ -141,11 +140,7 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
           if (data) {
             try {
               const json = JSON.parse(data)
-              if (json.reasoning) {
-                // Reasoning chunk
-                console.log('[REASONING] Chunk received:', json.reasoning.substring(0, 30) + '...')
-                onChunk(json.reasoning, 'reasoning')
-              } else if (json.chunk) {
+              if (json.chunk) {
                 // Content chunk
                 console.log('[PACKAGE] Chunk received:', json.chunk.substring(0, 30) + '...')
                 onChunk(json.chunk, 'content')
@@ -432,7 +427,7 @@ export async function pollAndStreamHumanizeJob(jobId, options = {}) {
     onProgress = () => {}, 
     onChunk = () => {},
     onComplete = () => {},
-    pollInterval = 1000, // Reduced from 2000 for better reasoning updates
+    pollInterval = 1000,
     maxWaitTime = 300000
   } = options
   
@@ -449,12 +444,7 @@ export async function pollAndStreamHumanizeJob(jobId, options = {}) {
     
     const { data } = result
     
-    // Debug log for reasoning
-    if (data.progress?.reasoning) {
-      console.log(`[POLL #${pollCount}] Reasoning available:`, data.progress.reasoning.substring(0, 50) + '...')
-    } else {
-      console.log(`[POLL #${pollCount}] Status: ${data.status}, Step: ${data.progress?.currentStep}, No reasoning yet`)
-    }
+    console.log(`[POLL #${pollCount}] Status: ${data.status}, Step: ${data.progress?.currentStep}`)
     
     onProgress({
       status: data.status,

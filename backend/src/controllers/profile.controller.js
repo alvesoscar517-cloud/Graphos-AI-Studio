@@ -809,7 +809,7 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
 };
 
 /**
- * Create profile with streaming progress and reasoning
+ * Create profile with streaming progress
  * Sends SSE events for realtime UI updates
  */
 exports.createProfileCompleteStream = async (req, res) => {
@@ -827,6 +827,9 @@ exports.createProfileCompleteStream = async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
   res.setHeader('X-Accel-Buffering', 'no');
+  
+  // Flush headers immediately to establish connection before AI processing
+  res.flushHeaders();
   
   // Helper to send SSE events
   const sendEvent = (data) => {
@@ -941,20 +944,11 @@ exports.createProfileCompleteStream = async (req, res) => {
 
     const profileId = uuidv4();
 
-    // Step 2: Create embeddings with reasoning
-    sendEvent({ 
-      type: 'reasoning', 
-      content: l.t('profile_stream.reasoning_embeddings')
-    });
-
+    // Step 2: Create embeddings
     const texts = samples.map(s => s.text);
     let embeddings;
     try {
       embeddings = await geminiService.createBatchEmbeddings(texts, 'RETRIEVAL_DOCUMENT');
-      sendEvent({ 
-        type: 'reasoning', 
-        content: l.t('profile_stream.reasoning_embeddings_done', { count: embeddings.length })
-      });
     } catch (embeddingError) {
       logger.error('Embedding creation failed', { error: embeddingError.message, profileId });
       sendEvent({
@@ -966,11 +960,6 @@ exports.createProfileCompleteStream = async (req, res) => {
     }
 
     // Cross-sample similarity check
-    sendEvent({ 
-      type: 'reasoning', 
-      content: l.t('profile_stream.reasoning_similarity')
-    });
-
     const similarPairs = [];
     for (let i = 0; i < embeddings.length; i++) {
       for (let j = i + 1; j < embeddings.length; j++) {
@@ -1001,44 +990,21 @@ exports.createProfileCompleteStream = async (req, res) => {
       return res.end();
     }
 
-    sendEvent({ 
-      type: 'reasoning', 
-      content: l.t('profile_stream.reasoning_similarity_passed')
-    });
-
     // Step 3: Calculate statistics
     sendEvent({ 
       type: 'step', 
       step: 2, 
       message: l.t('profile_stream.analyzing_patterns')
     });
-    
-    sendEvent({ 
-      type: 'reasoning', 
-      content: l.t('profile_stream.reasoning_statistics')
-    });
 
     const allText = texts.join(' ');
     const statisticalFeatures = analysisService.calculateStatistics(allText);
-
-    sendEvent({ 
-      type: 'reasoning', 
-      content: l.t('profile_stream.reasoning_statistics_done', { 
-        avgLength: Math.round(statisticalFeatures.avgSentenceLength || 0),
-        vocabulary: statisticalFeatures.vocabularyRichness ? Math.round(statisticalFeatures.vocabularyRichness * 100) : 0
-      })
-    });
 
     // Step 4: Generate voice profile
     sendEvent({ 
       type: 'step', 
       step: 3, 
       message: l.t('profile_stream.generating_voice')
-    });
-    
-    sendEvent({ 
-      type: 'reasoning', 
-      content: l.t('profile_stream.reasoning_voice_start')
     });
 
     const VOICE_SUMMARY_TIMEOUT = 30000;
@@ -1051,21 +1017,8 @@ exports.createProfileCompleteStream = async (req, res) => {
       );
       
       voiceProfile = await Promise.race([voicePromise, timeoutPromise]);
-      
-      sendEvent({ 
-        type: 'reasoning', 
-        content: l.t('profile_stream.reasoning_voice_done', {
-          tone: voiceProfile?.tone || 'neutral',
-          formality: voiceProfile?.formality_level || 5,
-          characteristics: (voiceProfile?.key_characteristics || []).slice(0, 3).join(', ')
-        })
-      });
     } catch (voiceError) {
       if (voiceError.message === 'VOICE_SUMMARY_TIMEOUT') {
-        sendEvent({ 
-          type: 'reasoning', 
-          content: l.t('profile_stream.reasoning_voice_fallback')
-        });
         voiceProfile = {
           tone: 'neutral',
           formality_level: 5,
@@ -1094,11 +1047,6 @@ exports.createProfileCompleteStream = async (req, res) => {
       message: l.t('profile_stream.saving_profile')
     });
     
-    sendEvent({ 
-      type: 'reasoning', 
-      content: l.t('profile_stream.reasoning_saving')
-    });
-
     const batch = db.batch();
 
     const profileRef = db.collection('voice_profiles').doc(profileId);
@@ -1164,11 +1112,6 @@ exports.createProfileCompleteStream = async (req, res) => {
       });
       return res.end();
     }
-
-    sendEvent({ 
-      type: 'reasoning', 
-      content: l.t('profile_stream.reasoning_complete')
-    });
 
     // Broadcast profile update
     realtimeController.broadcastProfileUpdate(userId, {

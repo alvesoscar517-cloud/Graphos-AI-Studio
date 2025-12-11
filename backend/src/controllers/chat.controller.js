@@ -221,7 +221,6 @@ exports.sendMessage = async (req, res) => {
 
 /**
  * Send chat message with streaming response
- * Supports reasoning output for Pro models
  */
 exports.sendMessageStream = async (req, res) => {
   try {
@@ -233,17 +232,11 @@ exports.sendMessageStream = async (req, res) => {
       profileId = null, 
       writingPreferences = null,
       chatSettings = null,
-      conversationSummary = null,
-      include_reasoning = false
+      conversationSummary = null
     } = req.body;
 
     // Validate model
     const model = validateModel(requestedModel, 'gemini-2.5-flash');
-    
-    // Only enable thinking for 2.5 models (native thinking support from Google)
-    // 2.0 models don't have native thinking - skip to save cost and time
-    const is25Model = model.includes('2.5');
-    const shouldIncludeReasoning = include_reasoning && is25Model;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ 
@@ -252,7 +245,7 @@ exports.sendMessageStream = async (req, res) => {
       });
     }
 
-    console.log(`[INFO] Chat stream request: ${messages.length} messages, model: ${model}${shouldIncludeReasoning ? ' (with reasoning)' : ''}`);
+    console.log(`[INFO] Chat stream request: ${messages.length} messages, model: ${model}`);
 
     // Load profile and build enhanced system prompt
     const profile = await loadProfile(profileId);
@@ -286,6 +279,9 @@ exports.sendMessageStream = async (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
     res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+    
+    // Flush headers immediately to establish connection before AI processing
+    res.flushHeaders();
 
     // Send context info first
     if (contextResult.wasSummarized) {
@@ -296,31 +292,19 @@ exports.sendMessageStream = async (req, res) => {
       })}\n\n`);
     }
 
-    // Use enhanced system prompt directly (no prompt-based reasoning needed)
     let finalSystemPrompt = enhancedSystemPrompt;
     
     // Build generation config
     const generationConfig = {
       temperature: temperature,
-      maxOutputTokens: shouldIncludeReasoning ? 4096 : 2048, // More tokens for thinking
+      maxOutputTokens: 2048,
     };
     
     // Build model config
-    let modelConfig = {
+    const modelConfig = {
       model: model,
       generationConfig,
     };
-    
-    // Add native thinkingConfig for 2.5 models when reasoning is requested
-    // Note: thinkingConfig should be at model level, not in generationConfig
-    if (shouldIncludeReasoning) {
-      modelConfig.thinkingConfig = {
-        thinkingBudget: 2048, // Allow up to 2048 tokens for thinking
-        includeThoughts: true // Request thinking summary in response
-      };
-      console.log('[CHAT] Using native thinking for model:', model);
-      console.log('[CHAT] Model config:', JSON.stringify(modelConfig, null, 2));
-    }
     
     const generativeModel = geminiService.vertexAI.getGenerativeModel(modelConfig);
 
@@ -358,43 +342,7 @@ exports.sendMessageStream = async (req, res) => {
     
     for await (const chunk of streamResult.stream) {
       try {
-        // Handle native thinking response (2.5 models only)
-        if (shouldIncludeReasoning && chunk.candidates && chunk.candidates[0]) {
-          const candidate = chunk.candidates[0];
-          
-          // Check for thinking content at candidate level (Vertex AI format)
-          if (candidate.thoughts || candidate.thoughtsContent) {
-            const thoughtText = candidate.thoughts || candidate.thoughtsContent;
-            if (thoughtText) {
-              res.write(`data: ${JSON.stringify({ reasoning: thoughtText })}\n\n`);
-            }
-          }
-          
-          // Check for thinking content in parts (native thinking from Google)
-          if (candidate.content && candidate.content.parts) {
-            for (const part of candidate.content.parts) {
-              // Native thinking content - check multiple possible indicators
-              const isThinkingPart = part.thought === true || 
-                                     part.thoughts !== undefined ||
-                                     part.thoughtsContent !== undefined;
-              
-              const thinkingText = part.thoughts || part.thoughtsContent;
-              
-              if (isThinkingPart && (part.text || thinkingText)) {
-                const reasoningContent = thinkingText || part.text;
-                res.write(`data: ${JSON.stringify({ reasoning: reasoningContent })}\n\n`);
-              }
-              // Regular content
-              else if (part.text && !isThinkingPart) {
-                totalChars += part.text.length;
-                res.write(`data: ${JSON.stringify({ chunk: part.text })}\n\n`);
-              }
-            }
-          }
-          continue;
-        }
-        
-        // Standard response handling (for 2.0 models or when thinking is disabled)
+        // Standard response handling
         let chunkText = null;
         
         if (typeof chunk.text === 'function') {
@@ -893,6 +841,9 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
     res.setHeader('X-Accel-Buffering', 'no');
+    
+    // Flush headers immediately to establish connection before AI processing
+    res.flushHeaders();
 
     // Send context info
     if (contextResult.wasSummarized) {

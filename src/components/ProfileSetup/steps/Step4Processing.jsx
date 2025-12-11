@@ -1,148 +1,16 @@
 /**
  * Step 4: Processing and Completion
  * Migrated to Tailwind CSS v4
- * Updated: 2-column layout with realtime reasoning display
+ * Updated: Shows processing steps with three dots animation
  */
-import { useState, useEffect, useRef, memo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '../../../lib/utils'
 import LottieWrapper from '../LottieWrapper'
-import Icon from '../../Common/Icon'
 import loadingBlueAnimation from '../../../animation/loading-animation-blue.json'
 import faceIdAnimation from '../../../animation/face-id.json'
 import error404Animation from '../../../animation/404 blue.json'
 
-/**
- * Reasoning Display Component - Shows AI thinking process
- */
-const ReasoningDisplay = memo(function ReasoningDisplay({ 
-  content = '', 
-  isActive = false,
-  startTime = null
-}) {
-  const { t } = useTranslation()
-  const [isExpanded, setIsExpanded] = useState(true)
-  const [elapsedTime, setElapsedTime] = useState(0)
-  const contentRef = useRef(null)
-  
-  // Track elapsed time
-  useEffect(() => {
-    if (!isActive || !startTime) {
-      return
-    }
-    
-    const interval = setInterval(() => {
-      setElapsedTime(Math.floor((Date.now() - startTime) / 1000))
-    }, 1000)
-    
-    return () => clearInterval(interval)
-  }, [isActive, startTime])
-  
-  // Auto-scroll to bottom when content updates
-  useEffect(() => {
-    if (contentRef.current && isExpanded) {
-      contentRef.current.scrollTop = contentRef.current.scrollHeight
-    }
-  }, [content, isExpanded])
-  
-  if (!content) return null
-  
-  const formatTime = (seconds) => {
-    if (seconds < 60) return `${seconds}s`
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}m ${secs}s`
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-      className="w-full bg-bg-secondary/80 backdrop-blur-sm rounded-xl border border-border-light overflow-hidden mt-6"
-    >
-      {/* Header */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className={cn(
-          "w-full flex items-center gap-2 px-4 py-3",
-          "bg-transparent border-none cursor-pointer",
-          "hover:bg-bg-hover/50 transition-colors",
-          "text-left"
-        )}
-      >
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          {isActive ? (
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-4 h-4 flex-shrink-0"
-            >
-              <Icon name="loader-2" size="sm" color="primary" />
-            </motion.div>
-          ) : (
-            <Icon name="check-circle" size="sm" color="success" className="flex-shrink-0" />
-          )}
-          
-          <span className="text-sm font-medium text-text-secondary truncate">
-            {isActive ? t('reasoning.thinking') : t('reasoning.thoughtFor', { time: formatTime(elapsedTime) })}
-          </span>
-        </div>
-        
-        {isActive && elapsedTime > 0 && (
-          <span className="text-xs text-text-muted flex-shrink-0">
-            {formatTime(elapsedTime)}
-          </span>
-        )}
-        
-        <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-          className="flex-shrink-0"
-        >
-          <Icon name="chevron-down" size="sm" color="muted" />
-        </motion.div>
-      </button>
-      
-      {/* Content */}
-      <AnimatePresence initial={false}>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div 
-              ref={contentRef}
-              className={cn(
-                "px-4 pb-4 max-h-[150px] overflow-y-auto",
-                "text-sm text-text-secondary leading-relaxed",
-                "whitespace-pre-wrap break-words",
-                "scrollbar-thin scrollbar-thumb-border-light scrollbar-track-transparent"
-              )}
-            >
-              {content}
-              
-              {/* Typing cursor when active */}
-              {isActive && (
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 0.5, repeat: Infinity }}
-                  className="inline-block w-0.5 h-4 bg-blue-500 ml-0.5 align-middle"
-                />
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  )
-})
-
-const ProcessingView = ({ animationKey, processingStep, processingMessage, totalSamples, reasoning, reasoningStartTime, t }) => (
+const ProcessingView = ({ animationKey, processingStep, processingMessage, totalSamples, t }) => (
   <div className="block animate-fade-in-slow h-[calc(100%-100px)] relative" role="status" aria-live="polite" aria-busy="true">
     <div className="grid grid-cols-2 h-full gap-0 relative min-h-0 overflow-hidden max-lg:grid-cols-1">
       {/* Animation Container - Left Column */}
@@ -194,15 +62,6 @@ const ProcessingView = ({ animationKey, processingStep, processingMessage, total
               </div>
             ))}
           </div>
-          
-          {/* Reasoning Display */}
-          {reasoning && (
-            <ReasoningDisplay
-              content={reasoning}
-              isActive={processingStep < 5}
-              startTime={reasoningStartTime}
-            />
-          )}
         </div>
       </div>
     </div>
@@ -280,8 +139,6 @@ const Step4Processing = ({
   errorCode, 
   qualityScore, 
   totalSamples, 
-  reasoning,
-  reasoningStartTime,
   onBack, 
   onRetry, 
   onComplete 
@@ -294,8 +151,6 @@ const Step4Processing = ({
     processingStep={processingStep} 
     processingMessage={processingMessage} 
     totalSamples={totalSamples} 
-    reasoning={reasoning}
-    reasoningStartTime={reasoningStartTime}
     t={t} 
   />
 }

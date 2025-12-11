@@ -801,7 +801,7 @@ exports.rewriteTextStream = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const { profile_id, text, model: requestedModel, user_id, writing_preferences, include_reasoning } = req.body;
+    const { profile_id, text, model: requestedModel, user_id, writing_preferences } = req.body;
 
     // Validate model
     const model = validateModel(requestedModel, 'gemini-2.5-flash');
@@ -866,22 +866,17 @@ exports.rewriteTextStream = async (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // Disable proxy buffering for Cloud Run
+    
+    // Flush headers immediately to establish connection before AI processing
+    res.flushHeaders();
 
     // Import humanize service for prompt building
     const humanizeService = require('../services/humanize.service');
     
-    // Build prompt based on anti-AI detection setting and reasoning request
+    // Build prompt based on anti-AI detection setting
     let prompt;
-    if (include_reasoning) {
-      // Build prompt with reasoning output (Chain-of-Thought)
-      prompt = humanizeService.buildRewritePromptWithReasoning(
-        text,
-        voiceProfile,
-        sampleText,
-        { writingPreferences: writing_preferences, useAntiAIDetection }
-      );
-      console.log('[REWRITE] Using prompt with reasoning output');
-    } else if (useAntiAIDetection) {
+    if (useAntiAIDetection) {
       // Build enhanced prompt with anti-AI detection rules
       prompt = humanizeService.buildEnhancedRewritePrompt(
         text,
@@ -903,10 +898,6 @@ exports.rewriteTextStream = async (req, res) => {
 
     const modelName = model || 'gemini-2.5-flash';
     
-    // Check if model supports native thinking (2.5 models)
-    const supportsNativeThinking = modelName.includes('2.5');
-    const useNativeThinking = include_reasoning && supportsNativeThinking;
-    
     // Build generation config
     const generationConfig = {
       temperature: 0.8, // Higher for more natural variation
@@ -914,99 +905,20 @@ exports.rewriteTextStream = async (req, res) => {
       topK: 40
     };
     
-    // Add thinkingConfig for 2.5 models when reasoning is requested
-    // Note: thinkingConfig is a top-level config, not inside generationConfig
-    let modelConfig = {
+    const modelConfig = {
       model: modelName,
       generationConfig
     };
     
-    if (useNativeThinking) {
-      // thinkingConfig should be at model level, not in generationConfig
-      modelConfig.thinkingConfig = {
-        thinkingBudget: 2048, // Allow up to 2048 tokens for thinking
-        includeThoughts: true // Request thinking summary in response
-      };
-      console.log('[REWRITE] Using native thinking for model:', modelName);
-      console.log('[REWRITE] Model config:', JSON.stringify(modelConfig, null, 2));
-    }
-    
     const generativeModel = geminiService.vertexAI.getGenerativeModel(modelConfig);
 
-    // For native thinking, use simple prompt without reasoning instructions
-    let finalPrompt = prompt;
-    if (useNativeThinking) {
-      // Remove reasoning instructions from prompt for native thinking
-      const humanizeService = require('../services/humanize.service');
-      finalPrompt = useAntiAIDetection 
-        ? humanizeService.buildEnhancedRewritePrompt(text, voiceProfile, sampleText, { writingPreferences: writing_preferences })
-        : humanizeService.buildSimpleRewritePrompt(text, voiceProfile, sampleText, { writingPreferences: writing_preferences });
-    }
-
-    const result = await generativeModel.generateContentStream(finalPrompt);
+    const result = await generativeModel.generateContentStream(prompt);
 
     let fullText = '';
-    // For native thinking, we don't need prompt-based reasoning parsing
-    let isInReasoning = include_reasoning && !useNativeThinking;
-    let reasoningBuffer = '';
-    let contentBuffer = '';
-    const REASONING_END_MARKER = '---CONTENT_START---';
     
-    let isFirstChunk = true;
     for await (const chunk of result.stream) {
       try {
-        // Handle native thinking response (2.5 models)
-        if (useNativeThinking && chunk.candidates && chunk.candidates[0]) {
-          const candidate = chunk.candidates[0];
-          
-          // Debug: Log first chunk structure to understand Gemini response format
-          if (isFirstChunk) {
-            console.log('[REWRITE DEBUG] First chunk raw structure:', JSON.stringify(chunk, null, 2).substring(0, 1000));
-            isFirstChunk = false;
-          }
-          
-          // Check for thinking content at candidate level (Vertex AI format)
-          // Some versions return thoughts at candidate level, not part level
-          if (candidate.thoughts || candidate.thoughtsContent) {
-            const thoughtText = candidate.thoughts || candidate.thoughtsContent;
-            if (thoughtText) {
-              console.log('[REWRITE] Sending reasoning from candidate.thoughts:', thoughtText.substring(0, 50) + '...');
-              res.write(`data: ${JSON.stringify({ reasoning: thoughtText })}\n\n`);
-            }
-          }
-          
-          // Check for thinking content in parts (native thinking)
-          if (candidate.content && candidate.content.parts) {
-            for (const part of candidate.content.parts) {
-              // Debug: Log each part's keys to understand response structure
-              console.log('[REWRITE DEBUG] Part keys:', Object.keys(part), 'thought:', part.thought, 'thoughtsContent:', part.thoughtsContent);
-              
-              // Native thinking content - check multiple possible indicators
-              // Vertex AI may use different field names depending on SDK version
-              const isThinkingPart = part.thought === true || 
-                                     part.thoughts !== undefined ||
-                                     part.thoughtsContent !== undefined ||
-                                     part.thoughtSignature !== undefined;
-              
-              // Extract thinking text from various possible fields
-              const thinkingText = part.thoughts || part.thoughtsContent;
-              
-              if (isThinkingPart && (part.text || thinkingText)) {
-                const reasoningContent = thinkingText || part.text;
-                console.log('[REWRITE] Sending reasoning chunk:', reasoningContent.substring(0, 50) + '...');
-                res.write(`data: ${JSON.stringify({ reasoning: reasoningContent })}\n\n`);
-              }
-              // Regular content (not thinking)
-              else if (part.text && !isThinkingPart) {
-                fullText += part.text;
-                res.write(`data: ${JSON.stringify({ chunk: part.text })}\n\n`);
-              }
-            }
-          }
-          continue;
-        }
-        
-        // Try different ways to extract text from chunk (for non-native thinking)
+        // Try different ways to extract text from chunk
         let chunkText = null;
         
         if (typeof chunk.text === 'function') {
@@ -1021,42 +933,9 @@ exports.rewriteTextStream = async (req, res) => {
         }
         
         if (chunkText) {
-          if (include_reasoning && isInReasoning) {
-            // Check if this chunk contains the marker (prompt-based reasoning for 2.0 models)
-            const combinedText = reasoningBuffer + chunkText;
-            const markerIndex = combinedText.indexOf(REASONING_END_MARKER);
-            
-            if (markerIndex !== -1) {
-              // Found marker - split reasoning and content
-              const reasoningPart = combinedText.substring(0, markerIndex);
-              const contentPart = combinedText.substring(markerIndex + REASONING_END_MARKER.length);
-              
-              // Send remaining reasoning
-              if (reasoningPart.length > reasoningBuffer.length) {
-                const newReasoning = reasoningPart.substring(reasoningBuffer.length);
-                res.write(`data: ${JSON.stringify({ reasoning: newReasoning })}\n\n`);
-              }
-              
-              // Switch to content mode
-              isInReasoning = false;
-              
-              // Send content if any
-              if (contentPart.trim()) {
-                fullText += contentPart;
-                res.write(`data: ${JSON.stringify({ chunk: contentPart })}\n\n`);
-              }
-              
-              reasoningBuffer = '';
-            } else {
-              // Still in reasoning - send chunk as reasoning
-              res.write(`data: ${JSON.stringify({ reasoning: chunkText })}\n\n`);
-              reasoningBuffer = combinedText;
-            }
-          } else {
-            // Normal content streaming
-            fullText += chunkText;
-            res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
-          }
+          // Normal content streaming
+          fullText += chunkText;
+          res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
         }
       } catch (chunkError) {
         console.error('Error processing chunk:', chunkError);
@@ -1525,6 +1404,10 @@ exports.streamHumanizeJobResult = async (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // Disable proxy buffering for Cloud Run
+    
+    // Flush headers immediately to establish connection
+    res.flushHeaders();
 
     // Stream text in chunks to simulate typing effect
     const chunkSize = 15; // Characters per chunk

@@ -6,12 +6,11 @@ import { cn } from '../../../lib/utils'
 import ChatMessage from './ChatMessage'
 import EditTitleModal from '../../Common/EditTitleModal'
 import LazyLottie from '../../Common/LazyLottie'
-import ReasoningDisplay from '../../Editor/ReasoningDisplay'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
 
 const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden, chatInput }) => {
   const { t } = useTranslation()
-  const { currentConversation, isLoading, updateConversationTitle, clearConversation, reasoning } = useWorkspace()
+  const { currentConversation, isLoading, updateConversationTitle, clearConversation } = useWorkspace()
   const messagesEndRef = useRef(null)
   const messagesContainerRef = useRef(null)
   const [title, setTitle] = useState('')
@@ -97,13 +96,6 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
     // Auto-scroll for new messages
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [currentConversation?.messages])
-
-  // Auto-scroll when reasoning is active or content updates
-  useEffect(() => {
-    if (reasoning?.isActive) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }
-  }, [reasoning?.isActive, reasoning?.content])
 
   // Detect scroll position to show/hide scroll button
   useEffect(() => {
@@ -213,19 +205,8 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
                 <ChatMessage key={message.id} message={message} />
               ))}
               
-              {/* Reasoning Display for Pro model */}
-              {reasoning?.isActive && (
-                <ReasoningDisplay
-                  content={reasoning.content}
-                  isActive={reasoning.isActive}
-                  isComplete={reasoning.isComplete}
-                  startTime={reasoning.startTime}
-                  className="mb-4"
-                />
-              )}
-              
-              {/* Show loading only when isLoading AND last message is not streaming with content AND not showing reasoning */}
-              {isLoading && !reasoning?.isActive && (() => {
+              {/* Show loading only when isLoading AND last message is not streaming with content */}
+              {isLoading && (() => {
                 const lastMsg = currentConversation.messages[currentConversation.messages.length - 1]
                 const isStreamingWithContent = lastMsg?.streaming && lastMsg?.content?.length > 0
                 return !isStreamingWithContent
