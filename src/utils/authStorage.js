@@ -85,7 +85,26 @@ export function decryptData(encryptedData) {
     }
   } catch (error) {
     console.error('[AuthStorage] Decryption failed:', error)
+    // Token is corrupted - trigger session expired to force re-login
+    console.warn('[AuthStorage] Token corrupted, user needs to re-login')
     return null
+  }
+}
+
+/**
+ * Check if stored token is valid (can be decrypted)
+ * Returns false if token is corrupted
+ */
+export function isTokenValid() {
+  try {
+    const rawToken = localStorage.getItem(AUTH_STORAGE_KEYS.AUTH_TOKEN)
+    if (!rawToken) return false
+    
+    const decrypted = decryptData(rawToken)
+    // Token should be a JWT-like string (contains dots)
+    return decrypted && typeof decrypted === 'string' && decrypted.includes('.')
+  } catch {
+    return false
   }
 }
 
@@ -250,10 +269,22 @@ export function clearAuthStorage() {
 export function setUserData(user) {
   if (!user) return false
   
-  secureSet(AUTH_STORAGE_KEYS.USER, user)
+  const success = secureSet(AUTH_STORAGE_KEYS.USER, user)
+  
+  if (!success) {
+    console.error('[AuthStorage] Failed to store user data')
+    return false
+  }
   
   if (user.userId || user.id) {
     secureSet(AUTH_STORAGE_KEYS.USER_ID, user.userId || user.id)
+  }
+  
+  // Verify data was stored correctly
+  const stored = secureGet(AUTH_STORAGE_KEYS.USER)
+  if (!stored || !stored.userId) {
+    console.error('[AuthStorage] User data verification failed')
+    return false
   }
   
   return true
@@ -417,6 +448,7 @@ export default {
   setAuthMethod,
   getAuthMethod,
   hasStoredAuth,
+  isTokenValid,
   
   // Profile operations
   setActiveProfile,

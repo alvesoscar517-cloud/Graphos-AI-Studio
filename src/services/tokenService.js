@@ -285,6 +285,9 @@ class TokenService {
 
   init() {
     if (this.getAccessToken() && this.getAuthMethod() === 'email') {
+      // Validate auth state consistency
+      this.validateAuthState()
+      
       this.scheduleRefresh()
       
       if (this.needsRefresh()) {
@@ -299,6 +302,31 @@ class TokenService {
         this.scheduleRefresh()
       }
     })
+  }
+  
+  /**
+   * Validate auth state consistency
+   * Checks if token and user data are both present
+   * If inconsistent, clears auth and triggers re-login
+   */
+  validateAuthState() {
+    const { getUserData } = require('../utils/authStorage')
+    const token = this.getAccessToken()
+    const userData = getUserData()
+    
+    if (token && !userData) {
+      console.warn('[TokenService] Auth state inconsistent: token exists but no user data')
+      // Clear tokens and trigger re-login
+      this.clearTokens()
+      this.notifyListeners('session_expired')
+      
+      window.dispatchEvent(new CustomEvent('sessionExpired', {
+        detail: { 
+          message: 'Your session data was corrupted. Please sign in again.',
+          code: 'AUTH_STATE_CORRUPTED'
+        }
+      }))
+    }
   }
 }
 

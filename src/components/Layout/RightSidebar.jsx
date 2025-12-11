@@ -120,7 +120,9 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     if (useIterative) {
       console.log('[LAUNCH] Starting async iterative humanization...')
       setIsRewriting(true)
+      console.log('[LAUNCH] Calling startProcessing("humanize")...')
       startProcessing('humanize') // Use 'humanize' type to show progress on editor
+      console.log('[LAUNCH] startProcessing called, reasoning should be active now')
       
       // Clear editor content to show reasoning
       updateNote(currentNote.id, { content: '' })
@@ -169,10 +171,12 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
         const result = await pollAndStreamHumanizeJob(startResult.jobId, {
           onProgress: (progress) => {
             console.log('[PROGRESS]', progress)
+            console.log('[PROGRESS] Has reasoning:', !!progress.progress?.reasoning, 'Length:', progress.progress?.reasoning?.length || 0)
             // Stream reasoning content if available and new
             if (progress.progress?.reasoning && progress.progress.reasoning !== lastReasoning) {
               // Append only the new part
               const newContent = progress.progress.reasoning.substring(lastReasoning.length)
+              console.log('[REASONING] Appending new content:', newContent.substring(0, 50) + '...')
               if (newContent) {
                 appendReasoning(newContent)
               }

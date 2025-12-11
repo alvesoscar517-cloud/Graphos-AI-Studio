@@ -5,6 +5,7 @@ import { getUserInfo } from './auth'
 /**
  * Get auth headers for streaming requests
  * Uses getAuthTokenWithType for proper auth type hint
+ * Throws error if no valid auth token available
  */
 async function getAuthHeaders() {
   const headers = {
@@ -18,6 +19,13 @@ async function getAuthHeaders() {
     if (authType) {
       headers['X-Auth-Type'] = authType
     }
+  } else {
+    // No token available - dispatch session expired event
+    console.error('[CHAT] No auth token available')
+    window.dispatchEvent(new CustomEvent('sessionExpired', {
+      detail: { message: 'Please sign in to continue.' }
+    }))
+    throw new Error('Unauthorized access')
   }
   
   return headers
@@ -111,8 +119,17 @@ export async function sendChatMessageStream(
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
+      
+      // Handle 401 - session expired
+      if (response.status === 401) {
+        console.error('[CHAT] 401 Unauthorized - session expired')
+        window.dispatchEvent(new CustomEvent('sessionExpired', {
+          detail: { message: 'Your session has expired. Please sign in again.' }
+        }))
+      }
+      
       throw {
-        code: errorData.code || 'INTERNAL_ERROR',
+        code: errorData.code || (response.status === 401 ? 'UNAUTHORIZED' : 'INTERNAL_ERROR'),
         message: errorData.error || `HTTP error! status: ${response.status}`,
         retryAfter: errorData.retryAfter
       }

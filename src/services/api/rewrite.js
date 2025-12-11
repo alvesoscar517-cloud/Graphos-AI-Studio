@@ -432,13 +432,15 @@ export async function pollAndStreamHumanizeJob(jobId, options = {}) {
     onProgress = () => {}, 
     onChunk = () => {},
     onComplete = () => {},
-    pollInterval = 2000, 
+    pollInterval = 1000, // Reduced from 2000 for better reasoning updates
     maxWaitTime = 300000
   } = options
   
   const startTime = Date.now()
+  let pollCount = 0
   
   while (Date.now() - startTime < maxWaitTime) {
+    pollCount++
     const result = await getHumanizeJobStatus(jobId)
     
     if (!result.success) {
@@ -446,6 +448,13 @@ export async function pollAndStreamHumanizeJob(jobId, options = {}) {
     }
     
     const { data } = result
+    
+    // Debug log for reasoning
+    if (data.progress?.reasoning) {
+      console.log(`[POLL #${pollCount}] Reasoning available:`, data.progress.reasoning.substring(0, 50) + '...')
+    } else {
+      console.log(`[POLL #${pollCount}] Status: ${data.status}, Step: ${data.progress?.currentStep}, No reasoning yet`)
+    }
     
     onProgress({
       status: data.status,

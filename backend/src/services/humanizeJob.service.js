@@ -171,12 +171,18 @@ async function processJob(jobId) {
   const startTime = Date.now();
 
   try {
-    // Update status to processing
+    // Update status to processing with initial reasoning
+    const initialStep = job.profileId ? 'loading_profile' : 'preparing';
+    const initialReasoning = job.profileId 
+      ? '**INITIALIZING**\n• Loading voice profile...\n• Preparing writing style analysis...'
+      : '**INITIALIZING**\n• Preparing humanization engine...\n• Analyzing text structure...';
+    
     await updateJob(jobId, {
       status: JOB_STATUS.PROCESSING,
       progress: {
         ...job.progress,
-        currentStep: job.profileId ? 'loading_profile' : 'rewriting'
+        currentStep: initialStep,
+        reasoning: initialReasoning
       }
     });
 
@@ -358,9 +364,15 @@ async function runIterativeRefinement(jobId, originalText, voiceProfile, context
   let currentText = originalText;
   let iterations = 0;
   let lastDetection = null;
+  
+  // Get existing reasoning from job (set in processJob)
+  const job = await getJob(jobId);
+  
+  // Accumulated reasoning - start with existing reasoning from processJob
+  let accumulatedReasoning = job?.progress?.reasoning || '';
 
-  // Build detailed working/reasoning message
-  const buildReasoningMessage = (step, iteration, aiProb, extraInfo = {}) => {
+  // Build detailed working/reasoning message and accumulate
+  const appendReasoningMessage = (step, iteration, aiProb, extraInfo = {}) => {
     const messages = [];
     
     if (step === 'analyzing') {
@@ -397,25 +409,29 @@ async function runIterativeRefinement(jobId, originalText, voiceProfile, context
       }
     }
     
-    return messages.join('');
+    // Accumulate reasoning
+    accumulatedReasoning += messages.join('');
+    return accumulatedReasoning;
   };
 
   // Initial analysis reasoning
+  const initialReasoning = appendReasoningMessage('analyzing', 0, null);
+  logger.info('Updating job with reasoning', { jobId, step: 'analyzing', reasoningLength: initialReasoning.length });
   await updateJob(jobId, {
     progress: {
       currentIteration: 0,
       totalIterations: maxIterations,
       currentStep: 'analyzing',
       aiProbability: null,
-      reasoning: buildReasoningMessage('analyzing', 0, null)
+      reasoning: initialReasoning
     }
   });
 
   for (let i = 0; i < maxIterations; i++) {
     iterations = i + 1;
 
-    // Update progress - rewriting with reasoning
-    const rewriteReasoning = buildReasoningMessage('rewriting', iterations, lastDetection?.aiProbability, { target: targetProbability });
+    // Update progress - rewriting with accumulated reasoning
+    const rewriteReasoning = appendReasoningMessage('rewriting', iterations, lastDetection?.aiProbability, { target: targetProbability });
     await updateJob(jobId, {
       progress: {
         currentIteration: iterations,
@@ -438,8 +454,8 @@ async function runIterativeRefinement(jobId, originalText, voiceProfile, context
       model
     );
 
-    // Update progress - checking with reasoning
-    const checkReasoning = buildReasoningMessage('checking', iterations, null);
+    // Update progress - checking with accumulated reasoning
+    const checkReasoning = appendReasoningMessage('checking', iterations, null);
     await updateJob(jobId, {
       progress: {
         currentIteration: iterations,

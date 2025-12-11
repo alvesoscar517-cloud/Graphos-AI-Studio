@@ -240,10 +240,17 @@ class ApiClient {
   async getAuthTokenWithType() {
     // First check localStorage for email auth token (with auto-refresh)
     try {
-      const { getAuthMethod } = await import('../../utils/authStorage')
+      const { getAuthMethod, isTokenValid } = await import('../../utils/authStorage')
       const authMethod = getAuthMethod()
       
       if (authMethod === 'email') {
+        // Check if token is valid (not corrupted)
+        if (!isTokenValid()) {
+          console.warn('[API] Token corrupted or invalid, clearing auth')
+          this.handleSessionExpired()
+          return { token: null, authType: null }
+        }
+        
         // Use tokenService to get valid token (auto-refreshes if needed)
         const token = await tokenService.getValidToken()
         if (token) return { token, authType: 'email' }

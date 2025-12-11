@@ -45,6 +45,19 @@ function TiptapEditorComponent({
   const { t } = useTranslation()
   const isStreaming = useIsStreaming()
   const reasoning = useReasoning()
+  
+  // Debug reasoning state
+  useEffect(() => {
+    if (reasoning.isActive || reasoning.content) {
+      console.log('[EDITOR] Reasoning state:', {
+        isActive: reasoning.isActive,
+        contentLength: reasoning.content?.length || 0,
+        isComplete: reasoning.isComplete,
+        isStreaming
+      })
+    }
+  }, [reasoning.isActive, reasoning.content, reasoning.isComplete, isStreaming])
+  
   const [activeTooltip, setActiveTooltip] = useState(null)
   const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set())
   const [undoStack, setUndoStack] = useState([])

@@ -40,6 +40,13 @@ export async function getUserInfo() {
         hasUser: !!storedUser,
         userId: storedUser?.userId || storedUser?.email || 'none'
       })
+      
+      // If we have token but no user data, auth state is corrupted
+      // This can happen if localStorage was partially cleared
+      if (authToken && !storedUser && authMethod === 'email') {
+        console.warn('[AUTH] Token exists but user data missing - auth state corrupted')
+        // Don't trigger session expired here, let the API call fail and handle it
+      }
     }
     
     // Relaxed check: if we have storedUser with userId/email, use it

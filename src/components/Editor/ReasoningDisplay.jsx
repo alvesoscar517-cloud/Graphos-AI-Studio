@@ -50,6 +50,11 @@ const ReasoningDisplay = memo(function ReasoningDisplay({
     }
   }, [content, isExpanded])
   
+  // Debug log
+  useEffect(() => {
+    console.log('[ReasoningDisplay] Render:', { isActive, contentLength: content?.length || 0, isComplete })
+  }, [isActive, content, isComplete])
+  
   if (!isActive && !content) return null
   
   const formatTime = (seconds) => {
