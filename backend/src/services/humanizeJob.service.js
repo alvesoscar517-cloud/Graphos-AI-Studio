@@ -59,7 +59,7 @@ async function createJob(params) {
     userId,
     maxIterations = 3,
     targetProbability = 35,
-    model = 'gemini-2.0-flash-exp',
+    model = 'gemini-2.5-flash',
     creditsBefore = 0,
     estimatedCost = 0,
     writingPreferences = {}

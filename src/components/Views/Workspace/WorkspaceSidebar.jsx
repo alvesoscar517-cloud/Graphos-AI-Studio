@@ -91,7 +91,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
 
   useEffect(() => {
     if (!modelSettings.model) {
-      updateModelSettings({ model: 'gemini-2.0-flash-exp' })
+      updateModelSettings({ model: 'gemini-2.5-flash' })
     }
   }, [])
 
@@ -206,7 +206,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
 
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 scrollbar-none">
         <ProfileSelector currentProfile={currentProfile} onProfileSelect={handleProfileSelect} />
-        <ModelSelector selectedModel={modelSettings.model || 'gemini-2.0-flash-exp'} onModelSelect={handleModelSelect} />
+        <ModelSelector selectedModel={modelSettings.model || 'gemini-2.5-flash'} onModelSelect={handleModelSelect} />
 
         {/* Voice Profile Section */}
         <div className="flex flex-col gap-2">

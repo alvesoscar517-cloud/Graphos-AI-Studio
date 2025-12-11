@@ -12,11 +12,9 @@ const { z } = require('zod');
 // ============================================================================
 
 const ALLOWED_MODELS = [
-  'gemini-2.0-flash-exp',
   'gemini-2.5-flash-lite',
   'gemini-2.5-flash',
-  'gemini-2.5-pro',
-  'gemini-2.0-pro'
+  'gemini-2.5-pro'
 ];
 
 const PASSWORD_MIN_LENGTH = 8;
@@ -55,7 +53,7 @@ const userIdSchema = z.string()
 /**
  * Model schema with default
  */
-const modelSchema = z.enum(ALLOWED_MODELS).default('gemini-2.0-flash-exp');
+const modelSchema = z.enum(ALLOWED_MODELS).default('gemini-2.5-flash');
 
 /**
  * Text input schema with sanitization

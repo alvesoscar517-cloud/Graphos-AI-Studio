@@ -10,6 +10,7 @@ import EditorToolbar from '../../Editor/EditorToolbar'
 import EditTitleModal from '../../Common/EditTitleModal'
 import TokenBadge from '../../Common/TokenBadge'
 import { cn } from '../../../lib/utils'
+import { exportToDocx, exportToPdf, exportToHtml } from '../../Editor/utils/exportDocument'
 
 const AIStudioEditorEnhanced = ({ 
   onToggleLeftSidebar, 
@@ -32,6 +33,9 @@ const AIStudioEditorEnhanced = ({
   const isGeneratingTitleRef = useRef(false)
   const fileInputRef = useRef(null)
   const [tiptapEditor, setTiptapEditor] = useState(null)
+  const [isExporting, setIsExporting] = useState(false)
+  const [showExportMenu, setShowExportMenu] = useState(false)
+  const exportMenuRef = useRef(null)
 
   // Store currentNote and updateNote in refs to avoid dependency issues
   const currentNoteRef = useRef(currentNote)
@@ -168,6 +172,47 @@ const AIStudioEditorEnhanced = ({
       setDisplayTitle(truncateTitleByWords(newTitle, 7))
     }
   }
+
+  // Export handlers
+  const handleExportDocx = async () => {
+    if (!tiptapEditor) return
+    setIsExporting(true)
+    setShowExportMenu(false)
+    try {
+      const filename = currentNote?.title || 'document'
+      await exportToDocx(tiptapEditor, filename.replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF\s-]/g, ''))
+      modal.success(t('export.success') || 'Exported successfully!')
+    } catch (error) {
+      console.error('Export failed:', error)
+      modal.error(t('export.failed') || 'Export failed. Please install: npm install docx file-saver')
+    }
+    setIsExporting(false)
+  }
+
+  const handleExportPdf = () => {
+    if (!tiptapEditor) return
+    setShowExportMenu(false)
+    const filename = currentNote?.title || 'document'
+    exportToPdf(tiptapEditor, filename.replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF\s-]/g, ''))
+  }
+
+  const handleExportHtml = () => {
+    if (!tiptapEditor) return
+    setShowExportMenu(false)
+    const filename = currentNote?.title || 'document'
+    exportToHtml(tiptapEditor, filename.replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF\s-]/g, ''))
+  }
+
+  // Close export menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target)) {
+        setShowExportMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handleContentChange = (newContent) => {
     if (currentNote) {
@@ -362,42 +407,114 @@ const AIStudioEditorEnhanced = ({
 
             <button 
               className={cn(
-                "flex items-center gap-1.5 py-1.5 px-3.5",
+                "flex items-center justify-center gap-1.5 py-1.5 px-3.5",
                 "bg-transparent text-text-primary",
                 "border border-border-light",
                 "rounded-pill text-sm font-medium cursor-pointer",
                 "transition-all duration-200",
                 "hover:bg-bg-hover",
                 "hover:border-border-hover",
-                "max-lg:py-1 max-lg:px-2.5",
-                "max-md:px-2"
+                "max-lg:py-1.5 max-lg:px-3",
+                "max-md:p-2 max-md:rounded-full"
               )}
               onClick={onCreateNote}
               data-tooltip={t('common.new')}
               data-tooltip-collapsed={t('common.new')}
             >
-              <img src="/icon/plus.svg" alt={t('common.new')} className="w-4 h-4 opacity-70 icon-invert max-md:w-3.5 max-md:h-3.5" />
+              <img src="/icon/plus.svg" alt={t('common.new')} className="w-4 h-4 opacity-70 icon-invert" />
               <span className="max-md:hidden">{t('common.new')}</span>
             </button>
             <button 
               className={cn(
-                "flex items-center gap-1.5 py-1.5 px-3.5",
+                "flex items-center justify-center gap-1.5 py-1.5 px-3.5",
                 "bg-transparent text-text-primary",
                 "border border-border-light",
                 "rounded-pill text-sm font-medium cursor-pointer",
                 "transition-all duration-200",
                 "hover:bg-bg-hover",
                 "hover:border-border-hover",
-                "max-lg:py-1 max-lg:px-2.5",
-                "max-md:px-2"
+                "max-lg:py-1.5 max-lg:px-3",
+                "max-md:p-2 max-md:rounded-full"
               )}
               onClick={() => fileInputRef.current?.click()}
               data-tooltip={t('common.upload')}
               data-tooltip-collapsed={t('common.upload')}
             >
-              <img src="/icon/upload.svg" alt={t('common.upload')} className="w-4 h-4 opacity-70 icon-invert max-md:w-3.5 max-md:h-3.5" />
+              <img src="/icon/upload.svg" alt={t('common.upload')} className="w-4 h-4 opacity-70 icon-invert" />
               <span className="max-md:hidden">{t('common.upload')}</span>
             </button>
+
+            {/* Export Dropdown */}
+            <div ref={exportMenuRef} className="relative">
+              <button 
+                className={cn(
+                  "flex items-center justify-center gap-1.5 py-1.5 px-3.5",
+                  "bg-transparent text-text-primary",
+                  "border border-border-light",
+                  "rounded-pill text-sm font-medium cursor-pointer",
+                  "transition-all duration-200",
+                  "hover:bg-bg-hover",
+                  "hover:border-border-hover",
+                  "max-lg:py-1.5 max-lg:px-3",
+                  "max-md:p-2 max-md:rounded-full",
+                  isExporting && "opacity-50 cursor-wait"
+                )}
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                disabled={isExporting || !tiptapEditor}
+                data-tooltip={t('common.download') || 'Download'}
+              >
+                <img src="/icon/download.svg" alt={t('common.download') || 'Download'} className="w-4 h-4 opacity-70 icon-invert" />
+                <span className="max-md:hidden">{isExporting ? '...' : t('common.download') || 'Download'}</span>
+                <img src="/icon/chevron-down.svg" alt="" className="w-3 h-3 opacity-50 icon-invert max-md:hidden" />
+              </button>
+
+              {/* Export Menu Dropdown */}
+              {showExportMenu && (
+                <div className={cn(
+                  "absolute right-0 top-full mt-1 z-50",
+                  "bg-bg-primary border border-border-light rounded-lg shadow-popup",
+                  "py-1 min-w-[160px]"
+                )}>
+                  <button
+                    onClick={handleExportDocx}
+                    className={cn(
+                      "w-full flex items-center gap-2 px-3 py-2",
+                      "text-sm text-text-primary text-left",
+                      "hover:bg-bg-hover transition-colors",
+                      "border-none bg-transparent cursor-pointer"
+                    )}
+                  >
+                    <img src="/icon/file-text.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
+                    Word (.docx)
+                  </button>
+                  <button
+                    onClick={handleExportPdf}
+                    className={cn(
+                      "w-full flex items-center gap-2 px-3 py-2",
+                      "text-sm text-text-primary text-left",
+                      "hover:bg-bg-hover transition-colors",
+                      "border-none bg-transparent cursor-pointer"
+                    )}
+                  >
+                    <img src="/icon/file.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
+                    PDF
+                  </button>
+                  <button
+                    onClick={handleExportHtml}
+                    className={cn(
+                      "w-full flex items-center gap-2 px-3 py-2",
+                      "text-sm text-text-primary text-left",
+                      "hover:bg-bg-hover transition-colors",
+                      "border-none bg-transparent cursor-pointer"
+                    )}
+                  >
+                    <img src="/icon/code.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
+                    HTML
+                  </button>
+                </div>
+              )}
+            </div>
+
             {rightSidebarHidden && (
               <button 
                 className={cn(

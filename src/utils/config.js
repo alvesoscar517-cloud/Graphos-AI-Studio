@@ -103,11 +103,10 @@ export const CONFIG = {
   
   // AI Models
   MODELS: {
-    DEFAULT: 'gemini-2.0-flash-exp',
+    DEFAULT: 'gemini-2.5-flash',
     AVAILABLE: [
-      { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash', speed: 'fast', quality: 'good' },
-      { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', speed: 'fast', quality: 'better' },
       { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite', speed: 'fastest', quality: 'good' },
+      { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', speed: 'fast', quality: 'better' },
       { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', speed: 'slow', quality: 'best' }
     ]
   },

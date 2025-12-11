@@ -85,7 +85,7 @@ async function summarizeConversation(messages, existingSummary = null) {
   
   try {
     const model = vertexAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-lite', // Use lite model for cost efficiency
+      model: 'gemini-2.5-flash-lite', // Use lite model for cost efficiency
       generationConfig: {
         temperature: 0.2, // Lower temp for more consistent summaries
         maxOutputTokens: SUMMARY_MAX_TOKENS

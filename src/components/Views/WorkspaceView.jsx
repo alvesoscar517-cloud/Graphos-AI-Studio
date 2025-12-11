@@ -69,7 +69,7 @@ const WorkspaceView = ({
                   isCentered={true}
                   autoFocus={true}
                   initialMessage={quickActionPrompt}
-                  selectedModel={modelSettings?.model || 'gemini-2.0-flash-exp'}
+                  selectedModel={modelSettings?.model || 'gemini-2.5-flash'}
                   onModelChange={handleModelChange}
                   showModelSelector={true}
                 />
@@ -89,7 +89,7 @@ const WorkspaceView = ({
               disabled={isLoading}
               isCentered={false}
               autoFocus={false}
-              selectedModel={modelSettings?.model || 'gemini-2.0-flash-exp'}
+              selectedModel={modelSettings?.model || 'gemini-2.5-flash'}
               onModelChange={handleModelChange}
               showModelSelector={true}
             />

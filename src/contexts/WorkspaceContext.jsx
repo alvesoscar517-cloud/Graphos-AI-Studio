@@ -57,7 +57,7 @@ export const WorkspaceProvider = ({ children }) => {
   })
   
   const [modelSettings, setModelSettings] = useState({
-    model: 'gemini-2.0-flash-exp',
+    model: 'gemini-2.5-flash',
     temperature: 0.7,
     maxTokens: 2048,
     writingPreferences: {
@@ -346,13 +346,12 @@ export const WorkspaceProvider = ({ children }) => {
 
     try {
       const modelMap = {
-        'gemini-2.0-flash-exp': 'gemini-2.0-flash-exp',
         'gemini-2.5-flash-lite': 'gemini-2.5-flash-lite',
         'gemini-2.5-flash': 'gemini-2.5-flash',
         'gemini-2.5-pro': 'gemini-2.5-pro'
       }
       
-      const actualModel = modelMap[modelSettings.model] || 'gemini-2.0-flash-exp'
+      const actualModel = modelMap[modelSettings.model] || 'gemini-2.5-flash'
 
       // Check if humanization is enabled
       const chatSettings = modelSettings.chatSettings || {}

@@ -6,17 +6,6 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
 
   const REWRITE_MODELS = [
     {
-      id: 'gemini-2.0-flash-exp',
-      name: 'Gemini 2.0 Flash',
-      speed: { icon: '/icon/gauge.svg', text: t('model.veryFast') },
-      description: t('model.geminiFlashExp'),
-      details: [
-        { icon: '/icon/zap.svg', text: t('model.experimental') },
-        { icon: '/icon/sparkles.svg', text: t('model.newFeatures') }
-      ],
-      icon: '/icon/Gemini.svg'
-    },
-    {
       id: 'gemini-2.5-flash-lite',
       name: 'Gemini 2.5 Flash Lite',
       speed: { icon: '/icon/gauge.svg', text: t('model.ultraFast') },

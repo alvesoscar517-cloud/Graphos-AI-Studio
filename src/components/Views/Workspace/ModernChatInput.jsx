@@ -12,7 +12,6 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
 // Gemini Models - simplified names like shadcn-io/ai
 const MODELS = [
-  { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash' },
   { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Lite' },
   { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
   { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' }
@@ -25,7 +24,7 @@ const ModernChatInput = ({
   placeholder,
   autoFocus = false,
   initialMessage = '',
-  selectedModel = 'gemini-2.0-flash-exp',
+  selectedModel = 'gemini-2.5-flash',
   onModelChange,
   showModelSelector = true
 }) => {

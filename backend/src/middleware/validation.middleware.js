@@ -32,13 +32,11 @@ const SCHEMAS = {
   // Model validation
   model: {
     allowedValues: [
-      'gemini-2.0-flash-exp',
-      'gemini-2.5-flash',
       'gemini-2.5-flash-lite',
-      'gemini-2.5-pro',
-      'gemini-2.0-pro'
+      'gemini-2.5-flash',
+      'gemini-2.5-pro'
     ],
-    default: 'gemini-2.0-flash-exp'
+    default: 'gemini-2.5-flash'
   },
   
   // Email validation

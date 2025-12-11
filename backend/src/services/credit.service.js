@@ -283,7 +283,7 @@ function calculateAnalysisCost(text) {
 /**
  * Calculate cost for text rewriting
  */
-function calculateRewriteCost(text, model = 'gemini-2.0-flash-exp') {
+function calculateRewriteCost(text, model = 'gemini-2.5-flash') {
   const wordCount = countWords(text);
   
   return calculateFeatureCost('text_rewrite', {
@@ -310,7 +310,7 @@ function calculateSuggestionsCost(textOrWordCount) {
 /**
  * Calculate cost for chat message
  */
-function calculateChatCost(text, model = 'gemini-2.0-flash-exp') {
+function calculateChatCost(text, model = 'gemini-2.5-flash') {
   const wordCount = countWords(text);
   
   return calculateFeatureCost('chat_message', {
@@ -322,7 +322,7 @@ function calculateChatCost(text, model = 'gemini-2.0-flash-exp') {
 /**
  * Calculate cost for humanized chat message
  */
-function calculateHumanizedChatCost(text, model = 'gemini-2.0-flash-exp') {
+function calculateHumanizedChatCost(text, model = 'gemini-2.5-flash') {
   const wordCount = countWords(text);
   
   return calculateFeatureCost('chat_humanized', {

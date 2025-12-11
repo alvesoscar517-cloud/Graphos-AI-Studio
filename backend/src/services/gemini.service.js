@@ -392,7 +392,7 @@ async function detectAIContent(text) {
 async function detectAIContentSingle(text) {
   try {
     const model = vertexAI.getGenerativeModel({ 
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: 'application/json',
         temperature: 0.1 // Low temperature for consistent results
@@ -503,7 +503,7 @@ Return JSON:
 async function detectAIContentDeep(text) {
   try {
     const model = vertexAI.getGenerativeModel({ 
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: 'application/json',
         temperature: 0.2
@@ -862,13 +862,14 @@ function detectAIContentHeuristic(text) {
 async function generateVoiceSummary(sampleTexts, statisticalFeatures) {
   try {
     // Use Gemini 2.5 Pro with native thinking for better voice profile analysis
+    // Note: thinkingConfig should be at model level, not in generationConfig
     const model = vertexAI.getGenerativeModel({ 
       model: 'gemini-2.5-pro',
       generationConfig: {
-        responseMimeType: 'application/json',
-        thinkingConfig: {
-          thinkingBudget: 1024 // Allow thinking for deeper analysis
-        }
+        responseMimeType: 'application/json'
+      },
+      thinkingConfig: {
+        thinkingBudget: 1024 // Allow thinking for deeper analysis
       }
     });
     
@@ -963,7 +964,7 @@ Return JSON in this format:
  * Enhanced rewrite with anti-AI detection
  * Uses humanize.service for advanced humanization
  */
-async function rewriteWithVoice(originalText, voiceProfile, context = {}, modelName = 'gemini-2.0-flash-exp') {
+async function rewriteWithVoice(originalText, voiceProfile, context = {}, modelName = 'gemini-2.5-flash') {
   try {
     // Import humanize service
     const humanizeService = require('./humanize.service');
@@ -1011,7 +1012,7 @@ async function rewriteWithVoice(originalText, voiceProfile, context = {}, modelN
 /**
  * Basic rewrite (fallback) - original implementation
  */
-async function rewriteWithVoiceBasic(originalText, voiceProfile, context = {}, modelName = 'gemini-2.0-flash-exp') {
+async function rewriteWithVoiceBasic(originalText, voiceProfile, context = {}, modelName = 'gemini-2.5-flash') {
   try {
     const model = vertexAI.getGenerativeModel({ 
       model: modelName
@@ -1130,7 +1131,7 @@ async function generateImprovementSuggestions(sentence, issues, voiceProfile, co
 
   try {
     const model = vertexAI.getGenerativeModel({ 
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: 'application/json',
         temperature: 0.5 // Lower temperature for more consistent results

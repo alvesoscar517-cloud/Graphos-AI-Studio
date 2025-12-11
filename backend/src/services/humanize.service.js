@@ -707,7 +707,7 @@ function breakParallelStructures(text) {
  * @param {string} modelName - Model to use
  * @returns {Promise<string>} - Rewritten text
  */
-async function rewriteWithAntiDetection(originalText, voiceProfile, context = {}, modelName = 'gemini-2.0-flash-exp') {
+async function rewriteWithAntiDetection(originalText, voiceProfile, context = {}, modelName = 'gemini-2.5-flash') {
   try {
     const model = vertexAI.getGenerativeModel({ 
       model: modelName,
@@ -761,7 +761,7 @@ async function rewriteWithAntiDetection(originalText, voiceProfile, context = {}
 async function rewriteWithIterativeRefinement(originalText, voiceProfile, context = {}, options = {}) {
   const maxIterations = options.maxIterations || 3;
   const targetProbability = options.targetProbability || 35;
-  const modelName = options.model || 'gemini-2.0-flash-exp';
+  const modelName = options.model || 'gemini-2.5-flash';
   
   let currentText = originalText;
   let iterations = 0;

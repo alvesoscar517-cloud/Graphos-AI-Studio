@@ -11,19 +11,14 @@ import { CONFIG, debugLog } from '../../utils/config';
 // ============================================================================
 
 const MODEL_LIMITS = {
-  'gemini-2.0-flash-exp': {
-    maxInputTokens: 32000,
-    maxOutputTokens: 8000,
+  'gemini-2.5-flash-lite': {
+    maxInputTokens: 16000,
+    maxOutputTokens: 4000,
     charsPerToken: 4
   },
   'gemini-2.5-flash': {
     maxInputTokens: 32000,
     maxOutputTokens: 8000,
-    charsPerToken: 4
-  },
-  'gemini-2.5-flash-lite': {
-    maxInputTokens: 16000,
-    maxOutputTokens: 4000,
     charsPerToken: 4
   },
   'gemini-2.5-pro': {
@@ -36,16 +31,16 @@ const MODEL_LIMITS = {
 /**
  * Estimate token count from text
  */
-function estimateTokens(text, model = 'gemini-2.0-flash-exp') {
-  const limits = MODEL_LIMITS[model] || MODEL_LIMITS['gemini-2.0-flash-exp'];
+function estimateTokens(text, model = 'gemini-2.5-flash') {
+  const limits = MODEL_LIMITS[model] || MODEL_LIMITS['gemini-2.5-flash'];
   return Math.ceil(text.length / limits.charsPerToken);
 }
 
 /**
  * Get max characters for model
  */
-function getMaxChars(model = 'gemini-2.0-flash-exp') {
-  const limits = MODEL_LIMITS[model] || MODEL_LIMITS['gemini-2.0-flash-exp'];
+function getMaxChars(model = 'gemini-2.5-flash') {
+  const limits = MODEL_LIMITS[model] || MODEL_LIMITS['gemini-2.5-flash'];
   return limits.maxInputTokens * limits.charsPerToken;
 }
 
@@ -60,7 +55,7 @@ function getMaxChars(model = 'gemini-2.0-flash-exp') {
  * @param {Object} options - Validation options
  * @returns {Object} - Validation result
  */
-export function validateTextBeforeAI(text, model = 'gemini-2.0-flash-exp', options = {}) {
+export function validateTextBeforeAI(text, model = 'gemini-2.5-flash', options = {}) {
   const { task = 'analyze', showWarning = true } = options;
   
   // Sanitize input first
@@ -88,7 +83,7 @@ export function validateTextBeforeAI(text, model = 'gemini-2.0-flash-exp', optio
   // Check token limits
   const estimatedTokens = estimateTokens(sanitized, model);
   const maxChars = getMaxChars(model);
-  const limits = MODEL_LIMITS[model] || MODEL_LIMITS['gemini-2.0-flash-exp'];
+  const limits = MODEL_LIMITS[model] || MODEL_LIMITS['gemini-2.5-flash'];
   
   const warnings = [...validation.warnings];
   let recommendation = 'ok';
@@ -129,7 +124,7 @@ export function validateTextBeforeAI(text, model = 'gemini-2.0-flash-exp', optio
 /**
  * Split text into chunks for model
  */
-export function splitTextForModel(text, model = 'gemini-2.0-flash-exp') {
+export function splitTextForModel(text, model = 'gemini-2.5-flash') {
   const maxChars = getMaxChars(model) * 0.8; // Leave 20% buffer
   
   if (text.length <= maxChars) {

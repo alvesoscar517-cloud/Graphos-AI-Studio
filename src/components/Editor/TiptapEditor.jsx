@@ -271,7 +271,7 @@ function TiptapEditorComponent({
             )}
           </AnimatePresence>
 
-          {/* Editor content - hidden during reasoning phase (before streaming starts) */}
+          {/* Editor content */}
           <EditorContent 
             editor={editor} 
             className={cn(

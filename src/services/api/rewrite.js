@@ -195,7 +195,7 @@ export async function checkHumanization(text) {
  */
 export async function iterativeHumanize(profileId, text, options = {}) {
   try {
-    const validation = validateTextBeforeAI(text, options.model || 'gemini-2.0-flash-exp', { task: 'rewrite' })
+    const validation = validateTextBeforeAI(text, options.model || 'gemini-2.5-flash', { task: 'rewrite' })
     if (!validation.valid) {
       return { 
         success: false, 
@@ -209,7 +209,7 @@ export async function iterativeHumanize(profileId, text, options = {}) {
       text: text,
       max_iterations: options.maxIterations || 3,
       target_probability: options.targetProbability || 35,
-      model: options.model || 'gemini-2.0-flash-exp'
+      model: options.model || 'gemini-2.5-flash'
     })
     
     return { 
@@ -232,7 +232,7 @@ export async function iterativeHumanize(profileId, text, options = {}) {
  */
 export async function startIterativeHumanize(profileId, text, options = {}) {
   try {
-    const validation = validateTextBeforeAI(text, options.model || 'gemini-2.0-flash-exp', { task: 'rewrite' })
+    const validation = validateTextBeforeAI(text, options.model || 'gemini-2.5-flash', { task: 'rewrite' })
     if (!validation.valid) {
       return { 
         success: false, 
@@ -246,7 +246,7 @@ export async function startIterativeHumanize(profileId, text, options = {}) {
       text: text,
       max_iterations: options.maxIterations || 3,
       target_probability: options.targetProbability || 35,
-      model: options.model || 'gemini-2.0-flash-exp',
+      model: options.model || 'gemini-2.5-flash',
       writing_preferences: options.writingPreferences || {}
     }
     

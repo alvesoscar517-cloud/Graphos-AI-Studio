@@ -10,17 +10,6 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
 
   const MODELS = [
     {
-      id: 'gemini-2.0-flash-exp',
-      name: 'Gemini 2.0 Flash',
-      speed: t('model.veryFast'),
-      description: t('model.geminiFlashExp'),
-      tags: [
-        { label: t('model.experimental'), icon: 'flask-conical' },
-        { label: t('model.newFeatures'), icon: 'sparkles' }
-      ],
-      icon: '/icon/Gemini.svg'
-    },
-    {
       id: 'gemini-2.5-flash-lite',
       name: 'Gemini 2.5 Flash Lite',
       speed: t('model.ultraFast'),

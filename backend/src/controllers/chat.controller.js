@@ -90,7 +90,7 @@ exports.sendMessage = async (req, res) => {
     const { 
       messages, 
       systemPrompt, 
-      model: requestedModel = 'gemini-2.0-flash-exp', 
+      model: requestedModel = 'gemini-2.5-flash', 
       temperature = 0.7, 
       profileId = null, 
       writingPreferences = null,
@@ -98,7 +98,7 @@ exports.sendMessage = async (req, res) => {
     } = req.body;
 
     // Validate model
-    const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
+    const model = validateModel(requestedModel, 'gemini-2.5-flash');
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ 
@@ -228,7 +228,7 @@ exports.sendMessageStream = async (req, res) => {
     const { 
       messages, 
       systemPrompt, 
-      model: requestedModel = 'gemini-2.0-flash-exp', 
+      model: requestedModel = 'gemini-2.5-flash', 
       temperature = 0.7, 
       profileId = null, 
       writingPreferences = null,
@@ -238,7 +238,7 @@ exports.sendMessageStream = async (req, res) => {
     } = req.body;
 
     // Validate model
-    const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
+    const model = validateModel(requestedModel, 'gemini-2.5-flash');
     
     // Only enable thinking for 2.5 models (native thinking support from Google)
     // 2.0 models don't have native thinking - skip to save cost and time
@@ -298,19 +298,23 @@ exports.sendMessageStream = async (req, res) => {
       maxOutputTokens: shouldIncludeReasoning ? 4096 : 2048, // More tokens for thinking
     };
     
+    // Build model config
+    let modelConfig = {
+      model: model,
+      generationConfig,
+    };
+    
     // Add native thinkingConfig for 2.5 models when reasoning is requested
-    // Only 2.5 models support native thinking from Google
+    // Note: thinkingConfig should be at model level, not in generationConfig
     if (shouldIncludeReasoning) {
-      generationConfig.thinkingConfig = {
+      modelConfig.thinkingConfig = {
         thinkingBudget: 2048 // Allow up to 2048 tokens for thinking
       };
       console.log('[CHAT] Using native thinking for model:', model);
+      console.log('[CHAT] Model config:', JSON.stringify(modelConfig, null, 2));
     }
     
-    const generativeModel = geminiService.vertexAI.getGenerativeModel({
-      model: model,
-      generationConfig,
-    });
+    const generativeModel = geminiService.vertexAI.getGenerativeModel(modelConfig);
 
     const lastMessage = optimizedMessages[optimizedMessages.length - 1];
     let streamResult;
@@ -574,7 +578,7 @@ exports.sendMessageHumanized = async (req, res) => {
     const { 
       messages, 
       systemPrompt, 
-      model: requestedModel = 'gemini-2.0-flash-exp', 
+      model: requestedModel = 'gemini-2.5-flash', 
       temperature = 0.7, 
       profileId = null, 
       writingPreferences = null,
@@ -583,7 +587,7 @@ exports.sendMessageHumanized = async (req, res) => {
     } = req.body;
 
     // Validate model
-    const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
+    const model = validateModel(requestedModel, 'gemini-2.5-flash');
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ 
@@ -684,7 +688,7 @@ exports.sendMessageHumanized = async (req, res) => {
               {
                 maxIterations: 1, // Single iteration for cost efficiency
                 targetProbability,
-                model: 'gemini-2.0-flash-exp'
+                model: 'gemini-2.5-flash'
               }
             );
             
@@ -772,7 +776,7 @@ exports.sendMessageHumanizedStream = async (req, res) => {
     const { 
       messages, 
       systemPrompt, 
-      model: requestedModel = 'gemini-2.0-flash-exp', 
+      model: requestedModel = 'gemini-2.5-flash', 
       temperature = 0.7, 
       profileId = null, 
       writingPreferences = null,
@@ -781,7 +785,7 @@ exports.sendMessageHumanizedStream = async (req, res) => {
     } = req.body;
 
     // Validate model
-    const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
+    const model = validateModel(requestedModel, 'gemini-2.5-flash');
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ 
@@ -967,7 +971,7 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
                 refinementContext,
                 writingPreferences 
               },
-              'gemini-2.0-flash-exp' // Use fast model for refinement
+              'gemini-2.5-flash' // Use fast model for refinement
             );
             
             // Quick re-check (optional, for logging)

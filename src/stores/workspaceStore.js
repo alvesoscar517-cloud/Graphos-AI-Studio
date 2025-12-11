@@ -16,7 +16,7 @@ export const useWorkspaceStore = create(
       
       // Model settings
       modelSettings: {
-        model: 'gemini-2.0-flash-exp',
+        model: 'gemini-2.5-flash',
         temperature: 0.7,
         maxTokens: 2048,
         writingPreferences: {
@@ -80,9 +80,20 @@ export const useWorkspaceStore = create(
     }),
     {
       name: 'workspace-storage',
+      version: 1, // Increment when schema changes
       partialize: (state) => ({
         modelSettings: state.modelSettings,
       }),
+      // Migrate old model names to new ones
+      migrate: (persistedState, version) => {
+        if (version === 0) {
+          // Migrate from gemini-2.0 to gemini-2.5
+          if (persistedState.modelSettings?.model?.includes('2.0')) {
+            persistedState.modelSettings.model = 'gemini-2.5-flash'
+          }
+        }
+        return persistedState
+      },
     }
   )
 )

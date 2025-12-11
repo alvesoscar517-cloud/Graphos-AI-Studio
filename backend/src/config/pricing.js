@@ -20,27 +20,19 @@ const FREE_CREDITS = 100; // Free credits for new users (increased from 50)
 // ============================================================================
 
 const MODEL_COSTS = {
-  // Gemini 2.0 Flash - Fast, no native thinking
-  'gemini-2.0-flash-exp': {
-    inputCostPer1M: 0.075,      // $0.075 per 1M input tokens
-    outputCostPer1M: 0.30,      // $0.30 per 1M output tokens
-    multiplier: 1.0,
-    hasNativeThinking: false
-  },
-  
   // Gemini 2.5 Flash Lite - Cheapest, with native thinking
   'gemini-2.5-flash-lite': {
     inputCostPer1M: 0.075,
     outputCostPer1M: 0.30,
-    multiplier: 0.9,             // Slightly cheaper than 2.0 flash
+    multiplier: 0.8,             // Cheapest option
     hasNativeThinking: true
   },
   
-  // Gemini 2.5 Flash - Balanced, with native thinking
+  // Gemini 2.5 Flash - Balanced, with native thinking (default)
   'gemini-2.5-flash': {
-    inputCostPer1M: 0.15,        // Slightly higher for thinking capability
+    inputCostPer1M: 0.15,
     outputCostPer1M: 0.60,
-    multiplier: 1.3,             // Good value with thinking
+    multiplier: 1.0,             // Base multiplier
     hasNativeThinking: true
   },
   
@@ -48,7 +40,7 @@ const MODEL_COSTS = {
   'gemini-2.5-pro': {
     inputCostPer1M: 1.25,
     outputCostPer1M: 5.00,
-    multiplier: 2.5,             // Reduced from 3.0 for better user value
+    multiplier: 2.0,             // Reduced for better user value
     hasNativeThinking: true
   },
   
@@ -57,14 +49,6 @@ const MODEL_COSTS = {
     inputCostPer1M: 0.025,       // $0.025 per 1M tokens
     outputCostPer1M: 0,
     multiplier: 0.5,
-    hasNativeThinking: false
-  },
-  
-  // Legacy Pro model (deprecated, kept for compatibility)
-  'gemini-2.0-pro': {
-    inputCostPer1M: 1.25,
-    outputCostPer1M: 5.00,
-    multiplier: 2.5,
     hasNativeThinking: false
   }
 };

@@ -908,17 +908,22 @@ exports.rewriteTextStream = async (req, res) => {
     };
     
     // Add thinkingConfig for 2.5 models when reasoning is requested
+    // Note: thinkingConfig is a top-level config, not inside generationConfig
+    let modelConfig = {
+      model: modelName,
+      generationConfig
+    };
+    
     if (useNativeThinking) {
-      generationConfig.thinkingConfig = {
+      // thinkingConfig should be at model level, not in generationConfig
+      modelConfig.thinkingConfig = {
         thinkingBudget: 2048 // Allow up to 2048 tokens for thinking
       };
       console.log('[REWRITE] Using native thinking for model:', modelName);
+      console.log('[REWRITE] Model config:', JSON.stringify(modelConfig, null, 2));
     }
     
-    const generativeModel = geminiService.vertexAI.getGenerativeModel({ 
-      model: modelName,
-      generationConfig
-    });
+    const generativeModel = geminiService.vertexAI.getGenerativeModel(modelConfig);
 
     // For native thinking, use simple prompt without reasoning instructions
     let finalPrompt = prompt;
@@ -939,21 +944,37 @@ exports.rewriteTextStream = async (req, res) => {
     let contentBuffer = '';
     const REASONING_END_MARKER = '---CONTENT_START---';
     
+    let isFirstChunk = true;
     for await (const chunk of result.stream) {
       try {
         // Handle native thinking response (2.5 models)
         if (useNativeThinking && chunk.candidates && chunk.candidates[0]) {
           const candidate = chunk.candidates[0];
           
+          // Debug: Log first chunk structure to understand Gemini response format
+          if (isFirstChunk) {
+            console.log('[REWRITE DEBUG] First chunk raw structure:', JSON.stringify(chunk, null, 2).substring(0, 1000));
+            isFirstChunk = false;
+          }
+          
           // Check for thinking content (native thinking)
           if (candidate.content && candidate.content.parts) {
             for (const part of candidate.content.parts) {
-              // Native thinking content
-              if (part.thought === true && part.text) {
+              // Debug: Log each part's keys
+              console.log('[REWRITE DEBUG] Part keys:', Object.keys(part), 'thought:', part.thought);
+              
+              // Native thinking content - check multiple possible indicators
+              // Google may use 'thought' boolean or other indicators
+              const isThinkingPart = part.thought === true || 
+                                     part.thoughtSignature !== undefined ||
+                                     (part.role === 'model' && part.thought);
+              
+              if (isThinkingPart && part.text) {
+                console.log('[REWRITE] Sending reasoning chunk:', part.text.substring(0, 50) + '...');
                 res.write(`data: ${JSON.stringify({ reasoning: part.text })}\n\n`);
               }
               // Regular content
-              else if (part.text && part.thought !== true) {
+              else if (part.text && !isThinkingPart) {
                 fullText += part.text;
                 res.write(`data: ${JSON.stringify({ chunk: part.text })}\n\n`);
               }
@@ -1138,11 +1159,11 @@ exports.iterativeHumanize = async (req, res) => {
       user_id,
       max_iterations = 3,
       target_probability = 35,
-      model: requestedModel = 'gemini-2.0-flash-exp'
+      model: requestedModel = 'gemini-2.5-flash'
     } = req.body;
 
     // Validate model
-    const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
+    const model = validateModel(requestedModel, 'gemini-2.5-flash');
 
     if (!profile_id || !text) {
       return res.status(400).json({ success: false, ...l.error('invalid_input') });
@@ -1269,7 +1290,7 @@ exports.startIterativeHumanize = async (req, res) => {
       user_id,
       max_iterations = 3,
       target_probability = 35,
-      model: requestedModel = 'gemini-2.0-flash-exp',
+      model: requestedModel = 'gemini-2.5-flash',
       writing_preferences = {}
     } = req.body;
 
@@ -1283,7 +1304,7 @@ exports.startIterativeHumanize = async (req, res) => {
     }
 
     // Validate model
-    const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
+    const model = validateModel(requestedModel, 'gemini-2.5-flash');
 
     // Text is required, profile_id is optional (for generic humanization)
     if (!text) {
@@ -1531,7 +1552,7 @@ exports.translateText = async (req, res) => {
       return res.status(400).json({ success: false, ...l.error('text_required') });
     }
 
-    const model = geminiService.vertexAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+    const model = geminiService.vertexAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `Translate from ${source_lang} to ${target_lang}. Return ONLY the translated text.\n\n${text}`;
 

@@ -170,7 +170,7 @@ const config = convict({
     model: {
       doc: 'Gemini model name',
       format: String,
-      default: 'gemini-2.0-flash-exp',
+      default: 'gemini-2.5-flash',
       env: 'GEMINI_MODEL'
     },
     embeddingModel: {

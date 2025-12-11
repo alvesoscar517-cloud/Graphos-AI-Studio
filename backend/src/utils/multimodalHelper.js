@@ -141,7 +141,7 @@ async function buildMultimodalContent(textContent, attachments) {
 async function analyzeImage(base64Image, mimeType, prompt = 'Describe this image in detail.') {
   try {
     const model = vertexAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         temperature: 0.4,
         maxOutputTokens: 1024

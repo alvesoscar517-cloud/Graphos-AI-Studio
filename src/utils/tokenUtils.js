@@ -9,19 +9,9 @@
  * - English: ~1.3 tokens/word
  */
 
-// Model limits - Only Gemini models (system only uses Gemini)
+// Model limits - Only Gemini 2.5 models (all support native thinking)
 export const MODEL_LIMITS = {
-  // Gemini 2.0 Flash Experimental
-  'gemini-2.0-flash-exp': {
-    name: 'Gemini 2.0 Flash',
-    maxInput: 1048576,
-    maxOutput: 8192,
-    creditsPerKInput: 0.5,    // 0.5 credits per 1K input tokens
-    creditsPerKOutput: 1.0,   // 1 credit per 1K output tokens
-    recommendedMaxChars: 80000,
-    speed: 'very-fast'
-  },
-  // Gemini 2.5 Flash Lite - Cheapest
+  // Gemini 2.5 Flash Lite - Cheapest with thinking
   'gemini-2.5-flash-lite': {
     name: 'Gemini 2.5 Flash Lite',
     maxInput: 1048576,
@@ -302,13 +292,13 @@ export function recommendModel(text, options = {}) {
     if (priority === 'quality') {
       return { model: 'gemini-2.5-pro', reason: 'High quality for short text' }
     }
-    return { model: 'gemini-2.0-flash', reason: 'Fast and cost-effective for short text' }
+    return { model: 'gemini-2.5-flash', reason: 'Fast and cost-effective for short text' }
   }
   
   // Medium text (5000 - 30000 chars)
   if (stats.chars < 30000) {
     if (priority === 'cost') {
-      return { model: 'gemini-2.0-flash', reason: 'Lowest cost' }
+      return { model: 'gemini-2.5-flash-lite', reason: 'Lowest cost' }
     }
     if (priority === 'quality') {
       return { model: 'gemini-2.5-flash', reason: 'Balance between quality and cost' }
@@ -319,7 +309,7 @@ export function recommendModel(text, options = {}) {
   // Long text (> 30000 chars) - need large context
   if (priority === 'cost') {
     return { 
-      model: 'gemini-2.0-flash', 
+      model: 'gemini-2.5-flash-lite', 
       reason: 'Low cost, but should chunk text',
       shouldChunk: true
     }
@@ -367,10 +357,9 @@ const FEATURE_COSTS = {
 }
 
 const MODEL_MULTIPLIERS = {
-  'gemini-2.0-flash-exp': 1.0,
   'gemini-2.5-flash-lite': 0.8,
-  'gemini-2.5-flash': 1.2,
-  'gemini-2.5-pro': 3.0
+  'gemini-2.5-flash': 1.0,
+  'gemini-2.5-pro': 2.0
 }
 
 /**

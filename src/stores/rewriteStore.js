@@ -54,10 +54,21 @@ export const useRewriteStore = create(
     }),
     {
       name: 'rewrite-storage',
+      version: 1, // Increment when schema changes
       partialize: (state) => ({
         selectedModel: state.selectedModel,
         writingPreferences: state.writingPreferences,
       }),
+      // Migrate old model names to new ones
+      migrate: (persistedState, version) => {
+        if (version === 0) {
+          // Migrate from gemini-2.0 to gemini-2.5
+          if (persistedState.selectedModel?.includes('2.0')) {
+            persistedState.selectedModel = 'gemini-2.5-flash'
+          }
+        }
+        return persistedState
+      },
     }
   )
 )
