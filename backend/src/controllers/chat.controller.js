@@ -274,6 +274,13 @@ exports.sendMessageStream = async (req, res) => {
     enhancedSystemPrompt = contextResult.systemPrompt;
     const optimizedMessages = contextResult.messages;
 
+    // Set CORS headers explicitly for streaming
+    const origin = req.get('Origin');
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
@@ -308,7 +315,8 @@ exports.sendMessageStream = async (req, res) => {
     // Note: thinkingConfig should be at model level, not in generationConfig
     if (shouldIncludeReasoning) {
       modelConfig.thinkingConfig = {
-        thinkingBudget: 2048 // Allow up to 2048 tokens for thinking
+        thinkingBudget: 2048, // Allow up to 2048 tokens for thinking
+        includeThoughts: true // Request thinking summary in response
       };
       console.log('[CHAT] Using native thinking for model:', model);
       console.log('[CHAT] Model config:', JSON.stringify(modelConfig, null, 2));
@@ -354,15 +362,30 @@ exports.sendMessageStream = async (req, res) => {
         if (shouldIncludeReasoning && chunk.candidates && chunk.candidates[0]) {
           const candidate = chunk.candidates[0];
           
-          // Check for thinking content (native thinking from Google)
+          // Check for thinking content at candidate level (Vertex AI format)
+          if (candidate.thoughts || candidate.thoughtsContent) {
+            const thoughtText = candidate.thoughts || candidate.thoughtsContent;
+            if (thoughtText) {
+              res.write(`data: ${JSON.stringify({ reasoning: thoughtText })}\n\n`);
+            }
+          }
+          
+          // Check for thinking content in parts (native thinking from Google)
           if (candidate.content && candidate.content.parts) {
             for (const part of candidate.content.parts) {
-              // Native thinking content (part.thought === true)
-              if (part.thought === true && part.text) {
-                res.write(`data: ${JSON.stringify({ reasoning: part.text })}\n\n`);
+              // Native thinking content - check multiple possible indicators
+              const isThinkingPart = part.thought === true || 
+                                     part.thoughts !== undefined ||
+                                     part.thoughtsContent !== undefined;
+              
+              const thinkingText = part.thoughts || part.thoughtsContent;
+              
+              if (isThinkingPart && (part.text || thinkingText)) {
+                const reasoningContent = thinkingText || part.text;
+                res.write(`data: ${JSON.stringify({ reasoning: reasoningContent })}\n\n`);
               }
               // Regular content
-              else if (part.text && part.thought !== true) {
+              else if (part.text && !isThinkingPart) {
                 totalChars += part.text.length;
                 res.write(`data: ${JSON.stringify({ chunk: part.text })}\n\n`);
               }
@@ -858,6 +881,13 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
     enhancedSystemPrompt = contextResult.systemPrompt;
     const optimizedMessages = contextResult.messages;
 
+    // Set CORS headers explicitly for streaming
+    const originHeader = req.get('Origin');
+    if (originHeader) {
+      res.setHeader('Access-Control-Allow-Origin', originHeader);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');

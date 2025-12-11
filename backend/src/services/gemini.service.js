@@ -869,7 +869,8 @@ async function generateVoiceSummary(sampleTexts, statisticalFeatures) {
         responseMimeType: 'application/json'
       },
       thinkingConfig: {
-        thinkingBudget: 1024 // Allow thinking for deeper analysis
+        thinkingBudget: 1024, // Allow thinking for deeper analysis
+        includeThoughts: true // Request thinking summary in response
       }
     });
     

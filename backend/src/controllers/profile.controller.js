@@ -815,6 +815,13 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
 exports.createProfileCompleteStream = async (req, res) => {
   const l = createLocalizer(req);
   
+  // Set CORS headers explicitly for streaming
+  const origin = req.get('Origin');
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
+  
   // Set up SSE headers
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');

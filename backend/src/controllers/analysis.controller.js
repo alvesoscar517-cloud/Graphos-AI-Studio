@@ -856,6 +856,13 @@ exports.rewriteTextStream = async (req, res) => {
       console.log('[REWRITE] Using generic voice profile (no profile_id provided)');
     }
 
+    // Set CORS headers explicitly for streaming (in case middleware hasn't fully loaded)
+    const origin = req.get('Origin');
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -917,7 +924,8 @@ exports.rewriteTextStream = async (req, res) => {
     if (useNativeThinking) {
       // thinkingConfig should be at model level, not in generationConfig
       modelConfig.thinkingConfig = {
-        thinkingBudget: 2048 // Allow up to 2048 tokens for thinking
+        thinkingBudget: 2048, // Allow up to 2048 tokens for thinking
+        includeThoughts: true // Request thinking summary in response
       };
       console.log('[REWRITE] Using native thinking for model:', modelName);
       console.log('[REWRITE] Model config:', JSON.stringify(modelConfig, null, 2));
@@ -957,23 +965,38 @@ exports.rewriteTextStream = async (req, res) => {
             isFirstChunk = false;
           }
           
-          // Check for thinking content (native thinking)
+          // Check for thinking content at candidate level (Vertex AI format)
+          // Some versions return thoughts at candidate level, not part level
+          if (candidate.thoughts || candidate.thoughtsContent) {
+            const thoughtText = candidate.thoughts || candidate.thoughtsContent;
+            if (thoughtText) {
+              console.log('[REWRITE] Sending reasoning from candidate.thoughts:', thoughtText.substring(0, 50) + '...');
+              res.write(`data: ${JSON.stringify({ reasoning: thoughtText })}\n\n`);
+            }
+          }
+          
+          // Check for thinking content in parts (native thinking)
           if (candidate.content && candidate.content.parts) {
             for (const part of candidate.content.parts) {
-              // Debug: Log each part's keys
-              console.log('[REWRITE DEBUG] Part keys:', Object.keys(part), 'thought:', part.thought);
+              // Debug: Log each part's keys to understand response structure
+              console.log('[REWRITE DEBUG] Part keys:', Object.keys(part), 'thought:', part.thought, 'thoughtsContent:', part.thoughtsContent);
               
               // Native thinking content - check multiple possible indicators
-              // Google may use 'thought' boolean or other indicators
+              // Vertex AI may use different field names depending on SDK version
               const isThinkingPart = part.thought === true || 
-                                     part.thoughtSignature !== undefined ||
-                                     (part.role === 'model' && part.thought);
+                                     part.thoughts !== undefined ||
+                                     part.thoughtsContent !== undefined ||
+                                     part.thoughtSignature !== undefined;
               
-              if (isThinkingPart && part.text) {
-                console.log('[REWRITE] Sending reasoning chunk:', part.text.substring(0, 50) + '...');
-                res.write(`data: ${JSON.stringify({ reasoning: part.text })}\n\n`);
+              // Extract thinking text from various possible fields
+              const thinkingText = part.thoughts || part.thoughtsContent;
+              
+              if (isThinkingPart && (part.text || thinkingText)) {
+                const reasoningContent = thinkingText || part.text;
+                console.log('[REWRITE] Sending reasoning chunk:', reasoningContent.substring(0, 50) + '...');
+                res.write(`data: ${JSON.stringify({ reasoning: reasoningContent })}\n\n`);
               }
-              // Regular content
+              // Regular content (not thinking)
               else if (part.text && !isThinkingPart) {
                 fullText += part.text;
                 res.write(`data: ${JSON.stringify({ chunk: part.text })}\n\n`);
@@ -1490,6 +1513,13 @@ exports.streamHumanizeJobResult = async (req, res) => {
     }
 
     const rewrittenText = job.result.rewrittenText;
+    
+    // Set CORS headers explicitly for streaming
+    const origin = req.get('Origin');
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
     
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
