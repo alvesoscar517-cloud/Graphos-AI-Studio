@@ -808,6 +808,412 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
   }
 };
 
+/**
+ * Create profile with streaming progress and reasoning
+ * Sends SSE events for realtime UI updates
+ */
+exports.createProfileCompleteStream = async (req, res) => {
+  const l = createLocalizer(req);
+  
+  // Set up SSE headers
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  
+  // Helper to send SSE events
+  const sendEvent = (data) => {
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
+  };
+  
+  try {
+    const { user_id, profile_name = 'Default Profile', email, name = 'User', theme = 'work', samples } = req.body;
+
+    // Step 0: Validation
+    sendEvent({ type: 'step', step: 0, message: l.t('profile_stream.validating') });
+
+    // Validate inputs
+    if (!samples || !Array.isArray(samples) || samples.length < 3) {
+      sendEvent({ 
+        type: 'error', 
+        error: l.t('voice_profile.insufficient_samples', { min: 3 }),
+        error_code: 'INSUFFICIENT_SAMPLES'
+      });
+      return res.end();
+    }
+
+    if (samples.length > 20) {
+      sendEvent({ 
+        type: 'error', 
+        error: 'Maximum 20 text samples allowed',
+        error_code: 'TOO_MANY_SAMPLES'
+      });
+      return res.end();
+    }
+
+    // Validate each sample content
+    for (let i = 0; i < samples.length; i++) {
+      try {
+        validateText(samples[i].text, 20, 20000);
+      } catch (error) {
+        sendEvent({
+          type: 'error',
+          error: `Sample #${i + 1}: ${error.message}`,
+          error_code: 'INVALID_SAMPLE_CONTENT'
+        });
+        return res.end();
+      }
+    }
+
+    const userId = validateUserId(user_id);
+
+    // Rate limiting check
+    const rateLimitTime = new Date(Date.now() - PROFILE_RATE_LIMIT_HOURS * 60 * 60 * 1000);
+    try {
+      const recentProfilesSnapshot = await db.collection('voice_profiles')
+        .where('userId', '==', userId)
+        .where('createdAt', '>', rateLimitTime)
+        .get();
+
+      if (recentProfilesSnapshot.size >= PROFILE_RATE_LIMIT_COUNT) {
+        sendEvent({
+          type: 'error',
+          error: `Reached limit of creating ${PROFILE_RATE_LIMIT_COUNT} profiles in ${PROFILE_RATE_LIMIT_HOURS} hours.`,
+          error_code: 'RATE_LIMIT_EXCEEDED'
+        });
+        return res.end();
+      }
+    } catch (rateLimitError) {
+      if (!(rateLimitError.code === 9 || rateLimitError.message?.includes('index'))) {
+        throw rateLimitError;
+      }
+    }
+
+    // Check for duplicate profile name
+    const existingProfileSnapshot = await db.collection('voice_profiles')
+      .where('userId', '==', userId)
+      .where('name', '==', profile_name.trim())
+      .get();
+
+    if (!existingProfileSnapshot.empty) {
+      sendEvent({
+        type: 'error',
+        error: `Profile name "${profile_name}" already exists.`,
+        error_code: 'DUPLICATE_PROFILE_NAME'
+      });
+      return res.end();
+    }
+
+    // Calculate quality score
+    const { calculateProfileScore } = require('../utils/validation');
+    const qualityScore = calculateProfileScore(samples);
+    
+    sendEvent({ 
+      type: 'step', 
+      step: 1, 
+      message: l.t('profile_stream.creating_embeddings', { count: samples.length })
+    });
+
+    // Step 1: Create or get user
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      await db.collection('users').doc(userId).set({
+        email: email || userId,
+        name,
+        tier: 'free',
+        credits: {
+          balance: FREE_CREDITS,
+          purchased: 0,
+          used: 0,
+          free: FREE_CREDITS
+        },
+        usage: { profilesCount: 0, analysesCount: 0, rewritesCount: 0 },
+        createdAt: new Date()
+      });
+    }
+
+    const profileId = uuidv4();
+
+    // Step 2: Create embeddings with reasoning
+    sendEvent({ 
+      type: 'reasoning', 
+      content: l.t('profile_stream.reasoning_embeddings')
+    });
+
+    const texts = samples.map(s => s.text);
+    let embeddings;
+    try {
+      embeddings = await geminiService.createBatchEmbeddings(texts, 'RETRIEVAL_DOCUMENT');
+      sendEvent({ 
+        type: 'reasoning', 
+        content: l.t('profile_stream.reasoning_embeddings_done', { count: embeddings.length })
+      });
+    } catch (embeddingError) {
+      logger.error('Embedding creation failed', { error: embeddingError.message, profileId });
+      sendEvent({
+        type: 'error',
+        error: 'Text processing error. Please check content and try again.',
+        error_code: 'EMBEDDING_FAILED'
+      });
+      return res.end();
+    }
+
+    // Cross-sample similarity check
+    sendEvent({ 
+      type: 'reasoning', 
+      content: l.t('profile_stream.reasoning_similarity')
+    });
+
+    const similarPairs = [];
+    for (let i = 0; i < embeddings.length; i++) {
+      for (let j = i + 1; j < embeddings.length; j++) {
+        const embeddingSimilarity = analysisService.calculateCosineSimilarity(embeddings[i], embeddings[j]);
+        
+        if (embeddingSimilarity > EMBEDDING_SIMILARITY_THRESHOLD) {
+          const textSimilarity = calculateTextSimilarity(samples[i].text, samples[j].text);
+          
+          if (textSimilarity > TEXT_SIMILARITY_THRESHOLD) {
+            similarPairs.push({ 
+              i: i + 1, 
+              j: j + 1, 
+              embeddingSimilarity: Math.round(embeddingSimilarity * 100),
+              textSimilarity: Math.round(textSimilarity * 100)
+            });
+          }
+        }
+      }
+    }
+
+    if (similarPairs.length > 0) {
+      const firstPair = similarPairs[0];
+      sendEvent({
+        type: 'error',
+        error: `Samples #${firstPair.i} and #${firstPair.j} are too similar (${firstPair.embeddingSimilarity}%). Please provide more diverse content.`,
+        error_code: 'SIMILAR_SAMPLES'
+      });
+      return res.end();
+    }
+
+    sendEvent({ 
+      type: 'reasoning', 
+      content: l.t('profile_stream.reasoning_similarity_passed')
+    });
+
+    // Step 3: Calculate statistics
+    sendEvent({ 
+      type: 'step', 
+      step: 2, 
+      message: l.t('profile_stream.analyzing_patterns')
+    });
+    
+    sendEvent({ 
+      type: 'reasoning', 
+      content: l.t('profile_stream.reasoning_statistics')
+    });
+
+    const allText = texts.join(' ');
+    const statisticalFeatures = analysisService.calculateStatistics(allText);
+
+    sendEvent({ 
+      type: 'reasoning', 
+      content: l.t('profile_stream.reasoning_statistics_done', { 
+        avgLength: Math.round(statisticalFeatures.avgSentenceLength || 0),
+        vocabulary: statisticalFeatures.vocabularyRichness ? Math.round(statisticalFeatures.vocabularyRichness * 100) : 0
+      })
+    });
+
+    // Step 4: Generate voice profile
+    sendEvent({ 
+      type: 'step', 
+      step: 3, 
+      message: l.t('profile_stream.generating_voice')
+    });
+    
+    sendEvent({ 
+      type: 'reasoning', 
+      content: l.t('profile_stream.reasoning_voice_start')
+    });
+
+    const VOICE_SUMMARY_TIMEOUT = 30000;
+    let voiceProfile;
+    
+    try {
+      const voicePromise = geminiService.generateVoiceSummary(texts, statisticalFeatures);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('VOICE_SUMMARY_TIMEOUT')), VOICE_SUMMARY_TIMEOUT)
+      );
+      
+      voiceProfile = await Promise.race([voicePromise, timeoutPromise]);
+      
+      sendEvent({ 
+        type: 'reasoning', 
+        content: l.t('profile_stream.reasoning_voice_done', {
+          tone: voiceProfile?.tone || 'neutral',
+          formality: voiceProfile?.formality_level || 5,
+          characteristics: (voiceProfile?.key_characteristics || []).slice(0, 3).join(', ')
+        })
+      });
+    } catch (voiceError) {
+      if (voiceError.message === 'VOICE_SUMMARY_TIMEOUT') {
+        sendEvent({ 
+          type: 'reasoning', 
+          content: l.t('profile_stream.reasoning_voice_fallback')
+        });
+        voiceProfile = {
+          tone: 'neutral',
+          formality_level: 5,
+          key_characteristics: ['Natural writing style', 'Uses simple language', 'Clear sentence structure'],
+          vocabulary_preferences: {
+            common_phrases: [],
+            avoid_words: [],
+            preferred_connectors: ['and', 'but', 'because']
+          },
+          sentence_patterns: {
+            typical_length: 'medium',
+            structure_preference: 'simple',
+            opening_style: 'Start with clear subject'
+          },
+          rewrite_instructions: 'Rewrite text while preserving meaning, using natural language.'
+        };
+      } else {
+        throw voiceError;
+      }
+    }
+
+    // Step 5: Save to database
+    sendEvent({ 
+      type: 'step', 
+      step: 4, 
+      message: l.t('profile_stream.saving_profile')
+    });
+    
+    sendEvent({ 
+      type: 'reasoning', 
+      content: l.t('profile_stream.reasoning_saving')
+    });
+
+    const batch = db.batch();
+
+    const profileRef = db.collection('voice_profiles').doc(profileId);
+    batch.set(profileRef, {
+      userId,
+      name: profile_name,
+      theme,
+      status: 'ready',
+      samplesCount: samples.length,
+      statisticalFeatures,
+      voiceProfile,
+      promptableSummary: `Tone: ${voiceProfile.tone}\nFormality Level: ${voiceProfile.formality_level}/10\nCharacteristics: ${voiceProfile.key_characteristics.join(', ')}`,
+      embeddingModel: 'text-embedding-004',
+      qualityScore: qualityScore.score,
+      qualityRating: qualityScore.rating,
+      qualityFeedback: qualityScore.feedback,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    samples.forEach((sample, idx) => {
+      const sampleId = uuidv4();
+      const sampleRef = db.collection('voice_profiles')
+        .doc(profileId)
+        .collection('samples')
+        .doc(sampleId);
+
+      batch.set(sampleRef, {
+        text: sample.text,
+        type: sample.type || 'unknown',
+        vector: embeddings[idx],
+        vectorModel: 'text-embedding-004',
+        taskType: 'RETRIEVAL_DOCUMENT',
+        createdAt: new Date()
+      });
+    });
+
+    const userRef = db.collection('users').doc(userId);
+    batch.update(userRef, {
+      'usage.profilesCount': FieldValue.increment(1)
+    });
+
+    // Commit with retry
+    const MAX_BATCH_RETRIES = 3;
+    let batchCommitted = false;
+
+    for (let attempt = 1; attempt <= MAX_BATCH_RETRIES && !batchCommitted; attempt++) {
+      try {
+        await batch.commit();
+        batchCommitted = true;
+      } catch (batchError) {
+        if (attempt < MAX_BATCH_RETRIES) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+      }
+    }
+
+    if (!batchCommitted) {
+      sendEvent({
+        type: 'error',
+        error: 'Unable to save profile. Please try again.',
+        error_code: 'DATABASE_WRITE_FAILED'
+      });
+      return res.end();
+    }
+
+    sendEvent({ 
+      type: 'reasoning', 
+      content: l.t('profile_stream.reasoning_complete')
+    });
+
+    // Broadcast profile update
+    realtimeController.broadcastProfileUpdate(userId, {
+      type: 'created',
+      profile: { profile_id: profileId, profile_name, theme, status: 'ready', samples_count: samples.length }
+    });
+
+    // Send notification
+    try {
+      await autoNotification.sendProfileCreatedNotification(userId, profile_name);
+    } catch (notifError) {
+      // Ignore notification errors
+    }
+
+    // Send completion
+    sendEvent({
+      type: 'complete',
+      profile_id: profileId,
+      status: 'ready',
+      samples_count: samples.length,
+      quality_score: qualityScore
+    });
+
+    res.write('data: [DONE]\n\n');
+    res.end();
+
+    logger.info('Profile created via stream', { profileId, userId, samplesCount: samples.length });
+
+  } catch (error) {
+    logger.error('Create profile stream error', { error: error.message, stack: error.stack });
+    
+    let errorMessage = 'Unable to create profile. Please try again.';
+    let errorCode = 'UNKNOWN_ERROR';
+    const errMsg = error.message || '';
+    
+    if (errMsg.includes('QUOTA_EXCEEDED') || errMsg.includes('quota')) {
+      errorMessage = 'AI service quota exceeded. Please try again later.';
+      errorCode = 'QUOTA_EXCEEDED';
+    } else if (errMsg.includes('EMBEDDING_FAILED')) {
+      errorMessage = 'Text processing error. Please check content and try again.';
+      errorCode = 'EMBEDDING_FAILED';
+    }
+    
+    sendEvent({
+      type: 'error',
+      error: errorMessage,
+      error_code: errorCode
+    });
+    res.end();
+  }
+};
+
 // ============================================================================
 // GET PROFILE
 // ============================================================================

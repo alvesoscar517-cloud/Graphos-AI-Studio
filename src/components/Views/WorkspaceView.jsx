@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { useWorkspace } from '../../contexts/WorkspaceContext'
 import WorkspaceDefault from './Workspace/WorkspaceDefault'
 import WorkspaceChat from './Workspace/WorkspaceChat'
-import SharedChatInput from './Workspace/SharedChatInput'
+import ModernChatInput from './Workspace/ModernChatInput'
 import { cn } from '../../lib/utils'
 
 const WorkspaceView = ({ 
@@ -11,9 +11,13 @@ const WorkspaceView = ({
   rightSidebarHidden,
   leftSidebarHidden
 }) => {
-  const { currentConversation, sendMessage, isLoading, clearConversation } = useWorkspace()
+  const { currentConversation, sendMessage, isLoading, clearConversation, modelSettings, updateModelSettings } = useWorkspace()
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [quickActionPrompt, setQuickActionPrompt] = useState('')
+
+  const handleModelChange = useCallback((modelId) => {
+    updateModelSettings({ model: modelId })
+  }, [updateModelSettings])
 
   // Handle quick action click - set prompt to input
   const handleQuickAction = useCallback((prompt) => {
@@ -59,14 +63,15 @@ const WorkspaceView = ({
               rightSidebarHidden={rightSidebarHidden}
               onQuickAction={handleQuickAction}
               chatInput={
-                <SharedChatInput
+                <ModernChatInput
                   onSendMessage={handleSendMessage}
                   disabled={isLoading || isTransitioning}
                   isCentered={true}
-                  isInline={true}
                   autoFocus={true}
-                  rightSidebarHidden={rightSidebarHidden}
                   initialMessage={quickActionPrompt}
+                  selectedModel={modelSettings?.model || 'gemini-2.0-flash-exp'}
+                  onModelChange={handleModelChange}
+                  showModelSelector={true}
                 />
               }
             />
@@ -79,13 +84,14 @@ const WorkspaceView = ({
           onToggleRightSidebar={onToggleRightSidebar}
           rightSidebarHidden={rightSidebarHidden}
           chatInput={
-            <SharedChatInput
+            <ModernChatInput
               onSendMessage={handleSendMessage}
               disabled={isLoading}
               isCentered={false}
               autoFocus={false}
-              rightSidebarHidden={rightSidebarHidden}
-              leftSidebarHidden={leftSidebarHidden}
+              selectedModel={modelSettings?.model || 'gemini-2.0-flash-exp'}
+              onModelChange={handleModelChange}
+              showModelSelector={true}
             />
           }
         />

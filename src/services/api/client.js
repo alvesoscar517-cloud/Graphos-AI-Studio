@@ -70,6 +70,7 @@ class ApiClient {
       method = 'GET',
       body = null,
       headers = {},
+      params = null,
       timeout = DEFAULT_TIMEOUT,
       retry = true,
       includeAuth = true,
@@ -77,7 +78,21 @@ class ApiClient {
     } = options
     
     const requestId = generateRequestId()
-    const url = `${this.baseUrl}${endpoint}`
+    
+    // Build URL with query params for GET requests
+    let url = `${this.baseUrl}${endpoint}`
+    if (params && typeof params === 'object') {
+      const searchParams = new URLSearchParams()
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, value)
+        }
+      })
+      const queryString = searchParams.toString()
+      if (queryString) {
+        url += `${endpoint.includes('?') ? '&' : '?'}${queryString}`
+      }
+    }
     
     // Build headers
     const requestHeaders = {

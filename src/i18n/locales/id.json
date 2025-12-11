@@ -460,6 +460,15 @@
     "aiProbability": "Probabilitas AI: {{percent}}%",
     "readingFile": "Membaca file..."
   },
+  "reasoning": {
+    "thinking": "Berpikir...",
+    "thoughtFor": "Berpikir selama {{time}}",
+    "startingAnalysis": "Memulai analisis...",
+    "analyzingText": "Menganalisis teks Anda...",
+    "planningRewrite": "Merencanakan pendekatan penulisan ulang...",
+    "applyingStyle": "Menerapkan gaya suara...",
+    "optimizing": "Mengoptimalkan untuk alur alami..."
+  },
   "model": {
     "selectAIModel": "Pilih Model AI",
     "inUse": "DIGUNAKAN",
@@ -580,7 +589,11 @@
     "noValidText": "File tidak berisi teks yang valid",
     "unableToReadFormat": "Tidak dapat membaca file {{format}}",
     "allDataWillBeLost": "Semua data yang dimasukkan akan hilang.",
-    "sections": "bagian"
+    "sections": "bagian",
+    "creatingEmbeddings": "Membuat embeddings ({{count}} sampel)",
+    "analyzingPatterns": "Menganalisis pola penulisan",
+    "generatingVoice": "Membuat profil suara",
+    "savingProfile": "Menyimpan profil"
   },
   "settings": {
     "theme": "Tema",

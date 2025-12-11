@@ -60,6 +60,11 @@ export {
 } from './useFeedback'
 
 export {
+  useCreditHistory,
+  useCreditHistorySummary,
+} from './useCreditHistory'
+
+export {
   useNotes,
   useNote,
   useCreateNote,

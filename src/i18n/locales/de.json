@@ -460,6 +460,15 @@
     "aiProbability": "KI-Wahrscheinlichkeit: {{percent}}%",
     "readingFile": "Lese Datei..."
   },
+  "reasoning": {
+    "thinking": "Denke nach...",
+    "thoughtFor": "{{time}} nachgedacht",
+    "startingAnalysis": "Analyse wird gestartet...",
+    "analyzingText": "Analysiere Ihren Text...",
+    "planningRewrite": "Plane Umschreibung...",
+    "applyingStyle": "Wende Schreibstil an...",
+    "optimizing": "Optimiere für natürlichen Fluss..."
+  },
   "model": {
     "selectAIModel": "KI-Modell wählen",
     "inUse": "IN VERWENDUNG",
@@ -580,7 +589,11 @@
     "noValidText": "Datei enthält keinen gültigen Text",
     "unableToReadFormat": "{{format}}-Datei kann nicht gelesen werden",
     "allDataWillBeLost": "Alle eingegebenen Daten gehen verloren.",
-    "sections": "Abschnitte"
+    "sections": "Abschnitte",
+    "creatingEmbeddings": "Embeddings erstellen ({{count}} Proben)",
+    "analyzingPatterns": "Schreibmuster analysieren",
+    "generatingVoice": "Stimmprofil generieren",
+    "savingProfile": "Profil speichern"
   },
   "settings": {
     "theme": "Design",

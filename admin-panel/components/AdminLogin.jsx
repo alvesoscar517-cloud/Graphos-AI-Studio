@@ -136,17 +136,17 @@ export default function AdminLogin() {
   // Login icon component
   const LoginIcon = ({ icon, isSetup = false }) => (
     <div className={cn(
-      "w-[60px] h-[60px] sm:w-[72px] sm:h-[72px] mx-auto mb-5 sm:mb-7 rounded-[18px] sm:rounded-[22px] flex items-center justify-center shadow-lg",
+      "w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] md:w-[72px] md:h-[72px] mx-auto mb-4 sm:mb-5 md:mb-7 rounded-[14px] sm:rounded-[18px] md:rounded-[22px] flex items-center justify-center shadow-lg",
       isSetup ? "bg-secondary" : "bg-primary"
     )}>
-      <img src={icon} alt="" className="w-7 h-7 sm:w-9 sm:h-9 icon-white" />
+      <img src={icon} alt="" className="w-6 h-6 sm:w-7 sm:h-7 md:w-9 md:h-9 icon-white" />
     </div>
   );
 
   // Error message component
   const ErrorMessage = ({ message }) => message ? (
-    <div className="flex items-center gap-2.5 p-4 rounded-xl bg-destructive/10 text-destructive text-[14px]">
-      <img src="/icon/alert-circle.svg" alt="" className="w-4 h-4" />
+    <div className="flex items-center gap-2 sm:gap-2.5 p-3 sm:p-4 rounded-xl bg-destructive/10 text-destructive text-[12px] sm:text-[14px]">
+      <img src="/icon/alert-circle.svg" alt="" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
       {message}
     </div>
   ) : null;
@@ -156,18 +156,18 @@ export default function AdminLogin() {
     return (
       <div 
         ref={vantaRef} 
-        className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
+        className="min-h-screen flex items-center justify-center p-3 sm:p-4 md:p-6 relative overflow-hidden overflow-y-auto"
         style={{ background: 'linear-gradient(135deg, #0071E3 0%, #5856D6 100%)' }}
       >
         
-        <Card className="w-full max-w-[440px] p-6 sm:p-10 relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">
-          <div className="text-center mb-6 sm:mb-10">
+        <Card className="w-full max-w-[400px] sm:max-w-[420px] md:max-w-[440px] p-5 sm:p-6 md:p-10 my-auto relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">
+          <div className="text-center mb-5 sm:mb-6 md:mb-10">
             <LoginIcon icon="/icon/settings.svg" isSetup />
-            <h1 className="text-[24px] sm:text-[28px] font-semibold text-primary tracking-[-0.022em] mb-2">Initial Setup</h1>
-            <p className="text-muted text-[14px] sm:text-[15px]">Create your admin account to get started</p>
+            <h1 className="text-[20px] sm:text-[24px] md:text-[28px] font-semibold text-primary tracking-[-0.022em] mb-1.5 sm:mb-2">Initial Setup</h1>
+            <p className="text-muted text-[12px] sm:text-[14px] md:text-[15px]">Create your admin account to get started</p>
           </div>
 
-          <form onSubmit={handleSetup} className="flex flex-col gap-6">
+          <form onSubmit={handleSetup} className="flex flex-col gap-4 sm:gap-5 md:gap-6">
             <Input
               label="Name"
               name="name"
@@ -209,10 +209,10 @@ export default function AdminLogin() {
 
             <ErrorMessage message={displayError} />
 
-            <Button type="submit" size="lg" loading={loading} className="w-full mt-2">
+            <Button type="submit" size="lg" loading={loading} className="w-full mt-1 sm:mt-2 text-[13px] sm:text-[14px]">
               {loading ? 'Creating Account...' : (
                 <>
-                  <img src="/icon/check.svg" alt="" className="w-4.5 h-4.5 icon-white" />
+                  <img src="/icon/check.svg" alt="" className="w-4 h-4 sm:w-4.5 sm:h-4.5 icon-white" />
                   Create Admin Account
                 </>
               )}
@@ -220,9 +220,9 @@ export default function AdminLogin() {
           </form>
 
           {!needsSetup && (
-            <div className="mt-8 text-center">
+            <div className="mt-6 sm:mt-8 text-center">
               <button 
-                className="text-muted text-[14px] hover:text-primary transition-all duration-200"
+                className="text-muted text-[12px] sm:text-[14px] hover:text-primary transition-all duration-200"
                 onClick={() => setMode('login')}
               >
                 ← Back to Login
@@ -240,18 +240,18 @@ export default function AdminLogin() {
   return (
     <div 
       ref={vantaRef} 
-      className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center p-3 sm:p-4 md:p-6 relative overflow-hidden overflow-y-auto"
       style={{ background: 'linear-gradient(135deg, #0071E3 0%, #5856D6 100%)' }}
     >
       
-      <Card className="w-full max-w-[440px] p-6 sm:p-10 relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">
-        <div className="text-center mb-6 sm:mb-10">
+      <Card className="w-full max-w-[400px] sm:max-w-[420px] md:max-w-[440px] p-5 sm:p-6 md:p-10 my-auto relative z-10 shadow-2xl backdrop-blur-xl bg-surface/95 border-border/30">
+        <div className="text-center mb-5 sm:mb-6 md:mb-10">
           <LoginIcon icon="/icon/shield-check.svg" />
-          <h1 className="text-[24px] sm:text-[28px] font-semibold text-primary tracking-[-0.022em] mb-2">Admin Panel</h1>
-          <p className="text-muted text-[14px] sm:text-[15px]">Login to manage the system</p>
+          <h1 className="text-[20px] sm:text-[24px] md:text-[28px] font-semibold text-primary tracking-[-0.022em] mb-1.5 sm:mb-2">Admin Panel</h1>
+          <p className="text-muted text-[12px] sm:text-[14px] md:text-[15px]">Login to manage the system</p>
         </div>
 
-        <form onSubmit={loginForm.handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={loginForm.handleSubmit} className="flex flex-col gap-4 sm:gap-5">
           <Input
             label="Email"
             type="email"
@@ -271,18 +271,18 @@ export default function AdminLogin() {
 
           <ErrorMessage message={loginError} />
 
-          <Button type="submit" size="lg" loading={loginForm.isLoading} className="w-full mt-2">
+          <Button type="submit" size="lg" loading={loginForm.isLoading} className="w-full mt-1 sm:mt-2 text-[13px] sm:text-[14px]">
             {loginForm.isLoading ? 'Logging in...' : (
               <>
-                <img src="/icon/log-in.svg" alt="" className="w-4.5 h-4.5 icon-white" />
+                <img src="/icon/log-in.svg" alt="" className="w-4 h-4 sm:w-4.5 sm:h-4.5 icon-white" />
                 Login
               </>
             )}
           </Button>
         </form>
 
-        <div className="mt-8 flex items-center justify-center gap-2 text-muted text-[13px]">
-          <img src="/icon/info.svg" alt="" className="w-3.5 h-3.5 opacity-50" />
+        <div className="mt-6 sm:mt-8 flex items-center justify-center gap-1.5 sm:gap-2 text-muted text-[11px] sm:text-[13px]">
+          <img src="/icon/info.svg" alt="" className="w-3 h-3 sm:w-3.5 sm:h-3.5 opacity-50" />
           <p>Contact administrator if you need help</p>
         </div>
       </Card>

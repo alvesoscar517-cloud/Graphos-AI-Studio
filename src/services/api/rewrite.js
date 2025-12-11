@@ -65,12 +65,12 @@ async function getAuthHeaders() {
 }
 
 /**
- * Streaming rewrite with model selection
+ * Streaming rewrite with model selection and reasoning support
  * @param {string} profileId 
  * @param {string} text 
  * @param {string} model 
  * @param {Object} writingPreferences 
- * @param {Function} onChunk 
+ * @param {Function} onChunk - Callback (chunk, type) where type is 'reasoning' or 'content'
  * @returns {Promise<void>}
  */
 export async function rewriteTextStream(profileId, text, model, writingPreferences, onChunk) {
@@ -85,7 +85,7 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
     
     const userInfo = await getUserInfo()
     const headers = await getAuthHeaders()
-    console.log('📡 Sending rewrite_stream request...')
+    console.log('📡 Sending rewrite_stream request with reasoning...')
     
     const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite_stream`, {
       method: 'POST',
@@ -95,7 +95,8 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
         text: text,
         model: model,
         writing_preferences: writingPreferences,
-        user_id: userInfo?.userId
+        user_id: userInfo?.userId,
+        include_reasoning: true // Request reasoning in response
       })
     })
     
@@ -135,9 +136,14 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
           if (data) {
             try {
               const json = JSON.parse(data)
-              if (json.chunk) {
+              if (json.reasoning) {
+                // Reasoning chunk
+                console.log('[REASONING] Chunk received:', json.reasoning.substring(0, 30) + '...')
+                onChunk(json.reasoning, 'reasoning')
+              } else if (json.chunk) {
+                // Content chunk
                 console.log('[PACKAGE] Chunk received:', json.chunk.substring(0, 30) + '...')
-                onChunk(json.chunk)
+                onChunk(json.chunk, 'content')
               } else if (json.error) {
                 console.error('[FAIL] Server error:', json.error)
                 throw new Error(json.error)

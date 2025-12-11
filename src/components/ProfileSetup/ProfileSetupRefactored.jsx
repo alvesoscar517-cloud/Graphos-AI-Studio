@@ -5,11 +5,11 @@
  * Migrated to Tailwind CSS v4
  * NOTE: This feature only supports light mode
  */
-import { useEffect, useCallback, useRef } from 'react'
+import { useEffect, useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '../../lib/utils'
-import { createProfileComplete } from '../../services/api'
+import { createProfileComplete, createProfileCompleteStream } from '../../services/api'
 import { clearAllProfileDetailCaches } from '../../utils/profileDetailCache'
 import { queryKeys } from '../../lib/queryKeys'
 import useProfileSetup, { getDraftTimeAgo } from './hooks/useProfileSetup'
@@ -155,7 +155,11 @@ const ProfileSetup = () => {
   // Ref to store the latest createProfile function
   const createProfileRef = useRef(null)
   
-  // Step 4: Create complete profile with retry mechanism
+  // Reasoning state for streaming
+  const [reasoning, setReasoning] = useState('')
+  const [reasoningStartTime, setReasoningStartTime] = useState(null)
+  
+  // Step 4: Create complete profile with streaming and reasoning
   const createProfile = useCallback(async (retryCount = 0) => {
     // CRITICAL: Prevent duplicate/concurrent profile creation
     if (!mountedRef.current) return
@@ -182,6 +186,8 @@ const ProfileSetup = () => {
     setShowCompletion(false)
     setProcessingStep(1)
     setProcessingMessage(t('profileSetupErrors.preparingData'))
+    setReasoning('')
+    setReasoningStartTime(Date.now())
 
     try {
       // Prepare all samples
@@ -191,7 +197,7 @@ const ProfileSetup = () => {
         ...profileData.shortSamples.map(text => ({ text, type: 'short' }))
       ]
 
-      console.log(`[PACKAGE] Creating profile with ${allSamples.length} samples (attempt ${retryCount + 1})`)
+      console.log(`[STREAM] Creating profile with ${allSamples.length} samples (attempt ${retryCount + 1})`)
 
       if (allSamples.length < 3) {
         if (mountedRef.current) {
@@ -201,64 +207,58 @@ const ProfileSetup = () => {
         }
         return
       }
-
-      const estimatedTime = Math.max(15, allSamples.length * 2)
       
       if (!mountedRef.current) return
-      
-      // Step 1: Preparing
-      setProcessingStep(1)
-      setProcessingMessage(t('profileSetupErrors.preparingSamples', { count: allSamples.length }))
-      
-      await new Promise(resolve => {
-        const timeout = setTimeout(resolve, 3000)
-        timeoutsRef.current.push(timeout)
-      })
-      
-      if (!mountedRef.current) return
-      
-      // Step 2: Creating embeddings
-      setProcessingStep(2)
-      setProcessingMessage(t('profileSetupErrors.creatingEmbeddings', { time: estimatedTime }))
       
       try {
-        const response = await createProfileComplete(
+        // Use streaming API with callbacks
+        const response = await createProfileCompleteStream(
           profileData.name,
           profileData.theme,
           allSamples,
+          {
+            onStep: (step, message) => {
+              if (mountedRef.current) {
+                setProcessingStep(step)
+                setProcessingMessage(message)
+              }
+            },
+            onReasoning: (content) => {
+              if (mountedRef.current) {
+                setReasoning(prev => prev + content)
+              }
+            },
+            onComplete: (result) => {
+              if (mountedRef.current) {
+                setProfileData(prev => ({ ...prev, profileId: result.profile_id }))
+                if (result.quality_score) {
+                  setQualityScore(result.quality_score)
+                }
+                clearAllProfileDetailCaches()
+                queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })
+                setProcessing(false)
+                setShowCompletion(true)
+                isCreatingProfileRef.current = false
+              }
+            },
+            onError: (error) => {
+              // Error will be thrown and caught below
+            }
+          },
           { signal: abortControllerRef.current?.signal }
         )
         
-        if (!mountedRef.current) return
-        
-        if (!response.success) {
-          throw new Error(response.error || t('profileSetupErrors.unableToCreate'))
-        }
-        
-        setProfileData(prev => ({ ...prev, profileId: response.profile_id }))
-        
-        if (response.quality_score) {
-          setQualityScore(response.quality_score)
-        }
-        
-        clearAllProfileDetailCaches()
-        
-        // Invalidate TanStack Query cache to ensure HomeView shows new profile
-        queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })
-        
-        // Step 3: Finalizing
-        setProcessingStep(3)
-        setProcessingMessage(t('profileSetupErrors.finalizingProfile'))
-        
-        await new Promise(resolve => {
-          const timeout = setTimeout(resolve, 2000)
-          timeoutsRef.current.push(timeout)
-        })
-        
-        if (mountedRef.current) {
+        // If we get here without onComplete being called, handle the response
+        if (response && response.success && mountedRef.current && !showCompletion) {
+          setProfileData(prev => ({ ...prev, profileId: response.profile_id }))
+          if (response.quality_score) {
+            setQualityScore(response.quality_score)
+          }
+          clearAllProfileDetailCaches()
+          queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })
           setProcessing(false)
           setShowCompletion(true)
-          isCreatingProfileRef.current = false // Reset flag on success
+          isCreatingProfileRef.current = false
         }
       } catch (apiError) {
         // Ignore abort errors
@@ -352,9 +352,9 @@ const ProfileSetup = () => {
         isCreatingProfileRef.current = false // Reset flag on error
       }
     }
-  }, [profileData, setProfileData, setProcessing, setShowError, setShowCompletion, 
+  }, [profileData, setProfileData, setProcessing, setShowError, setShowCompletion, showCompletion,
       setProcessingStep, setProcessingMessage, setErrorMessage, setErrorCode, setQualityScore, 
-      mountedRef, timeoutsRef, t])
+      mountedRef, timeoutsRef, t, queryClient])
 
   // Keep createProfileRef updated with the latest createProfile function
   useEffect(() => {
@@ -493,6 +493,8 @@ const ProfileSetup = () => {
             errorCode={errorCode}
             qualityScore={qualityScore}
             totalSamples={totalSamples}
+            reasoning={reasoning}
+            reasoningStartTime={reasoningStartTime}
             onBack={() => {
               // Abort any pending API request to prevent race conditions
               if (abortControllerRef.current) {
@@ -519,6 +521,8 @@ const ProfileSetup = () => {
                 setProcessingStep(1)
                 setProcessingMessage('')
                 setShowCompletion(false)
+                setReasoning('')
+                setReasoningStartTime(null)
               })
             }}
             onRetry={() => {
@@ -526,6 +530,8 @@ const ProfileSetup = () => {
               setShowError(false)
               setErrorCode('')
               setErrorMessage('')
+              setReasoning('')
+              setReasoningStartTime(null)
               isCreatingProfileRef.current = false
               createProfileRef.current?.()
             }}

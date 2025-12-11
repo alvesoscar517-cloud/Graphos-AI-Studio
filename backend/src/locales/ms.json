@@ -87,6 +87,25 @@
     "tone_friendly": "Mesra"
   },
 
+  "profile_stream": {
+    "validating": "Mengesahkan data input...",
+    "creating_embeddings": "Mencipta embeddings untuk {{count}} sampel...",
+    "analyzing_patterns": "Menganalisis corak penulisan...",
+    "generating_voice": "Menjana profil suara...",
+    "saving_profile": "Menyimpan profil ke pangkalan data...",
+    "reasoning_embeddings": "Menukar sampel teks anda kepada vektor semantik untuk pengecaman corak...",
+    "reasoning_embeddings_done": "Berjaya mencipta {{count}} embeddings. Menyemak kepelbagaian kandungan...",
+    "reasoning_similarity": "Membandingkan sampel untuk memastikan kepelbagaian dan keunikan kandungan...",
+    "reasoning_similarity_passed": "Semua sampel cukup pelbagai. Meneruskan analisis...",
+    "reasoning_statistics": "Mengira ciri statistik: panjang ayat, kekayaan perbendaharaan kata, corak tanda baca...",
+    "reasoning_statistics_done": "Statistik selesai. Panjang ayat purata: {{avgLength}} perkataan, kekayaan perbendaharaan kata: {{vocabulary}}%",
+    "reasoning_voice_start": "Menganalisis gaya penulisan anda untuk mengenal pasti nada, formaliti, dan ciri utama...",
+    "reasoning_voice_done": "Profil suara dikenal pasti: nada {{tone}}, tahap formaliti {{formality}}/10. Ciri utama: {{characteristics}}",
+    "reasoning_voice_fallback": "Menggunakan profil suara sandaran kerana tamat masa. Profil anda masih akan berfungsi dengan baik.",
+    "reasoning_saving": "Menulis data profil dan embeddings sampel ke pangkalan data...",
+    "reasoning_complete": "Penciptaan profil selesai! Profil suara anda sedia untuk digunakan."
+  },
+
   "ai_detection": {
     "title": "Pengesanan Kandungan AI",
     "result_human": "Teks ini kelihatan seperti ditulis oleh manusia",

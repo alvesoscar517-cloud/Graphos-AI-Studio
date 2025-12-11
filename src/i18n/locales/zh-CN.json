@@ -460,6 +460,15 @@
     "aiProbability": "AI 概率：{{percent}}%",
     "readingFile": "正在读取文件..."
   },
+  "reasoning": {
+    "thinking": "思考中...",
+    "thoughtFor": "思考了 {{time}}",
+    "startingAnalysis": "开始分析...",
+    "analyzingText": "正在分析您的文本...",
+    "planningRewrite": "规划重写方案...",
+    "applyingStyle": "应用写作风格...",
+    "optimizing": "优化自然流畅度..."
+  },
   "model": {
     "selectAIModel": "选择 AI 模型",
     "inUse": "使用中",
@@ -580,7 +589,11 @@
     "noValidText": "文件不包含有效文本",
     "unableToReadFormat": "无法读取 {{format}} 文件",
     "allDataWillBeLost": "所有输入的数据将丢失。",
-    "sections": "个部分"
+    "sections": "个部分",
+    "creatingEmbeddings": "正在创建嵌入向量 ({{count}} 个样本)",
+    "analyzingPatterns": "正在分析写作模式",
+    "generatingVoice": "正在生成语音配置文件",
+    "savingProfile": "正在保存配置文件"
   },
   "settings": {
     "theme": "主题",

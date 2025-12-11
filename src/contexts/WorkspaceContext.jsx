@@ -47,6 +47,15 @@ export const WorkspaceProvider = ({ children }) => {
   const [currentConversation, setCurrentConversation] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  
+  // Reasoning state for Pro model
+  const [reasoning, setReasoning] = useState({
+    isActive: false,
+    content: '',
+    isComplete: false,
+    startTime: null
+  })
+  
   const [modelSettings, setModelSettings] = useState({
     model: 'gemini-2.0-flash-exp',
     temperature: 0.7,
@@ -461,6 +470,19 @@ export const WorkspaceProvider = ({ children }) => {
           }
         )
       } else {
+        // Check if Pro model - enable reasoning
+        const isProModel = actualModel.includes('pro')
+        
+        // Start reasoning state for Pro model
+        if (isProModel) {
+          setReasoning({
+            isActive: true,
+            content: '',
+            isComplete: false,
+            startTime: Date.now()
+          })
+        }
+        
         await sendChatMessageStream(
           apiMessages,
           currentConversation?.systemPrompt || generateSystemPrompt(),
@@ -482,9 +504,23 @@ export const WorkspaceProvider = ({ children }) => {
                 console.log(`[NOTE] Conversation summarized (${contextInfo.summarizedCount} messages)`)
               }
             },
+            onReasoning: (reasoningChunk) => {
+              // Handle reasoning chunks for Pro model
+              setReasoning(prev => ({
+                ...prev,
+                content: prev.content + reasoningChunk
+              }))
+            },
             onComplete: (completeInfo) => {
               if (completeInfo.summary) {
                 newSummary = completeInfo.summary
+              }
+              // Complete reasoning when content starts
+              if (isProModel) {
+                setReasoning(prev => ({
+                  ...prev,
+                  isComplete: true
+                }))
               }
             }
           }
@@ -571,6 +607,13 @@ export const WorkspaceProvider = ({ children }) => {
       }))
     } finally {
       setIsLoading(false)
+      // Clear reasoning state
+      setReasoning({
+        isActive: false,
+        content: '',
+        isComplete: false,
+        startTime: null
+      })
     }
   }, [currentConversation, generateSystemPrompt, createConversation, modelSettings, currentProfile, generateTitle, formatErrorMessage, truncateTitleToWords])
 
@@ -710,6 +753,7 @@ export const WorkspaceProvider = ({ children }) => {
     isLoading,
     error,
     modelSettings,
+    reasoning, // Reasoning state for Pro model
     createConversation,
     loadConversation,
     sendMessage,

@@ -87,6 +87,25 @@
     "tone_friendly": "フレンドリー"
   },
 
+  "profile_stream": {
+    "validating": "入力データを検証中...",
+    "creating_embeddings": "{{count}} サンプルの埋め込みを作成中...",
+    "analyzing_patterns": "文章パターンを分析中...",
+    "generating_voice": "音声プロファイルを生成中...",
+    "saving_profile": "プロファイルをデータベースに保存中...",
+    "reasoning_embeddings": "テキストサンプルをパターン認識用のセマンティックベクトルに変換中...",
+    "reasoning_embeddings_done": "{{count}} 個の埋め込みを正常に作成しました。コンテンツの多様性を確認中...",
+    "reasoning_similarity": "サンプルを比較してコンテンツの多様性と独自性を確認中...",
+    "reasoning_similarity_passed": "すべてのサンプルは十分に多様です。分析を続行中...",
+    "reasoning_statistics": "統計的特徴を計算中：文の長さ、語彙の豊富さ、句読点パターン...",
+    "reasoning_statistics_done": "統計完了。平均文長：{{avgLength}} 語、語彙の豊富さ：{{vocabulary}}%",
+    "reasoning_voice_start": "トーン、フォーマリティ、主要な特徴を特定するために文章スタイルを分析中...",
+    "reasoning_voice_done": "音声プロファイルを特定：{{tone}} トーン、フォーマリティレベル {{formality}}/10。主要な特徴：{{characteristics}}",
+    "reasoning_voice_fallback": "タイムアウトのためフォールバック音声プロファイルを使用。プロファイルは正常に機能します。",
+    "reasoning_saving": "プロファイルデータとサンプル埋め込みをデータベースに書き込み中...",
+    "reasoning_complete": "プロファイル作成完了！音声プロファイルの準備ができました。"
+  },
+
   "ai_detection": {
     "title": "AIコンテンツ検出",
     "result_human": "このテキストは人間が書いたものと思われます",

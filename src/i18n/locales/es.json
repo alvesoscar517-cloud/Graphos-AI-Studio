@@ -460,6 +460,15 @@
     "aiProbability": "Probabilidad IA: {{percent}}%",
     "readingFile": "Leyendo archivo..."
   },
+  "reasoning": {
+    "thinking": "Pensando...",
+    "thoughtFor": "Pensó durante {{time}}",
+    "startingAnalysis": "Iniciando análisis...",
+    "analyzingText": "Analizando su texto...",
+    "planningRewrite": "Planificando reescritura...",
+    "applyingStyle": "Aplicando estilo de escritura...",
+    "optimizing": "Optimizando para flujo natural..."
+  },
   "model": {
     "selectAIModel": "Seleccionar modelo IA",
     "inUse": "EN USO",
@@ -580,7 +589,11 @@
     "noValidText": "El archivo no contiene texto válido",
     "unableToReadFormat": "No se puede leer el archivo {{format}}",
     "allDataWillBeLost": "Todos los datos ingresados se perderán.",
-    "sections": "secciones"
+    "sections": "secciones",
+    "creatingEmbeddings": "Creando embeddings ({{count}} muestras)",
+    "analyzingPatterns": "Analizando patrones de escritura",
+    "generatingVoice": "Generando perfil de voz",
+    "savingProfile": "Guardando perfil"
   },
   "settings": {
     "theme": "Tema",

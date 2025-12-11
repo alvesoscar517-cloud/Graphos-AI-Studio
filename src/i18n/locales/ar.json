@@ -460,6 +460,15 @@
     "aiProbability": "احتمالية AI: {{percent}}%",
     "readingFile": "جاري قراءة الملف..."
   },
+  "reasoning": {
+    "thinking": "جاري التفكير...",
+    "thoughtFor": "فكّر لمدة {{time}}",
+    "startingAnalysis": "بدء التحليل...",
+    "analyzingText": "جاري تحليل النص...",
+    "planningRewrite": "التخطيط لنهج إعادة الصياغة...",
+    "applyingStyle": "تطبيق أسلوب الصوت...",
+    "optimizing": "التحسين للتدفق الطبيعي..."
+  },
   "model": {
     "selectAIModel": "اختر نموذج الذكاء الاصطناعي",
     "inUse": "قيد الاستخدام",
@@ -580,7 +589,11 @@
     "noValidText": "الملف لا يحتوي على نص صالح",
     "unableToReadFormat": "تعذر قراءة ملف بتنسيق {{format}}",
     "allDataWillBeLost": "سيتم فقد جميع البيانات المدخلة.",
-    "sections": "أقسام"
+    "sections": "أقسام",
+    "creatingEmbeddings": "إنشاء التضمينات ({{count}} عينات)",
+    "analyzingPatterns": "تحليل أنماط الكتابة",
+    "generatingVoice": "إنشاء ملف تعريف الصوت",
+    "savingProfile": "حفظ الملف الشخصي"
   },
   "settings": {
     "theme": "المظهر",

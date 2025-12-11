@@ -310,7 +310,8 @@ const AIStudioEditorEnhanced = ({
             <div 
               className={cn(
                 "text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default shrink-0",
-                "max-w-xl max-lg:max-w-xs max-md:max-w-[120px] max-md:text-xs max-md:px-1"
+                "max-w-xl",
+                isTypingTitle && "animate-pulse"
               )}
               title={currentNote?.title || ''}
             >

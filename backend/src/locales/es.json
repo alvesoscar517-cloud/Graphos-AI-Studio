@@ -87,6 +87,25 @@
     "tone_friendly": "Amigable"
   },
 
+  "profile_stream": {
+    "validating": "Validando datos de entrada...",
+    "creating_embeddings": "Creando embeddings para {{count}} muestras...",
+    "analyzing_patterns": "Analizando patrones de escritura...",
+    "generating_voice": "Generando perfil de voz...",
+    "saving_profile": "Guardando perfil en la base de datos...",
+    "reasoning_embeddings": "Convirtiendo sus muestras de texto en vectores semánticos para reconocimiento de patrones...",
+    "reasoning_embeddings_done": "{{count}} embeddings creados exitosamente. Verificando diversidad de contenido...",
+    "reasoning_similarity": "Comparando muestras para asegurar diversidad y unicidad del contenido...",
+    "reasoning_similarity_passed": "Todas las muestras son suficientemente diversas. Continuando con el análisis...",
+    "reasoning_statistics": "Calculando características estadísticas: longitud de oraciones, riqueza de vocabulario, patrones de puntuación...",
+    "reasoning_statistics_done": "Estadísticas completadas. Longitud promedio de oraciones: {{avgLength}} palabras, riqueza de vocabulario: {{vocabulary}}%",
+    "reasoning_voice_start": "Analizando su estilo de escritura para identificar tono, formalidad y características clave...",
+    "reasoning_voice_done": "Perfil de voz identificado: tono {{tone}}, nivel de formalidad {{formality}}/10. Características clave: {{characteristics}}",
+    "reasoning_voice_fallback": "Usando perfil de voz de respaldo debido al tiempo de espera. Su perfil seguirá funcionando bien.",
+    "reasoning_saving": "Escribiendo datos del perfil y embeddings de muestras en la base de datos...",
+    "reasoning_complete": "¡Creación del perfil completada! Su perfil de voz está listo para usar."
+  },
+
   "ai_detection": {
     "title": "Detección de contenido de IA",
     "result_human": "Este texto parece estar escrito por un humano",

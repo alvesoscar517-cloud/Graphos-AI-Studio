@@ -460,6 +460,15 @@
     "aiProbability": "AI संभावना: {{percent}}%",
     "readingFile": "फ़ाइल पढ़ी जा रही है..."
   },
+  "reasoning": {
+    "thinking": "सोच रहा हूँ...",
+    "thoughtFor": "{{time}} तक सोचा",
+    "startingAnalysis": "विश्लेषण शुरू हो रहा है...",
+    "analyzingText": "आपके टेक्स्ट का विश्लेषण हो रहा है...",
+    "planningRewrite": "री-राइट दृष्टिकोण की योजना बना रहा है...",
+    "applyingStyle": "वॉयस स्टाइल लागू हो रहा है...",
+    "optimizing": "प्राकृतिक प्रवाह के लिए अनुकूलन..."
+  },
   "model": {
     "selectAIModel": "AI मॉडल चुनें",
     "inUse": "उपयोग में",
@@ -580,7 +589,11 @@
     "noValidText": "फ़ाइल में मान्य टेक्स्ट नहीं है",
     "unableToReadFormat": "{{format}} फ़ाइल पढ़ने में असमर्थ",
     "allDataWillBeLost": "सभी दर्ज किया गया डेटा खो जाएगा।",
-    "sections": "अनुभाग"
+    "sections": "अनुभाग",
+    "creatingEmbeddings": "एम्बेडिंग बना रहे हैं ({{count}} नमूने)",
+    "analyzingPatterns": "लेखन पैटर्न का विश्लेषण कर रहे हैं",
+    "generatingVoice": "वॉइस प्रोफ़ाइल बना रहे हैं",
+    "savingProfile": "प्रोफ़ाइल सहेज रहे हैं"
   },
   "settings": {
     "theme": "थीम",

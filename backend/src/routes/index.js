@@ -261,6 +261,14 @@ router.post('/create_profile_complete',
   asyncHandler(profileController.createProfileComplete)
 );
 
+// Streaming version with realtime progress
+router.post('/create_profile_complete/stream', 
+  optionalAuth, checkLocked, activityLoggerMiddleware,
+  profileCreationRateLimiter,
+  creditMiddleware.profileComplete, 
+  profileController.createProfileCompleteStream // No asyncHandler for SSE
+);
+
 router.post('/add_sample', 
   deprecationWarning('/profiles/add-sample'),
   optionalAuth, checkLocked, activityLoggerMiddleware,

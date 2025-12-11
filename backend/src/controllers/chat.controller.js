@@ -163,6 +163,7 @@ exports.sendMessage = async (req, res) => {
 
 /**
  * Send chat message with streaming response
+ * Supports reasoning output for Pro models
  */
 exports.sendMessageStream = async (req, res) => {
   try {
@@ -173,11 +174,16 @@ exports.sendMessageStream = async (req, res) => {
       temperature = 0.7, 
       profileId = null, 
       writingPreferences = null,
-      conversationSummary = null
+      conversationSummary = null,
+      include_reasoning = false
     } = req.body;
 
     // Validate model
     const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
+    
+    // Check if Pro model and reasoning requested
+    const isProModel = model.includes('pro');
+    const shouldIncludeReasoning = include_reasoning && isProModel;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ 
@@ -186,7 +192,7 @@ exports.sendMessageStream = async (req, res) => {
       });
     }
 
-    console.log(`[INFO] Chat stream request: ${messages.length} messages, model: ${model}`);
+    console.log(`[INFO] Chat stream request: ${messages.length} messages, model: ${model}${shouldIncludeReasoning ? ' (with reasoning)' : ''}`);
 
     // Load profile and build enhanced system prompt
     const profile = await loadProfile(profileId);
@@ -217,11 +223,43 @@ exports.sendMessageStream = async (req, res) => {
       })}\n\n`);
     }
 
+    // Build system prompt with reasoning instructions for Pro model
+    let finalSystemPrompt = enhancedSystemPrompt;
+    const REASONING_END_MARKER = '---CONTENT_START---';
+    
+    if (shouldIncludeReasoning) {
+      finalSystemPrompt = `${enhancedSystemPrompt}
+
+═══════════════════════════════════════════════════════════════
+RESPONSE FORMAT (Pro Model with Reasoning):
+═══════════════════════════════════════════════════════════════
+You MUST structure your response in TWO parts:
+
+1. REASONING SECTION (first):
+   - Start with "Let me think about this..."
+   - Show your thought process step by step
+   - Analyze the question/request
+   - Consider different approaches
+   - Plan your response
+
+2. Then output the marker: ${REASONING_END_MARKER}
+
+3. FINAL RESPONSE (after marker):
+   - Your actual response to the user
+   - Clear, helpful, and well-structured
+
+Example format:
+Let me think about this...
+[Your reasoning here]
+${REASONING_END_MARKER}
+[Your actual response here]`;
+    }
+
     const generativeModel = geminiService.vertexAI.getGenerativeModel({
       model: model,
       generationConfig: {
         temperature: temperature,
-        maxOutputTokens: 2048,
+        maxOutputTokens: shouldIncludeReasoning ? 4096 : 2048, // More tokens for reasoning
       },
     });
 
@@ -238,7 +276,7 @@ exports.sendMessageStream = async (req, res) => {
       
       streamResult = await generativeModel.generateContentStream({
         contents: [{ role: 'user', parts: contentParts }],
-        systemInstruction: enhancedSystemPrompt
+        systemInstruction: finalSystemPrompt
       });
     } else {
       // Text-only streaming
@@ -249,13 +287,16 @@ exports.sendMessageStream = async (req, res) => {
 
       const chat = generativeModel.startChat({
         history: chatHistory,
-        systemInstruction: enhancedSystemPrompt
+        systemInstruction: finalSystemPrompt
       });
 
       streamResult = await chat.sendMessageStream(lastMessage.content);
     }
 
     let totalChars = 0;
+    let isInReasoning = shouldIncludeReasoning; // Start in reasoning mode if enabled
+    let reasoningBuffer = '';
+    
     for await (const chunk of streamResult.stream) {
       try {
         // Try different ways to extract text from chunk (same as analysis controller)
@@ -273,8 +314,42 @@ exports.sendMessageStream = async (req, res) => {
         }
         
         if (chunkText) {
-          totalChars += chunkText.length;
-          res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+          if (shouldIncludeReasoning && isInReasoning) {
+            // Check if this chunk contains the marker
+            const combinedText = reasoningBuffer + chunkText;
+            const markerIndex = combinedText.indexOf(REASONING_END_MARKER);
+            
+            if (markerIndex !== -1) {
+              // Found marker - split reasoning and content
+              const reasoningPart = combinedText.substring(0, markerIndex);
+              const contentPart = combinedText.substring(markerIndex + REASONING_END_MARKER.length);
+              
+              // Send remaining reasoning
+              if (reasoningPart.length > reasoningBuffer.length) {
+                const newReasoning = reasoningPart.substring(reasoningBuffer.length);
+                res.write(`data: ${JSON.stringify({ reasoning: newReasoning })}\n\n`);
+              }
+              
+              // Switch to content mode
+              isInReasoning = false;
+              
+              // Send content if any
+              if (contentPart.trim()) {
+                totalChars += contentPart.length;
+                res.write(`data: ${JSON.stringify({ chunk: contentPart })}\n\n`);
+              }
+              
+              reasoningBuffer = '';
+            } else {
+              // Still in reasoning - send chunk as reasoning
+              res.write(`data: ${JSON.stringify({ reasoning: chunkText })}\n\n`);
+              reasoningBuffer = combinedText;
+            }
+          } else {
+            // Normal content streaming
+            totalChars += chunkText.length;
+            res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+          }
         }
       } catch (chunkError) {
         console.error('[ERROR] Error processing chunk:', chunkError);

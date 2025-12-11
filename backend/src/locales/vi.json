@@ -87,6 +87,25 @@
     "tone_friendly": "Thân thiện"
   },
 
+  "profile_stream": {
+    "validating": "Đang xác thực dữ liệu đầu vào...",
+    "creating_embeddings": "Đang tạo embeddings cho {{count}} mẫu...",
+    "analyzing_patterns": "Đang phân tích các mẫu viết...",
+    "generating_voice": "Đang tạo hồ sơ giọng văn...",
+    "saving_profile": "Đang lưu hồ sơ vào cơ sở dữ liệu...",
+    "reasoning_embeddings": "Đang chuyển đổi các mẫu văn bản thành vector ngữ nghĩa để nhận dạng mẫu...",
+    "reasoning_embeddings_done": "Đã tạo thành công {{count}} embeddings. Đang kiểm tra độ đa dạng nội dung...",
+    "reasoning_similarity": "Đang so sánh các mẫu để đảm bảo độ đa dạng và tính độc đáo...",
+    "reasoning_similarity_passed": "Tất cả các mẫu đều đủ đa dạng. Tiếp tục phân tích...",
+    "reasoning_statistics": "Đang tính toán các đặc điểm thống kê: độ dài câu, độ phong phú từ vựng, mẫu dấu câu...",
+    "reasoning_statistics_done": "Hoàn tất thống kê. Độ dài câu trung bình: {{avgLength}} từ, độ phong phú từ vựng: {{vocabulary}}%",
+    "reasoning_voice_start": "Đang phân tích phong cách viết để xác định giọng điệu, mức độ trang trọng và các đặc điểm chính...",
+    "reasoning_voice_done": "Đã xác định hồ sơ giọng văn: giọng {{tone}}, mức độ trang trọng {{formality}}/10. Đặc điểm chính: {{characteristics}}",
+    "reasoning_voice_fallback": "Sử dụng hồ sơ giọng văn dự phòng do hết thời gian. Hồ sơ của bạn vẫn hoạt động tốt.",
+    "reasoning_saving": "Đang ghi dữ liệu hồ sơ và embeddings mẫu vào cơ sở dữ liệu...",
+    "reasoning_complete": "Hoàn tất tạo hồ sơ! Hồ sơ giọng văn của bạn đã sẵn sàng sử dụng."
+  },
+
   "ai_detection": {
     "title": "Phát hiện nội dung AI",
     "result_human": "Văn bản này có vẻ do người viết",

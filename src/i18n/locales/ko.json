@@ -460,6 +460,15 @@
     "aiProbability": "AI 확률: {{percent}}%",
     "readingFile": "파일 읽는 중..."
   },
+  "reasoning": {
+    "thinking": "생각 중...",
+    "thoughtFor": "{{time}} 동안 생각함",
+    "startingAnalysis": "분석 시작...",
+    "analyzingText": "텍스트 분석 중...",
+    "planningRewrite": "다시 쓰기 계획 중...",
+    "applyingStyle": "문체 적용 중...",
+    "optimizing": "자연스러운 흐름 최적화 중..."
+  },
   "model": {
     "selectAIModel": "AI 모델 선택",
     "inUse": "사용 중",
@@ -580,7 +589,11 @@
     "noValidText": "파일에 유효한 텍스트가 없습니다",
     "unableToReadFormat": "{{format}} 파일을 읽을 수 없습니다",
     "allDataWillBeLost": "입력된 모든 데이터가 손실됩니다.",
-    "sections": "섹션"
+    "sections": "섹션",
+    "creatingEmbeddings": "임베딩 생성 중 ({{count}}개 샘플)",
+    "analyzingPatterns": "글쓰기 패턴 분석 중",
+    "generatingVoice": "음성 프로필 생성 중",
+    "savingProfile": "프로필 저장 중"
   },
   "settings": {
     "theme": "테마",

@@ -56,10 +56,11 @@ function formatErrorMessage(error) {
  * @param {number} temperature 
  * @param {string} profileId 
  * @param {Object} writingPreferences 
- * @param {Function} onChunk - Called for each text chunk
+ * @param {Function} onChunk - Called for each text chunk (chunk, type) where type is 'reasoning' or 'content'
  * @param {Object} [options] - Additional options
  * @param {Function} [options.onContext] - Called when context info received
  * @param {Function} [options.onComplete] - Called when stream completes
+ * @param {Function} [options.onReasoning] - Called for reasoning chunks (Pro model only)
  * @param {string} [options.conversationSummary] - Existing conversation summary
  * @returns {Promise<Object>} - { success, summary, error }
  */
@@ -73,10 +74,13 @@ export async function sendChatMessageStream(
   onChunk,
   options = {}
 ) {
-  const { onContext, onComplete, conversationSummary } = options
+  const { onContext, onComplete, onReasoning, conversationSummary } = options
+  
+  // Check if Pro model - enable reasoning
+  const isProModel = model?.includes('pro')
   
   try {
-    console.log('📡 Sending chat stream request...')
+    console.log('📡 Sending chat stream request...', isProModel ? '(with reasoning)' : '')
     
     const headers = await getAuthHeaders()
     const userInfo = await getUserInfo()
@@ -92,7 +96,8 @@ export async function sendChatMessageStream(
         profileId,
         writingPreferences,
         conversationSummary,
-        user_id: userInfo?.userId
+        user_id: userInfo?.userId,
+        include_reasoning: isProModel // Request reasoning for Pro model
       })
     })
     
@@ -149,6 +154,12 @@ export async function sendChatMessageStream(
               } else if (json.type === 'complete') {
                 summary = json.summary
                 outputTokens = json.outputTokens
+              } else if (json.reasoning) {
+                // Reasoning chunk (Pro model)
+                console.log('[REASONING] Chunk received:', json.reasoning.substring(0, 30) + '...')
+                if (onReasoning) {
+                  onReasoning(json.reasoning)
+                }
               } else if (json.chunk) {
                 onChunk(json.chunk)
               } else if (json.error) {

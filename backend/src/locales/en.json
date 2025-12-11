@@ -87,6 +87,25 @@
     "tone_friendly": "Friendly"
   },
 
+  "profile_stream": {
+    "validating": "Validating input data...",
+    "creating_embeddings": "Creating embeddings for {{count}} samples...",
+    "analyzing_patterns": "Analyzing writing patterns...",
+    "generating_voice": "Generating voice profile...",
+    "saving_profile": "Saving profile to database...",
+    "reasoning_embeddings": "Converting your text samples into semantic vectors for pattern recognition...",
+    "reasoning_embeddings_done": "Successfully created {{count}} embeddings. Now checking for content diversity...",
+    "reasoning_similarity": "Comparing samples to ensure content diversity and uniqueness...",
+    "reasoning_similarity_passed": "All samples are sufficiently diverse. Proceeding with analysis...",
+    "reasoning_statistics": "Calculating statistical features: sentence length, vocabulary richness, punctuation patterns...",
+    "reasoning_statistics_done": "Statistics complete. Average sentence length: {{avgLength}} words, vocabulary richness: {{vocabulary}}%",
+    "reasoning_voice_start": "Analyzing your writing style to identify tone, formality, and key characteristics...",
+    "reasoning_voice_done": "Voice profile identified: {{tone}} tone, formality level {{formality}}/10. Key traits: {{characteristics}}",
+    "reasoning_voice_fallback": "Using fallback voice profile due to timeout. Your profile will still work well.",
+    "reasoning_saving": "Writing profile data and sample embeddings to database...",
+    "reasoning_complete": "Profile creation complete! Your voice profile is ready to use."
+  },
+
   "ai_detection": {
     "title": "AI Content Detection",
     "result_human": "This text appears to be human-written",

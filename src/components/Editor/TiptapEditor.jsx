@@ -13,10 +13,10 @@ import { Color } from '@tiptap/extension-color'
 import FontFamily from '@tiptap/extension-font-family'
 import SearchHighlightExtension from './extensions/SearchHighlightExtension'
 import DeviationHighlightExtension from './extensions/DeviationHighlightExtension'
-import LazyLottie from '../Common/LazyLottie'
-import sparklesAnimation from '../../animation/Sparkles Loop Loader AI.json'
+import ReasoningDisplay from './ReasoningDisplay'
+import { AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { useIsStreaming } from '@/stores'
+import { useIsStreaming, useReasoning } from '@/stores'
 import { cn } from '../../lib/utils'
 import { serializeToPlainText, parseFromPlainText } from './utils/serialization'
 import SuggestionTooltip from '../Analysis/SuggestionTooltip'
@@ -43,6 +43,7 @@ function TiptapEditorComponent({
 }, ref) {
   const { t } = useTranslation()
   const isStreaming = useIsStreaming()
+  const reasoning = useReasoning()
   const [activeTooltip, setActiveTooltip] = useState(null)
   const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set())
   const [undoStack, setUndoStack] = useState([])
@@ -259,17 +260,22 @@ function TiptapEditorComponent({
           )}
         />
 
-        {/* AI Processing overlay with sparkles animation */}
-        {isProcessing && !isStreaming && (
-          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-            <div className="absolute inset-0 bg-bg-tertiary/30 backdrop-blur-[1px]" />
-            <LazyLottie 
-              animationData={sparklesAnimation} 
-              loop={true} 
-              style={{ width: 240, height: 240, position: 'relative', zIndex: 1 }} 
-            />
-          </div>
-        )}
+        {/* AI Processing overlay with reasoning display */}
+        <AnimatePresence>
+          {isProcessing && !isStreaming && reasoning.isActive && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-6">
+              <div className="absolute inset-0 bg-bg-tertiary/60 backdrop-blur-[2px]" />
+              <div className="relative z-10 w-full max-w-lg">
+                <ReasoningDisplay
+                  content={reasoning.content}
+                  isActive={reasoning.isActive}
+                  isComplete={reasoning.isComplete}
+                  startTime={reasoning.startTime}
+                />
+              </div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Suggestion tooltip */}
         {activeTooltip && (

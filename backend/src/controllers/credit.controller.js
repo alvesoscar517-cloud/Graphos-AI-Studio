@@ -161,36 +161,169 @@ exports.getCreditBalance = async (req, res) => {
 };
 
 /**
- * Get credit transaction history
+ * Get credit transaction history with filters
  */
 exports.getCreditHistory = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const { user_id, limit = 50 } = req.query;
+    const { 
+      user_id, 
+      limit = 50, 
+      type, // 'deduction' | 'addition' | 'all'
+      feature, // filter by feature name
+      start_date, // ISO date string
+      end_date, // ISO date string
+      cursor // pagination cursor (last doc id)
+    } = req.query;
     
     if (!user_id) {
       return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
-    const transactionsSnapshot = await db.collection('credit_transactions')
-      .where('userId', '==', user_id)
-      .orderBy('timestamp', 'desc')
-      .limit(parseInt(limit))
-      .get();
+    let query = db.collection('credit_transactions')
+      .where('userId', '==', user_id);
     
-    const transactions = transactionsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    // Filter by type
+    if (type && type !== 'all') {
+      query = query.where('type', '==', type);
+    }
+    
+    // Filter by feature
+    if (feature && feature !== 'all') {
+      query = query.where('feature', '==', feature);
+    }
+    
+    // Filter by date range
+    if (start_date) {
+      query = query.where('timestamp', '>=', start_date);
+    }
+    if (end_date) {
+      query = query.where('timestamp', '<=', end_date);
+    }
+    
+    // Order and limit
+    query = query.orderBy('timestamp', 'desc').limit(parseInt(limit) + 1);
+    
+    // Pagination cursor
+    if (cursor) {
+      const cursorDoc = await db.collection('credit_transactions').doc(cursor).get();
+      if (cursorDoc.exists) {
+        query = query.startAfter(cursorDoc);
+      }
+    }
+    
+    const transactionsSnapshot = await query.get();
+    
+    const transactions = [];
+    let hasMore = false;
+    
+    transactionsSnapshot.docs.forEach((doc, index) => {
+      if (index < parseInt(limit)) {
+        transactions.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      } else {
+        hasMore = true;
+      }
+    });
+    
+    // Get next cursor
+    const nextCursor = hasMore && transactions.length > 0 
+      ? transactions[transactions.length - 1].id 
+      : null;
     
     res.json({
       success: true,
       transactions,
+      hasMore,
+      nextCursor,
       language: l.lang
     });
   } catch (error) {
     logger.error('Error getting credit history', { error: error.message });
+    res.status(500).json({ success: false, ...l.error('server_error') });
+  }
+};
+
+/**
+ * Get credit history summary (stats)
+ */
+exports.getCreditHistorySummary = async (req, res) => {
+  const l = createLocalizer(req);
+  
+  try {
+    const { user_id, days = 30 } = req.query;
+    
+    if (!user_id) {
+      return res.status(400).json({ success: false, ...l.error('invalid_input') });
+    }
+    
+    // Calculate date range
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - parseInt(days));
+    
+    const transactionsSnapshot = await db.collection('credit_transactions')
+      .where('userId', '==', user_id)
+      .where('timestamp', '>=', startDate.toISOString())
+      .where('timestamp', '<=', endDate.toISOString())
+      .get();
+    
+    // Calculate summary
+    const summary = {
+      totalTransactions: 0,
+      totalDeducted: 0,
+      totalAdded: 0,
+      byFeature: {},
+      byDay: {}
+    };
+    
+    transactionsSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      summary.totalTransactions++;
+      
+      const amount = Math.abs(data.amount || 0);
+      
+      if (data.type === 'deduction') {
+        summary.totalDeducted += amount;
+        
+        // Group by feature
+        const feature = data.feature || 'unknown';
+        if (!summary.byFeature[feature]) {
+          summary.byFeature[feature] = { count: 0, total: 0 };
+        }
+        summary.byFeature[feature].count++;
+        summary.byFeature[feature].total += amount;
+      } else if (data.type === 'addition') {
+        summary.totalAdded += amount;
+      }
+      
+      // Group by day
+      const day = data.timestamp?.split('T')[0] || 'unknown';
+      if (!summary.byDay[day]) {
+        summary.byDay[day] = { deducted: 0, added: 0 };
+      }
+      if (data.type === 'deduction') {
+        summary.byDay[day].deducted += amount;
+      } else {
+        summary.byDay[day].added += amount;
+      }
+    });
+    
+    // Round values
+    summary.totalDeducted = Math.round(summary.totalDeducted * 100) / 100;
+    summary.totalAdded = Math.round(summary.totalAdded * 100) / 100;
+    
+    res.json({
+      success: true,
+      summary,
+      period: { startDate: startDate.toISOString(), endDate: endDate.toISOString(), days: parseInt(days) },
+      language: l.lang
+    });
+  } catch (error) {
+    logger.error('Error getting credit history summary', { error: error.message });
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };

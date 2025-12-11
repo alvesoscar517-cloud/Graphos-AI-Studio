@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import ReactMarkdown from 'react-markdown'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import Icon from '../../Common/Icon'
+import MarkdownResponse from './MarkdownResponse'
 import { cn } from '../../../lib/utils'
 
 const ChatMessage = ({ message }) => {
@@ -28,15 +28,15 @@ const ChatMessage = ({ message }) => {
   const getErrorIcon = () => {
     switch (message.errorCode) {
       case 'QUOTA_EXCEEDED':
-        return '/icon/clock.svg'
+        return 'clock'
       case 'RATE_LIMITED':
-        return '/icon/alert-triangle.svg'
+        return 'alert-triangle'
       case 'CONTENT_BLOCKED':
-        return '/icon/shield.svg'
+        return 'shield'
       case 'NETWORK_ERROR':
-        return '/icon/wifi-off.svg'
+        return 'wifi-off'
       default:
-        return '/icon/alert-circle.svg'
+        return 'alert-circle'
     }
   }
 
@@ -92,7 +92,7 @@ const ChatMessage = ({ message }) => {
               )}>
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2.5">
-                    <Icon name={getErrorIcon().replace('/icon/', '').replace('.svg', '')} size="md" color="error" className="shrink-0" />
+                    <Icon name={getErrorIcon()} size="md" color="error" className="shrink-0" />
                     <span className="text-base leading-[1.6] text-error">
                       {message.content}
                     </span>
@@ -116,47 +116,34 @@ const ChatMessage = ({ message }) => {
               </div>
             ) : (
               <>
-                <div className={cn(
-                  "text-base leading-[1.6] text-text-primary",
-                  "will-change-contents",
-                  "[contain:layout_style]",
-                  "[-webkit-font-smoothing:antialiased]",
-                  "[-moz-osx-font-smoothing:grayscale]",
-                  "[text-rendering:optimizeSpeed]",
-                  // Markdown styles - matching AI Studio TiptapEditor
-                  "[&_p]:m-0 [&_p]:mb-4 [&_p:last-child]:mb-0",
-                  "[&_code]:bg-bg-secondary [&_code]:py-0.5 [&_code]:px-1.5 [&_code]:rounded [&_code]:font-mono [&_code]:text-[0.875em]",
-                  "[&_pre]:bg-bg-secondary [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-4",
-                  "[&_pre_code]:bg-transparent [&_pre_code]:p-0",
-                  "[&_ul]:my-2 [&_ul]:pl-6 [&_ol]:my-2 [&_ol]:pl-6",
-                  "[&_li]:my-1",
-                  "[&_strong]:font-semibold",
-                  "[&_em]:italic",
-                  "[&_a]:text-primary [&_a]:underline",
-                  "[&_blockquote]:border-l-3 [&_blockquote]:border-primary [&_blockquote]:pl-4 [&_blockquote]:my-4 [&_blockquote]:text-text-secondary [&_blockquote]:italic",
-                  // Hide horizontal rules (---) from AI responses
-                  "[&_hr]:hidden"
-                )}>
-                  <ReactMarkdown>{message.content}</ReactMarkdown>
-                </div>
+                {/* AI Response with MarkdownResponse component */}
+                <MarkdownResponse streaming={message.streaming}>
+                  {message.content}
+                </MarkdownResponse>
                 
-                {/* Only show copy button when not streaming and has content */}
+                {/* Copy button - only show when not streaming and has content */}
                 {!message.streaming && message.content && (
                   <button 
                     className={cn(
-                      "bg-transparent border-none p-1.5 cursor-pointer rounded-md mt-2",
-                      "opacity-50 inline-flex items-center justify-center",
-                      "hover:opacity-100 hover:bg-bg-hover"
+                      "bg-transparent border-none p-1.5 cursor-pointer rounded-md mt-3",
+                      "inline-flex items-center gap-1.5",
+                      "text-text-muted text-xs",
+                      "hover:bg-bg-hover hover:text-text-primary",
+                      "transition-all duration-200"
                     )}
                     onClick={handleCopy}
-                    data-tooltip={copied ? t('common.copied') : t('common.copy')}
-                    data-tooltip-position="top"
                   >
-                    <img 
-                      src={copied ? "/icon/check.svg" : "/icon/copy.svg"} 
-                      alt={t('common.copy')} 
-                      className="w-4 h-4 icon-invert"
-                    />
+                    {copied ? (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                      </svg>
+                    )}
+                    <span>{copied ? t('common.copied') : t('common.copyResponse')}</span>
                   </button>
                 )}
               </>

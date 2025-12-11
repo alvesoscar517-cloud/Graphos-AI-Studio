@@ -50,7 +50,8 @@ const EditTitleModal = ({ isOpen, currentTitle, onSave, onClose, maxLength = 100
   return (
     <div 
       className={cn(
-        "fixed inset-0 flex items-center justify-center z-menu bg-black/50 backdrop-blur-sm",
+        "fixed inset-0 flex items-center justify-center z-menu",
+        "bg-black/5 backdrop-blur-[1px]",
         "max-md:items-end max-md:p-3"
       )}
       onClick={handleOverlayClick}

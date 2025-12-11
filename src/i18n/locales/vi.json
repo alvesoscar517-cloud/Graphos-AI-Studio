@@ -30,6 +30,7 @@
     "deselectAll": "Bỏ chọn tất cả",
     "items": "mục",
     "copy": "Sao chép",
+    "copyResponse": "Sao chép phản hồi",
     "cut": "Cắt",
     "paste": "Dán",
     "redo": "Làm lại",
@@ -382,6 +383,10 @@
     "askAnything": "Hỏi bất cứ điều gì...",
     "typeMessage": "Nhập tin nhắn... (Enter để gửi, Shift+Enter để xuống dòng)",
     "scrollDown": "Cuộn xuống",
+    "voiceInput": "Nhập bằng giọng nói",
+    "recording": "Đang ghi...",
+    "stopRecording": "Dừng ghi âm",
+    "voiceNotSupported": "Trình duyệt không hỗ trợ nhập giọng nói",
     "insufficientCredits": "Không đủ Credit",
     "buyCreditsNow": "Mua Credit ngay",
     "quickActions": {
@@ -641,6 +646,15 @@
       "estimatedTime": "Ước tính: {{time}}"
     }
   },
+  "reasoning": {
+    "thinking": "Đang suy nghĩ...",
+    "thoughtFor": "Đã suy nghĩ {{time}}",
+    "startingAnalysis": "Bắt đầu phân tích...",
+    "analyzingText": "Đang phân tích văn bản của bạn...",
+    "planningRewrite": "Đang lên kế hoạch viết lại...",
+    "applyingStyle": "Đang áp dụng phong cách viết...",
+    "optimizing": "Đang tối ưu hóa cho dòng chảy tự nhiên..."
+  },
   "model": {
     "selectAIModel": "Chọn mô hình AI",
     "inUse": "ĐANG DÙNG",
@@ -762,7 +776,11 @@
     "noValidText": "Tệp không chứa văn bản hợp lệ",
     "unableToReadFormat": "Không thể đọc tệp định dạng {{format}}",
     "allDataWillBeLost": "Tất cả dữ liệu đã nhập sẽ bị mất.",
-    "sections": "phần"
+    "sections": "phần",
+    "creatingEmbeddings": "Đang tạo embeddings ({{count}} mẫu)",
+    "analyzingPatterns": "Đang phân tích mẫu viết",
+    "generatingVoice": "Đang tạo hồ sơ giọng văn",
+    "savingProfile": "Đang lưu hồ sơ"
   },
   "settings": {
     "theme": "Giao diện",
@@ -775,7 +793,51 @@
     "termsOfService": "Điều khoản dịch vụ",
     "privacyPolicy": "Chính sách bảo mật",
     "sendFeedback": "Gửi phản hồi",
+    "creditHistory": "Lịch sử Credits",
     "billingSupport": "Hỗ trợ thanh toán"
+  },
+  "creditHistory": {
+    "title": "Lịch sử Credits",
+    "subtitle": "Theo dõi việc sử dụng credits minh bạch",
+    "currentBalance": "Số dư",
+    "totalUsed": "Đã dùng",
+    "totalAdded": "Đã nạp",
+    "transactions": "Giao dịch",
+    "last7Days": "7 ngày qua",
+    "last30Days": "30 ngày qua",
+    "last90Days": "90 ngày qua",
+    "lastYear": "Năm qua",
+    "allTypes": "Tất cả loại",
+    "deductions": "Trừ credits",
+    "additions": "Nạp credits",
+    "allFeatures": "Tất cả tính năng",
+    "filterByFeature": "Tính năng:",
+    "noTransactions": "Không có giao dịch nào",
+    "endOfList": "Hết giao dịch",
+    "balanceAfter": "Số dư sau",
+    "topFeatures": "Tính năng sử dụng nhiều nhất",
+    "features": {
+      "ai_detection": "Phát hiện AI",
+      "text_analysis": "Phân tích văn bản",
+      "text_rewrite": "Viết lại văn bản",
+      "improvement_suggestions": "Gợi ý cải thiện",
+      "chat_message": "Tin nhắn Chat",
+      "chat_humanized": "Chat nhân hóa",
+      "voice_profile_generation": "Tạo hồ sơ giọng",
+      "profile_sample_add": "Thêm mẫu",
+      "profile_samples_batch": "Thêm nhiều mẫu",
+      "profile_complete": "Hoàn thành hồ sơ",
+      "translation": "Dịch thuật",
+      "check_humanization": "Kiểm tra nhân hóa",
+      "iterative_humanize": "Nhân hóa lặp",
+      "conversation_summarize": "Tóm tắt hội thoại",
+      "file_upload_image": "Tải ảnh lên",
+      "file_upload_document": "Tải tài liệu lên",
+      "purchase": "Mua Credits",
+      "bonus": "Credits thưởng",
+      "refund": "Hoàn tiền",
+      "welcome_bonus": "Thưởng chào mừng"
+    }
   },
   "share": {
     "shareThisItem": "Chia sẻ mục này",

@@ -460,6 +460,15 @@
     "aiProbability": "ความน่าจะเป็น AI: {{percent}}%",
     "readingFile": "กำลังอ่านไฟล์..."
   },
+  "reasoning": {
+    "thinking": "กำลังคิด...",
+    "thoughtFor": "คิดเป็นเวลา {{time}}",
+    "startingAnalysis": "เริ่มการวิเคราะห์...",
+    "analyzingText": "กำลังวิเคราะห์ข้อความของคุณ...",
+    "planningRewrite": "วางแผนแนวทางการเขียนใหม่...",
+    "applyingStyle": "กำลังใช้สไตล์เสียง...",
+    "optimizing": "ปรับให้เหมาะสมเพื่อความลื่นไหลตามธรรมชาติ..."
+  },
   "model": {
     "selectAIModel": "เลือกโมเดล AI",
     "inUse": "กำลังใช้งาน",
@@ -580,7 +589,11 @@
     "noValidText": "ไฟล์ไม่มีข้อความที่ถูกต้อง",
     "unableToReadFormat": "ไม่สามารถอ่านไฟล์ {{format}}",
     "allDataWillBeLost": "ข้อมูลที่ป้อนทั้งหมดจะสูญหาย",
-    "sections": "ส่วน"
+    "sections": "ส่วน",
+    "creatingEmbeddings": "กำลังสร้าง embeddings ({{count}} ตัวอย่าง)",
+    "analyzingPatterns": "กำลังวิเคราะห์รูปแบบการเขียน",
+    "generatingVoice": "กำลังสร้างโปรไฟล์เสียง",
+    "savingProfile": "กำลังบันทึกโปรไฟล์"
   },
   "settings": {
     "theme": "ธีม",

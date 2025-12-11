@@ -460,6 +460,15 @@
     "aiProbability": "AI確率: {{percent}}%",
     "readingFile": "ファイルを読み込み中..."
   },
+  "reasoning": {
+    "thinking": "考え中...",
+    "thoughtFor": "{{time}} 考えました",
+    "startingAnalysis": "分析を開始...",
+    "analyzingText": "テキストを分析中...",
+    "planningRewrite": "リライト計画を立案中...",
+    "applyingStyle": "文体を適用中...",
+    "optimizing": "自然な流れに最適化中..."
+  },
   "model": {
     "selectAIModel": "AIモデルを選択",
     "inUse": "使用中",
@@ -580,7 +589,11 @@
     "noValidText": "ファイルに有効なテキストが含まれていません",
     "unableToReadFormat": "{{format}} ファイルを読み込めません",
     "allDataWillBeLost": "入力されたデータはすべて失われます。",
-    "sections": "セクション"
+    "sections": "セクション",
+    "creatingEmbeddings": "埋め込みを作成中 ({{count}} サンプル)",
+    "analyzingPatterns": "文章パターンを分析中",
+    "generatingVoice": "音声プロファイルを生成中",
+    "savingProfile": "プロファイルを保存中"
   },
   "settings": {
     "theme": "テーマ",

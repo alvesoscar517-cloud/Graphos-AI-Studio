@@ -333,14 +333,14 @@ const LoginOverlay = () => {
   return (
     <div 
       ref={vantaRef}
-      className="fixed inset-0 z-modal flex items-center justify-center overflow-hidden p-5 light-mode-only"
+      className="fixed inset-0 z-modal flex items-center justify-center overflow-hidden overflow-y-auto p-3 sm:p-5 light-mode-only"
       style={{
         background: 'linear-gradient(135deg, #0071E3 0%, #5856D6 100%)'
       }}
     >
       <div className={cn(
-        "relative z-10 w-full max-w-[400px] text-center",
-        "py-8 px-8 pb-6 bg-white rounded-2xl",
+        "relative z-10 w-full max-w-[400px] text-center my-auto",
+        "py-6 px-5 sm:py-8 sm:px-8 pb-5 sm:pb-6 bg-white rounded-2xl",
         "border border-black/[0.04] shadow-modal animate-slide-up-slow"
       )}>
         {authMode === 'select' && (
@@ -357,8 +357,8 @@ const LoginOverlay = () => {
         {(authMode === 'email-register' || authMode === 'forgot-password') && (
           <button 
             className={cn(
-              "absolute top-8 left-9 bg-transparent border-none",
-              "text-sm text-gray-400 cursor-pointer p-0 rounded-lg",
+              "absolute top-5 left-5 sm:top-8 sm:left-9 bg-transparent border-none",
+              "text-xs sm:text-sm text-gray-400 cursor-pointer p-0 rounded-lg",
               "transition-all duration-150 font-medium flex items-center gap-1",
               "hover:not-disabled:text-gray-900",
               "disabled:opacity-50 disabled:cursor-not-allowed"

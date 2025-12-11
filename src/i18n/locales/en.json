@@ -30,6 +30,7 @@
     "deselectAll": "Deselect All",
     "items": "items",
     "copy": "Copy",
+    "copyResponse": "Copy response",
     "cut": "Cut",
     "paste": "Paste",
     "redo": "Redo",
@@ -384,6 +385,10 @@
     "askAnything": "Ask anything...",
     "typeMessage": "Type message... (Enter to send, Shift+Enter for new line)",
     "scrollDown": "Scroll down",
+    "voiceInput": "Voice input",
+    "recording": "Recording...",
+    "stopRecording": "Stop recording",
+    "voiceNotSupported": "Voice input is not supported in this browser",
     "insufficientCredits": "Insufficient Credits",
     "buyCreditsNow": "Buy Credits Now",
     "quickActions": {
@@ -643,6 +648,15 @@
       "estimatedTime": "Estimated: {{time}}"
     }
   },
+  "reasoning": {
+    "thinking": "Thinking...",
+    "thoughtFor": "Thought for {{time}}",
+    "startingAnalysis": "Starting analysis...",
+    "analyzingText": "Analyzing your text...",
+    "planningRewrite": "Planning rewrite approach...",
+    "applyingStyle": "Applying voice style...",
+    "optimizing": "Optimizing for natural flow..."
+  },
   "model": {
     "selectAIModel": "Select AI Model",
     "inUse": "IN USE",
@@ -764,7 +778,11 @@
     "noValidText": "File does not contain valid text",
     "unableToReadFormat": "Unable to read {{format}} file",
     "allDataWillBeLost": "All entered data will be lost.",
-    "sections": "sections"
+    "sections": "sections",
+    "creatingEmbeddings": "Creating embeddings ({{count}} samples)",
+    "analyzingPatterns": "Analyzing writing patterns",
+    "generatingVoice": "Generating voice profile",
+    "savingProfile": "Saving profile"
   },
   "settings": {
     "theme": "Theme",
@@ -777,7 +795,51 @@
     "termsOfService": "Terms of service",
     "privacyPolicy": "Privacy policy",
     "sendFeedback": "Send feedback",
+    "creditHistory": "Credit History",
     "billingSupport": "Billing Support"
+  },
+  "creditHistory": {
+    "title": "Credit History",
+    "subtitle": "Track your credit usage transparently",
+    "currentBalance": "Balance",
+    "totalUsed": "Used",
+    "totalAdded": "Added",
+    "transactions": "Transactions",
+    "last7Days": "Last 7 days",
+    "last30Days": "Last 30 days",
+    "last90Days": "Last 90 days",
+    "lastYear": "Last year",
+    "allTypes": "All types",
+    "deductions": "Deductions",
+    "additions": "Additions",
+    "allFeatures": "All features",
+    "filterByFeature": "Feature:",
+    "noTransactions": "No transactions found",
+    "endOfList": "No more transactions",
+    "balanceAfter": "Balance after",
+    "topFeatures": "Top Features Usage",
+    "features": {
+      "ai_detection": "AI Detection",
+      "text_analysis": "Text Analysis",
+      "text_rewrite": "Text Rewrite",
+      "improvement_suggestions": "Suggestions",
+      "chat_message": "Chat Message",
+      "chat_humanized": "Humanized Chat",
+      "voice_profile_generation": "Profile Generation",
+      "profile_sample_add": "Add Sample",
+      "profile_samples_batch": "Batch Samples",
+      "profile_complete": "Complete Profile",
+      "translation": "Translation",
+      "check_humanization": "Check Humanization",
+      "iterative_humanize": "Iterative Humanize",
+      "conversation_summarize": "Summarize",
+      "file_upload_image": "Image Upload",
+      "file_upload_document": "Document Upload",
+      "purchase": "Credit Purchase",
+      "bonus": "Bonus Credits",
+      "refund": "Refund",
+      "welcome_bonus": "Welcome Bonus"
+    }
   },
   "share": {
     "shareThisItem": "Share this item",

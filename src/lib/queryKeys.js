@@ -10,6 +10,8 @@ export const queryKeys = {
     current: () => [...queryKeys.user.all, 'current'],
     profile: () => [...queryKeys.user.all, 'profile'],
     credits: () => [...queryKeys.user.all, 'credits'],
+    creditHistory: (filters) => [...queryKeys.user.all, 'creditHistory', filters],
+    creditHistorySummary: (days) => [...queryKeys.user.all, 'creditHistorySummary', days],
     sessions: () => [...queryKeys.user.all, 'sessions'],
   },
 

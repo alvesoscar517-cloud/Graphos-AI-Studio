@@ -87,6 +87,25 @@
     "tone_friendly": "Freundlich"
   },
 
+  "profile_stream": {
+    "validating": "Eingabedaten werden validiert...",
+    "creating_embeddings": "Embeddings für {{count}} Proben werden erstellt...",
+    "analyzing_patterns": "Schreibmuster werden analysiert...",
+    "generating_voice": "Stimmprofil wird generiert...",
+    "saving_profile": "Profil wird in der Datenbank gespeichert...",
+    "reasoning_embeddings": "Ihre Textproben werden in semantische Vektoren zur Mustererkennung umgewandelt...",
+    "reasoning_embeddings_done": "{{count}} Embeddings erfolgreich erstellt. Inhaltsvielfalt wird überprüft...",
+    "reasoning_similarity": "Proben werden verglichen, um Inhaltsvielfalt und Einzigartigkeit sicherzustellen...",
+    "reasoning_similarity_passed": "Alle Proben sind ausreichend vielfältig. Analyse wird fortgesetzt...",
+    "reasoning_statistics": "Statistische Merkmale werden berechnet: Satzlänge, Wortschatzreichtum, Interpunktionsmuster...",
+    "reasoning_statistics_done": "Statistik abgeschlossen. Durchschnittliche Satzlänge: {{avgLength}} Wörter, Wortschatzreichtum: {{vocabulary}}%",
+    "reasoning_voice_start": "Ihr Schreibstil wird analysiert, um Ton, Formalität und Schlüsselmerkmale zu identifizieren...",
+    "reasoning_voice_done": "Stimmprofil identifiziert: {{tone}} Ton, Formalitätsstufe {{formality}}/10. Schlüsselmerkmale: {{characteristics}}",
+    "reasoning_voice_fallback": "Fallback-Stimmprofil wird aufgrund von Zeitüberschreitung verwendet. Ihr Profil funktioniert weiterhin gut.",
+    "reasoning_saving": "Profildaten und Proben-Embeddings werden in die Datenbank geschrieben...",
+    "reasoning_complete": "Profilerstellung abgeschlossen! Ihr Stimmprofil ist einsatzbereit."
+  },
+
   "ai_detection": {
     "title": "KI-Inhaltserkennung",
     "result_human": "Dieser Text scheint von einem Menschen geschrieben zu sein",

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNotes } from '../../contexts/NotesContext'
 import { useProfiles } from '../../contexts/ProfileContext'
-import { useRewrite, useAIProcessingActions, useAIProcessing } from '@/stores'
+import { useRewrite, useAIProcessingActions, useAIProcessing, useReasoning } from '@/stores'
 import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import { handleCreditError } from '../../utils/creditHandler'
@@ -21,6 +21,7 @@ import Icon from '../Common/Icon'
 import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
+import BackgroundGradient from '../Common/BackgroundGradient'
 
 // Breakpoints for responsive behavior
 const BREAKPOINT_MOBILE = 768
@@ -36,13 +37,13 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
   const { currentNote, updateNote } = useNotes()
   const { currentProfile, selectProfile } = useProfiles()
   const { selectedModel, setSelectedModel, writingPreferences, setWritingPreferences } = useRewrite()
-  const { startProcessing, startStreaming, stopProcessing } = useAIProcessingActions()
+  const { startProcessing, startStreaming, stopProcessing, appendReasoning, completeReasoning, clearReasoning } = useAIProcessingActions()
   const { isProcessing } = useAIProcessing()
+  const reasoning = useReasoning()
   const [mode, setMode] = useState('analysis') // 'analysis' or 'rewrite'
   const [isDragging, setIsDragging] = useState(false)
   const [isInteractingWithSlider, setIsInteractingWithSlider] = useState(false)
   const [isRewriting, setIsRewriting] = useState(false)
-  const [humanizeProgress, setHumanizeProgress] = useState(null) // Local state for progress display
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
 
@@ -100,31 +101,6 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
            prefs.useSentencePatterns || prefs.useRewriteInstructions
   }
 
-  // Get progress text for humanize
-  const getProgressText = () => {
-    if (!humanizeProgress) return null
-    const { currentStep, currentIteration, totalIterations, aiProbability, iterationsUsed, reachedTarget } = humanizeProgress
-    
-    switch (currentStep) {
-      case 'queued':
-        return t('rewrite.humanizeProgress.queued')
-      case 'loading_profile':
-        return t('rewrite.humanizeProgress.loading_profile')
-      case 'rewriting':
-        return t('rewrite.humanizeProgress.rewriting', { current: currentIteration, total: totalIterations })
-      case 'checking':
-        return aiProbability 
-          ? `${t('rewrite.humanizeProgress.checking')} (${aiProbability}%)`
-          : t('rewrite.humanizeProgress.checking')
-      case 'completed':
-        return `${reachedTarget ? '✓' : '⚠'} ${t('rewrite.completedIterations', { count: iterationsUsed || 1 })} - AI: ${aiProbability}%`
-      case 'failed':
-        return t('rewrite.humanizeProgress.failed')
-      default:
-        return t('rewrite.humanizing')
-    }
-  }
-
   // Rewrite handler
   const handleRewrite = async () => {
     const text = currentNote?.content
@@ -145,6 +121,9 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       console.log('[LAUNCH] Starting async iterative humanization...')
       setIsRewriting(true)
       startProcessing('humanize') // Use 'humanize' type to show progress on editor
+      
+      // Clear editor content to show reasoning
+      updateNote(currentNote.id, { content: '' })
       
       try {
         // Start async job - profile_id is optional for generic humanization
@@ -183,18 +162,30 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           }
         }
         
+        // Track last reasoning to avoid duplicates
+        let lastReasoning = ''
+        
         // Poll for progress, then stream result when completed
         const result = await pollAndStreamHumanizeJob(startResult.jobId, {
           onProgress: (progress) => {
             console.log('[PROGRESS]', progress)
-            setHumanizeProgress(progress.progress)
+            // Stream reasoning content if available and new
+            if (progress.progress?.reasoning && progress.progress.reasoning !== lastReasoning) {
+              // Append only the new part
+              const newContent = progress.progress.reasoning.substring(lastReasoning.length)
+              if (newContent) {
+                appendReasoning(newContent)
+              }
+              lastReasoning = progress.progress.reasoning
+            }
           },
           onChunk: (chunk) => {
-            // First chunk - clear editor and start streaming
+            // First chunk - complete reasoning and start streaming
             if (!hasStartedStreaming) {
               hasStartedStreaming = true
-              console.log('[SYNC] First chunk - clearing editor, starting stream')
-              startStreaming() // Stop shimmer effect
+              console.log('[SYNC] First chunk - completing reasoning, starting stream')
+              completeReasoning()
+              startStreaming() // Stop reasoning display
               updateNote(currentNote.id, { content: '' })
               displayedText = ''
             }
@@ -208,13 +199,6 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           },
           onComplete: (metadata) => {
             console.log('[COMPLETE] Streaming finished:', metadata)
-            // Show final result in progress area
-            setHumanizeProgress({
-              currentStep: 'completed',
-              aiProbability: metadata.finalAIProbability,
-              iterationsUsed: metadata.iterationsUsed,
-              reachedTarget: metadata.reachedTarget
-            })
           },
           pollInterval: 1500,
           maxWaitTime: 300000
@@ -238,25 +222,19 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           await waitForAnimation()
         } else if (result.success && result.data) {
           // Fallback if streaming didn't work - direct update
+          completeReasoning()
+          startStreaming()
           updateNote(currentNote.id, { content: result.data.rewritten_text })
-          setHumanizeProgress({
-            currentStep: 'completed',
-            aiProbability: result.data.final_ai_probability,
-            iterationsUsed: result.data.iterations_used,
-            reachedTarget: result.data.reached_target
-          })
         }
         
         if (!result.success) {
           throw new Error(result.error || t('rewrite.humanizationFailed'))
         }
-        
-        // Clear progress after 3 seconds
-        setTimeout(() => {
-          setHumanizeProgress(null)
-        }, 3000)
       } catch (error) {
         console.error('[FAIL] Error in iterative humanize:', error)
+        
+        // Restore original text on error
+        updateNote(currentNote.id, { content: originalText })
         
         const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
         
@@ -264,10 +242,10 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           const localizedError = getLocalizedContentError(error.message, t)
           modal.error(localizedError || t('rewrite.humanizationFailed'))
         }
-        setHumanizeProgress(null)
       } finally {
         setIsRewriting(false)
         stopProcessing()
+        clearReasoning()
       }
       return
     }
@@ -276,6 +254,9 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     console.log('[LAUNCH] Starting rewrite process...')
     setIsRewriting(true)
     startProcessing('rewrite')
+    
+    // Clear editor content to show reasoning
+    updateNote(currentNote.id, { content: '' })
     
     try {
       let fullText = ''
@@ -303,14 +284,21 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
         originalText,
         selectedModel,
         writingPreferences,
-        (chunk) => {
+        (chunk, type) => {
+          // Handle reasoning chunks
+          if (type === 'reasoning') {
+            appendReasoning(chunk)
+            return
+          }
+          
           chunkCount++
           console.log(`[PACKAGE] Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
           
           if (!hasStartedStreaming) {
             hasStartedStreaming = true
-            console.log('[SYNC] First chunk - clearing editor, stopping shimmer')
-            startStreaming() // Stop shimmer effect when streaming starts
+            console.log('[SYNC] First chunk - completing reasoning, starting stream')
+            completeReasoning()
+            startStreaming() // Stop reasoning display when streaming starts
             updateNote(currentNote.id, { content: '' })
             displayedText = ''
           }
@@ -346,16 +334,19 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     } catch (error) {
       console.error('[FAIL] Error rewriting:', error)
       
+      // Restore original text on error
+      updateNote(currentNote.id, { content: originalText })
+      
       const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
       
       if (!wasCreditError) {
         const localizedError = getLocalizedContentError(error.message, t)
         modal.error(localizedError || t('rewrite.rewriteFailed'))
       }
-      updateNote(currentNote.id, { content: originalText })
     } finally {
       setIsRewriting(false)
       stopProcessing()
+      clearReasoning()
     }
   }
 
@@ -567,55 +558,43 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
             
             {/* Rewrite Button */}
             <div className="flex flex-col gap-2">
-              <button
-                className={cn(
-                  "w-full flex items-center justify-center gap-2 py-3 px-4",
-                  "rounded-xl font-semibold text-sm cursor-pointer",
-                  "transition-all duration-200",
-                  "bg-fill-tertiary text-blue-600 border border-border-light",
-                  "hover:bg-bg-hover hover:border-border-hover",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
-                )}
-                onClick={handleRewrite}
-                disabled={!hasText || !hasAnyFeatureEnabled() || isRewriting || isProcessing}
+              <BackgroundGradient 
+                className="rounded-xl bg-bg-primary"
+                containerClassName="w-full"
+                animate={!isRewriting && hasText && hasAnyFeatureEnabled()}
               >
-                {isRewriting ? (
-                  // @ts-ignore - LazyLottie props are correct
-                  <LazyLottie 
-                    animationData={threeDotsAnimation} 
-                    loop={true}
-                    style={{ width: 40, height: 16 }}
-                  />
-                ) : (
-                  <>
-                    <img 
-                      src={`/icon/${writingPreferences?.useIterativeRefinement ? "user-check" : "pen"}.svg`}
-                      alt={rewriteLabel}
-                      className="w-4 h-4 filter-icon-primary"
-                    />
-                    <span>{rewriteLabel}</span>
-                  </>
-                )}
-              </button>
-              
-              {/* Progress display for Iterative Humanize */}
-              {humanizeProgress && writingPreferences?.useIterativeRefinement && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
+                <button
                   className={cn(
-                    "text-center py-2 px-3 rounded-lg text-xs",
-                    humanizeProgress.currentStep === 'completed' 
-                      ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                      : humanizeProgress.currentStep === 'failed'
-                      ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
-                      : "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
+                    "w-full flex items-center justify-center gap-2 py-3 px-4",
+                    "rounded-xl font-semibold text-sm cursor-pointer",
+                    "transition-all duration-200",
+                    "bg-bg-primary text-blue-600",
+                    "hover:bg-bg-hover",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
+                  onClick={handleRewrite}
+                  disabled={!hasText || !hasAnyFeatureEnabled() || isRewriting || isProcessing}
                 >
-                  {getProgressText()}
-                </motion.div>
-              )}
+                  {isRewriting ? (
+                    // @ts-ignore - LazyLottie props are correct
+                    <LazyLottie 
+                      animationData={threeDotsAnimation} 
+                      loop={true}
+                      style={{ width: 40, height: 16 }}
+                    />
+                  ) : (
+                    <>
+                      <img 
+                        src={`/icon/${writingPreferences?.useIterativeRefinement ? "user-check" : "pen"}.svg`}
+                        alt={rewriteLabel}
+                        className="w-4 h-4 filter-icon-primary"
+                      />
+                      <span>{rewriteLabel}</span>
+                    </>
+                  )}
+                </button>
+              </BackgroundGradient>
+              
             </div>
           </>
         )}

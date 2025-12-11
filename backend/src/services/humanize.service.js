@@ -920,6 +920,98 @@ async function getHumanizationSuggestions(text) {
 }
 
 // ============================================================================
+// REASONING PROMPT BUILDER
+// ============================================================================
+
+/**
+ * Build rewrite prompt with Chain-of-Thought reasoning output
+ * The model will first output its reasoning process, then the final rewritten text
+ * @param {string} originalText - Text to rewrite
+ * @param {Object} voiceProfile - Voice profile object
+ * @param {string} sampleText - Sample text from user's writing (for few-shot)
+ * @param {Object} options - Additional options including writingPreferences, useAntiAIDetection
+ * @returns {string} - Prompt with reasoning structure
+ */
+function buildRewritePromptWithReasoning(originalText, voiceProfile, sampleText = null, options = {}) {
+  // Detect content language
+  const lang = detectContentLanguage(originalText);
+  const langConfig = languageProcessor.getConfig(lang);
+  const writingPreferences = options.writingPreferences || {};
+  const useAntiAIDetection = options.useAntiAIDetection !== false;
+  
+  // Build voice profile description
+  const voiceDescription = buildVoiceDescription(voiceProfile, writingPreferences);
+  
+  // Get AI phrases to avoid if anti-AI detection is enabled
+  const aiPhrases = useAntiAIDetection ? (AI_PHRASES_TO_AVOID[lang] || AI_PHRASES_TO_AVOID.en) : [];
+  const languageInstructions = useAntiAIDetection ? getLanguageSpecificInstructions(lang) : '';
+  
+  let prompt = `You are an expert ghostwriter. Your task is to rewrite text to match a specific voice profile.
+
+IMPORTANT: Output your response in TWO parts:
+1. First, your REASONING process (analysis and planning)
+2. Then, the marker "---CONTENT_START---"
+3. Finally, the REWRITTEN TEXT only
+
+═══════════════════════════════════════════════════════════════
+TARGET VOICE PROFILE:
+═══════════════════════════════════════════════════════════════
+${voiceDescription}`;
+
+  // Add anti-AI detection rules if enabled
+  if (useAntiAIDetection) {
+    prompt += `
+
+═══════════════════════════════════════════════════════════════
+ANTI-AI DETECTION RULES:
+═══════════════════════════════════════════════════════════════
+- Avoid AI-typical phrases: ${aiPhrases.slice(0, 8).map(p => `"${p}"`).join(', ')}
+- Mix sentence lengths naturally
+- Add human-like imperfections
+- Use natural transitions
+${languageInstructions}`;
+  }
+
+  // Add few-shot example if available
+  if (sampleText && sampleText.length > 50) {
+    prompt += `
+
+═══════════════════════════════════════════════════════════════
+EXAMPLE OF THIS PERSON'S WRITING STYLE:
+═══════════════════════════════════════════════════════════════
+"${sampleText.substring(0, 1000)}"`;
+  }
+
+  // Add rewrite instructions from profile if enabled
+  const useRewriteInstructions = writingPreferences.useRewriteInstructions !== false;
+  if (useRewriteInstructions && voiceProfile?.rewrite_instructions) {
+    prompt += `
+
+═══════════════════════════════════════════════════════════════
+SPECIFIC REWRITE INSTRUCTIONS:
+═══════════════════════════════════════════════════════════════
+${voiceProfile.rewrite_instructions}`;
+  }
+
+  prompt += `
+
+═══════════════════════════════════════════════════════════════
+ORIGINAL TEXT TO REWRITE:
+═══════════════════════════════════════════════════════════════
+${originalText}
+
+═══════════════════════════════════════════════════════════════
+YOUR RESPONSE (reasoning first, then marker, then rewritten text):
+═══════════════════════════════════════════════════════════════
+
+Let me analyze this text and plan my rewrite approach...
+
+REASONING:`;
+
+  return prompt;
+}
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 
@@ -932,6 +1024,7 @@ module.exports = {
   // Utility functions
   buildEnhancedRewritePrompt,
   buildSimpleRewritePrompt,
+  buildRewritePromptWithReasoning,
   buildRefinementContext,
   injectHumanImperfections,
   addContractions,

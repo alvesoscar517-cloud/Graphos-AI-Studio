@@ -87,6 +87,25 @@
     "tone_friendly": "友好"
   },
 
+  "profile_stream": {
+    "validating": "正在验证输入数据...",
+    "creating_embeddings": "正在为 {{count}} 个样本创建嵌入向量...",
+    "analyzing_patterns": "正在分析写作模式...",
+    "generating_voice": "正在生成语音配置文件...",
+    "saving_profile": "正在保存配置文件到数据库...",
+    "reasoning_embeddings": "正在将您的文本样本转换为语义向量以进行模式识别...",
+    "reasoning_embeddings_done": "成功创建 {{count}} 个嵌入向量。正在检查内容多样性...",
+    "reasoning_similarity": "正在比较样本以确保内容多样性和独特性...",
+    "reasoning_similarity_passed": "所有样本都足够多样化。继续分析...",
+    "reasoning_statistics": "正在计算统计特征：句子长度、词汇丰富度、标点模式...",
+    "reasoning_statistics_done": "统计完成。平均句子长度：{{avgLength}} 个词，词汇丰富度：{{vocabulary}}%",
+    "reasoning_voice_start": "正在分析您的写作风格以识别语气、正式程度和关键特征...",
+    "reasoning_voice_done": "已识别语音配置文件：{{tone}} 语气，正式程度 {{formality}}/10。关键特征：{{characteristics}}",
+    "reasoning_voice_fallback": "由于超时使用备用语音配置文件。您的配置文件仍然可以正常工作。",
+    "reasoning_saving": "正在将配置文件数据和样本嵌入向量写入数据库...",
+    "reasoning_complete": "配置文件创建完成！您的语音配置文件已准备就绪。"
+  },
+
   "ai_detection": {
     "title": "AI 内容检测",
     "result_human": "这段文本看似由人类撰写",

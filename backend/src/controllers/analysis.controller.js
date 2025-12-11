@@ -801,7 +801,7 @@ exports.rewriteTextStream = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const { profile_id, text, model: requestedModel, user_id, writing_preferences } = req.body;
+    const { profile_id, text, model: requestedModel, user_id, writing_preferences, include_reasoning } = req.body;
 
     // Validate model
     const model = validateModel(requestedModel, 'gemini-2.5-flash');
@@ -863,9 +863,18 @@ exports.rewriteTextStream = async (req, res) => {
     // Import humanize service for prompt building
     const humanizeService = require('../services/humanize.service');
     
-    // Build prompt based on anti-AI detection setting
+    // Build prompt based on anti-AI detection setting and reasoning request
     let prompt;
-    if (useAntiAIDetection) {
+    if (include_reasoning) {
+      // Build prompt with reasoning output (Chain-of-Thought)
+      prompt = humanizeService.buildRewritePromptWithReasoning(
+        text,
+        voiceProfile,
+        sampleText,
+        { writingPreferences: writing_preferences, useAntiAIDetection }
+      );
+      console.log('[REWRITE] Using prompt with reasoning output');
+    } else if (useAntiAIDetection) {
       // Build enhanced prompt with anti-AI detection rules
       prompt = humanizeService.buildEnhancedRewritePrompt(
         text,
@@ -898,6 +907,11 @@ exports.rewriteTextStream = async (req, res) => {
     const result = await generativeModel.generateContentStream(prompt);
 
     let fullText = '';
+    let isInReasoning = include_reasoning; // Start in reasoning mode if requested
+    let reasoningBuffer = '';
+    let contentBuffer = '';
+    const REASONING_END_MARKER = '---CONTENT_START---';
+    
     for await (const chunk of result.stream) {
       try {
         // Try different ways to extract text from chunk
@@ -915,8 +929,42 @@ exports.rewriteTextStream = async (req, res) => {
         }
         
         if (chunkText) {
-          fullText += chunkText;
-          res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+          if (include_reasoning && isInReasoning) {
+            // Check if this chunk contains the marker
+            const combinedText = reasoningBuffer + chunkText;
+            const markerIndex = combinedText.indexOf(REASONING_END_MARKER);
+            
+            if (markerIndex !== -1) {
+              // Found marker - split reasoning and content
+              const reasoningPart = combinedText.substring(0, markerIndex);
+              const contentPart = combinedText.substring(markerIndex + REASONING_END_MARKER.length);
+              
+              // Send remaining reasoning
+              if (reasoningPart.length > reasoningBuffer.length) {
+                const newReasoning = reasoningPart.substring(reasoningBuffer.length);
+                res.write(`data: ${JSON.stringify({ reasoning: newReasoning })}\n\n`);
+              }
+              
+              // Switch to content mode
+              isInReasoning = false;
+              
+              // Send content if any
+              if (contentPart.trim()) {
+                fullText += contentPart;
+                res.write(`data: ${JSON.stringify({ chunk: contentPart })}\n\n`);
+              }
+              
+              reasoningBuffer = '';
+            } else {
+              // Still in reasoning - send chunk as reasoning
+              res.write(`data: ${JSON.stringify({ reasoning: chunkText })}\n\n`);
+              reasoningBuffer = combinedText;
+            }
+          } else {
+            // Normal content streaming
+            fullText += chunkText;
+            res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+          }
         }
       } catch (chunkError) {
         console.error('Error processing chunk:', chunkError);

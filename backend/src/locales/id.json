@@ -87,6 +87,25 @@
     "tone_friendly": "Ramah"
   },
 
+  "profile_stream": {
+    "validating": "Memvalidasi data input...",
+    "creating_embeddings": "Membuat embeddings untuk {{count}} sampel...",
+    "analyzing_patterns": "Menganalisis pola penulisan...",
+    "generating_voice": "Membuat profil suara...",
+    "saving_profile": "Menyimpan profil ke database...",
+    "reasoning_embeddings": "Mengonversi sampel teks Anda menjadi vektor semantik untuk pengenalan pola...",
+    "reasoning_embeddings_done": "Berhasil membuat {{count}} embeddings. Memeriksa keragaman konten...",
+    "reasoning_similarity": "Membandingkan sampel untuk memastikan keragaman dan keunikan konten...",
+    "reasoning_similarity_passed": "Semua sampel cukup beragam. Melanjutkan analisis...",
+    "reasoning_statistics": "Menghitung fitur statistik: panjang kalimat, kekayaan kosakata, pola tanda baca...",
+    "reasoning_statistics_done": "Statistik selesai. Panjang kalimat rata-rata: {{avgLength}} kata, kekayaan kosakata: {{vocabulary}}%",
+    "reasoning_voice_start": "Menganalisis gaya penulisan Anda untuk mengidentifikasi nada, formalitas, dan karakteristik utama...",
+    "reasoning_voice_done": "Profil suara teridentifikasi: nada {{tone}}, tingkat formalitas {{formality}}/10. Karakteristik utama: {{characteristics}}",
+    "reasoning_voice_fallback": "Menggunakan profil suara cadangan karena timeout. Profil Anda tetap akan berfungsi dengan baik.",
+    "reasoning_saving": "Menulis data profil dan embeddings sampel ke database...",
+    "reasoning_complete": "Pembuatan profil selesai! Profil suara Anda siap digunakan."
+  },
+
   "ai_detection": {
     "title": "Deteksi Konten AI",
     "result_human": "Teks ini sepertinya ditulis oleh manusia",

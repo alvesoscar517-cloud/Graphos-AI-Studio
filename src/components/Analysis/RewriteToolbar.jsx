@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, MotionConfig } from 'framer-motion'
 import LazyLottie from '../Common/LazyLottie'
 import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
-import { useRewrite, useAIProcessingActions } from '@/stores'
+import { useRewrite, useAIProcessingActions, useReasoning } from '@/stores'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import { handleCreditError } from '../../utils/creditHandler'
 import modal from '../../utils/modal'
@@ -53,9 +53,9 @@ const RewriteToolbar = ({
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { selectedModel, writingPreferences } = useRewrite()
-  const { startProcessing, startStreaming, stopProcessing } = useAIProcessingActions()
+  const { startProcessing, startStreaming, stopProcessing, appendReasoning, completeReasoning, clearReasoning } = useAIProcessingActions()
+  const reasoning = useReasoning()
   const [isLoading, setIsLoading] = useState(false)
-  const [humanizeProgress, setHumanizeProgress] = useState(null)
   const fileInputRef = useRef(null)
 
   const hasProfile = currentProfile !== null
@@ -71,31 +71,6 @@ const RewriteToolbar = ({
     return prefs.useAntiAIDetection || prefs.useIterativeRefinement ||
            prefs.useVocabularyPreferences || prefs.useKeyCharacteristics ||
            prefs.useSentencePatterns || prefs.useRewriteInstructions
-  }
-
-  // Get progress text for humanize
-  const getProgressText = () => {
-    if (!humanizeProgress) return null
-    const { currentStep, currentIteration, totalIterations, aiProbability, iterationsUsed, reachedTarget } = humanizeProgress
-    
-    switch (currentStep) {
-      case 'queued':
-        return t('rewrite.humanizeProgress.queued')
-      case 'loading_profile':
-        return t('rewrite.humanizeProgress.loading_profile')
-      case 'rewriting':
-        return t('rewrite.humanizeProgress.rewriting', { current: currentIteration, total: totalIterations })
-      case 'checking':
-        return aiProbability 
-          ? `${t('rewrite.humanizeProgress.checking')} (${aiProbability}%)`
-          : t('rewrite.humanizeProgress.checking')
-      case 'completed':
-        return `${reachedTarget ? '✓' : '⚠'} ${t('rewrite.completedIterations', { count: iterationsUsed || 1 })} - AI: ${aiProbability}%`
-      case 'failed':
-        return t('rewrite.humanizeProgress.failed')
-      default:
-        return t('rewrite.humanizing')
-    }
   }
 
   const handleRewrite = async () => {
@@ -117,7 +92,10 @@ const RewriteToolbar = ({
       // Use async iterative humanization
       console.log('[LAUNCH] Starting async iterative humanization...')
       setIsLoading(true)
-      startProcessing('humanize') // Use 'humanize' type to show progress on editor
+      startProcessing('humanize') // Use 'humanize' type to show reasoning on editor
+      
+      // Clear editor content to show reasoning
+      onTextChange('')
       
       try {
         // Start async job - profile_id is optional for generic humanization
@@ -156,16 +134,28 @@ const RewriteToolbar = ({
           }
         }
         
+        // Track last reasoning to avoid duplicates
+        let lastReasoning = ''
+        
         // Poll for progress, then stream result when completed
         const result = await pollAndStreamHumanizeJob(startResult.jobId, {
           onProgress: (progress) => {
             console.log('[PROGRESS]', progress)
-            setHumanizeProgress(progress.progress)
+            // Stream reasoning content if available and new
+            if (progress.progress?.reasoning && progress.progress.reasoning !== lastReasoning) {
+              // Append only the new part
+              const newContent = progress.progress.reasoning.substring(lastReasoning.length)
+              if (newContent) {
+                appendReasoning(newContent)
+              }
+              lastReasoning = progress.progress.reasoning
+            }
           },
           onChunk: (chunk) => {
             if (!hasStartedStreaming) {
               hasStartedStreaming = true
-              console.log('[SYNC] First chunk - clearing editor, starting stream')
+              console.log('[SYNC] First chunk - completing reasoning, starting stream')
+              completeReasoning()
               startStreaming()
               onTextChange('')
               displayedText = ''
@@ -180,12 +170,6 @@ const RewriteToolbar = ({
           },
           onComplete: (metadata) => {
             console.log('[COMPLETE] Streaming finished:', metadata)
-            setHumanizeProgress({
-              currentStep: 'completed',
-              aiProbability: metadata.finalAIProbability,
-              iterationsUsed: metadata.iterationsUsed,
-              reachedTarget: metadata.reachedTarget
-            })
           },
           pollInterval: 1500,
           maxWaitTime: 300000
@@ -209,25 +193,19 @@ const RewriteToolbar = ({
           await waitForAnimation()
         } else if (result.success && result.data) {
           // Fallback if streaming didn't work
+          completeReasoning()
+          startStreaming()
           onTextChange(result.data.rewritten_text)
-          setHumanizeProgress({
-            currentStep: 'completed',
-            aiProbability: result.data.final_ai_probability,
-            iterationsUsed: result.data.iterations_used,
-            reachedTarget: result.data.reached_target
-          })
         }
         
         if (!result.success) {
           throw new Error(result.error || t('rewrite.humanizationFailed'))
         }
-        
-        // Clear progress after 3 seconds
-        setTimeout(() => {
-          setHumanizeProgress(null)
-        }, 3000)
       } catch (error) {
         console.error('[FAIL] Error in iterative humanize:', error)
+        
+        // Restore original text on error
+        onTextChange(originalText)
         
         // Check if it's a credit error first
         const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
@@ -236,11 +214,10 @@ const RewriteToolbar = ({
           const localizedError = getLocalizedContentError(error.message, t)
           modal.error(localizedError || t('rewrite.humanizationFailed'))
         }
-        onTextChange(originalText)
-        setHumanizeProgress(null)
       } finally {
         setIsLoading(false)
         stopProcessing()
+        clearReasoning()
       }
       return
     }
@@ -249,6 +226,9 @@ const RewriteToolbar = ({
     console.log('[LAUNCH] Starting rewrite process...')
     setIsLoading(true)
     startProcessing('rewrite')
+    
+    // Clear editor content to show reasoning
+    onTextChange('')
     
     try {
       let fullText = '' // Complete text buffer
@@ -280,15 +260,22 @@ const RewriteToolbar = ({
         originalText,
         selectedModel,
         writingPreferences,
-        (chunk) => {
+        (chunk, type) => {
+          // Handle reasoning chunks
+          if (type === 'reasoning') {
+            appendReasoning(chunk)
+            return
+          }
+          
           chunkCount++
           console.log(`[PACKAGE] Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
           
-          // First chunk - clear editor
+          // First content chunk - complete reasoning and start streaming
           if (!hasStartedStreaming) {
             hasStartedStreaming = true
-            console.log('[SYNC] First chunk - clearing editor, stopping shimmer')
-            startStreaming() // Stop shimmer effect when streaming starts
+            console.log('[SYNC] First chunk - completing reasoning, starting stream')
+            completeReasoning()
+            startStreaming() // Stop reasoning display when streaming starts
             onTextChange('') // Clear old text immediately
             displayedText = ''
           }
@@ -328,6 +315,9 @@ const RewriteToolbar = ({
     } catch (error) {
       console.error('[FAIL] Error rewriting:', error)
       
+      // Restore original text on error
+      onTextChange(originalText)
+      
       // Check if it's a credit error first
       const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
       
@@ -335,11 +325,10 @@ const RewriteToolbar = ({
         const localizedError = getLocalizedContentError(error.message, t)
         modal.error(localizedError || t('rewrite.rewriteFailed'))
       }
-      // Restore original text on error
-      onTextChange(originalText)
     } finally {
       setIsLoading(false)
       stopProcessing()
+      clearReasoning()
     }
   }
 
@@ -527,24 +516,6 @@ const RewriteToolbar = ({
           style={{ display: 'none' }}
         />
         
-        {/* Progress display for Iterative Humanize */}
-        {humanizeProgress && writingPreferences?.useIterativeRefinement && (
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className={cn(
-              "pointer-events-auto mt-2 text-center py-2 px-4 rounded-xl text-xs backdrop-blur-xl",
-              humanizeProgress.currentStep === 'completed' 
-                ? "bg-green-500/20 text-green-100 border border-green-500/30"
-                : humanizeProgress.currentStep === 'failed'
-                ? "bg-red-500/20 text-red-100 border border-red-500/30"
-                : "bg-blue-500/20 text-blue-100 border border-blue-500/30"
-            )}
-          >
-            {getProgressText()}
-          </motion.div>
-        )}
       </motion.div>
     </MotionConfig>
   )

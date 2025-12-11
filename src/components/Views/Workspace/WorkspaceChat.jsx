@@ -6,11 +6,12 @@ import { cn } from '../../../lib/utils'
 import ChatMessage from './ChatMessage'
 import EditTitleModal from '../../Common/EditTitleModal'
 import LazyLottie from '../../Common/LazyLottie'
+import ReasoningDisplay from '../../Editor/ReasoningDisplay'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
 
 const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden, chatInput }) => {
   const { t } = useTranslation()
-  const { currentConversation, isLoading, updateConversationTitle, clearConversation } = useWorkspace()
+  const { currentConversation, isLoading, updateConversationTitle, clearConversation, reasoning } = useWorkspace()
   const messagesEndRef = useRef(null)
   const messagesContainerRef = useRef(null)
   const [title, setTitle] = useState('')
@@ -96,6 +97,13 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
     // Auto-scroll for new messages
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [currentConversation?.messages])
+
+  // Auto-scroll when reasoning is active or content updates
+  useEffect(() => {
+    if (reasoning?.isActive) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [reasoning?.isActive, reasoning?.content])
 
   // Detect scroll position to show/hide scroll button
   useEffect(() => {
@@ -204,8 +212,20 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
               {currentConversation.messages.map((message) => (
                 <ChatMessage key={message.id} message={message} />
               ))}
-              {/* Show loading only when isLoading AND last message is not streaming with content */}
-              {isLoading && (() => {
+              
+              {/* Reasoning Display for Pro model */}
+              {reasoning?.isActive && (
+                <ReasoningDisplay
+                  content={reasoning.content}
+                  isActive={reasoning.isActive}
+                  isComplete={reasoning.isComplete}
+                  startTime={reasoning.startTime}
+                  className="mb-4"
+                />
+              )}
+              
+              {/* Show loading only when isLoading AND last message is not streaming with content AND not showing reasoning */}
+              {isLoading && !reasoning?.isActive && (() => {
                 const lastMsg = currentConversation.messages[currentConversation.messages.length - 1]
                 const isStreamingWithContent = lastMsg?.streaming && lastMsg?.content?.length > 0
                 return !isStreamingWithContent
@@ -236,12 +256,14 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
         </button>
       )}
 
-      {/* Chat Input - positioned at bottom, aligned with messages */}
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
-        {/* Gradient fade - covers full width */}
-        <div className="h-8 bg-gradient-to-t from-bg-tertiary to-transparent" />
-        {/* Input wrapper - same width as messages area, pr-2 to match scrollbar-gutter */}
-        <div className="bg-bg-tertiary pr-2">
+      {/* Chat Input - positioned at bottom, leave space for scrollbar */}
+      <div className="absolute bottom-0 left-0 right-[8px] pointer-events-none">
+        {/* Gradient fade */}
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="h-10 bg-gradient-to-t from-bg-tertiary to-transparent" />
+        </div>
+        {/* Input wrapper */}
+        <div className="bg-bg-tertiary">
           <div className="max-w-3xl mx-auto px-4 pb-4 pointer-events-auto">
             {chatInput}
           </div>

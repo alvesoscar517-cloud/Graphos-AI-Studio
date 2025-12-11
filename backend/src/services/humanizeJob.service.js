@@ -350,7 +350,7 @@ async function processJob(jobId) {
 }
 
 /**
- * Run iterative refinement with progress updates
+ * Run iterative refinement with progress updates and reasoning
  */
 async function runIterativeRefinement(jobId, originalText, voiceProfile, context, options) {
   const { maxIterations, targetProbability, model } = options;
@@ -359,16 +359,55 @@ async function runIterativeRefinement(jobId, originalText, voiceProfile, context
   let iterations = 0;
   let lastDetection = null;
 
+  // Build initial reasoning message
+  const buildReasoningMessage = (step, iteration, aiProb) => {
+    const messages = [];
+    
+    if (step === 'analyzing') {
+      messages.push(`Analyzing text structure and style patterns...`);
+      messages.push(`\nIdentifying key characteristics to preserve...`);
+    } else if (step === 'rewriting') {
+      if (iteration === 1) {
+        messages.push(`Starting first rewrite pass...`);
+        messages.push(`\nApplying voice profile characteristics...`);
+        messages.push(`\nOptimizing for natural human-like flow...`);
+      } else {
+        messages.push(`\n\nIteration ${iteration}: Refining based on feedback...`);
+        if (aiProb) {
+          messages.push(`\nPrevious AI probability: ${aiProb}%`);
+          messages.push(`\nAdjusting patterns to reduce AI markers...`);
+        }
+      }
+    } else if (step === 'checking') {
+      messages.push(`\nVerifying AI detection probability...`);
+    }
+    
+    return messages.join('');
+  };
+
+  // Initial analysis reasoning
+  await updateJob(jobId, {
+    progress: {
+      currentIteration: 0,
+      totalIterations: maxIterations,
+      currentStep: 'analyzing',
+      aiProbability: null,
+      reasoning: buildReasoningMessage('analyzing', 0, null)
+    }
+  });
+
   for (let i = 0; i < maxIterations; i++) {
     iterations = i + 1;
 
-    // Update progress - rewriting
+    // Update progress - rewriting with reasoning
+    const rewriteReasoning = buildReasoningMessage('rewriting', iterations, lastDetection?.aiProbability);
     await updateJob(jobId, {
       progress: {
         currentIteration: iterations,
         totalIterations: maxIterations,
         currentStep: 'rewriting',
-        aiProbability: lastDetection?.aiProbability || null
+        aiProbability: lastDetection?.aiProbability || null,
+        reasoning: rewriteReasoning
       }
     });
 
@@ -384,13 +423,15 @@ async function runIterativeRefinement(jobId, originalText, voiceProfile, context
       model
     );
 
-    // Update progress - checking
+    // Update progress - checking with reasoning
+    const checkReasoning = buildReasoningMessage('checking', iterations, null);
     await updateJob(jobId, {
       progress: {
         currentIteration: iterations,
         totalIterations: maxIterations,
         currentStep: 'checking',
-        aiProbability: lastDetection?.aiProbability || null
+        aiProbability: lastDetection?.aiProbability || null,
+        reasoning: checkReasoning
       }
     });
 

@@ -87,6 +87,25 @@
     "tone_friendly": "Amical"
   },
 
+  "profile_stream": {
+    "validating": "Validation des données d'entrée...",
+    "creating_embeddings": "Création des embeddings pour {{count}} échantillons...",
+    "analyzing_patterns": "Analyse des modèles d'écriture...",
+    "generating_voice": "Génération du profil vocal...",
+    "saving_profile": "Enregistrement du profil dans la base de données...",
+    "reasoning_embeddings": "Conversion de vos échantillons de texte en vecteurs sémantiques pour la reconnaissance de motifs...",
+    "reasoning_embeddings_done": "{{count}} embeddings créés avec succès. Vérification de la diversité du contenu...",
+    "reasoning_similarity": "Comparaison des échantillons pour assurer la diversité et l'unicité du contenu...",
+    "reasoning_similarity_passed": "Tous les échantillons sont suffisamment diversifiés. Poursuite de l'analyse...",
+    "reasoning_statistics": "Calcul des caractéristiques statistiques : longueur des phrases, richesse du vocabulaire, motifs de ponctuation...",
+    "reasoning_statistics_done": "Statistiques terminées. Longueur moyenne des phrases : {{avgLength}} mots, richesse du vocabulaire : {{vocabulary}}%",
+    "reasoning_voice_start": "Analyse de votre style d'écriture pour identifier le ton, la formalité et les caractéristiques clés...",
+    "reasoning_voice_done": "Profil vocal identifié : ton {{tone}}, niveau de formalité {{formality}}/10. Caractéristiques clés : {{characteristics}}",
+    "reasoning_voice_fallback": "Utilisation du profil vocal de secours en raison du délai d'attente. Votre profil fonctionnera toujours bien.",
+    "reasoning_saving": "Écriture des données du profil et des embeddings d'échantillons dans la base de données...",
+    "reasoning_complete": "Création du profil terminée ! Votre profil vocal est prêt à être utilisé."
+  },
+
   "ai_detection": {
     "title": "Détection de contenu IA",
     "result_human": "Ce texte semble avoir été écrit par un humain",

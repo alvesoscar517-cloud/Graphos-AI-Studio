@@ -29,9 +29,9 @@ const Input = forwardRef(({
       {label && (
         <label
           htmlFor={inputId}
-          className="text-[12px] font-semibold uppercase tracking-[0.02em] text-secondary flex items-center gap-2"
+          className="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.02em] text-secondary flex items-center gap-1.5 sm:gap-2"
         >
-          {icon && <span className="w-3.5 h-3.5 icon-dark">{icon}</span>}
+          {icon && <span className="w-3 h-3 sm:w-3.5 sm:h-3.5 icon-dark">{icon}</span>}
           {label}
         </label>
       )}

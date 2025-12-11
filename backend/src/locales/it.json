@@ -87,6 +87,25 @@
     "tone_friendly": "Amichevole"
   },
 
+  "profile_stream": {
+    "validating": "Validazione dei dati di input...",
+    "creating_embeddings": "Creazione embeddings per {{count}} campioni...",
+    "analyzing_patterns": "Analisi dei modelli di scrittura...",
+    "generating_voice": "Generazione profilo vocale...",
+    "saving_profile": "Salvataggio profilo nel database...",
+    "reasoning_embeddings": "Conversione dei campioni di testo in vettori semantici per il riconoscimento dei pattern...",
+    "reasoning_embeddings_done": "{{count}} embeddings creati con successo. Verifica della diversità dei contenuti...",
+    "reasoning_similarity": "Confronto dei campioni per garantire diversità e unicità dei contenuti...",
+    "reasoning_similarity_passed": "Tutti i campioni sono sufficientemente diversi. Proseguimento dell'analisi...",
+    "reasoning_statistics": "Calcolo delle caratteristiche statistiche: lunghezza delle frasi, ricchezza del vocabolario, pattern di punteggiatura...",
+    "reasoning_statistics_done": "Statistiche completate. Lunghezza media delle frasi: {{avgLength}} parole, ricchezza del vocabolario: {{vocabulary}}%",
+    "reasoning_voice_start": "Analisi del tuo stile di scrittura per identificare tono, formalità e caratteristiche chiave...",
+    "reasoning_voice_done": "Profilo vocale identificato: tono {{tone}}, livello di formalità {{formality}}/10. Caratteristiche chiave: {{characteristics}}",
+    "reasoning_voice_fallback": "Utilizzo del profilo vocale di fallback a causa del timeout. Il tuo profilo funzionerà comunque bene.",
+    "reasoning_saving": "Scrittura dei dati del profilo e degli embeddings dei campioni nel database...",
+    "reasoning_complete": "Creazione del profilo completata! Il tuo profilo vocale è pronto per l'uso."
+  },
+
   "ai_detection": {
     "title": "Rilevamento Contenuti IA",
     "result_human": "Questo testo sembra essere scritto da un umano",

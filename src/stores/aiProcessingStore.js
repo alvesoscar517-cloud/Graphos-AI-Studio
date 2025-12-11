@@ -14,31 +14,59 @@ export const useAIProcessingStore = create((set) => ({
   
   // Humanize progress state (for iterative refinement)
   humanizeProgress: null, // { currentStep, currentIteration, totalIterations, aiProbability }
+  
+  // Reasoning state for realtime display
+  reasoning: {
+    isActive: false,
+    content: '',
+    isComplete: false,
+    startTime: null,
+  },
 
   // Actions
   startProcessing: (type) => set({ 
     isProcessing: true, 
     isStreaming: false, 
     processingType: type,
-    humanizeProgress: type === 'humanize' ? { currentStep: 'queued' } : null
+    humanizeProgress: type === 'humanize' ? { currentStep: 'queued' } : null,
+    reasoning: { isActive: true, content: '', isComplete: false, startTime: Date.now() }
   }),
   startStreaming: () => set({ isStreaming: true }), // Call when first chunk received
   stopProcessing: () => set({ 
     isProcessing: false, 
     isStreaming: false, 
     processingType: null,
-    humanizeProgress: null
+    humanizeProgress: null,
+    reasoning: { isActive: false, content: '', isComplete: false, startTime: null }
   }),
   
   // Update humanize progress
   setHumanizeProgress: (progress) => set({ humanizeProgress: progress }),
+  
+  // Reasoning actions
+  appendReasoning: (chunk) => set((state) => ({
+    reasoning: {
+      ...state.reasoning,
+      content: state.reasoning.content + chunk
+    }
+  })),
+  completeReasoning: () => set((state) => ({
+    reasoning: {
+      ...state.reasoning,
+      isComplete: true
+    }
+  })),
+  clearReasoning: () => set({
+    reasoning: { isActive: false, content: '', isComplete: false, startTime: null }
+  }),
 
   // Convenience setters
   setProcessing: (isProcessing, type = null) => set({ 
     isProcessing, 
     isStreaming: false,
     processingType: isProcessing ? type : null,
-    humanizeProgress: null
+    humanizeProgress: null,
+    reasoning: { isActive: false, content: '', isComplete: false, startTime: null }
   }),
 }))
 
@@ -47,6 +75,7 @@ export const useIsProcessing = () => useAIProcessingStore((state) => state.isPro
 export const useIsStreaming = () => useAIProcessingStore((state) => state.isStreaming)
 export const useProcessingType = () => useAIProcessingStore((state) => state.processingType)
 export const useHumanizeProgress = () => useAIProcessingStore((state) => state.humanizeProgress)
+export const useReasoning = () => useAIProcessingStore((state) => state.reasoning)
 
 // Use useShallow to prevent infinite re-renders when returning objects
 export const useAIProcessingActions = () => useAIProcessingStore(
@@ -56,6 +85,9 @@ export const useAIProcessingActions = () => useAIProcessingStore(
     stopProcessing: state.stopProcessing,
     setProcessing: state.setProcessing,
     setHumanizeProgress: state.setHumanizeProgress,
+    appendReasoning: state.appendReasoning,
+    completeReasoning: state.completeReasoning,
+    clearReasoning: state.clearReasoning,
   }))
 )
 
@@ -67,10 +99,14 @@ export const useAIProcessing = () => useAIProcessingStore(
     isStreaming: state.isStreaming,
     processingType: state.processingType,
     humanizeProgress: state.humanizeProgress,
+    reasoning: state.reasoning,
     startProcessing: state.startProcessing,
     startStreaming: state.startStreaming,
     stopProcessing: state.stopProcessing,
     setHumanizeProgress: state.setHumanizeProgress,
+    appendReasoning: state.appendReasoning,
+    completeReasoning: state.completeReasoning,
+    clearReasoning: state.clearReasoning,
   }))
 )
 

@@ -460,6 +460,15 @@
     "aiProbability": "Вероятность ИИ: {{percent}}%",
     "readingFile": "Чтение файла..."
   },
+  "reasoning": {
+    "thinking": "Думаю...",
+    "thoughtFor": "Думал {{time}}",
+    "startingAnalysis": "Начинаю анализ...",
+    "analyzingText": "Анализирую ваш текст...",
+    "planningRewrite": "Планирую переписывание...",
+    "applyingStyle": "Применяю стиль письма...",
+    "optimizing": "Оптимизирую для естественности..."
+  },
   "model": {
     "selectAIModel": "Выберите модель ИИ",
     "inUse": "ИСПОЛЬЗУЕТСЯ",
@@ -580,7 +589,11 @@
     "noValidText": "Файл не содержит валидного текста",
     "unableToReadFormat": "Не удалось прочитать формат {{format}}",
     "allDataWillBeLost": "Все введенные данные будут потеряны.",
-    "sections": "секций"
+    "sections": "секций",
+    "creatingEmbeddings": "Создание эмбеддингов ({{count}} образцов)",
+    "analyzingPatterns": "Анализ паттернов письма",
+    "generatingVoice": "Генерация голосового профиля",
+    "savingProfile": "Сохранение профиля"
   },
   "settings": {
     "theme": "Тема",
