@@ -461,8 +461,8 @@
     "readingFile": "Leyendo archivo..."
   },
   "reasoning": {
-    "thinking": "Pensando...",
-    "thoughtFor": "Pensó durante {{time}}",
+    "thinking": "Procesando...",
+    "thoughtFor": "Procesado durante {{time}}",
     "startingAnalysis": "Iniciando análisis...",
     "analyzingText": "Analizando su texto...",
     "planningRewrite": "Planificando reescritura...",

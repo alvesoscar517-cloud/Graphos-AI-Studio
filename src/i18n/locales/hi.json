@@ -461,8 +461,8 @@
     "readingFile": "फ़ाइल पढ़ी जा रही है..."
   },
   "reasoning": {
-    "thinking": "सोच रहा हूँ...",
-    "thoughtFor": "{{time}} तक सोचा",
+    "thinking": "प्रोसेसिंग...",
+    "thoughtFor": "{{time}} तक प्रोसेस किया",
     "startingAnalysis": "विश्लेषण शुरू हो रहा है...",
     "analyzingText": "आपके टेक्स्ट का विश्लेषण हो रहा है...",
     "planningRewrite": "री-राइट दृष्टिकोण की योजना बना रहा है...",

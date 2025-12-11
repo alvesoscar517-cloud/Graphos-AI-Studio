@@ -895,26 +895,74 @@ exports.rewriteTextStream = async (req, res) => {
     }
 
     const modelName = model || 'gemini-2.5-flash';
+    
+    // Check if model supports native thinking (2.5 models)
+    const supportsNativeThinking = modelName.includes('2.5');
+    const useNativeThinking = include_reasoning && supportsNativeThinking;
+    
+    // Build generation config
+    const generationConfig = {
+      temperature: 0.8, // Higher for more natural variation
+      topP: 0.9,
+      topK: 40
+    };
+    
+    // Add thinkingConfig for 2.5 models when reasoning is requested
+    if (useNativeThinking) {
+      generationConfig.thinkingConfig = {
+        thinkingBudget: 2048 // Allow up to 2048 tokens for thinking
+      };
+      console.log('[REWRITE] Using native thinking for model:', modelName);
+    }
+    
     const generativeModel = geminiService.vertexAI.getGenerativeModel({ 
       model: modelName,
-      generationConfig: {
-        temperature: 0.8, // Higher for more natural variation
-        topP: 0.9,
-        topK: 40
-      }
+      generationConfig
     });
 
-    const result = await generativeModel.generateContentStream(prompt);
+    // For native thinking, use simple prompt without reasoning instructions
+    let finalPrompt = prompt;
+    if (useNativeThinking) {
+      // Remove reasoning instructions from prompt for native thinking
+      const humanizeService = require('../services/humanize.service');
+      finalPrompt = useAntiAIDetection 
+        ? humanizeService.buildEnhancedRewritePrompt(text, voiceProfile, sampleText, { writingPreferences: writing_preferences })
+        : humanizeService.buildSimpleRewritePrompt(text, voiceProfile, sampleText, { writingPreferences: writing_preferences });
+    }
+
+    const result = await generativeModel.generateContentStream(finalPrompt);
 
     let fullText = '';
-    let isInReasoning = include_reasoning; // Start in reasoning mode if requested
+    // For native thinking, we don't need prompt-based reasoning parsing
+    let isInReasoning = include_reasoning && !useNativeThinking;
     let reasoningBuffer = '';
     let contentBuffer = '';
     const REASONING_END_MARKER = '---CONTENT_START---';
     
     for await (const chunk of result.stream) {
       try {
-        // Try different ways to extract text from chunk
+        // Handle native thinking response (2.5 models)
+        if (useNativeThinking && chunk.candidates && chunk.candidates[0]) {
+          const candidate = chunk.candidates[0];
+          
+          // Check for thinking content (native thinking)
+          if (candidate.content && candidate.content.parts) {
+            for (const part of candidate.content.parts) {
+              // Native thinking content
+              if (part.thought === true && part.text) {
+                res.write(`data: ${JSON.stringify({ reasoning: part.text })}\n\n`);
+              }
+              // Regular content
+              else if (part.text && part.thought !== true) {
+                fullText += part.text;
+                res.write(`data: ${JSON.stringify({ chunk: part.text })}\n\n`);
+              }
+            }
+          }
+          continue;
+        }
+        
+        // Try different ways to extract text from chunk (for non-native thinking)
         let chunkText = null;
         
         if (typeof chunk.text === 'function') {
@@ -930,7 +978,7 @@ exports.rewriteTextStream = async (req, res) => {
         
         if (chunkText) {
           if (include_reasoning && isInReasoning) {
-            // Check if this chunk contains the marker
+            // Check if this chunk contains the marker (prompt-based reasoning for 2.0 models)
             const combinedText = reasoningBuffer + chunkText;
             const markerIndex = combinedText.indexOf(REASONING_END_MARKER);
             

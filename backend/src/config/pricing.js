@@ -20,40 +20,52 @@ const FREE_CREDITS = 100; // Free credits for new users (increased from 50)
 // ============================================================================
 
 const MODEL_COSTS = {
-  // Gemini Flash models (fast, cheap)
+  // Gemini 2.0 Flash - Fast, no native thinking
   'gemini-2.0-flash-exp': {
     inputCostPer1M: 0.075,      // $0.075 per 1M input tokens
     outputCostPer1M: 0.30,      // $0.30 per 1M output tokens
-    multiplier: 1.0
+    multiplier: 1.0,
+    hasNativeThinking: false
   },
+  
+  // Gemini 2.5 Flash Lite - Cheapest, with native thinking
   'gemini-2.5-flash-lite': {
     inputCostPer1M: 0.075,
     outputCostPer1M: 0.30,
-    multiplier: 0.8              // Cheapest model
+    multiplier: 0.9,             // Slightly cheaper than 2.0 flash
+    hasNativeThinking: true
   },
+  
+  // Gemini 2.5 Flash - Balanced, with native thinking
   'gemini-2.5-flash': {
-    inputCostPer1M: 0.075,
-    outputCostPer1M: 0.30,
-    multiplier: 1.2              // Slightly more expensive
+    inputCostPer1M: 0.15,        // Slightly higher for thinking capability
+    outputCostPer1M: 0.60,
+    multiplier: 1.3,             // Good value with thinking
+    hasNativeThinking: true
   },
+  
+  // Gemini 2.5 Pro - Best quality, with native thinking
   'gemini-2.5-pro': {
     inputCostPer1M: 1.25,
     outputCostPer1M: 5.00,
-    multiplier: 3.0              // Most expensive, highest quality
+    multiplier: 2.5,             // Reduced from 3.0 for better user value
+    hasNativeThinking: true
   },
   
   // Embedding model
   'text-embedding-004': {
     inputCostPer1M: 0.025,       // $0.025 per 1M tokens
     outputCostPer1M: 0,
-    multiplier: 0.5
+    multiplier: 0.5,
+    hasNativeThinking: false
   },
   
-  // Legacy Pro model
+  // Legacy Pro model (deprecated, kept for compatibility)
   'gemini-2.0-pro': {
     inputCostPer1M: 1.25,
     outputCostPer1M: 5.00,
-    multiplier: 3.0
+    multiplier: 2.5,
+    hasNativeThinking: false
   }
 };
 
@@ -95,13 +107,14 @@ const FEATURE_COSTS = {
   },
   
   // ============================================================================
-  // VOICE PROFILE OPERATIONS (reduced costs - important for user onboarding)
+  // VOICE PROFILE OPERATIONS (Updated: Dec 2025 - uses 2.5 Pro with thinking)
+  // User-friendly pricing - profile creation is important for onboarding
   // ============================================================================
   'voice_profile_generation': {
-    baseCost: 5,
+    baseCost: 8,                  // Increased for 2.5 Pro with thinking
     perSampleCost: 0.5,
-    maxCost: 15,
-    description: 'Voice profile generation (finalize)'
+    maxCost: 20,                  // Cap to protect users
+    description: 'Voice profile generation with AI thinking (2.5 Pro)'
   },
   'profile_sample_add': {
     baseCost: 0.3,
@@ -116,10 +129,10 @@ const FEATURE_COSTS = {
     description: 'Batch add samples to profile'
   },
   'profile_complete': {
-    baseCost: 5,
+    baseCost: 10,                 // Increased for 2.5 Pro with thinking
     perSampleCost: 0.5,
-    maxCost: 15,
-    description: 'Complete profile creation'
+    maxCost: 25,                  // Cap to protect users
+    description: 'Complete profile creation with AI thinking (2.5 Pro)'
   },
   
   // ============================================================================

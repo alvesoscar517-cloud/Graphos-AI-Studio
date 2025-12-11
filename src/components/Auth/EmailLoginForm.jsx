@@ -79,11 +79,11 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
           break
           
         case 'AUTH_ACCOUNT_DELETED':
-          errorMessage = t('auth.errors.accountDeleted', 'This account has been deleted.')
+          errorMessage = t('auth.errors.accountDeleted', 'This account has been deleted. Contact Support@graphosai.com if you believe this is an error.')
           break
           
         case 'AUTH_ACCOUNT_SUSPENDED':
-          errorMessage = t('auth.errors.accountSuspended', 'Your account has been suspended. Please contact support.')
+          errorMessage = t('auth.errors.accountSuspended', 'Your account has been suspended. Please contact Support@graphosai.com for assistance.')
           break
           
         case 'AUTH_EMAIL_NOT_VERIFIED':

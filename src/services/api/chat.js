@@ -4,16 +4,20 @@ import { getUserInfo } from './auth'
 
 /**
  * Get auth headers for streaming requests
+ * Uses getAuthTokenWithType for proper auth type hint
  */
 async function getAuthHeaders() {
   const headers = {
     'Content-Type': 'application/json'
   }
   
-  // Get auth token
-  const authToken = await apiClient.getAuthToken()
-  if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`
+  // Get auth token with type hint for backend optimization
+  const { token, authType } = await apiClient.getAuthTokenWithType()
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+    if (authType) {
+      headers['X-Auth-Type'] = authType
+    }
   }
   
   return headers
@@ -70,17 +74,20 @@ export async function sendChatMessageStream(
   model, 
   temperature, 
   profileId, 
-  writingPreferences, 
+  writingPreferences,
+  chatSettings,
   onChunk,
   options = {}
 ) {
   const { onContext, onComplete, onReasoning, conversationSummary } = options
   
-  // Check if Pro model - enable reasoning
-  const isProModel = model?.includes('pro')
+  // Only enable reasoning/thinking for 2.5 models (native thinking support)
+  // 2.0 models don't have native thinking - skip to save cost and time
+  const is25Model = model?.includes('2.5')
+  const enableReasoning = is25Model
   
   try {
-    console.log('📡 Sending chat stream request...', isProModel ? '(with reasoning)' : '')
+    console.log('📡 Sending chat stream request...', enableReasoning ? '(with thinking)' : '')
     
     const headers = await getAuthHeaders()
     const userInfo = await getUserInfo()
@@ -95,9 +102,10 @@ export async function sendChatMessageStream(
         temperature,
         profileId,
         writingPreferences,
+        chatSettings,
         conversationSummary,
         user_id: userInfo?.userId,
-        include_reasoning: isProModel // Request reasoning for Pro model
+        include_reasoning: enableReasoning // Only for 2.5 models with native thinking
       })
     })
     

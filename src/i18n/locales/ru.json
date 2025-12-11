@@ -461,8 +461,8 @@
     "readingFile": "Чтение файла..."
   },
   "reasoning": {
-    "thinking": "Думаю...",
-    "thoughtFor": "Думал {{time}}",
+    "thinking": "Обработка...",
+    "thoughtFor": "Обработано за {{time}}",
     "startingAnalysis": "Начинаю анализ...",
     "analyzingText": "Анализирую ваш текст...",
     "planningRewrite": "Планирую переписывание...",

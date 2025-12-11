@@ -1001,12 +1001,44 @@ ORIGINAL TEXT TO REWRITE:
 ${originalText}
 
 ═══════════════════════════════════════════════════════════════
-YOUR RESPONSE (reasoning first, then marker, then rewritten text):
+YOUR RESPONSE FORMAT:
 ═══════════════════════════════════════════════════════════════
 
-Let me analyze this text and plan my rewrite approach...
+You MUST output your response in this EXACT format:
 
-REASONING:`;
+**REASONING SECTION** (Be detailed and thorough):
+1. TEXT ANALYSIS:
+   - Identify the main topic and purpose
+   - Note the current tone and style
+   - Count approximate word count and sentence structure
+   
+2. VOICE PROFILE MATCHING:
+   - Compare original style vs target voice profile
+   - Identify specific changes needed (vocabulary, sentence length, formality)
+   - Note any characteristic phrases or patterns to incorporate
+   
+3. HUMANIZATION STRATEGY:
+   - List AI-typical patterns to avoid
+   - Plan natural variations (sentence length, transitions)
+   - Identify opportunities for human-like touches
+
+4. REWRITE PLAN:
+   - Outline key transformations paragraph by paragraph
+   - Note specific phrases to change
+   - Plan the flow and structure
+
+Then output EXACTLY this marker on its own line:
+---CONTENT_START---
+
+Then output ONLY the rewritten text (no explanations, no labels).
+
+═══════════════════════════════════════════════════════════════
+BEGIN YOUR RESPONSE:
+═══════════════════════════════════════════════════════════════
+
+**REASONING:**
+
+1. TEXT ANALYSIS:`;
 
   return prompt;
 }

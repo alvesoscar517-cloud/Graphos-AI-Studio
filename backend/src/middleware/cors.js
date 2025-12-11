@@ -1,6 +1,6 @@
 /**
  * Enhanced CORS Middleware Configuration
- * Supports environment-based origin whitelisting
+ * Supports environment-based origin whitelisting with dynamic Firestore config
  */
 
 const cors = require('cors');
@@ -18,14 +18,37 @@ const DEFAULT_ORIGINS = [
 
 /**
  * Get allowed origins based on environment
+ * Dynamically reads from envConfigHelper to support Firestore config
  */
 function getAllowedOrigins() {
-  // In production, use configured whitelist
-  if (config.IS_PRODUCTION && config.SECURITY?.CORS_WHITELIST?.length > 0) {
-    return config.SECURITY.CORS_WHITELIST;
+  // Try to get CORS_WHITELIST from envConfigHelper (supports Firestore config)
+  try {
+    const envConfigHelper = require('../config/envConfigHelper');
+    const corsWhitelist = envConfigHelper.get('CORS_WHITELIST', '');
+    
+    // Parse whitelist if it's a string (comma-separated)
+    if (corsWhitelist && typeof corsWhitelist === 'string') {
+      const origins = corsWhitelist.split(',').map(o => o.trim()).filter(Boolean);
+      if (origins.length > 0) {
+        // Combine with default origins for development convenience
+        return [...new Set([...DEFAULT_ORIGINS, ...origins])];
+      }
+    }
+    
+    // If it's already an array
+    if (Array.isArray(corsWhitelist) && corsWhitelist.length > 0) {
+      return [...new Set([...DEFAULT_ORIGINS, ...corsWhitelist])];
+    }
+  } catch (e) {
+    // envConfigHelper not loaded yet, fall through to static config
   }
   
-  // In development, allow default origins
+  // Fallback to static config
+  if (config.IS_PRODUCTION && config.SECURITY?.CORS_WHITELIST?.length > 0) {
+    return [...new Set([...DEFAULT_ORIGINS, ...config.SECURITY.CORS_WHITELIST])];
+  }
+  
+  // In development or no whitelist configured, allow default origins
   return DEFAULT_ORIGINS;
 }
 
@@ -36,12 +59,10 @@ function isOriginAllowed(origin) {
   // Allow requests with no origin (same-origin, Postman, etc.)
   if (!origin) return true;
   
-  // DEVELOPMENT ONLY: Allow localhost ports for testing
-  // In production, this is skipped - only configured origins are allowed
-  if (!config.IS_PRODUCTION) {
-    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
-      return true;
-    }
+  // Always allow localhost for development/testing
+  // This is safe because localhost can only be accessed from the local machine
+  if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+    return true;
   }
   
   const allowedOrigins = getAllowedOrigins();

@@ -461,8 +461,8 @@
     "readingFile": "파일 읽는 중..."
   },
   "reasoning": {
-    "thinking": "생각 중...",
-    "thoughtFor": "{{time}} 동안 생각함",
+    "thinking": "처리 중...",
+    "thoughtFor": "{{time}} 동안 처리함",
     "startingAnalysis": "분석 시작...",
     "analyzingText": "텍스트 분석 중...",
     "planningRewrite": "다시 쓰기 계획 중...",

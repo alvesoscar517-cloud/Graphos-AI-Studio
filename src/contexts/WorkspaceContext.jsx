@@ -490,6 +490,7 @@ export const WorkspaceProvider = ({ children }) => {
           modelSettings.temperature || 0.7,
           currentProfile?.profile_id || null,
           modelSettings.writingPreferences || null,
+          chatSettings,
           (chunk) => {
             fullText += chunk
             if (!isAnimating) {

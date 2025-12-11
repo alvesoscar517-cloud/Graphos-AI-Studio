@@ -414,18 +414,20 @@ const ModernChatInput = ({
                         const buttonRect = modelButtonRef.current?.getBoundingClientRect()
                         if (!buttonRect) return {}
                         
-                        // Calculate if input is in bottom half of screen
-                        const isInBottomHalf = buttonRect.top > window.innerHeight / 2
                         const dropdownHeight = MODELS.length * 40 + 8 // Approximate height
+                        const spaceBelow = window.innerHeight - buttonRect.bottom
                         
-                        if (isInBottomHalf) {
-                          // Dropdown opens upward
+                        // Only show upward if not enough space below (input is at bottom)
+                        const shouldOpenUpward = spaceBelow < dropdownHeight + 20
+                        
+                        if (shouldOpenUpward) {
+                          // Dropdown opens upward (only when input is at bottom)
                           return {
                             bottom: window.innerHeight - buttonRect.top + 4,
                             left: buttonRect.left
                           }
                         } else {
-                          // Dropdown opens downward
+                          // Default: Dropdown opens downward
                           return {
                             top: buttonRect.bottom + 4,
                             left: buttonRect.left

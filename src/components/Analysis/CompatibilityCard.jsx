@@ -196,7 +196,6 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
           )}
         </div>
 
-        {/* Action Buttons */}
         {/* Action Button */}
         <button 
           className={cn(

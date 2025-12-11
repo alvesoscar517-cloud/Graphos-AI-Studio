@@ -207,14 +207,14 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
 
         {/* First Purchase Banner */}
         {isFirstPurchaseEligible && (
-          <div className="mx-6 mb-2 p-3 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border border-amber-500/30 rounded-xl">
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-xl">🎉</span>
+          <div className="mx-6 mb-2 p-3 bg-bg-secondary rounded-xl">
+            <div className="flex items-center justify-center gap-2.5">
+              <img src="/icon/party-popper.svg" alt="" className="w-5 h-5 shrink-0" style={{ filter: 'brightness(0) saturate(100%) invert(69%) sepia(61%) saturate(2000%) hue-rotate(10deg) brightness(100%) contrast(96%)' }} />
               <div className="text-center">
-                <span className="text-sm font-bold text-amber-400">{t('billing.firstPurchaseTitle', 'WELCOME OFFER')}</span>
-                <span className="text-sm text-amber-300/90 ml-2">{t('billing.firstPurchaseDesc', 'Double credits on your first purchase!')}</span>
+                <span className="text-sm font-bold text-amber-500">{t('billing.firstPurchaseTitle', 'WELCOME OFFER')}</span>
+                <span className="text-sm font-medium text-amber-500 ml-2">{t('billing.firstPurchaseDesc', 'Double credits on your first purchase!')}</span>
               </div>
-              <span className="text-xl">🎁</span>
+              <img src="/icon/gift.svg" alt="" className="w-5 h-5 shrink-0" style={{ filter: 'brightness(0) saturate(100%) invert(69%) sepia(61%) saturate(2000%) hue-rotate(10deg) brightness(100%) contrast(96%)' }} />
             </div>
           </div>
         )}
@@ -234,21 +234,21 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                   <div
                     key={pkg.id}
                     className={cn(
-                      "bg-bg-secondary border border-border-light rounded-xl py-5 px-4 flex flex-col items-center relative",
+                      "bg-bg-secondary border border-border-light rounded-2xl py-5 px-4 flex flex-col items-center relative",
                       "transition-colors hover:border-border-hover",
-                      isFirstPurchaseEligible && "border-amber-500/30",
                       "max-sm:flex-row max-sm:flex-wrap max-sm:p-3.5 max-sm:gap-2.5"
                     )}
                   >
                     {/* First Purchase x2 Badge */}
                     {isFirstPurchaseEligible && (
-                      <div className={cn(
-                        "absolute -top-2.5 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-none",
-                        "py-1 px-2 rounded-lg text-xs font-bold uppercase tracking-wide shadow-lg",
-                        "max-sm:static max-sm:order-[-1]"
-                      )}>
-                        x2
-                      </div>
+                      <img 
+                        src="/icon/x2-badge.svg" 
+                        alt="x2" 
+                        className={cn(
+                          "absolute -top-3.5 -right-3 w-9 h-9 drop-shadow-md",
+                          "max-sm:static max-sm:order-[-1] max-sm:w-8 max-sm:h-8"
+                        )}
+                      />
                     )}
                     
                     {pkg.popular && !isFirstPurchaseEligible && (
@@ -286,7 +286,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                         {isFirstPurchaseEligible ? (
                           <>
                             <span className="text-xs text-text-muted line-through">{pkg.totalCredits.toLocaleString()}</span>
-                            <strong className="text-base font-semibold text-amber-400">{displayCredits.toLocaleString()}</strong>
+                            <strong className="text-base font-semibold text-amber-500">{displayCredits.toLocaleString()}</strong>
                           </>
                         ) : (
                           <strong className="text-base font-semibold">{displayCredits.toLocaleString()}</strong>
@@ -294,11 +294,11 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                         <span className="text-sm text-text-secondary">{t('billing.credits')}</span>
                       </div>
                       {isFirstPurchaseEligible ? (
-                        <div className="inline-flex items-center gap-1 py-0.5 px-2 bg-amber-500/20 rounded text-xs font-semibold text-amber-400">
+                        <div className="inline-flex items-center gap-1 py-0.5 px-2 bg-amber-500/15 rounded-lg text-xs font-semibold text-amber-500">
                           <span>+{pkg.firstPurchaseBonus?.toLocaleString()} {t('billing.bonus')}</span>
                         </div>
                       ) : bonusPercent ? (
-                        <div className="inline-flex items-center gap-1 py-0.5 px-2 bg-success/10 rounded text-xs font-semibold text-success">
+                        <div className="inline-flex items-center gap-1 py-0.5 px-2 bg-success/10 rounded-lg text-xs font-semibold text-success">
                           <img src="/icon/gift.svg" alt="" className="w-icon-2xs h-icon-2xs" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(70%) saturate(459%) hue-rotate(93deg) brightness(95%) contrast(92%)' }} />
                           <span>+{bonusPercent}% {t('billing.bonus')}</span>
                         </div>
@@ -317,7 +317,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
 
                     <button
                       className={cn(
-                        "w-full py-2.5 px-3.5 border-none rounded-lg text-sm font-semibold cursor-pointer",
+                        "w-full py-2.5 px-3.5 border-none rounded-xl text-sm font-semibold cursor-pointer",
                         "transition-colors flex items-center justify-center gap-1.5 mt-auto",
                         pkg.popular 
                           ? "bg-primary text-white hover:opacity-90" 

@@ -351,7 +351,7 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
       </div>
 
       {showNotifications && <NotificationPopup onClose={() => setShowNotifications(false)} onViewChange={onViewChange} />}
-      {showSettings && <SettingsPopup onClose={() => setShowSettings(false)} />}
+      {showSettings && <SettingsPopup onClose={() => setShowSettings(false)} onViewChange={onViewChange} />}
       {showUserProfile && <UserProfilePopup onClose={() => setShowUserProfile(false)} />}
     </motion.aside>
   )

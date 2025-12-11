@@ -14,6 +14,7 @@ import FontFamily from '@tiptap/extension-font-family'
 import SearchHighlightExtension from './extensions/SearchHighlightExtension'
 import DeviationHighlightExtension from './extensions/DeviationHighlightExtension'
 import ReasoningDisplay from './ReasoningDisplay'
+import SparklesLoader from '../Common/SparklesLoader'
 import { AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useIsStreaming, useReasoning } from '@/stores'
@@ -51,6 +52,9 @@ function TiptapEditorComponent({
   const editorContainerRef = useRef(null)
   const isExternalUpdate = useRef(false)
   const lastValueRef = useRef(value)
+  
+  // Track if we should hide text during rewrite/humanize reasoning phase
+  const isReasoningPhase = reasoning.isActive && !isStreaming && !reasoning.isComplete
 
   const editor = useEditor({
     extensions: [
@@ -250,22 +254,13 @@ function TiptapEditorComponent({
       )}
 
       {/* Editor content area */}
-      <div className="relative flex-1 overflow-hidden">
-        {/* Editor content - highlights are now applied via DeviationHighlightExtension */}
-        <EditorContent 
-          editor={editor} 
-          className={cn(
-            "tiptap-editor",
-            isProcessing && "tiptap-processing"
-          )}
-        />
-
-        {/* AI Processing overlay with reasoning display */}
-        <AnimatePresence>
-          {isProcessing && !isStreaming && reasoning.isActive && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-6">
-              <div className="absolute inset-0 bg-bg-tertiary/60 backdrop-blur-[2px]" />
-              <div className="relative z-10 w-full max-w-lg">
+      <div className="relative flex-1 overflow-hidden flex flex-col">
+        {/* Scrollable content wrapper */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Reasoning Display - inline at top of editor content */}
+          <AnimatePresence>
+            {reasoning.isActive && !isStreaming && (
+              <div className="px-8 pt-4">
                 <ReasoningDisplay
                   content={reasoning.content}
                   isActive={reasoning.isActive}
@@ -273,7 +268,24 @@ function TiptapEditorComponent({
                   startTime={reasoning.startTime}
                 />
               </div>
-            </div>
+            )}
+          </AnimatePresence>
+
+          {/* Editor content - hidden during reasoning phase (before streaming starts) */}
+          <EditorContent 
+            editor={editor} 
+            className={cn(
+              "tiptap-editor",
+              isProcessing && "tiptap-processing",
+              isReasoningPhase && "opacity-0 h-0 overflow-hidden"
+            )}
+          />
+        </div>
+
+        {/* SparklesLoader overlay for detect/analyze (no reasoning) */}
+        <AnimatePresence>
+          {isProcessing && !isStreaming && !reasoning.isActive && (
+            <SparklesLoader size="md" overlayClassName="bg-bg-tertiary/30 backdrop-blur-[1px]" />
           )}
         </AnimatePresence>
 

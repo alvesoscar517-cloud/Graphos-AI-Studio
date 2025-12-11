@@ -29,7 +29,10 @@ export const useAIProcessingStore = create((set) => ({
     isStreaming: false, 
     processingType: type,
     humanizeProgress: type === 'humanize' ? { currentStep: 'queued' } : null,
-    reasoning: { isActive: true, content: '', isComplete: false, startTime: Date.now() }
+    // Only enable reasoning for rewrite and humanize (AI Studio features)
+    reasoning: (type === 'rewrite' || type === 'humanize') 
+      ? { isActive: true, content: '', isComplete: false, startTime: Date.now() }
+      : { isActive: false, content: '', isComplete: false, startTime: null }
   }),
   startStreaming: () => set({ isStreaming: true }), // Call when first chunk received
   stopProcessing: () => set({ 

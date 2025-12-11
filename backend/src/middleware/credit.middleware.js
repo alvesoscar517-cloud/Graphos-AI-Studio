@@ -93,17 +93,27 @@ function requireCredits(featureName, costCalculator) {
     const lang = getLanguage(req);
     
     try {
-      const userId = req.body.user_id || req.query.user_id;
+      // Try multiple sources for userId:
+      // 1. req.userId from auth middleware (most reliable)
+      // 2. req.body.user_id from request body
+      // 3. req.query.user_id from query params
+      const userId = req.userId || req.body.user_id || req.query.user_id;
       
       logger.info('Credit middleware started', { 
         featureName, 
         userId: userId ? 'present' : 'missing',
+        source: req.userId ? 'auth_middleware' : (req.body.user_id ? 'body' : 'query'),
         hasBody: !!req.body,
         bodyKeys: req.body ? Object.keys(req.body) : []
       });
       
       if (!userId) {
-        logger.warn('Credit middleware: user_id missing', { featureName });
+        logger.warn('Credit middleware: user_id missing from all sources', { 
+          featureName,
+          hasReqUserId: !!req.userId,
+          hasBodyUserId: !!req.body.user_id,
+          hasQueryUserId: !!req.query.user_id
+        });
         return res.status(401).json({ 
           success: false,
           error: localization.translate('errors.unauthorized', lang),

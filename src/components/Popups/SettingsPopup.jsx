@@ -2,19 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import FeedbackModal from './FeedbackModal'
 import BillingSupportModal from './BillingSupportModal'
-import CreditHistoryModal from './CreditHistoryModal'
 import Icon from '../Common/Icon'
 import Portal from '../Common/Portal'
 import { cn } from '../../lib/utils'
 import { useTheme } from '../../stores/themeStore'
 
-const SettingsPopup = ({ onClose }) => {
+const SettingsPopup = ({ onClose, onViewChange }) => {
   const { t } = useTranslation()
   const popupRef = useRef(null)
   const themeSubmenuRef = useRef(null)
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
   const [showBillingModal, setShowBillingModal] = useState(false)
-  const [showCreditHistoryModal, setShowCreditHistoryModal] = useState(false)
   const [showThemeSubmenu, setShowThemeSubmenu] = useState(false)
   const { themeMode, setTheme } = useTheme()
 
@@ -128,19 +126,19 @@ const SettingsPopup = ({ onClose }) => {
           </span>
         </div>
 
-        {/* Credit History */}
-        <div className="dropdown-item" onClick={() => setShowCreditHistoryModal(true)}>
-          <Icon name="history" alt={t('settings.creditHistory')} size="md" />
-          <span className="flex-1 text-sm whitespace-nowrap">
-            {t('settings.creditHistory') || 'Credit History'}
-          </span>
-        </div>
-
         {/* Billing */}
         <div className="dropdown-item" onClick={() => setShowBillingModal(true)}>
           <Icon name="dollar-sign" alt={t('settings.billingSupport')} size="md" />
           <span className="flex-1 text-sm whitespace-nowrap">
             {t('settings.billingSupport')}
+          </span>
+        </div>
+
+        {/* Credit History */}
+        <div className="dropdown-item" onClick={() => { onViewChange?.('credit-history'); onClose(); }}>
+          <Icon name="credit-card" alt={t('settings.creditHistory')} size="md" />
+          <span className="flex-1 text-sm whitespace-nowrap">
+            {t('settings.creditHistory') || 'Credit History'}
           </span>
         </div>
       
@@ -149,9 +147,6 @@ const SettingsPopup = ({ onClose }) => {
         )}
         {showBillingModal && (
           <BillingSupportModal onClose={() => setShowBillingModal(false)} />
-        )}
-        {showCreditHistoryModal && (
-          <CreditHistoryModal onClose={() => setShowCreditHistoryModal(false)} />
         )}
       </div>
     </Portal>

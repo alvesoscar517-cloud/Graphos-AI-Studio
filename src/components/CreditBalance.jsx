@@ -67,8 +67,8 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
         className={cn(
           "w-full py-2.5 px-4 rounded-3xl text-xs font-medium cursor-pointer",
           "transition-colors duration-200",
-          "bg-fill-tertiary border-none text-text-primary",
-          "hover:bg-fill-secondary"
+          "bg-bg-primary border border-border-light text-text-primary",
+          "hover:bg-bg-hover hover:border-border-hover"
         )}
         onClick={onUpgradeClick}
       >

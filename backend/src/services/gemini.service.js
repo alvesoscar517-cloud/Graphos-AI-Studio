@@ -861,12 +861,18 @@ function detectAIContentHeuristic(text) {
 
 async function generateVoiceSummary(sampleTexts, statisticalFeatures) {
   try {
+    // Use Gemini 2.5 Pro with native thinking for better voice profile analysis
     const model = vertexAI.getGenerativeModel({ 
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-pro',
       generationConfig: {
-        responseMimeType: 'application/json'
+        responseMimeType: 'application/json',
+        thinkingConfig: {
+          thinkingBudget: 1024 // Allow thinking for deeper analysis
+        }
       }
     });
+    
+    console.log('[PROFILE] Using Gemini 2.5 Pro with thinking for voice analysis');
 
     const selectedSamples = sampleTexts
       .sort(() => Math.random() - 0.5)

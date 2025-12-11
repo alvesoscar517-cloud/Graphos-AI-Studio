@@ -61,9 +61,10 @@ async function checkLocked(req, res, next) {
         error: 'Account locked',
         code: 'ACCOUNT_LOCKED',
         message: 'Your account has been locked and cannot access the system.',
-        reason: userData.lockReason || 'Please contact support for more information.',
+        reason: userData.lockReason || 'Please contact Support@graphosai.com for assistance.',
         locked: true,
-        contactSupport: true
+        contactSupport: true,
+        supportEmail: 'Support@graphosai.com'
       });
     }
     

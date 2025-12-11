@@ -23,14 +23,39 @@ const API_BASE_URL = import.meta.env?.VITE_API_URL ||
 // ============================================================================
 
 /**
- * Get authorization headers
+ * Get authorization headers with auth type hint
+ * Supports both email (JWT) and Google (Firebase) auth
  * @returns {Promise<Record<string, string>>}
  */
 export async function getAuthHeaders() {
   try {
-    const token = await tokenService.getValidToken();
-    if (token) {
-      return { 'Authorization': `Bearer ${token}` };
+    // First try email auth (JWT token)
+    const { getAuthMethod } = await import('./authStorage');
+    const authMethod = getAuthMethod();
+    
+    if (authMethod === 'email') {
+      const token = await tokenService.getValidToken();
+      if (token) {
+        return { 
+          'Authorization': `Bearer ${token}`,
+          'X-Auth-Type': 'email'
+        };
+      }
+    }
+    
+    // Try Google auth (Chrome extension)
+    if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
+      try {
+        const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' });
+        if (response?.token) {
+          return { 
+            'Authorization': `Bearer ${response.token}`,
+            'X-Auth-Type': 'google'
+          };
+        }
+      } catch {
+        // Not in extension context
+      }
     }
   } catch (error) {
     console.warn('[API] Failed to get auth token:', error.message);

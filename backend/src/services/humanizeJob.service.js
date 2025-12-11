@@ -359,27 +359,42 @@ async function runIterativeRefinement(jobId, originalText, voiceProfile, context
   let iterations = 0;
   let lastDetection = null;
 
-  // Build initial reasoning message
-  const buildReasoningMessage = (step, iteration, aiProb) => {
+  // Build detailed working/reasoning message
+  const buildReasoningMessage = (step, iteration, aiProb, extraInfo = {}) => {
     const messages = [];
     
     if (step === 'analyzing') {
-      messages.push(`Analyzing text structure and style patterns...`);
-      messages.push(`\nIdentifying key characteristics to preserve...`);
+      messages.push(`**ANALYZING TEXT**`);
+      messages.push(`\n• Scanning text structure and sentence patterns...`);
+      messages.push(`\n• Identifying vocabulary and tone characteristics...`);
+      messages.push(`\n• Mapping key points to preserve during rewrite...`);
+      messages.push(`\n• Preparing voice profile matching strategy...`);
     } else if (step === 'rewriting') {
       if (iteration === 1) {
-        messages.push(`Starting first rewrite pass...`);
-        messages.push(`\nApplying voice profile characteristics...`);
-        messages.push(`\nOptimizing for natural human-like flow...`);
+        messages.push(`\n\n**REWRITE PASS ${iteration}**`);
+        messages.push(`\n• Applying voice profile characteristics...`);
+        messages.push(`\n• Adjusting sentence structure and length variation...`);
+        messages.push(`\n• Replacing AI-typical phrases with natural alternatives...`);
+        messages.push(`\n• Adding human-like imperfections and flow...`);
       } else {
-        messages.push(`\n\nIteration ${iteration}: Refining based on feedback...`);
+        messages.push(`\n\n**REFINEMENT PASS ${iteration}**`);
         if (aiProb) {
-          messages.push(`\nPrevious AI probability: ${aiProb}%`);
-          messages.push(`\nAdjusting patterns to reduce AI markers...`);
+          messages.push(`\n• Previous AI probability: ${aiProb}% (target: ${extraInfo.target || 35}%)`);
+          messages.push(`\n• Analyzing detected AI markers...`);
+          messages.push(`\n• Applying targeted corrections...`);
+          messages.push(`\n• Enhancing natural language patterns...`);
         }
       }
     } else if (step === 'checking') {
-      messages.push(`\nVerifying AI detection probability...`);
+      messages.push(`\n\n**VERIFICATION**`);
+      messages.push(`\n• Running AI detection analysis...`);
+      messages.push(`\n• Evaluating humanization quality...`);
+    } else if (step === 'complete') {
+      messages.push(`\n\n**COMPLETE**`);
+      if (aiProb !== null) {
+        messages.push(`\n• Final AI probability: ${aiProb}%`);
+        messages.push(`\n• Iterations used: ${iteration}`);
+      }
     }
     
     return messages.join('');
@@ -400,7 +415,7 @@ async function runIterativeRefinement(jobId, originalText, voiceProfile, context
     iterations = i + 1;
 
     // Update progress - rewriting with reasoning
-    const rewriteReasoning = buildReasoningMessage('rewriting', iterations, lastDetection?.aiProbability);
+    const rewriteReasoning = buildReasoningMessage('rewriting', iterations, lastDetection?.aiProbability, { target: targetProbability });
     await updateJob(jobId, {
       progress: {
         currentIteration: iterations,

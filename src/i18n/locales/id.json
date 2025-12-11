@@ -461,8 +461,8 @@
     "readingFile": "Membaca file..."
   },
   "reasoning": {
-    "thinking": "Berpikir...",
-    "thoughtFor": "Berpikir selama {{time}}",
+    "thinking": "Memproses...",
+    "thoughtFor": "Diproses selama {{time}}",
     "startingAnalysis": "Memulai analisis...",
     "analyzingText": "Menganalisis teks Anda...",
     "planningRewrite": "Merencanakan pendekatan penulisan ulang...",

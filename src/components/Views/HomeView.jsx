@@ -79,7 +79,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
       <div className="flex-1 p-0 w-full overflow-y-auto">
         {/* Hero */}
         <div className={cn(
-          "text-left mb-6 flex flex-col gap-0.5",
+          "text-left mb-6 flex flex-col gap-0",
           "w-[80%] mx-auto",
           "transition-all duration-300",
           "max-lg:w-[90%] max-md:w-[95%] max-md:px-4",
@@ -88,7 +88,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
           <h2 className="text-4xl font-normal text-text-primary mb-0 max-md:text-3xl max-sm:text-2xl">
             <span className="font-bold">Graphos</span> AI Studio
           </h2>
-          <div className="flex items-center justify-between gap-4 max-md:flex-col max-md:items-start max-md:gap-3 max-sm:gap-2">
+          <div className="flex items-center justify-between gap-4 -mt-0.5 max-md:flex-col max-md:items-start max-md:gap-3 max-sm:gap-2">
             <p className="text-sm text-text-muted font-normal mb-0 leading-relaxed max-sm:text-xs">
               {t('home.heroSubtitle')}
             </p>
@@ -169,7 +169,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
           "max-md:w-[95%] max-md:px-4 max-md:mb-8",
           "max-sm:mb-6"
         )}>
-          <h3 className="text-xl font-normal text-text-primary mb-6 max-md:text-lg max-md:mb-4 max-sm:text-base max-sm:mb-3">
+          <h3 className="text-xl font-semibold text-text-primary mb-6 max-md:text-lg max-md:mb-4 max-sm:text-base max-sm:mb-3">
             {t('home.featuredFeatures')}
           </h3>
           <div className="grid grid-cols-2 gap-4 max-lg:gap-3 max-md:grid-cols-1 max-sm:gap-2.5">

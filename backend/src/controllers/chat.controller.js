@@ -23,6 +23,64 @@ const activityLogService = require('../services/activityLog.service');
 const { createLocalizer } = require('../utils/localized-messages.util');
 
 /**
+ * Build response style instructions based on chatSettings
+ * @param {Object} chatSettings - { responseStyle, creativityLevel }
+ * @returns {string} - Instructions to add to system prompt
+ */
+function buildResponseStyleInstructions(chatSettings) {
+  if (!chatSettings) return '';
+  
+  const { responseStyle, creativityLevel } = chatSettings;
+  let instructions = '';
+  
+  // Response length style
+  if (responseStyle) {
+    const lengthInstructions = {
+      concise: `
+RESPONSE LENGTH: CONCISE
+- Keep responses brief and to the point
+- Use short sentences and paragraphs
+- Avoid unnecessary elaboration
+- Get straight to the answer
+- Maximum 2-3 paragraphs unless absolutely necessary`,
+      balanced: '', // Default, no special instructions
+      detailed: `
+RESPONSE LENGTH: DETAILED
+- Provide comprehensive, thorough responses
+- Include relevant examples and explanations
+- Cover multiple aspects of the topic
+- Use structured formatting when helpful
+- Don't hesitate to elaborate on important points`
+    };
+    instructions += lengthInstructions[responseStyle] || '';
+  }
+  
+  // Creativity level
+  if (creativityLevel) {
+    const creativityInstructions = {
+      low: `
+CREATIVITY LEVEL: PRECISE
+- Stick closely to facts and established information
+- Avoid speculation or creative interpretations
+- Use formal, professional language
+- Prioritize accuracy over engagement
+- Be conservative with suggestions`,
+      medium: '', // Default, no special instructions
+      high: `
+CREATIVITY LEVEL: CREATIVE
+- Feel free to be creative and engaging
+- Use analogies, metaphors, and vivid examples
+- Suggest innovative or unconventional approaches
+- Add personality and flair to responses
+- Think outside the box when problem-solving`
+    };
+    instructions += creativityInstructions[creativityLevel] || '';
+  }
+  
+  return instructions;
+}
+
+/**
  * Send chat message (non-streaming)
  */
 exports.sendMessage = async (req, res) => {
@@ -174,6 +232,7 @@ exports.sendMessageStream = async (req, res) => {
       temperature = 0.7, 
       profileId = null, 
       writingPreferences = null,
+      chatSettings = null,
       conversationSummary = null,
       include_reasoning = false
     } = req.body;
@@ -181,9 +240,10 @@ exports.sendMessageStream = async (req, res) => {
     // Validate model
     const model = validateModel(requestedModel, 'gemini-2.0-flash-exp');
     
-    // Check if Pro model and reasoning requested
-    const isProModel = model.includes('pro');
-    const shouldIncludeReasoning = include_reasoning && isProModel;
+    // Only enable thinking for 2.5 models (native thinking support from Google)
+    // 2.0 models don't have native thinking - skip to save cost and time
+    const is25Model = model.includes('2.5');
+    const shouldIncludeReasoning = include_reasoning && is25Model;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ 
@@ -197,6 +257,12 @@ exports.sendMessageStream = async (req, res) => {
     // Load profile and build enhanced system prompt
     const profile = await loadProfile(profileId);
     let enhancedSystemPrompt = buildEnhancedSystemPrompt(systemPrompt, profile, writingPreferences);
+    
+    // Add response style instructions if provided
+    const responseStyleInstructions = buildResponseStyleInstructions(chatSettings);
+    if (responseStyleInstructions) {
+      enhancedSystemPrompt += responseStyleInstructions;
+    }
 
     // Manage conversation context (summarize if needed)
     const contextResult = await manageConversationContext(
@@ -223,44 +289,27 @@ exports.sendMessageStream = async (req, res) => {
       })}\n\n`);
     }
 
-    // Build system prompt with reasoning instructions for Pro model
+    // Use enhanced system prompt directly (no prompt-based reasoning needed)
     let finalSystemPrompt = enhancedSystemPrompt;
-    const REASONING_END_MARKER = '---CONTENT_START---';
     
+    // Build generation config
+    const generationConfig = {
+      temperature: temperature,
+      maxOutputTokens: shouldIncludeReasoning ? 4096 : 2048, // More tokens for thinking
+    };
+    
+    // Add native thinkingConfig for 2.5 models when reasoning is requested
+    // Only 2.5 models support native thinking from Google
     if (shouldIncludeReasoning) {
-      finalSystemPrompt = `${enhancedSystemPrompt}
-
-═══════════════════════════════════════════════════════════════
-RESPONSE FORMAT (Pro Model with Reasoning):
-═══════════════════════════════════════════════════════════════
-You MUST structure your response in TWO parts:
-
-1. REASONING SECTION (first):
-   - Start with "Let me think about this..."
-   - Show your thought process step by step
-   - Analyze the question/request
-   - Consider different approaches
-   - Plan your response
-
-2. Then output the marker: ${REASONING_END_MARKER}
-
-3. FINAL RESPONSE (after marker):
-   - Your actual response to the user
-   - Clear, helpful, and well-structured
-
-Example format:
-Let me think about this...
-[Your reasoning here]
-${REASONING_END_MARKER}
-[Your actual response here]`;
+      generationConfig.thinkingConfig = {
+        thinkingBudget: 2048 // Allow up to 2048 tokens for thinking
+      };
+      console.log('[CHAT] Using native thinking for model:', model);
     }
-
+    
     const generativeModel = geminiService.vertexAI.getGenerativeModel({
       model: model,
-      generationConfig: {
-        temperature: temperature,
-        maxOutputTokens: shouldIncludeReasoning ? 4096 : 2048, // More tokens for reasoning
-      },
+      generationConfig,
     });
 
     const lastMessage = optimizedMessages[optimizedMessages.length - 1];
@@ -294,12 +343,31 @@ ${REASONING_END_MARKER}
     }
 
     let totalChars = 0;
-    let isInReasoning = shouldIncludeReasoning; // Start in reasoning mode if enabled
-    let reasoningBuffer = '';
     
     for await (const chunk of streamResult.stream) {
       try {
-        // Try different ways to extract text from chunk (same as analysis controller)
+        // Handle native thinking response (2.5 models only)
+        if (shouldIncludeReasoning && chunk.candidates && chunk.candidates[0]) {
+          const candidate = chunk.candidates[0];
+          
+          // Check for thinking content (native thinking from Google)
+          if (candidate.content && candidate.content.parts) {
+            for (const part of candidate.content.parts) {
+              // Native thinking content (part.thought === true)
+              if (part.thought === true && part.text) {
+                res.write(`data: ${JSON.stringify({ reasoning: part.text })}\n\n`);
+              }
+              // Regular content
+              else if (part.text && part.thought !== true) {
+                totalChars += part.text.length;
+                res.write(`data: ${JSON.stringify({ chunk: part.text })}\n\n`);
+              }
+            }
+          }
+          continue;
+        }
+        
+        // Standard response handling (for 2.0 models or when thinking is disabled)
         let chunkText = null;
         
         if (typeof chunk.text === 'function') {
@@ -314,42 +382,8 @@ ${REASONING_END_MARKER}
         }
         
         if (chunkText) {
-          if (shouldIncludeReasoning && isInReasoning) {
-            // Check if this chunk contains the marker
-            const combinedText = reasoningBuffer + chunkText;
-            const markerIndex = combinedText.indexOf(REASONING_END_MARKER);
-            
-            if (markerIndex !== -1) {
-              // Found marker - split reasoning and content
-              const reasoningPart = combinedText.substring(0, markerIndex);
-              const contentPart = combinedText.substring(markerIndex + REASONING_END_MARKER.length);
-              
-              // Send remaining reasoning
-              if (reasoningPart.length > reasoningBuffer.length) {
-                const newReasoning = reasoningPart.substring(reasoningBuffer.length);
-                res.write(`data: ${JSON.stringify({ reasoning: newReasoning })}\n\n`);
-              }
-              
-              // Switch to content mode
-              isInReasoning = false;
-              
-              // Send content if any
-              if (contentPart.trim()) {
-                totalChars += contentPart.length;
-                res.write(`data: ${JSON.stringify({ chunk: contentPart })}\n\n`);
-              }
-              
-              reasoningBuffer = '';
-            } else {
-              // Still in reasoning - send chunk as reasoning
-              res.write(`data: ${JSON.stringify({ reasoning: chunkText })}\n\n`);
-              reasoningBuffer = combinedText;
-            }
-          } else {
-            // Normal content streaming
-            totalChars += chunkText.length;
-            res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
-          }
+          totalChars += chunkText.length;
+          res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
         }
       } catch (chunkError) {
         console.error('[ERROR] Error processing chunk:', chunkError);
@@ -770,6 +804,12 @@ exports.sendMessageHumanizedStream = async (req, res) => {
     
     // Build enhanced system prompt
     let enhancedSystemPrompt = buildEnhancedSystemPrompt(systemPrompt, profile, writingPreferences);
+    
+    // Add response style instructions if provided
+    const responseStyleInstructions = buildResponseStyleInstructions(chatSettings);
+    if (responseStyleInstructions) {
+      enhancedSystemPrompt += responseStyleInstructions;
+    }
     
     // Add anti-AI detection rules to system prompt
     if (chatSettings?.useAntiAIDetection || chatSettings?.humanizeResponse) {

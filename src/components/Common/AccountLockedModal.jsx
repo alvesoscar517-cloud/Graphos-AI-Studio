@@ -24,7 +24,7 @@ export default function AccountLockedModal() {
   }, []);
 
   const handleContactSupport = () => {
-    window.open('https://forms.gle/your-support-form', '_blank');
+    window.location.href = 'mailto:Support@graphosai.com?subject=Account%20Locked%20-%20Request%20for%20Assistance';
   };
 
   const handleClose = () => {
@@ -106,6 +106,11 @@ export default function AccountLockedModal() {
         {/* Footer */}
         <p className="text-sm text-text-muted m-0 leading-relaxed">
           {t('accountLocked.footer', 'Please contact support for more information about unlocking your account.')}
+        </p>
+        
+        {/* Support Email */}
+        <p className="text-xs text-text-muted mt-4 m-0">
+          {t('common.supportEmail', 'Email')}: <a href="mailto:Support@graphosai.com" className="text-primary hover:underline">Support@graphosai.com</a>
         </p>
       </div>
     </div>

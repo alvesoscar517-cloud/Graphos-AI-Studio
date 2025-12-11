@@ -2,6 +2,7 @@ import HomeView from '../Views/HomeView'
 import AIStudioView from '../Views/AIStudioView'
 import WorkspaceView from '../Views/WorkspaceView'
 import HistoryView from '../Views/HistoryView'
+import CreditHistoryView from '../Views/CreditHistoryView'
 import { cn } from '../../lib/utils'
 
 const MainContent = ({ 
@@ -52,6 +53,13 @@ const MainContent = ({
       
       {currentView === 'history' && (
         <HistoryView 
+          onToggleLeftSidebar={onToggleLeftSidebar}
+          onViewChange={onViewChange}
+        />
+      )}
+
+      {currentView === 'credit-history' && (
+        <CreditHistoryView 
           onToggleLeftSidebar={onToggleLeftSidebar}
           onViewChange={onViewChange}
         />

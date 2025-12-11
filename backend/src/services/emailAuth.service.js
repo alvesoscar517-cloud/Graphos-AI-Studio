@@ -218,7 +218,7 @@ async function verifyEmail(email, otp) {
         email: normalizedEmail,
         code: error.code
       });
-      throw new Error('AUTH_SERVICE_ERROR: Service configuration error. Please contact support.');
+      throw new Error('AUTH_SERVICE_ERROR: Service configuration error. Please contact Support@graphosai.com.');
     }
     
     if (error.message?.includes('Firebase') || error.message?.includes('initializeApp') || error.code?.startsWith('app/')) {
@@ -329,13 +329,13 @@ async function login(email, password, options = {}) {
   // Check if account is deleted (soft delete by admin)
   if (userData.deleted === true) {
     logger.warn('Login attempt on deleted account', { userId, email: normalizedEmail });
-    throw new Error('AUTH_ACCOUNT_DELETED: This account has been deleted. Please contact support if you believe this is an error.');
+    throw new Error('AUTH_ACCOUNT_DELETED: This account has been deleted. Please contact Support@graphosai.com if you believe this is an error.');
   }
   
   // Check if account is locked by admin
   if (userData.locked === true) {
     logger.warn('Login attempt on admin-locked account', { userId, email: normalizedEmail, reason: userData.lockReason });
-    throw new Error(`AUTH_ACCOUNT_SUSPENDED: Your account has been suspended.${userData.lockReason ? ` Reason: ${userData.lockReason}` : ''} Please contact support.`);
+    throw new Error(`AUTH_ACCOUNT_SUSPENDED: Your account has been suspended.${userData.lockReason ? ` Reason: ${userData.lockReason}` : ''} Please contact Support@graphosai.com.`);
   }
   
   // Check if account is temporarily locked (due to failed login attempts)

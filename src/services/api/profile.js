@@ -6,15 +6,20 @@ import apiClient from './client'
 
 /**
  * Get auth headers for streaming requests
+ * Uses getAuthTokenWithType for proper auth type hint
  */
 async function getAuthHeaders() {
   const headers = {
     'Content-Type': 'application/json'
   }
   
-  const authToken = await apiClient.getAuthToken()
-  if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`
+  // Get auth token with type hint for backend optimization
+  const { token, authType } = await apiClient.getAuthTokenWithType()
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+    if (authType) {
+      headers['X-Auth-Type'] = authType
+    }
   }
   
   return headers

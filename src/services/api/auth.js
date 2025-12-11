@@ -3,7 +3,6 @@
  * Helper functions for authentication in API calls
  */
 
-import { CONFIG } from '../../utils/config'
 import { isDevMode, getDefaultTestUser, devLog } from '../../utils/devConfig'
 import { 
   getUserData, 
@@ -33,6 +32,27 @@ export async function getUserInfo() {
     const authMethod = getAuthMethod()
     const storedUser = getUserData()
     
+    // Debug logging for auth issues
+    if (!authToken || !storedUser) {
+      console.log('[AUTH DEBUG] Missing auth data:', {
+        hasToken: !!authToken,
+        authMethod,
+        hasUser: !!storedUser,
+        userId: storedUser?.userId || storedUser?.email || 'none'
+      })
+    }
+    
+    // Relaxed check: if we have storedUser with userId/email, use it
+    // This handles cases where authMethod might not be set correctly
+    if (storedUser && (storedUser.userId || storedUser.email)) {
+      return {
+        userId: storedUser.userId || storedUser.email,
+        email: storedUser.email,
+        name: storedUser.displayName || storedUser.name || 'User'
+      }
+    }
+    
+    // Original strict check for backward compatibility
     if (authToken && authMethod === 'email' && storedUser) {
       return {
         userId: storedUser.userId || storedUser.email,
@@ -41,6 +61,7 @@ export async function getUserInfo() {
       }
     }
   } catch (e) {
+    console.error('[AUTH] Error getting user info from storage:', e)
     // Continue to check Chrome extension
   }
   
@@ -49,8 +70,10 @@ export async function getUserInfo() {
     // Check if running in Chrome extension context
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
       try {
-        const response = await chrome.runtime.sendMessage({ action: 'getUserInfo' })
-        if (response && response.email) {
+        const response = /** @type {{ email?: string, name?: string }} */ (
+          await chrome.runtime.sendMessage({ action: 'getUserInfo' })
+        )
+        if (response?.email) {
           return {
             userId: response.email,
             email: response.email,

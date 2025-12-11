@@ -790,7 +790,7 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
       errorCode = 'QUOTA_EXCEEDED';
       statusCode = 503;
     } else if (errMsg.includes('PERMISSION_DENIED')) {
-      errorMessage = 'AI service permission error. Please contact support.';
+      errorMessage = 'AI service permission error. Please contact Support@graphosai.com.';
       errorCode = 'PERMISSION_DENIED';
       statusCode = 503;
     } else if (errMsg.includes('UNAVAILABLE') || errMsg.includes('unavailable')) {

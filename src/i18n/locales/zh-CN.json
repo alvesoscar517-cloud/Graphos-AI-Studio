@@ -461,8 +461,8 @@
     "readingFile": "正在读取文件..."
   },
   "reasoning": {
-    "thinking": "思考中...",
-    "thoughtFor": "思考了 {{time}}",
+    "thinking": "处理中...",
+    "thoughtFor": "处理了 {{time}}",
     "startingAnalysis": "开始分析...",
     "analyzingText": "正在分析您的文本...",
     "planningRewrite": "规划重写方案...",

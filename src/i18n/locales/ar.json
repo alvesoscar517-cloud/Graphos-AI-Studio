@@ -461,8 +461,8 @@
     "readingFile": "جاري قراءة الملف..."
   },
   "reasoning": {
-    "thinking": "جاري التفكير...",
-    "thoughtFor": "فكّر لمدة {{time}}",
+    "thinking": "جاري المعالجة...",
+    "thoughtFor": "تمت المعالجة لمدة {{time}}",
     "startingAnalysis": "بدء التحليل...",
     "analyzingText": "جاري تحليل النص...",
     "planningRewrite": "التخطيط لنهج إعادة الصياغة...",

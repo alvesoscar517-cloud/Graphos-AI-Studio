@@ -14,7 +14,7 @@ export const ERROR_MESSAGES = {
   // Auth errors
   UNAUTHORIZED: 'Your session has expired. Please sign in again.',
   FORBIDDEN: 'You do not have permission to perform this action.',
-  ACCOUNT_LOCKED: 'Your account has been locked. Please contact support.',
+  ACCOUNT_LOCKED: 'Your account has been locked. Please contact Support@graphosai.com for assistance.',
   INVALID_CREDENTIALS: 'Invalid email or password.',
   
   // Validation errors

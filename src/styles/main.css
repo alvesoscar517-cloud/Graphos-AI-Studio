@@ -633,6 +633,25 @@
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
+    /* Chặn select text toàn bộ app */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  /* Cho phép select text trong các vùng cần thiết */
+  input,
+  textarea,
+  [contenteditable="true"],
+  .selectable,
+  pre,
+  code,
+  .ProseMirror {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
   }
 
   #root {
@@ -1745,13 +1764,14 @@
 
 .notification-modal-container {
   background: var(--color-bg-primary);
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   max-width: 420px;
   width: 90%;
   overflow: hidden;
   transform: scale(0.9) translateY(20px);
   transition: transform 0.2s ease;
+  border: 1px solid var(--color-border-light);
 }
 
 .notification-modal-overlay.show .notification-modal-container {
@@ -1778,26 +1798,32 @@
 .notification-modal-icon img {
   width: 24px;
   height: 24px;
+  filter: brightness(0) invert(1);
 }
 
 .notification-modal-icon.success {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: var(--color-system-green);
 }
 
 .notification-modal-icon.error {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: var(--color-system-red);
 }
 
 .notification-modal-icon.warning {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: var(--color-system-orange);
 }
 
 .notification-modal-icon.info {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: var(--color-system-blue);
 }
 
 .notification-modal-icon.question {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: var(--color-fill-secondary);
+}
+
+.notification-modal-icon.question img {
+  filter: none;
+  opacity: 0.6;
 }
 
 .notification-modal-header-text {
@@ -1830,7 +1856,7 @@
 
 .notification-modal-button {
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: 9999px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -1841,7 +1867,6 @@
 
 .notification-modal-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .notification-modal-button:active {
@@ -1849,30 +1874,32 @@
 }
 
 .notification-modal-button.primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
+  background: var(--color-text-primary);
+  color: var(--color-bg-primary);
 }
 
 .notification-modal-button.primary:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  opacity: 0.9;
 }
 
 .notification-modal-button.danger {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: var(--color-system-red);
   color: white;
 }
 
 .notification-modal-button.danger:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  opacity: 0.9;
 }
 
 .notification-modal-button.secondary {
-  background: var(--color-fill-tertiary);
+  background: var(--color-bg-tertiary);
   color: var(--color-text-primary);
+  border: 1px solid var(--color-border-light);
 }
 
 .notification-modal-button.secondary:hover {
-  background: var(--color-fill-secondary);
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
 }
 
 /* Loading state */
@@ -1910,16 +1937,14 @@
 
 .dark .notification-modal-container {
   background: var(--color-bg-secondary);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-}
-
-.dark .notification-modal-icon img {
-  filter: brightness(0) invert(1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  border-color: var(--color-border-light);
 }
 
 /* Force light theme for modal */
 .notification-modal-overlay.force-light-theme .notification-modal-container {
   background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.08);
 }
 
 .notification-modal-overlay.force-light-theme .notification-modal-title {
@@ -1933,10 +1958,15 @@
 .notification-modal-overlay.force-light-theme .notification-modal-button.secondary {
   background: #f3f4f6;
   color: #4b5563;
+  border-color: rgba(0, 0, 0, 0.08);
 }
 
 .notification-modal-overlay.force-light-theme .notification-modal-button.secondary:hover {
   background: #e5e7eb;
+}
+
+.notification-modal-overlay.force-light-theme .notification-modal-icon img {
+  filter: brightness(0) invert(1);
 }
 
 

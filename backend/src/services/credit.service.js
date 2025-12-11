@@ -60,14 +60,32 @@ async function getUserCredits(userId) {
         bonus: DEFAULT_NEW_USER_CREDITS
       };
       
+      const now = new Date().toISOString();
+      
       await userRef.set({
         userId,
         credits: defaultCredits,
-        createdAt: new Date().toISOString(),
+        createdAt: now,
         isNewUser: true,
         usage: {
-          lastActivity: new Date().toISOString()
+          lastActivity: now
         }
+      });
+      
+      // Log welcome bonus transaction for transparency
+      const transactionRef = db.collection('credit_transactions').doc();
+      await transactionRef.set({
+        userId,
+        type: 'addition',
+        amount: DEFAULT_NEW_USER_CREDITS,
+        feature: 'welcome_bonus',
+        description: 'Welcome bonus credits',
+        metadata: {
+          source: 'registration',
+          isFirstTransaction: true
+        },
+        timestamp: now,
+        balanceAfter: DEFAULT_NEW_USER_CREDITS
       });
       
       logger.info('New user created with default credits', { userId, credits: DEFAULT_NEW_USER_CREDITS });
@@ -214,7 +232,8 @@ async function addCredits(userId, amount, source, metadata = {}) {
         userId,
         type: 'addition',
         amount,
-        source,
+        feature: source, // Use 'feature' field for consistency with deduction transactions
+        source, // Keep source for backward compatibility
         metadata,
         timestamp: new Date().toISOString(),
         balanceAfter: currentBalance + amount
