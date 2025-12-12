@@ -6,9 +6,10 @@ import OTPVerification from './OTPVerification'
 
 const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoading }) => {
   const { t } = useTranslation()
-  const [step, setStep] = useState('email')
+  const [step, setStep] = useState('email') // email, otp, newPassword, success
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
+  const [emailSentSuccess, setEmailSentSuccess] = useState(false)
 
   // Helper to parse and translate password reset errors
   const getResetErrorMessage = (err) => {
@@ -55,11 +56,16 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
   }
 
   // Email step form
-  const emailForm = useForgotPasswordForm(async (email) => {
+  const emailForm = useForgotPasswordForm(async (emailInput) => {
     try {
-      await onResetPassword.request(email)
-      setEmail(email)
-      setStep('otp')
+      await onResetPassword.request(emailInput)
+      setEmail(emailInput)
+      setEmailSentSuccess(true)
+      // Auto transition to OTP after showing success briefly
+      setTimeout(() => {
+        setEmailSentSuccess(false)
+        setStep('otp')
+      }, 1500)
     } catch (err) {
       const errorMessage = getResetErrorMessage(err)
       throw new Error(errorMessage)
@@ -70,6 +76,7 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
   const passwordForm = useResetPasswordForm(async (data) => {
     try {
       await onResetPassword.complete(email, otp, data.newPassword)
+      setStep('success')
     } catch (err) {
       const errorCode = err.code || err.message?.split(':')[0]?.trim()
       
@@ -99,6 +106,35 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
     "disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed",
     "placeholder:text-gray-400"
   )
+
+  // Success Step
+  if (step === 'success') {
+    return (
+      <div className="text-center py-4 sm:py-6">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-emerald-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <svg className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <h3 className="m-0 mb-2 text-lg sm:text-xl font-semibold text-gray-900">
+          {t('auth.email.passwordResetSuccess', 'Password Reset Successfully!')}
+        </h3>
+        <p className="m-0 mb-6 text-xs sm:text-sm text-gray-600 leading-relaxed">
+          {t('auth.email.passwordResetSuccessMessage', 'Your password has been reset. You can now sign in with your new password.')}
+        </p>
+        <button
+          type="button"
+          onClick={onCancel}
+          className={cn(
+            "w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200",
+            "bg-system-blue text-white hover:brightness-110 active:scale-[0.98]"
+          )}
+        >
+          {t('auth.email.backToLogin', 'Back to login')}
+        </button>
+      </div>
+    )
+  }
 
   // OTP Step
   if (step === 'otp') {
@@ -298,8 +334,18 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
         )}
       </div>
 
+      {/* Success Message */}
+      {emailSentSuccess && (
+        <div className="flex items-center gap-2 sm:gap-2.5 p-3 sm:p-3.5 mb-4 sm:mb-5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs sm:text-sm text-emerald-600 text-left">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          {t('auth.email.resetCodeSent', 'Reset code sent! Check your email.')}
+        </div>
+      )}
+
       {/* Error */}
-      {rootError && (
+      {rootError && !emailSentSuccess && (
         <div className="flex items-center gap-2 sm:gap-2.5 p-3 sm:p-3.5 mb-4 sm:mb-5 bg-red-50 border border-red-200 rounded-xl text-xs sm:text-sm text-red-600 text-left">
           <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
@@ -311,7 +357,7 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
       {/* Submit */}
       <button 
         type="submit" 
-        disabled={loading}
+        disabled={loading || emailSentSuccess}
         className={cn(
           "w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200",
           "bg-system-blue text-white hover:brightness-110 active:scale-[0.98] active:brightness-95",
@@ -323,7 +369,7 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
             <span className="inline-block w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-transparent border-t-current rounded-full animate-spin mr-2 align-middle"/>
             {t('auth.email.sending')}
           </>
-        ) : t('auth.email.sendResetCode')}
+        ) : emailSentSuccess ? t('auth.email.resetCodeSent', 'Code sent!') : t('auth.email.sendResetCode')}
       </button>
 
       {/* Back to Login */}

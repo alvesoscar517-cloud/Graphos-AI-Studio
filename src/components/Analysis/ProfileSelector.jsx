@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
@@ -5,9 +6,9 @@ import { useNavigate } from 'react-router-dom'
 import { useProfiles } from '../../contexts/ProfileContext'
 import { deleteProfile as deleteProfileAPI } from '../../services/api'
 import { invalidateProfileDetailCache } from '../../utils/profileDetailCache'
-import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
 import { cn } from '../../lib/utils'
+import Icon from '../Common/Icon'
 
 const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
   const { t } = useTranslation()
@@ -17,7 +18,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
   const [searchTerm, setSearchTerm] = useState('')
 
   const handleClick = () => {
-    console.log('🖱️ ProfileSelector clicked, opening modal')
+    logger.log('🖱️ ProfileSelector clicked, opening modal')
     setShowModal(true)
   }
 
@@ -43,7 +44,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
           onProfileSelect(null)
         }
       } else {
-        modal.error(t('profile.unableToDelete') + ': ' + result.error)
+        modal.errorWithReport(t('profile.unableToDelete') + ': ' + result.error, new Error(result.error), 'Error', 'ProfileSelector.handleDelete')
       }
     }
   }
@@ -97,7 +98,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
           <div className="card-icon !w-12 !h-12">
             <img 
               src={`/icon/${getThemeIcon(currentProfile?.theme)}.svg`} 
-              alt="Profile" 
+              alt={t('nav.profile')} 
               className="w-6 h-6 filter-icon-primary"
             />
           </div>
@@ -189,7 +190,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                 <div className="flex flex-col items-center justify-center h-full">
                   <img 
                     src="/icon for background/monster-chibi.svg" 
-                    alt="No profiles" 
+                    alt={t('common.noProfiles')} 
                     className="w-32 h-32 mb-4 opacity-60 icon-invert"
                   />
                   <p className="text-sm text-text-secondary mb-4">

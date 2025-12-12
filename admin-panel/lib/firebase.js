@@ -6,6 +6,7 @@
  * Security is enforced via Firestore Security Rules.
  */
 
+import logger from '../lib/logger'
 import { initializeApp } from 'firebase/app'
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 
@@ -34,7 +35,7 @@ export function initializeFirebase() {
         tabManager: persistentMultipleTabManager()
       })
     })
-    console.log('[Firebase] Admin panel initialized successfully')
+    logger.log('[Firebase] Admin panel initialized successfully')
     return { app, db }
   } catch (error) {
     console.error('[Firebase] Initialization error:', error)
@@ -48,3 +49,4 @@ export function getDb() {
 }
 
 export { app, db }
+

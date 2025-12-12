@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger'
 import { CONFIG } from '../../utils/config'
 import apiClient from './client'
 import { getUserInfo } from './auth'
@@ -89,7 +90,7 @@ export async function sendChatMessageStream(
   const { onContext, onComplete, conversationSummary } = options
   
   try {
-    console.log('📡 Sending chat stream request...')
+    logger.log('📡 Sending chat stream request...')
     
     const headers = await getAuthHeaders()
     const userInfo = await getUserInfo()
@@ -128,7 +129,7 @@ export async function sendChatMessageStream(
       }
     }
     
-    console.log('📡 Response received, starting to read stream...')
+    logger.log('📡 Response received, starting to read stream...')
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
@@ -140,15 +141,15 @@ export async function sendChatMessageStream(
       const { done, value } = await reader.read()
       
       if (done) {
-        console.log('📡 Stream ended, total chunks received:', chunkCount)
-        console.log('📡 Remaining buffer:', buffer)
+        logger.log('📡 Stream ended, total chunks received:', chunkCount)
+        logger.log('📡 Remaining buffer:', buffer)
         break
       }
       
       // Decode chunk and add to buffer
       const decoded = decoder.decode(value, { stream: true })
       buffer += decoded
-      console.log('📡 Raw chunk received:', decoded.substring(0, 100))
+      logger.log('📡 Raw chunk received:', decoded.substring(0, 100))
       
       // Process complete lines
       const lines = buffer.split('\n')
@@ -159,7 +160,7 @@ export async function sendChatMessageStream(
           const data = line.slice(6).trim()
           
           if (data === '[DONE]') {
-            console.log('📡 Received [DONE] signal')
+            logger.log('📡 Received [DONE] signal')
             if (onComplete) {
               onComplete({ summary, outputTokens })
             }
@@ -169,7 +170,7 @@ export async function sendChatMessageStream(
           if (data) {
             try {
               const json = JSON.parse(data)
-              console.log('📡 Parsed JSON type:', json.type || (json.chunk ? 'chunk' : 'unknown'))
+              logger.log('📡 Parsed JSON type:', json.type || (json.chunk ? 'chunk' : 'unknown'))
               
               // Handle different message types
               if (json.type === 'context' && onContext) {
@@ -322,7 +323,7 @@ export async function sendHumanizedChatStream(
   const { onContext, onComplete, onHumanized, onHumanizing, conversationSummary } = options
   
   try {
-    console.log('📡 Sending humanized chat stream request...')
+    logger.log('📡 Sending humanized chat stream request...')
     
     const headers = await getAuthHeaders()
     const userInfo = await getUserInfo()

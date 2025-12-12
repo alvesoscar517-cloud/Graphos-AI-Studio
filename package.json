@@ -19,8 +19,12 @@
     "build:prod": "NODE_ENV=production vite build && node post-build.js && node build-extension.js",
     "preview": "vite preview",
     "preview:admin": "vite preview --config vite.config.admin.js",
-    "lint": "echo 'Linting not configured yet'",
-    "format": "echo 'Formatting not configured yet'",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs",
+    "lint:fix": "eslint . --ext .js,.jsx,.cjs,.mjs --fix",
+    "lint:src": "eslint src/ --ext .js,.jsx",
+    "lint:admin": "eslint admin-panel/ --ext .js,.jsx",
+    "format": "prettier --write \"src/**/*.{js,jsx,json}\" \"admin-panel/**/*.{js,jsx,json}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,json}\" \"admin-panel/**/*.{js,jsx,json}\"",
     "pre-release": "node scripts/pre-release-check.js",
     "validate:i18n": "node scripts/validate-i18n.js",
     "prepare:release": "npm run validate:i18n && npm run pre-release && npm run build",
@@ -75,6 +79,7 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
@@ -82,8 +87,13 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.22",
     "concurrently": "^9.2.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^16.5.0",
     "i18next-scanner": "^4.6.0",
     "postcss": "^8.5.6",
+    "prettier": "^3.7.4",
     "tailwindcss": "^4.1.17",
     "vite": "^5.2.0"
   }

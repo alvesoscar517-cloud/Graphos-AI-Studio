@@ -140,7 +140,7 @@ function brotliCompressionMiddleware(req, res, next) {
     const originalWrite = res.write.bind(res);
     const originalEnd = res.end.bind(res);
     
-    let chunks = [];
+    const chunks = [];
     let headersSent = false;
     let isStreaming = false;
     

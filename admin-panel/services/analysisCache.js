@@ -1,3 +1,4 @@
+import logger from '../lib/logger'
 /**
  * Analysis Cache Service
  * Save stores AI analysis results to avoid repeated API calls
@@ -79,11 +80,11 @@ export function getCachedAnalysis(noteId, text, type) {
   const result = cache[noteId]?.[textHash]?.[type]
   
   if (result) {
-    console.log(`[SUCCESS] Cache hit for ${type} on note ${noteId}`)
+    // Cache hit - no logging needed in production
     return result.data
   }
   
-  console.log(`[FAIL] Cache miss for ${type} on note ${noteId}`)
+  // Cache miss - no logging needed in production
   return null
 }
 
@@ -114,7 +115,7 @@ export function setCachedAnalysis(noteId, text, type, data) {
   }
   
   saveCache(cache)
-  console.log(`[SAVE] Cached ${type} result for note ${noteId}`)
+  logger.log(`[SAVE] Cached ${type} result for note ${noteId}`)
 }
 
 /**
@@ -144,7 +145,7 @@ export function clearNoteCache(noteId) {
   const cache = loadCache()
   delete cache[noteId]
   saveCache(cache)
-  console.log(`[TRASH] Cleared cache for note ${noteId}`)
+  logger.log(`[TRASH] Cleared cache for note ${noteId}`)
 }
 
 /**
@@ -152,7 +153,7 @@ export function clearNoteCache(noteId) {
  */
 export function clearAllCache() {
   localStorage.removeItem(CACHE_KEY)
-  console.log('[TRASH] Cleared all analysis cache')
+  logger.log('[TRASH] Cleared all analysis cache')
 }
 
 /**
@@ -162,7 +163,7 @@ export function clearAllCache() {
 export function getCacheStats() {
   const cache = loadCache()
   let totalEntries = 0
-  let noteCount = Object.keys(cache).length
+  const noteCount = Object.keys(cache).length
   
   Object.values(cache).forEach(noteCache => {
     Object.values(noteCache).forEach(textCache => {
@@ -176,3 +177,4 @@ export function getCacheStats() {
     size: new Blob([JSON.stringify(cache)]).size
   }
 }
+

@@ -6,6 +6,7 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
   const { t } = useTranslation()
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [countdown, setCountdown] = useState(600)
   const [resendCooldown, setResendCooldown] = useState(0)
   const inputRefs = useRef([])
@@ -121,8 +122,17 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
 
   const handleResend = async () => {
     if (resendCooldown > 0) return
-    try { await onResend(); setResendCooldown(60); setCountdown(600); setOtp(['', '', '', '', '', '']); setError(''); inputRefs.current[0]?.focus() }
-    catch (err) { setError(getErrorMessage(err)) }
+    try { 
+      await onResend()
+      setResendCooldown(60)
+      setCountdown(600)
+      setOtp(['', '', '', '', '', ''])
+      setError('')
+      setSuccess(t('auth.email.otpResent', 'New code sent! Check your email.'))
+      setTimeout(() => setSuccess(''), 3000)
+      inputRefs.current[0]?.focus()
+    }
+    catch (err) { setError(getErrorMessage(err)); setSuccess('') }
   }
 
   return (
@@ -154,7 +164,16 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
         ))}
       </div>
 
-      {error && (
+      {success && (
+        <div className="flex items-center justify-center gap-2 sm:gap-2.5 p-3 sm:p-3.5 mb-4 sm:mb-5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs sm:text-sm text-emerald-600">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          {success}
+        </div>
+      )}
+
+      {error && !success && (
         <div className="flex items-center justify-center gap-2 sm:gap-2.5 p-3 sm:p-3.5 mb-4 sm:mb-5 bg-red-50 border border-red-200 rounded-xl text-xs sm:text-sm text-red-600">
           <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>

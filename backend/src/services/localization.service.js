@@ -2,13 +2,27 @@
  * Localization Service
  * Handles translation and localized content delivery
  * Enhanced with locale-aware formatting for 15 languages
+ * 
+ * Features:
+ * - Lazy loading of locale files
+ * - LRU cache for formatted values
+ * - File watching in development mode
+ * - Type-safe translation keys (see types/i18n.d.ts)
  */
 
 const fs = require('fs');
 const path = require('path');
 
+const logger = require('../utils/logger');
 const LOCALES_DIR = path.join(__dirname, '../locales');
 const DEFAULT_LANGUAGE = 'en';
+
+// Cache configuration
+const CACHE_CONFIG = {
+  maxSize: 1000,           // Max cached translations
+  ttl: 5 * 60 * 1000,      // 5 minutes TTL
+  enableFileWatch: process.env.NODE_ENV === 'development'
+};
 
 // Supported languages (15)
 const SUPPORTED_LANGUAGES = ['en', 'vi', 'zh', 'ja', 'ko', 'fr', 'de', 'es', 'pt', 'it', 'ru', 'ar', 'th', 'id', 'ms'];
@@ -124,7 +138,96 @@ class LocalizationService {
   constructor() {
     this.locales = {};
     this.loadedLanguages = new Set();
+    this.translationCache = new Map();
+    this.cacheTimestamps = new Map();
+    this.fileWatchers = new Map();
+    
     this.loadLocale(DEFAULT_LANGUAGE); // Always load default
+    
+    // Setup file watching in development
+    if (CACHE_CONFIG.enableFileWatch) {
+      this._setupFileWatching();
+    }
+  }
+
+  /**
+   * Setup file watching for hot reload in development
+   * @private
+   */
+  _setupFileWatching() {
+    for (const lang of SUPPORTED_LANGUAGES) {
+      const filePath = path.join(LOCALES_DIR, `${lang}.json`);
+      if (fs.existsSync(filePath)) {
+        try {
+          const watcher = fs.watch(filePath, (eventType) => {
+            if (eventType === 'change') {
+              logger.info(`[LOCALE] File changed, reloading: ${lang}`);
+              this._reloadLocale(lang);
+            }
+          });
+          this.fileWatchers.set(lang, watcher);
+        } catch (error) {
+          logger.warn(`[LOCALE] Could not watch file for ${lang}:`, error.message);
+        }
+      }
+    }
+  }
+
+  /**
+   * Reload a specific locale (used by file watcher)
+   * @private
+   */
+  _reloadLocale(lang) {
+    this.loadedLanguages.delete(lang);
+    this.loadLocale(lang);
+    this._invalidateCacheForLang(lang);
+  }
+
+  /**
+   * Invalidate cache entries for a specific language
+   * @private
+   */
+  _invalidateCacheForLang(lang) {
+    for (const key of this.translationCache.keys()) {
+      if (key.startsWith(`${lang}:`)) {
+        this.translationCache.delete(key);
+        this.cacheTimestamps.delete(key);
+      }
+    }
+    logger.info(`[LOCALE] Cache invalidated for: ${lang}`);
+  }
+
+  /**
+   * Get from cache with TTL check
+   * @private
+   */
+  _getFromCache(cacheKey) {
+    if (!this.translationCache.has(cacheKey)) return null;
+    
+    const timestamp = this.cacheTimestamps.get(cacheKey);
+    if (Date.now() - timestamp > CACHE_CONFIG.ttl) {
+      this.translationCache.delete(cacheKey);
+      this.cacheTimestamps.delete(cacheKey);
+      return null;
+    }
+    
+    return this.translationCache.get(cacheKey);
+  }
+
+  /**
+   * Set cache with size limit (LRU-like eviction)
+   * @private
+   */
+  _setCache(cacheKey, value) {
+    // Simple eviction: remove oldest entries if over limit
+    if (this.translationCache.size >= CACHE_CONFIG.maxSize) {
+      const oldestKey = this.translationCache.keys().next().value;
+      this.translationCache.delete(oldestKey);
+      this.cacheTimestamps.delete(oldestKey);
+    }
+    
+    this.translationCache.set(cacheKey, value);
+    this.cacheTimestamps.set(cacheKey, Date.now());
   }
 
   /**
@@ -142,11 +245,11 @@ class LocalizationService {
         const content = fs.readFileSync(filePath, 'utf8');
         this.locales[lang] = JSON.parse(content);
         this.loadedLanguages.add(lang);
-        console.log(`[LOCALE] Loaded locale: ${lang}`);
+        logger.info(`[LOCALE] Loaded locale: ${lang}`);
         return true;
       }
     } catch (error) {
-      console.error(`[LOCALE] Failed to load locale ${lang}:`, error.message);
+      logger.error(`[LOCALE] Failed to load locale ${lang}:`, error.message);
     }
     
     return false;
@@ -163,13 +266,29 @@ class LocalizationService {
     // Ensure locale is loaded
     this.loadLocale(lang);
     
+    // Check cache for translations without params (most common case)
+    const hasParams = params && Object.keys(params).length > 0;
+    const cacheKey = `${lang}:${key}`;
+    
+    if (!hasParams) {
+      const cached = this._getFromCache(cacheKey);
+      if (cached !== null) {
+        return cached;
+      }
+    }
+    
     // Get translation from locale or fallback to default
     let text = this.getNestedValue(this.locales[lang], key) 
             || this.getNestedValue(this.locales[DEFAULT_LANGUAGE], key) 
             || key;
     
+    // Cache the raw translation (before interpolation)
+    if (!hasParams) {
+      this._setCache(cacheKey, text);
+    }
+    
     // Interpolate parameters: {{name}} -> value
-    if (params && typeof params === 'object') {
+    if (hasParams) {
       Object.entries(params).forEach(([paramKey, value]) => {
         const regex = new RegExp(`{{\\s*${paramKey}\\s*}}`, 'g');
         text = text.replace(regex, String(value));
@@ -294,7 +413,7 @@ class LocalizationService {
     this.locales = {};
     this.loadedLanguages.clear();
     this.loadLocale(DEFAULT_LANGUAGE);
-    console.log('[LOCALE] All locales reloaded');
+    logger.info('[LOCALE] All locales reloaded');
   }
 
   // ============================================================================
@@ -328,7 +447,7 @@ class LocalizationService {
       });
       return formatter.format(value);
     } catch (error) {
-      console.error(`[LOCALE] formatNumber error for ${lang}:`, error.message);
+      logger.error(`[LOCALE] formatNumber error for ${lang}:`, error.message);
       return String(value);
     }
   }
@@ -381,7 +500,7 @@ class LocalizationService {
       const formatter = new Intl.DateTimeFormat(locale, options);
       return formatter.format(dateObj);
     } catch (error) {
-      console.error(`[LOCALE] formatDate error for ${lang}:`, error.message);
+      logger.error(`[LOCALE] formatDate error for ${lang}:`, error.message);
       return String(date);
     }
   }
@@ -407,7 +526,7 @@ class LocalizationService {
       
       return formatter.format(amount);
     } catch (error) {
-      console.error(`[LOCALE] formatCurrency error for ${lang}:`, error.message);
+      logger.error(`[LOCALE] formatCurrency error for ${lang}:`, error.message);
       return `${amount} ${currency || 'USD'}`;
     }
   }
@@ -446,7 +565,7 @@ class LocalizationService {
 
       return parts.join(' ');
     } catch (error) {
-      console.error(`[LOCALE] formatDuration error for ${lang}:`, error.message);
+      logger.error(`[LOCALE] formatDuration error for ${lang}:`, error.message);
       return `${seconds}s`;
     }
   }
@@ -502,7 +621,7 @@ class LocalizationService {
       
       return translation;
     } catch (error) {
-      console.error(`[LOCALE] pluralize error for ${lang}:`, error.message);
+      logger.error(`[LOCALE] pluralize error for ${lang}:`, error.message);
       return this.translate(key, lang, { count, ...params });
     }
   }
@@ -529,7 +648,7 @@ class LocalizationService {
       
       return formatter.format(percentValue);
     } catch (error) {
-      console.error(`[LOCALE] formatPercentage error for ${lang}:`, error.message);
+      logger.error(`[LOCALE] formatPercentage error for ${lang}:`, error.message);
       return `${value}%`;
     }
   }
@@ -581,6 +700,91 @@ class LocalizationService {
    */
   getSupportedLanguages() {
     return [...SUPPORTED_LANGUAGES];
+  }
+
+  // ============================================================================
+  // CACHE MANAGEMENT
+  // ============================================================================
+
+  /**
+   * Get cache statistics
+   * @returns {Object} - Cache stats
+   */
+  getCacheStats() {
+    let expiredCount = 0;
+    const now = Date.now();
+    
+    for (const [key, timestamp] of this.cacheTimestamps.entries()) {
+      if (now - timestamp > CACHE_CONFIG.ttl) {
+        expiredCount++;
+      }
+    }
+    
+    return {
+      size: this.translationCache.size,
+      maxSize: CACHE_CONFIG.maxSize,
+      ttl: CACHE_CONFIG.ttl,
+      expiredEntries: expiredCount,
+      loadedLanguages: [...this.loadedLanguages],
+      fileWatchEnabled: CACHE_CONFIG.enableFileWatch
+    };
+  }
+
+  /**
+   * Clear expired cache entries
+   * @returns {number} - Number of entries cleared
+   */
+  clearExpiredCache() {
+    const now = Date.now();
+    let cleared = 0;
+    
+    for (const [key, timestamp] of this.cacheTimestamps.entries()) {
+      if (now - timestamp > CACHE_CONFIG.ttl) {
+        this.translationCache.delete(key);
+        this.cacheTimestamps.delete(key);
+        cleared++;
+      }
+    }
+    
+    if (cleared > 0) {
+      logger.info(`[LOCALE] Cleared ${cleared} expired cache entries`);
+    }
+    
+    return cleared;
+  }
+
+  /**
+   * Clear all cache
+   */
+  clearCache() {
+    const size = this.translationCache.size;
+    this.translationCache.clear();
+    this.cacheTimestamps.clear();
+    logger.info(`[LOCALE] Cleared all ${size} cache entries`);
+  }
+
+  /**
+   * Preload all locales into memory
+   * Useful for production to avoid lazy loading delays
+   */
+  preloadAllLocales() {
+    for (const lang of SUPPORTED_LANGUAGES) {
+      this.loadLocale(lang);
+    }
+    logger.info(`[LOCALE] Preloaded ${this.loadedLanguages.size} locales`);
+  }
+
+  /**
+   * Cleanup resources (file watchers)
+   * Call this on application shutdown
+   */
+  cleanup() {
+    for (const [lang, watcher] of this.fileWatchers.entries()) {
+      watcher.close();
+      logger.info(`[LOCALE] Closed file watcher for: ${lang}`);
+    }
+    this.fileWatchers.clear();
+    this.clearCache();
   }
 }
 

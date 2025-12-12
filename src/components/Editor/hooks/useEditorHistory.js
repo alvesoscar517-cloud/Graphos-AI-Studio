@@ -1,3 +1,4 @@
+import { logger } from '../../../utils/logger'
 import { useCallback } from 'react'
 
 /**
@@ -38,7 +39,7 @@ export function useEditorHistory(editor) {
     // Set content in a way that creates a single undo step
     editor.commands.setContent(newContent, false, { preserveWhitespace: 'full' })
 
-    console.log('[HISTORY] Suggestion applied as single transaction')
+    logger.log('[HISTORY] Suggestion applied as single transaction')
     return true
   }, [editor])
 
@@ -52,7 +53,7 @@ export function useEditorHistory(editor) {
     // Just ensure it's recorded as a single undo step
     editor.commands.setContent(streamedContent, false, { preserveWhitespace: 'full' })
 
-    console.log('[HISTORY] Streaming finalized as single transaction')
+    logger.log('[HISTORY] Streaming finalized as single transaction')
     return true
   }, [editor])
 

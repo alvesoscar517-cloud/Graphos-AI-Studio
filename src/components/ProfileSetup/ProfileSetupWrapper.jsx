@@ -1,6 +1,5 @@
 import { Suspense, lazy } from 'react'
 import { useTranslation } from 'react-i18next'
-import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import ghostIcon from '../../../icon for background/ghost-with-raised-arms.svg'
 // ErrorBoundary styles in main.css

@@ -1,3 +1,5 @@
+const logger = require('../utils/logger');
+
 /**
  * Conversation Summarizer
  * Handles automatic summarization of long conversations
@@ -133,7 +135,7 @@ Write a summary (max 150 words) capturing:
     const result = await model.generateContent(prompt);
     const summary = result.response.candidates[0].content.parts[0].text.trim();
     
-    console.log(`[SUMMARIZE] ${existingSummary ? 'Updated' : 'Created'} summary: ${messagesToSummarize.length} msgs -> ${summary.length} chars`);
+    logger.info(`[SUMMARIZE] ${existingSummary ? 'Updated' : 'Created'} summary: ${messagesToSummarize.length} msgs -> ${summary.length} chars`);
     
     return {
       summary,
@@ -141,7 +143,7 @@ Write a summary (max 150 words) capturing:
       summarizedCount: messagesToSummarize.length
     };
   } catch (error) {
-    console.error('[ERROR] Summarization failed:', error.message);
+    logger.error('[ERROR] Summarization failed:', error.message);
     // Fallback: keep recent messages with existing summary
     return {
       summary: existingSummary,
@@ -217,7 +219,7 @@ async function manageConversationContext(messages, systemPrompt, existingSummary
     };
   }
   
-  console.log(`[CONTEXT] Optimizing: ${messages.length} msgs, ~${tokenEstimate.total} tokens`);
+  logger.info(`[CONTEXT] Optimizing: ${messages.length} msgs, ~${tokenEstimate.total} tokens`);
   
   // Strategy: Progressive summarization
   // 1. If we have existing summary, use it and only summarize new old messages
@@ -239,7 +241,7 @@ async function manageConversationContext(messages, systemPrompt, existingSummary
   // Calculate final token estimate
   const finalTokens = estimateConversationTokens(optimizedMessages, enhancedSystemPrompt);
   
-  console.log(`[CONTEXT] Optimized: ${messages.length} -> ${optimizedMessages.length} msgs, ~${tokenEstimate.total} -> ~${finalTokens.total} tokens`);
+  logger.info(`[CONTEXT] Optimized: ${messages.length} -> ${optimizedMessages.length} msgs, ~${tokenEstimate.total} -> ~${finalTokens.total} tokens`);
   
   return {
     systemPrompt: enhancedSystemPrompt,

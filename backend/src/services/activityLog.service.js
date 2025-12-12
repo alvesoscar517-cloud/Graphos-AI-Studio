@@ -15,7 +15,7 @@ try {
   db = firebase.db;
   FieldValue = firebase.FieldValue;
 } catch (error) {
-  console.error('[WARN] Firebase not available for activity logging:', error.message);
+  logger.error('[WARN] Firebase not available for activity logging:', error.message);
   db = null;
   FieldValue = null;
 }

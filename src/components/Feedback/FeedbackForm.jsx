@@ -3,12 +3,14 @@
  * Uses React Hook Form + Zod + TanStack Query
  */
 
+import { useTranslation } from 'react-i18next'
 import { useFeedbackForm } from '@/hooks/forms'
 import { useSendFeedback } from '@/hooks/queries'
 import { useToasts } from '@/stores/uiStore'
 import { useUser } from '@/stores/authStore'
 
 export function FeedbackForm({ onSuccess, onCancel }) {
+  const { t } = useTranslation()
   const user = useUser()
   const { showSuccess, showError } = useToasts()
   const sendFeedback = useSendFeedback()
@@ -20,10 +22,10 @@ export function FeedbackForm({ onSuccess, onCancel }) {
         content: data.message,
         images: [],
       })
-      showSuccess('Thank you for your feedback!')
+      showSuccess(t('feedback.thankYou'))
       onSuccess?.()
     } catch (error) {
-      showError(error.message)
+      showError(error.message, { error, context: 'FeedbackForm.handleSubmit' })
       throw error
     }
   }
@@ -42,14 +44,14 @@ export function FeedbackForm({ onSuccess, onCancel }) {
     <form onSubmit={onSubmit} className="space-y-4">
       {/* Type */}
       <div>
-        <label className="block text-sm font-medium mb-1">Feedback Type</label>
+        <label className="block text-sm font-medium mb-1">{t('feedback.feedbackType', 'Feedback Type')}</label>
         <select
           {...register('type')}
           className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
         >
-          <option value="general">General Feedback</option>
-          <option value="bug">Bug Report</option>
-          <option value="feature">Feature Request</option>
+          <option value="general">{t('feedback.generalFeedback')}</option>
+          <option value="bug">{t('feedback.bugReport')}</option>
+          <option value="feature">{t('feedback.featureRequest')}</option>
         </select>
         {errors.type && (
           <p className="mt-1 text-sm text-red-500">{errors.type.message}</p>
@@ -58,10 +60,10 @@ export function FeedbackForm({ onSuccess, onCancel }) {
 
       {/* Subject */}
       <div>
-        <label className="block text-sm font-medium mb-1">Subject</label>
+        <label className="block text-sm font-medium mb-1">{t('feedback.subject', 'Subject')}</label>
         <input
           {...register('subject')}
-          placeholder="Brief description"
+          placeholder={t('feedback.briefDescription')}
           className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
         />
         {errors.subject && (
@@ -71,10 +73,10 @@ export function FeedbackForm({ onSuccess, onCancel }) {
 
       {/* Message */}
       <div>
-        <label className="block text-sm font-medium mb-1">Message</label>
+        <label className="block text-sm font-medium mb-1">{t('feedback.message', 'Message')}</label>
         <textarea
           {...register('message')}
-          placeholder="Tell us more..."
+          placeholder={t('feedback.tellUsMore')}
           rows={5}
           className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
         />
@@ -86,12 +88,12 @@ export function FeedbackForm({ onSuccess, onCancel }) {
       {/* Email (optional) */}
       <div>
         <label className="block text-sm font-medium mb-1">
-          Email (optional)
+          {t('feedback.emailOptional', 'Email (optional)')}
         </label>
         <input
           {...register('email')}
           type="email"
-          placeholder="your@email.com"
+          placeholder={t('feedback.emailPlaceholder')}
           className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
         />
         {errors.email && (

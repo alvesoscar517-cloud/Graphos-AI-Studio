@@ -3,11 +3,13 @@
  * Uses React Hook Form + Zod + TanStack Query
  */
 
+import { useTranslation } from 'react-i18next'
 import { useNoteForm } from '@/hooks/forms'
 import { useCreateNote, useUpdateNote } from '@/hooks/queries'
 import { useToasts } from '@/stores/uiStore'
 
 export function NoteEditor({ note = null, onSave, onCancel }) {
+  const { t } = useTranslation()
   const { showSuccess, showError } = useToasts()
   const createNote = useCreateNote()
   const updateNote = useUpdateNote()
@@ -18,14 +20,14 @@ export function NoteEditor({ note = null, onSave, onCancel }) {
     try {
       if (isEditing) {
         await updateNote.mutateAsync({ noteId: note.id, data })
-        showSuccess('Note updated!')
+        showSuccess(t('notes.updated'))
       } else {
         await createNote.mutateAsync(data)
-        showSuccess('Note created!')
+        showSuccess(t('notes.created'))
       }
       onSave?.()
     } catch (error) {
-      showError(error.message || 'Failed to save note')
+      showError(error.message || t('errors.generic'), { error, context: 'NoteEditor.handleSubmit' })
       throw error
     }
   }
@@ -45,7 +47,7 @@ export function NoteEditor({ note = null, onSave, onCancel }) {
       <div>
         <input
           {...register('title')}
-          placeholder="Note title (optional)"
+          placeholder={t('notes.noteTitle')}
           className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
         />
         {errors.title && (
@@ -59,9 +61,9 @@ export function NoteEditor({ note = null, onSave, onCancel }) {
           {...register('type')}
           className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
         >
-          <option value="Note">Note</option>
-          <option value="Chat prompt">Chat prompt</option>
-          <option value="Template">Template</option>
+          <option value="Note">{t('notes.note')}</option>
+          <option value="Chat prompt">{t('notes.chatPrompt')}</option>
+          <option value="Template">{t('notes.template')}</option>
         </select>
       </div>
 
@@ -69,7 +71,7 @@ export function NoteEditor({ note = null, onSave, onCancel }) {
       <div>
         <textarea
           {...register('content')}
-          placeholder="Write your note..."
+          placeholder={t('notes.writeNote')}
           rows={8}
           className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
         />

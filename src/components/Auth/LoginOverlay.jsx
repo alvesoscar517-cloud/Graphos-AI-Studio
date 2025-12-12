@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger'
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useIsAuthenticated, useAuth } from '../../stores/authStore'
@@ -33,12 +34,12 @@ const LoginOverlay = () => {
 
   useEffect(() => {
     // Show overlay when loading OR not authenticated
-    console.log('[SECURE] LoginOverlay state:', { authLoading, isAuthenticated, shouldShow })
+    logger.log('[SECURE] LoginOverlay state:', { authLoading, isAuthenticated, shouldShow })
     if (authLoading || !isAuthenticated) {
-      console.log('[WARNING] Showing login overlay')
+      logger.log('[WARNING] Showing login overlay')
       setShouldShow(true)
     } else {
-      console.log('[SUCCESS] Hiding login overlay')
+      logger.log('[SUCCESS] Hiding login overlay')
       setShouldShow(false)
     }
   }, [authLoading, isAuthenticated])
@@ -134,16 +135,57 @@ const LoginOverlay = () => {
     }
   }
 
+  // Helper to get Google sign-in error message
+  const getGoogleSignInErrorMessage = (error) => {
+    const message = error.message || ''
+    const code = error.code || ''
+    
+    // User cancelled
+    if (message.includes('cancelled') || message.includes('popup_closed') || 
+        code === 'auth/popup-closed-by-user' || message.includes('user denied')) {
+      return null // Don't show error
+    }
+    
+    // Network error
+    if (message.includes('network') || message.includes('offline') || error.isNetworkError) {
+      return t('errors.networkError', 'Connection error. Please check your network.')
+    }
+    
+    // Extension not available
+    if (message.includes('extension') || message.includes('Chrome')) {
+      return t('auth.errors.extensionRequired', 'Please use the Chrome extension to sign in with Google.')
+    }
+    
+    // Account exists with different method
+    if (message.includes('email-already-in-use') || code === 'auth/account-exists-with-different-credential') {
+      return t('auth.errors.emailExistsWithDifferentMethod', 'An account already exists with this email. Please sign in with email/password.')
+    }
+    
+    // Google account disabled
+    if (code === 'auth/user-disabled') {
+      return t('auth.errors.accountSuspended', 'Your account has been suspended. Please contact support.')
+    }
+    
+    // Generic error
+    return t('auth.errors.googleSignInFailed', 'Google sign in failed. Please try again.')
+  }
+
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
     try {
-      const success = await signIn()
-      if (!success) {
-        alert(t('auth.signInFailed'))
+      const result = await signIn()
+      if (!result?.success && result?.error) {
+        const errorMessage = getGoogleSignInErrorMessage({ message: result.error, code: result.code })
+        if (errorMessage) {
+          alert(errorMessage)
+        }
       }
     } catch (error) {
       console.error('Sign in error:', error)
-      alert(t('auth.loginFailed') + ': ' + error.message)
+      const errorMessage = getGoogleSignInErrorMessage(error)
+      if (errorMessage) {
+        alert(errorMessage)
+      }
     } finally {
       setIsLoading(false)
     }
@@ -170,14 +212,14 @@ const LoginOverlay = () => {
   const handleEmailRegister = async (email, password, displayName) => {
     setIsLoading(true)
     try {
-      console.log('[DEBUG] Registering with email:', email)
+      logger.log('[DEBUG] Registering with email:', email)
       const result = await registerWithEmail(email, password, displayName)
       if (!result.success) {
         const error = new Error(result.error || 'Registration failed')
         error.code = result.code
         throw error
       }
-      console.log('[DEBUG] Registration successful, setting pendingEmail:', email)
+      logger.log('[DEBUG] Registration successful, setting pendingEmail:', email)
       setPendingEmail(email)
       setAuthMode('otp')
     } catch (error) {
@@ -191,7 +233,7 @@ const LoginOverlay = () => {
   const handleVerifyOTP = async (otp) => {
     setIsLoading(true)
     try {
-      console.log('[DEBUG] Verifying OTP for email:', pendingEmail, 'OTP:', otp)
+      logger.log('[DEBUG] Verifying OTP for email:', pendingEmail, 'OTP:', otp)
       const result = await verifyEmail(pendingEmail, otp)
 
       if (!result.success && !result.needsLogin) {
@@ -202,7 +244,7 @@ const LoginOverlay = () => {
 
       // If server couldn't generate token, redirect to login
       if (result?.needsLogin) {
-        console.log('[INFO] Account verified but needs manual login')
+        logger.log('[INFO] Account verified but needs manual login')
         setAuthMode('email-login')
         // Show success message - user needs to login
         return
@@ -252,11 +294,11 @@ const LoginOverlay = () => {
 
   // Don't show overlay while checking auth or if already authenticated
   if (!shouldShow) {
-    console.log('🚫 LoginOverlay: Not rendering (shouldShow = false)')
+    logger.log('🚫 LoginOverlay: Not rendering (shouldShow = false)')
     return null
   }
 
-  console.log('✨ LoginOverlay: Rendering overlay')
+  logger.log('✨ LoginOverlay: Rendering overlay')
 
   const renderAuthContent = () => {
     if (authLoading) {

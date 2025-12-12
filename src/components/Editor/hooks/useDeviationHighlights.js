@@ -1,3 +1,4 @@
+import { logger } from '../../../utils/logger'
 import { useState, useCallback, useEffect, useRef } from 'react'
 
 /**
@@ -119,7 +120,7 @@ export function useDeviationHighlights(editor, analysis, showHighlights = true) 
     // Call external handler
     onApply?.(newContent)
     
-    console.log('[HIGHLIGHT] Suggestion applied:', activeTooltip.originalText.substring(0, 30), '→', rewrittenText.substring(0, 30))
+    logger.log('[HIGHLIGHT] Suggestion applied:', activeTooltip.originalText.substring(0, 30), '→', rewrittenText.substring(0, 30))
   }, [activeTooltip, editor])
 
   /**
@@ -131,7 +132,7 @@ export function useDeviationHighlights(editor, analysis, showHighlights = true) 
     setDismissedSentences(prev => new Set([...prev, activeTooltip.originalText]))
     setActiveTooltip(null)
     
-    console.log('[HIGHLIGHT] Suggestion dismissed:', activeTooltip.originalText.substring(0, 30))
+    logger.log('[HIGHLIGHT] Suggestion dismissed:', activeTooltip.originalText.substring(0, 30))
   }, [activeTooltip])
 
   /**
@@ -172,7 +173,7 @@ export function useDeviationHighlights(editor, analysis, showHighlights = true) 
     const highlights = parseHighlights(content)
     setHasHighlights(highlights.length > 0)
 
-    console.log('[HIGHLIGHT] Found', highlights.length, 'sentences with issues')
+    logger.log('[HIGHLIGHT] Found', highlights.length, 'sentences with issues')
   }, [editor, analysis, showHighlights, parseHighlights, clearHighlights, checkSignificantChange, resetDismissed])
 
   // Reset dismissed when analysis changes

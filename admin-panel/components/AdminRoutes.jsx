@@ -16,6 +16,8 @@ const UserProfiles = lazy(() => import('./Users/UserProfiles'));
 const UserLogs = lazy(() => import('./Users/UserLogs'));
 const SupportList = lazy(() => import('./Support/SupportList'));
 const SupportDetail = lazy(() => import('./Support/SupportDetail'));
+const ErrorReportsList = lazy(() => import('./ErrorReports/ErrorReportsList'));
+const ErrorReportDetail = lazy(() => import('./ErrorReports/ErrorReportDetail'));
 const AnalyticsView = lazy(() => import('./Analytics/AnalyticsView'));
 const OrdersView = lazy(() => import('./Orders/OrdersView'));
 const SettingsView = lazy(() => import('./Settings/SettingsView'));
@@ -61,6 +63,8 @@ export default function AdminRoutes() {
               <Route path="/users/:userId/credits" element={<UserCreditsDetail />} />
               <Route path="/support" element={<SupportList />} />
               <Route path="/support/:id" element={<SupportDetail />} />
+              <Route path="/error-reports" element={<ErrorReportsList />} />
+              <Route path="/error-reports/:id" element={<ErrorReportDetail />} />
               <Route path="/analytics" element={<AnalyticsView />} />
               <Route path="/orders" element={<OrdersView />} />
               <Route path="/settings" element={<SettingsView />} />

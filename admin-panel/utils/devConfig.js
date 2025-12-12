@@ -1,3 +1,4 @@
+import logger from '../lib/logger'
 /**
  * Development Configuration
  * Configuration for development environment to avoid creating new profile each test
@@ -53,7 +54,7 @@ export function isDevMode() {
  */
 export function devLog(...args) {
   if (isDevMode() && DEV_CONFIG.VERBOSE_LOGGING) {
-    console.log('[DEV]', ...args)
+    logger.log('[DEV]', ...args)
   }
 }
 
@@ -136,3 +137,4 @@ export function resetDevEnvironment() {
   localStorage.removeItem('activeProfileName')
   devLog('Dev environment reset')
 }
+

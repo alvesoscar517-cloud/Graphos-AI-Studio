@@ -37,7 +37,7 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: resolve(__dirname, 'dist-admin'),
+    outDir: resolve(__dirname, 'dist/admin'),
     emptyOutDir: true,
     sourcemap: false,
     rollupOptions: {

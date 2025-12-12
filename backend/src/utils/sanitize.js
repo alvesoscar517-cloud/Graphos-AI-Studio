@@ -7,6 +7,7 @@
 
 const sanitizeHtml = require('sanitize-html');
 
+const logger = require('../utils/logger');
 // ============================================================================
 // SANITIZE-HTML CONFIGURATIONS
 // ============================================================================
@@ -328,7 +329,7 @@ function sanitizeMiddleware(options = {}) {
     try {
       // Debug: log body before sanitization for auth routes
       if (req.path.includes('/auth/')) {
-        console.log('[SANITIZE] Auth route body before:', JSON.stringify(req.body));
+        logger.info('[SANITIZE] Auth route body before:', JSON.stringify(req.body));
       }
       
       if (sanitizeBody && req.body) {
@@ -337,7 +338,7 @@ function sanitizeMiddleware(options = {}) {
             try {
               req.body[field] = sanitizeText(req.body[field], maxTextLength);
             } catch (fieldError) {
-              console.error(`[SANITIZE] Error sanitizing field "${field}":`, fieldError.message);
+              logger.error(`[SANITIZE] Error sanitizing field "${field}":`, fieldError.message);
               throw fieldError;
             }
           }
@@ -345,14 +346,14 @@ function sanitizeMiddleware(options = {}) {
         try {
           req.body = sanitizeObject(req.body, { stripTags: true });
         } catch (objError) {
-          console.error('[SANITIZE] Error sanitizing object:', objError.message);
+          logger.error('[SANITIZE] Error sanitizing object:', objError.message);
           throw objError;
         }
       }
       
       // Debug: log body after sanitization for auth routes
       if (req.path.includes('/auth/')) {
-        console.log('[SANITIZE] Auth route body after:', JSON.stringify(req.body));
+        logger.info('[SANITIZE] Auth route body after:', JSON.stringify(req.body));
       }
       
       if (sanitizeQuery && req.query) {
@@ -365,11 +366,11 @@ function sanitizeMiddleware(options = {}) {
       
       next();
     } catch (error) {
-      console.error('[SANITIZE] Error:', error.message);
-      console.error('[SANITIZE] Stack:', error.stack);
-      console.error('[SANITIZE] Path:', req.path);
-      console.error('[SANITIZE] Body keys:', Object.keys(req.body || {}));
-      console.error('[SANITIZE] Text length:', req.body?.text?.length);
+      logger.error('[SANITIZE] Error:', error.message);
+      logger.error('[SANITIZE] Stack:', error.stack);
+      logger.error('[SANITIZE] Path:', req.path);
+      logger.error('[SANITIZE] Body keys:', Object.keys(req.body || {}));
+      logger.error('[SANITIZE] Text length:', req.body?.text?.length);
       res.status(400).json({
         success: false,
         error: 'Invalid input',

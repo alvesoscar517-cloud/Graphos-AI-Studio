@@ -3,6 +3,7 @@
  * Configuration for development environment to avoid creating new profiles on each test
  */
 
+import { logger } from '../utils/logger'
 import { safeGetJSON, safeSetJSON } from './storageCleanup'
 
 export const DEV_CONFIG = {
@@ -55,7 +56,7 @@ export function isDevMode() {
  */
 export function devLog(...args) {
   if (isDevMode() && DEV_CONFIG.VERBOSE_LOGGING) {
-    console.log('[DEV]', ...args)
+    logger.log('[DEV]', ...args)
   }
 }
 

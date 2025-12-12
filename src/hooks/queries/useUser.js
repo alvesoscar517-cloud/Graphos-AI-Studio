@@ -3,6 +3,7 @@
  * TanStack Query hooks for user management with Firestore Realtime updates
  */
 
+import { logger } from '@/utils/logger'
 import { useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queryKeys'
@@ -33,7 +34,7 @@ export function useCurrentUser(options = {}) {
         const { default: realtimeService } = await import('@/services/realtimeService')
 
         unsubscribeRef.current = realtimeService.subscribe('userProfile', (data) => {
-          console.log('[REALTIME] User profile update:', data)
+          logger.log('[REALTIME] User profile update:', data)
           if (data.type === 'updated' && data.profile) {
             // Update cache with new profile data
             queryClient.setQueryData(queryKeys.user.current(), (old) => {

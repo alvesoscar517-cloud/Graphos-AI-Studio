@@ -9,6 +9,7 @@
  * - notifications collection
  */
 
+import logger from '../lib/logger'
 import { 
   collection, 
   query, 
@@ -53,7 +54,7 @@ class FirestoreRealtimeService {
       return false
     }
 
-    console.log('[FirestoreRealtime] Initializing admin listeners...')
+    logger.log('[FirestoreRealtime] Initializing admin listeners...')
 
     // Use periodic refresh for stats instead of full collection listeners
     this._setupStatsRefresh()
@@ -246,7 +247,7 @@ class FirestoreRealtimeService {
             const isRecentlyCreated = (Date.now() - userCreatedAt.getTime()) < 30000
             
             if (!isInitialLoad || isRecentlyCreated) {
-              console.log('[FirestoreRealtime] New user registered:', user.email || user.id)
+              logger.log('[FirestoreRealtime] New user registered:', user.email || user.id)
               this._notify('users', {
                 type: 'user_created',
                 user,
@@ -309,7 +310,7 @@ class FirestoreRealtimeService {
             const isRecentlyCreated = (Date.now() - orderCreatedAt.getTime()) < 30000
             
             if (!isInitialLoad || isRecentlyCreated) {
-              console.log('[FirestoreRealtime] New order:', order.id, order.productName)
+              logger.log('[FirestoreRealtime] New order:', order.id, order.productName)
               this._notify('orders', {
                 type: 'order_created',
                 order,
@@ -433,7 +434,7 @@ class FirestoreRealtimeService {
     }
     
     this.isInitialized = false
-    console.log('[FirestoreRealtime] Admin listeners cleaned up')
+    logger.log('[FirestoreRealtime] Admin listeners cleaned up')
   }
 
   /**
@@ -449,3 +450,6 @@ const firestoreRealtimeService = new FirestoreRealtimeService()
 
 export default firestoreRealtimeService
 export { firestoreRealtimeService }
+
+
+

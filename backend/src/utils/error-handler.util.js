@@ -7,6 +7,7 @@
 
 const localizationService = require('../services/localization.service');
 
+const logger = require('../utils/logger');
 // ============================================================================
 // ERROR MAPPINGS - Map technical errors to friendly keys
 // ============================================================================
@@ -239,7 +240,7 @@ function createUserFriendlyError(error, lang = 'en', context = {}) {
   }
   
   // Log the original error for debugging (server-side only)
-  console.error(`[ERROR] Original: ${errorCode}`, error?.message || error);
+  logger.error(`[ERROR] Original: ${errorCode}`, error?.message || error);
   
   return {
     success: false,

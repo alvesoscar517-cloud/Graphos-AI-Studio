@@ -1,3 +1,4 @@
+import { logger } from './logger'
 /**
  * Enhanced Configuration
  * Centralized config with validation and environment awareness
@@ -136,7 +137,7 @@ export const CONFIG = {
  */
 export function debugLog(...args) {
   if (CONFIG.ENABLE_DEBUG_LOGS) {
-    console.log('[DEBUG]', ...args);
+    logger.log('[DEBUG]', ...args);
   }
 }
 
@@ -199,9 +200,9 @@ export function validateConfig() {
   }
   
   if (CONFIG.ENABLE_DEBUG_LOGS) {
-    console.log('[CONFIG] Configuration validated successfully');
-    console.log('[CONFIG] Environment:', MODE);
-    console.log('[CONFIG] API URL:', CONFIG.API_BASE_URL);
+    logger.log('[CONFIG] Configuration validated successfully');
+    logger.log('[CONFIG] Environment:', MODE);
+    logger.log('[CONFIG] API URL:', CONFIG.API_BASE_URL);
   }
   
   return true;
@@ -233,3 +234,4 @@ export function isFileSizeValid(sizeInBytes) {
 validateConfig();
 
 export default CONFIG;
+

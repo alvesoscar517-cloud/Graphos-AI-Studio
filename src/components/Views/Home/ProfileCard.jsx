@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/utils'
-import LazyLottie from '../../Common/LazyLottie'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
 
 /**

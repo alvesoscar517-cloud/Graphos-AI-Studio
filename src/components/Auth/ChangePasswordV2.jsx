@@ -14,6 +14,41 @@ const ChangePasswordV2 = ({ onChangePassword, onCancel, isLoading: externalLoadi
     new: false,
     confirm: false,
   })
+  const [showSuccess, setShowSuccess] = useState(false)
+
+  // Helper to parse change password errors
+  const getChangePasswordErrorMessage = (err) => {
+    const message = err.message || ''
+    const errorCode = err.code || message.split(':')[0]?.trim()
+    
+    switch (errorCode) {
+      case 'AUTH_INVALID_CREDENTIALS':
+      case 'AUTH_WRONG_PASSWORD':
+        return t('auth.errors.currentPasswordIncorrect', 'Current password is incorrect.')
+        
+      case 'AUTH_WEAK_PASSWORD':
+        return t('auth.errors.weakPassword', 'Password does not meet requirements. Please use a stronger password.')
+        
+      case 'AUTH_PASSWORD_SAME':
+        return t('auth.email.passwordSameAsCurrent', 'New password must be different from current password.')
+        
+      case 'AUTH_PASSWORD_REUSED':
+        return t('auth.errors.passwordReused', 'Cannot reuse recent passwords. Please choose a different password.')
+        
+      case 'AUTH_TOO_MANY_ATTEMPTS':
+        return t('auth.errors.tooManyPasswordAttempts', 'Too many failed attempts. Please try again later.')
+        
+      case 'NETWORK_ERROR':
+        return t('errors.networkError', 'Connection error. Please check your network.')
+        
+      default:
+        const colonIndex = message.indexOf(':')
+        if (colonIndex > 0) {
+          return message.substring(colonIndex + 1).trim()
+        }
+        return message || t('auth.email.changePasswordFailed', 'Failed to change password. Please try again.')
+    }
+  }
 
   const {
     register,
@@ -22,7 +57,19 @@ const ChangePasswordV2 = ({ onChangePassword, onCancel, isLoading: externalLoadi
     rootError,
     isLoading: formLoading,
   } = useChangePasswordForm(async (data) => {
-    await onChangePassword(data.currentPassword, data.newPassword)
+    try {
+      const result = await onChangePassword(data.currentPassword, data.newPassword)
+      if (result?.success === false) {
+        const error = new Error(result.error || 'Failed to change password')
+        // @ts-ignore - Adding code property for error handling
+        error.code = result.code
+        throw error
+      }
+      setShowSuccess(true)
+    } catch (err) {
+      const errorMessage = getChangePasswordErrorMessage(err)
+      throw new Error(errorMessage)
+    }
   })
 
   const isLoading = externalLoading || formLoading
@@ -60,6 +107,38 @@ const ChangePasswordV2 = ({ onChangePassword, onCancel, isLoading: externalLoadi
         <circle cx="12" cy="12" r="3" />
       </svg>
     )
+
+  // Success state
+  if (showSuccess) {
+    return (
+      <div className="text-center py-6">
+        <div className="w-16 h-16 bg-emerald-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <svg className="w-8 h-8 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <h4 className="m-0 mb-2 text-lg font-semibold text-gray-900">
+          {t('auth.email.passwordChangedTitle', 'Password Changed!')}
+        </h4>
+        <p className="m-0 mb-6 text-sm text-gray-600 leading-relaxed">
+          {t('auth.email.passwordChangedMessage', 'Your password has been updated successfully. You may need to sign in again on other devices.')}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setShowSuccess(false)
+            onCancel?.()
+          }}
+          className={cn(
+            "px-6 py-3 text-sm font-semibold rounded-xl transition-all duration-200",
+            "bg-system-blue text-white hover:brightness-110 active:scale-[0.98]"
+          )}
+        >
+          {t('auth.email.done', 'Done')}
+        </button>
+      </div>
+    )
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

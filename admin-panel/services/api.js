@@ -1,3 +1,4 @@
+import logger from '../lib/logger'
 import { CONFIG } from '../utils/config'
 import { isDevMode, getDefaultTestUser, devLog } from '../utils/devConfig'
 import { getAuthHeader } from './authService'
@@ -37,7 +38,7 @@ export async function getUserInfo() {
           }
         }
       } catch (chromeError) {
-        console.log('Chrome extension context not available, using localStorage')
+        logger.log('Chrome extension context not available, using localStorage')
       }
     }
   } catch (error) {
@@ -72,7 +73,7 @@ export async function getUserInfo() {
 export async function loadProfiles() {
   try {
     const userInfo = await getUserInfo()
-    console.log('📋 Loading profiles for user:', userInfo.userId)
+    logger.log('📋 Loading profiles for user:', userInfo.userId)
     
     // Use new endpoint instead of deprecated /get_profiles
     const url = `${CONFIG.API_BASE_URL}/profiles?user_id=${userInfo.userId}`
@@ -83,7 +84,7 @@ export async function loadProfiles() {
     const data = await response.json()
     
     if (response.ok && data.success) {
-      console.log('[SUCCESS] Loaded profiles:', data.profiles?.length || 0)
+      logger.log('[SUCCESS] Loaded profiles:', data.profiles?.length || 0)
       return data.profiles || []
     }
     console.warn('[WARNING] API returned error:', data)
@@ -291,7 +292,7 @@ export async function addSample(profileId, text) {
 
 export async function addSamplesBatch(profileId, samples) {
   try {
-    console.log(`[PACKAGE] Uploading ${samples.length} samples in batch...`)
+    logger.log(`[PACKAGE] Uploading ${samples.length} samples in batch...`)
     const response = await fetch(`${CONFIG.API_BASE_URL}/add_samples_batch`, {
       method: 'POST',
       headers: getApiHeaders(),
@@ -303,7 +304,7 @@ export async function addSamplesBatch(profileId, samples) {
     
     const data = await response.json()
     if (response.ok && data.success) {
-      console.log(`[SUCCESS] Batch upload successful: ${data.samples_added} samples`)
+      logger.log(`[SUCCESS] Batch upload successful: ${data.samples_added} samples`)
       return data
     }
     throw new Error(data.error || 'Failed to add samples batch')
@@ -336,20 +337,20 @@ export async function finalizeProfile(profileId) {
 
 export async function getProfileDetails(profileId) {
   try {
-    console.log('📋 Loading profile details for:', profileId)
+    logger.log('📋 Loading profile details for:', profileId)
     
     const url = `${CONFIG.API_BASE_URL}/get_profile?profile_id=${profileId}`
-    console.log('[LINK] API URL:', url)
+    logger.log('[LINK] API URL:', url)
     
     const response = await fetch(url, {
       headers: getApiHeaders()
     })
     const data = await response.json()
     
-    console.log('[PACKAGE] Profile Details Response:', data)
+    logger.log('[PACKAGE] Profile Details Response:', data)
     
     if (response.ok && data.success) {
-      console.log('[SUCCESS] Loaded profile details')
+      logger.log('[SUCCESS] Loaded profile details')
       return data.profile
     }
     throw new Error(data.error || 'Failed to load profile details')
@@ -362,7 +363,7 @@ export async function getProfileDetails(profileId) {
 // Suggestion API - NEW
 export async function getSuggestions(profileId, sentence, sentenceScore, context = {}) {
   try {
-    console.log('💡 Getting suggestions for sentence...')
+    logger.log('💡 Getting suggestions for sentence...')
     
     const response = await fetch(`${CONFIG.API_BASE_URL}/suggest_improvements`, {
       method: 'POST',
@@ -378,7 +379,7 @@ export async function getSuggestions(profileId, sentence, sentenceScore, context
     const data = await response.json()
     
     if (response.ok && data.success) {
-      console.log(`[SUCCESS] Got ${data.suggestions?.length || 0} suggestions`)
+      logger.log(`[SUCCESS] Got ${data.suggestions?.length || 0} suggestions`)
       return { success: true, data }
     }
     
@@ -436,7 +437,7 @@ export async function analyzeTextOptimized(profileId, text) {
     const cached = getCachedData(cacheKey)
     
     if (cached) {
-      console.log('⚡ Using cached analysis result')
+      logger.log('⚡ Using cached analysis result')
       return { success: true, data: cached }
     }
     
@@ -487,7 +488,7 @@ export async function getSuggestionsOptimized(profileId, sentence, sentenceScore
     const cached = getCachedData(cacheKey)
     
     if (cached) {
-      console.log('⚡ Using cached suggestions')
+      logger.log('⚡ Using cached suggestions')
       return { success: true, data: cached }
     }
     
@@ -538,3 +539,5 @@ export async function analyzeTextBatch(profileId, texts) {
     return { success: false, error: error.message }
   }
 }
+
+

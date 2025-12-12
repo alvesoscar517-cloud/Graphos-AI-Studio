@@ -1,3 +1,4 @@
+import logger from '../lib/logger'
 const DB_NAME = 'AIContentAuthenticator'
 const DB_VERSION = 1
 const NOTES_STORE = 'notes'
@@ -18,7 +19,7 @@ export async function initDB() {
 
     request.onsuccess = () => {
       db = request.result
-      console.log('[SUCCESS] IndexedDB initialized')
+      logger.log('[SUCCESS] IndexedDB initialized')
       resolve(db)
     }
 
@@ -29,7 +30,7 @@ export async function initDB() {
       if (!db.objectStoreNames.contains(NOTES_STORE)) {
         const notesStore = db.createObjectStore(NOTES_STORE, { keyPath: 'id' })
         notesStore.createIndex('updated', 'updated', { unique: false })
-        console.log('[SUCCESS] Created notes store')
+        logger.log('[SUCCESS] Created notes store')
       }
     }
   })
@@ -47,7 +48,7 @@ export async function getNotesFromDB() {
     const request = store.getAll()
 
     request.onsuccess = () => {
-      console.log('[SUCCESS] Loaded notes from IndexedDB:', request.result.length)
+      logger.log('[SUCCESS] Loaded notes from IndexedDB:', request.result.length)
       resolve(request.result)
     }
 
@@ -77,7 +78,7 @@ export async function saveNotesToDB(notes) {
     })
 
     transaction.oncomplete = () => {
-      console.log('[SUCCESS] Saved notes to IndexedDB:', notes.length)
+      logger.log('[SUCCESS] Saved notes to IndexedDB:', notes.length)
       resolve()
     }
 
@@ -100,7 +101,7 @@ export async function saveNoteToDB(note) {
     const request = store.put(note)
 
     request.onsuccess = () => {
-      console.log('[SUCCESS] Saved note to IndexedDB:', note.title)
+      logger.log('[SUCCESS] Saved note to IndexedDB:', note.title)
       resolve()
     }
 
@@ -123,7 +124,7 @@ export async function deleteNoteFromDB(noteId) {
     const request = store.delete(noteId)
 
     request.onsuccess = () => {
-      console.log('[SUCCESS] Deleted note from IndexedDB')
+      logger.log('[SUCCESS] Deleted note from IndexedDB')
       resolve()
     }
 
@@ -146,7 +147,7 @@ export async function clearNotesDB() {
     const request = store.clear()
 
     request.onsuccess = () => {
-      console.log('[SUCCESS] Cleared notes from IndexedDB')
+      logger.log('[SUCCESS] Cleared notes from IndexedDB')
       resolve()
     }
 
@@ -156,3 +157,4 @@ export async function clearNotesDB() {
     }
   })
 }
+

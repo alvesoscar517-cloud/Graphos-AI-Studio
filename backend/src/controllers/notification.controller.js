@@ -35,9 +35,9 @@ exports.getUserNotifications = async (req, res) => {
     } catch (indexError) {
       // Fallback: query without orderBy, sort in memory
       // This happens when composite index is not yet created
-      console.warn('[WARN] Composite index not available, using fallback query:', indexError.message);
+      logger.warn('[WARN] Composite index not available, using fallback query:', indexError.message);
       
-      let query = db.collection('user_notifications')
+      const query = db.collection('user_notifications')
         .where('userId', '==', user_id);
       
       snapshot = await query.get();
@@ -111,7 +111,7 @@ exports.getUserNotifications = async (req, res) => {
       language: l.lang
     });
   } catch (error) {
-    console.error('[ERROR] Get user notifications error:', error);
+    logger.error('[ERROR] Get user notifications error:', error);
     logger.error('Get user notifications error', { 
       userId: req.query?.user_id,
       error: error.message, 
@@ -162,7 +162,7 @@ exports.markAsRead = async (req, res) => {
       message: l.t('notifications.mark_read')
     });
   } catch (error) {
-    console.error('[ERROR] Mark notification as read error:', error);
+    logger.error('[ERROR] Mark notification as read error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
@@ -207,7 +207,7 @@ exports.markAsClicked = async (req, res) => {
       message: l.t('success.updated')
     });
   } catch (error) {
-    console.error('[ERROR] Mark notification as clicked error:', error);
+    logger.error('[ERROR] Mark notification as clicked error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
@@ -243,7 +243,7 @@ exports.deleteNotification = async (req, res) => {
       message: l.t('success.deleted')
     });
   } catch (error) {
-    console.error('[ERROR] Delete notification error:', error);
+    logger.error('[ERROR] Delete notification error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
@@ -306,7 +306,7 @@ exports.markAllAsRead = async (req, res) => {
       updated: snapshot.size
     });
   } catch (error) {
-    console.error('[ERROR] Mark all as read error:', error);
+    logger.error('[ERROR] Mark all as read error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
@@ -334,7 +334,7 @@ exports.getUnreadCount = async (req, res) => {
       count: snapshot.size
     });
   } catch (error) {
-    console.error('[ERROR] Get unread count error:', error);
+    logger.error('[ERROR] Get unread count error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };

@@ -1,10 +1,12 @@
 /**
  * Toast Container Component
  * Renders toasts from Zustand UI store
+ * Includes error reporting button for error toasts
  */
 
 import { useToasts } from '@/stores/uiStore'
 import { cn } from '@/lib/utils'
+import { ErrorReportButton } from './ErrorReportButton'
 
 const toastStyles = {
   success: 'bg-green-500/90 text-white',
@@ -56,6 +58,16 @@ export function ToastContainer() {
             {toastIcons[toast.type] || toastIcons.info}
           </span>
           <p className="flex-1 text-sm font-medium">{toast.message}</p>
+          
+          {/* Show report button for error toasts */}
+          {toast.type === 'error' && (
+            <ErrorReportButton 
+              error={toast.error || toast.message}
+              context={toast.context}
+              variant="mini"
+            />
+          )}
+          
           <button
             onClick={() => removeToast(toast.id)}
             className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"

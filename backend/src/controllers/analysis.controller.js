@@ -448,7 +448,7 @@ exports.analyzeText = async (req, res) => {
             rewritten
           };
         } catch (err) {
-          console.error(`[WARN] Failed to generate AI suggestions for sentence ${item.index}:`, err.message);
+          logger.error(`[WARN] Failed to generate AI suggestions for sentence ${item.index}:`, err.message);
           return null;
         }
       });
@@ -639,7 +639,7 @@ exports.suggestImprovements = async (req, res) => {
       issues_found: issues.length
     });
   } catch (error) {
-    console.error('[ERROR] Suggestion generation error:', error);
+    logger.error('[ERROR] Suggestion generation error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
@@ -708,11 +708,11 @@ exports.rewriteText = async (req, res) => {
         sampleText = samplesSnapshot.docs[0].data().text;
       }
     } catch (e) {
-      console.log('[WARN] Could not fetch sample text for few-shot:', e.message);
+      logger.info('[WARN] Could not fetch sample text for few-shot:', e.message);
     }
 
     // Enhance context with writing preferences and new options
-    let enhancedContext = { ...context, sampleText };
+    const enhancedContext = { ...context, sampleText };
     if (writing_preferences) {
       enhancedContext.writingPreferences = {
         useVocabularyPreferences: writing_preferences.useVocabularyPreferences,
@@ -743,7 +743,7 @@ exports.rewriteText = async (req, res) => {
           confidence: aiCheck.confidence 
         });
       } catch (e) {
-        console.log('[WARN] Post-rewrite AI check failed:', e.message);
+        logger.info('[WARN] Post-rewrite AI check failed:', e.message);
       }
     }
 
@@ -788,7 +788,7 @@ exports.rewriteText = async (req, res) => {
       message: l.t('humanize.complete')
     });
   } catch (error) {
-    console.error('[ERROR] Rewrite error:', error);
+    logger.error('[ERROR] Rewrite error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
@@ -841,7 +841,7 @@ exports.rewriteTextStream = async (req, res) => {
           sampleText = samplesSnapshot.docs[0].data().text?.substring(0, 1000);
         }
       } catch (e) {
-        console.log('[WARN] Could not fetch sample text:', e.message);
+        logger.info('[WARN] Could not fetch sample text:', e.message);
       }
     } else {
       // Generic voice profile when no profile provided
@@ -853,7 +853,7 @@ exports.rewriteTextStream = async (req, res) => {
         transition_preferences: [],
         punctuation_style: 'Standard'
       };
-      console.log('[REWRITE] Using generic voice profile (no profile_id provided)');
+      logger.info('[REWRITE] Using generic voice profile (no profile_id provided)');
     }
 
     // Set CORS headers explicitly for streaming (in case middleware hasn't fully loaded)
@@ -884,7 +884,7 @@ exports.rewriteTextStream = async (req, res) => {
         sampleText,
         { writingPreferences: writing_preferences }
       );
-      console.log('[REWRITE] Using enhanced prompt with anti-AI detection');
+      logger.info('[REWRITE] Using enhanced prompt with anti-AI detection');
     } else {
       // Build simple prompt without anti-AI detection rules
       prompt = humanizeService.buildSimpleRewritePrompt(
@@ -893,7 +893,7 @@ exports.rewriteTextStream = async (req, res) => {
         sampleText,
         { writingPreferences: writing_preferences }
       );
-      console.log('[REWRITE] Using simple prompt without anti-AI detection');
+      logger.info('[REWRITE] Using simple prompt without anti-AI detection');
     }
 
     const modelName = model || 'gemini-2.5-flash';
@@ -938,7 +938,7 @@ exports.rewriteTextStream = async (req, res) => {
           res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
         }
       } catch (chunkError) {
-        console.error('Error processing chunk:', chunkError);
+        logger.error('Error processing chunk:', chunkError);
       }
     }
 
@@ -977,7 +977,7 @@ exports.rewriteTextStream = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('[ERROR] Streaming rewrite error:', error);
+    logger.error('[ERROR] Streaming rewrite error:', error);
     res.write(`data: ${JSON.stringify({ error: String(error) })}\n\n`);
     res.end();
   }
@@ -1042,7 +1042,7 @@ exports.checkHumanization = async (req, res) => {
       language: l.lang
     });
   } catch (error) {
-    console.error('[ERROR] Humanization check error:', error);
+    logger.error('[ERROR] Humanization check error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
@@ -1101,7 +1101,7 @@ exports.iterativeHumanize = async (req, res) => {
         sampleText = samplesSnapshot.docs[0].data().text;
       }
     } catch (e) {
-      console.log('[WARN] Could not fetch sample text:', e.message);
+      logger.info('[WARN] Could not fetch sample text:', e.message);
     }
 
     const humanizeService = require('../services/humanize.service');
@@ -1172,7 +1172,7 @@ exports.iterativeHumanize = async (req, res) => {
       message: l.t('humanize.complete')
     });
   } catch (error) {
-    console.error('[ERROR] Iterative humanize error:', error);
+    logger.error('[ERROR] Iterative humanize error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
@@ -1284,7 +1284,7 @@ exports.startIterativeHumanize = async (req, res) => {
       message: l.t('humanize.job_started') || 'Humanization job started'
     });
   } catch (error) {
-    console.error('[ERROR] Start iterative humanize error:', error);
+    logger.error('[ERROR] Start iterative humanize error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
@@ -1351,7 +1351,7 @@ exports.getHumanizeJobStatus = async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.error('[ERROR] Get humanize job status error:', error);
+    logger.error('[ERROR] Get humanize job status error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
@@ -1438,7 +1438,7 @@ exports.streamHumanizeJobResult = async (req, res) => {
       textLength: rewrittenText.length 
     });
   } catch (error) {
-    console.error('[ERROR] Stream humanize job result error:', error);
+    logger.error('[ERROR] Stream humanize job result error:', error);
     
     // If headers not sent yet, send JSON error
     if (!res.headersSent) {
@@ -1494,7 +1494,7 @@ exports.translateText = async (req, res) => {
       language: l.lang
     });
   } catch (error) {
-    console.error('[ERROR] Translation error:', error);
+    logger.error('[ERROR] Translation error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };

@@ -52,7 +52,7 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
     <div className="px-5 pb-3.5 text-center">
       <div className="mb-3 py-1.5 px-3.5 inline-block">
         {isLoading ? (
-          <span className="text-sm text-text-secondary animate-pulse">Loading...</span>
+          <span className="text-sm text-text-secondary animate-pulse">{t('common.loading')}</span>
         ) : (
           <span className={cn(
             "text-sm tracking-wide text-text-secondary",

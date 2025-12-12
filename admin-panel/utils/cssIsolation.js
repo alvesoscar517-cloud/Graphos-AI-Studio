@@ -1,3 +1,4 @@
+import logger from '../lib/logger'
 /**
  * CSS Isolation Utilities
  * Tools to ensure admin CSS doesn't conflict with main app
@@ -52,25 +53,25 @@ export function logCSSIsolationStatus() {
   
   // Check Shadow DOM support
   const shadowSupported = isShadowDOMSupported();
-  console.log('Shadow DOM Support:', shadowSupported ? '[SUCCESS]' : '[FAIL]');
+  logger.log('Shadow DOM Support:', shadowSupported ? '[SUCCESS]' : '[FAIL]');
 
   // Check for conflicts
   const conflicts = detectCSSConflicts();
   if (conflicts.length > 0) {
     console.warn('[WARNING] Potential CSS conflicts detected:', conflicts);
   } else {
-    console.log('[SUCCESS] No CSS conflicts detected');
+    logger.log('[SUCCESS] No CSS conflicts detected');
   }
 
   // Check admin root
   const adminRoot = document.getElementById('admin-root');
   if (adminRoot) {
     const hasShadowRoot = !!adminRoot.shadowRoot;
-    console.log('Admin Root Shadow DOM:', hasShadowRoot ? '[SUCCESS]' : '[FAIL]');
+    logger.log('Admin Root Shadow DOM:', hasShadowRoot ? '[SUCCESS]' : '[FAIL]');
     
     if (hasShadowRoot) {
-      console.log('Shadow Root Mode:', adminRoot.shadowRoot.mode);
-      console.log('Shadow Root Children:', adminRoot.shadowRoot.children.length);
+      logger.log('Shadow Root Mode:', adminRoot.shadowRoot.mode);
+      logger.log('Shadow Root Children:', adminRoot.shadowRoot.children.length);
     }
   }
 
@@ -160,3 +161,4 @@ export function monitorCSSChanges() {
 
   return observer;
 }
+

@@ -3,6 +3,7 @@
  * TanStack Query hook for voice profiles management with real-time updates
  */
 
+import { logger } from '@/utils/logger'
 import { useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queryKeys'
@@ -41,7 +42,7 @@ export function useProfilesQuery(options = {}) {
 
         // Subscribe to profile events
         unsubscribeRef.current = realtimeService.subscribe('profile', (data) => {
-          console.log('[REALTIME] Profile update received:', data)
+          logger.log('[REALTIME] Profile update received:', data)
           // Invalidate to refetch on any profile change
           if (data.type === 'created' || data.type === 'updated' || data.type === 'deleted') {
             queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })

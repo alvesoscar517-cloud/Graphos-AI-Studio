@@ -7,6 +7,7 @@
 const { v4: uuidv4 } = require('uuid');
 const geminiService = require('../services/gemini.service');
 const humanizeService = require('../services/humanize.service');
+const logger = require('../utils/logger');
 const { 
   loadProfile, 
   buildEnhancedSystemPrompt, 
@@ -108,7 +109,7 @@ exports.sendMessage = async (req, res) => {
       });
     }
 
-    console.log(`[INFO] Chat request: ${messages.length} messages, model: ${model}`);
+    logger.info(`[INFO] Chat request: ${messages.length} messages, model: ${model}`);
 
     // Load profile and build enhanced system prompt
     const profile = await loadProfile(profileId);
@@ -126,7 +127,7 @@ exports.sendMessage = async (req, res) => {
 
     // Estimate tokens
     const tokenEstimate = estimateConversationTokens(optimizedMessages, enhancedSystemPrompt);
-    console.log(`[INFO] Estimated tokens: ${tokenEstimate.total}`);
+    logger.info(`[INFO] Estimated tokens: ${tokenEstimate.total}`);
 
     const generativeModel = geminiService.vertexAI.getGenerativeModel({
       model: model,
@@ -142,7 +143,7 @@ exports.sendMessage = async (req, res) => {
 
     if (hasMultimodalContent(lastMessage)) {
       // Multimodal request
-      console.log('[INFO] Processing multimodal message with attachments');
+      logger.info('[INFO] Processing multimodal message with attachments');
       const contentParts = await buildMultimodalContent(
         lastMessage.content, 
         lastMessage.attachments
@@ -178,7 +179,7 @@ exports.sendMessage = async (req, res) => {
       throw new Error('Unable to extract text from response');
     }
 
-    console.log(`[SUCCESS] Chat response generated (${text.length} chars)`);
+    logger.info(`[SUCCESS] Chat response generated (${text.length} chars)`);
 
     // Log activity if user_id is available from request
     const userId = req.body.user_id || req.headers['x-user-id'];
@@ -209,7 +210,7 @@ exports.sendMessage = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[ERROR] Chat error:', error);
+    logger.error('[ERROR] Chat error:', error);
     const formattedError = formatError(error);
     res.status(500).json({ 
       error: formattedError.message,
@@ -245,7 +246,7 @@ exports.sendMessageStream = async (req, res) => {
       });
     }
 
-    console.log(`[INFO] Chat stream request: ${messages.length} messages, model: ${model}`);
+    logger.info(`[INFO] Chat stream request: ${messages.length} messages, model: ${model}`);
 
     // Load profile and build enhanced system prompt
     const profile = await loadProfile(profileId);
@@ -292,7 +293,7 @@ exports.sendMessageStream = async (req, res) => {
       })}\n\n`);
     }
 
-    let finalSystemPrompt = enhancedSystemPrompt;
+    const finalSystemPrompt = enhancedSystemPrompt;
     
     // Build generation config
     const generationConfig = {
@@ -313,7 +314,7 @@ exports.sendMessageStream = async (req, res) => {
 
     if (hasMultimodalContent(lastMessage)) {
       // Multimodal streaming
-      console.log('[INFO] Processing multimodal stream with attachments');
+      logger.info('[INFO] Processing multimodal stream with attachments');
       const contentParts = await buildMultimodalContent(
         lastMessage.content, 
         lastMessage.attachments
@@ -361,7 +362,7 @@ exports.sendMessageStream = async (req, res) => {
           res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
         }
       } catch (chunkError) {
-        console.error('[ERROR] Error processing chunk:', chunkError);
+        logger.error('[ERROR] Error processing chunk:', chunkError);
       }
     }
 
@@ -390,11 +391,11 @@ exports.sendMessageStream = async (req, res) => {
       });
     }
 
-    console.log(`[SUCCESS] Chat stream completed (${totalChars} chars)`);
+    logger.info(`[SUCCESS] Chat stream completed (${totalChars} chars)`);
 
   } catch (error) {
-    console.error('[ERROR] Chat stream error:', error);
-    console.error('[ERROR] Chat stream error details:', {
+    logger.error('[ERROR] Chat stream error:', error);
+    logger.error('[ERROR] Chat stream error details:', {
       message: error.message,
       code: error.code,
       status: error.status,
@@ -448,14 +449,14 @@ exports.uploadFile = async (req, res) => {
           extractedText = null;
         }
       } catch (e) {
-        console.warn('[WARN] OCR failed:', e.message);
+        logger.warn('[WARN] OCR failed:', e.message);
       }
 
       // Get image description
       try {
         analysis = await analyzeImage(file, mimeType, 'Briefly describe what you see in this image.');
       } catch (e) {
-        console.warn('[WARN] Image analysis failed:', e.message);
+        logger.warn('[WARN] Image analysis failed:', e.message);
       }
     }
 
@@ -485,7 +486,7 @@ exports.uploadFile = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[ERROR] Upload error:', error);
+    logger.error('[ERROR] Upload error:', error);
     const formattedError = formatError(error);
     res.status(500).json({ 
       error: formattedError.message,
@@ -530,7 +531,7 @@ exports.summarizeConversation = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[ERROR] Summarization error:', error);
+    logger.error('[ERROR] Summarization error:', error);
     const formattedError = formatError(error);
     res.status(500).json({ 
       error: formattedError.message,
@@ -569,7 +570,7 @@ exports.sendMessageHumanized = async (req, res) => {
 
     // Profile is optional - humanization can work without profile using generic voice
 
-    console.log(`[INFO] Humanized chat request: ${messages.length} messages, model: ${model}, profileId: ${profileId || 'none'}`);
+    logger.info(`[INFO] Humanized chat request: ${messages.length} messages, model: ${model}, profileId: ${profileId || 'none'}`);
 
     // Load profile (optional - can be null for generic humanization)
     const profile = await loadProfile(profileId);
@@ -630,7 +631,7 @@ exports.sendMessageHumanized = async (req, res) => {
     let text = result.response.text ? result.response.text() : 
       result.response.candidates[0].content.parts[0].text;
 
-    console.log(`[INFO] Initial response generated (${text.length} chars)`);
+    logger.info(`[INFO] Initial response generated (${text.length} chars)`);
 
     // Smart humanization based on text length and settings
     let humanizationResult = null;
@@ -642,15 +643,15 @@ exports.sendMessageHumanized = async (req, res) => {
         if (text.length < 500) {
           text = humanizeService.injectHumanImperfections(text, voiceProfile);
           humanizationResult = { applied: true, method: 'light' };
-          console.log('[INFO] Applied light humanization for short response');
+          logger.info('[INFO] Applied light humanization for short response');
         } else {
           // For longer text, check AI probability first
-          console.log('[INFO] Checking AI probability...');
+          logger.info('[INFO] Checking AI probability...');
           const aiCheck = await geminiService.detectAIContentEnhanced(text);
           
           if (aiCheck.aiProbability > targetProbability + 15) {
             // AI probability significantly above target - do refinement
-            console.log(`[INFO] AI probability ${aiCheck.aiProbability}% > target, applying refinement...`);
+            logger.info(`[INFO] AI probability ${aiCheck.aiProbability}% > target, applying refinement...`);
             
             const humanized = await humanizeService.rewriteWithIterativeRefinement(
               text,
@@ -673,7 +674,7 @@ exports.sendMessageHumanized = async (req, res) => {
               reachedTarget: humanized.reachedTarget
             };
             
-            console.log(`[SUCCESS] Humanization: ${aiCheck.aiProbability}% -> ${humanized.aiProbability}%`);
+            logger.info(`[SUCCESS] Humanization: ${aiCheck.aiProbability}% -> ${humanized.aiProbability}%`);
           } else if (aiCheck.aiProbability > targetProbability) {
             // Slightly above target - just apply imperfections
             text = humanizeService.injectHumanImperfections(text, voiceProfile);
@@ -689,11 +690,11 @@ exports.sendMessageHumanized = async (req, res) => {
               reason: 'already_human',
               aiProbability: aiCheck.aiProbability
             };
-            console.log(`[INFO] AI probability ${aiCheck.aiProbability}% already below target`);
+            logger.info(`[INFO] AI probability ${aiCheck.aiProbability}% already below target`);
           }
         }
       } catch (humanizeError) {
-        console.error('[WARN] Humanization failed:', humanizeError.message);
+        logger.error('[WARN] Humanization failed:', humanizeError.message);
         humanizationResult = { applied: false, error: humanizeError.message };
       }
     } else if (chatSettings?.useAntiAIDetection && text.length > 100) {
@@ -728,7 +729,7 @@ exports.sendMessageHumanized = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[ERROR] Humanized chat error:', error);
+    logger.error('[ERROR] Humanized chat error:', error);
     const formattedError = formatError(error);
     res.status(500).json({ 
       error: formattedError.message,
@@ -765,7 +766,7 @@ exports.sendMessageHumanizedStream = async (req, res) => {
       });
     }
 
-    console.log(`[INFO] Humanized stream request: ${messages.length} messages, model: ${model}, profileId: ${profileId || 'none'}`);
+    logger.info(`[INFO] Humanized stream request: ${messages.length} messages, model: ${model}, profileId: ${profileId || 'none'}`);
 
     // Load profile (optional - can be null for generic humanization)
     const profile = await loadProfile(profileId);
@@ -902,7 +903,7 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
           res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
         }
       } catch (chunkError) {
-        console.error('[ERROR] Error processing chunk:', chunkError);
+        logger.error('[ERROR] Error processing chunk:', chunkError);
       }
     }
 
@@ -920,15 +921,15 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
           // Light humanization - just imperfection injection
           finalText = humanizeService.injectHumanImperfections(fullText, voiceProfile);
           humanizationResult = { applied: true, method: 'light' };
-          console.log('[INFO] Applied light humanization for short response');
+          logger.info('[INFO] Applied light humanization for short response');
         } else {
           // For longer text, check AI probability first
-          console.log('[INFO] Checking AI probability for longer response...');
+          logger.info('[INFO] Checking AI probability for longer response...');
           const aiCheck = await geminiService.detectAIContentEnhanced(fullText);
           
           if (aiCheck.aiProbability > targetProbability + 15) {
             // AI probability is significantly above target - do one refinement iteration
-            console.log(`[INFO] AI probability ${aiCheck.aiProbability}% > target ${targetProbability}%, applying refinement...`);
+            logger.info(`[INFO] AI probability ${aiCheck.aiProbability}% > target ${targetProbability}%, applying refinement...`);
             
             // Send progress to client
             res.write(`data: ${JSON.stringify({ 
@@ -967,7 +968,7 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
               improved: recheck.aiProbability < aiCheck.aiProbability
             };
             
-            console.log(`[SUCCESS] Refinement complete: ${aiCheck.aiProbability}% -> ${recheck.aiProbability}%`);
+            logger.info(`[SUCCESS] Refinement complete: ${aiCheck.aiProbability}% -> ${recheck.aiProbability}%`);
           } else if (aiCheck.aiProbability > targetProbability) {
             // AI probability slightly above target - just apply imperfections
             finalText = humanizeService.injectHumanImperfections(fullText, voiceProfile);
@@ -976,7 +977,7 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
               method: 'imperfections',
               aiProbability: aiCheck.aiProbability
             };
-            console.log(`[INFO] AI probability ${aiCheck.aiProbability}% close to target, applied imperfections only`);
+            logger.info(`[INFO] AI probability ${aiCheck.aiProbability}% close to target, applied imperfections only`);
           } else {
             // Already below target - no humanization needed
             humanizationResult = { 
@@ -984,7 +985,7 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
               reason: 'already_human',
               aiProbability: aiCheck.aiProbability
             };
-            console.log(`[INFO] AI probability ${aiCheck.aiProbability}% already below target ${targetProbability}%`);
+            logger.info(`[INFO] AI probability ${aiCheck.aiProbability}% already below target ${targetProbability}%`);
           }
         }
         
@@ -996,7 +997,7 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
           })}\n\n`);
         }
       } catch (e) {
-        console.warn('[WARN] Post-humanization failed:', e.message);
+        logger.warn('[WARN] Post-humanization failed:', e.message);
         humanizationResult = { applied: false, error: e.message };
       }
     } else if (chatSettings?.useAntiAIDetection && fullText.length > 100) {
@@ -1011,7 +1012,7 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
         }
         humanizationResult = { applied: true, method: 'anti-ai' };
       } catch (e) {
-        console.warn('[WARN] Anti-AI imperfection injection failed:', e.message);
+        logger.warn('[WARN] Anti-AI imperfection injection failed:', e.message);
       }
     }
 
@@ -1042,10 +1043,10 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
       });
     }
 
-    console.log(`[SUCCESS] Humanized stream completed (${totalChars} chars)`);
+    logger.info(`[SUCCESS] Humanized stream completed (${totalChars} chars)`);
 
   } catch (error) {
-    console.error('[ERROR] Humanized stream error:', error);
+    logger.error('[ERROR] Humanized stream error:', error);
     const formattedError = formatError(error);
     res.write(`data: ${JSON.stringify({ 
       error: formattedError.message,

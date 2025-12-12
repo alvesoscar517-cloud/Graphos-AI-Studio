@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { logger } from '@/utils/logger'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -17,11 +18,11 @@ import DeviationCard from '../Analysis/DeviationCard'
 import StatisticsCard from '../Analysis/StatisticsCard'
 import ModelSelector from '../Analysis/ModelSelector'
 import WritingPreferences from '../Analysis/WritingPreferences'
-import Icon from '../Common/Icon'
-import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
 import BackgroundGradient from '../Common/BackgroundGradient'
+import Icon from '../Common/Icon'
+import LazyLottie from '../Common/LazyLottie'
 
 // Breakpoints for responsive behavior
 const BREAKPOINT_MOBILE = 768
@@ -117,7 +118,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     const originalText = text
     
     if (useIterative) {
-      console.log('[LAUNCH] Starting async iterative humanization...')
+      logger.log('[LAUNCH] Starting async iterative humanization...')
       setIsRewriting(true)
       startProcessing('humanize')
       
@@ -138,7 +139,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           throw new Error(startResult.error || t('rewrite.humanizationFailed'))
         }
         
-        console.log('[LAUNCH] Job started:', startResult.jobId, 'Estimated:', startResult.estimatedTime?.display)
+        logger.log('[LAUNCH] Job started:', startResult.jobId, 'Estimated:', startResult.estimatedTime?.display)
         
         // Variables for streaming animation
         let fullText = ''
@@ -161,13 +162,13 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
         // Poll for progress, then stream result when completed
         const result = await pollAndStreamHumanizeJob(startResult.jobId, {
           onProgress: (progress) => {
-            console.log('[PROGRESS]', progress)
+            logger.log('[PROGRESS]', progress)
           },
           onChunk: (chunk) => {
             // First chunk - start streaming
             if (!hasStartedStreaming) {
               hasStartedStreaming = true
-              console.log('[SYNC] First chunk - starting stream')
+              logger.log('[SYNC] First chunk - starting stream')
               startStreaming()
               updateNote(currentNote.id, { content: '' })
               displayedText = ''
@@ -181,7 +182,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
             }
           },
           onComplete: (metadata) => {
-            console.log('[COMPLETE] Streaming finished:', metadata)
+            logger.log('[COMPLETE] Streaming finished:', metadata)
           },
           pollInterval: 1500,
           maxWaitTime: 300000
@@ -222,7 +223,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
         
         if (!wasCreditError) {
           const localizedError = getLocalizedContentError(error.message, t)
-          modal.error(localizedError || t('rewrite.humanizationFailed'))
+          modal.errorWithReport(localizedError || t('rewrite.humanizationFailed'), error, 'Error', 'RightSidebar.handleHumanize')
         }
       } finally {
         setIsRewriting(false)
@@ -232,7 +233,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     }
     
     // Standard streaming rewrite
-    console.log('[LAUNCH] Starting rewrite process...')
+    logger.log('[LAUNCH] Starting rewrite process...')
     setIsRewriting(true)
     startProcessing('rewrite')
     
@@ -269,11 +270,11 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           }
           
           chunkCount++
-          console.log(`[PACKAGE] Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
+          logger.log(`[PACKAGE] Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
           
           if (!hasStartedStreaming) {
             hasStartedStreaming = true
-            console.log('[SYNC] First chunk - starting stream')
+            logger.log('[SYNC] First chunk - starting stream')
             startStreaming()
             updateNote(currentNote.id, { content: '' })
             displayedText = ''
@@ -286,7 +287,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
             animateText()
           }
           
-          console.log(`✍️ Buffer: ${fullText.length} chars, Displayed: ${displayedText.length} chars`)
+          logger.log(`✍️ Buffer: ${fullText.length} chars, Displayed: ${displayedText.length} chars`)
         }
       )
       
@@ -305,7 +306,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       
       await waitForAnimation()
       
-      console.log(`[SUCCESS] Rewrite completed successfully - ${chunkCount} chunks received`)
+      logger.log(`[SUCCESS] Rewrite completed successfully - ${chunkCount} chunks received`)
       
     } catch (error) {
       console.error('[FAIL] Error rewriting:', error)
@@ -317,7 +318,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       
       if (!wasCreditError) {
         const localizedError = getLocalizedContentError(error.message, t)
-        modal.error(localizedError || t('rewrite.rewriteFailed'))
+        modal.errorWithReport(localizedError || t('rewrite.rewriteFailed'), error, 'Error', 'RightSidebar.handleRewrite')
       }
     } finally {
       setIsRewriting(false)

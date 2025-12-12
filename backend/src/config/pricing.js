@@ -9,6 +9,7 @@
 
 const envConfig = require('./envConfigHelper');
 
+const logger = require('../utils/logger');
 // ============================================================================
 // FREE CREDITS FOR NEW USERS
 // ============================================================================
@@ -299,7 +300,7 @@ function getPackageByPrice(priceInCents) {
 function calculateFeatureCost(featureName, params = {}) {
   const feature = FEATURE_COSTS[featureName];
   if (!feature) {
-    console.warn(`[PRICING] Unknown feature: ${featureName}, using default cost`);
+    logger.warn(`[PRICING] Unknown feature: ${featureName}, using default cost`);
     return 1; // Default cost for unknown features
   }
   

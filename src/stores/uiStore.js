@@ -61,7 +61,17 @@ export const useUIStore = create((set, get) => ({
   },
 
   showError: (message, options = {}) => {
-    return get().addToast({ type: 'error', message, ...options })
+    // Support passing error object for reporting
+    // Usage: showError('Message', { error: errorObject }) or showError(errorObject)
+    const errorObj = options.error || (message instanceof Error ? message : null)
+    const displayMessage = message instanceof Error ? message.message : message
+    return get().addToast({ 
+      type: 'error', 
+      message: displayMessage, 
+      error: errorObj,
+      context: options.context,
+      ...options 
+    })
   },
 
   showWarning: (message, options = {}) => {

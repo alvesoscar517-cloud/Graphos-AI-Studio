@@ -2,6 +2,7 @@
  * CreditHistoryView - Standalone Credit History Page
  * Layout similar to HistoryView - minimalist, modern design
  */
+import { logger } from '@/utils/logger'
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -67,9 +68,9 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
   
   // Debug: Log summary data
   useEffect(() => {
-    console.log('[CreditHistory] Summary data:', summaryData)
-    console.log('[CreditHistory] Summary loading:', summaryLoading)
-    console.log('[CreditHistory] Summary error:', summaryError)
+    logger.log('[CreditHistory] Summary data:', summaryData)
+    logger.log('[CreditHistory] Summary loading:', summaryLoading)
+    logger.log('[CreditHistory] Summary error:', summaryError)
   }, [summaryData, summaryLoading, summaryError])
   
   const {

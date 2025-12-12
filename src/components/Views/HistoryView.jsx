@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger'
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
@@ -143,12 +144,12 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       })
     })
     // Debug log
-    console.log('[HistoryView] allItems:', items.length, 'drive:', items.filter(i => i.source === 'drive').length, 'local:', items.filter(i => i.source === 'local').length)
+    logger.log('[HistoryView] allItems:', items.length, 'drive:', items.filter(i => i.source === 'drive').length, 'local:', items.filter(i => i.source === 'local').length)
     return items
   }, [notes, conversations])
 
   const filteredItems = useMemo(() => {
-    console.log('[HistoryView] Filtering with filterSource:', filterSource)
+    logger.log('[HistoryView] Filtering with filterSource:', filterSource)
     const result = allItems.filter(item => {
       const matchesSearch = !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesType = filterType === 'all' || 
@@ -159,7 +160,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                            (filterSource === 'local' && item.source === 'local')
       return matchesSearch && matchesType && matchesSource
     })
-    console.log('[HistoryView] filteredItems count:', result.length)
+    logger.log('[HistoryView] filteredItems count:', result.length)
     return result
   }, [allItems, searchTerm, filterType, filterSource])
 
@@ -226,7 +227,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         setIsSelectionMode(false)
         modal.toast(t('history.deleted'), t('history.itemsDeleted', { count: itemsToDelete.length }), 'success')
       } catch (error) {
-        modal.error(t('history.unableToDeleteSome') + ': ' + error.message)
+        modal.errorWithReport(t('history.unableToDeleteSome') + ': ' + error.message, error, 'Error', 'HistoryView.handleBulkDelete')
       }
     }
   }
@@ -253,7 +254,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         else await deleteConversation(item.id)
         modal.toast(t('history.deleted'), '', 'success')
       } catch (error) {
-        modal.error(t('history.unableToDelete') + ': ' + error.message)
+        modal.errorWithReport(t('history.unableToDelete') + ': ' + error.message, error, 'Error', 'HistoryView.handleDeleteItem')
       }
     }
   }
@@ -271,7 +272,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       else if (error.message === 'NEED_REAUTH') {
         const confirmed = await modal.confirm(t('auth.needReauth'), t('auth.drivePermissionRequired'), { confirmText: t('auth.signInAgain'), danger: false })
         if (confirmed) { await signOut(); modal.info(t('history.needSignInAgain')) }
-      } else modal.error(t('history.unableToOpenDrive') + ': ' + error.message)
+      } else modal.errorWithReport(t('history.unableToOpenDrive') + ': ' + error.message, error, 'Error', 'HistoryView.handleOpenInDrive')
     }
   }
 
@@ -297,7 +298,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       
       modal.toast(t('history.synced'), t('history.notesSynced'), 'success')
     } catch (error) {
-      modal.error(t('history.unableToSync') + ': ' + error.message)
+      modal.errorWithReport(t('history.unableToSync') + ': ' + error.message, error, 'Error', 'HistoryView.handleSyncNotes')
     } finally { setIsSyncing(false) }
   }
 
@@ -312,7 +313,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         modal.toast(t('history.driveFolderOpened'), '', 'success')
       }
     } catch (error) {
-      modal.error(error.message || t('auth.email.linkFailed'))
+      modal.errorWithReport(error.message || t('auth.email.linkFailed'), error, 'Error', 'HistoryView.handleLinkGoogleAndContinue')
     }
   }
 
@@ -611,7 +612,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                       <button 
                         className="toolbar-btn min-w-28 max-lg:min-w-0 max-lg:px-2"
                         onClick={() => {
-                          console.log('[HistoryView] Toggle dropdown, current:', isSourceDropdownOpen)
+                          logger.log('[HistoryView] Toggle dropdown, current:', isSourceDropdownOpen)
                           setIsSourceDropdownOpen(!isSourceDropdownOpen)
                         }}
                       >
@@ -636,7 +637,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                                 index === arr.length - 1 && "rounded-b-lg"
                               )}
                               onClick={() => { 
-                                console.log('[HistoryView] Setting filterSource to:', source);
+                                logger.log('[HistoryView] Setting filterSource to:', source);
                                 setFilterSource(source); 
                                 setIsSourceDropdownOpen(false) 
                               }}
@@ -691,7 +692,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                     className="bg-transparent text-text-secondary border border-border-hover py-2.5 px-6 rounded-pill text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-bg-tertiary hover:text-text-primary hover:border-text-primary hover:-translate-y-px active:translate-y-0"
                     onClick={async () => {
                       try { await syncNotes(); modal.toast(t('history.synced'), '', 'success') }
-                      catch (error) { modal.error(t('history.unableToSync') + ': ' + error.message) }
+                      catch (error) { modal.errorWithReport(t('history.unableToSync') + ': ' + error.message, error, 'Error', 'HistoryView.inlineSync') }
                     }}
                   >
                     {t('history.syncFromDrive')}

@@ -10,6 +10,7 @@
  * - Standardized error handling via logError
  */
 
+import { logger } from '../../utils/logger'
 import { CONFIG } from '../../utils/config'
 import { withRetry, logError } from '../../utils/errors'
 import { getUserInfo } from './auth'
@@ -155,7 +156,7 @@ class ApiClient {
         
         // Log request in debug mode
         if (CONFIG.ENABLE_DEBUG_LOGS) {
-          console.log(`[API] ${method} ${endpoint} - ${response.status} (${duration}ms)`)
+          logger.log(`[API] ${method} ${endpoint} - ${response.status} (${duration}ms)`)
         }
         
         // Parse response
@@ -306,7 +307,7 @@ class ApiClient {
       }
 
       // Retry original request with new token
-      console.log('[API] Retrying request with refreshed token')
+      logger.log('[API] Retrying request with refreshed token')
       return this.request(endpoint, { ...options, _isRetry: true })
     } catch (error) {
       logError(error, { context: 'handleUnauthorized', endpoint })
@@ -318,7 +319,7 @@ class ApiClient {
    * Handle session expired
    */
   handleSessionExpired() {
-    console.log('[API] Session expired, clearing auth')
+    logger.log('[API] Session expired, clearing auth')
     tokenService.clearTokens()
     
     // Dispatch event for UI to handle

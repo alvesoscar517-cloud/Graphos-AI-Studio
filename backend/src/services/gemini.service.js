@@ -8,6 +8,7 @@ const { helpers } = require('@google-cloud/aiplatform');
 const { getVertexAI, getAIPlatformClient, config } = require('../config/gemini');
 const languageProcessor = require('./languageProcessor.service');
 
+const logger = require('../utils/logger');
 // Get services (lazy initialization)
 const vertexAI = getVertexAI();
 const aiplatformClient = getAIPlatformClient();
@@ -63,7 +64,7 @@ function cleanupEmbeddingCache() {
   }
   
   if (expiredCount > 0 || evictedCount > 0) {
-    console.log(`[CACHE CLEANUP] Removed ${expiredCount} expired, ${evictedCount} evicted. Size: ${embeddingCache.size}`);
+    logger.info(`[CACHE CLEANUP] Removed ${expiredCount} expired, ${evictedCount} evicted. Size: ${embeddingCache.size}`);
   }
 }
 
@@ -72,14 +73,14 @@ let cleanupInterval = null;
 function startCacheCleanup() {
   if (cleanupInterval) return;
   cleanupInterval = setInterval(cleanupEmbeddingCache, CACHE_CLEANUP_INTERVAL);
-  console.log('[CACHE] Periodic cleanup started');
+  logger.info('[CACHE] Periodic cleanup started');
 }
 
 function stopCacheCleanup() {
   if (cleanupInterval) {
     clearInterval(cleanupInterval);
     cleanupInterval = null;
-    console.log('[CACHE] Periodic cleanup stopped');
+    logger.info('[CACHE] Periodic cleanup stopped');
   }
 }
 
@@ -118,7 +119,7 @@ async function getCachedEmbedding(text, taskType) {
   // Try Redis/distributed cache first
   const redisCached = await redisService.embeddingCache.get(textHash, taskType);
   if (redisCached) {
-    console.log(`[CACHE] Embedding cache HIT (distributed)`);
+    logger.info(`[CACHE] Embedding cache HIT (distributed)`);
     return redisCached;
   }
   
@@ -133,7 +134,7 @@ async function getCachedEmbedding(text, taskType) {
     return null;
   }
   
-  console.log(`[CACHE] Embedding cache HIT (memory)`);
+  logger.info(`[CACHE] Embedding cache HIT (memory)`);
   return cached.embedding;
 }
 
@@ -179,7 +180,7 @@ async function createEmbedding(text, taskType = 'SEMANTIC_SIMILARITY') {
     if (cached) return cached;
     
     if (text.length > 20000) {
-      console.warn(`[WARN] Text too long (${text.length} chars), truncating to 20000`);
+      logger.warn(`[WARN] Text too long (${text.length} chars), truncating to 20000`);
       text = text.substring(0, 20000);
     }
 
@@ -196,7 +197,7 @@ async function createEmbedding(text, taskType = 'SEMANTIC_SIMILARITY') {
       instances: [instanceValue]
     };
 
-    console.log(`[PROCESS] Generating Gemini embedding (${taskType}) for ${text.length} chars...`);
+    logger.info(`[PROCESS] Generating Gemini embedding (${taskType}) for ${text.length} chars...`);
     const [response] = await aiplatformClient.predict(request);
     
     if (!response.predictions || response.predictions.length === 0) {
@@ -210,13 +211,13 @@ async function createEmbedding(text, taskType = 'SEMANTIC_SIMILARITY') {
     }
     
     const embedding = prediction.embeddings.values;
-    console.log(`[SUCCESS] Generated embedding with ${embedding.length} dimensions`);
+    logger.info(`[SUCCESS] Generated embedding with ${embedding.length} dimensions`);
     
     await setCachedEmbedding(text, taskType, embedding);
     
     return embedding;
   } catch (error) {
-    console.error('[ERROR] Embedding generation failed:', error.message);
+    logger.error('[ERROR] Embedding generation failed:', error.message);
     
     if (error.message.includes('quota') || error.message.includes('RESOURCE_EXHAUSTED')) {
       throw new Error('QUOTA_EXCEEDED: Gemini API quota exhausted. Please try again later.');
@@ -249,15 +250,15 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
     });
     
     if (textsToFetch.length === 0) {
-      console.log(`[CACHE] All ${texts.length} embeddings from cache`);
+      logger.info(`[CACHE] All ${texts.length} embeddings from cache`);
       return embeddings;
     }
     
-    console.log(`[CACHE] Hits: ${texts.length - textsToFetch.length}, Misses: ${textsToFetch.length}`);
+    logger.info(`[CACHE] Hits: ${texts.length - textsToFetch.length}, Misses: ${textsToFetch.length}`);
 
     const validTexts = textsToFetch.map(text => {
       if (text.length > 20000) {
-        console.warn(`[WARN] Text too long (${text.length} chars), truncating`);
+        logger.warn(`[WARN] Text too long (${text.length} chars), truncating`);
         return text.substring(0, 20000);
       }
       return text;
@@ -279,7 +280,7 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
       instances
     };
 
-    console.log(`[PROCESS] Generating ${textsToFetch.length} Gemini embeddings in batch (${taskType})...`);
+    logger.info(`[PROCESS] Generating ${textsToFetch.length} Gemini embeddings in batch (${taskType})...`);
     const [response] = await aiplatformClient.predict(request);
     
     const predictions = response.predictions.map(p => helpers.fromValue(p));
@@ -302,10 +303,10 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
       embeddings[originalIdx] = newEmbeddings[newIdx];
     });
     
-    console.log(`[SUCCESS] Generated ${newEmbeddings.length} new embeddings (${texts.length - newEmbeddings.length} from cache)`);
+    logger.info(`[SUCCESS] Generated ${newEmbeddings.length} new embeddings (${texts.length - newEmbeddings.length} from cache)`);
     return embeddings;
   } catch (error) {
-    console.error('[ERROR] Batch embedding generation failed:', {
+    logger.error('[ERROR] Batch embedding generation failed:', {
       message: error.message,
       code: error.code,
       details: error.details,
@@ -339,7 +340,7 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
  */
 function preprocessTextForDetection(text) {
   // Normalize formatting
-  let cleaned = text
+  const cleaned = text
     .replace(/\n{3,}/g, '\n\n')  // Normalize line breaks
     .replace(/\s{2,}/g, ' ')     // Normalize spaces
     .replace(/\t/g, ' ')         // Replace tabs
@@ -374,14 +375,14 @@ async function detectAIContent(text) {
     
     // If multiple chunks, analyze each and combine results
     if (chunks.length > 1) {
-      console.log(`[PROCESS] Analyzing ${chunks.length} text chunks for AI detection...`);
+      logger.info(`[PROCESS] Analyzing ${chunks.length} text chunks for AI detection...`);
       const results = await Promise.all(chunks.map(chunk => detectAIContentSingle(chunk)));
       return combineDetectionResults(results);
     }
     
     return await detectAIContentSingle(chunks[0]);
   } catch (error) {
-    console.error('[ERROR] AI detection failed:', error);
+    logger.error('[ERROR] AI detection failed:', error);
     return detectAIContentHeuristic(text);
   }
 }
@@ -492,7 +493,7 @@ Return JSON:
       summary: parsed.analysis_summary || ''
     };
   } catch (error) {
-    console.error('[ERROR] Single chunk AI detection failed:', error);
+    logger.error('[ERROR] Single chunk AI detection failed:', error);
     throw error;
   }
 }
@@ -566,7 +567,7 @@ Return JSON:
       keyFactor: parsed.key_determination_factor
     };
   } catch (error) {
-    console.error('[ERROR] Deep AI detection failed:', error);
+    logger.error('[ERROR] Deep AI detection failed:', error);
     throw error;
   }
 }
@@ -582,9 +583,9 @@ function combineDetectionResults(results) {
   // Weighted average - give more weight to higher confidence results
   let totalWeight = 0;
   let weightedProbability = 0;
-  let allEvidence = [];
-  let allHumanIndicators = [];
-  let allAiIndicators = [];
+  const allEvidence = [];
+  const allHumanIndicators = [];
+  const allAiIndicators = [];
   
   results.forEach(result => {
     const weight = result.confidence || 50;
@@ -626,14 +627,14 @@ async function detectAIContentEnhanced(text) {
     // Pass 1: Standard detection
     const quickResult = await detectAIContent(text);
     
-    console.log(`[AI-DETECT] Pass 1 result: ${quickResult.aiProbability}% (confidence: ${quickResult.confidence}%)`);
+    logger.info(`[AI-DETECT] Pass 1 result: ${quickResult.aiProbability}% (confidence: ${quickResult.confidence}%)`);
     
     // If result is uncertain AND confidence is low, run deep analysis
     const isUncertain = quickResult.aiProbability >= UNCERTAIN_LOW && quickResult.aiProbability <= UNCERTAIN_HIGH;
     const isLowConfidence = quickResult.confidence < DEEP_CONFIDENCE_THRESHOLD;
     
     if (isUncertain && isLowConfidence) {
-      console.log(`[AI-DETECT] Result uncertain (${UNCERTAIN_LOW}-${UNCERTAIN_HIGH}%), running deep analysis...`);
+      logger.info(`[AI-DETECT] Result uncertain (${UNCERTAIN_LOW}-${UNCERTAIN_HIGH}%), running deep analysis...`);
       
       try {
         const deepResult = await detectAIContentDeep(text);
@@ -642,7 +643,7 @@ async function detectAIContentEnhanced(text) {
         const combinedProbability = (quickResult.aiProbability * 0.4 + deepResult.aiProbability * 0.6);
         const combinedConfidence = Math.max(quickResult.confidence, deepResult.confidence);
         
-        console.log(`[AI-DETECT] Deep analysis: ${deepResult.aiProbability}% → Combined: ${combinedProbability.toFixed(1)}%`);
+        logger.info(`[AI-DETECT] Deep analysis: ${deepResult.aiProbability}% → Combined: ${combinedProbability.toFixed(1)}%`);
         
         return {
           aiProbability: parseFloat(combinedProbability.toFixed(2)),
@@ -654,14 +655,14 @@ async function detectAIContentEnhanced(text) {
           keyFactor: deepResult.keyFactor
         };
       } catch (deepError) {
-        console.error('[WARN] Deep analysis failed, using quick result:', deepError.message);
+        logger.error('[WARN] Deep analysis failed, using quick result:', deepError.message);
         return quickResult;
       }
     }
     
     return quickResult;
   } catch (error) {
-    console.error('[ERROR] Enhanced AI detection failed:', error);
+    logger.error('[ERROR] Enhanced AI detection failed:', error);
     return detectAIContentHeuristic(text);
   }
 }
@@ -869,7 +870,7 @@ async function generateVoiceSummary(sampleTexts, statisticalFeatures) {
       }
     });
     
-    console.log('[PROFILE] Using Gemini 2.5 Pro for voice analysis');
+    logger.info('[PROFILE] Using Gemini 2.5 Pro for voice analysis');
 
     const selectedSamples = sampleTexts
       .sort(() => Math.random() - 0.5)
@@ -922,11 +923,11 @@ Return JSON in this format:
     const responseText = result.response.candidates[0].content.parts[0].text.trim();
     const voiceProfile = JSON.parse(responseText);
     
-    console.log(`[SUCCESS] Generated voice profile: ${voiceProfile.tone}, formality: ${voiceProfile.formality_level}`);
+    logger.info(`[SUCCESS] Generated voice profile: ${voiceProfile.tone}, formality: ${voiceProfile.formality_level}`);
     
     return voiceProfile;
   } catch (error) {
-    console.error('[ERROR] Voice summary generation failed:', error);
+    logger.error('[ERROR] Voice summary generation failed:', error);
     
     return {
       tone: 'neutral',
@@ -967,7 +968,7 @@ async function rewriteWithVoice(originalText, voiceProfile, context = {}, modelN
     
     // Check if iterative refinement is requested
     if (context.useIterativeRefinement) {
-      console.log('[REWRITE] Using iterative refinement mode...');
+      logger.info('[REWRITE] Using iterative refinement mode...');
       const result = await humanizeService.rewriteWithIterativeRefinement(
         originalText,
         voiceProfile,
@@ -982,7 +983,7 @@ async function rewriteWithVoice(originalText, voiceProfile, context = {}, modelN
     }
     
     // Use enhanced anti-AI detection rewrite
-    console.log('[REWRITE] Using enhanced anti-AI detection mode...');
+    logger.info('[REWRITE] Using enhanced anti-AI detection mode...');
     const rewrittenText = await humanizeService.rewriteWithAntiDetection(
       originalText,
       voiceProfile,
@@ -994,13 +995,13 @@ async function rewriteWithVoice(originalText, voiceProfile, context = {}, modelN
       modelName
     );
 
-    console.log(`[SUCCESS] Rewritten text (${originalText.length} → ${rewrittenText.length} chars)`);
+    logger.info(`[SUCCESS] Rewritten text (${originalText.length} → ${rewrittenText.length} chars)`);
     return rewrittenText;
   } catch (error) {
-    console.error('[ERROR] Text rewriting failed:', error);
+    logger.error('[ERROR] Text rewriting failed:', error);
     
     // Fallback to basic rewrite if humanize service fails
-    console.log('[REWRITE] Falling back to basic rewrite...');
+    logger.info('[REWRITE] Falling back to basic rewrite...');
     return await rewriteWithVoiceBasic(originalText, voiceProfile, context, modelName);
   }
 }
@@ -1094,7 +1095,7 @@ REWRITTEN TEXT:`;
 
     return rewrittenText;
   } catch (error) {
-    console.error('[ERROR] Basic text rewriting failed:', error);
+    logger.error('[ERROR] Basic text rewriting failed:', error);
     throw error;
   }
 }
@@ -1120,7 +1121,7 @@ async function generateImprovementSuggestions(sentence, issues, voiceProfile, co
     const cacheKey = getSuggestionAICacheKey(sentence, profileId);
     const cached = suggestionAICache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < SUGGESTION_AI_CACHE_TTL) {
-      console.log(`[CACHE] AI suggestion cache HIT`);
+      logger.info(`[CACHE] AI suggestion cache HIT`);
       return cached.data;
     }
   }
@@ -1218,7 +1219,7 @@ RETURN ONLY JSON, NO ADDITIONAL EXPLANATION.`;
     
     return suggestions;
   } catch (error) {
-    console.error('[ERROR] Failed to generate suggestions:', error);
+    logger.error('[ERROR] Failed to generate suggestions:', error);
     
     // Fallback to rule-based suggestions
     return generateFallbackSuggestions(issues);

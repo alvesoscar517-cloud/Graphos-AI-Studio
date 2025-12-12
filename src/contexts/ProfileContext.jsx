@@ -7,6 +7,7 @@
  * New code should import directly from '@/hooks/queries/useProfiles'
  */
 
+import { logger } from '@/utils/logger'
 import { createContext, useContext, useCallback, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useProfilesQuery, useCreateProfile, useUpdateProfile, useDeleteProfile } from '../hooks/queries/useProfiles'
@@ -53,7 +54,7 @@ export const ProfileProvider = ({ children }) => {
       // Return a minimal profile object to prevent UI showing "No Profile"
       const storedProfile = getStorageActiveProfile()
       if (storedProfile.id && storedProfile.name) {
-        console.log('[PROFILE] Using stored profile while loading:', storedProfile.name)
+        logger.log('[PROFILE] Using stored profile while loading:', storedProfile.name)
         return {
           profile_id: storedProfile.id,
           profile_name: storedProfile.name,
@@ -65,7 +66,7 @@ export const ProfileProvider = ({ children }) => {
     const found = profiles.find(p => p.profile_id === activeProfileId)
     if (!found && activeProfileId) {
       // Profile was deleted or not found, clear storage
-      console.log('[PROFILE] Stored profile not found in list, clearing')
+      logger.log('[PROFILE] Stored profile not found in list, clearing')
       clearActiveProfile()
       return null
     }
@@ -74,7 +75,7 @@ export const ProfileProvider = ({ children }) => {
 
   // Select profile
   const selectProfile = useCallback((profile) => {
-    console.log('📌 Selecting profile:', profile?.profile_name || 'None')
+    logger.log('📌 Selecting profile:', profile?.profile_name || 'None')
     
     if (profile) {
       setStorageActiveProfile(profile.profile_id, profile.profile_name)
@@ -95,7 +96,7 @@ export const ProfileProvider = ({ children }) => {
 
   // Invalidate cache
   const invalidateCache = useCallback(() => {
-    console.log('[SYNC] Invalidating profile cache...')
+    logger.log('[SYNC] Invalidating profile cache...')
     queryClient.invalidateQueries({ queryKey: queryKeys.profiles.all })
   }, [queryClient])
 

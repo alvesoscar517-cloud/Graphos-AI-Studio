@@ -5,6 +5,7 @@
 const { Firestore, FieldValue } = require('@google-cloud/firestore');
 const config = require('./index');
 
+const logger = require('../utils/logger');
 let db = null;
 
 try {
@@ -15,9 +16,9 @@ try {
     maxIdleChannels: 10,
     keepAlive: true
   });
-  console.log('[INIT] Firestore initialized');
+  logger.info('[INIT] Firestore initialized');
 } catch (error) {
-  console.error('[INIT] Firestore initialization failed:', error.message);
+  logger.error('[INIT] Firestore initialization failed:', error.message);
   // Create a mock db that throws on operations - server can still start
   db = {
     collection: () => {

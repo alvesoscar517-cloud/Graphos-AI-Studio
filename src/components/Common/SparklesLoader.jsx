@@ -10,7 +10,6 @@
  * @param {string} [props.overlayClassName] - Additional CSS classes for overlay
  */
 import { memo } from 'react'
-import LazyLottie from './LazyLottie'
 import sparklesAnimation from '../../animation/Sparkles Loop Loader AI.json'
 import { cn } from '../../lib/utils'
 

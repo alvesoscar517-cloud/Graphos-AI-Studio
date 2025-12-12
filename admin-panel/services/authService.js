@@ -7,6 +7,7 @@
  * - Single source of truth for admin auth
  */
 
+import logger from '../lib/logger'
 import { getApiBaseUrl } from '../utils/config';
 
 const API_BASE_URL = getApiBaseUrl();
@@ -250,7 +251,7 @@ export function startTokenRefresh() {
           startTokenRefresh();
         } else {
           // Refresh failed - clear auth and stop (don't reload to avoid loop)
-          console.log('Token refresh failed, clearing auth data');
+          logger.log('Token refresh failed, clearing auth data');
           clearAuthData();
           stopTokenRefresh();
         }
@@ -292,3 +293,6 @@ export default {
   stopTokenRefresh,
   getAuthHeader
 };
+
+
+

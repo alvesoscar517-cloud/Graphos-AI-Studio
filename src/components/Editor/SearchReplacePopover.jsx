@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import Icon from '../Common/Icon'
 import { cn } from '../../lib/utils'
+import Icon from '../Common/Icon'
 
 /**
  * SearchReplacePopover - Search and replace functionality for editor

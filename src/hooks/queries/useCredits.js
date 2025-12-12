@@ -3,6 +3,7 @@
  * TanStack Query hook for user credits management with Firestore Realtime updates
  */
 
+import { logger } from '@/utils/logger'
 import { useEffect, useRef, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queryKeys'
@@ -45,7 +46,7 @@ export function useCredits(options = {}) {
     const now = Date.now()
     if (now - lastVisibilityRefetchRef.current > VISIBILITY_REFETCH_COOLDOWN) {
       lastVisibilityRefetchRef.current = now
-      console.log('[Credits] Refetching credits...')
+      logger.log('[Credits] Refetching credits...')
       queryClient.invalidateQueries({ queryKey: queryKeys.user.credits() })
     }
   }, [queryClient])
@@ -58,7 +59,7 @@ export function useCredits(options = {}) {
         const { default: realtimeService } = await import('@/services/realtimeService')
         
         unsubscribeRef.current = realtimeService.subscribe('credits', (data) => {
-          console.log('[REALTIME] Credit update received:', data)
+          logger.log('[REALTIME] Credit update received:', data)
           const creditsData = data.credits || data
           queryClient.setQueryData(queryKeys.user.credits(), creditsData)
         })
@@ -79,7 +80,7 @@ export function useCredits(options = {}) {
           const isStale = query.dataUpdatedAt && (Date.now() - query.dataUpdatedAt > 60000)
           
           if (!realtimeService.isConnected() || isStale) {
-            console.log('[Credits] Tab visible, connected:', realtimeService.isConnected(), 'isStale:', isStale)
+            logger.log('[Credits] Tab visible, connected:', realtimeService.isConnected(), 'isStale:', isStale)
             refetchCredits()
           }
         } catch (err) {
@@ -92,7 +93,7 @@ export function useCredits(options = {}) {
 
     // Also listen for payment success event to immediately refetch
     const handlePaymentSuccess = () => {
-      console.log('[Credits] Payment success detected, refetching...')
+      logger.log('[Credits] Payment success detected, refetching...')
       lastVisibilityRefetchRef.current = 0 // Reset cooldown
       queryClient.invalidateQueries({ queryKey: queryKeys.user.credits() })
     }

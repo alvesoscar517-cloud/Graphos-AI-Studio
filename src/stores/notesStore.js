@@ -4,6 +4,7 @@
  * Works alongside TanStack Query for data fetching
  */
 
+import { logger } from '../utils/logger'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -19,7 +20,7 @@ export const useNotesStore = create((set) => ({
 // Listen for sign out event to clear state
 if (typeof window !== 'undefined') {
   window.addEventListener('auth-signout', () => {
-    console.log('[SECURITY] Clearing notes store on sign out')
+    logger.log('[SECURITY] Clearing notes store on sign out')
     useNotesStore.getState().clearCurrentNote()
   })
 }

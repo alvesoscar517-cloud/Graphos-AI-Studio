@@ -5,6 +5,7 @@
  * Migrated to Tailwind CSS v4
  * NOTE: This feature only supports light mode
  */
+import { logger } from '../../utils/logger'
 import { useEffect, useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
@@ -160,7 +161,7 @@ const ProfileSetup = () => {
     // CRITICAL: Prevent duplicate/concurrent profile creation
     if (!mountedRef.current) return
     if (isCreatingProfileRef.current && retryCount === 0) {
-      console.log('[PROFILE] Creation already in progress, skipping duplicate call')
+      logger.log('[PROFILE] Creation already in progress, skipping duplicate call')
       return
     }
     
@@ -191,7 +192,7 @@ const ProfileSetup = () => {
         ...profileData.shortSamples.map(text => ({ text, type: 'short' }))
       ]
 
-      console.log(`[STREAM] Creating profile with ${allSamples.length} samples (attempt ${retryCount + 1})`)
+      logger.log(`[STREAM] Creating profile with ${allSamples.length} samples (attempt ${retryCount + 1})`)
 
       if (allSamples.length < 3) {
         if (mountedRef.current) {
@@ -252,7 +253,7 @@ const ProfileSetup = () => {
       } catch (apiError) {
         // Ignore abort errors
         if (apiError.name === 'AbortError') {
-          console.log('API request was aborted')
+          logger.log('API request was aborted')
           isCreatingProfileRef.current = false
           return
         }
@@ -283,7 +284,7 @@ const ProfileSetup = () => {
         )
         
         if (isRetryable && retryCount < MAX_RETRIES) {
-          console.log(`[SYNC] Retrying... (${retryCount + 1}/${MAX_RETRIES})`)
+          logger.log(`[SYNC] Retrying... (${retryCount + 1}/${MAX_RETRIES})`)
           setProcessingMessage(t('profileSetupErrors.retrying', { current: retryCount + 1, max: MAX_RETRIES }))
           
           await new Promise(resolve => {
@@ -374,7 +375,7 @@ const ProfileSetup = () => {
     
     // Mark as triggered BEFORE calling createProfile to prevent race conditions
     hasTriggeredCreationRef.current = true
-    console.log('[PROFILE] Triggering profile creation (step 4 entered)')
+    logger.log('[PROFILE] Triggering profile creation (step 4 entered)')
     
     // Use setTimeout to ensure state updates are batched and prevent infinite loops
     const timeoutId = setTimeout(() => {

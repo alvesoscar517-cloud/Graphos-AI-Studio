@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger'
 /**
  * Centralized API Error Handler
  * 
@@ -87,7 +88,7 @@ export function parseApiError(response, data, requestId = null) {
   
   // Determine error code from response
   let code = data?.code || 'UNKNOWN'
-  let details = data?.details || null
+  const details = data?.details || null
   
   // Map HTTP status codes to error codes if not provided
   if (!data?.code) {
@@ -191,7 +192,7 @@ export function handleApiError(error, options = {}) {
   
   // Handle logout if needed
   if (apiError.shouldLogout && onLogout) {
-    console.log('[AUTH] Error requires logout, triggering...')
+    logger.log('[AUTH] Error requires logout, triggering...')
     onLogout()
   }
   
@@ -272,7 +273,7 @@ class RequestDeduplicator {
   async execute(key, requestFn) {
     // Check if request is already pending
     if (this.pendingRequests.has(key)) {
-      console.log(`[DEDUP] Reusing pending request: ${key.substring(0, 50)}...`)
+      logger.log(`[DEDUP] Reusing pending request: ${key.substring(0, 50)}...`)
       return this.pendingRequests.get(key)
     }
 
@@ -280,7 +281,7 @@ class RequestDeduplicator {
     const lastCompleted = this.recentRequests.get(key)
     if (lastCompleted && Date.now() - lastCompleted < this.COOLDOWN_MS) {
       const waitTime = this.COOLDOWN_MS - (Date.now() - lastCompleted)
-      console.log(`[DEDUP] Request on cooldown, waiting ${waitTime}ms: ${key.substring(0, 50)}...`)
+      logger.log(`[DEDUP] Request on cooldown, waiting ${waitTime}ms: ${key.substring(0, 50)}...`)
       await new Promise(resolve => setTimeout(resolve, waitTime))
     }
 
@@ -321,3 +322,4 @@ export default {
   requestDeduplicator,
   ERROR_MESSAGES,
 }
+

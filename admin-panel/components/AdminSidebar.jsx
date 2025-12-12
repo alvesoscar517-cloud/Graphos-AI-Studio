@@ -8,6 +8,7 @@ export default function AdminSidebar({ isOpen, onToggle, isMobile }) {
     { path: '/users', icon: 'users.svg', label: 'Users' },
     { path: '/orders', icon: 'dollar-sign.svg', label: 'Orders & Revenue' },
     { path: '/support', icon: 'headphones.svg', label: 'Support' },
+    { path: '/error-reports', icon: 'alert-triangle.svg', label: 'Error Reports' },
     { path: '/analytics', icon: 'chart-line.svg', label: 'Analytics' },
     { path: '/activity-logs', icon: 'activity.svg', label: 'Activity Logs' },
     { path: '/logs', icon: 'file-text.svg', label: 'System Logs' },

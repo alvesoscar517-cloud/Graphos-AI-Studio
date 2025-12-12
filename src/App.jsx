@@ -6,15 +6,47 @@ import { useThemeStore } from './stores/themeStore'
 import LoginOverlay from './components/Auth/LoginOverlay'
 import MainLayout from './components/Layout/MainLayout'
 import ProfileSetupWrapper from './components/ProfileSetup/ProfileSetupWrapper'
-
 import ErrorBoundary from './components/Common/ErrorBoundary'
 import ContextMenu from './components/Common/ContextMenu'
 import ToastContainer from './components/Common/ToastContainer'
+import ErrorReportListener from './components/Common/ErrorReportListener'
 import SessionExpiredModal from './components/Auth/SessionExpiredModal'
 import modal from './utils/modal'
 import { initTooltips } from './utils/tooltips'
 import { initStorageCleanup } from './utils/storageCleanup'
 import { migrateToSecureStorage } from './utils/authStorage'
+
+// Separate component to access auth context
+function AppContent() {
+  const { isLoading } = useAuth()
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  return (
+    <Routes>
+      <Route 
+        path="/profile-setup" 
+        element={
+          <ErrorBoundary>
+            {!isLoading && isAuthenticated ? (
+              <ProfileSetupWrapper />
+            ) : (
+              <div className="app">
+                <LoginOverlay />
+              </div>
+            )}
+          </ErrorBoundary>
+        } 
+      />
+      <Route path="*" element={
+        <ErrorBoundary>
+          <div className="app">
+            {(isLoading || !isAuthenticated) && <LoginOverlay />}
+            {!isLoading && isAuthenticated && <MainLayout />}
+          </div>
+        </ErrorBoundary>
+      } />
+    </Routes>
+  )
+}
 
 function App() {
   // Initialize theme from Zustand store
@@ -63,44 +95,10 @@ function App() {
           <ContextMenu />
           <ToastContainer />
           <SessionExpiredModal />
+          <ErrorReportListener />
         </AppProviders>
       </Router>
     </ErrorBoundary>
-  )
-}
-
-// Separate component to access auth context
-function AppContent() {
-  const { isLoading } = useAuth()
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated) // Use Zustand store
-  return (
-    <Routes>
-      <Route 
-        path="/profile-setup" 
-        element={
-          <ErrorBoundary>
-            {!isLoading && isAuthenticated ? (
-              <ProfileSetupWrapper />
-            ) : (
-              <div className="app">
-                <LoginOverlay />
-              </div>
-            )}
-          </ErrorBoundary>
-        } 
-      />
-
-      <Route path="*" element={
-        <ErrorBoundary>
-          <div className="app">
-            {/* Show login overlay when loading or not authenticated */}
-            {(isLoading || !isAuthenticated) && <LoginOverlay />}
-            {/* Only render MainLayout when authenticated and not loading */}
-            {!isLoading && isAuthenticated && <MainLayout />}
-          </div>
-        </ErrorBoundary>
-      } />
-    </Routes>
   )
 }
 

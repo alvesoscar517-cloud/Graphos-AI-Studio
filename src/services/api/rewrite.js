@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger'
 import { CONFIG } from '../../utils/config'
 import { getUserInfo } from './auth'
 import { validateTextBeforeAI } from './validation'
@@ -25,7 +26,7 @@ export async function rewriteText(profileId, text, model = 'gemini-2.5-flash', w
       }
     }
     
-    console.log('[CHART] Rewrite text stats:', validation.stats.display)
+    logger.log('[CHART] Rewrite text stats:', validation.stats.display)
     
     // Use deduplicated request to prevent duplicate concurrent rewrite calls
     const { data } = await apiClient.postDeduplicated('/rewrite', {
@@ -86,11 +87,11 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
       throw new Error(validation.errors.join(', '))
     }
     
-    console.log('[CHART] Stream rewrite text stats:', validation.stats.display)
+    logger.log('[CHART] Stream rewrite text stats:', validation.stats.display)
     
     const userInfo = await getUserInfo()
     const headers = await getAuthHeaders()
-    console.log('📡 Sending rewrite_stream request...')
+    logger.log('📡 Sending rewrite_stream request...')
     
     const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite_stream`, {
       method: 'POST',
@@ -108,7 +109,7 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     
-    console.log('📡 Response received, starting to read stream...')
+    logger.log('📡 Response received, starting to read stream...')
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
@@ -117,7 +118,7 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
       const { done, value } = await reader.read()
       
       if (done) {
-        console.log('📡 Stream ended')
+        logger.log('📡 Stream ended')
         break
       }
       
@@ -133,7 +134,7 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
           const data = line.slice(6).trim()
           
           if (data === '[DONE]') {
-            console.log('📡 Received [DONE] signal')
+            logger.log('📡 Received [DONE] signal')
             return
           }
           
@@ -142,7 +143,7 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
               const json = JSON.parse(data)
               if (json.chunk) {
                 // Content chunk
-                console.log('[PACKAGE] Chunk received:', json.chunk.substring(0, 30) + '...')
+                logger.log('[PACKAGE] Chunk received:', json.chunk.substring(0, 30) + '...')
                 onChunk(json.chunk, 'content')
               } else if (json.error) {
                 console.error('[FAIL] Server error:', json.error)
@@ -444,7 +445,7 @@ export async function pollAndStreamHumanizeJob(jobId, options = {}) {
     
     const { data } = result
     
-    console.log(`[POLL #${pollCount}] Status: ${data.status}, Step: ${data.progress?.currentStep}`)
+    logger.log(`[POLL #${pollCount}] Status: ${data.status}, Step: ${data.progress?.currentStep}`)
     
     onProgress({
       status: data.status,

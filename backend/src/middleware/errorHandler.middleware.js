@@ -146,7 +146,7 @@ function errorHandler(err, req, res, next) {
   let statusCode = err.statusCode || err.status || parsed.status || 500;
   let code = err.code || parsed.code || 'INTERNAL_ERROR';
   let message = err.message || parsed.message || 'An unexpected error occurred';
-  let details = err.details || null;
+  const details = err.details || null;
   
   // Check for mapped errors
   const mapped = mapError(err);

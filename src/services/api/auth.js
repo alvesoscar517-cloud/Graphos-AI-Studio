@@ -3,6 +3,7 @@
  * Helper functions for authentication in API calls
  */
 
+import { logger } from '../../utils/logger'
 import { isDevMode, getDefaultTestUser, devLog } from '../../utils/devConfig'
 import { 
   getUserData, 
@@ -34,7 +35,7 @@ export async function getUserInfo() {
     
     // Debug logging for auth issues
     if (!authToken || !storedUser) {
-      console.log('[AUTH DEBUG] Missing auth data:', {
+      logger.log('[AUTH DEBUG] Missing auth data:', {
         hasToken: !!authToken,
         authMethod,
         hasUser: !!storedUser,
@@ -88,7 +89,7 @@ export async function getUserInfo() {
           }
         }
       } catch (chromeError) {
-        console.log('Chrome extension context not available')
+        logger.log('Chrome extension context not available')
       }
     }
   } catch (error) {
@@ -114,6 +115,6 @@ export async function getUserInfo() {
   }
   
   // No authenticated user found
-  console.log('[INFO] No authenticated user found')
+  logger.log('[INFO] No authenticated user found')
   return null
 }

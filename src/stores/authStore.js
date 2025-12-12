@@ -11,6 +11,7 @@
  * - Google + Email authentication
  */
 
+import { logger } from '../utils/logger'
 import { create } from 'zustand'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
@@ -114,7 +115,7 @@ export const useAuthStore = create(
             // Subscribe to token events
             tokenService.subscribe((event) => {
               if (event === 'session_expired' || event === 'tokens_cleared') {
-                console.log('[AUTH] Session expired via tokenService')
+                logger.log('[AUTH] Session expired via tokenService')
                 get()._clearAuth()
               }
             })
@@ -136,7 +137,7 @@ export const useAuthStore = create(
               
               // Check if token needs refresh
               if (tokenService.needsRefresh()) {
-                console.log('[AUTH] Token needs refresh, refreshing...')
+                logger.log('[AUTH] Token needs refresh, refreshing...')
                 await tokenService.refreshAccessToken()
               }
               
@@ -148,11 +149,11 @@ export const useAuthStore = create(
                 })
                 
                 if (response.status === 401) { 
-                  console.log('[AUTH] Token invalid')
+                  logger.log('[AUTH] Token invalid')
                   get()._clearAuth() 
                 }
               } catch (networkError) { 
-                console.log('[AUTH] Network error, keeping session') 
+                logger.log('[AUTH] Network error, keeping session') 
               }
               
               set({ isLoading: false })
@@ -176,7 +177,7 @@ export const useAuthStore = create(
                   }
                 }
               } catch (e) { 
-                console.log('[AUTH] Chrome check failed:', e.message) 
+                logger.log('[AUTH] Chrome check failed:', e.message) 
               }
             }
           } catch (error) {
@@ -376,9 +377,9 @@ export const useAuthStore = create(
         requestPasswordReset: async (email) => {
           try {
             const requestBody = JSON.stringify({ email })
-            console.log('[AUTH] requestPasswordReset - email:', email)
-            console.log('[AUTH] requestPasswordReset - body:', requestBody)
-            console.log('[AUTH] requestPasswordReset - URL:', `${API_BASE_URL}/auth/email/forgot-password`)
+            logger.log('[AUTH] requestPasswordReset - email:', email)
+            logger.log('[AUTH] requestPasswordReset - body:', requestBody)
+            logger.log('[AUTH] requestPasswordReset - URL:', `${API_BASE_URL}/auth/email/forgot-password`)
             
             const response = await fetch(`${API_BASE_URL}/auth/email/forgot-password`, {
               method: 'POST',
@@ -386,10 +387,10 @@ export const useAuthStore = create(
               body: requestBody
             })
             
-            console.log('[AUTH] requestPasswordReset - response status:', response.status)
+            logger.log('[AUTH] requestPasswordReset - response status:', response.status)
             
             const data = await response.json()
-            console.log('[AUTH] requestPasswordReset - response data:', data)
+            logger.log('[AUTH] requestPasswordReset - response data:', data)
             
             if (!response.ok) {
               throw new Error(data.error || 'Failed to request reset')

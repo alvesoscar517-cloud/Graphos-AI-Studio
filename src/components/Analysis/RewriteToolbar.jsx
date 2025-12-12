@@ -1,8 +1,7 @@
+import { logger } from '@/utils/logger'
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { motion, MotionConfig } from 'framer-motion'
-import LazyLottie from '../Common/LazyLottie'
 import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
 import { useRewrite, useAIProcessingActions } from '@/stores'
 import { getLocalizedContentError } from '../../utils/errorMessages'
@@ -89,7 +88,7 @@ const RewriteToolbar = ({
     
     if (useIterative) {
       // Use async iterative humanization
-      console.log('[LAUNCH] Starting async iterative humanization...')
+      logger.log('[LAUNCH] Starting async iterative humanization...')
       setIsLoading(true)
       startProcessing('humanize')
       
@@ -110,7 +109,7 @@ const RewriteToolbar = ({
           throw new Error(startResult.error || t('rewrite.humanizationFailed'))
         }
         
-        console.log('[LAUNCH] Job started:', startResult.jobId, 'Estimated:', startResult.estimatedTime?.display)
+        logger.log('[LAUNCH] Job started:', startResult.jobId, 'Estimated:', startResult.estimatedTime?.display)
         
         // Variables for streaming animation
         let fullText = ''
@@ -133,12 +132,12 @@ const RewriteToolbar = ({
         // Poll for progress, then stream result when completed
         const result = await pollAndStreamHumanizeJob(startResult.jobId, {
           onProgress: (progress) => {
-            console.log('[PROGRESS]', progress)
+            logger.log('[PROGRESS]', progress)
           },
           onChunk: (chunk) => {
             if (!hasStartedStreaming) {
               hasStartedStreaming = true
-              console.log('[SYNC] First chunk - starting stream')
+              logger.log('[SYNC] First chunk - starting stream')
               startStreaming()
               onTextChange('')
               displayedText = ''
@@ -152,7 +151,7 @@ const RewriteToolbar = ({
             }
           },
           onComplete: (metadata) => {
-            console.log('[COMPLETE] Streaming finished:', metadata)
+            logger.log('[COMPLETE] Streaming finished:', metadata)
           },
           pollInterval: 1500,
           maxWaitTime: 300000
@@ -194,7 +193,7 @@ const RewriteToolbar = ({
         
         if (!wasCreditError) {
           const localizedError = getLocalizedContentError(error.message, t)
-          modal.error(localizedError || t('rewrite.humanizationFailed'))
+          modal.errorWithReport(localizedError || t('rewrite.humanizationFailed'), error, 'Error', 'RewriteToolbar.handleHumanize')
         }
       } finally {
         setIsLoading(false)
@@ -204,7 +203,7 @@ const RewriteToolbar = ({
     }
     
     // Standard streaming rewrite with enhanced anti-AI detection
-    console.log('[LAUNCH] Starting rewrite process...')
+    logger.log('[LAUNCH] Starting rewrite process...')
     setIsLoading(true)
     startProcessing('rewrite')
     
@@ -245,12 +244,12 @@ const RewriteToolbar = ({
           }
           
           chunkCount++
-          console.log(`[PACKAGE] Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
+          logger.log(`[PACKAGE] Chunk ${chunkCount} received:`, chunk.substring(0, 50) + '...')
           
           // First content chunk - start streaming
           if (!hasStartedStreaming) {
             hasStartedStreaming = true
-            console.log('[SYNC] First chunk - starting stream')
+            logger.log('[SYNC] First chunk - starting stream')
             startStreaming()
             onTextChange('') // Clear old text immediately
             displayedText = ''
@@ -265,7 +264,7 @@ const RewriteToolbar = ({
             animateText()
           }
           
-          console.log(`✍️ Buffer: ${fullText.length} chars, Displayed: ${displayedText.length} chars`)
+          logger.log(`✍️ Buffer: ${fullText.length} chars, Displayed: ${displayedText.length} chars`)
         }
       )
       
@@ -286,7 +285,7 @@ const RewriteToolbar = ({
       await waitForAnimation()
       
       // Success - text is already in editor
-      console.log(`[SUCCESS] Rewrite completed successfully - ${chunkCount} chunks received`)
+      logger.log(`[SUCCESS] Rewrite completed successfully - ${chunkCount} chunks received`)
       
     } catch (error) {
       console.error('[FAIL] Error rewriting:', error)
@@ -299,7 +298,7 @@ const RewriteToolbar = ({
       
       if (!wasCreditError) {
         const localizedError = getLocalizedContentError(error.message, t)
-        modal.error(localizedError || t('rewrite.rewriteFailed'))
+        modal.errorWithReport(localizedError || t('rewrite.rewriteFailed'), error, 'Error', 'RewriteToolbar.handleRewrite')
       }
     } finally {
       setIsLoading(false)
@@ -364,7 +363,7 @@ const RewriteToolbar = ({
         } catch (pdfError) {
           console.error('PDF parsing error:', pdfError)
           loadingModal.close()
-          modal.error(t('rewrite.unableToReadPdf') + ' ' + pdfError.message)
+          modal.errorWithReport(t('rewrite.unableToReadPdf') + ' ' + pdfError.message, pdfError, 'Error', 'RewriteToolbar.parsePDF')
           return
         }
       } else if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
@@ -378,7 +377,7 @@ const RewriteToolbar = ({
         } catch (docxError) {
           console.error('DOCX parsing error:', docxError)
           loadingModal.close()
-          modal.error(t('rewrite.unableToReadDocx') + ' ' + docxError.message)
+          modal.errorWithReport(t('rewrite.unableToReadDocx') + ' ' + docxError.message, docxError, 'Error', 'RewriteToolbar.parseDOCX')
           return
         }
       }
@@ -389,12 +388,12 @@ const RewriteToolbar = ({
         onTextChange(extractedText)
         modal.success(t('rewrite.fileContentLoaded'))
       } else {
-        modal.error(t('rewrite.unableToExtractContent'))
+        modal.errorWithReport(t('rewrite.unableToExtractContent'), new Error('Empty content'), 'Error', 'RewriteToolbar.extractContent')
       }
     } catch (error) {
       loadingModal.close()
       console.error('Error reading file:', error)
-      modal.error(t('rewrite.unableToReadFile') + ' ' + error.message)
+      modal.errorWithReport(t('rewrite.unableToReadFile') + ' ' + error.message, error, 'Error', 'RewriteToolbar.readFile')
     }
 
     // Reset input

@@ -13,6 +13,7 @@
 const { getVertexAI } = require('../config/gemini');
 const analysisService = require('./analysis.service');
 
+const logger = require('../utils/logger');
 const vertexAI = getVertexAI();
 
 // ============================================================================
@@ -446,7 +447,7 @@ function buildEnhancedRewritePrompt(originalText, voiceProfile, sampleText = nul
   // Build voice profile description based on writing preferences
   const voiceDescription = buildVoiceDescription(voiceProfile, writingPreferences);
   
-  console.log(`[HUMANIZE] Detected content language: ${lang} (${langConfig.name})`);
+  logger.info(`[HUMANIZE] Detected content language: ${lang} (${langConfig.name})`);
 
   // Build the enhanced prompt with language-specific rules
   let prompt = `You are an expert ghostwriter who must rewrite text to PERFECTLY match a specific human's writing style. Your goal is to make the output COMPLETELY INDISTINGUISHABLE from human writing.
@@ -674,7 +675,7 @@ function varyPunctuation(text, lang) {
 function breakParallelStructures(text) {
   // Find bullet-point like patterns and slightly vary them
   const bulletPatterns = /^(\s*[-•*]\s*)(.+)$/gm;
-  let matches = [...text.matchAll(bulletPatterns)];
+  const matches = [...text.matchAll(bulletPatterns)];
   
   if (matches.length >= 3) {
     // Randomly vary one item slightly
@@ -732,7 +733,7 @@ async function rewriteWithAntiDetection(originalText, voiceProfile, context = {}
       }
     );
 
-    console.log(`[HUMANIZE] Generating rewrite with enhanced anti-AI prompt...`);
+    logger.info(`[HUMANIZE] Generating rewrite with enhanced anti-AI prompt...`);
     
     const result = await model.generateContent(prompt);
     let rewrittenText = result.response.candidates[0].content.parts[0].text.trim();
@@ -742,10 +743,10 @@ async function rewriteWithAntiDetection(originalText, voiceProfile, context = {}
       rewrittenText = injectHumanImperfections(rewrittenText, voiceProfile);
     }
 
-    console.log(`[HUMANIZE] Rewrite complete (${originalText.length} → ${rewrittenText.length} chars)`);
+    logger.info(`[HUMANIZE] Rewrite complete (${originalText.length} → ${rewrittenText.length} chars)`);
     return rewrittenText;
   } catch (error) {
-    console.error('[HUMANIZE] Rewrite failed:', error);
+    logger.error('[HUMANIZE] Rewrite failed:', error);
     throw error;
   }
 }
@@ -770,7 +771,7 @@ async function rewriteWithIterativeRefinement(originalText, voiceProfile, contex
   // Import detectAIContent dynamically to avoid circular dependency
   const geminiService = require('./gemini.service');
   
-  console.log(`[HUMANIZE] Starting iterative refinement (max ${maxIterations} iterations, target <${targetProbability}%)`);
+  logger.info(`[HUMANIZE] Starting iterative refinement (max ${maxIterations} iterations, target <${targetProbability}%)`);
   
   for (let i = 0; i < maxIterations; i++) {
     iterations = i + 1;
@@ -788,14 +789,14 @@ async function rewriteWithIterativeRefinement(originalText, voiceProfile, contex
     );
     
     // Step 2: Check AI probability
-    console.log(`[HUMANIZE] Iteration ${iterations}: Checking AI probability...`);
+    logger.info(`[HUMANIZE] Iteration ${iterations}: Checking AI probability...`);
     lastDetection = await geminiService.detectAIContentEnhanced(currentText);
     
-    console.log(`[HUMANIZE] Iteration ${iterations}: AI probability = ${lastDetection.aiProbability}%`);
+    logger.info(`[HUMANIZE] Iteration ${iterations}: AI probability = ${lastDetection.aiProbability}%`);
     
     // Step 3: If below target, we're done
     if (lastDetection.aiProbability < targetProbability) {
-      console.log(`[HUMANIZE] [SUCCESS] Target reached! AI probability ${lastDetection.aiProbability}% < ${targetProbability}%`);
+      logger.info(`[HUMANIZE] [SUCCESS] Target reached! AI probability ${lastDetection.aiProbability}% < ${targetProbability}%`);
       return {
         text: currentText,
         iterations,
@@ -808,7 +809,7 @@ async function rewriteWithIterativeRefinement(originalText, voiceProfile, contex
     
     // If this is the last iteration, break
     if (i === maxIterations - 1) {
-      console.log(`[HUMANIZE] [WARN] Max iterations reached. Final AI probability: ${lastDetection.aiProbability}%`);
+      logger.info(`[HUMANIZE] [WARN] Max iterations reached. Final AI probability: ${lastDetection.aiProbability}%`);
     }
   }
   

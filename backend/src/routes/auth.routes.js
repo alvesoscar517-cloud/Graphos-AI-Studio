@@ -3,6 +3,7 @@
  */
 
 const express = require('express');
+const logger = require('../utils/logger');
 const router = express.Router();
 const config = require('../config');
 const envConfig = require('../config/envConfigHelper');
@@ -30,15 +31,22 @@ router.post('/send-feedback', optionalAuth, async (req, res) => {
     const userName = req.user?.name || 'Anonymous User';
     
     if (req.user) {
-      console.log('[INFO] Authenticated user:', { userId, email: userEmail, name: userName, authMethod: req.authMethod });
+      logger.info('[INFO] Authenticated user:', { userId, email: userEmail, name: userName, authMethod: req.authMethod });
     } else {
-      console.log('[INFO] Anonymous user (no valid token provided)');
+      logger.info('[INFO] Anonymous user (no valid token provided)');
     }
 
-    const isBillingSupport = type === 'billing_support';
-    const messageType = isBillingSupport ? 'billing_support' : 'feedback';
+    // Determine ticket type
+    let messageType = 'feedback';
+    if (type === 'billing_support') {
+      messageType = 'billing_support';
+    } else if (type === 'error_report') {
+      messageType = 'error_report';
+    }
+    const isBillingSupport = messageType === 'billing_support';
+    const isErrorReport = messageType === 'error_report';
     
-    console.log(`[INFO] Saving ${messageType} from ${userName} (${userEmail})...`);
+    logger.info(`[INFO] Saving ${messageType} from ${userName} (${userEmail})...`);
 
     // Save to Firestore
     const ticketId = uuidv4();
@@ -46,8 +54,8 @@ router.post('/send-feedback', optionalAuth, async (req, res) => {
     
     const ticketData = {
       type: messageType,
-      category: category || 'general',
-      priority: priority || 'medium',
+      category: category || (isErrorReport ? 'error' : 'general'),
+      priority: priority || (isErrorReport ? 'high' : 'medium'),
       title,
       content,
       images: images || [],
@@ -57,11 +65,13 @@ router.post('/send-feedback', optionalAuth, async (req, res) => {
       status: 'open',
       createdAt: now,
       updatedAt: now,
-      replies: []
+      replies: [],
+      // Store metadata for error reports
+      ...(req.body.metadata && { metadata: req.body.metadata })
     };
 
     await db.collection('support_tickets').doc(ticketId).set(ticketData);
-    console.log(`[SUCCESS] Ticket ${ticketId} saved to Firestore`);
+    logger.info(`[SUCCESS] Ticket ${ticketId} saved to Firestore`);
 
     // Send email notification to admin
     try {
@@ -110,7 +120,7 @@ router.post('/send-feedback', optionalAuth, async (req, res) => {
         });
       }
 
-      const subjectPrefix = isBillingSupport ? '[Billing Support]' : '[Feedback]';
+      const subjectPrefix = isBillingSupport ? '[Billing Support]' : isErrorReport ? '[Error Report]' : '[Feedback]';
       // Use no-reply for system notifications, not SMTP_USER (admin email)
       const fromEmail = envConfig.get('EMAIL_FROM') || config.EMAIL_FROM || 'no-reply@graphosai.com';
       const fromName = envConfig.get('EMAIL_FROM_NAME') || config.EMAIL_FROM_NAME || 'Graphos AI Studio';
@@ -124,9 +134,9 @@ router.post('/send-feedback', optionalAuth, async (req, res) => {
         priority: priority === 'urgent' || priority === 'high' ? 'high' : 'normal'
       });
 
-      console.log(`[SUCCESS] Email notification sent to admin: ${smtpUser}`);
+      logger.info(`[SUCCESS] Email notification sent to admin: ${smtpUser}`);
     } catch (emailError) {
-      console.error('[WARNING] Email notification failed:', emailError.message);
+      logger.error('[WARNING] Email notification failed:', emailError.message);
       // Continue even if email fails - ticket is already saved
     }
 
@@ -137,7 +147,7 @@ router.post('/send-feedback', optionalAuth, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[ERROR] Send feedback error:', error);
+    logger.error('[ERROR] Send feedback error:', error);
     res.status(500).json({ 
       success: false,
       ...l.error('server_error'),

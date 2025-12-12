@@ -4,12 +4,14 @@
  */
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNotes, useDeleteNote } from '@/hooks/queries'
 import { useDisclosure } from '@/hooks'
 import { useToasts } from '@/stores/uiStore'
 import NoteEditor from './NoteEditor'
 
 export function NoteList() {
+  const { t } = useTranslation()
   const { data: notes = [], isLoading, error, refetch } = useNotes()
   const deleteNote = useDeleteNote()
   const { showSuccess, showError } = useToasts()
@@ -27,12 +29,12 @@ export function NoteList() {
   }
 
   const handleDelete = async (noteId) => {
-    if (!confirm('Delete this note?')) return
+    if (!confirm(t('sidebar.confirmDeleteNote', { title: '' }))) return
     try {
       await deleteNote.mutateAsync(noteId)
-      showSuccess('Note deleted!')
+      showSuccess(t('notes.deleted'))
     } catch (error) {
-      showError(error.message || 'Failed to delete note')
+      showError(error.message || t('errors.generic'), { error, context: 'NoteList.handleDelete' })
     }
   }
 
@@ -50,15 +52,20 @@ export function NoteList() {
   }
 
   if (error) {
+    // Lazy import to avoid circular dependency
+    const { ErrorReportButton } = require('@/components/Common/ErrorReportButton')
     return (
       <div className="p-4 text-center">
-        <p className="text-red-500 mb-2">Failed to load notes</p>
-        <button
-          onClick={() => refetch()}
-          className="text-blue-600 hover:underline"
-        >
-          Try again
-        </button>
+        <p className="text-red-500 mb-2">{t('notes.failedToLoad')}</p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={() => refetch()}
+            className="text-blue-600 hover:underline"
+          >
+            {t('errorBoundary.tryAgain')}
+          </button>
+          <ErrorReportButton error={error} variant="link" context="NoteList" />
+        </div>
       </div>
     )
   }
@@ -67,12 +74,12 @@ export function NoteList() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Notes</h2>
+        <h2 className="text-lg font-semibold">{t('notes.notes')}</h2>
         <button
           onClick={handleCreate}
           className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
         >
-          + New Note
+          + {t('notes.newNote')}
         </button>
       </div>
 
@@ -81,7 +88,7 @@ export function NoteList() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-lg mx-4">
             <h3 className="text-lg font-semibold mb-4">
-              {editingNote ? 'Edit Note' : 'New Note'}
+              {editingNote ? t('notes.editNote') : t('notes.newNote')}
             </h3>
             <NoteEditor
               note={editingNote}
@@ -95,7 +102,7 @@ export function NoteList() {
       {/* Notes List */}
       {notes.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
-          No notes yet. Create your first note!
+          {t('notes.noNotesYet')}
         </div>
       ) : (
         <div className="space-y-2">
@@ -107,7 +114,7 @@ export function NoteList() {
               <div className="flex justify-between items-start">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium truncate">
-                    {note.title || 'Untitled'}
+                    {note.title || t('notes.untitled')}
                   </h3>
                   <p className="text-sm text-gray-500 line-clamp-2 mt-1">
                     {note.content}

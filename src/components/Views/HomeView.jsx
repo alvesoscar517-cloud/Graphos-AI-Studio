@@ -34,7 +34,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
       setShowDetailPopup(true)
     } catch (error) {
       console.error('Error loading profile details:', error)
-      modal.error(t('home.unableToLoadProfileDetails'))
+      modal.errorWithReport(t('home.unableToLoadProfileDetails'), error, 'Error', 'HomeView.handleProfileClick')
     }
   }
 

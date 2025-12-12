@@ -10,6 +10,7 @@ const pRetry = require('p-retry');
 const pTimeout = require('p-timeout');
 const pMap = require('p-map');
 
+const logger = require('../utils/logger');
 // ============================================================================
 // CONCURRENCY CONTROL
 // ============================================================================
@@ -73,7 +74,7 @@ async function withRetry(fn, options = {}) {
         options.onFailedAttempt(error);
       }
       // Log retry attempts
-      console.log(`Retry attempt ${error.attemptNumber} failed. ${error.retriesLeft} retries left.`);
+      logger.info(`Retry attempt ${error.attemptNumber} failed. ${error.retriesLeft} retries left.`);
     }
   });
 }

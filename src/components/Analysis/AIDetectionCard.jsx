@@ -8,11 +8,11 @@ import { useAIProcessingActions } from '@/stores'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import { handleCreditError } from '../../utils/creditHandler'
-import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
-import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
 import { cn } from '../../lib/utils'
+import Icon from '../Common/Icon'
+import LazyLottie from '../Common/LazyLottie'
 
 // Helper function to format evidence text - convert [TAG] to "Tag:"
 const formatEvidenceText = (text) => {
@@ -175,7 +175,7 @@ const AIDetectionCard = ({ disabled, text }) => {
       if (!wasCreditError) {
         // Get localized error message for other errors
         const localizedError = getLocalizedContentError(error.message, t)
-        modal.error(localizedError || t('analysis.detectionFailed'))
+        modal.errorWithReport(localizedError || t('analysis.detectionFailed'), error, 'Error', 'AIDetectionCard.detectAI')
       }
       
       setResult(null)
@@ -223,7 +223,7 @@ const AIDetectionCard = ({ disabled, text }) => {
             >
               <img 
                 src="/icon/chevron-down.svg"
-                alt="toggle"
+                alt={t('common.toggle')}
                 className={cn(
                   "w-icon-md h-icon-md opacity-60 transition-all duration-300",
                   "hover:opacity-100 icon-invert",

@@ -72,7 +72,16 @@
     "sentences": "sentences",
     "characters": "characters",
     "cached": "Cached",
-    "fresh": "Fresh"
+    "fresh": "Fresh",
+    "loadMore": "Load more",
+    "toggle": "Toggle",
+    "speed": "Speed",
+    "noProfiles": "No profiles",
+    "expand": "Expand",
+    "empty": "Empty",
+    "userAvatar": "User Avatar",
+    "google": "Google",
+    "supportEmail": "Email"
   },
   "auth": {
     "login": "Login",
@@ -228,7 +237,16 @@
       "confirmDelete": "Yes, delete my account",
       "deleteAccountFailed": "Failed to delete account",
       "accountTab": "Account",
-      "securityTab": "Security"
+      "securityTab": "Security",
+      "registerSubtitle": "Create your account to get started",
+      "passwordResetSuccess": "Password Reset Successfully!",
+      "passwordResetSuccessMessage": "Your password has been reset. You can now sign in with your new password.",
+      "resetCodeSent": "Reset code sent! Check your email.",
+      "otpResent": "New code sent! Check your email.",
+      "verificationSuccess": "Email verified successfully!",
+      "verificationSuccessMessage": "Your email has been verified. You can now sign in.",
+      "registrationSuccess": "Account created! Please verify your email.",
+      "passwordRequired": "Password is required"
     },
     "errors": {
       "accountDeleted": "This account has been deleted. Please contact support if you believe this is an error.",
@@ -250,8 +268,17 @@
       "resetEmailSent": "If this email exists, a reset code has been sent.",
       "invalidResetCode": "Invalid reset code. Please check and try again.",
       "passwordReused": "Cannot reuse recent passwords. Please choose a different password.",
-      "tooManyResetAttempts": "Too many attempts. Please try again later."
-    }
+      "tooManyResetAttempts": "Too many attempts. Please try again later.",
+      "currentPasswordIncorrect": "Current password is incorrect.",
+      "tooManyPasswordAttempts": "Too many failed attempts. Please try again later.",
+      "emailAlreadyVerified": "This email has already been verified. Please sign in.",
+      "extensionRequired": "Please use the Chrome extension to sign in with Google.",
+      "emailExistsWithDifferentMethod": "An account already exists with this email. Please sign in with email/password.",
+      "googleSignInFailed": "Google sign in failed. Please try again.",
+      "googleSignInCancelled": "Google sign in was cancelled."
+    },
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "sessionExpiredTitle": "Session Expired"
   },
   "nav": {
     "home": "Home",
@@ -387,11 +414,13 @@
     "typeMessage": "Type message... (Enter to send, Shift+Enter for new line)",
     "scrollDown": "Scroll down",
     "voiceInput": "Voice input",
+    "voice": "Voice",
     "recording": "Recording...",
     "stopRecording": "Stop recording",
     "voiceNotSupported": "Voice input is not supported in this browser",
     "insufficientCredits": "Insufficient Credits",
     "buyCreditsNow": "Buy Credits Now",
+    "emptyChat": "Start a conversation",
     "quickActions": {
       "writeEssay": "Write an essay",
       "writeEssayPrompt": "Write an essay about: ",
@@ -615,7 +644,13 @@
     "high": "High",
     "vsProfile": "vs Profile",
     "current": "Current",
-    "recommended": "Recommended"
+    "recommended": "Recommended",
+    "verdictHuman": "Human-written",
+    "verdictMostlyHuman": "Mostly human",
+    "verdictMixed": "Mixed content",
+    "verdictMostlyAI": "Mostly AI",
+    "verdictAI": "AI-generated",
+    "profileIdMissing": "Profile ID is missing"
   },
   "rewrite": {
     "rewrite": "Rewrite",
@@ -866,7 +901,17 @@
     "thankYou": "Thank you for your feedback! We will respond soon.",
     "errorOccurred": "An error occurred, please try again",
     "unableToConnect": "Unable to connect to server",
-    "sending": "Sending..."
+    "sending": "Sending...",
+    "briefDescription": "Brief description",
+    "tellUsMore": "Tell us more...",
+    "generalFeedback": "General Feedback",
+    "bugReport": "Bug Report",
+    "featureRequest": "Feature Request",
+    "emailPlaceholder": "your@email.com",
+    "feedbackType": "Feedback Type",
+    "subject": "Subject",
+    "message": "Message",
+    "emailOptional": "Email (optional)"
   },
   "billing": {
     "thanksForOrder": "Thanks for your order!",
@@ -907,10 +952,18 @@
   },
   "notifications": {
     "notifications": "Notifications",
+    "title": "Notifications",
     "noNotifications": "No notifications",
     "markAllAsRead": "Mark all read",
+    "markAllRead": "Mark all read",
     "deleteNotification": "Delete notification",
-    "notification": "Notification"
+    "notification": "Notification",
+    "unread": "Unread",
+    "error": "Failed to load notifications",
+    "noUnread": "No unread notifications",
+    "empty": "No notifications yet",
+    "all": "All",
+    "close": "Close"
   },
   "sharedContent": {
     "loadingSharedContent": "Loading shared content...",
@@ -961,21 +1014,19 @@
     "deduction": "Deduction",
     "addition": "Addition",
     "transaction": "Transaction",
-    "feature.chatMessage": "Chat Message",
-    "feature.humanize": "Humanize Text",
-    "feature.detect": "AI Detection",
-    "feature.rewrite": "Rewrite Text",
-    "feature.analyze": "Text Analysis",
-    "feature.purchase": "Credit Purchase",
-    "feature.firstPurchase": "First Purchase Bonus",
-    "feature.bonus": "Bonus Credits",
-    "feature.welcomeBonus": "Welcome Bonus",
-    "feature.refund": "Refund",
-    "feature.subscriptionRenewal": "Subscription Renewal",
-    "type.purchase": "Purchase",
-    "type.usage": "Usage",
-    "type.bonus": "Bonus",
-    "type.refund": "Refund"
+    "feature": {
+      "chatMessage": "Chat Message",
+      "humanize": "Humanize Text",
+      "detect": "AI Detection",
+      "rewrite": "Rewrite Text",
+      "analyze": "Text Analysis",
+      "purchase": "Credit Purchase",
+      "firstPurchase": "First Purchase Bonus",
+      "bonus": "Bonus Credits",
+      "welcomeBonus": "Welcome Bonus",
+      "refund": "Refund",
+      "subscriptionRenewal": "Subscription Renewal"
+    }
   },
   "editor": {
     "enterYourText": "Enter your text...",
@@ -1193,7 +1244,12 @@
     "goBack": "Go Back",
     "backToHome": "Back to Home",
     "technicalDetails": "Technical Details",
-    "helpText": "If the problem persists, please contact support."
+    "helpText": "If the problem persists, please contact",
+    "reportError": "Report Error",
+    "reporting": "Reporting...",
+    "reported": "Reported!",
+    "alreadyReported": "Already Reported",
+    "reportFailed": "Failed"
   },
   "profileSetupErrors": {
     "atLeast3Samples": "At least 3 text samples are required to create a profile",
@@ -1220,5 +1276,51 @@
     "contactSupport": "Contact Support",
     "close": "Close",
     "footer": "Please contact support for more information about unlocking your account."
+  },
+  "pagination": {
+    "firstPage": "First page",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "lastPage": "Last page"
+  },
+  "notes": {
+    "noteTitle": "Note title (optional)",
+    "writeNote": "Write your note...",
+    "note": "Note",
+    "chatPrompt": "Chat prompt",
+    "template": "Template",
+    "updated": "Note updated!",
+    "created": "Note created!",
+    "deleted": "Note deleted!",
+    "notes": "Notes",
+    "newNote": "New Note",
+    "editNote": "Edit Note",
+    "noNotesYet": "No notes yet. Create your first note!",
+    "failedToLoad": "Failed to load notes",
+    "untitled": "Untitled"
+  },
+  "errorBoundary": {
+    "somethingWentWrong": "Something went wrong",
+    "tryAgain": "Try again",
+    "failedToLoadData": "Failed to load data",
+    "reportError": "Report Error"
+  },
+  "errorReport": {
+    "report": "Report",
+    "reportThis": "Report this error",
+    "reporting": "Reporting...",
+    "reported": "Reported!",
+    "alreadyReported": "Already Reported",
+    "failed": "Failed",
+    "thankYou": "Thanks for reporting!",
+    "errorReported": "Error reported. Thank you!",
+    "helpUsImprove": "Help us improve by reporting this error"
+  },
+  "accountSettings": {
+    "driveSyncEnabled": "Google Drive sync is enabled"
+  },
+  "securitySettings": {
+    "ipAddress": "IP",
+    "unknown": "Unknown"
   }
 }

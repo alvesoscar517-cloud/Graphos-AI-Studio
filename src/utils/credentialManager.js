@@ -6,7 +6,7 @@
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Credential_Management_API
  */
 
-/* eslint-disable no-undef */
+ 
 // @ts-nocheck - Credential Management API types not fully supported
 
 import { logger } from './logger'

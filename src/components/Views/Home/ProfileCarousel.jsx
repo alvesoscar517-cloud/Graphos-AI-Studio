@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import LazyLottie from '../../Common/LazyLottie'
 import ProfileCard from './ProfileCard'
 import EmptyProfileCard from './EmptyProfileCard'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'

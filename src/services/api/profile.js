@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger'
 import { CONFIG } from '../../utils/config'
 import { getUserInfo } from './auth'
 import { handleError, ProfileError, NetworkError } from '../../utils/errors'
@@ -38,12 +39,12 @@ export async function loadProfiles() {
     
     // Don't make API call if user is not authenticated
     if (!userInfo || !userInfo.userId) {
-      console.log('[INFO] No authenticated user, skipping profile load')
+      logger.log('[INFO] No authenticated user, skipping profile load')
       perfMonitor.end(endpoint)
       return []
     }
     
-    console.log('📋 Loading profiles for user:', userInfo.userId)
+    logger.log('📋 Loading profiles for user:', userInfo.userId)
     
     // Use new endpoint instead of deprecated /get_profiles
     const { data } = await apiClient.get(`/profiles?user_id=${userInfo.userId}`)
@@ -55,7 +56,7 @@ export async function loadProfiles() {
     const duration = perfMonitor.end(endpoint)
     apiTracker.trackCall(endpoint, duration, { userId: userInfo.userId })
     
-    console.log('[SUCCESS] Loaded profiles:', data.profiles?.length || 0)
+    logger.log('[SUCCESS] Loaded profiles:', data.profiles?.length || 0)
     return data.profiles || []
   } catch (error) {
     perfMonitor.end(endpoint)
@@ -87,14 +88,14 @@ export async function deleteProfile(profileId) {
  */
 export async function getProfileDetails(profileId) {
   try {
-    console.log('📋 Loading profile details for:', profileId)
+    logger.log('📋 Loading profile details for:', profileId)
     
     const { data } = await apiClient.get(`/get_profile?profile_id=${profileId}`)
     
-    console.log('[PACKAGE] Profile Details Response:', data)
+    logger.log('[PACKAGE] Profile Details Response:', data)
     
     if (data.success) {
-      console.log('[SUCCESS] Loaded profile details')
+      logger.log('[SUCCESS] Loaded profile details')
       return data.profile
     }
     throw new Error(data.error || 'Failed to load profile details')
@@ -166,7 +167,7 @@ export async function addSample(profileId, text) {
  */
 export async function addSamplesBatch(profileId, samples) {
   try {
-    console.log(`[PACKAGE] Uploading ${samples.length} samples in batch...`)
+    logger.log(`[PACKAGE] Uploading ${samples.length} samples in batch...`)
     
     const { data } = await apiClient.post('/add_samples_batch', {
       profile_id: profileId,
@@ -174,7 +175,7 @@ export async function addSamplesBatch(profileId, samples) {
     })
     
     if (data.success) {
-      console.log(`[SUCCESS] Batch upload successful: ${data.samples_added} samples`)
+      logger.log(`[SUCCESS] Batch upload successful: ${data.samples_added} samples`)
       return data
     }
     throw new Error(data.error || 'Failed to add samples batch')
@@ -223,9 +224,9 @@ export async function createProfileComplete(profileName, theme, samples, options
       throw new Error('User not authenticated')
     }
     
-    console.log(`[PACKAGE] Creating complete profile with ${samples.length} samples...`)
-    console.log('[PACKAGE] User info:', { userId: userInfo.userId, email: userInfo.email })
-    console.log('[PACKAGE] Request data:', { 
+    logger.log(`[PACKAGE] Creating complete profile with ${samples.length} samples...`)
+    logger.log('[PACKAGE] User info:', { userId: userInfo.userId, email: userInfo.email })
+    logger.log('[PACKAGE] Request data:', { 
       profile_name: profileName, 
       theme, 
       samplesCount: samples.length,
@@ -245,7 +246,7 @@ export async function createProfileComplete(profileName, theme, samples, options
     })
     
     if (data.success) {
-      console.log(`[SUCCESS] Profile created successfully: ${data.profile_id}`)
+      logger.log(`[SUCCESS] Profile created successfully: ${data.profile_id}`)
       return data
     }
     throw new Error(data.error || 'Failed to create profile')
@@ -278,7 +279,7 @@ export async function createProfileCompleteStream(profileName, theme, samples, c
       throw new Error('User not authenticated')
     }
     
-    console.log(`[STREAM] Creating profile with ${samples.length} samples...`)
+    logger.log(`[STREAM] Creating profile with ${samples.length} samples...`)
     
     const headers = await getAuthHeaders()
     
@@ -321,7 +322,7 @@ export async function createProfileCompleteStream(profileName, theme, samples, c
           const data = line.slice(6).trim()
           
           if (data === '[DONE]') {
-            console.log('[STREAM] Profile creation complete')
+            logger.log('[STREAM] Profile creation complete')
             if (result && onComplete) {
               onComplete(result)
             }

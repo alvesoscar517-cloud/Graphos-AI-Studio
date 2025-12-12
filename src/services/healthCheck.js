@@ -9,6 +9,7 @@
  * - Graceful degradation support
  */
 
+import { logger } from '../utils/logger'
 import { CONFIG } from '../utils/config';
 
 // ============================================================================
@@ -54,7 +55,7 @@ class HealthCheckService {
       this.check();
     }, interval);
 
-    console.log('[HealthCheck] Started with interval:', interval);
+    logger.log('[HealthCheck] Started with interval:', interval);
   }
 
   /**
@@ -65,7 +66,7 @@ class HealthCheckService {
       clearInterval(this.checkInterval);
       this.checkInterval = null;
     }
-    console.log('[HealthCheck] Stopped');
+    logger.log('[HealthCheck] Stopped');
   }
 
   /**
@@ -114,7 +115,7 @@ class HealthCheckService {
           this._notifyStatusChange();
         }
 
-        console.log('[HealthCheck] Healthy', { latency, version: data.version });
+        logger.log('[HealthCheck] Healthy', { latency, version: data.version });
 
         return { healthy: true, latency, info: data };
       } else {
@@ -224,7 +225,7 @@ class HealthCheckService {
   // ============================================================================
 
   _notifyStatusChange() {
-    console.log('[HealthCheck] Status changed:', this.status);
+    logger.log('[HealthCheck] Status changed:', this.status);
     
     this.listeners.forEach(callback => {
       try {
@@ -261,7 +262,7 @@ if (typeof document !== 'undefined') {
 
   // Check on network recovery
   window.addEventListener('online', () => {
-    console.log('[HealthCheck] Network online, checking...');
+    logger.log('[HealthCheck] Network online, checking...');
     healthCheckService.check();
   });
 }

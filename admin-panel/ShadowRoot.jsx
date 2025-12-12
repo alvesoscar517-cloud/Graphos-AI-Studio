@@ -1,3 +1,4 @@
+import logger from '../lib/logger'
 import { useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -38,7 +39,7 @@ export default function ShadowRoot({ children, styles }) {
       reactRootRef.current.render(children);
       
       isInitialized.current = true;
-      console.log('[SUCCESS] Shadow DOM created successfully for Admin Panel');
+      logger.log('[SUCCESS] Shadow DOM created successfully for Admin Panel');
     } catch (error) {
       console.error('[ERROR] Failed to create Shadow DOM:', error);
     }
@@ -63,3 +64,4 @@ export default function ShadowRoot({ children, styles }) {
     />
   );
 }
+

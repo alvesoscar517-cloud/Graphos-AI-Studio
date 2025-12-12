@@ -6,6 +6,7 @@ const { VertexAI } = require('@google-cloud/vertexai');
 const { PredictionServiceClient } = require('@google-cloud/aiplatform');
 const config = require('./index');
 
+const logger = require('../utils/logger');
 // Lazy initialization to avoid cold start penalty
 let vertexAI = null;
 let aiplatformClient = null;
@@ -16,7 +17,7 @@ function getVertexAI() {
       project: config.PROJECT_ID,
       location: config.LOCATION
     });
-    console.log('[INIT] Vertex AI initialized');
+    logger.info('[INIT] Vertex AI initialized');
   }
   return vertexAI;
 }
@@ -26,7 +27,7 @@ function getAIPlatformClient() {
     aiplatformClient = new PredictionServiceClient({
       apiEndpoint: `${config.LOCATION}-aiplatform.googleapis.com`
     });
-    console.log('[INIT] AI Platform Client initialized');
+    logger.info('[INIT] AI Platform Client initialized');
   }
   return aiplatformClient;
 }

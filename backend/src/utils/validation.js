@@ -1,3 +1,5 @@
+const logger = require('../utils/logger');
+
 /**
  * Input Validation Utilities
  * Now powered by Zod schemas with backward compatibility
@@ -208,7 +210,7 @@ function validateModel(model, defaultModel = 'gemini-2.5-flash') {
     return validModel;
   }
   
-  console.warn(`[WARN] Invalid model requested: ${model}, using default: ${defaultModel}`);
+  logger.warn(`[WARN] Invalid model requested: ${model}, using default: ${defaultModel}`);
   return defaultModel;
 }
 

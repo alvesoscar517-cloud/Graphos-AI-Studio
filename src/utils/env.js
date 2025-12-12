@@ -1,3 +1,4 @@
+import { logger } from './logger'
 /**
  * Environment Configuration
  * Centralized access to environment variables
@@ -54,7 +55,7 @@ export function validateEnv() {
 
 // Log environment on load
 if (ENV.IS_DEV) {
-  console.log('[SETTINGS] Environment Configuration:', {
+  logger.log('[SETTINGS] Environment Configuration:', {
     mode: ENV.NODE_ENV,
     apiUrl: ENV.API_BASE_URL,
     devMode: ENV.ENABLE_DEV_MODE,
@@ -66,3 +67,4 @@ if (ENV.IS_DEV) {
 if (ENV.IS_PROD) {
   validateEnv()
 }
+

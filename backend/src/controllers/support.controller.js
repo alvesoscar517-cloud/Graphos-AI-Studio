@@ -44,7 +44,7 @@ exports.getTickets = async (req, res) => {
     
     res.json({ success: true, tickets, count: tickets.length, language: l.lang });
   } catch (error) {
-    console.error('[ERROR] Get tickets error:', error);
+    logger.error('[ERROR] Get tickets error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
@@ -78,7 +78,7 @@ exports.getTicketDetails = async (req, res) => {
     
     res.json({ success: true, ticket, language: l.lang });
   } catch (error) {
-    console.error('[ERROR] Get ticket error:', error);
+    logger.error('[ERROR] Get ticket error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
@@ -103,7 +103,7 @@ exports.updateTicketStatus = async (req, res) => {
     
     res.json({ success: true, message: l.t('support.ticket_updated') });
   } catch (error) {
-    console.error('[ERROR] Update status error:', error);
+    logger.error('[ERROR] Update status error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
@@ -183,7 +183,7 @@ exports.replyToTicket = async (req, res) => {
             userLang = userData.preferredLanguage || userData.language || 'en';
           }
         } catch (langError) {
-          console.log('[INFO] Could not get user language, using default');
+          logger.info('[INFO] Could not get user language, using default');
         }
         
         const htmlContent = supportReplyEmail({
@@ -203,9 +203,9 @@ exports.replyToTicket = async (req, res) => {
           html: htmlContent
         });
         
-        console.log(`[SUCCESS] Email sent to ${ticket.userEmail} (lang: ${userLang})`);
+        logger.info(`[SUCCESS] Email sent to ${ticket.userEmail} (lang: ${userLang})`);
       } catch (emailError) {
-        console.error('[WARNING] Email send failed:', emailError);
+        logger.error('[WARNING] Email send failed:', emailError);
       }
     }
     
@@ -318,12 +318,12 @@ exports.replyToTicket = async (req, res) => {
             createdAt: now
           });
           
-          console.log(`[SUCCESS] Notification sent to user ${userId}`);
+          logger.info(`[SUCCESS] Notification sent to user ${userId}`);
         } else {
-          console.log(`[WARNING] User not found with email: ${ticket.userEmail}`);
+          logger.info(`[WARNING] User not found with email: ${ticket.userEmail}`);
         }
       } catch (notifError) {
-        console.error('[WARNING] Notification send failed:', notifError);
+        logger.error('[WARNING] Notification send failed:', notifError);
       }
     }
     
@@ -333,7 +333,7 @@ exports.replyToTicket = async (req, res) => {
       reply
     });
   } catch (error) {
-    console.error('[ERROR] Reply error:', error);
+    logger.error('[ERROR] Reply error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
@@ -349,7 +349,7 @@ exports.deleteTicket = async (req, res) => {
     
     res.json({ success: true, message: l.t('success.deleted') });
   } catch (error) {
-    console.error('[ERROR] Delete ticket error:', error);
+    logger.error('[ERROR] Delete ticket error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };
@@ -377,7 +377,7 @@ exports.getStatistics = async (req, res) => {
       language: l.lang
     });
   } catch (error) {
-    console.error('[ERROR] Get statistics error:', error);
+    logger.error('[ERROR] Get statistics error:', error);
     res.status(500).json({ success: false, ...l.error('server_error') });
   }
 };

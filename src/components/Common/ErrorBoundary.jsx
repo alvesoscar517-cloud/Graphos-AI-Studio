@@ -9,7 +9,7 @@ import ErrorPage from './ErrorPage'
 export class ErrorBoundary extends Component {
   constructor(props) {
     super(props)
-    this.state = { hasError: false, error: null }
+    this.state = { hasError: false, error: null, errorInfo: null }
   }
 
   static getDerivedStateFromError(error) {
@@ -18,11 +18,12 @@ export class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo)
+    this.setState({ errorInfo })
     this.props.onError?.(error, errorInfo)
   }
 
   handleRetry = () => {
-    this.setState({ hasError: false, error: null })
+    this.setState({ hasError: false, error: null, errorInfo: null })
   }
 
   render() {
@@ -36,12 +37,12 @@ export class ErrorBoundary extends Component {
       if (this.props.inline) {
         return (
           <div className="p-4 text-center">
-            <p className="text-red-500 mb-2">Something went wrong</p>
+            <p className="text-red-500 mb-2">{this.props.t?.('errorBoundary.somethingWentWrong') || 'Something went wrong'}</p>
             <button
               onClick={this.handleRetry}
               className="text-blue-600 hover:underline text-sm"
             >
-              Try again
+              {this.props.t?.('errorBoundary.tryAgain') || 'Try again'}
             </button>
           </div>
         )
@@ -51,6 +52,7 @@ export class ErrorBoundary extends Component {
       return (
         <ErrorPage 
           error={this.state.error}
+          componentStack={this.state.errorInfo?.componentStack}
           onRetry={this.handleRetry}
         />
       )
@@ -63,17 +65,23 @@ export class ErrorBoundary extends Component {
 /**
  * Query Error Fallback - for TanStack Query errors
  */
-export function QueryErrorFallback({ error, resetErrorBoundary }) {
+export function QueryErrorFallback({ error, resetErrorBoundary, t }) {
+  // Lazy import to avoid circular dependency
+  const ErrorReportButton = require('./ErrorReportButton').ErrorReportButton
+  
   return (
     <div className="p-4 text-center">
-      <p className="text-red-500 mb-2">Failed to load data</p>
+      <p className="text-red-500 mb-2">{t?.('errorBoundary.failedToLoadData') || 'Failed to load data'}</p>
       <p className="text-gray-500 text-sm mb-4">{error?.message}</p>
-      <button
-        onClick={resetErrorBoundary}
-        className="text-blue-600 hover:underline"
-      >
-        Try again
-      </button>
+      <div className="flex items-center justify-center gap-3">
+        <button
+          onClick={resetErrorBoundary}
+          className="text-blue-600 hover:underline"
+        >
+          {t?.('errorBoundary.tryAgain') || 'Try again'}
+        </button>
+        <ErrorReportButton error={error} variant="link" context="QueryErrorFallback" />
+      </div>
     </div>
   )
 }

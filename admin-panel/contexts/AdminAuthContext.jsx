@@ -1,3 +1,4 @@
+import logger from '../lib/logger'
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   authApi,
@@ -56,7 +57,7 @@ export function AdminAuthProvider({ children }) {
         // Clear any stale auth data first
         clearAuthData();
         // User needs to login - don't try to refresh if no token exists
-        console.log('No valid token, user needs to login');
+        logger.log('No valid token, user needs to login');
         setIsAdminAuthenticated(false);
       }
     } catch (err) {
@@ -167,3 +168,4 @@ export function useAdminAuth() {
   }
   return context;
 }
+

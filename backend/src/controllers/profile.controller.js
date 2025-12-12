@@ -228,7 +228,7 @@ exports.addSamplesBatch = async (req, res) => {
       message: l.t('voice_profile.sample_added')
     });
   } catch (error) {
-    console.error('[ERROR] Batch add samples error:', error);
+    logger.error('[ERROR] Batch add samples error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
@@ -287,7 +287,7 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
     try {
       await autoNotification.sendProfileCreatedNotification(profileData.userId, profileData.name);
     } catch (notifError) {
-      console.warn('[WARN] Failed to send profile created notification:', notifError.message);
+      logger.warn('[WARN] Failed to send profile created notification:', notifError.message);
     }
     
     // Log activity with credits info from middleware
@@ -312,7 +312,7 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
       message: l.t('voice_profile.updated')
     });
   } catch (error) {
-    console.error('[ERROR] Finalize profile error:', error);
+    logger.error('[ERROR] Finalize profile error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
@@ -734,7 +734,7 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
     try {
       await autoNotification.sendProfileCreatedNotification(userId, profile_name);
     } catch (notifError) {
-      console.warn('[WARN] Failed to send profile created notification:', notifError.message);
+      logger.warn('[WARN] Failed to send profile created notification:', notifError.message);
     }
 
     res.status(201).json({
@@ -1201,7 +1201,7 @@ exports.getProfile = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('[ERROR] Get profile error:', error);
+    logger.error('[ERROR] Get profile error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
@@ -1247,7 +1247,7 @@ exports.getProfiles = async (req, res) => {
       count: profiles.length
     });
   } catch (error) {
-    console.error('[ERROR] Get profiles error:', error);
+    logger.error('[ERROR] Get profiles error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };
@@ -1302,7 +1302,7 @@ exports.deleteProfile = async (req, res) => {
       message: l.t('voice_profile.deleted')
     });
   } catch (error) {
-    console.error('[ERROR] Delete profile error:', error);
+    logger.error('[ERROR] Delete profile error:', error);
     res.status(500).json({ success: false, ...l.error('server_error'), details: String(error) });
   }
 };

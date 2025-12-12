@@ -6,6 +6,7 @@
 const { getVertexAI } = require('../config/gemini');
 const path = require('path');
 
+const logger = require('../utils/logger');
 const vertexAI = getVertexAI();
 
 // Supported image types
@@ -77,14 +78,14 @@ async function processAttachments(attachments) {
     const { supported, type } = checkFileSupport(attachment.mimeType || attachment.type);
     
     if (!supported) {
-      console.warn(`[WARN] Unsupported file type: ${attachment.mimeType || attachment.type}`);
+      logger.warn(`[WARN] Unsupported file type: ${attachment.mimeType || attachment.type}`);
       continue;
     }
     
     if (type === 'image') {
       // Check size
       if (attachment.size && attachment.size > MAX_IMAGE_SIZE) {
-        console.warn(`[WARN] Image too large: ${attachment.size} bytes`);
+        logger.warn(`[WARN] Image too large: ${attachment.size} bytes`);
         continue;
       }
       
@@ -157,7 +158,7 @@ async function analyzeImage(base64Image, mimeType, prompt = 'Describe this image
     
     return result.response.candidates[0].content.parts[0].text;
   } catch (error) {
-    console.error('[ERROR] Image analysis failed:', error.message);
+    logger.error('[ERROR] Image analysis failed:', error.message);
     throw error;
   }
 }

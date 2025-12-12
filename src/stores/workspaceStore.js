@@ -4,6 +4,7 @@
  * Works alongside TanStack Query for data fetching
  */
 
+import { logger } from '../utils/logger'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
@@ -124,7 +125,7 @@ export const useWorkspaceActions = () => useWorkspaceStore(
 // Listen for sign out event to clear state
 if (typeof window !== 'undefined') {
   window.addEventListener('auth-signout', () => {
-    console.log('[SECURITY] Clearing workspace store on sign out')
+    logger.log('[SECURITY] Clearing workspace store on sign out')
     useWorkspaceStore.getState().reset()
   })
 }

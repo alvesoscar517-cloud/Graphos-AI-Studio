@@ -3,6 +3,7 @@
  * Real-time payment detection using Firestore Realtime
  */
 
+import { logger } from '../utils/logger'
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { getUserInfo } from '../services/api';
 import realtimeService from '../services/realtimeService';
@@ -66,11 +67,11 @@ export const PaymentProvider = ({ children }) => {
     setConnectionStatus('disconnected');
     startTimeRef.current = null;
     clearPersistedState();
-    console.log('⏹️ Stopped listening for payments');
+    logger.log('⏹️ Stopped listening for payments');
   }, []);
 
   const handlePaymentSuccess = useCallback((data) => {
-    console.log('[SUCCESS] Payment detected!', data);
+    logger.log('[SUCCESS] Payment detected!', data);
     stopListening();
     
     setPurchaseResult({
@@ -106,11 +107,11 @@ export const PaymentProvider = ({ children }) => {
       
       // Auto-stop after max duration
       timeoutRef.current = setTimeout(() => {
-        console.log('⏰ Max listen duration reached');
+        logger.log('⏰ Max listen duration reached');
         stopListening();
       }, MAX_LISTEN_DURATION);
       
-      console.log('🎧 Started listening for payments (Firestore Realtime)');
+      logger.log('🎧 Started listening for payments (Firestore Realtime)');
       
       // Store status unsubscribe for cleanup
       const originalUnsub = unsubscribeRef.current;
@@ -134,7 +135,7 @@ export const PaymentProvider = ({ children }) => {
     const state = getPersistedState();
     if (state) {
       startTimeRef.current = state.startTime;
-      console.log('[PACKAGE] Resuming payment listener from persisted state');
+      logger.log('[PACKAGE] Resuming payment listener from persisted state');
       startPolling();
     }
   }, [isAuthenticated, authLoading]);

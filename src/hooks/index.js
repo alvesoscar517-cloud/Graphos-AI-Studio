@@ -46,6 +46,11 @@ export { useOptimisticMutation, useListMutation } from './useOptimisticMutation'
 export { useSessionExpired } from './useSessionExpired'
 export { useCredentials } from './useCredentials'
 
+// ============================================
+// Error Reporting hooks
+// ============================================
+export { useErrorReporter } from './useErrorReporter'
+
 // Re-export auth storage utilities for convenience
 export { 
   clearAuthStorage,

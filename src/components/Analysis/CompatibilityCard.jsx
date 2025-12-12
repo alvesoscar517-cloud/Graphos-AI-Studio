@@ -6,11 +6,11 @@ import { useNotes } from '../../contexts/NotesContext'
 import { useAIProcessingActions } from '@/stores'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
-import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
-import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
+import Icon from '../Common/Icon'
+import LazyLottie from '../Common/LazyLottie'
 
 const CompatibilityCard = ({ disabled, currentProfile, text }) => {
   const { t } = useTranslation()
@@ -122,7 +122,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
     } catch (error) {
       console.error('[FAIL] Error calculating score:', error)
       const localizedError = getLocalizedContentError(error.message, t)
-      modal.error(localizedError || t('analysis.calculationFailed'))
+      modal.errorWithReport(localizedError || t('analysis.calculationFailed'), error, 'Error', 'CompatibilityCard.calculateScore')
       setScore(null)
       setAnalysisDetails(null)
     } finally {

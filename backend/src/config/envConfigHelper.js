@@ -1,3 +1,5 @@
+const logger = require('../utils/logger');
+
 /**
  * Environment Config Helper
  * Provides sync access to config with Firestore > process.env > default fallback
@@ -193,13 +195,13 @@ async function loadFromFirestore() {
     updateCache('backend', configs.backend);
     updateCache('custom', configs.custom);
     
-    console.log('[ENV-CONFIG] Loaded from Firestore:', {
+    logger.info('[ENV-CONFIG] Loaded from Firestore:', {
       shared: Object.keys(configs.shared).length,
       backend: Object.keys(configs.backend).length,
       custom: Object.keys(configs.custom).length
     });
   } catch (error) {
-    console.warn('[ENV-CONFIG] Failed to load from Firestore, using process.env:', error.message);
+    logger.warn('[ENV-CONFIG] Failed to load from Firestore, using process.env:', error.message);
   } finally {
     firestoreConfig.loading = false;
   }

@@ -1,6 +1,8 @@
 // Modal notification system for React
 // NotificationModal styles in main.css
 
+import i18n from '@/i18n'
+
 class ModalSystem {
   constructor() {
     this.currentModal = null
@@ -71,6 +73,53 @@ class ModalSystem {
 
   error(message, title = 'Error') {
     return this.alert(message, title, 'error')
+  }
+
+  /**
+   * Show error modal with report button
+   * @param {string} message - Error message to display
+   * @param {Error|string} error - Error object for reporting
+   * @param {string} title - Modal title
+   * @param {string} context - Additional context for the error report
+   */
+  errorWithReport(message, error = null, title = 'Error', context = '') {
+    const errorObj = error instanceof Error ? error : new Error(error || message)
+    const t = (key, fallback) => i18n.t(key, fallback)
+    
+    return new Promise((resolve) => {
+      this.showModal({
+        type: 'error',
+        title,
+        message,
+        buttons: [
+          {
+            text: t('errorReport.report', 'Report'),
+            style: 'secondary',
+            onClick: async () => {
+              // Since we can't use hooks outside React, we'll dispatch a custom event
+              try {
+                window.dispatchEvent(new CustomEvent('report-error', { 
+                  detail: { error: errorObj, context } 
+                }))
+                this.toast(t('errorReport.errorReported', 'Error reported. Thank you!'), '', 'success')
+              } catch (e) {
+                console.error('Failed to report error:', e)
+              }
+              this.closeModal()
+              resolve(false)
+            }
+          },
+          {
+            text: 'OK',
+            style: 'primary',
+            onClick: () => {
+              this.closeModal()
+              resolve(true)
+            }
+          }
+        ]
+      })
+    })
   }
 
   warning(message, title = 'Warning') {

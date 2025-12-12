@@ -3,6 +3,7 @@
  * Track API calls, performance metrics, and user interactions
  */
 
+import { logger } from '../utils/logger'
 import { CONFIG } from './config';
 
 // ============================================================================
@@ -153,7 +154,7 @@ class ApiTracker {
     }
     
     if (CONFIG.ENABLE_DEBUG_LOGS) {
-      console.log(`[API] ${endpoint} completed in ${duration}ms`, metadata);
+      logger.log(`[API] ${endpoint} completed in ${duration}ms`, metadata);
     }
   }
   
@@ -247,7 +248,7 @@ class InteractionTracker {
     }
     
     if (CONFIG.ENABLE_DEBUG_LOGS) {
-      console.log(`[INTERACTION] ${action}`, details);
+      logger.log(`[INTERACTION] ${action}`, details);
     }
   }
   

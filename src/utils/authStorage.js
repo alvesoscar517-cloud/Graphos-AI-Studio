@@ -1,3 +1,4 @@
+import { logger } from './logger'
 /**
  * Auth Storage Utility
  * Centralized, secure storage for authentication data
@@ -260,7 +261,7 @@ export function clearAuthStorage() {
     // Ignore errors during cleanup
   }
 
-  console.log('[SECURITY] Auth storage cleared')
+  logger.log('[SECURITY] Auth storage cleared')
 }
 
 /**
@@ -411,7 +412,7 @@ export function migrateToSecureStorage() {
     
     if (!isEncrypted && rawToken.length < 500) {
       // Likely unencrypted, migrate
-      console.log('[AuthStorage] Migrating to secure storage...')
+      logger.log('[AuthStorage] Migrating to secure storage...')
       
       const refreshToken = localStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN)
       const sessionId = localStorage.getItem(AUTH_STORAGE_KEYS.SESSION_ID)
@@ -421,7 +422,7 @@ export function migrateToSecureStorage() {
       if (refreshToken) secureSet(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken)
       if (sessionId) secureSet(AUTH_STORAGE_KEYS.SESSION_ID, sessionId)
       
-      console.log('[AuthStorage] Migration complete')
+      logger.log('[AuthStorage] Migration complete')
     }
   } catch (error) {
     console.error('[AuthStorage] Migration failed:', error)
@@ -461,3 +462,4 @@ export default {
   // Constants
   AUTH_STORAGE_KEYS,
 }
+

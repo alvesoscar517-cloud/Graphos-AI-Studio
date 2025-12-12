@@ -100,13 +100,13 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
         window.open(data.checkoutUrl, '_blank');
         onClose();
       } else {
-        showError(data.error || t('errors.unableToCreatePayment'));
+        showError(data.error || t('errors.unableToCreatePayment'), { error: new Error(data.error || 'Payment creation failed'), context: 'UpgradePlanModal.handlePurchase' });
       }
     } catch (err) {
       console.error('Error creating checkout:', err);
       // Show more specific error message if available
       const errorMessage = err?.message || t('errors.networkError');
-      showError(errorMessage);
+      showError(errorMessage, { error: err, context: 'UpgradePlanModal.handlePurchase' });
     } finally {
       setLoadingPackageId(null);
     }

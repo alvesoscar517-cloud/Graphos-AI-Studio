@@ -72,7 +72,16 @@
     "sentences": "câu",
     "characters": "ký tự",
     "cached": "Đã lưu cache",
-    "fresh": "Mới nhất"
+    "fresh": "Mới nhất",
+    "loadMore": "Tải thêm",
+    "toggle": "Chuyển đổi",
+    "speed": "Tốc độ",
+    "noProfiles": "Không có hồ sơ",
+    "expand": "Mở rộng",
+    "empty": "Trống",
+    "userAvatar": "Ảnh đại diện",
+    "google": "Google",
+    "supportEmail": "Email"
   },
   "auth": {
     "login": "Đăng nhập",
@@ -226,7 +235,17 @@
       "confirmDelete": "Có, xóa tài khoản của tôi",
       "deleteAccountFailed": "Không thể xóa tài khoản",
       "accountTab": "Tài khoản",
-      "securityTab": "Bảo mật"
+      "securityTab": "Bảo mật",
+      "linkGoogleRequired": "Liên kết tài khoản Google",
+      "linkGoogleDesc": "Để sử dụng đồng bộ Google Drive, vui lòng liên kết tài khoản Google của bạn trước.",
+      "registerSubtitle": "Tạo tài khoản để bắt đầu",
+      "passwordResetSuccess": "Đặt lại mật khẩu thành công!",
+      "passwordResetSuccessMessage": "Mật khẩu của bạn đã được đặt lại. Bạn có thể đăng nhập với mật khẩu mới.",
+      "resetCodeSent": "Đã gửi mã đặt lại! Kiểm tra email của bạn.",
+      "otpResent": "Đã gửi mã mới! Kiểm tra email của bạn.",
+      "verificationSuccess": "Xác minh email thành công!",
+      "verificationSuccessMessage": "Email của bạn đã được xác minh. Bạn có thể đăng nhập ngay.",
+      "registrationSuccess": "Tạo tài khoản thành công! Vui lòng xác minh email."
     },
     "errors": {
       "accountDeleted": "Tài khoản này đã bị xóa. Vui lòng liên hệ hỗ trợ nếu bạn cho rằng đây là lỗi.",
@@ -248,8 +267,17 @@
       "resetEmailSent": "Nếu email tồn tại, mã đặt lại đã được gửi.",
       "invalidResetCode": "Mã đặt lại không đúng. Vui lòng kiểm tra và thử lại.",
       "passwordReused": "Không thể sử dụng lại mật khẩu gần đây. Vui lòng chọn mật khẩu khác.",
-      "tooManyResetAttempts": "Thử quá nhiều lần. Vui lòng thử lại sau."
-    }
+      "tooManyResetAttempts": "Thử quá nhiều lần. Vui lòng thử lại sau.",
+      "currentPasswordIncorrect": "Mật khẩu hiện tại không đúng.",
+      "tooManyPasswordAttempts": "Thử quá nhiều lần. Vui lòng thử lại sau.",
+      "emailAlreadyVerified": "Email này đã được xác minh. Vui lòng đăng nhập.",
+      "extensionRequired": "Vui lòng sử dụng tiện ích Chrome để đăng nhập bằng Google.",
+      "emailExistsWithDifferentMethod": "Tài khoản với email này đã tồn tại. Vui lòng đăng nhập bằng email/mật khẩu.",
+      "googleSignInFailed": "Đăng nhập Google thất bại. Vui lòng thử lại.",
+      "googleSignInCancelled": "Đăng nhập Google đã bị hủy."
+    },
+    "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+    "sessionExpiredTitle": "Phiên đã hết hạn"
   },
   "nav": {
     "home": "Trang chủ",
@@ -399,7 +427,9 @@
       "rewriteTextPrompt": "Viết lại văn bản sau theo phong cách của tôi: ",
       "researchTopic": "Nghiên cứu chủ đề",
       "researchTopicPrompt": "Nghiên cứu và tổng hợp thông tin về: "
-    }
+    },
+    "voice": "Giọng nói",
+    "emptyChat": "Bắt đầu cuộc trò chuyện"
   },
   "errors": {
     "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
@@ -613,7 +643,13 @@
     "high": "Cao",
     "vsProfile": "so với Hồ sơ",
     "current": "Hiện tại",
-    "recommended": "Khuyên dùng"
+    "recommended": "Khuyên dùng",
+    "verdictHuman": "Do con người viết",
+    "verdictMostlyHuman": "Phần lớn do con người",
+    "verdictMixed": "Nội dung hỗn hợp",
+    "verdictMostlyAI": "Phần lớn do AI",
+    "verdictAI": "Do AI tạo ra",
+    "profileIdMissing": "Thiếu ID hồ sơ"
   },
   "rewrite": {
     "rewrite": "Viết lại",
@@ -864,7 +900,17 @@
     "thankYou": "Cảm ơn phản hồi của bạn! Chúng tôi sẽ phản hồi sớm.",
     "errorOccurred": "Đã xảy ra lỗi, vui lòng thử lại",
     "unableToConnect": "Không thể kết nối đến máy chủ",
-    "sending": "Đang gửi..."
+    "sending": "Đang gửi...",
+    "briefDescription": "Mô tả ngắn gọn",
+    "tellUsMore": "Cho chúng tôi biết thêm...",
+    "generalFeedback": "Phản hồi chung",
+    "bugReport": "Báo cáo lỗi",
+    "featureRequest": "Yêu cầu tính năng",
+    "emailPlaceholder": "email@cuaban.com",
+    "feedbackType": "Loại phản hồi",
+    "subject": "Chủ đề",
+    "message": "Tin nhắn",
+    "emailOptional": "Email (tùy chọn)"
   },
   "billing": {
     "thanksForOrder": "Cảm ơn bạn đã đặt hàng!",
@@ -908,7 +954,15 @@
     "noNotifications": "Không có thông báo",
     "markAllAsRead": "Đánh dấu tất cả đã đọc",
     "deleteNotification": "Xóa thông báo",
-    "notification": "Thông báo"
+    "notification": "Thông báo",
+    "unread": "Chưa đọc",
+    "error": "Không thể tải thông báo",
+    "noUnread": "Không có thông báo chưa đọc",
+    "empty": "Chưa có thông báo",
+    "all": "Tất cả",
+    "title": "Thông báo",
+    "markAllRead": "Đánh dấu đã đọc tất cả",
+    "close": "Đóng"
   },
   "sharedContent": {
     "loadingSharedContent": "Đang tải nội dung được chia sẻ...",
@@ -959,21 +1013,19 @@
     "deduction": "Trừ",
     "addition": "Cộng",
     "transaction": "Giao dịch",
-    "feature.chatMessage": "Tin nhắn Chat",
-    "feature.humanize": "Nhân hóa văn bản",
-    "feature.detect": "Phát hiện AI",
-    "feature.rewrite": "Viết lại văn bản",
-    "feature.analyze": "Phân tích văn bản",
-    "feature.purchase": "Mua Credit",
-    "feature.firstPurchase": "Thưởng mua lần đầu",
-    "feature.bonus": "Credit thưởng",
-    "feature.welcomeBonus": "Thưởng chào mừng",
-    "feature.refund": "Hoàn tiền",
-    "feature.subscriptionRenewal": "Gia hạn gói",
-    "type.purchase": "Mua",
-    "type.usage": "Sử dụng",
-    "type.bonus": "Thưởng",
-    "type.refund": "Hoàn tiền"
+    "feature": {
+      "chatMessage": "Tin nhắn Chat",
+      "humanize": "Nhân hóa văn bản",
+      "detect": "Phát hiện AI",
+      "rewrite": "Viết lại văn bản",
+      "analyze": "Phân tích văn bản",
+      "purchase": "Mua Credit",
+      "firstPurchase": "Thưởng mua lần đầu",
+      "bonus": "Credit thưởng",
+      "welcomeBonus": "Thưởng chào mừng",
+      "refund": "Hoàn tiền",
+      "subscriptionRenewal": "Gia hạn gói"
+    }
   },
   "editor": {
     "enterYourText": "Nhập văn bản của bạn...",
@@ -1191,7 +1243,12 @@
     "goBack": "Quay lại",
     "backToHome": "Về trang chủ",
     "technicalDetails": "Chi tiết kỹ thuật",
-    "helpText": "Nếu vấn đề vẫn tiếp diễn, vui lòng liên hệ hỗ trợ."
+    "helpText": "Nếu vấn đề vẫn tiếp diễn, vui lòng liên hệ",
+    "reportError": "Báo cáo lỗi",
+    "reporting": "Đang gửi...",
+    "reported": "Đã báo cáo!",
+    "alreadyReported": "Đã báo cáo trước đó",
+    "reportFailed": "Thất bại"
   },
   "profileSetupErrors": {
     "atLeast3Samples": "Cần ít nhất 3 mẫu văn bản để tạo hồ sơ",
@@ -1218,5 +1275,51 @@
     "contactSupport": "Liên hệ hỗ trợ",
     "close": "Đóng",
     "footer": "Vui lòng liên hệ bộ phận hỗ trợ để biết thêm thông tin về việc mở khóa tài khoản."
+  },
+  "pagination": {
+    "firstPage": "Trang đầu",
+    "previousPage": "Trang trước",
+    "nextPage": "Trang sau",
+    "lastPage": "Trang cuối"
+  },
+  "notes": {
+    "noteTitle": "Tiêu đề ghi chú (tùy chọn)",
+    "writeNote": "Viết ghi chú của bạn...",
+    "note": "Ghi chú",
+    "chatPrompt": "Lời nhắc trò chuyện",
+    "template": "Mẫu",
+    "updated": "Đã cập nhật ghi chú!",
+    "created": "Đã tạo ghi chú!",
+    "deleted": "Đã xóa ghi chú!",
+    "notes": "Ghi chú",
+    "newNote": "Ghi chú mới",
+    "editNote": "Chỉnh sửa ghi chú",
+    "noNotesYet": "Chưa có ghi chú. Tạo ghi chú đầu tiên!",
+    "failedToLoad": "Không thể tải ghi chú",
+    "untitled": "Chưa đặt tên"
+  },
+  "errorBoundary": {
+    "somethingWentWrong": "Đã xảy ra lỗi",
+    "tryAgain": "Thử lại",
+    "failedToLoadData": "Không thể tải dữ liệu",
+    "reportError": "Báo cáo lỗi"
+  },
+  "errorReport": {
+    "report": "Báo cáo",
+    "reportThis": "Báo cáo lỗi này",
+    "reporting": "Đang gửi...",
+    "reported": "Đã báo cáo!",
+    "alreadyReported": "Đã báo cáo trước đó",
+    "failed": "Thất bại",
+    "thankYou": "Cảm ơn bạn đã báo cáo!",
+    "errorReported": "Đã gửi báo cáo lỗi. Cảm ơn bạn!",
+    "helpUsImprove": "Giúp chúng tôi cải thiện bằng cách báo cáo lỗi này"
+  },
+  "accountSettings": {
+    "driveSyncEnabled": "Đồng bộ Google Drive đã được bật"
+  },
+  "securitySettings": {
+    "ipAddress": "IP",
+    "unknown": "Không xác định"
   }
 }

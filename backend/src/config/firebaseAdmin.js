@@ -6,6 +6,7 @@
 const admin = require('firebase-admin');
 const config = require('./index');
 
+const logger = require('../utils/logger');
 let initialized = false;
 let initError = null;
 
@@ -27,7 +28,7 @@ function initializeFirebaseAdmin() {
   
   if (admin.apps.length > 0) {
     initialized = true;
-    console.log('[Firebase Admin] Already initialized, reusing existing app');
+    logger.info('[Firebase Admin] Already initialized, reusing existing app');
     return admin;
   }
   
@@ -38,14 +39,14 @@ function initializeFirebaseAdmin() {
     });
     
     initialized = true;
-    console.log('[Firebase Admin] Initialized successfully', {
+    logger.info('[Firebase Admin] Initialized successfully', {
       projectId: config.PROJECT_ID,
       appsCount: admin.apps.length
     });
     
     return admin;
   } catch (error) {
-    console.error('[Firebase Admin] Initialization failed:', {
+    logger.error('[Firebase Admin] Initialization failed:', {
       error: error.message,
       code: error.code
     });
@@ -76,7 +77,7 @@ function isAvailable() {
 try {
   initializeFirebaseAdmin();
 } catch (error) {
-  console.error('[Firebase Admin] Failed to initialize on startup:', error.message);
+  logger.error('[Firebase Admin] Failed to initialize on startup:', error.message);
 }
 
 module.exports = {

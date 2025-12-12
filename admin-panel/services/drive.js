@@ -1,3 +1,4 @@
+import logger from '../lib/logger'
 import { CONFIG } from '../utils/config'
 
 let driveFolderId = null
@@ -73,7 +74,7 @@ export async function getOrCreateAppFolder() {
     driveFolderId = createData.id
     await chrome.storage.local.set({ driveFolderId })
 
-    console.log('[SUCCESS] Created Drive folder:', driveFolderId)
+    logger.log('[SUCCESS] Created Drive folder:', driveFolderId)
     return driveFolderId
   } catch (error) {
     console.error('[FAIL] Error with Drive folder:', error)
@@ -145,7 +146,7 @@ export async function syncNotesToDrive(notes) {
       }
     }
 
-    console.log('[SUCCESS] Notes synced to Drive')
+    logger.log('[SUCCESS] Notes synced to Drive')
     return true
   } catch (error) {
     console.error('[FAIL] Error syncing to Drive:', error)
@@ -162,7 +163,7 @@ export async function loadNotesFromDrive() {
     const result = await chrome.storage.local.get(['accessToken'])
     const token = result.accessToken
 
-    console.log('📋 Loading notes from Drive folder:', folderId)
+    logger.log('📋 Loading notes from Drive folder:', folderId)
 
     // List all files in folder
     const response = await fetch(
@@ -219,7 +220,7 @@ export async function loadNotesFromDrive() {
       }
     }
 
-    console.log('[SUCCESS] Loaded notes from Drive:', notes.length)
+    logger.log('[SUCCESS] Loaded notes from Drive:', notes.length)
     return notes
   } catch (error) {
     console.error('[FAIL] Error loading notes from Drive:', error)
@@ -266,7 +267,7 @@ export async function saveNoteToDrive(note) {
         }
       )
       
-      console.log('[SUCCESS] Updated note in Drive:', fileName)
+      logger.log('[SUCCESS] Updated note in Drive:', fileName)
       return note.driveId
     }
 
@@ -293,7 +294,7 @@ export async function saveNoteToDrive(note) {
     )
 
     const data = await response.json()
-    console.log('[SUCCESS] Created note in Drive:', fileName)
+    logger.log('[SUCCESS] Created note in Drive:', fileName)
     return data.id
   } catch (error) {
     console.error('[FAIL] Error saving note to Drive:', error)
@@ -319,7 +320,7 @@ export async function deleteNoteFromDrive(driveId) {
       }
     )
 
-    console.log('[SUCCESS] Deleted note from Drive')
+    logger.log('[SUCCESS] Deleted note from Drive')
     return true
   } catch (error) {
     console.error('[FAIL] Error deleting note from Drive:', error)
@@ -357,3 +358,6 @@ export async function openDriveFolder(notes) {
     throw error
   }
 }
+
+
+

@@ -9,6 +9,7 @@
  * - Firebase handles reconnection
  */
 
+import { logger } from '@/utils/logger'
 import { 
   doc, 
   collection, 
@@ -65,7 +66,7 @@ class FirestoreRealtimeService {
     this.userId = userId
     this.isInitialized = true
 
-    console.log('[FirestoreRealtime] Initializing for user:', userId)
+    logger.log('[FirestoreRealtime] Initializing for user:', userId)
 
     // Setup listeners - combined user listener for credits + profile
     this._setupUserListener(db, userId)
@@ -116,7 +117,7 @@ class FirestoreRealtimeService {
             
             // Check if credits changed
             if (data.credits && (!lastData || JSON.stringify(data.credits) !== JSON.stringify(lastData.credits))) {
-              console.log('[FirestoreRealtime] Credits updated:', data.credits.balance)
+              logger.log('[FirestoreRealtime] Credits updated:', data.credits.balance)
               this._notify('credits', {
                 type: 'update',
                 credits: {
@@ -135,7 +136,7 @@ class FirestoreRealtimeService {
               JSON.stringify(data.settings) !== JSON.stringify(lastData.settings)
             
             if (profileChanged && (data.settings || data.locked !== undefined)) {
-              console.log('[FirestoreRealtime] User profile updated')
+              logger.log('[FirestoreRealtime] User profile updated')
               this._notify('userProfile', {
                 type: 'updated',
                 profile: {
@@ -250,7 +251,7 @@ class FirestoreRealtimeService {
             const notification = { id: change.doc.id, ...docData, createdAt }
             
             if (change.type === 'added') {
-              console.log('[FirestoreRealtime] New notification:', notification.id)
+              logger.log('[FirestoreRealtime] New notification:', notification.id)
               this._notify('notification', {
                 type: 'new',
                 notification,
@@ -317,21 +318,21 @@ class FirestoreRealtimeService {
             }
             
             if (change.type === 'added') {
-              console.log('[FirestoreRealtime] Voice profile added:', profile.profile_id)
+              logger.log('[FirestoreRealtime] Voice profile added:', profile.profile_id)
               this._notify('profile', {
                 type: 'created',
                 profile,
                 timestamp: Date.now()
               })
             } else if (change.type === 'modified') {
-              console.log('[FirestoreRealtime] Voice profile updated:', profile.profile_id)
+              logger.log('[FirestoreRealtime] Voice profile updated:', profile.profile_id)
               this._notify('profile', {
                 type: 'updated',
                 profile,
                 timestamp: Date.now()
               })
             } else if (change.type === 'removed') {
-              console.log('[FirestoreRealtime] Voice profile deleted:', profile.profile_id)
+              logger.log('[FirestoreRealtime] Voice profile deleted:', profile.profile_id)
               this._notify('profile', {
                 type: 'deleted',
                 profileId: profile.profile_id,
@@ -382,7 +383,7 @@ class FirestoreRealtimeService {
                 createdAt 
               }
               
-              console.log('[FirestoreRealtime] New order detected:', order.id)
+              logger.log('[FirestoreRealtime] New order detected:', order.id)
               this._notify('payment', {
                 type: 'order_created',
                 order,
@@ -472,7 +473,7 @@ class FirestoreRealtimeService {
     this.lastUserData = null
     this.userId = null
     this.isInitialized = false
-    console.log('[FirestoreRealtime] Cleaned up')
+    logger.log('[FirestoreRealtime] Cleaned up')
   }
 }
 

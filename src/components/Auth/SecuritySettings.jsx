@@ -130,7 +130,7 @@ const SecuritySettings = () => {
                       </div>
                       <div className="flex gap-4 text-xs text-text-muted">
                         <span>{formatDate(entry.loginAt)}</span>
-                        <span>IP: {entry.ipAddress || 'Unknown'}</span>
+                        <span>{t('securitySettings.ipAddress')}: {entry.ipAddress || t('securitySettings.unknown')}</span>
                       </div>
                     </div>
                   </div>

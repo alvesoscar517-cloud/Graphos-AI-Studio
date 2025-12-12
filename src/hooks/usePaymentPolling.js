@@ -8,6 +8,7 @@
  * - Better user experience
  */
 
+import { logger } from '../utils/logger'
 import { useState, useEffect, useRef, useCallback } from 'react';
 import realtimeService from '../services/realtimeService';
 
@@ -32,7 +33,7 @@ export function usePaymentPolling() {
     setIsPolling(true);
     setPurchaseResult(null);
     
-    console.log('[Payment] Started listening for payment (Firestore Realtime)');
+    logger.log('[Payment] Started listening for payment (Firestore Realtime)');
   }, [isPolling]);
 
   // Stop listening
@@ -47,7 +48,7 @@ export function usePaymentPolling() {
     }
     setIsPolling(false);
     pollStartTime.current = null;
-    console.log('[Payment] Stopped listening');
+    logger.log('[Payment] Stopped listening');
   }, []);
 
   // Clear purchase result (after showing notification)
@@ -67,7 +68,7 @@ export function usePaymentPolling() {
         
         // Only accept orders created after checkout was opened
         if (orderTime >= checkoutTime - 5000) { // 5s buffer for clock skew
-          console.log('[Payment] Order detected via Realtime!', data.order);
+          logger.log('[Payment] Order detected via Realtime!', data.order);
           setPurchaseResult({
             order: data.order,
             credits: data.order.credits
@@ -85,7 +86,7 @@ export function usePaymentPolling() {
         const checkoutTime = checkoutTimestamp.current || 0;
         
         if (orderTime >= checkoutTime - 5000) {
-          console.log('[Payment] Order detected via browser event!', order);
+          logger.log('[Payment] Order detected via browser event!', order);
           setPurchaseResult({
             order,
             credits: order.credits
@@ -99,7 +100,7 @@ export function usePaymentPolling() {
 
     // Timeout after max duration
     const timeoutId = setTimeout(() => {
-      console.log('[Payment] Max duration reached, stopping');
+      logger.log('[Payment] Max duration reached, stopping');
       stopPolling();
     }, MAX_POLL_DURATION);
 
@@ -117,7 +118,7 @@ export function usePaymentPolling() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && isPolling) {
-        console.log('[Payment] Tab visible, realtime should have updates');
+        logger.log('[Payment] Tab visible, realtime should have updates');
         // Realtime handles updates automatically, no action needed
       }
     };

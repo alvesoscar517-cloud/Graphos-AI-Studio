@@ -3,6 +3,7 @@
  * TanStack Query hook for user notifications with Firestore Realtime support
  */
 
+import { logger } from '@/utils/logger'
 import { useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queryKeys'
@@ -31,7 +32,7 @@ export function useNotifications(userId) {
     if (!userId) return
 
     const unsubscribe = realtimeService.subscribe('notification', (data) => {
-      console.log('[REALTIME] Notification update:', data)
+      logger.log('[REALTIME] Notification update:', data)
       
       // If we received a new notification, add it directly to cache
       if (data.type === 'new' && data.notification) {

@@ -5,6 +5,7 @@
 
 const nlpUtils = require('../utils/nlp');
 
+const logger = require('../utils/logger');
 // ============================================================================
 // INDUSTRY BENCHMARKS - Industry standards for comparison
 // ============================================================================
@@ -407,7 +408,7 @@ function splitIntoSentences(text) {
 function calculateCosineSimilarity(vector1, vector2) {
   // Check for null/undefined vectors
   if (!vector1 || !vector2) {
-    console.warn('[WARN] calculateCosineSimilarity: null/undefined vector', { 
+    logger.warn('[WARN] calculateCosineSimilarity: null/undefined vector', { 
       hasVector1: !!vector1, 
       hasVector2: !!vector2 
     });
@@ -415,7 +416,7 @@ function calculateCosineSimilarity(vector1, vector2) {
   }
   
   if (!Array.isArray(vector1) || !Array.isArray(vector2)) {
-    console.warn('[WARN] calculateCosineSimilarity: non-array vector', { 
+    logger.warn('[WARN] calculateCosineSimilarity: non-array vector', { 
       vector1Type: typeof vector1, 
       vector2Type: typeof vector2 
     });
@@ -423,7 +424,7 @@ function calculateCosineSimilarity(vector1, vector2) {
   }
   
   if (vector1.length !== vector2.length) {
-    console.warn('[WARN] calculateCosineSimilarity: length mismatch', { 
+    logger.warn('[WARN] calculateCosineSimilarity: length mismatch', { 
       vector1Length: vector1.length, 
       vector2Length: vector2.length 
     });
@@ -973,7 +974,7 @@ function calculateSuggestionConfidence(issues, sentenceScore) {
  */
 function preprocessTextForDetection(text) {
   // Normalize formatting
-  let cleaned = text
+  const cleaned = text
     .replace(/\n{3,}/g, '\n\n')  // Normalize line breaks
     .replace(/\s{2,}/g, ' ')     // Normalize spaces
     .replace(/\t/g, ' ')         // Replace tabs
@@ -1090,7 +1091,7 @@ function getCachedSuggestions(sentence, profileId) {
     return null;
   }
   
-  console.log(`[CACHE] Suggestion cache HIT for: "${sentence.substring(0, 30)}..."`);
+  logger.info(`[CACHE] Suggestion cache HIT for: "${sentence.substring(0, 30)}..."`);
   return cached.data;
 }
 
@@ -1116,7 +1117,7 @@ function setCachedSuggestions(sentence, profileId, suggestions) {
  */
 function clearSuggestionCache() {
   suggestionCache.clear();
-  console.log('[CACHE] Suggestion cache cleared');
+  logger.info('[CACHE] Suggestion cache cleared');
 }
 
 // ============================================================================

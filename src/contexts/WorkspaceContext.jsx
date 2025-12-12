@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger'
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../stores/authStore'
 import { logError } from '../utils/errors'
@@ -71,7 +72,7 @@ export const WorkspaceProvider = ({ children }) => {
 
     // Detect user change (logout or switch account)
     if (prevUserEmail && prevUserEmail !== currentUserEmail) {
-      console.log('[SECURITY] User changed, clearing workspace data...')
+      logger.log('[SECURITY] User changed, clearing workspace data...')
       setConversations([])
       setCurrentConversation(null)
       setError(null)
@@ -90,7 +91,7 @@ export const WorkspaceProvider = ({ children }) => {
           setConversations(limited)
           
           if (parsed.length > MAX_CONVERSATIONS) {
-            console.log(`[WARNING] Loaded ${MAX_CONVERSATIONS} of ${parsed.length} conversations`)
+            logger.log(`[WARNING] Loaded ${MAX_CONVERSATIONS} of ${parsed.length} conversations`)
           }
         } catch (err) {
           console.error('Failed to load conversations:', err)
@@ -102,7 +103,7 @@ export const WorkspaceProvider = ({ children }) => {
       }
     } else {
       // User logged out, clear everything
-      console.log('[INFO] User logged out, clearing workspace state')
+      logger.log('[INFO] User logged out, clearing workspace state')
       setConversations([])
       setCurrentConversation(null)
     }
@@ -144,7 +145,7 @@ export const WorkspaceProvider = ({ children }) => {
           new Date(b.updated || b.created) - new Date(a.updated || a.created)
         )
         
-        console.log(`🧹 Auto-cleanup: Keeping ${MAX_CONVERSATIONS} of ${prev.length} conversations`)
+        logger.log(`🧹 Auto-cleanup: Keeping ${MAX_CONVERSATIONS} of ${prev.length} conversations`)
         return sorted.slice(0, MAX_CONVERSATIONS)
       })
     }, 5 * 60 * 1000)
@@ -197,7 +198,7 @@ export const WorkspaceProvider = ({ children }) => {
     setConversations(prev => {
       const emptyConvs = prev.filter(c => !hasContent(c) && c.id !== currentConversation?.id)
       if (emptyConvs.length > 0) {
-        console.log(`🧹 Cleaning up ${emptyConvs.length} empty conversations`)
+        logger.log(`🧹 Cleaning up ${emptyConvs.length} empty conversations`)
         return prev.filter(c => hasContent(c) || c.id === currentConversation?.id)
       }
       return prev
@@ -404,12 +405,12 @@ export const WorkspaceProvider = ({ children }) => {
       }))
       
       if (hasSummary && updatedMessages.length > MAX_MESSAGES_TO_SEND) {
-        console.log(`[OPTIMIZE] Sending ${messagesToSend.length}/${updatedMessages.length} messages (has summary)`)
+        logger.log(`[OPTIMIZE] Sending ${messagesToSend.length}/${updatedMessages.length} messages (has summary)`)
       }
 
       // Use humanized or standard chat based on settings
       if (useHumanizedChat) {
-        console.log('🎭 Using humanized chat', currentProfile ? 'with voice profile' : 'with generic voice')
+        logger.log('🎭 Using humanized chat', currentProfile ? 'with voice profile' : 'with generic voice')
         await streamFunction(
           apiMessages,
           currentConversation?.systemPrompt || generateSystemPrompt(),
@@ -429,16 +430,16 @@ export const WorkspaceProvider = ({ children }) => {
             conversationSummary: conversation?.summary,
             onContext: (contextInfo) => {
               if (contextInfo.wasSummarized) {
-                console.log(`[NOTE] Conversation summarized (${contextInfo.summarizedCount} messages)`)
+                logger.log(`[NOTE] Conversation summarized (${contextInfo.summarizedCount} messages)`)
               }
             },
             onHumanizing: (humanizingInfo) => {
               // Humanization in progress - show status
-              console.log(`🔄 Humanizing: AI probability ${humanizingInfo.aiProbability}% -> target ${humanizingInfo.target}%`)
+              logger.log(`🔄 Humanizing: AI probability ${humanizingInfo.aiProbability}% -> target ${humanizingInfo.target}%`)
             },
             onHumanized: (humanizedText) => {
               // Replace with fully humanized text
-              console.log('✨ Received humanized text')
+              logger.log('✨ Received humanized text')
               fullText = humanizedText
               displayedText = humanizedText
               setCurrentConversation(prev => ({
@@ -480,7 +481,7 @@ export const WorkspaceProvider = ({ children }) => {
             conversationSummary: conversation?.summary,
             onContext: (contextInfo) => {
               if (contextInfo.wasSummarized) {
-                console.log(`[NOTE] Conversation summarized (${contextInfo.summarizedCount} messages)`)
+                logger.log(`[NOTE] Conversation summarized (${contextInfo.summarizedCount} messages)`)
               }
             },
             onComplete: (completeInfo) => {
@@ -660,7 +661,7 @@ export const WorkspaceProvider = ({ children }) => {
       )
       
       const result = await syncToDrive(conversationsToSync)
-      console.log(`📤 Synced ${result.synced} conversations to Drive`)
+      logger.log(`📤 Synced ${result.synced} conversations to Drive`)
       return result
     } catch (error) {
       console.error('Failed to sync conversations to Drive:', error)
@@ -696,7 +697,7 @@ export const WorkspaceProvider = ({ children }) => {
         .sort((a, b) => new Date(b.updated) - new Date(a.updated))
       
       setConversations(allConversations)
-      console.log(`📥 Loaded ${driveConversations.length} conversations from Drive, ${newFromDrive.length} new`)
+      logger.log(`📥 Loaded ${driveConversations.length} conversations from Drive, ${newFromDrive.length} new`)
       
       return { loaded: driveConversations.length, new: newFromDrive.length }
     } catch (error) {

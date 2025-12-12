@@ -768,9 +768,9 @@ async function sendToUser(userId, notification) {
   try {
     const realtimeController = require('../controllers/realtime.controller');
     realtimeController.broadcastNotification(userId, notificationData);
-    console.log(`[AUTO-NOTIF] Broadcasted to user ${userId}:`, notification.translations.vi?.title || notification.translations.en?.title);
+    logger.info(`[AUTO-NOTIF] Broadcasted to user ${userId}:`, notification.translations.vi?.title || notification.translations.en?.title);
   } catch (e) {
-    console.log(`[AUTO-NOTIF] Saved to DB (no SSE):`, notification.translations.vi?.title || notification.translations.en?.title);
+    logger.info(`[AUTO-NOTIF] Saved to DB (no SSE):`, notification.translations.vi?.title || notification.translations.en?.title);
   }
   
   return userNotifId;
@@ -795,14 +795,14 @@ async function sendWelcomeNotification(userId, freeCredits = 100) {
       .get();
 
     if (!existingSnapshot.empty) {
-      console.log(`[AUTO-NOTIF] User ${userId} already received welcome notification`);
+      logger.info(`[AUTO-NOTIF] User ${userId} already received welcome notification`);
       return null;
     }
 
     const notification = createFromTemplate('WELCOME', { credits: freeCredits });
     return await sendToUser(userId, notification);
   } catch (error) {
-    console.error('[AUTO-NOTIF] Send welcome notification error:', error);
+    logger.error('[AUTO-NOTIF] Send welcome notification error:', error);
     return null;
   }
 }
@@ -819,7 +819,7 @@ async function sendPurchaseNotification(userId, packageName, creditsAdded, newBa
     });
     return await sendToUser(userId, notification);
   } catch (error) {
-    console.error('[AUTO-NOTIF] Send purchase notification error:', error);
+    logger.error('[AUTO-NOTIF] Send purchase notification error:', error);
     return null;
   }
 }
@@ -845,7 +845,7 @@ async function sendLowCreditsWarning(userId, remainingCredits) {
     const notification = createFromTemplate('LOW_CREDITS', { credits: remainingCredits });
     return await sendToUser(userId, notification);
   } catch (error) {
-    console.error('[AUTO-NOTIF] Send low credits warning error:', error);
+    logger.error('[AUTO-NOTIF] Send low credits warning error:', error);
     return null;
   }
 }
@@ -858,7 +858,7 @@ async function sendProfileCreatedNotification(userId, profileName) {
     const notification = createFromTemplate('PROFILE_CREATED', { profileName });
     return await sendToUser(userId, notification);
   } catch (error) {
-    console.error('[AUTO-NOTIF] Send profile created notification error:', error);
+    logger.error('[AUTO-NOTIF] Send profile created notification error:', error);
     return null;
   }
 }
@@ -908,10 +908,10 @@ async function sendNewFeatureAnnouncement(featureName, description, targetView =
       await batch.commit();
     }
 
-    console.log(`[AUTO-NOTIF] New feature announcement sent to ${userIds.length} users`);
+    logger.info(`[AUTO-NOTIF] New feature announcement sent to ${userIds.length} users`);
     return userIds.length;
   } catch (error) {
-    console.error('[AUTO-NOTIF] Send new feature announcement error:', error);
+    logger.error('[AUTO-NOTIF] Send new feature announcement error:', error);
     return 0;
   }
 }
@@ -919,6 +919,7 @@ async function sendNewFeatureAnnouncement(featureName, description, targetView =
 // Import localization service for number formatting
 const localizationService = require('./localization.service');
 
+const logger = require('../utils/logger');
 /**
  * Send first purchase bonus notification with detailed breakdown
  */
@@ -939,7 +940,7 @@ async function sendFirstPurchaseBonusNotification(userId, packageName, baseCredi
     });
     return await sendToUser(userId, notification);
   } catch (error) {
-    console.error('[AUTO-NOTIF] Send first purchase bonus notification error:', error);
+    logger.error('[AUTO-NOTIF] Send first purchase bonus notification error:', error);
     return null;
   }
 }
@@ -966,14 +967,14 @@ async function sendFirstAnalysisNotification(userId) {
     });
 
     if (alreadySent) {
-      console.log(`[AUTO-NOTIF] User ${userId} already received first analysis notification`);
+      logger.info(`[AUTO-NOTIF] User ${userId} already received first analysis notification`);
       return null;
     }
 
     const notification = createFromTemplate('FIRST_ANALYSIS_COMPLETED', {});
     return await sendToUser(userId, notification);
   } catch (error) {
-    console.error('[AUTO-NOTIF] Send first analysis notification error:', error);
+    logger.error('[AUTO-NOTIF] Send first analysis notification error:', error);
     return null;
   }
 }
@@ -1000,7 +1001,7 @@ async function sendReEngagementNotification(userId, remainingCredits, userLang =
     const notification = createFromTemplate('RE_ENGAGEMENT', { credits: formattedCredits });
     return await sendToUser(userId, notification);
   } catch (error) {
-    console.error('[AUTO-NOTIF] Send re-engagement notification error:', error);
+    logger.error('[AUTO-NOTIF] Send re-engagement notification error:', error);
     return null;
   }
 }

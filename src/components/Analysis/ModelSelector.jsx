@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
-import Icon from '../Common/Icon'
 import { cn } from '../../lib/utils'
+import Icon from '../Common/Icon'
 
 const ModelSelector = ({ selectedModel, onModelSelect }) => {
   const { t } = useTranslation()
@@ -70,7 +70,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
           <div className="flex flex-col gap-0.5 w-full">
             <h3 className="text-xs font-medium text-text-primary m-0 leading-tight">{currentModel.name}</h3>
             <p className="text-xs text-text-secondary m-0 flex items-center justify-center gap-1">
-              <Icon name="gauge" alt="Speed" size="sm" color="muted" />
+              <Icon name="gauge" alt={t('common.speed')} size="sm" color="muted" />
               {currentModel.speed}
             </p>
           </div>
@@ -127,7 +127,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
                         )}
                       </h3>
                       <div className="flex items-center gap-1 text-[11px] text-text-secondary">
-                        <Icon name="gauge" alt="speed" size="xs" color="muted" />
+                        <Icon name="gauge" alt={t('common.speed')} size="xs" color="muted" />
                         <span className="leading-none">{model.speed}</span>
                       </div>
                     </div>

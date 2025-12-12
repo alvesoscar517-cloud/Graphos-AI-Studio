@@ -35,7 +35,9 @@ export default function SupportList() {
 
   const loadData = async () => {
     try {
-      await loadSupport({ status: filterStatus, type: filterType, limit: 100 });
+      // Exclude error_report type - they have their own page
+      const typeParam = filterType === 'all' ? 'feedback,billing_support' : filterType;
+      await loadSupport({ status: filterStatus, type: typeParam, limit: 100 });
     } catch (err) {}
   };
 

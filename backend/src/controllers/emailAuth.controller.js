@@ -26,12 +26,12 @@ function getSmtpConfig() {
 }
 
 // For backward compatibility - these will be updated when Firestore config loads
-let smtpHost = config.SMTP_HOST || 'smtp.gmail.com';
-let smtpPort = config.SMTP_PORT || 587;
-let smtpUser = config.SMTP_USER || '';
-let smtpPass = config.SMTP_PASS || '';
-let fromEmail = config.EMAIL_FROM || 'no-reply@graphosai.com';
-let fromName = config.EMAIL_FROM_NAME || 'Graphos AI Studio';
+const smtpHost = config.SMTP_HOST || 'smtp.gmail.com';
+const smtpPort = config.SMTP_PORT || 587;
+const smtpUser = config.SMTP_USER || '';
+const smtpPass = config.SMTP_PASS || '';
+const fromEmail = config.EMAIL_FROM || 'no-reply@graphosai.com';
+const fromName = config.EMAIL_FROM_NAME || 'Graphos AI Studio';
 
 // Log SMTP configuration (without sensitive data)
 logger.info('Email configuration loaded (will update from Firestore)', {

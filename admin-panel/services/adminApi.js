@@ -3,6 +3,7 @@
  * Handles all admin panel API calls
  */
 
+import logger from '../lib/logger'
 import { cache } from '../utils/cache';
 import { getApiBaseUrl } from '../utils/config';
 import { getAuthHeader, getAccessToken, clearAuthData } from './authService';
@@ -13,7 +14,7 @@ const API_BASE_URL = getApiBaseUrl();
 async function apiCall(endpoint, options = {}) {
   const authHeaders = getAuthHeader();
   
-  console.log('[adminApi] Making API call:', {
+  logger.log('[adminApi] Making API call:', {
     endpoint,
     method: options.method || 'GET',
     hasAuth: !!authHeaders['Authorization'] || !!authHeaders['X-Admin-Key']
@@ -29,7 +30,7 @@ async function apiCall(endpoint, options = {}) {
     },
   });
 
-  console.log('[adminApi] Response received:', {
+  logger.log('[adminApi] Response received:', {
     endpoint,
     status: response.status,
     ok: response.ok
@@ -50,7 +51,7 @@ async function apiCall(endpoint, options = {}) {
   }
 
   const data = await response.json();
-  console.log('[adminApi] Success:', { endpoint, data });
+  logger.log('[adminApi] Success:', { endpoint, data });
   return data;
 }
 
@@ -686,3 +687,4 @@ export const backupApi = {
     return apiCall('/api/backup/storage-stats');
   },
 };
+

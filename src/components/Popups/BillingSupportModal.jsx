@@ -10,8 +10,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useToasts } from '../../stores/uiStore'
 import { useSendBillingSupport } from '@/hooks/queries'
-import Icon from '../Common/Icon'
 import { cn } from '../../lib/utils'
+import Icon from '../Common/Icon'
 
 // Validation schema
 const billingSupportSchema = z.object({

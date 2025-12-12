@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger'
 import { CONFIG } from '../../utils/config'
 import { getUserInfo } from './auth'
 import { validateTextBeforeAI } from './validation'
@@ -18,7 +19,7 @@ export async function analyzeText(profileId, text, options = {}) {
   perfMonitor.start(endpoint)
   
   // Debug: Log incoming parameters
-  console.log('[DEBUG] analyzeText called with:', {
+  logger.log('[DEBUG] analyzeText called with:', {
     profileId,
     profileIdType: typeof profileId,
     textLength: text?.length,
@@ -39,7 +40,7 @@ export async function analyzeText(profileId, text, options = {}) {
     }
     
     // Log stats for monitoring
-    console.log('[CHART] Text stats:', validation.stats.display)
+    logger.log('[CHART] Text stats:', validation.stats.display)
     if (validation.warnings.length > 0) {
       console.warn('[WARNING] Warnings:', validation.warnings)
     }
@@ -50,7 +51,7 @@ export async function analyzeText(profileId, text, options = {}) {
       text: text,
       text_stats: validation.stats
     }
-    console.log('[DEBUG] Sending analyze request:', {
+    logger.log('[DEBUG] Sending analyze request:', {
       profile_id: requestPayload.profile_id,
       textLength: requestPayload.text?.length
     })
@@ -59,7 +60,7 @@ export async function analyzeText(profileId, text, options = {}) {
     const { data } = await apiClient.postDeduplicated('/analyze', requestPayload)
     
     // Debug: Log response data
-    console.log('[DEBUG] Analyze response:', {
+    logger.log('[DEBUG] Analyze response:', {
       success: data.success,
       hasData: !!data,
       keys: data ? Object.keys(data).slice(0, 10) : [],
@@ -150,7 +151,7 @@ export async function detectAI(text, enhanced = true, language = null) {
  */
 export async function getSuggestions(profileId, sentence, sentenceScore, context = {}) {
   try {
-    console.log('💡 Getting suggestions for sentence...')
+    logger.log('💡 Getting suggestions for sentence...')
     
     const { data } = await apiClient.post('/suggest_improvements', {
       profile_id: profileId,
@@ -160,7 +161,7 @@ export async function getSuggestions(profileId, sentence, sentenceScore, context
     })
     
     if (data.success) {
-      console.log(`[SUCCESS] Got ${data.suggestions?.length || 0} suggestions`)
+      logger.log(`[SUCCESS] Got ${data.suggestions?.length || 0} suggestions`)
       return { success: true, data }
     }
     
@@ -243,7 +244,7 @@ export async function analyzeTextOptimized(profileId, text) {
     const cached = getCachedData(cacheKey)
     
     if (cached) {
-      console.log('⚡ Using cached analysis result')
+      logger.log('⚡ Using cached analysis result')
       return { success: true, data: cached }
     }
     
@@ -292,7 +293,7 @@ export async function getSuggestionsOptimized(profileId, sentence, sentenceScore
     const cached = getCachedData(cacheKey)
     
     if (cached) {
-      console.log('⚡ Using cached suggestions')
+      logger.log('⚡ Using cached suggestions')
       return { success: true, data: cached }
     }
     

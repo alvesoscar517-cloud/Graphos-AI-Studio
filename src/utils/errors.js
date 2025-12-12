@@ -3,6 +3,7 @@
  * Provides structured error classes and handling functions
  */
 
+import { logger } from '../utils/logger'
 import { CONFIG } from './config';
 
 // ============================================================================
@@ -298,7 +299,7 @@ export async function withRetry(fn, options = {}) {
       const delay = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
       
       if (CONFIG.ENABLE_DEBUG_LOGS) {
-        console.log(`[RETRY] Attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
+        logger.log(`[RETRY] Attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
       }
       
       await new Promise(resolve => setTimeout(resolve, delay));

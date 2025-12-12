@@ -1,3 +1,5 @@
+const logger = require('../utils/logger');
+
 /**
  * Profile Helper
  * Centralized profile loading and system prompt generation
@@ -17,13 +19,13 @@ async function loadProfile(profileId) {
     const profileDoc = await db.collection('profiles').doc(profileId).get();
     
     if (!profileDoc.exists) {
-      console.warn(`[WARN] Profile ${profileId} not found`);
+      logger.warn(`[WARN] Profile ${profileId} not found`);
       return null;
     }
     
     return profileDoc.data();
   } catch (error) {
-    console.error(`[ERROR] Error loading profile ${profileId}:`, error.message);
+    logger.error(`[ERROR] Error loading profile ${profileId}:`, error.message);
     return null;
   }
 }
@@ -162,7 +164,7 @@ function formatError(error) {
   const errorCode = error.code || '';
   
   // Log full error for debugging
-  console.error('[formatError] Processing error:', {
+  logger.error('[formatError] Processing error:', {
     message,
     code: errorCode,
     name: error.name,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import Icon from '../Common/Icon'
 import { cn } from '../../lib/utils'
+import Icon from '../Common/Icon'
 
 const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, onSliderInteraction }) => {
   const { t } = useTranslation()

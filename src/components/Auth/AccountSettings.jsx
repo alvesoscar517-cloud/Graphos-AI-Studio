@@ -79,7 +79,7 @@ const AccountSettings = () => {
               </div>
               <div>
                 <h4 className="m-0 mb-0.5 text-sm font-semibold text-green-800">{t('auth.email.googleLinkTitle')}</h4>
-                <p className="m-0 text-sm text-green-700">Google Drive sync is enabled</p>
+                <p className="m-0 text-sm text-green-700">{t('auth.email.driveSyncEnabled')}</p>
               </div>
             </div>
           )}

@@ -3,6 +3,7 @@
  * Displayed when user's account has been locked by admin
  */
 
+import { logger } from '../../utils/logger'
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/utils';
@@ -14,7 +15,7 @@ export default function AccountLockedModal() {
 
   useEffect(() => {
     const handleAccountLocked = (event) => {
-      console.log('[AccountLockedModal] Account locked event:', event.detail);
+      logger.log('[AccountLockedModal] Account locked event:', event.detail);
       setLockInfo(event.detail);
       setIsVisible(true);
     };

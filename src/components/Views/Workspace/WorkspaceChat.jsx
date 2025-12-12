@@ -5,7 +5,6 @@ import { truncateTitleByWords } from '../../../utils/titleUtils'
 import { cn } from '../../../lib/utils'
 import ChatMessage from './ChatMessage'
 import EditTitleModal from '../../Common/EditTitleModal'
-import LazyLottie from '../../Common/LazyLottie'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
 
 const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden, chatInput }) => {

@@ -10,6 +10,7 @@
  * - Error normalization
  */
 
+import { logger } from '../../utils/logger'
 import ky from 'ky';
 import { CONFIG } from '../../utils/config';
 import { tokenService } from '../tokenService';
@@ -198,14 +199,14 @@ const kyInstance = ky.create({
         
         // Log in debug mode
         if (CONFIG.ENABLE_DEBUG_LOGS) {
-          console.log(`[ky] ${request.method} ${request.url}`);
+          logger.log(`[ky] ${request.method} ${request.url}`);
         }
       }
     ],
     
     beforeRetry: [
       async ({ request, options, error, retryCount }) => {
-        console.log(`[ky] Retry ${retryCount} for ${request.url}`);
+        logger.log(`[ky] Retry ${retryCount} for ${request.url}`);
         
         // Refresh token on 401
         if (error?.response?.status === 401 && retryCount === 1) {
@@ -226,7 +227,7 @@ const kyInstance = ky.create({
         const duration = Date.now() - (options._startTime || Date.now());
         
         if (CONFIG.ENABLE_DEBUG_LOGS) {
-          console.log(`[ky] ${request.method} ${request.url} - ${response.status} (${duration}ms)`);
+          logger.log(`[ky] ${request.method} ${request.url} - ${response.status} (${duration}ms)`);
         }
         
         // Handle account locked

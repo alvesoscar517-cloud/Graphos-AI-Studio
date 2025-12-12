@@ -1,7 +1,7 @@
 // Profile cache management
 import { logger } from './logger'
 
-let profilesCache = {
+const profilesCache = {
   data: null,
   timestamp: null,
   expiryTime: 5 * 60 * 1000 // 5 minutes

@@ -57,6 +57,7 @@ export {
 export {
   useSendFeedback,
   useSendBillingSupport,
+  useSendErrorReport,
 } from './useFeedback'
 
 export {

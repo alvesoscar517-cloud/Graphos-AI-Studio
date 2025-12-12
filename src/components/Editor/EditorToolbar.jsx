@@ -1,9 +1,9 @@
 import { useCallback, useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import Icon from '../Common/Icon'
 import { cn } from '../../lib/utils'
 import LinkModal from './LinkModal'
 import SearchReplacePopover from './SearchReplacePopover'
+import Icon from '../Common/Icon'
 
 /**
  * ToolbarButton - Individual toolbar button

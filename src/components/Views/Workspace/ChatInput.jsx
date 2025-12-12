@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import Icon from '../../Common/Icon'
 import { cn } from '../../../lib/utils'
+import Icon from '../../Common/Icon'
 
 // Supported file types
 const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']

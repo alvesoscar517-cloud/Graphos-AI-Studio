@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLanguage } from '../../hooks/useLanguage'
-import Icon from './Icon'
 import { cn } from '../../lib/utils'
+import Icon from './Icon'
 
 const LanguageSwitcher = ({ compact = false }) => {
+  const { t } = useTranslation()
   const { currentLanguage, changeLanguage, supportedLanguages, getCurrentLanguageInfo } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
@@ -92,7 +94,7 @@ const LanguageSwitcher = ({ compact = false }) => {
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <Icon name="globe" alt="Language" size="md" color="muted" />
+        <Icon name="globe" alt={t('analysis.language')} size="md" color="muted" />
         <span>{currentLangInfo.nativeName}</span>
         <Icon 
           name="chevron-down"

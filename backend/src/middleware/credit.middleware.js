@@ -352,7 +352,7 @@ const costCalculators = {
   profileComplete: (req) => {
     const { samples } = req.body;
     if (!samples || !Array.isArray(samples)) {
-      console.warn('[CREDIT] Invalid samples in profileComplete cost calculation:', typeof samples);
+      logger.warn('[CREDIT] Invalid samples in profileComplete cost calculation:', typeof samples);
       return 0; // Will be caught by controller validation
     }
     return creditService.calculateProfileCompleteCost(samples);

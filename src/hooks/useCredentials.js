@@ -3,6 +3,7 @@
  * Auto-fill login form từ browser password manager
  */
 
+import { logger } from '@/utils/logger'
 import { useEffect, useState } from 'react'
 import { getStoredCredentials, isCredentialAPISupported } from '@/utils/credentialManager'
 
@@ -38,7 +39,7 @@ export function useCredentials(setValue, autoFill = true) {
           }
         }
       } catch (error) {
-        console.log('[useCredentials] Error:', error.message)
+        logger.log('[useCredentials] Error:', error.message)
       } finally {
         setIsLoading(false)
       }

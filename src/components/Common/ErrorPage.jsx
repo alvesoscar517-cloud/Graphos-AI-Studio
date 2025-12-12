@@ -5,19 +5,24 @@
  * outside of Router context (e.g., when ErrorBoundary catches errors at app level)
  */
 
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSendErrorReport } from '@/hooks/queries'
 import ghostIcon from '../../../icon for background/ghost-with-raised-arms.svg'
 
 const ErrorPage = ({ 
   error, 
   onRetry, 
   showHomeButton = true,
-  showBackButton = true,
+  showReportButton = true,
   showReloadButton = true,
   title,
-  message 
+  message,
+  componentStack
 }) => {
   const { t } = useTranslation()
+  const [reportStatus, setReportStatus] = useState('idle') // idle | sending | sent | already_reported | error
+  const sendErrorReport = useSendErrorReport()
 
   const handleGoHome = () => {
     // Use window.location instead of navigate() to avoid Router dependency
@@ -34,6 +39,40 @@ const ErrorPage = ({
 
   const handleReload = () => {
     window.location.reload()
+  }
+
+  const handleReportError = async () => {
+    if (reportStatus === 'sending' || reportStatus === 'sent' || reportStatus === 'already_reported') return
+    
+    setReportStatus('sending')
+    try {
+      const result = await sendErrorReport.mutateAsync({
+        error,
+        url: window.location.href,
+        componentStack
+      })
+      
+      if (result.alreadyReported) {
+        setReportStatus('already_reported')
+      } else {
+        setReportStatus('sent')
+      }
+    } catch (err) {
+      console.error('Failed to report error:', err)
+      setReportStatus('error')
+      // Reset after 3 seconds to allow retry
+      setTimeout(() => setReportStatus('idle'), 3000)
+    }
+  }
+
+  const getReportButtonText = () => {
+    switch (reportStatus) {
+      case 'sending': return t('errorPage.reporting', 'Reporting...')
+      case 'sent': return t('errorPage.reported', 'Reported!')
+      case 'already_reported': return t('errorPage.alreadyReported', 'Already Reported')
+      case 'error': return t('errorPage.reportFailed', 'Failed')
+      default: return t('errorPage.reportError', 'Report Error')
+    }
   }
 
   const errorTitle = title || t('errorPage.title', 'Oops! Something went wrong')
@@ -96,13 +135,24 @@ const ErrorPage = ({
             </button>
           )}
 
-          {showBackButton && (
+          {showReportButton && error && (
             <button 
-              className="inline-flex items-center justify-center gap-2 py-2.5 px-5 text-sm font-medium rounded-lg cursor-pointer transition-all bg-bg-secondary text-text-primary border border-border-light hover:bg-bg-hover active:scale-[0.98]"
-              onClick={handleGoBack}
+              className={`inline-flex items-center justify-center gap-2 py-2.5 px-5 text-sm font-medium rounded-lg cursor-pointer transition-all border border-border-light active:scale-[0.98] ${
+                reportStatus === 'sent' || reportStatus === 'already_reported'
+                  ? 'bg-green-500/10 text-green-600 border-green-500/30 cursor-default'
+                  : reportStatus === 'error'
+                  ? 'bg-red-500/10 text-red-600 border-red-500/30'
+                  : 'bg-bg-secondary text-text-primary hover:bg-bg-hover'
+              }`}
+              onClick={handleReportError}
+              disabled={reportStatus === 'sending' || reportStatus === 'sent' || reportStatus === 'already_reported'}
             >
-              <img src="/icon/arrow-left.svg" alt="" className="w-4 h-4 opacity-70 icon-invert" />
-              {t('errorPage.goBack', 'Go Back')}
+              <img 
+                src={reportStatus === 'sent' || reportStatus === 'already_reported' ? '/icon/check.svg' : '/icon/flag.svg'} 
+                alt="" 
+                className={`w-4 h-4 ${reportStatus === 'sent' || reportStatus === 'already_reported' ? 'opacity-100' : 'opacity-70 icon-invert'}`}
+              />
+              {getReportButtonText()}
             </button>
           )}
 

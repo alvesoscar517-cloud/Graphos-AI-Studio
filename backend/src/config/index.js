@@ -7,6 +7,7 @@
 
 const convictConfig = require('./schema');
 
+const logger = require('../utils/logger');
 // ============================================================================
 // ENVIRONMENT-SPECIFIC OVERRIDES
 // ============================================================================
@@ -21,9 +22,9 @@ const envConfigPath = path.join(__dirname, `config.${env}.json`);
 if (fs.existsSync(envConfigPath)) {
   try {
     convictConfig.loadFile(envConfigPath);
-    console.log(`[CONFIG] Loaded environment config: ${envConfigPath}`);
+    logger.info(`[CONFIG] Loaded environment config: ${envConfigPath}`);
   } catch (error) {
-    console.warn(`[CONFIG WARNING] Failed to load ${envConfigPath}:`, error.message);
+    logger.warn(`[CONFIG WARNING] Failed to load ${envConfigPath}:`, error.message);
   }
 }
 
@@ -37,27 +38,27 @@ let configValidationError = null;
 try {
   // Use 'warn' to allow unknown properties during migration
   convictConfig.validate({ allowed: 'warn' });
-  console.log('[CONFIG] Configuration validated successfully');
+  logger.info('[CONFIG] Configuration validated successfully');
 } catch (error) {
   configValidationError = error;
-  console.error('[CONFIG ERROR] Configuration validation failed:', error.message);
-  console.error('[CONFIG ERROR] Full error:', JSON.stringify(error, null, 2));
-  console.error('[CONFIG ERROR] Current config values:');
+  logger.error('[CONFIG ERROR] Configuration validation failed:', error.message);
+  logger.error('[CONFIG ERROR] Full error:', JSON.stringify(error, null, 2));
+  logger.error('[CONFIG ERROR] Current config values:');
   try {
     const props = convictConfig.getProperties();
     // Log non-sensitive config for debugging
-    console.error('[CONFIG ERROR] env:', props.env);
-    console.error('[CONFIG ERROR] server.port:', props.server?.port);
-    console.error('[CONFIG ERROR] gcp.projectId:', props.gcp?.projectId);
-    console.error('[CONFIG ERROR] email.smtpPort:', props.email?.smtpPort);
+    logger.error('[CONFIG ERROR] env:', props.env);
+    logger.error('[CONFIG ERROR] server.port:', props.server?.port);
+    logger.error('[CONFIG ERROR] gcp.projectId:', props.gcp?.projectId);
+    logger.error('[CONFIG ERROR] email.smtpPort:', props.email?.smtpPort);
   } catch (e) {
-    console.error('[CONFIG ERROR] Could not get properties:', e.message);
+    logger.error('[CONFIG ERROR] Could not get properties:', e.message);
   }
   
   // In production, we'll still continue but log a warning
   // The server will start but may have issues
   if (convictConfig.get('env') === 'production') {
-    console.error('[CONFIG WARNING] Configuration validation failed in production, but continuing to allow debugging');
+    logger.error('[CONFIG WARNING] Configuration validation failed in production, but continuing to allow debugging');
     // Don't exit - let the server start so we can see logs
   }
 }
@@ -72,7 +73,7 @@ if (convictConfig.get('env') === 'production') {
   }
   
   if (missingSecrets.length > 0) {
-    console.warn(`[CONFIG WARNING] Missing recommended secrets: ${missingSecrets.join(', ')}`);
+    logger.warn(`[CONFIG WARNING] Missing recommended secrets: ${missingSecrets.join(', ')}`);
   }
 }
 

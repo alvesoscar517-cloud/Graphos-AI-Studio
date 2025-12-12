@@ -9,6 +9,7 @@
  * - Optimistic updates
  */
 
+import { logger } from '../utils/logger'
 import { create } from 'zustand'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
@@ -74,13 +75,13 @@ export const useNotificationStore = create(
 
           // Check cache validity (unless forced)
           if (!force && get()._isCacheValid()) {
-            console.log('[NotificationStore] Using cached data')
+            logger.log('[NotificationStore] Using cached data')
             return
           }
 
           try {
             set({ loading: true, error: null })
-            console.log('[NotificationStore] Fetching notifications...')
+            logger.log('[NotificationStore] Fetching notifications...')
             
             const params = new URLSearchParams({
               user_id: userId,
@@ -99,7 +100,7 @@ export const useNotificationStore = create(
               loading: false 
             })
             
-            console.log('[NotificationStore] Loaded', notifications.length, 'notifications,', unreadCount, 'unread')
+            logger.log('[NotificationStore] Loaded', notifications.length, 'notifications,', unreadCount, 'unread')
           } catch (error) {
             console.error('[NotificationStore] Fetch error:', error)
             set({ error: error.message, loading: false })
@@ -260,7 +261,7 @@ export const useNotificationStore = create(
         init: (userId) => {
           if (get()._initialized) return
           
-          console.log('[NotificationStore] Initializing...')
+          logger.log('[NotificationStore] Initializing...')
           
           // Fetch notifications only if cache is invalid
           if (!get()._isCacheValid()) {
@@ -269,7 +270,7 @@ export const useNotificationStore = create(
           
           // Setup Firestore Realtime listener - PRIMARY source for real-time updates
           const unsubscribe = realtimeService.subscribe('notification', (data) => {
-            console.log('[NotificationStore] Realtime notification received:', data)
+            logger.log('[NotificationStore] Realtime notification received:', data)
             if (data.type === 'new' && data.notification) {
               get().addNotification(data.notification)
             } else if (data.type === 'updated' && data.notification) {
@@ -290,7 +291,7 @@ export const useNotificationStore = create(
           
           // Initialize Firestore Realtime connection
           if (!realtimeService.isConnected() && userId) {
-            console.log('[NotificationStore] Initializing Firestore Realtime connection')
+            logger.log('[NotificationStore] Initializing Firestore Realtime connection')
             realtimeService.connect(userId)
           }
           
@@ -304,7 +305,7 @@ export const useNotificationStore = create(
           const handleVisibility = () => {
             if (document.visibilityState === 'visible') {
               if (!get()._isCacheValid() && !realtimeService.isConnected()) {
-                console.log('[NotificationStore] Visibility fetch (cache expired, not connected)')
+                logger.log('[NotificationStore] Visibility fetch (cache expired, not connected)')
                 get().fetchNotifications(true)
               }
             }
@@ -344,7 +345,7 @@ export const useNotificationStore = create(
             _initialized: false
           })
           
-          console.log('[NotificationStore] Cleaned up')
+          logger.log('[NotificationStore] Cleaned up')
         },
 
         /**

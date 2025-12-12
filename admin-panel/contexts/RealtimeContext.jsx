@@ -9,6 +9,7 @@
  * - Toast notifications for realtime events (new users, orders)
  */
 
+import logger from '../lib/logger'
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { analyticsApi, advancedAnalyticsApi, supportApi, usersApi, logsApi, notificationsApi } from '../services/adminApi';
 import { cache } from '../utils/cache';
@@ -84,7 +85,7 @@ export function RealtimeProvider({ children }) {
    */
   const initializeRealtime = useCallback(() => {
     if (!isAuthenticated()) {
-      console.log('[RealtimeContext] Not authenticated, skipping realtime init');
+      logger.log('[RealtimeContext] Not authenticated, skipping realtime init');
       return;
     }
 
@@ -99,7 +100,7 @@ export function RealtimeProvider({ children }) {
     
     if (success) {
       setRealtimeConnected(true);
-      console.log('[RealtimeContext] Firestore Realtime connected');
+      logger.log('[RealtimeContext] Firestore Realtime connected');
 
       // Subscribe to stats updates
       const unsubStats = firestoreRealtimeService.subscribe('stats', (data) => {
@@ -158,7 +159,7 @@ export function RealtimeProvider({ children }) {
       // Subscribe to new user registrations
       const unsubUsers = firestoreRealtimeService.subscribe('users', (data) => {
         if (data.type === 'user_created' && data.user) {
-          console.log('[RealtimeContext] New user:', data.user.email);
+          logger.log('[RealtimeContext] New user:', data.user.email);
           
           // Invalidate users cache to trigger refetch
           cache.delete('admin_users');
@@ -194,7 +195,7 @@ export function RealtimeProvider({ children }) {
       // Subscribe to new orders (purchases)
       const unsubOrders = firestoreRealtimeService.subscribe('orders', (data) => {
         if (data.type === 'order_created' && data.order) {
-          console.log('[RealtimeContext] New order:', data.order.productName);
+          logger.log('[RealtimeContext] New order:', data.order.productName);
           
           // Invalidate analytics cache
           cache.delete('admin_analytics');
@@ -627,3 +628,4 @@ export function useRealtime() {
 }
 
 export default RealtimeContext;
+

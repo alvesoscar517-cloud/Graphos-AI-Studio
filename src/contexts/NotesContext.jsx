@@ -5,6 +5,7 @@
  * New code should import directly from '@/hooks/queries/useNotes'
  */
 
+import { logger } from '@/utils/logger'
 import { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { 
@@ -83,7 +84,7 @@ export const NotesProvider = ({ children }) => {
 
     // Detect user change
     if (prevUserId && prevUserId !== currentUserId) {
-      console.log('[SECURITY] User changed, clearing notes data...')
+      logger.log('[SECURITY] User changed, clearing notes data...')
       setCurrentNoteId(null)
       setNeedsReauth(false)
       queryClient.removeQueries({ queryKey: queryKeys.notes.all })
@@ -91,7 +92,7 @@ export const NotesProvider = ({ children }) => {
 
     // User logged out
     if (!isAuthenticated && prevUser) {
-      console.log('[INFO] User logged out, clearing notes')
+      logger.log('[INFO] User logged out, clearing notes')
       setCurrentNoteId(null)
       setNeedsReauth(false)
       queryClient.removeQueries({ queryKey: queryKeys.notes.all })
@@ -100,11 +101,11 @@ export const NotesProvider = ({ children }) => {
     prevUserRef.current = user
   }, [user, isAuthenticated, authLoading, queryClient])
 
-  // Create note
+  // Create note - title will be set by component using i18n
   const createNote = useCallback(() => {
     const newNote = {
       id: Date.now().toString(),
-      title: 'Untitled',
+      title: '', // Empty title, component will display translated "Untitled"
       content: '',
       type: 'Chat prompt',
       updated: new Date(),

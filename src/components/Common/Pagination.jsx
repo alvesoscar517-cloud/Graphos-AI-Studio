@@ -3,6 +3,7 @@
  * Reusable pagination controls
  */
 
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 
 export function Pagination({
@@ -13,12 +14,13 @@ export function Pagination({
   maxVisiblePages = 5,
   className = '',
 }) {
+  const { t } = useTranslation()
   if (totalPages <= 1) return null
 
   const getVisiblePages = () => {
     const pages = []
     let start = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
-    let end = Math.min(totalPages, start + maxVisiblePages - 1)
+    const end = Math.min(totalPages, start + maxVisiblePages - 1)
 
     if (end - start + 1 < maxVisiblePages) {
       start = Math.max(1, end - maxVisiblePages + 1)
@@ -45,7 +47,7 @@ export function Pagination({
             'disabled:opacity-50 disabled:cursor-not-allowed',
             'hover:bg-gray-100'
           )}
-          aria-label="First page"
+          aria-label={t('pagination.firstPage')}
         >
           ««
         </button>
@@ -60,7 +62,7 @@ export function Pagination({
           'disabled:opacity-50 disabled:cursor-not-allowed',
           'hover:bg-gray-100'
         )}
-        aria-label="Previous page"
+        aria-label={t('pagination.previousPage')}
       >
         «
       </button>
@@ -117,7 +119,7 @@ export function Pagination({
           'disabled:opacity-50 disabled:cursor-not-allowed',
           'hover:bg-gray-100'
         )}
-        aria-label="Next page"
+        aria-label={t('pagination.nextPage')}
       >
         »
       </button>
@@ -132,7 +134,7 @@ export function Pagination({
             'disabled:opacity-50 disabled:cursor-not-allowed',
             'hover:bg-gray-100'
           )}
-          aria-label="Last page"
+          aria-label={t('pagination.lastPage')}
         >
           »»
         </button>

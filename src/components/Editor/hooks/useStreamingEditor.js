@@ -1,3 +1,4 @@
+import { logger } from '../../../utils/logger'
 import { useCallback, useRef, useState } from 'react'
 
 /**
@@ -66,7 +67,7 @@ export function useStreamingEditor(editor) {
     
     setIsStreaming(true)
     
-    console.log('[STREAMING] Started')
+    logger.log('[STREAMING] Started')
   }, [editor])
 
   /**
@@ -84,7 +85,7 @@ export function useStreamingEditor(editor) {
       animateText()
     }
     
-    console.log(`[STREAMING] Chunk received, buffer: ${state.fullText.length} chars`)
+    logger.log(`[STREAMING] Chunk received, buffer: ${state.fullText.length} chars`)
   }, [editor, isStreaming, animateText])
 
   /**
@@ -118,7 +119,7 @@ export function useStreamingEditor(editor) {
           state.displayedLength = 0
           state.originalContent = ''
           
-          console.log('[STREAMING] Ended')
+          logger.log('[STREAMING] Ended')
           resolve()
         } else {
           requestAnimationFrame(checkComplete)
@@ -159,7 +160,7 @@ export function useStreamingEditor(editor) {
     state.isAnimating = false
     state.originalContent = ''
     
-    console.log('[STREAMING] Aborted')
+    logger.log('[STREAMING] Aborted')
   }, [editor])
 
   /**

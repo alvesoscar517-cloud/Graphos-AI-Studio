@@ -8,7 +8,11 @@
     "dev": "node index.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "i18n:validate": "node scripts/validate-locales.js",
+    "i18n:validate:fix": "node scripts/validate-locales.js --fix",
+    "i18n:validate:verbose": "node scripts/validate-locales.js --verbose",
+    "i18n:generate-types": "node scripts/generate-i18n-types.js"
   },
   "engines": {
     "node": "18"

@@ -184,7 +184,7 @@ const AIStudioEditorEnhanced = ({
       modal.success(t('export.success') || 'Exported successfully!')
     } catch (error) {
       console.error('Export failed:', error)
-      modal.error(t('export.failed') || 'Export failed. Please install: npm install docx file-saver')
+      modal.errorWithReport(t('export.failed') || 'Export failed. Please install: npm install docx file-saver', error, 'Error', 'AIStudioEditor.exportDocx')
     }
     setIsExporting(false)
   }
@@ -276,7 +276,7 @@ const AIStudioEditorEnhanced = ({
         } catch (pdfError) {
           console.error('PDF parsing error:', pdfError)
           loadingModal.close()
-          modal.error(t('rewrite.unableToReadPdf') + ' ' + pdfError.message)
+          modal.errorWithReport(t('rewrite.unableToReadPdf') + ' ' + pdfError.message, pdfError, 'Error', 'AIStudioEditor.parsePDF')
           return
         }
       } else if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
@@ -289,7 +289,7 @@ const AIStudioEditorEnhanced = ({
         } catch (docxError) {
           console.error('DOCX parsing error:', docxError)
           loadingModal.close()
-          modal.error(t('rewrite.unableToReadDocx') + ' ' + docxError.message)
+          modal.errorWithReport(t('rewrite.unableToReadDocx') + ' ' + docxError.message, docxError, 'Error', 'AIStudioEditor.parseDOCX')
           return
         }
       }
@@ -300,12 +300,12 @@ const AIStudioEditorEnhanced = ({
         updateNote(currentNote.id, { content: extractedText })
         modal.success(t('rewrite.fileContentLoaded'))
       } else {
-        modal.error(t('rewrite.unableToExtractContent'))
+        modal.errorWithReport(t('rewrite.unableToExtractContent'), new Error('Empty content'), 'Error', 'AIStudioEditor.extractContent')
       }
     } catch (error) {
       loadingModal.close()
       console.error('Error reading file:', error)
-      modal.error(t('rewrite.unableToReadFile') + ' ' + error.message)
+      modal.errorWithReport(t('rewrite.unableToReadFile') + ' ' + error.message, error, 'Error', 'AIStudioEditor.readFile')
     }
 
     event.target.value = ''

@@ -1,3 +1,4 @@
+import { logger } from '../../../utils/logger'
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/utils'
@@ -65,7 +66,7 @@ const SharedChatInput = ({
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files)
-    console.log('Files selected:', files)
+    logger.log('Files selected:', files)
     e.target.value = ''
   }
 

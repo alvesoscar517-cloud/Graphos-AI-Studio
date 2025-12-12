@@ -5,8 +5,8 @@ import { useProfiles } from '../../../contexts/ProfileContext'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import ProfileSelector from '../../Analysis/ProfileSelector'
 import ModelSelector from '../../Analysis/ModelSelector'
-import Icon from '../../Common/Icon'
 import { cn } from '../../../lib/utils'
+import Icon from '../../Common/Icon'
 
 // Breakpoints for responsive behavior
 const BREAKPOINT_MOBILE = 768

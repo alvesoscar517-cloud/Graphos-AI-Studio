@@ -5,11 +5,11 @@ import { useNotes } from '../../contexts/NotesContext'
 import { useAIProcessingActions } from '@/stores'
 import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
-import LazyLottie from '../Common/LazyLottie'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
-import Icon from '../Common/Icon'
 import modal from '../../utils/modal'
 import { cn } from '../../lib/utils'
+import Icon from '../Common/Icon'
+import LazyLottie from '../Common/LazyLottie'
 
 const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) => {
   const { t } = useTranslation()
@@ -86,7 +86,7 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
     } catch (error) {
       console.error('Error finding deviations:', error)
       const localizedError = getLocalizedContentError(error.message, t)
-      modal.error(localizedError || t('analysis.analysisFailed'))
+      modal.errorWithReport(localizedError || t('analysis.analysisFailed'), error, 'Error', 'DeviationCard.findDeviations')
     } finally {
       setIsLoading(false)
       stopProcessing()
@@ -117,7 +117,7 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
             onClick={() => setShowResult(!showResult)}
           >
             <img 
-              src="/icon/chevron-down.svg" alt="toggle"
+              src="/icon/chevron-down.svg" alt={t('common.toggle')}
               className={cn("w-icon-md h-icon-md opacity-60 transition-all duration-300 hover:opacity-100 icon-invert", showResult ? "rotate-180" : "rotate-0")}
             />
           </button>
