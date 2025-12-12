@@ -5,8 +5,11 @@
 
 import { Component } from 'react'
 import ErrorPage from './ErrorPage'
+import ErrorBoundaryContext from '../../contexts/ErrorBoundaryContext'
 
 export class ErrorBoundary extends Component {
+  static contextType = ErrorBoundaryContext
+
   constructor(props) {
     super(props)
     this.state = { hasError: false, error: null, errorInfo: null }
@@ -20,9 +23,24 @@ export class ErrorBoundary extends Component {
     console.error('ErrorBoundary caught an error:', error, errorInfo)
     this.setState({ errorInfo })
     this.props.onError?.(error, errorInfo)
+    
+    // Notify context that an error is being displayed
+    // Use both context and event for maximum compatibility
+    if (this.context?.setActiveError) {
+      this.context.setActiveError()
+    } else {
+      // Fallback to event if context is not available
+      window.dispatchEvent(new CustomEvent('errorBoundaryActive'))
+    }
   }
 
   handleRetry = () => {
+    // Clear the active error state before retrying
+    if (this.context?.clearActiveError) {
+      this.context.clearActiveError()
+    } else {
+      window.dispatchEvent(new CustomEvent('errorBoundaryCleared'))
+    }
     this.setState({ hasError: false, error: null, errorInfo: null })
   }
 

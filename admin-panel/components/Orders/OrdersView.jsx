@@ -421,7 +421,7 @@ function ProfitCalculator({ revenueStats, costs, setCosts, timeRange, setTimeRan
             />
             <CostItem name="Server (Cloud Run/GCP)" desc={`$${costs.serverCost}/month`} value={serverCosts} />
             <CostItem name="Firebase" desc={`$${costs.firebaseCost}/month`} value={firebaseCosts} />
-            <CostItem name="Gemini API" desc={`$${costs.geminiApi}/month`} value={geminiCosts} />
+            <CostItem name="AI API" desc={`$${costs.geminiApi}/month`} value={geminiCosts} />
             <CostItem name="Domain" desc={`$${costs.domainCost}/month`} value={domainCosts} />
             <CostItem name="Other Costs" desc="Misc expenses" value={otherCosts} />
             <div className="flex justify-between pt-3 border-t border-border font-semibold">
@@ -467,7 +467,7 @@ function ProfitCalculator({ revenueStats, costs, setCosts, timeRange, setTimeRan
               onChange={(e) => setCosts({...costs, firebaseCost: parseFloat(e.target.value) || 0})}
             />
             <Input
-              label="Gemini API ($/mo)"
+              label="AI API ($/mo)"
               type="number"
               value={costs.geminiApi}
               onChange={(e) => setCosts({...costs, geminiApi: parseFloat(e.target.value) || 0})}

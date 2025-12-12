@@ -1,6 +1,6 @@
 /**
- * Gemini Circuit Breaker Wrapper
- * Provides circuit breaker protection for Gemini API calls
+ * AI Circuit Breaker Wrapper
+ * Provides circuit breaker protection for AI API calls
  * 
  * @module utils/geminiCircuitBreaker
  */

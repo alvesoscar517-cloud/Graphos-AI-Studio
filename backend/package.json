@@ -1,7 +1,7 @@
 {
   "name": "ai-content-authenticator-backend",
   "version": "2.1.0",
-  "description": "Graphos AI Studio - Node.js Backend with Gemini Ecosystem",
+  "description": "Graphos AI Studio - Node.js Backend with Graphos AI Ecosystem",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

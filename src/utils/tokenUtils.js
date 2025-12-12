@@ -9,11 +9,11 @@
  * - English: ~1.3 tokens/word
  */
 
-// Model limits - Only Gemini 2.5 models (all support native thinking)
+// Model limits - Graphos AI models (all support native thinking)
 export const MODEL_LIMITS = {
-  // Gemini 2.5 Flash Lite - Cheapest with thinking
+  // Graphos Velocity - Fastest, cost-effective
   'gemini-2.5-flash-lite': {
-    name: 'Gemini 2.5 Flash Lite',
+    name: 'Graphos Velocity',
     maxInput: 1048576,
     maxOutput: 65536,
     creditsPerKInput: 0.3,
@@ -21,9 +21,9 @@ export const MODEL_LIMITS = {
     recommendedMaxChars: 120000,
     speed: 'fastest'
   },
-  // Gemini 2.5 Flash - Recommended
+  // Graphos Hyper - Recommended, balanced
   'gemini-2.5-flash': {
-    name: 'Gemini 2.5 Flash',
+    name: 'Graphos Hyper',
     maxInput: 1048576,
     maxOutput: 65536,
     creditsPerKInput: 0.5,
@@ -31,9 +31,9 @@ export const MODEL_LIMITS = {
     recommendedMaxChars: 100000,
     speed: 'fast'
   },
-  // Gemini 2.5 Pro - Highest quality
+  // Graphos Zenith - Highest quality
   'gemini-2.5-pro': {
-    name: 'Gemini 2.5 Pro',
+    name: 'Graphos Zenith',
     maxInput: 1048576,
     maxOutput: 65536,
     creditsPerKInput: 2.0,

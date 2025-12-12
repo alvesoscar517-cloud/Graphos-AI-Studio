@@ -345,7 +345,7 @@ export const settingsApi = {
 // ============================================================================
 
 export const translationApi = {
-  // Auto-translate text using Gemini
+  // Auto-translate text using Graphos AI
   // sourceLang defaults to 'en' (English as default source)
   translate: async (text, sourceLang = 'en', targetLang = 'vi') => {
     try {

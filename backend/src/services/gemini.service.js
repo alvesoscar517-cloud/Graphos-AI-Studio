@@ -1,5 +1,5 @@
 /**
- * Gemini AI Service
+ * Graphos AI Service
  * Handles all AI operations: embeddings, content detection, voice analysis
  * Enhanced with language-specific AI detection for 15 languages
  */
@@ -197,7 +197,7 @@ async function createEmbedding(text, taskType = 'SEMANTIC_SIMILARITY') {
       instances: [instanceValue]
     };
 
-    logger.info(`[PROCESS] Generating Gemini embedding (${taskType}) for ${text.length} chars...`);
+    logger.info(`[PROCESS] Generating embedding (${taskType}) for ${text.length} chars...`);
     const [response] = await aiplatformClient.predict(request);
     
     if (!response.predictions || response.predictions.length === 0) {
@@ -220,7 +220,7 @@ async function createEmbedding(text, taskType = 'SEMANTIC_SIMILARITY') {
     logger.error('[ERROR] Embedding generation failed:', error.message);
     
     if (error.message.includes('quota') || error.message.includes('RESOURCE_EXHAUSTED')) {
-      throw new Error('QUOTA_EXCEEDED: Gemini API quota exhausted. Please try again later.');
+      throw new Error('QUOTA_EXCEEDED: AI API quota exhausted. Please try again later.');
     }
     
     throw new Error(`EMBEDDING_FAILED: ${error.message}`);
@@ -280,7 +280,7 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
       instances
     };
 
-    logger.info(`[PROCESS] Generating ${textsToFetch.length} Gemini embeddings in batch (${taskType})...`);
+    logger.info(`[PROCESS] Generating ${textsToFetch.length} embeddings in batch (${taskType})...`);
     const [response] = await aiplatformClient.predict(request);
     
     const predictions = response.predictions.map(p => helpers.fromValue(p));
@@ -314,7 +314,7 @@ async function createBatchEmbeddings(texts, taskType = 'SEMANTIC_SIMILARITY') {
     });
     
     if (error.message?.includes('quota') || error.message?.includes('RESOURCE_EXHAUSTED') || error.code === 8) {
-      throw new Error('QUOTA_EXCEEDED: Gemini API quota exhausted. Please try again later.');
+      throw new Error('QUOTA_EXCEEDED: AI API quota exhausted. Please try again later.');
     }
     
     if (error.message?.includes('PERMISSION_DENIED') || error.code === 7) {
@@ -862,7 +862,7 @@ function detectAIContentHeuristic(text) {
 
 async function generateVoiceSummary(sampleTexts, statisticalFeatures) {
   try {
-    // Use Gemini 2.5 Pro for voice profile analysis
+    // Use Graphos Zenith for voice profile analysis
     const model = vertexAI.getGenerativeModel({ 
       model: 'gemini-2.5-pro',
       generationConfig: {
@@ -870,7 +870,7 @@ async function generateVoiceSummary(sampleTexts, statisticalFeatures) {
       }
     });
     
-    logger.info('[PROFILE] Using Gemini 2.5 Pro for voice analysis');
+    logger.info('[PROFILE] Using Graphos Zenith for voice analysis');
 
     const selectedSamples = sampleTexts
       .sort(() => Math.random() - 0.5)

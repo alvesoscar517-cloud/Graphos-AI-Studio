@@ -1,5 +1,6 @@
 /**
- * Gemini AI Configuration
+ * Graphos AI Configuration
+ * Handles Vertex AI and AI Platform client initialization
  */
 
 const { VertexAI } = require('@google-cloud/vertexai');

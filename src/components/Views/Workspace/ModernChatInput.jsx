@@ -10,11 +10,11 @@ const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/we
 const SUPPORTED_DOC_TYPES = ['application/pdf', 'text/plain', 'text/csv', 'application/json']
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
-// Gemini Models - simplified names like shadcn-io/ai
+// Graphos AI Models
 const MODELS = [
-  { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Lite' },
-  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
-  { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' }
+  { id: 'gemini-2.5-flash-lite', name: 'Graphos Velocity' },
+  { id: 'gemini-2.5-flash', name: 'Graphos Hyper' },
+  { id: 'gemini-2.5-pro', name: 'Graphos Zenith' }
 ]
 
 const ModernChatInput = ({

@@ -1,16 +1,19 @@
 /**
  * Session Expired Modal
  * Shows when user's session has expired and needs to re-login
+ * Note: Will not show if ErrorBoundary is actively displaying an error
  */
 
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useErrorBoundaryState } from '../../contexts/ErrorBoundaryContext'
 
 export function SessionExpiredModal() {
   const { t } = useTranslation()
   const [isVisible, setIsVisible] = useState(false)
   const [message, setMessage] = useState('')
+  const { hasActiveError } = useErrorBoundaryState()
 
   useEffect(() => {
     const handleSessionExpired = (event) => {
@@ -22,6 +25,10 @@ export function SessionExpiredModal() {
     return () => window.removeEventListener('sessionExpired', handleSessionExpired)
   }, [t])
 
+  // Don't show modal if ErrorBoundary is displaying an error
+  // This allows users to report errors before being redirected to login
+  const shouldShow = isVisible && !hasActiveError
+
   const handleClose = () => {
     setIsVisible(false)
     // Reload to show login screen
@@ -30,7 +37,7 @@ export function SessionExpiredModal() {
 
   return (
     <AnimatePresence>
-      {isVisible && (
+      {shouldShow && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

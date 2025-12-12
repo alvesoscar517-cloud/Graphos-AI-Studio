@@ -11,6 +11,7 @@ import ContextMenu from './components/Common/ContextMenu'
 import ToastContainer from './components/Common/ToastContainer'
 import ErrorReportListener from './components/Common/ErrorReportListener'
 import SessionExpiredModal from './components/Auth/SessionExpiredModal'
+import { ErrorBoundaryProvider } from './contexts/ErrorBoundaryContext'
 import modal from './utils/modal'
 import { initTooltips } from './utils/tooltips'
 import { initStorageCleanup } from './utils/storageCleanup'
@@ -87,18 +88,21 @@ function App() {
 
   // Using composed providers for cleaner code
   // Provider order is managed in AppProviders
+  // ErrorBoundaryProvider wraps everything to track error state across the app
   return (
-    <ErrorBoundary>
-      <Router>
-        <AppProviders>
-          <AppContent />
-          <ContextMenu />
-          <ToastContainer />
-          <SessionExpiredModal />
-          <ErrorReportListener />
-        </AppProviders>
-      </Router>
-    </ErrorBoundary>
+    <ErrorBoundaryProvider>
+      <ErrorBoundary>
+        <Router>
+          <AppProviders>
+            <AppContent />
+            <ContextMenu />
+            <ToastContainer />
+            <SessionExpiredModal />
+            <ErrorReportListener />
+          </AppProviders>
+        </Router>
+      </ErrorBoundary>
+    </ErrorBoundaryProvider>
   )
 }
 

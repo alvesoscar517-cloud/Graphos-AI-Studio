@@ -1,6 +1,6 @@
 /**
  * Multimodal Helper
- * Handles image and file processing for Gemini Vision
+ * Handles image and file processing for Graphos AI Vision
  */
 
 const { getVertexAI } = require('../config/gemini');
@@ -45,10 +45,10 @@ function checkFileSupport(mimeType) {
 }
 
 /**
- * Convert base64 image to Gemini format
+ * Convert base64 image to AI format
  * @param {string} base64Data - Base64 encoded image data
  * @param {string} mimeType - MIME type
- * @returns {Object} - Gemini image part
+ * @returns {Object} - AI image part
  */
 function createImagePart(base64Data, mimeType) {
   // Remove data URL prefix if present
@@ -63,9 +63,9 @@ function createImagePart(base64Data, mimeType) {
 }
 
 /**
- * Process attachments for Gemini multimodal request
+ * Process attachments for AI multimodal request
  * @param {Array} attachments - Array of attachment objects
- * @returns {Promise<Array>} - Array of Gemini content parts
+ * @returns {Promise<Array>} - Array of AI content parts
  */
 async function processAttachments(attachments) {
   if (!attachments || attachments.length === 0) {
@@ -115,7 +115,7 @@ async function processAttachments(attachments) {
  * Build multimodal message content
  * @param {string} textContent - Text message
  * @param {Array} attachments - Attachments array
- * @returns {Promise<Array>} - Content parts for Gemini
+ * @returns {Promise<Array>} - Content parts for AI
  */
 async function buildMultimodalContent(textContent, attachments) {
   const parts = [];
@@ -133,7 +133,7 @@ async function buildMultimodalContent(textContent, attachments) {
 }
 
 /**
- * Analyze image with Gemini Vision
+ * Analyze image with Graphos AI Vision
  * @param {string} base64Image - Base64 encoded image
  * @param {string} mimeType - Image MIME type
  * @param {string} prompt - Analysis prompt
@@ -142,7 +142,7 @@ async function buildMultimodalContent(textContent, attachments) {
 async function analyzeImage(base64Image, mimeType, prompt = 'Describe this image in detail.') {
   try {
     const model = vertexAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.5-flash', // Graphos Hyper
       generationConfig: {
         temperature: 0.4,
         maxOutputTokens: 1024

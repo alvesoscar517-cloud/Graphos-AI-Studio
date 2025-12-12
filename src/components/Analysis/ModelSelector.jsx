@@ -11,36 +11,36 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
   const MODELS = [
     {
       id: 'gemini-2.5-flash-lite',
-      name: 'Gemini 2.5 Flash Lite',
+      name: 'Graphos Velocity',
       speed: t('model.ultraFast'),
       description: t('model.geminiFlashLite'),
       tags: [
         { label: t('model.shortText'), icon: 'file-text' },
         { label: t('model.lowCost'), icon: 'coins' }
       ],
-      icon: '/icon/Gemini.svg'
+      iconName: 'audio-lines'
     },
     {
       id: 'gemini-2.5-flash',
-      name: 'Gemini 2.5 Flash',
+      name: 'Graphos Hyper',
       speed: t('model.fast'),
       description: t('model.geminiFlash'),
       tags: [
         { label: t('model.versatile'), icon: 'layers' },
         { label: t('model.recommended'), icon: 'star' }
       ],
-      icon: '/icon/Gemini.svg'
+      iconName: 'audio-lines'
     },
     {
       id: 'gemini-2.5-pro',
-      name: 'Gemini 2.5 Pro',
+      name: 'Graphos Zenith',
       speed: t('model.slower'),
       description: t('model.geminiPro'),
       tags: [
         { label: t('model.importantText'), icon: 'file-check' },
         { label: t('model.highQuality'), icon: 'award' }
       ],
-      icon: '/icon/Gemini.svg'
+      iconName: 'audio-lines'
     }
   ]
 
@@ -65,7 +65,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
       >
         <div className="flex flex-col items-center gap-1.5 w-full">
           <div className="card-icon !w-12 !h-12">
-            <img src={currentModel.icon} alt="Model" className="w-6 h-6" />
+            <Icon name={currentModel.iconName} alt="Model" size="lg" color="primary" />
           </div>
           <div className="flex flex-col gap-0.5 w-full">
             <h3 className="text-xs font-medium text-text-primary m-0 leading-tight">{currentModel.name}</h3>
@@ -114,14 +114,14 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
                 >
                   {/* Header */}
                   <div className="flex items-center gap-3 max-md:gap-2">
-                    <div className="card-icon !w-10 !h-10 max-md:!w-9 max-md:!h-9">
-                      <img src={model.icon} alt={model.name} className="w-5 h-5 max-md:w-4 max-md:h-4" />
+                    <div className="card-icon !w-11 !h-11 max-md:!w-10 max-md:!h-10">
+                      <Icon name={model.iconName} alt={model.name} size="lg" color="primary" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-md font-semibold text-text-primary m-0 mb-1 flex items-center gap-2 max-md:text-sm max-md:gap-1.5 max-md:flex-wrap">
                         {model.name}
                         {selectedModel === model.id && (
-                          <span className="inline-flex items-center gap-0.5 py-0.5 px-1.5 bg-primary/15 text-primary rounded-md text-[9px] font-medium uppercase">
+                          <span className="inline-flex items-center gap-0.5 py-0.5 px-1.5 bg-primary/15 text-primary rounded-md text-[8px] font-medium uppercase tracking-wide">
                             {t('model.inUse')}
                           </span>
                         )}

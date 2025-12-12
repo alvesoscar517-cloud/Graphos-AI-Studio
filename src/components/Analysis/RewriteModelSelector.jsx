@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
+import Icon from '../Common/Icon'
 
 const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
   const { t } = useTranslation()
@@ -7,36 +8,36 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
   const REWRITE_MODELS = [
     {
       id: 'gemini-2.5-flash-lite',
-      name: 'Gemini 2.5 Flash Lite',
+      name: 'Graphos Velocity',
       speed: { icon: '/icon/gauge.svg', text: t('model.ultraFast') },
       description: t('model.geminiFlashLite'),
       details: [
         { icon: '/icon/file-text.svg', text: t('model.shortText') },
         { icon: '/icon/dollar-sign.svg', text: t('model.lowCost') }
       ],
-      icon: '/icon/Gemini.svg'
+      iconName: 'audio-lines'
     },
     {
       id: 'gemini-2.5-flash',
-      name: 'Gemini 2.5 Flash',
+      name: 'Graphos Hyper',
       speed: { icon: '/icon/gauge.svg', text: t('model.fast') },
       description: t('model.geminiFlash'),
       details: [
         { icon: '/icon/layers.svg', text: t('model.versatile') },
         { icon: '/icon/star.svg', text: t('model.recommended') }
       ],
-      icon: '/icon/Gemini.svg'
+      iconName: 'audio-lines'
     },
     {
       id: 'gemini-2.5-pro',
-      name: 'Gemini 2.5 Pro',
+      name: 'Graphos Zenith',
       speed: { icon: '/icon/gauge.svg', text: t('model.slower') },
       description: t('model.geminiPro'),
       details: [
         { icon: '/icon/award.svg', text: t('model.importantText') },
         { icon: '/icon/trending-up.svg', text: t('model.highQuality') }
       ],
-      icon: '/icon/Gemini.svg'
+      iconName: 'audio-lines'
     }
   ]
 
@@ -63,7 +64,7 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
             {/* Header */}
             <div className="flex items-center gap-3">
               <div className="card-icon !w-10 !h-10">
-                <img src={model.icon} alt={model.name} className="w-5 h-5" />
+                <Icon name={model.iconName} alt={model.name} size="md" color="primary" />
               </div>
               
               <div className="flex-1 min-w-0">

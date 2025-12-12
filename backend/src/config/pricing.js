@@ -17,11 +17,11 @@ const logger = require('../utils/logger');
 const FREE_CREDITS = 100; // Free credits for new users (increased from 50)
 
 // ============================================================================
-// MODEL PRICING (based on Gemini API costs)
+// MODEL PRICING (Graphos AI models)
 // ============================================================================
 
 const MODEL_COSTS = {
-  // Gemini 2.5 Flash Lite - Cheapest, with native thinking
+  // Graphos Velocity - Fastest, cost-effective
   'gemini-2.5-flash-lite': {
     inputCostPer1M: 0.075,
     outputCostPer1M: 0.30,
@@ -29,7 +29,7 @@ const MODEL_COSTS = {
     hasNativeThinking: true
   },
   
-  // Gemini 2.5 Flash - Balanced, with native thinking (default)
+  // Graphos Hyper - Balanced, recommended (default)
   'gemini-2.5-flash': {
     inputCostPer1M: 0.15,
     outputCostPer1M: 0.60,
@@ -37,7 +37,7 @@ const MODEL_COSTS = {
     hasNativeThinking: true
   },
   
-  // Gemini 2.5 Pro - Best quality, with native thinking
+  // Graphos Zenith - Best quality, highest accuracy
   'gemini-2.5-pro': {
     inputCostPer1M: 1.25,
     outputCostPer1M: 5.00,
@@ -92,14 +92,14 @@ const FEATURE_COSTS = {
   },
   
   // ============================================================================
-  // VOICE PROFILE OPERATIONS (Updated: Dec 2025 - uses 2.5 Pro with thinking)
+  // VOICE PROFILE OPERATIONS (Updated: Dec 2025 - uses Graphos Zenith with thinking)
   // User-friendly pricing - profile creation is important for onboarding
   // ============================================================================
   'voice_profile_generation': {
-    baseCost: 8,                  // Increased for 2.5 Pro with thinking
+    baseCost: 8,                  // Increased for Graphos Zenith with thinking
     perSampleCost: 0.5,
     maxCost: 20,                  // Cap to protect users
-    description: 'Voice profile generation with AI thinking (2.5 Pro)'
+    description: 'Voice profile generation with AI thinking (Graphos Zenith)'
   },
   'profile_sample_add': {
     baseCost: 0.3,
@@ -114,10 +114,10 @@ const FEATURE_COSTS = {
     description: 'Batch add samples to profile'
   },
   'profile_complete': {
-    baseCost: 10,                 // Increased for 2.5 Pro with thinking
+    baseCost: 10,                 // Increased for Graphos Zenith with thinking
     perSampleCost: 0.5,
     maxCost: 25,                  // Cap to protect users
-    description: 'Complete profile creation with AI thinking (2.5 Pro)'
+    description: 'Complete profile creation with AI thinking (Graphos Zenith)'
   },
   
   // ============================================================================

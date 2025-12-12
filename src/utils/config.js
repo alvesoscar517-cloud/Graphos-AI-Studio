@@ -106,9 +106,9 @@ export const CONFIG = {
   MODELS: {
     DEFAULT: 'gemini-2.5-flash',
     AVAILABLE: [
-      { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite', speed: 'fastest', quality: 'good' },
-      { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', speed: 'fast', quality: 'better' },
-      { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', speed: 'slow', quality: 'best' }
+      { id: 'gemini-2.5-flash-lite', name: 'Graphos Velocity', speed: 'fastest', quality: 'good' },
+      { id: 'gemini-2.5-flash', name: 'Graphos Hyper', speed: 'fast', quality: 'better' },
+      { id: 'gemini-2.5-pro', name: 'Graphos Zenith', speed: 'slow', quality: 'best' }
     ]
   },
   

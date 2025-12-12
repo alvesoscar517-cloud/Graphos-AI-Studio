@@ -165,10 +165,10 @@ const config = convict({
     }
   },
   
-  // Gemini
+  // AI Model Configuration
   gemini: {
     model: {
-      doc: 'Gemini model name',
+      doc: 'AI model name',
       format: String,
       default: 'gemini-2.5-flash',
       env: 'GEMINI_MODEL'

@@ -74,7 +74,7 @@ router.get('/', (_req, res) => {
     service: 'Graphos AI Studio - Backend',
     version: '2.1',
     status: 'running',
-    powered_by: 'Google Gemini Ecosystem',
+    powered_by: 'Graphos AI Ecosystem',
     architecture: 'Modular',
     documentation: '/api/docs',
     endpoints: {

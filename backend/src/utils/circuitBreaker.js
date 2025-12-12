@@ -334,12 +334,12 @@ function shutdownAll() {
 // ============================================================================
 
 /**
- * Create circuit breaker for Gemini API calls
+ * Create circuit breaker for AI API calls
  * @param {Function} fn - Function to protect
  * @returns {CircuitBreaker}
  */
 function createGeminiBreaker(fn) {
-  return createBreaker('gemini', fn, {
+  return createBreaker('ai', fn, {
     timeout: 60000,              // 60 seconds for AI calls
     errorThresholdPercentage: 40,
     resetTimeout: 60000,         // 1 minute before retry
