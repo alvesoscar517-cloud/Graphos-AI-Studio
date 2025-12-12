@@ -13,9 +13,9 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
       id: 'gemini-2.5-flash-lite',
       name: 'Graphos Velocity',
       speed: t('model.ultraFast'),
-      description: t('model.geminiFlashLite'),
+      description: t('model.velocityDesc'),
       tags: [
-        { label: t('model.shortText'), icon: 'file-text' },
+        { label: t('model.shortText'), icon: 'zap' },
         { label: t('model.lowCost'), icon: 'coins' }
       ],
       iconName: 'audio-lines'
@@ -24,7 +24,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
       id: 'gemini-2.5-flash',
       name: 'Graphos Hyper',
       speed: t('model.fast'),
-      description: t('model.geminiFlash'),
+      description: t('model.hyperDesc'),
       tags: [
         { label: t('model.versatile'), icon: 'layers' },
         { label: t('model.recommended'), icon: 'star' }
@@ -35,9 +35,9 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
       id: 'gemini-2.5-pro',
       name: 'Graphos Zenith',
       speed: t('model.slower'),
-      description: t('model.geminiPro'),
+      description: t('model.zenithDesc'),
       tags: [
-        { label: t('model.importantText'), icon: 'file-check' },
+        { label: t('model.importantText'), icon: 'briefcase' },
         { label: t('model.highQuality'), icon: 'award' }
       ],
       iconName: 'audio-lines'

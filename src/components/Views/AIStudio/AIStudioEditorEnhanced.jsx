@@ -358,7 +358,6 @@ const AIStudioEditorEnhanced = ({
                 "max-w-xl",
                 isTypingTitle && "animate-pulse"
               )}
-              title={currentNote?.title || ''}
             >
               {displayTitle || t('editor.untitled')}
             </div>
@@ -472,15 +471,15 @@ const AIStudioEditorEnhanced = ({
               {showExportMenu && (
                 <div className={cn(
                   "absolute right-0 top-full mt-1 z-50",
-                  "bg-bg-primary border border-border-light rounded-lg shadow-popup",
-                  "py-1 min-w-[160px]"
+                  "bg-bg-primary border border-border-light rounded-xl shadow-popup",
+                  "p-1.5 min-w-[160px]"
                 )}>
                   <button
                     onClick={handleExportDocx}
                     className={cn(
-                      "w-full flex items-center gap-2 px-3 py-2",
+                      "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg",
                       "text-sm text-text-primary text-left",
-                      "hover:bg-bg-hover transition-colors",
+                      "hover:bg-fill-tertiary transition-colors",
                       "border-none bg-transparent cursor-pointer"
                     )}
                   >
@@ -490,9 +489,9 @@ const AIStudioEditorEnhanced = ({
                   <button
                     onClick={handleExportPdf}
                     className={cn(
-                      "w-full flex items-center gap-2 px-3 py-2",
+                      "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg",
                       "text-sm text-text-primary text-left",
-                      "hover:bg-bg-hover transition-colors",
+                      "hover:bg-fill-tertiary transition-colors",
                       "border-none bg-transparent cursor-pointer"
                     )}
                   >
@@ -502,9 +501,9 @@ const AIStudioEditorEnhanced = ({
                   <button
                     onClick={handleExportHtml}
                     className={cn(
-                      "w-full flex items-center gap-2 px-3 py-2",
+                      "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg",
                       "text-sm text-text-primary text-left",
-                      "hover:bg-bg-hover transition-colors",
+                      "hover:bg-fill-tertiary transition-colors",
                       "border-none bg-transparent cursor-pointer"
                     )}
                   >

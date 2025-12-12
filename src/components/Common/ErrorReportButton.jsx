@@ -94,7 +94,7 @@ export function ErrorReportButton({
       <button
         onClick={handleReport}
         disabled={isDisabled}
-        title={isSuccess ? t('errorReport.thankYou', 'Thanks for reporting!') : t('errorReport.reportThis', 'Report this error')}
+        data-tooltip={isSuccess ? t('errorReport.thankYou', 'Thanks for reporting!') : t('errorReport.reportThis', 'Report this error')}
         className={cn(
           'p-1 rounded transition-all',
           isSuccess 
@@ -115,7 +115,7 @@ export function ErrorReportButton({
       <button
         onClick={handleReport}
         disabled={isDisabled}
-        title={isSuccess ? t('errorReport.thankYou', 'Thanks for reporting!') : t('errorReport.reportThis', 'Report this error')}
+        data-tooltip={isSuccess ? t('errorReport.thankYou', 'Thanks for reporting!') : t('errorReport.reportThis', 'Report this error')}
         className={cn(
           'p-2 rounded-lg transition-all',
           isSuccess 

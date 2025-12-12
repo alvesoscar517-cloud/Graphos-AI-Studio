@@ -49,12 +49,13 @@ export default function CustomSelect({ value, onChange, options, label, classNam
         </svg>
       </div>
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-lg shadow-lg z-50 overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-xl shadow-lg z-50 p-1.5">
           {options.map((option) => (
             <div
               key={option.value}
               className={cn(
-                "px-4 py-2.5 text-sm text-primary cursor-pointer transition-colors hover:bg-surface-secondary",
+                "px-3 py-2 text-sm text-primary cursor-pointer transition-colors rounded-lg",
+                "hover:bg-surface-secondary",
                 option.value === value && "bg-surface-secondary font-medium"
               )}
               onClick={() => handleSelect(option.value)}

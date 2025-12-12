@@ -33,21 +33,9 @@ export async function getUserInfo() {
     const authMethod = getAuthMethod()
     const storedUser = getUserData()
     
-    // Debug logging for auth issues
-    if (!authToken || !storedUser) {
-      logger.log('[AUTH DEBUG] Missing auth data:', {
-        hasToken: !!authToken,
-        authMethod,
-        hasUser: !!storedUser,
-        userId: storedUser?.userId || storedUser?.email || 'none'
-      })
-      
-      // If we have token but no user data, auth state is corrupted
-      // This can happen if localStorage was partially cleared
-      if (authToken && !storedUser && authMethod === 'email') {
-        console.warn('[AUTH] Token exists but user data missing - auth state corrupted')
-        // Don't trigger session expired here, let the API call fail and handle it
-      }
+    // If we have token but no user data, auth state is corrupted
+    if (authToken && !storedUser && authMethod === 'email') {
+      logger.warn('Auth', 'Token exists but user data missing - auth state corrupted')
     }
     
     // Relaxed check: if we have storedUser with userId/email, use it
@@ -69,7 +57,7 @@ export async function getUserInfo() {
       }
     }
   } catch (e) {
-    console.error('[AUTH] Error getting user info from storage:', e)
+    logger.error('Auth', 'Error getting user info from storage', e)
     // Continue to check Chrome extension
   }
   
@@ -93,7 +81,7 @@ export async function getUserInfo() {
       }
     }
   } catch (error) {
-    console.error('Error getting user info:', error)
+    logger.error('Auth', 'Error getting user info', error)
   }
   
   // Check localStorage userId (legacy support)
@@ -111,10 +99,9 @@ export async function getUserInfo() {
       }
     }
   } catch (storageError) {
-    console.warn('localStorage not available')
+    logger.warn('Auth', 'localStorage not available')
   }
   
   // No authenticated user found
-  logger.log('[INFO] No authenticated user found')
   return null
 }

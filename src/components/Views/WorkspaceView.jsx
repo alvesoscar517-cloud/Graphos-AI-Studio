@@ -13,23 +13,17 @@ const WorkspaceView = ({
 }) => {
   const { currentConversation, sendMessage, isLoading, clearConversation, modelSettings, updateModelSettings } = useWorkspace()
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [quickActionPrompt, setQuickActionPrompt] = useState('')
 
   const handleModelChange = useCallback((modelId) => {
     updateModelSettings({ model: modelId })
   }, [updateModelSettings])
-
-  // Handle quick action click - set prompt to input
-  const handleQuickAction = useCallback((prompt) => {
-    setQuickActionPrompt(prompt)
-  }, [])
 
   const handleStartChat = () => {
     // Clear current conversation to return to default interface
     clearConversation()
   }
 
-  const handleSendMessage = async (message) => {
+  const handleSendMessage = useCallback(async (message) => {
     if (!currentConversation) {
       // Trigger transition animation
       setIsTransitioning(true)
@@ -42,7 +36,7 @@ const WorkspaceView = ({
     } else {
       await sendMessage(message)
     }
-  }
+  }, [currentConversation, sendMessage])
 
   // Show default view when no conversation OR conversation has no messages
   const showDefaultView = !currentConversation || currentConversation.messages.length === 0
@@ -61,14 +55,13 @@ const WorkspaceView = ({
               onToggleLeftSidebar={onToggleLeftSidebar}
               onToggleRightSidebar={onToggleRightSidebar}
               rightSidebarHidden={rightSidebarHidden}
-              onQuickAction={handleQuickAction}
+              onSendMessage={handleSendMessage}
               chatInput={
                 <ModernChatInput
                   onSendMessage={handleSendMessage}
                   disabled={isLoading || isTransitioning}
                   isCentered={true}
                   autoFocus={true}
-                  initialMessage={quickActionPrompt}
                   selectedModel={modelSettings?.model || 'gemini-2.5-flash'}
                   onModelChange={handleModelChange}
                   showModelSelector={true}

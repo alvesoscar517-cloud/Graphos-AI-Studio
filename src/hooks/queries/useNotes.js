@@ -14,6 +14,7 @@ import {
   deleteNoteFromDB 
 } from '@/services/indexedDB'
 import { loadNotesFromDrive, saveNoteToDrive, deleteNoteFromDrive } from '@/services/drive'
+import { useNotesStore } from '@/stores/notesStore'
 
 const MAX_VISIBLE_NOTES = 5
 
@@ -337,7 +338,6 @@ export function useCurrentNoteWithStore() {
   
   // Sync with store
   useEffect(() => {
-    const { useNotesStore } = require('@/stores/notesStore')
     const unsubscribe = useNotesStore.subscribe(
       (state) => state.currentNoteId,
       (id) => setCurrentNoteId(id)

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import ProfileCard from './ProfileCard'
 import EmptyProfileCard from './EmptyProfileCard'
-import threeDotsAnimation from '../../../animation/Three dots loading.json'
+import { SkeletonProfileCard } from '../../ui/skeleton'
 import { cn } from '../../../lib/utils'
 
 // Breakpoints for responsive carousel
@@ -136,12 +136,19 @@ const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile, loading }) =
 
       {/* Content */}
       {loading ? (
-        <div className="flex items-center justify-center min-h-[200px] py-10">
-          <LazyLottie 
-            animationData={threeDotsAnimation} 
-            loop={true}
-            style={{ width: 80, height: 40 }}
-          />
+        <div className="flex gap-5 max-lg:gap-4 max-md:gap-3 overflow-hidden">
+          {Array.from({ length: visibleCards }).map((_, i) => (
+            <SkeletonProfileCard 
+              key={i} 
+              style={{ 
+                flex: visibleCards === 1 
+                  ? '0 0 100%' 
+                  : visibleCards === 2 
+                    ? '0 0 calc(50% - 10px)' 
+                    : '0 0 calc(33.333% - 13.33px)'
+              }}
+            />
+          ))}
         </div>
       ) : profiles.length === 0 ? (
         <EmptyProfileCard />

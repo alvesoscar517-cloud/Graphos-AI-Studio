@@ -15,7 +15,6 @@ export default function AccountLockedModal() {
 
   useEffect(() => {
     const handleAccountLocked = (event) => {
-      logger.log('[AccountLockedModal] Account locked event:', event.detail);
       setLockInfo(event.detail);
       setIsVisible(true);
     };

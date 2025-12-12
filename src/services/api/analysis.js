@@ -18,17 +18,9 @@ export async function analyzeText(profileId, text, options = {}) {
   const endpoint = 'analyze'
   perfMonitor.start(endpoint)
   
-  // Debug: Log incoming parameters
-  logger.log('[DEBUG] analyzeText called with:', {
-    profileId,
-    profileIdType: typeof profileId,
-    textLength: text?.length,
-    hasProfileId: !!profileId
-  })
-  
   // Validate profileId
   if (!profileId) {
-    console.error('[ERROR] analyzeText: profileId is missing or undefined!')
+    logger.error('Analysis', 'analyzeText: profileId is missing or undefined!')
     throw new AnalysisError('Profile ID is required for analysis')
   }
   
@@ -39,34 +31,18 @@ export async function analyzeText(profileId, text, options = {}) {
       throw new AnalysisError(validation.errors.join(', '), { stats: validation.stats })
     }
     
-    // Log stats for monitoring
-    logger.log('[CHART] Text stats:', validation.stats.display)
     if (validation.warnings.length > 0) {
-      console.warn('[WARNING] Warnings:', validation.warnings)
+      logger.warn('Analysis', `Warnings: ${validation.warnings.join(', ')}`)
     }
     
-    // Debug: Log request payload
     const requestPayload = {
       profile_id: profileId,
       text: text,
       text_stats: validation.stats
     }
-    logger.log('[DEBUG] Sending analyze request:', {
-      profile_id: requestPayload.profile_id,
-      textLength: requestPayload.text?.length
-    })
     
     // Use deduplicated request to prevent duplicate concurrent analysis calls
     const { data } = await apiClient.postDeduplicated('/analyze', requestPayload)
-    
-    // Debug: Log response data
-    logger.log('[DEBUG] Analyze response:', {
-      success: data.success,
-      hasData: !!data,
-      keys: data ? Object.keys(data).slice(0, 10) : [],
-      error: data?.error,
-      cache_hit: data?.cache_hit
-    })
     
     if (!data.success) {
       throw new AnalysisError(data.error || 'Analysis failed')
@@ -136,7 +112,7 @@ export async function detectAI(text, enhanced = true, language = null) {
       textStats: validation.stats
     }
   } catch (error) {
-    console.error('Error detecting AI:', error)
+    logger.error('Analysis', 'Error detecting AI', error)
     return { success: false, error: error.message }
   }
 }
@@ -151,8 +127,6 @@ export async function detectAI(text, enhanced = true, language = null) {
  */
 export async function getSuggestions(profileId, sentence, sentenceScore, context = {}) {
   try {
-    logger.log('💡 Getting suggestions for sentence...')
-    
     const { data } = await apiClient.post('/suggest_improvements', {
       profile_id: profileId,
       sentence: sentence,
@@ -161,13 +135,12 @@ export async function getSuggestions(profileId, sentence, sentenceScore, context
     })
     
     if (data.success) {
-      logger.log(`[SUCCESS] Got ${data.suggestions?.length || 0} suggestions`)
       return { success: true, data }
     }
     
     throw new Error(data.error || 'Failed to get suggestions')
   } catch (error) {
-    console.error('[FAIL] Error getting suggestions:', error)
+    logger.error('Analysis', 'Error getting suggestions', error)
     return { success: false, error: error.message }
   }
 }
@@ -187,7 +160,7 @@ export async function analyzeTextBatch(profileId, texts) {
     
     return { success: data.success, data, error: data.error }
   } catch (error) {
-    console.error('Error batch analyzing:', error)
+    logger.error('Analysis', 'Error batch analyzing', error)
     return { success: false, error: error.message }
   }
 }
@@ -244,7 +217,6 @@ export async function analyzeTextOptimized(profileId, text) {
     const cached = getCachedData(cacheKey)
     
     if (cached) {
-      logger.log('⚡ Using cached analysis result')
       return { success: true, data: cached }
     }
     
@@ -262,7 +234,7 @@ export async function analyzeTextOptimized(profileId, text) {
     
     return { success: false, error: data.error }
   } catch (error) {
-    console.error('Error analyzing text:', error)
+    logger.error('Analysis', 'Error analyzing text', error)
     return { success: false, error: error.message }
   }
 }
@@ -293,7 +265,6 @@ export async function getSuggestionsOptimized(profileId, sentence, sentenceScore
     const cached = getCachedData(cacheKey)
     
     if (cached) {
-      logger.log('⚡ Using cached suggestions')
       return { success: true, data: cached }
     }
     
@@ -312,7 +283,7 @@ export async function getSuggestionsOptimized(profileId, sentence, sentenceScore
     
     throw new Error(data.error || 'Failed to get suggestions')
   } catch (error) {
-    console.error('[FAIL] Error getting suggestions:', error)
+    logger.error('Analysis', 'Error getting suggestions', error)
     return { success: false, error: error.message }
   }
 }

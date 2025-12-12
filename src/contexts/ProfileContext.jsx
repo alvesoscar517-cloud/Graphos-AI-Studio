@@ -75,7 +75,7 @@ export const ProfileProvider = ({ children }) => {
 
   // Select profile
   const selectProfile = useCallback((profile) => {
-    logger.log('📌 Selecting profile:', profile?.profile_name || 'None')
+    logger.log('[PIN] Selecting profile:', profile?.profile_name || 'None')
     
     if (profile) {
       setStorageActiveProfile(profile.profile_id, profile.profile_name)
@@ -106,7 +106,7 @@ export const ProfileProvider = ({ children }) => {
       const result = await createProfileMutation.mutateAsync(profileData)
       return result
     } catch (error) {
-      console.error('[FAIL] Error creating profile:', error)
+      logger.error('Profile', 'Error creating profile', error)
       throw error
     }
   }, [createProfileMutation])
@@ -122,7 +122,7 @@ export const ProfileProvider = ({ children }) => {
         setActiveProfileId(null)
       }
     } catch (error) {
-      console.error('[FAIL] Error deleting profile:', error)
+      logger.error('Profile', 'Error deleting profile', error)
       throw error
     }
   }, [deleteProfileMutation, activeProfileId])
@@ -133,7 +133,7 @@ export const ProfileProvider = ({ children }) => {
       const result = await updateProfileMutation.mutateAsync({ profileId, data })
       return result
     } catch (error) {
-      console.error('[FAIL] Error updating profile:', error)
+      logger.error('Profile', 'Error updating profile', error)
       throw error
     }
   }, [updateProfileMutation])

@@ -342,7 +342,7 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
               <Icon name="user-circle" alt="User" size="lg" />
             )}
             {!isCollapsed && (
-              <span className="overflow-hidden text-ellipsis whitespace-nowrap" title={user?.email}>
+              <span className="overflow-hidden text-ellipsis whitespace-nowrap">
                 {truncateEmail(user?.email, 18) || t('common.notLoggedIn')}
               </span>
             )}

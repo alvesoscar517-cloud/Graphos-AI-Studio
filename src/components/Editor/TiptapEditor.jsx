@@ -58,6 +58,9 @@ function TiptapEditorComponent({
         heading: {
           levels: [1, 2, 3, 4],
         },
+        // Disable built-in extensions that we configure separately
+        link: false,
+        underline: false,
       }),
       Placeholder.configure({
         placeholder: placeholder || t('editor.enterYourText'),

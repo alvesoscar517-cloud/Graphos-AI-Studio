@@ -5,7 +5,7 @@
  * outside of Router context (e.g., when ErrorBoundary catches errors at app level)
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSendErrorReport } from '@/hooks/queries'
 import ghostIcon from '../../../icon for background/ghost-with-raised-arms.svg'
@@ -24,17 +24,19 @@ const ErrorPage = ({
   const [reportStatus, setReportStatus] = useState('idle') // idle | sending | sent | already_reported | error
   const sendErrorReport = useSendErrorReport()
 
+  // Suppress sessionExpired modal while on error page
+  useEffect(() => {
+    window.__errorPageActive = true
+    // Clear any pending session expired when entering error page
+    window.__clearPendingSessionExpired?.()
+    return () => {
+      window.__errorPageActive = false
+    }
+  }, [])
+
   const handleGoHome = () => {
     // Use window.location instead of navigate() to avoid Router dependency
     window.location.href = '/'
-  }
-
-  const handleGoBack = () => {
-    if (window.history.length > 1) {
-      window.history.back()
-    } else {
-      handleGoHome()
-    }
   }
 
   const handleReload = () => {
@@ -87,7 +89,7 @@ const ErrorPage = ({
           <img 
             src={ghostIcon} 
             alt="Error" 
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain opacity-80 dark:invert dark:opacity-70"
           />
         </div>
 
@@ -137,20 +139,30 @@ const ErrorPage = ({
 
           {showReportButton && error && (
             <button 
-              className={`inline-flex items-center justify-center gap-2 py-2.5 px-5 text-sm font-medium rounded-lg cursor-pointer transition-all border border-border-light active:scale-[0.98] ${
+              className={`inline-flex items-center justify-center gap-2 py-2.5 px-5 text-sm font-medium rounded-lg cursor-pointer transition-all border active:scale-[0.98] ${
                 reportStatus === 'sent' || reportStatus === 'already_reported'
-                  ? 'bg-green-500/10 text-green-600 border-green-500/30 cursor-default'
+                  ? 'bg-system-green/10 text-system-green border-system-green/30 cursor-default'
                   : reportStatus === 'error'
-                  ? 'bg-red-500/10 text-red-600 border-red-500/30'
-                  : 'bg-bg-secondary text-text-primary hover:bg-bg-hover'
+                  ? 'bg-system-red/10 text-system-red border-system-red/30'
+                  : 'bg-bg-secondary text-text-primary border-border-light hover:bg-bg-hover'
               }`}
               onClick={handleReportError}
               disabled={reportStatus === 'sending' || reportStatus === 'sent' || reportStatus === 'already_reported'}
             >
               <img 
-                src={reportStatus === 'sent' || reportStatus === 'already_reported' ? '/icon/check.svg' : '/icon/flag.svg'} 
+                src={reportStatus === 'sent' || reportStatus === 'already_reported' ? '/icon/check-circle.svg' : '/icon/flag.svg'} 
                 alt="" 
-                className={`w-4 h-4 ${reportStatus === 'sent' || reportStatus === 'already_reported' ? 'opacity-100' : 'opacity-70 icon-invert'}`}
+                className={`w-4 h-4 ${
+                  reportStatus === 'sent' || reportStatus === 'already_reported' 
+                    ? '' 
+                    : 'opacity-70 icon-invert'
+                }`}
+                style={reportStatus === 'sent' || reportStatus === 'already_reported' 
+                  ? { filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' } 
+                  : reportStatus === 'error'
+                  ? { filter: 'invert(31%) sepia(98%) saturate(7483%) hue-rotate(359deg) brightness(103%) contrast(107%)' }
+                  : {}
+                }
               />
               {getReportButtonText()}
             </button>

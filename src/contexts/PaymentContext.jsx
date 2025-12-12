@@ -67,7 +67,6 @@ export const PaymentProvider = ({ children }) => {
     setConnectionStatus('disconnected');
     startTimeRef.current = null;
     clearPersistedState();
-    logger.log('⏹️ Stopped listening for payments');
   }, []);
 
   const handlePaymentSuccess = useCallback((data) => {
@@ -107,11 +106,11 @@ export const PaymentProvider = ({ children }) => {
       
       // Auto-stop after max duration
       timeoutRef.current = setTimeout(() => {
-        logger.log('⏰ Max listen duration reached');
+  
         stopListening();
       }, MAX_LISTEN_DURATION);
       
-      logger.log('🎧 Started listening for payments (Firestore Realtime)');
+
       
       // Store status unsubscribe for cleanup
       const originalUnsub = unsubscribeRef.current;
@@ -120,7 +119,7 @@ export const PaymentProvider = ({ children }) => {
         unsubStatus();
       };
     } catch (error) {
-      console.error('Failed to start payment listening:', error);
+      logger.error('Payment', 'Failed to start payment listening', error);
     }
   }, [isPolling, handlePaymentSuccess, stopListening]);
 
@@ -135,7 +134,7 @@ export const PaymentProvider = ({ children }) => {
     const state = getPersistedState();
     if (state) {
       startTimeRef.current = state.startTime;
-      logger.log('[PACKAGE] Resuming payment listener from persisted state');
+
       startPolling();
     }
   }, [isAuthenticated, authLoading]);

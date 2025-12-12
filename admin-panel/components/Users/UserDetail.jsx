@@ -24,7 +24,8 @@ export default function UserDetail() {
     type: 'info',
     priority: 'medium',
     title: '',
-    message: ''
+    message: '',
+    sendEmail: false
   });
   const [sendingNotification, setSendingNotification] = useState(false);
   const [adjustingCredits, setAdjustingCredits] = useState(false);
@@ -171,15 +172,23 @@ export default function UserDetail() {
 
     try {
       setSendingNotification(true);
-      await usersApi.sendNotification(id, {
+      const result = await usersApi.sendNotification(id, {
         type: notificationData.type,
         priority: notificationData.priority,
         title: notificationData.title,
-        message: notificationData.message
+        message: notificationData.message,
+        sendEmail: notificationData.sendEmail
       });
-      notify.success('Notification sent successfully!');
+      
+      let successMsg = 'Notification sent successfully!';
+      if (notificationData.sendEmail) {
+        successMsg = result.emailSent 
+          ? 'Notification sent! Email delivered.' 
+          : 'Notification sent! (Email could not be delivered)';
+      }
+      notify.success(successMsg);
       setShowNotificationModal(false);
-      setNotificationData({ type: 'info', priority: 'medium', title: '', message: '' });
+      setNotificationData({ type: 'info', priority: 'medium', title: '', message: '', sendEmail: false });
     } catch (err) {
       notify.error('Error: ' + err.message);
     } finally {
@@ -470,13 +479,31 @@ export default function UserDetail() {
                 />
                 <div className="text-xs text-muted text-right mt-1">{notificationData.message.length}/500</div>
               </div>
+              {/* Email option */}
+              <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${notificationData.sendEmail ? 'bg-primary/10 border border-primary' : 'bg-surface-secondary hover:bg-surface-tertiary'}`}>
+                <input
+                  type="checkbox"
+                  checked={notificationData.sendEmail}
+                  onChange={(e) => setNotificationData({...notificationData, sendEmail: e.target.checked})}
+                  className="w-4 h-4"
+                />
+                <div className="flex items-center gap-2">
+                  <img src="/icon/mail.svg" alt="" className="w-4 h-4 icon-dark" />
+                  <div>
+                    <span className="font-medium text-sm">Also send via Email</span>
+                    {user?.email && (
+                      <span className="text-xs text-muted block mt-0.5">Will send to: {user.email}</span>
+                    )}
+                  </div>
+                </div>
+              </label>
             </div>
             <div className="flex justify-end gap-3 p-4 border-t border-border">
               <Button variant="secondary" onClick={() => setShowNotificationModal(false)} disabled={sendingNotification}>
                 Cancel
               </Button>
               <Button onClick={handleSendNotification} disabled={sendingNotification} loading={sendingNotification}>
-                Send Notification
+                {notificationData.sendEmail ? 'Send + Email' : 'Send Notification'}
               </Button>
             </div>
           </div>

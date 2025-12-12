@@ -16,7 +16,8 @@ async function getAuthHeaders() {
   
   // Get auth token with type hint for backend optimization
   const { token, authType } = await apiClient.getAuthTokenWithType()
-  if (token) {
+  // Only add Authorization header if token is a valid non-empty string
+  if (token && typeof token === 'string' && token.trim()) {
     headers['Authorization'] = `Bearer ${token}`
     if (authType) {
       headers['X-Auth-Type'] = authType
@@ -38,16 +39,13 @@ export async function loadProfiles() {
     const userInfo = await getUserInfo()
     
     // Don't make API call if user is not authenticated
-    if (!userInfo || !userInfo.userId) {
-      logger.log('[INFO] No authenticated user, skipping profile load')
+    if (!userInfo || !userInfo.userId || typeof userInfo.userId !== 'string') {
       perfMonitor.end(endpoint)
       return []
     }
     
-    logger.log('📋 Loading profiles for user:', userInfo.userId)
-    
     // Use new endpoint instead of deprecated /get_profiles
-    const { data } = await apiClient.get(`/profiles?user_id=${userInfo.userId}`)
+    const { data } = await apiClient.get(`/profiles?user_id=${encodeURIComponent(userInfo.userId)}`)
     
     if (!data.success) {
       throw new ProfileError(data.error || 'Failed to load profiles')
@@ -56,12 +54,14 @@ export async function loadProfiles() {
     const duration = perfMonitor.end(endpoint)
     apiTracker.trackCall(endpoint, duration, { userId: userInfo.userId })
     
-    logger.log('[SUCCESS] Loaded profiles:', data.profiles?.length || 0)
-    return data.profiles || []
+    const profiles = data.profiles || []
+    logger.log('[API] profiles completed in', duration + 'ms', { count: profiles.length })
+    
+    return profiles
   } catch (error) {
     perfMonitor.end(endpoint)
     apiTracker.trackError(endpoint, error)
-    console.error('[FAIL] Error loading profiles:', error)
+    logger.error('Profile', 'Error loading profiles', error)
     return []
   }
 }
@@ -76,7 +76,7 @@ export async function deleteProfile(profileId) {
     const { data } = await apiClient.post('/delete_profile', { profile_id: profileId })
     return { success: data.success, error: data.error }
   } catch (error) {
-    console.error('Error deleting profile:', error)
+    logger.error('Profile', 'Error deleting profile', error)
     return { success: false, error: error.message }
   }
 }
@@ -88,19 +88,14 @@ export async function deleteProfile(profileId) {
  */
 export async function getProfileDetails(profileId) {
   try {
-    logger.log('📋 Loading profile details for:', profileId)
-    
     const { data } = await apiClient.get(`/get_profile?profile_id=${profileId}`)
     
-    logger.log('[PACKAGE] Profile Details Response:', data)
-    
     if (data.success) {
-      logger.log('[SUCCESS] Loaded profile details')
       return data.profile
     }
     throw new Error(data.error || 'Failed to load profile details')
   } catch (error) {
-    console.error('[FAIL] Error loading profile details:', error)
+    logger.error('Profile', 'Error loading profile details', error)
     throw error
   }
 }
@@ -131,7 +126,7 @@ export async function createProfile(profileName, theme = 'work') {
     }
     throw new Error(data.error || 'Failed to create profile')
   } catch (error) {
-    console.error('Error creating profile:', error)
+    logger.error('Profile', 'Error creating profile', error)
     throw error
   }
 }
@@ -154,7 +149,7 @@ export async function addSample(profileId, text) {
     }
     throw new Error(data.error || 'Failed to add sample')
   } catch (error) {
-    console.error('Error adding sample:', error)
+    logger.error('Profile', 'Error adding sample', error)
     throw error
   }
 }
@@ -167,20 +162,17 @@ export async function addSample(profileId, text) {
  */
 export async function addSamplesBatch(profileId, samples) {
   try {
-    logger.log(`[PACKAGE] Uploading ${samples.length} samples in batch...`)
-    
     const { data } = await apiClient.post('/add_samples_batch', {
       profile_id: profileId,
       samples: samples
     })
     
     if (data.success) {
-      logger.log(`[SUCCESS] Batch upload successful: ${data.samples_added} samples`)
       return data
     }
     throw new Error(data.error || 'Failed to add samples batch')
   } catch (error) {
-    console.error('Error adding samples batch:', error)
+    logger.error('Profile', 'Error adding samples batch', error)
     throw error
   }
 }
@@ -201,7 +193,7 @@ export async function finalizeProfile(profileId) {
     }
     throw new Error(data.error || 'Failed to finalize profile')
   } catch (error) {
-    console.error('Error finalizing profile:', error)
+    logger.error('Profile', 'Error finalizing profile', error)
     throw error
   }
 }
@@ -220,18 +212,8 @@ export async function createProfileComplete(profileName, theme, samples, options
     const userInfo = await getUserInfo()
     
     if (!userInfo || !userInfo.userId) {
-      console.error('[PROFILE] User not authenticated - userInfo:', userInfo)
       throw new Error('User not authenticated')
     }
-    
-    logger.log(`[PACKAGE] Creating complete profile with ${samples.length} samples...`)
-    logger.log('[PACKAGE] User info:', { userId: userInfo.userId, email: userInfo.email })
-    logger.log('[PACKAGE] Request data:', { 
-      profile_name: profileName, 
-      theme, 
-      samplesCount: samples.length,
-      sampleTypes: samples.map(s => s?.type || 'unknown')
-    })
     
     // Use deduplicated request to prevent duplicate concurrent profile creation
     // This is critical to prevent multiple credits being deducted
@@ -246,7 +228,6 @@ export async function createProfileComplete(profileName, theme, samples, options
     })
     
     if (data.success) {
-      logger.log(`[SUCCESS] Profile created successfully: ${data.profile_id}`)
       return data
     }
     throw new Error(data.error || 'Failed to create profile')
@@ -255,7 +236,7 @@ export async function createProfileComplete(profileName, theme, samples, options
     if (error.name === 'AbortError') {
       throw error
     }
-    console.error('Error creating complete profile:', error)
+    logger.error('Profile', 'Error creating complete profile', error)
     throw error
   }
 }
@@ -279,7 +260,7 @@ export async function createProfileCompleteStream(profileName, theme, samples, c
       throw new Error('User not authenticated')
     }
     
-    logger.log(`[STREAM] Creating profile with ${samples.length} samples...`)
+
     
     const headers = await getAuthHeaders()
     
@@ -322,7 +303,6 @@ export async function createProfileCompleteStream(profileName, theme, samples, c
           const data = line.slice(6).trim()
           
           if (data === '[DONE]') {
-            logger.log('[STREAM] Profile creation complete')
             if (result && onComplete) {
               onComplete(result)
             }
@@ -353,7 +333,7 @@ export async function createProfileCompleteStream(profileName, theme, samples, c
               }
             } catch (e) {
               if (e.code) throw e
-              console.warn('[STREAM] Failed to parse JSON:', data, e)
+              logger.warn('Profile', `Failed to parse JSON: ${data}`)
             }
           }
         }
@@ -365,7 +345,7 @@ export async function createProfileCompleteStream(profileName, theme, samples, c
     if (error.name === 'AbortError') {
       throw error
     }
-    console.error('[STREAM] Error creating profile:', error)
+    logger.error('Profile', 'Error creating profile stream', error)
     if (onError) {
       onError(error)
     }

@@ -26,30 +26,26 @@ class RealtimeService {
    */
   connect(userId) {
     if (!userId) {
-      console.warn('[RealtimeService] userId required')
+      logger.warn('RealtimeService', 'userId required')
       return
     }
 
     // Already connected with same user
     if (this.userId === userId && firestoreRealtimeService.isConnected()) {
-      logger.log('[RealtimeService] Already connected')
       return
     }
 
     this.userId = userId
     this._setStatus('connecting')
 
-    logger.log('[RealtimeService] Connecting via Firestore...', { userId })
-
     // Initialize Firestore realtime
     const success = firestoreRealtimeService.init(userId)
     
     if (success) {
       this._setStatus('connected')
-      logger.log('[RealtimeService] Connected via Firestore')
     } else {
       this._setStatus('failed')
-      console.warn('[RealtimeService] Failed to connect')
+      logger.warn('RealtimeService', 'Failed to connect')
     }
   }
 
@@ -60,7 +56,6 @@ class RealtimeService {
     firestoreRealtimeService.cleanup()
     this.userId = null
     this._setStatus('disconnected')
-    logger.log('[RealtimeService] Disconnected')
   }
 
   /**
@@ -110,7 +105,6 @@ class RealtimeService {
    */
   resetAuthState() {
     // No-op for Firestore, kept for compatibility
-    logger.log('[RealtimeService] Auth state reset')
   }
 
   /**
@@ -129,7 +123,7 @@ class RealtimeService {
       try {
         cb(status)
       } catch (e) {
-        console.error('[RealtimeService] Status callback error:', e)
+        logger.error('RealtimeService', 'Status callback error', e)
       }
     })
   }
@@ -149,7 +143,6 @@ if (typeof document !== 'undefined') {
     
     if (document.visibilityState === 'visible' && realtimeService.userId) {
       if (!realtimeService.isConnected()) {
-        logger.log('[RealtimeService] Tab visible, reconnecting...')
         await realtimeService.connect(realtimeService.userId)
       }
     }
@@ -163,7 +156,6 @@ if (typeof document !== 'undefined') {
     lastOnline = now
     
     if (realtimeService.userId && !realtimeService.isConnected()) {
-      logger.log('[RealtimeService] Network online, reconnecting...')
       await realtimeService.connect(realtimeService.userId)
     }
   })

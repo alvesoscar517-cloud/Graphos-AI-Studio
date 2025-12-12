@@ -49,7 +49,7 @@ export function detectCSSConflicts() {
  * Log CSS isolation status
  */
 export function logCSSIsolationStatus() {
-  console.group('🎨 CSS Isolation Status');
+  console.group('[STYLE] CSS Isolation Status');
   
   // Check Shadow DOM support
   const shadowSupported = isShadowDOMSupported();

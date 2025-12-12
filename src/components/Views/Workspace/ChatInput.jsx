@@ -198,7 +198,6 @@ const ChatInput = ({ onSendMessage, disabled }) => {
                 <div className="flex flex-col gap-0.5 min-w-0 flex-1">
                   <span 
                     className="text-xs text-text-primary whitespace-nowrap overflow-hidden text-ellipsis"
-                    title={attachment.name}
                   >
                     {attachment.name.length > 20 
                       ? attachment.name.substring(0, 17) + '...' 

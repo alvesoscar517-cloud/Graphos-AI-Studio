@@ -481,7 +481,7 @@ Return JSON:
       formattedEvidence.push(`[OK] Human indicators: ${parsed.human_indicators.slice(0, 2).join(', ')}`);
     }
     if (parsed.ai_indicators?.length > 0) {
-      formattedEvidence.push(`⚠ AI indicators: ${parsed.ai_indicators.slice(0, 2).join(', ')}`);
+      formattedEvidence.push(`[WARNING] AI indicators: ${parsed.ai_indicators.slice(0, 2).join(', ')}`);
     }
     
     return {

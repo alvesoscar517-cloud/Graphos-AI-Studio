@@ -102,7 +102,7 @@ export const useNotificationStore = create(
             
             logger.log('[NotificationStore] Loaded', notifications.length, 'notifications,', unreadCount, 'unread')
           } catch (error) {
-            console.error('[NotificationStore] Fetch error:', error)
+            logger.error('NotificationStore', 'Fetch error', error)
             set({ error: error.message, loading: false })
           }
         },
@@ -153,7 +153,7 @@ export const useNotificationStore = create(
             await apiClient.post(`/api/notifications/${notificationId}/read`, { user_id: userId })
             return true
           } catch (error) {
-            console.error('[NotificationStore] Mark as read error:', error)
+            logger.error('NotificationStore', 'Mark as read error', error)
             return false
           }
         },
@@ -176,7 +176,7 @@ export const useNotificationStore = create(
             await apiClient.post('/api/notifications/mark-all-read', { user_id: userId })
             return true
           } catch (error) {
-            console.error('[NotificationStore] Mark all as read error:', error)
+            logger.error('NotificationStore', 'Mark all as read error', error)
             return false
           }
         },
@@ -201,7 +201,7 @@ export const useNotificationStore = create(
             await apiClient.delete(`/api/notifications/${notificationId}?user_id=${userId}`)
             return true
           } catch (error) {
-            console.error('[NotificationStore] Delete error:', error)
+            logger.error('NotificationStore', 'Delete error', error)
             return false
           }
         },
@@ -217,13 +217,14 @@ export const useNotificationStore = create(
             await apiClient.post(`/api/notifications/${notificationId}/click`, { user_id: userId })
             return true
           } catch (error) {
-            console.error('[NotificationStore] Mark as clicked error:', error)
+            logger.error('NotificationStore', 'Mark as clicked error', error)
             return false
           }
         },
 
         /**
          * Handle CTA action
+         * Maps admin panel view names to frontend view names
          */
         handleCtaAction: (notification, onViewChange) => {
           const ctaAction = notification.ctaAction
@@ -241,12 +242,36 @@ export const useNotificationStore = create(
             
             case 'view':
               if (ctaAction.action && onViewChange) {
-                onViewChange(ctaAction.action)
+                // Map admin panel view names to frontend view names
+                const viewMapping = {
+                  'home': 'home',
+                  'profiles': 'home', // Profiles are on home page
+                  'analysis': 'aistudio-editor',
+                  'rewrite': 'aistudio-editor',
+                  'history': 'history',
+                  'settings': 'home', // Settings popup, stay on home
+                  'upgrade': 'home', // Upgrade modal, stay on home
+                  'credits': 'credit-history',
+                  'support': 'home', // Support popup, stay on home
+                  'workspace': 'workspace',
+                  'aistudio-editor': 'aistudio-editor',
+                  'credit-history': 'credit-history'
+                }
+                
+                const mappedView = viewMapping[ctaAction.action] || ctaAction.action
+                onViewChange(mappedView)
+                
+                // For special actions, trigger additional UI
+                if (ctaAction.action === 'upgrade' || ctaAction.action === 'settings' || ctaAction.action === 'support') {
+                  // These will be handled by the component that receives the view change
+                  // Could dispatch a custom event or use a global state
+                  logger.info('NotificationStore', `Special action: ${ctaAction.action}`)
+                }
               }
               break
             
             default:
-              console.warn('[NotificationStore] Unknown CTA action type:', ctaAction.type)
+              logger.warn('NotificationStore', `Unknown CTA action type: ${ctaAction.type}`)
           }
         },
 

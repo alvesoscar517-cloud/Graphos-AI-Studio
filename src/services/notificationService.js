@@ -10,6 +10,7 @@
  * - LocalStorage fallback
  */
 
+import { logger } from '../utils/logger';
 import apiClient from './api/client';
 
 // Get user ID from auth
@@ -50,7 +51,7 @@ export async function getUserNotifications(unreadOnly = false, limit = 50) {
       total: data.count || 0
     };
   } catch (error) {
-    console.error('Get notifications error:', error);
+    logger.error('Notification', 'Get notifications failed', error);
     return getLocalNotifications();
   }
 }
@@ -66,7 +67,7 @@ export async function markNotificationAsRead(notificationId) {
     await apiClient.post(`/api/notifications/${notificationId}/read`, { user_id: userId });
     return true;
   } catch (error) {
-    console.error('Mark as read error:', error);
+    logger.error('Notification', 'Mark as read failed', error);
     markLocalNotificationAsRead(notificationId);
     return false;
   }
@@ -83,7 +84,7 @@ export async function markAllNotificationsAsRead() {
     await apiClient.post('/api/notifications/mark-all-read', { user_id: userId });
     return true;
   } catch (error) {
-    console.error('Mark all as read error:', error);
+    logger.error('Notification', 'Mark all as read failed', error);
     // Fallback to localStorage
     markAllLocalNotificationsAsRead();
     return false;
@@ -101,7 +102,7 @@ export async function markNotificationAsClicked(notificationId) {
     await apiClient.post(`/api/notifications/${notificationId}/click`, { user_id: userId });
     return true;
   } catch (error) {
-    console.error('Mark as clicked error:', error);
+    logger.error('Notification', 'Mark as clicked failed', error);
     return false;
   }
 }
@@ -120,7 +121,7 @@ export async function deleteNotification(notificationId) {
     await apiClient.delete(`/api/notifications/${notificationId}?user_id=${userId}`);
     return true;
   } catch (error) {
-    console.error('Delete notification error:', error);
+    logger.error('Notification', 'Delete notification failed', error);
     deleteLocalNotification(notificationId);
     return false;
   }
@@ -128,6 +129,7 @@ export async function deleteNotification(notificationId) {
 
 /**
  * Handle CTA action
+ * Maps admin panel view names to frontend view names
  * @param {Object} notification - Notification object with ctaAction
  * @param {Function} onViewChange - Callback to change view (from parent component)
  */
@@ -147,12 +149,29 @@ export function handleCtaAction(notification, onViewChange) {
     
     case 'view':
       if (ctaAction.action && onViewChange) {
-        onViewChange(ctaAction.action);
+        // Map admin panel view names to frontend view names
+        const viewMapping = {
+          'home': 'home',
+          'profiles': 'home', // Profiles are on home page
+          'analysis': 'aistudio-editor',
+          'rewrite': 'aistudio-editor',
+          'history': 'history',
+          'settings': 'home', // Settings popup, stay on home
+          'upgrade': 'home', // Upgrade modal, stay on home
+          'credits': 'credit-history',
+          'support': 'home', // Support popup, stay on home
+          'workspace': 'workspace',
+          'aistudio-editor': 'aistudio-editor',
+          'credit-history': 'credit-history'
+        };
+        
+        const mappedView = viewMapping[ctaAction.action] || ctaAction.action;
+        onViewChange(mappedView);
       }
       break;
     
     default:
-      console.warn('Unknown CTA action type:', ctaAction.type);
+      logger.warn('Notification', `Unknown CTA action type: ${ctaAction.type}`);
   }
 }
 
@@ -181,7 +200,7 @@ function getLocalNotifications() {
 
     return { notifications: validNotifications, unreadCount, total: validNotifications.length };
   } catch (error) {
-    console.error('Get local notifications error:', error);
+    logger.error('Notification', 'Get local notifications failed', error);
     return { notifications: [], unreadCount: 0, total: 0 };
   }
 }
@@ -198,7 +217,7 @@ function markLocalNotificationAsRead(notificationId) {
 
     localStorage.setItem('user_notifications', JSON.stringify(updated));
   } catch (error) {
-    console.error('Mark local notification as read error:', error);
+    logger.error('Notification', 'Mark local notification as read failed', error);
   }
 }
 
@@ -213,7 +232,7 @@ function markAllLocalNotificationsAsRead() {
 
     localStorage.setItem('user_notifications', JSON.stringify(updated));
   } catch (error) {
-    console.error('Mark all local notifications as read error:', error);
+    logger.error('Notification', 'Mark all local notifications as read failed', error);
   }
 }
 
@@ -227,7 +246,7 @@ function deleteLocalNotification(notificationId) {
 
     localStorage.setItem('user_notifications', JSON.stringify(updated));
   } catch (error) {
-    console.error('Delete local notification error:', error);
+    logger.error('Notification', 'Delete local notification failed', error);
   }
 }
 
@@ -268,7 +287,7 @@ export function simulateNotification(notification) {
 
     return newNotification;
   } catch (error) {
-    console.error('Simulate notification error:', error);
+    logger.error('Notification', 'Simulate notification failed', error);
     return null;
   }
 }

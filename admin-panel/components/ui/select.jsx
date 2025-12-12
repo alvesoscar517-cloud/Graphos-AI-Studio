@@ -114,7 +114,7 @@ const Select = forwardRef(({
         {isOpen && (
           <div
             className={cn(
-              'absolute z-[100] w-full mt-2 py-2 rounded-2xl',
+              'absolute z-[100] w-full mt-2 p-1.5 rounded-xl',
               'border border-border/30 bg-surface/95 backdrop-blur-xl shadow-dropdown',
               'max-h-72 overflow-y-auto scrollbar-hide',
               'animate-in fade-in-0 zoom-in-[0.97] duration-200'
@@ -130,11 +130,10 @@ const Select = forwardRef(({
                   type="button"
                   onClick={() => handleSelect(option.value)}
                   className={cn(
-                    'flex items-center gap-2.5 w-full px-4 py-2.5 text-[15px] text-left',
-                    'transition-all duration-150 cursor-pointer mx-1.5 rounded-xl',
-                    'w-[calc(100%-12px)]',
-                    'hover:bg-surface-secondary/80 focus:bg-surface-secondary/80 focus:outline-none',
-                    isSelected && 'bg-primary/5 font-medium'
+                    'flex items-center gap-2.5 w-full px-3 py-2 text-[15px] text-left',
+                    'transition-all duration-150 cursor-pointer rounded-lg',
+                    'hover:bg-surface-secondary focus:bg-surface-secondary focus:outline-none',
+                    isSelected && 'bg-surface-secondary font-medium'
                   )}
                   role="option"
                   aria-selected={isSelected}

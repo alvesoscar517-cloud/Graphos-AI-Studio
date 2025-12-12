@@ -92,7 +92,7 @@ function App() {
   return (
     <ErrorBoundaryProvider>
       <ErrorBoundary>
-        <Router>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AppProviders>
             <AppContent />
             <ContextMenu />

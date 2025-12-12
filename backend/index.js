@@ -26,119 +26,119 @@ let realtimeEventsService, realtimeController;
 
 try {
   express = require('express');
-  console.log('[STARTUP] ✓ express');
-} catch (e) { console.error('[STARTUP] ✗ express:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] express');
+} catch (e) { console.error('[STARTUP] [FAIL] express:', e.message); process.exit(1); }
 
 try {
   config = require('./src/config');
-  console.log('[STARTUP] ✓ config');
-} catch (e) { console.error('[STARTUP] ✗ config:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] config');
+} catch (e) { console.error('[STARTUP] [FAIL] config:', e.message); process.exit(1); }
 
 try {
   corsMiddleware = require('./src/middleware/cors');
-  console.log('[STARTUP] ✓ cors middleware');
-} catch (e) { console.error('[STARTUP] ✗ cors middleware:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] cors middleware');
+} catch (e) { console.error('[STARTUP] [FAIL] cors middleware:', e.message); process.exit(1); }
 
 try {
   const errorHandlerModule = require('./src/middleware/errorHandler.middleware');
   errorHandler = errorHandlerModule.errorHandler;
   notFoundHandler = errorHandlerModule.notFoundHandler;
   requestTimeout = errorHandlerModule.requestTimeout;
-  console.log('[STARTUP] ✓ errorHandler middleware');
-} catch (e) { console.error('[STARTUP] ✗ errorHandler middleware:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] errorHandler middleware');
+} catch (e) { console.error('[STARTUP] [FAIL] errorHandler middleware:', e.message); process.exit(1); }
 
 try {
   rateLimitMiddleware = require('./src/middleware/rateLimit');
-  console.log('[STARTUP] ✓ rateLimit middleware');
-} catch (e) { console.error('[STARTUP] ✗ rateLimit middleware:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] rateLimit middleware');
+} catch (e) { console.error('[STARTUP] [FAIL] rateLimit middleware:', e.message); process.exit(1); }
 
 try {
   activityLoggerMiddleware = require('./src/middleware/activityLogger.middleware').activityLoggerMiddleware;
-  console.log('[STARTUP] ✓ activityLogger middleware');
-} catch (e) { console.error('[STARTUP] ✗ activityLogger middleware:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] activityLogger middleware');
+} catch (e) { console.error('[STARTUP] [FAIL] activityLogger middleware:', e.message); process.exit(1); }
 
 try {
   languageMiddleware = require('./src/middleware/language.middleware').languageMiddleware;
-  console.log('[STARTUP] ✓ language middleware');
-} catch (e) { console.error('[STARTUP] ✗ language middleware:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] language middleware');
+} catch (e) { console.error('[STARTUP] [FAIL] language middleware:', e.message); process.exit(1); }
 
 try {
   responseLocalizationMiddleware = require('./src/utils/response.util').responseLocalizationMiddleware;
-  console.log('[STARTUP] ✓ response.util');
-} catch (e) { console.error('[STARTUP] ✗ response.util:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] response.util');
+} catch (e) { console.error('[STARTUP] [FAIL] response.util:', e.message); process.exit(1); }
 
 try {
   const loggerModule = require('./src/utils/logger');
   correlationMiddleware = loggerModule.correlationMiddleware;
   requestLogger = loggerModule.requestLogger;
   logger = loggerModule;
-  console.log('[STARTUP] ✓ logger');
-} catch (e) { console.error('[STARTUP] ✗ logger:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] logger');
+} catch (e) { console.error('[STARTUP] [FAIL] logger:', e.message); process.exit(1); }
 
 try {
   compressionMiddleware = require('./src/middleware/compression');
-  console.log('[STARTUP] ✓ compression middleware');
-} catch (e) { console.error('[STARTUP] ✗ compression middleware:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] compression middleware');
+} catch (e) { console.error('[STARTUP] [FAIL] compression middleware:', e.message); process.exit(1); }
 
 try {
   routes = require('./src/routes');
-  console.log('[STARTUP] ✓ routes');
-} catch (e) { console.error('[STARTUP] ✗ routes:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] routes');
+} catch (e) { console.error('[STARTUP] [FAIL] routes:', e.message); process.exit(1); }
 
 try {
   redisService = require('./src/services/redis.service');
-  console.log('[STARTUP] ✓ redis.service');
-} catch (e) { console.error('[STARTUP] ✗ redis.service:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] redis.service');
+} catch (e) { console.error('[STARTUP] [FAIL] redis.service:', e.message); process.exit(1); }
 
 try {
   activityLogService = require('./src/services/activityLog.service');
-  console.log('[STARTUP] ✓ activityLog.service');
-} catch (e) { console.error('[STARTUP] ✗ activityLog.service:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] activityLog.service');
+} catch (e) { console.error('[STARTUP] [FAIL] activityLog.service:', e.message); process.exit(1); }
 
 try {
   setupHealthCheck = require('./src/utils/health').setupHealthCheck;
-  console.log('[STARTUP] ✓ health util');
-} catch (e) { console.error('[STARTUP] ✗ health util:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] health util');
+} catch (e) { console.error('[STARTUP] [FAIL] health util:', e.message); process.exit(1); }
 
 try {
   queueService = require('./src/services/queue.service');
-  console.log('[STARTUP] ✓ queue.service');
-} catch (e) { console.error('[STARTUP] ✗ queue.service:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] queue.service');
+} catch (e) { console.error('[STARTUP] [FAIL] queue.service:', e.message); process.exit(1); }
 
 try {
   const emailWorker = require('./src/workers/email.worker');
   startEmailWorker = emailWorker.startEmailWorker;
   stopEmailWorker = emailWorker.stopEmailWorker;
-  console.log('[STARTUP] ✓ email.worker');
-} catch (e) { console.error('[STARTUP] ✗ email.worker:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] email.worker');
+} catch (e) { console.error('[STARTUP] [FAIL] email.worker:', e.message); process.exit(1); }
 
 try {
   const analysisWorker = require('./src/workers/analysis.worker');
   startAnalysisWorker = analysisWorker.startAnalysisWorker;
   stopAnalysisWorker = analysisWorker.stopAnalysisWorker;
-  console.log('[STARTUP] ✓ analysis.worker');
-} catch (e) { console.error('[STARTUP] ✗ analysis.worker:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] analysis.worker');
+} catch (e) { console.error('[STARTUP] [FAIL] analysis.worker:', e.message); process.exit(1); }
 
 try {
   getCircuitBreakerStates = require('./src/utils/circuitBreaker').getAllStates;
-  console.log('[STARTUP] ✓ circuitBreaker');
-} catch (e) { console.error('[STARTUP] ✗ circuitBreaker:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] circuitBreaker');
+} catch (e) { console.error('[STARTUP] [FAIL] circuitBreaker:', e.message); process.exit(1); }
 
 try {
   realtimeEventsService = require('./src/services/realtimeEvents.service');
-  console.log('[STARTUP] ✓ realtimeEvents.service');
-} catch (e) { console.error('[STARTUP] ✗ realtimeEvents.service:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] realtimeEvents.service');
+} catch (e) { console.error('[STARTUP] [FAIL] realtimeEvents.service:', e.message); process.exit(1); }
 
 try {
   realtimeController = require('./src/controllers/realtime.controller');
-  console.log('[STARTUP] ✓ realtime.controller');
-} catch (e) { console.error('[STARTUP] ✗ realtime.controller:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] realtime.controller');
+} catch (e) { console.error('[STARTUP] [FAIL] realtime.controller:', e.message); process.exit(1); }
 
 let envConfigService;
 try {
   envConfigService = require('./src/services/envConfig.service');
-  console.log('[STARTUP] ✓ envConfig.service');
-} catch (e) { console.error('[STARTUP] ✗ envConfig.service:', e.message); process.exit(1); }
+  console.log('[STARTUP] [SUCCESS] envConfig.service');
+} catch (e) { console.error('[STARTUP] [FAIL] envConfig.service:', e.message); process.exit(1); }
 
 console.log('[STARTUP] All dependencies loaded successfully!');
 
@@ -406,18 +406,18 @@ async function startServer() {
       // Initialize realtime events listener (Firestore -> SSE bridge)
       try {
         realtimeEventsService.initialize(realtimeController);
-        console.log('[STARTUP] ✓ Realtime events listener initialized');
+        console.log('[STARTUP] [SUCCESS] Realtime events listener initialized');
       } catch (realtimeError) {
-        console.warn('[STARTUP] ⚠ Realtime events listener failed:', realtimeError.message);
+        console.warn('[STARTUP] [WARNING] Realtime events listener failed:', realtimeError.message);
       }
       
       // Initialize environment config from Firestore (async, non-blocking)
       try {
         const envConfigHelper = require('./src/config/envConfigHelper');
         await envConfigHelper.loadFromFirestore();
-        console.log('[STARTUP] ✓ Environment config loaded from Firestore');
+        console.log('[STARTUP] [SUCCESS] Environment config loaded from Firestore');
       } catch (envError) {
-        console.warn('[STARTUP] ⚠ Environment config from Firestore failed, using process.env:', envError.message);
+        console.warn('[STARTUP] [WARNING] Environment config from Firestore failed, using process.env:', envError.message);
       }
       
       console.log('');
@@ -448,7 +448,7 @@ async function startServer() {
       // Log config warnings if any
       if (config.CONFIG_WARNINGS && config.CONFIG_WARNINGS.length > 0) {
         console.log('[WARNINGS]');
-        config.CONFIG_WARNINGS.forEach(w => console.log(`   ⚠️  ${w}`));
+        config.CONFIG_WARNINGS.forEach(w => console.log(`   [WARNING]  ${w}`));
         console.log('');
       }
       

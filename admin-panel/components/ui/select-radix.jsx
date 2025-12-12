@@ -10,11 +10,13 @@ const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) 
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'flex h-10 w-full items-center justify-between rounded-md border border-border',
-      'bg-surface px-3 py-2 text-sm',
+      'flex h-10 w-full items-center justify-between rounded-xl border border-border/40',
+      'bg-surface-secondary px-3 py-2 text-sm',
       'placeholder:text-muted-foreground',
-      'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+      'hover:bg-surface hover:border-border/60',
+      'focus:outline-none focus:bg-surface focus:border-[rgba(0,122,255,0.4)]',
       'disabled:cursor-not-allowed disabled:opacity-50',
+      'transition-all duration-[250ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]',
       '[&>span]:line-clamp-1',
       className
     )}
@@ -67,8 +69,8 @@ const SelectContent = React.forwardRef(({ className, children, position = 'poppe
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        'relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border',
-        'bg-surface text-primary shadow-md',
+        'relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-xl border border-border/30',
+        'bg-surface/95 backdrop-blur-xl text-primary shadow-dropdown',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
         'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
@@ -112,8 +114,9 @@ const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => 
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none',
-      'focus:bg-surface-secondary focus:text-primary',
+      'relative flex w-full cursor-pointer select-none items-center rounded-lg py-2 pl-8 pr-2 text-sm outline-none',
+      'hover:bg-surface-secondary/80 focus:bg-surface-secondary/80 focus:text-primary',
+      'transition-colors duration-150',
       'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className
     )}

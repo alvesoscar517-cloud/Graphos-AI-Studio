@@ -51,7 +51,7 @@ function loadCache() {
     
     return cache
   } catch (error) {
-    console.error('Error loading analysis cache:', error)
+    logger.error('Cache', 'Error loading analysis cache', error)
     return {}
   }
 }
@@ -61,7 +61,7 @@ function saveCache(cache) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(cache))
   } catch (error) {
-    console.error('Error saving analysis cache:', error)
+    logger.error('Cache', 'Error saving analysis cache', error)
   }
 }
 
@@ -80,13 +80,7 @@ export function getCachedAnalysis(noteId, text, type) {
   
   const result = cache[noteId]?.[textHash]?.[type]
   
-  if (result) {
-    logger.log(`[SUCCESS] Cache hit for ${type} on note ${noteId}`)
-    return result.data
-  }
-  
-  logger.log(`[FAIL] Cache miss for ${type} on note ${noteId}`)
-  return null
+  return result ? result.data : null
 }
 
 /**
@@ -116,7 +110,6 @@ export function setCachedAnalysis(noteId, text, type, data) {
   }
   
   saveCache(cache)
-  logger.log(`[SAVE] Cached ${type} result for note ${noteId}`)
 }
 
 /**
@@ -146,7 +139,6 @@ export function clearNoteCache(noteId) {
   const cache = loadCache()
   delete cache[noteId]
   saveCache(cache)
-  logger.log(`[TRASH] Cleared cache for note ${noteId}`)
 }
 
 /**
@@ -154,7 +146,6 @@ export function clearNoteCache(noteId) {
  */
 export function clearAllCache() {
   localStorage.removeItem(CACHE_KEY)
-  logger.log('[TRASH] Cleared all analysis cache')
 }
 
 /**

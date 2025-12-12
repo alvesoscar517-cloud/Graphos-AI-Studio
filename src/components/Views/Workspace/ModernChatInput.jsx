@@ -10,6 +10,9 @@ const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/we
 const SUPPORTED_DOC_TYPES = ['application/pdf', 'text/plain', 'text/csv', 'application/json']
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
+// Help prefix for app context detection
+const HELP_PREFIX = '[APP_HELP] '
+
 // Graphos AI Models
 const MODELS = [
   { id: 'gemini-2.5-flash-lite', name: 'Graphos Velocity' },
@@ -35,13 +38,18 @@ const ModernChatInput = ({
   const [attachments, setAttachments] = useState([])
   const [uploadError, setUploadError] = useState(null)
   const [showModelDropdown, setShowModelDropdown] = useState(false)
+  const [showPlusMenu, setShowPlusMenu] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [status, setStatus] = useState('ready') // ready, submitted, streaming
+  const [isHelpMode, setIsHelpMode] = useState(false) // Help mode for app context
   
   const textareaRef = useRef(null)
   const fileInputRef = useRef(null)
+  const imageInputRef = useRef(null)
   const modelDropdownRef = useRef(null)
   const modelButtonRef = useRef(null)
+  const plusButtonRef = useRef(null)
+  const plusMenuRef = useRef(null)
 
   // Speech Recognition
   const {
@@ -88,12 +96,16 @@ const ModernChatInput = ({
     }
   }, [uploadError])
 
-  // Close model dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (modelDropdownRef.current && !modelDropdownRef.current.contains(e.target) &&
           modelButtonRef.current && !modelButtonRef.current.contains(e.target)) {
         setShowModelDropdown(false)
+      }
+      if (plusMenuRef.current && !plusMenuRef.current.contains(e.target) &&
+          plusButtonRef.current && !plusButtonRef.current.contains(e.target)) {
+        setShowPlusMenu(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -105,16 +117,19 @@ const ModernChatInput = ({
   const handleSend = useCallback(() => {
     if ((message.trim() || attachments.length > 0) && !disabled && status === 'ready') {
       setStatus('submitted')
-      onSendMessage(message.trim(), attachments)
+      // Prepend help prefix if in help mode
+      const finalMessage = isHelpMode ? HELP_PREFIX + message.trim() : message.trim()
+      onSendMessage(finalMessage, attachments)
       setMessage('')
       setAttachments([])
+      setIsHelpMode(false) // Reset help mode after sending
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto'
       }
       // Reset status after a short delay
       setTimeout(() => setStatus('ready'), 500)
     }
-  }, [message, attachments, disabled, onSendMessage, status])
+  }, [message, attachments, disabled, onSendMessage, status, isHelpMode])
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -167,6 +182,13 @@ const ModernChatInput = ({
     
     setAttachments(prev => [...prev, ...newAttachments])
     e.target.value = ''
+    setShowPlusMenu(false)
+  }
+
+  const handleHelpClick = () => {
+    setIsHelpMode(true)
+    setShowPlusMenu(false)
+    textareaRef.current?.focus()
   }
 
   const handleRemoveAttachment = (index) => {
@@ -248,63 +270,58 @@ const ModernChatInput = ({
         </div>
       )}
 
-      {/* Attachments Preview */}
-      {attachments.length > 0 && (
-        <div className={cn(
-          "flex flex-wrap gap-2 p-3 mb-0",
-          "bg-bg-secondary rounded-t-2xl",
-          "border border-border-light border-b-0"
-        )}>
-          {attachments.map((attachment, index) => (
-            <div 
-              key={index} 
-              className={cn(
-                "flex items-center gap-2 py-1.5 px-2",
-                "bg-bg-primary border border-border-light rounded-lg",
-                "max-w-[200px]"
-              )}
-            >
-              {attachment.isImage ? (
-                <img 
-                  src={attachment.url} 
-                  alt={attachment.name} 
-                  className="w-10 h-10 object-cover rounded"
-                />
-              ) : (
-                <div className="w-10 h-10 flex items-center justify-center rounded bg-bg-hover">
-                  <Icon name="file-text" size="md" color="muted" />
-                </div>
-              )}
-              <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                <span className="text-xs text-text-primary truncate" title={attachment.name}>
-                  {attachment.name.length > 15 ? attachment.name.substring(0, 12) + '...' : attachment.name}
-                </span>
-                <span className="text-xs text-text-secondary">
-                  {formatFileSize(attachment.size)}
-                </span>
-              </div>
-              <button 
-                className={cn(
-                  "p-1 bg-transparent border-none cursor-pointer rounded",
-                  "opacity-50 flex items-center justify-center",
-                  "hover:opacity-100 hover:bg-bg-hover"
-                )}
-                onClick={() => handleRemoveAttachment(index)}
-              >
-                <Icon name="x" size="xs" color="muted" />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* Main Input Container - shadcn-io/ai style */}
       <div className={cn(
         "relative flex flex-col",
         "bg-bg-primary border border-border-light rounded-2xl",
-        "shadow-sm",
-        attachments.length > 0 && "rounded-t-none border-t-0"
+        "shadow-sm"
       )}>
+        {/* Attachments Preview - inside input container */}
+        {attachments.length > 0 && (
+          <div className="flex flex-wrap gap-2 px-4 pt-3 pb-0">
+            {attachments.map((attachment, index) => (
+              <div 
+                key={index} 
+                className={cn(
+                  "flex items-center gap-2 py-1.5 px-2",
+                  "bg-bg-secondary/50 border border-border-light/50 rounded-lg",
+                  "max-w-[200px]"
+                )}
+              >
+                {attachment.isImage ? (
+                  <img 
+                    src={attachment.url} 
+                    alt={attachment.name} 
+                    className="w-10 h-10 object-cover rounded"
+                  />
+                ) : (
+                  <div className="w-10 h-10 flex items-center justify-center rounded bg-bg-hover">
+                    <Icon name="file-text" size="md" color="muted" />
+                  </div>
+                )}
+                <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                  <span className="text-xs text-text-primary truncate">
+                    {attachment.name.length > 15 ? attachment.name.substring(0, 12) + '...' : attachment.name}
+                  </span>
+                  <span className="text-xs text-text-secondary">
+                    {formatFileSize(attachment.size)}
+                  </span>
+                </div>
+                <button 
+                  className={cn(
+                    "p-1 bg-transparent border-none cursor-pointer rounded",
+                    "opacity-50 flex items-center justify-center",
+                    "hover:opacity-100 hover:bg-bg-hover"
+                  )}
+                  onClick={() => handleRemoveAttachment(index)}
+                >
+                  <Icon name="x" size="xs" color="muted" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Textarea */}
         <textarea
           ref={textareaRef}
@@ -316,7 +333,7 @@ const ModernChatInput = ({
             "overflow-y-auto",
             "placeholder:text-text-muted/60"
           )}
-          placeholder={defaultPlaceholder}
+          placeholder={isHelpMode ? t('workspace.helpPlaceholder') : defaultPlaceholder}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -330,24 +347,127 @@ const ModernChatInput = ({
         <div className="flex items-center justify-between px-3 pb-3">
           {/* Left Tools */}
           <div className="flex items-center gap-0.5">
-            {/* Attach File Button */}
-            <button
-              type="button"
-              className={cn(
-                "inline-flex items-center justify-center gap-2",
-                "h-8 px-2 rounded-lg",
-                "text-text-muted hover:text-text-primary",
-                "hover:bg-bg-hover/80",
-                "transition-colors",
-                "disabled:opacity-50 disabled:pointer-events-none"
+            {/* Plus Menu Button */}
+            <div className="relative">
+              <button
+                ref={plusButtonRef}
+                type="button"
+                className={cn(
+                  "inline-flex items-center justify-center gap-2",
+                  "h-8 w-8 rounded-lg",
+                  "text-text-muted hover:text-text-primary",
+                  "hover:bg-bg-hover/80",
+                  "transition-colors",
+                  "disabled:opacity-50 disabled:pointer-events-none"
+                )}
+                onClick={() => setShowPlusMenu(!showPlusMenu)}
+                disabled={disabled}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+
+              {/* Plus Menu Dropdown */}
+              {showPlusMenu && createPortal(
+                <div 
+                  className="fixed inset-0 z-50"
+                  onClick={() => setShowPlusMenu(false)}
+                >
+                  <div 
+                    ref={plusMenuRef}
+                    className={cn(
+                      "absolute bg-bg-primary border border-border-light rounded-xl",
+                      "shadow-lg p-1.5 min-w-[180px]",
+                      "animate-fade-in"
+                    )}
+                    style={(() => {
+                      const buttonRect = plusButtonRef.current?.getBoundingClientRect()
+                      if (!buttonRect) return {}
+                      
+                      const dropdownHeight = 3 * 40 + 8
+                      const spaceBelow = window.innerHeight - buttonRect.bottom
+                      const shouldOpenUpward = spaceBelow < dropdownHeight + 20
+                      
+                      if (shouldOpenUpward) {
+                        return {
+                          bottom: window.innerHeight - buttonRect.top + 4,
+                          left: buttonRect.left
+                        }
+                      } else {
+                        return {
+                          top: buttonRect.bottom + 4,
+                          left: buttonRect.left
+                        }
+                      }
+                    })()}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Images Option */}
+                    <button
+                      className={cn(
+                        "w-full px-3 py-2 text-left rounded-lg",
+                        "flex items-center gap-3",
+                        "text-sm text-text-primary",
+                        "hover:bg-fill-tertiary",
+                        "transition-colors"
+                      )}
+                      onClick={() => {
+                        imageInputRef.current?.click()
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                        <circle cx="9" cy="9" r="2" />
+                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                      </svg>
+                      <span>{t('workspace.plusMenu.images')}</span>
+                    </button>
+
+                    {/* Files Option */}
+                    <button
+                      className={cn(
+                        "w-full px-3 py-2 text-left rounded-lg",
+                        "flex items-center gap-3",
+                        "text-sm text-text-primary",
+                        "hover:bg-fill-tertiary",
+                        "transition-colors"
+                      )}
+                      onClick={() => {
+                        fileInputRef.current?.click()
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                      <span>{t('workspace.plusMenu.files')}</span>
+                    </button>
+
+                    {/* Help Option - Info icon */}
+                    <button
+                      className={cn(
+                        "w-full px-3 py-2 text-left rounded-lg",
+                        "flex items-center gap-3",
+                        "text-sm text-text-primary",
+                        "hover:bg-fill-tertiary",
+                        "transition-colors"
+                      )}
+                      onClick={handleHelpClick}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                      <span>{t('workspace.plusMenu.help')}</span>
+                    </button>
+                  </div>
+                </div>,
+                document.body
               )}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={disabled}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-              </svg>
-            </button>
+            </div>
 
             {/* Voice Input Button */}
             {browserSupportsSpeechRecognition && (
@@ -371,6 +491,52 @@ const ModernChatInput = ({
                   <line x1="12" x2="12" y1="19" y2="22" />
                 </svg>
                 <span className="text-xs">{listening ? t('workspace.recording') : t('workspace.voice')}</span>
+              </button>
+            )}
+
+            {/* Help Mode Indicator */}
+            {isHelpMode && (
+              <button
+                type="button"
+                onClick={() => setIsHelpMode(false)}
+                className={cn(
+                  "inline-flex items-center gap-1.5",
+                  "h-8 px-3 rounded-lg",
+                  "bg-bg-hover text-text-primary",
+                  "hover:bg-bg-secondary",
+                  "transition-colors cursor-pointer",
+                  "group"
+                )}
+              >
+                <svg 
+                  width="14" 
+                  height="14" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4" />
+                  <path d="M12 8h.01" />
+                </svg>
+                <span className="text-xs">{t('workspace.plusMenu.help')}</span>
+                <svg 
+                  width="12" 
+                  height="12" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  className="text-text-muted group-hover:text-text-primary ml-0.5"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
               </button>
             )}
 
@@ -406,7 +572,7 @@ const ModernChatInput = ({
                       ref={modelDropdownRef}
                       className={cn(
                         "absolute bg-bg-primary border border-border-light rounded-xl",
-                        "shadow-lg py-1 min-w-[180px]",
+                        "shadow-lg p-1.5 min-w-[180px]",
                         "animate-fade-in"
                       )}
                       style={(() => {
@@ -439,10 +605,10 @@ const ModernChatInput = ({
                         <button
                           key={model.id}
                           className={cn(
-                            "w-full px-3 py-2 text-left",
+                            "w-full px-3 py-2 text-left rounded-lg",
                             "flex items-center justify-between",
                             "text-sm text-text-primary",
-                            "hover:bg-bg-hover",
+                            "hover:bg-fill-tertiary",
                             "transition-colors"
                           )}
                           onClick={() => {
@@ -495,12 +661,20 @@ const ModernChatInput = ({
         </div>
       </div>
 
-      {/* Hidden File Input */}
+      {/* Hidden File Inputs */}
+      <input
+        ref={imageInputRef}
+        type="file"
+        multiple
+        accept={SUPPORTED_IMAGE_TYPES.join(',')}
+        className="hidden"
+        onChange={handleFileSelect}
+      />
       <input
         ref={fileInputRef}
         type="file"
         multiple
-        accept={[...SUPPORTED_IMAGE_TYPES, ...SUPPORTED_DOC_TYPES].join(',')}
+        accept={SUPPORTED_DOC_TYPES.join(',')}
         className="hidden"
         onChange={handleFileSelect}
       />

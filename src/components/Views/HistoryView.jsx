@@ -10,6 +10,7 @@ import { truncateTitleByWords } from '../../utils/titleUtils'
 import modal from '../../utils/modal'
 
 import LinkGooglePrompt from '../Auth/LinkGooglePrompt'
+import { SkeletonHistoryRow } from '../ui/skeleton'
 import { cn } from '../../lib/utils'
 import { createPortal } from 'react-dom'
 
@@ -105,13 +106,14 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
 
   const formatTimeAgo = useCallback((date) => {
     const now = new Date()
-    const diffMs = now - date
+    const dateObj = date instanceof Date ? date : new Date(date)
+    const diffMs = now.getTime() - dateObj.getTime()
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
     const diffDays = Math.floor(diffHours / 24)
     if (diffHours < 1) return t('common.justNow')
     if (diffHours < 24) return t('common.hoursAgo', { count: diffHours })
     if (diffDays < 7) return t('common.daysAgo', { count: diffDays })
-    return date.toLocaleDateString()
+    return dateObj.toLocaleDateString()
   }, [t])
 
   const searchRegex = useMemo(() => {
@@ -124,9 +126,13 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const allItems = useMemo(() => {
     const items = []
     notes.forEach(note => {
+      // Fallback title for notes: use first content or "Untitled"
+      const noteTitle = note.title?.trim() || 
+        (note.content?.trim()?.split(/[.!?\n]/)[0]?.slice(0, 50)) || 
+        t('common.untitled', 'Untitled')
       items.push({
         id: note.id,
-        title: note.title,
+        title: noteTitle,
         type: note.type === 'chat' ? 'chat' : 'text',
         updated: note.updated,
         source: note.driveId ? 'drive' : 'local',
@@ -134,23 +140,24 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       })
     })
     conversations.forEach(conv => {
+      // Fallback title for conversations: use first message or "New Chat"
+      const convTitle = conv.title?.trim() || 
+        (conv.messages?.[0]?.content?.trim()?.split(/[.!?\n]/)[0]?.slice(0, 50)) || 
+        t('workspace.newChat', 'New Chat')
       items.push({
         id: conv.id,
-        title: conv.title,
+        title: convTitle,
         type: 'chat',
         updated: new Date(conv.updated),
         source: conv.driveId ? 'drive' : 'local',
         data: conv
       })
     })
-    // Debug log
-    logger.log('[HistoryView] allItems:', items.length, 'drive:', items.filter(i => i.source === 'drive').length, 'local:', items.filter(i => i.source === 'local').length)
     return items
   }, [notes, conversations])
 
   const filteredItems = useMemo(() => {
-    logger.log('[HistoryView] Filtering with filterSource:', filterSource)
-    const result = allItems.filter(item => {
+    return allItems.filter(item => {
       const matchesSearch = !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesType = filterType === 'all' || 
                          (filterType === 'text' && item.type === 'text') ||
@@ -160,8 +167,6 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                            (filterSource === 'local' && item.source === 'local')
       return matchesSearch && matchesType && matchesSource
     })
-    logger.log('[HistoryView] filteredItems count:', result.length)
-    return result
   }, [allItems, searchTerm, filterType, filterSource])
 
   const sortedItems = useMemo(() => {
@@ -353,7 +358,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
               alt={item.type === 'chat' ? "Chat" : "Text"} 
               className="w-5 h-5 opacity-55 shrink-0 icon-invert"
             />
-            <span className="overflow-hidden text-ellipsis whitespace-nowrap" title={item.title}>
+            <span className="overflow-hidden text-ellipsis whitespace-nowrap">
               <HighlightText text={truncateTitleByWords(item.title, 7)} searchTerm={searchTerm} regex={searchRegex} />
             </span>
           </div>
@@ -611,10 +616,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                     <div className="relative inline-block" ref={sourceDropdownRef}>
                       <button 
                         className="toolbar-btn min-w-28 max-lg:min-w-0 max-lg:px-2"
-                        onClick={() => {
-                          logger.log('[HistoryView] Toggle dropdown, current:', isSourceDropdownOpen)
-                          setIsSourceDropdownOpen(!isSourceDropdownOpen)
-                        }}
+                        onClick={() => setIsSourceDropdownOpen(!isSourceDropdownOpen)}
                       >
                         <span className="max-xl:hidden">{filterSource === 'all' ? t('history.allSources') : filterSource === 'drive' ? t('history.driveOnly') : t('history.localOnly')}</span>
                         <span className="xl:hidden">{filterSource === 'all' ? t('history.all') : filterSource === 'drive' ? t('history.drive') : t('history.local')}</span>
@@ -624,20 +626,17 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                       </button>
                       {isSourceDropdownOpen && (
                         <div 
-                          className="absolute top-full left-0 mt-1 bg-bg-secondary border border-border rounded-lg shadow-lg z-[100] animate-fade-in overflow-hidden min-w-full"
+                          className="absolute top-full left-0 mt-1 bg-bg-secondary border border-border rounded-xl shadow-lg z-[100] animate-fade-in p-1.5 min-w-full"
                         >
-                          {['all', 'drive', 'local'].map((source, index, arr) => (
+                          {['all', 'drive', 'local'].map((source) => (
                             <button 
                               key={source}
                               className={cn(
-                                "block w-full py-2.5 px-4 bg-transparent border-none text-left text-sm text-text-secondary cursor-pointer transition-all duration-100 font-normal whitespace-nowrap",
-                                "hover:bg-bg-tertiary hover:text-text-primary",
-                                filterSource === source && "bg-primary/10 text-primary font-medium hover:bg-primary/15",
-                                index === 0 && "rounded-t-lg",
-                                index === arr.length - 1 && "rounded-b-lg"
+                                "block w-full py-2 px-3 bg-transparent border-none text-left text-sm cursor-pointer transition-all duration-100 whitespace-nowrap rounded-lg",
+                                "hover:bg-fill-tertiary",
+                                filterSource === source ? "text-text-primary font-medium" : "text-text-secondary font-normal"
                               )}
                               onClick={() => { 
-                                logger.log('[HistoryView] Setting filterSource to:', source);
                                 setFilterSource(source); 
                                 setIsSourceDropdownOpen(false) 
                               }}
@@ -658,10 +657,12 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           )}
 
           {/* Table Container */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] pr-0 scrollbar-thin-hover min-h-0 max-md:pr-0">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] pr-0 min-h-0 max-md:pr-0">
             {loading ? (
-              <div className="flex flex-col items-center justify-center py-10 px-5 text-center min-h-96 flex-1">
-                <p className="text-sm text-text-secondary mb-8 leading-relaxed max-w-modal-sm">{t('history.loadingFromDrive')}</p>
+              <div className="pt-2">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <SkeletonHistoryRow key={i} />
+                ))}
               </div>
             ) : needsReauth ? (
               <div className="flex flex-col items-center justify-center py-10 px-5 text-center min-h-96 flex-1">

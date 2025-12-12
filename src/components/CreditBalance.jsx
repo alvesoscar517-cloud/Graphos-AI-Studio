@@ -9,6 +9,7 @@ import { useCredits } from '@/hooks/queries'
 import { queryKeys } from '@/lib/queryKeys'
 import realtimeService from '@/services/realtimeService'
 import { useIsAuthenticated } from '@/stores/authStore'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
 const CreditBalance = ({ userId, onUpgradeClick }) => {
@@ -52,7 +53,7 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
     <div className="px-5 pb-3.5 text-center">
       <div className="mb-3 py-1.5 px-3.5 inline-block">
         {isLoading ? (
-          <span className="text-sm text-text-secondary animate-pulse">{t('common.loading')}</span>
+          <Skeleton className="h-4 w-32 rounded mx-auto" />
         ) : (
           <span className={cn(
             "text-sm tracking-wide text-text-secondary",

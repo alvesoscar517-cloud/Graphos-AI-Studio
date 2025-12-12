@@ -265,10 +265,12 @@ exports.getCreditHistorySummary = async (req, res) => {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - parseInt(days));
     
+    // Query without timestamp filter first (to avoid index issues)
+    // Then filter in memory
     const transactionsSnapshot = await db.collection('credit_transactions')
       .where('userId', '==', user_id)
-      .where('timestamp', '>=', startDate.toISOString())
-      .where('timestamp', '<=', endDate.toISOString())
+      .orderBy('timestamp', 'desc')
+      .limit(500) // Limit to avoid memory issues
       .get();
     
     // Calculate summary
@@ -282,6 +284,24 @@ exports.getCreditHistorySummary = async (req, res) => {
     
     transactionsSnapshot.docs.forEach(doc => {
       const data = doc.data();
+      
+      // Parse timestamp - handle both string and Firestore Timestamp
+      let txDate;
+      if (data.timestamp) {
+        if (typeof data.timestamp === 'string') {
+          txDate = new Date(data.timestamp);
+        } else if (data.timestamp.toDate) {
+          txDate = data.timestamp.toDate();
+        } else {
+          txDate = new Date(data.timestamp);
+        }
+      }
+      
+      // Filter by date range in memory
+      if (txDate && (txDate < startDate || txDate > endDate)) {
+        return; // Skip transactions outside date range
+      }
+      
       summary.totalTransactions++;
       
       const amount = Math.abs(data.amount || 0);
@@ -301,7 +321,7 @@ exports.getCreditHistorySummary = async (req, res) => {
       }
       
       // Group by day
-      const day = data.timestamp?.split('T')[0] || 'unknown';
+      const day = txDate ? txDate.toISOString().split('T')[0] : 'unknown';
       if (!summary.byDay[day]) {
         summary.byDay[day] = { deducted: 0, added: 0 };
       }

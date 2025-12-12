@@ -353,7 +353,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
             <img src="/icon/lemonsqueezy-with-name.svg" alt="Lemon Squeezy" className="h-4 w-auto opacity-90 icon-invert" />
           </div>
           <div className="flex items-center gap-1.5 text-text-muted text-xs">
-            <img src="/icon/credit-card.svg" alt="Card" title={t('billing.creditDebitCard')} className="w-3.5 h-3.5 opacity-50 icon-invert" />
+            <img src="/icon/credit-card.svg" alt="Card" data-tooltip={t('billing.creditDebitCard')} className="w-3.5 h-3.5 opacity-50 icon-invert" />
             <span className="opacity-70">{t('billing.paymentMethods')}</span>
           </div>
         </div>

@@ -10,6 +10,7 @@
  */
 
 import { CONFIG } from '../utils/config'
+import { logger } from '../utils/logger'
 import {
   secureGet,
   secureSet,
@@ -18,6 +19,7 @@ import {
   clearTokens as clearStorageTokens,
   setTokens as setStorageTokens,
   getAuthMethod,
+  getUserData,
 } from '../utils/authStorage'
 
 const API_BASE_URL = CONFIG.API_BASE_URL || 'https://graphosai-472729326429.us-central1.run.app'
@@ -248,13 +250,18 @@ class TokenService {
    */
   async getValidToken() {
     const currentToken = this.getAccessToken()
-    if (!currentToken) {
+    
+    // Validate token is a proper string (JWT should contain dots)
+    if (!currentToken || typeof currentToken !== 'string' || !currentToken.includes('.')) {
       return null
     }
 
     if (this.needsRefresh() && this.hasRefreshToken()) {
       const newToken = await this.refreshAccessToken()
-      return newToken || currentToken
+      if (newToken && typeof newToken === 'string' && newToken.includes('.')) {
+        return newToken
+      }
+      return currentToken
     }
 
     return currentToken
@@ -274,7 +281,7 @@ class TokenService {
       try {
         callback(event)
       } catch (error) {
-        console.error('[TokenService] Listener error:', error)
+        logger.error('TokenService', 'Listener error', error)
       }
     })
   }
@@ -310,12 +317,11 @@ class TokenService {
    * If inconsistent, clears auth and triggers re-login
    */
   validateAuthState() {
-    const { getUserData } = require('../utils/authStorage')
     const token = this.getAccessToken()
     const userData = getUserData()
     
     if (token && !userData) {
-      console.warn('[TokenService] Auth state inconsistent: token exists but no user data')
+      logger.warn('TokenService', 'Auth state inconsistent: token exists but no user data')
       // Clear tokens and trigger re-login
       this.clearTokens()
       this.notifyListeners('session_expired')

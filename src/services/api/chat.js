@@ -22,7 +22,7 @@ async function getAuthHeaders() {
     }
   } else {
     // No token available - dispatch session expired event
-    console.error('[CHAT] No auth token available')
+    logger.error('Chat', 'No auth token available')
     window.dispatchEvent(new CustomEvent('sessionExpired', {
       detail: { message: 'Please sign in to continue.' }
     }))
@@ -90,7 +90,7 @@ export async function sendChatMessageStream(
   const { onContext, onComplete, conversationSummary } = options
   
   try {
-    logger.log('📡 Sending chat stream request...')
+    logger.log('[API] Sending chat stream request...')
     
     const headers = await getAuthHeaders()
     const userInfo = await getUserInfo()
@@ -116,7 +116,7 @@ export async function sendChatMessageStream(
       
       // Handle 401 - session expired
       if (response.status === 401) {
-        console.error('[CHAT] 401 Unauthorized - session expired')
+        logger.error('Chat', '401 Unauthorized - session expired')
         window.dispatchEvent(new CustomEvent('sessionExpired', {
           detail: { message: 'Your session has expired. Please sign in again.' }
         }))
@@ -129,7 +129,7 @@ export async function sendChatMessageStream(
       }
     }
     
-    logger.log('📡 Response received, starting to read stream...')
+    logger.log('[API] Response received, starting to read stream...')
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
@@ -141,15 +141,15 @@ export async function sendChatMessageStream(
       const { done, value } = await reader.read()
       
       if (done) {
-        logger.log('📡 Stream ended, total chunks received:', chunkCount)
-        logger.log('📡 Remaining buffer:', buffer)
+        logger.log('[API] Stream ended, total chunks received:', chunkCount)
+        logger.log('[API] Remaining buffer:', buffer)
         break
       }
       
       // Decode chunk and add to buffer
       const decoded = decoder.decode(value, { stream: true })
       buffer += decoded
-      logger.log('📡 Raw chunk received:', decoded.substring(0, 100))
+      logger.log('[API] Raw chunk received:', decoded.substring(0, 100))
       
       // Process complete lines
       const lines = buffer.split('\n')
@@ -160,17 +160,15 @@ export async function sendChatMessageStream(
           const data = line.slice(6).trim()
           
           if (data === '[DONE]') {
-            logger.log('📡 Received [DONE] signal')
-            if (onComplete) {
-              onComplete({ summary, outputTokens })
-            }
+            logger.log('[API] Received [DONE] signal')
+            // onComplete already called in 'complete' type handler
             return { success: true, summary, outputTokens }
           }
           
           if (data) {
             try {
               const json = JSON.parse(data)
-              logger.log('📡 Parsed JSON type:', json.type || (json.chunk ? 'chunk' : 'unknown'))
+              logger.log('[API] Parsed JSON type:', json.type || (json.chunk ? 'chunk' : 'unknown'))
               
               // Handle different message types
               if (json.type === 'context' && onContext) {
@@ -178,11 +176,15 @@ export async function sendChatMessageStream(
               } else if (json.type === 'complete') {
                 summary = json.summary
                 outputTokens = json.outputTokens
+                // Pass suggestions to onComplete callback
+                if (onComplete) {
+                  onComplete({ summary, outputTokens, suggestions: json.suggestions })
+                }
               } else if (json.chunk) {
                 chunkCount++
                 onChunk(json.chunk)
               } else if (json.error) {
-                console.error('[FAIL] Server error:', json.error)
+                logger.error('Chat', `Server error: ${json.error}`)
                 throw {
                   code: json.code || 'INTERNAL_ERROR',
                   message: json.error,
@@ -191,7 +193,7 @@ export async function sendChatMessageStream(
               }
             } catch (e) {
               if (e.code) throw e // Re-throw formatted errors
-              console.warn('[WARNING] Failed to parse JSON:', data, e)
+              logger.warn('Chat', `Failed to parse JSON: ${data}`)
             }
           }
         }
@@ -200,7 +202,7 @@ export async function sendChatMessageStream(
     
     return { success: true, summary, outputTokens }
   } catch (error) {
-    console.error('[FAIL] Error streaming chat:', error)
+    logger.error('Chat', 'Error streaming chat', error)
     const errorMessage = formatErrorMessage(error)
     throw new Error(errorMessage)
   }
@@ -239,7 +241,7 @@ export async function sendChatMessage(
     
     return data
   } catch (error) {
-    console.error('[FAIL] Error sending chat:', error)
+    logger.error('Chat', 'Error sending chat', error)
     throw new Error(formatErrorMessage(error))
   }
 }
@@ -261,7 +263,7 @@ export async function uploadChatFile(base64Data, mimeType, fileName) {
     
     return data
   } catch (error) {
-    console.error('[FAIL] Error uploading file:', error)
+    logger.error('Chat', 'Error uploading file', error)
     throw new Error(formatErrorMessage(error))
   }
 }
@@ -276,7 +278,7 @@ export async function summarizeConversation(messages) {
     const { data } = await apiClient.post('/api/chat/summarize', { messages })
     return data
   } catch (error) {
-    console.error('[FAIL] Error summarizing:', error)
+    logger.error('Chat', 'Error summarizing', error)
     throw new Error(formatErrorMessage(error))
   }
 }
@@ -323,7 +325,7 @@ export async function sendHumanizedChatStream(
   const { onContext, onComplete, onHumanized, onHumanizing, conversationSummary } = options
   
   try {
-    logger.log('📡 Sending humanized chat stream request...')
+    logger.log('[API] Sending humanized chat stream request...')
     
     const headers = await getAuthHeaders()
     const userInfo = await getUserInfo()
@@ -397,6 +399,10 @@ export async function sendHumanizedChatStream(
                 summary = json.summary
                 outputTokens = json.outputTokens
                 humanizationResult = json.humanization
+                // Pass suggestions to onComplete callback
+                if (onComplete) {
+                  onComplete({ summary, outputTokens, humanization: humanizationResult, suggestions: json.suggestions })
+                }
               } else if (json.chunk) {
                 onChunk(json.chunk)
               } else if (json.error) {
@@ -408,7 +414,7 @@ export async function sendHumanizedChatStream(
               }
             } catch (e) {
               if (e.code) throw e
-              console.warn('[WARNING] Failed to parse JSON:', data, e)
+              logger.warn('Chat', `Failed to parse JSON: ${data}`)
             }
           }
         }
@@ -417,7 +423,7 @@ export async function sendHumanizedChatStream(
     
     return { success: true, summary, outputTokens, humanization: humanizationResult }
   } catch (error) {
-    console.error('[FAIL] Error streaming humanized chat:', error)
+    logger.error('Chat', 'Error streaming humanized chat', error)
     throw new Error(formatErrorMessage(error))
   }
 }

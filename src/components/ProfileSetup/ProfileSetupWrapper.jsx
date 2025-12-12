@@ -26,9 +26,6 @@ const LoadingSkeleton = () => {
 }
 
 const ProfileSetupWrapper = () => {
-  // TODO: Remove this test error after testing error reporting
-  throw new Error('Test error for error reporting feature')
-  
   return (
     <Suspense fallback={<LoadingSkeleton />}>
       <ProfileSetup />

@@ -10,9 +10,9 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
       id: 'gemini-2.5-flash-lite',
       name: 'Graphos Velocity',
       speed: { icon: '/icon/gauge.svg', text: t('model.ultraFast') },
-      description: t('model.geminiFlashLite'),
+      description: t('model.velocityDesc'),
       details: [
-        { icon: '/icon/file-text.svg', text: t('model.shortText') },
+        { icon: '/icon/zap.svg', text: t('model.shortText') },
         { icon: '/icon/dollar-sign.svg', text: t('model.lowCost') }
       ],
       iconName: 'audio-lines'
@@ -21,7 +21,7 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
       id: 'gemini-2.5-flash',
       name: 'Graphos Hyper',
       speed: { icon: '/icon/gauge.svg', text: t('model.fast') },
-      description: t('model.geminiFlash'),
+      description: t('model.hyperDesc'),
       details: [
         { icon: '/icon/layers.svg', text: t('model.versatile') },
         { icon: '/icon/star.svg', text: t('model.recommended') }
@@ -32,9 +32,9 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
       id: 'gemini-2.5-pro',
       name: 'Graphos Zenith',
       speed: { icon: '/icon/gauge.svg', text: t('model.slower') },
-      description: t('model.geminiPro'),
+      description: t('model.zenithDesc'),
       details: [
-        { icon: '/icon/award.svg', text: t('model.importantText') },
+        { icon: '/icon/briefcase.svg', text: t('model.importantText') },
         { icon: '/icon/trending-up.svg', text: t('model.highQuality') }
       ],
       iconName: 'audio-lines'

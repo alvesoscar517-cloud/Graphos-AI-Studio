@@ -213,7 +213,7 @@ export function RealtimeProvider({ children }) {
             const amount = data.order.amount || data.order.price || 0;
             const productName = data.order.productName || data.order.product || 'Credits';
             showToast.success(
-              `💰 New purchase: ${productName} ($${amount.toFixed(2)})`,
+              `[MONEY] New purchase: ${productName} ($${amount.toFixed(2)})`,
               { duration: 6000 }
             );
           }

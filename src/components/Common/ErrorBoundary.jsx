@@ -6,6 +6,7 @@
 import { Component } from 'react'
 import ErrorPage from './ErrorPage'
 import ErrorBoundaryContext from '../../contexts/ErrorBoundaryContext'
+import { ErrorReportButton } from './ErrorReportButton'
 
 export class ErrorBoundary extends Component {
   static contextType = ErrorBoundaryContext
@@ -84,9 +85,6 @@ export class ErrorBoundary extends Component {
  * Query Error Fallback - for TanStack Query errors
  */
 export function QueryErrorFallback({ error, resetErrorBoundary, t }) {
-  // Lazy import to avoid circular dependency
-  const ErrorReportButton = require('./ErrorReportButton').ErrorReportButton
-  
   return (
     <div className="p-4 text-center">
       <p className="text-red-500 mb-2">{t?.('errorBoundary.failedToLoadData') || 'Failed to load data'}</p>

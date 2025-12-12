@@ -395,14 +395,22 @@ const ProfileSetup = () => {
 
   return (
     <div className={cn(
-      "fixed inset-0 bg-gray-100 flex items-center justify-center p-5 overflow-hidden z-modal-backdrop",
+      "fixed inset-0 bg-gray-100 flex items-center justify-center p-5 z-modal-backdrop",
       "bg-[radial-gradient(at_20%_25%,hsla(240,80%,90%,0.8)_0px,transparent_50%),radial-gradient(at_80%_15%,hsla(320,70%,92%,0.7)_0px,transparent_50%),radial-gradient(at_50%_50%,hsla(200,60%,94%,0.6)_0px,transparent_55%),radial-gradient(at_10%_80%,hsla(280,50%,91%,0.5)_0px,transparent_50%),radial-gradient(at_90%_75%,hsla(180,50%,93%,0.6)_0px,transparent_55%)]",
-      "before:content-[''] before:absolute before:inset-0 before:bg-white/25 before:z-0"
+      "before:content-[''] before:absolute before:inset-0 before:bg-white/25 before:z-0",
+      // Desktop: no scroll on outer container
+      "overflow-hidden",
+      // Tablet portrait & mobile: allow outer scroll
+      "max-lg:overflow-y-auto max-lg:items-start max-lg:py-8"
     )}>
       <div className={cn(
-        "w-10/12 max-w-modal-2xl h-[85vh] bg-white/75 backdrop-blur-2xl",
+        "w-10/12 max-w-modal-2xl bg-white/75 backdrop-blur-2xl",
         "border border-white/30 rounded-3xl shadow-lg",
-        "overflow-hidden animate-slide-in relative z-base"
+        "overflow-hidden animate-slide-in relative z-base",
+        // Desktop: fixed height with internal scroll
+        "h-[85vh]",
+        // Tablet portrait & mobile: auto height, let outer container scroll
+        "max-lg:h-auto max-lg:max-h-[95vh] max-lg:overflow-y-auto max-lg:scrollbar-hidden"
       )}>
         {/* Progress Bar */}
         <div className="py-[30px] px-10 pb-5 bg-transparent" role="progressbar" aria-valuenow={currentStep} aria-valuemin={1} aria-valuemax={4} aria-label={`Progress: Step ${currentStep} of 4`}>
@@ -586,7 +594,18 @@ const ProfileSetup = () => {
 
       {/* Auto-save indicator */}
       {lastSavedAt && currentStep < 4 && (
-        <div className="fixed bottom-6 right-6 z-modal-backdrop flex items-center gap-1.5 py-1.5 px-3 bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 text-xs text-gray-600" data-tooltip={t('profileSetup.autoSavingDraft')}>
+        <div
+          className={cn(
+            'fixed z-toast flex items-center gap-1.5 py-1.5 px-3',
+            'bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200',
+            'text-xs text-gray-600',
+            // Desktop: bottom right
+            'bottom-6 right-6',
+            // Tablet/mobile: top right to avoid being hidden by modal
+            'max-lg:bottom-auto max-lg:top-4 max-lg:right-4'
+          )}
+          data-tooltip={t('profileSetup.autoSavingDraft')}
+        >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-success">
             <polyline points="20 6 9 17 4 12"/>
           </svg>

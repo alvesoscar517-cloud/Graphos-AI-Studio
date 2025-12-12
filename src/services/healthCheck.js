@@ -55,7 +55,6 @@ class HealthCheckService {
       this.check();
     }, interval);
 
-    logger.log('[HealthCheck] Started with interval:', interval);
   }
 
   /**
@@ -66,7 +65,6 @@ class HealthCheckService {
       clearInterval(this.checkInterval);
       this.checkInterval = null;
     }
-    logger.log('[HealthCheck] Stopped');
   }
 
   /**
@@ -115,8 +113,6 @@ class HealthCheckService {
           this._notifyStatusChange();
         }
 
-        logger.log('[HealthCheck] Healthy', { latency, version: data.version });
-
         return { healthy: true, latency, info: data };
       } else {
         throw new Error(`HTTP ${response.status}`);
@@ -139,11 +135,7 @@ class HealthCheckService {
         this._notifyStatusChange();
       }
 
-      console.warn('[HealthCheck] Failed', { 
-        error: error.message, 
-        latency,
-        consecutiveFailures: this.consecutiveFailures 
-      });
+      logger.warn('HealthCheck', `Failed: ${error.message}, latency: ${latency}ms, failures: ${this.consecutiveFailures}`);
 
       return { healthy: false, latency, error: error.message };
     } finally {
@@ -225,13 +217,11 @@ class HealthCheckService {
   // ============================================================================
 
   _notifyStatusChange() {
-    logger.log('[HealthCheck] Status changed:', this.status);
-    
     this.listeners.forEach(callback => {
       try {
         callback(this.status, this.getStatus());
       } catch (error) {
-        console.error('[HealthCheck] Listener error:', error);
+        logger.error('HealthCheck', 'Listener error', error);
       }
     });
 
@@ -262,7 +252,6 @@ if (typeof document !== 'undefined') {
 
   // Check on network recovery
   window.addEventListener('online', () => {
-    logger.log('[HealthCheck] Network online, checking...');
     healthCheckService.check();
   });
 }

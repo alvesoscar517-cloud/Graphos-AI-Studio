@@ -1,42 +1,23 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 
 const TextScramble = ({ children, className = '' }) => {
   const [displayText, setDisplayText] = useState('')
   const frameRef = useRef(0)
+  const rafRef = useRef(null)
   const queueRef = useRef([])
   const resolveRef = useRef(null)
+  const isMountedRef = useRef(true)
   const targetText = typeof children === 'string' ? children : ''
 
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
-  const randomChar = () => {
+  const randomChar = useCallback(() => {
     return chars[Math.floor(Math.random() * chars.length)]
-  }
+  }, [])
 
-  const setText = (newText) => {
-    const oldText = displayText
-    const length = Math.max(oldText.length, newText.length)
-    const promise = new Promise((resolve) => {
-      resolveRef.current = resolve
-    })
+  const update = useCallback(() => {
+    if (!isMountedRef.current) return
 
-    queueRef.current = []
-    
-    for (let i = 0; i < length; i++) {
-      const from = oldText[i] || ''
-      const to = newText[i] || ''
-      const start = i * 3
-      const end = start + 15
-      queueRef.current.push({ from, to, start, end })
-    }
-
-    cancelAnimationFrame(frameRef.current)
-    frameRef.current = 0
-    update()
-    return promise
-  }
-
-  const update = () => {
     let output = ''
     let complete = 0
 
@@ -65,18 +46,50 @@ const TextScramble = ({ children, className = '' }) => {
       }
     } else {
       frameRef.current++
-      requestAnimationFrame(update)
+      rafRef.current = requestAnimationFrame(update)
     }
-  }
+  }, [randomChar])
+
+  const setText = useCallback((newText) => {
+    const oldText = displayText
+    const length = Math.max(oldText.length, newText.length)
+    const promise = new Promise((resolve) => {
+      resolveRef.current = resolve
+    })
+
+    queueRef.current = []
+    
+    for (let i = 0; i < length; i++) {
+      const from = oldText[i] || ''
+      const to = newText[i] || ''
+      const start = i * 3
+      const end = start + 15
+      queueRef.current.push({ from, to, start, end })
+    }
+
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current)
+    }
+    frameRef.current = 0
+    update()
+    return promise
+  }, [displayText, update])
 
   useEffect(() => {
+    isMountedRef.current = true
+    
     const timer = setTimeout(() => {
-      setText(targetText)
+      if (isMountedRef.current) {
+        setText(targetText)
+      }
     }, 100)
 
     return () => {
+      isMountedRef.current = false
       clearTimeout(timer)
-      cancelAnimationFrame(frameRef.current)
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
+      }
     }
   }, [targetText])
 

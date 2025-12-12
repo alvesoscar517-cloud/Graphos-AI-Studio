@@ -28,6 +28,7 @@ import {
   secureGet,
   AUTH_STORAGE_KEYS,
   migrateToSecureStorage,
+  setRememberMe,
 } from '../utils/authStorage'
 import { logError } from '../utils/errors'
 import { saveCredentials, preventAutoSignIn } from '../utils/credentialManager'
@@ -124,6 +125,16 @@ export const useAuthStore = create(
             const storedToken = secureGet(AUTH_STORAGE_KEYS.AUTH_TOKEN)
             const storedMethod = getStorageAuthMethod()
             const storedUser = getUserData()
+            
+            // If Zustand restored isAuthenticated but no token, clear auth
+            // This prevents inconsistent state
+            const currentState = get()
+            if (currentState.isAuthenticated && !storedToken) {
+              logger.warn('Auth', 'Zustand restored auth but no token found, clearing')
+              get()._clearAuth()
+              set({ isLoading: false })
+              return
+            }
             
             if (storedToken && storedMethod === 'email' && storedUser) {
               // Set authenticated state immediately
@@ -247,12 +258,8 @@ export const useAuthStore = create(
             secureSet(AUTH_STORAGE_KEYS.USER_ID, data.user.userId)
             setStorageAuthMethod('email')
             
-            // Store remember me preference
-            if (rememberMe) {
-              secureSet(AUTH_STORAGE_KEYS.REMEMBER_ME, 'true')
-            } else {
-              localStorage.removeItem(AUTH_STORAGE_KEYS.REMEMBER_ME)
-            }
+            // Store remember me preference FIRST (determines which storage to use)
+            setRememberMe(rememberMe)
             
             // Use tokenService for token management
             // Backend now handles expiry based on rememberMe
@@ -447,7 +454,16 @@ export const useAuthStore = create(
               throw new Error(data.error || 'Failed to change password')
             }
             
-            return { success: true }
+            // If backend signals requireRelogin, force logout
+            // This is industry standard - all sessions are revoked after password change
+            if (data.requireRelogin) {
+              logger.log('[AUTH] Password changed, forcing re-login (all sessions revoked)')
+              // Clear tokens and auth state
+              tokenService.clearTokens()
+              get()._clearAuth()
+            }
+            
+            return { success: true, requireRelogin: data.requireRelogin }
           } catch (error) {
             logError(error, { context: 'changePassword' })
             return { success: false, error: error.message }
@@ -551,6 +567,36 @@ export const useAuthStore = create(
             return { success: true, revokedCount: data.revokedCount }
           } catch (error) {
             logError(error, { context: 'revokeAllOtherSessions' })
+            return { success: false, error: error.message }
+          }
+        },
+
+        revokeAllSessions: async () => {
+          try {
+            const authToken = await tokenService.getValidToken()
+            
+            const response = await fetch(`${API_BASE_URL}/auth/email/sessions/revoke-all`, {
+              method: 'POST',
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+              }
+            })
+            
+            const data = await response.json()
+            
+            if (!response.ok) {
+              throw new Error(data.error || 'Failed to revoke all sessions')
+            }
+            
+            // Clear local auth state since current session is also revoked
+            logger.log('[AUTH] All sessions revoked, signing out locally')
+            tokenService.clearTokens()
+            get()._clearAuth()
+            
+            return { success: true, revokedCount: data.revokedCount }
+          } catch (error) {
+            logError(error, { context: 'revokeAllSessions' })
             return { success: false, error: error.message }
           }
         },
@@ -726,7 +772,7 @@ export const useAuthStore = create(
         syncFromContext: ({ user, isAuthenticated, authMethod, hasGoogleLinked, isLoading }) => {
           // This is now a no-op since authStore is the source of truth
           // Kept for backward compatibility
-          console.warn('[AUTH] syncFromContext is deprecated - authStore is now the source of truth')
+          logger.warn('Auth', 'syncFromContext is deprecated - authStore is now the source of truth')
         },
       }),
       {
@@ -798,6 +844,7 @@ export const useAuth = () => {
     getActiveSessions: store.getActiveSessions,
     revokeSession: store.revokeSession,
     revokeAllOtherSessions: store.revokeAllOtherSessions,
+    revokeAllSessions: store.revokeAllSessions,
     getLoginHistory: store.getLoginHistory,
     
     // Google linking

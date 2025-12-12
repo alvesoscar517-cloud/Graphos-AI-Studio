@@ -163,7 +163,7 @@ export async function loadNotesFromDrive() {
     const result = await chrome.storage.local.get(['accessToken'])
     const token = result.accessToken
 
-    logger.log('📋 Loading notes from Drive folder:', folderId)
+    logger.log('[INFO] Loading notes from Drive folder:', folderId)
 
     // List all files in folder
     const response = await fetch(

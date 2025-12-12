@@ -11,17 +11,24 @@ import faceIdAnimation from '../../../animation/face-id.json'
 import error404Animation from '../../../animation/404 blue.json'
 
 const ProcessingView = ({ animationKey, processingStep, processingMessage, totalSamples, t }) => (
-  <div className="block animate-fade-in-slow h-[calc(100%-100px)] relative" role="status" aria-live="polite" aria-busy="true">
-    <div className="grid grid-cols-2 h-full gap-0 relative min-h-0 overflow-hidden max-lg:grid-cols-1">
-      {/* Animation Container - Left Column */}
-      <div className="flex items-center justify-center w-full h-full p-10 box-border bg-transparent">
+  <div className="block animate-fade-in-slow h-[calc(100%-100px)] relative max-lg:h-auto" role="status" aria-live="polite" aria-busy="true">
+    <div className="grid grid-cols-2 h-full gap-0 relative min-h-0 overflow-hidden max-lg:grid-cols-1 max-lg:overflow-visible">
+      {/* Animation Container - Hidden on tablet portrait */}
+      <div className="flex items-center justify-center w-full h-full p-10 box-border bg-transparent max-lg:hidden">
         <div className="!w-lottie-md !h-lottie-md max-w-full max-h-full max-lg:!w-lottie-sm max-lg:!h-lottie-sm">
           <LottieWrapper key={`step4-${animationKey}`} animationData={loadingBlueAnimation} loop={true} />
         </div>
       </div>
       
+      {/* Compact Animation for tablet/mobile */}
+      <div className="hidden max-lg:flex items-center justify-center py-6 bg-transparent">
+        <div className="!w-lottie-xs !h-lottie-xs">
+          <LottieWrapper key={`step4-mobile-${animationKey}`} animationData={loadingBlueAnimation} loop={true} />
+        </div>
+      </div>
+      
       {/* Content Container - Right Column */}
-      <div className="py-2.5 pl-0 pr-10 flex flex-col justify-center bg-transparent overflow-y-auto h-full relative scrollbar-hidden max-md:px-5">
+      <div className="py-2.5 pl-0 pr-10 flex flex-col justify-center bg-transparent overflow-y-auto h-full relative scrollbar-hidden max-lg:h-auto max-lg:overflow-visible max-lg:px-6 max-md:px-5">
         <div className="w-[95%] max-lg:w-full">
           <h1 className="text-2xl font-semibold text-gray-800 mb-3 leading-tight">
             {t('profileSetup.finalizingProfile')}

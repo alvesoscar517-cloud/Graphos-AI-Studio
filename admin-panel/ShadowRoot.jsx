@@ -30,7 +30,6 @@ export default function ShadowRoot({ children, styles }) {
       const container = document.createElement('div');
       container.id = 'shadow-container';
       container.style.width = '100%';
-      container.style.height = '100%';
       container.style.minHeight = '100vh';
       shadowRootRef.current.appendChild(container);
 
@@ -57,7 +56,6 @@ export default function ShadowRoot({ children, styles }) {
       ref={shadowHostRef} 
       style={{ 
         width: '100%', 
-        height: '100%',
         minHeight: '100vh',
         display: 'block'
       }} 

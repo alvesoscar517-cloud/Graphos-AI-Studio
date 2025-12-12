@@ -1,103 +1,98 @@
 /**
- * Credits Query Hook
- * TanStack Query hook for user credits management with Firestore Realtime updates
+ * Credits Query Hook - SIMPLIFIED
+ * TanStack Query hook for user credits management
+ * 
+ * Strategy:
+ * - Fetch from API on mount
+ * - Refetch on window focus (with cooldown)
+ * - Refetch on payment success event
+ * - Realtime updates via Firestore (optional enhancement)
  */
 
 import { logger } from '@/utils/logger'
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queryKeys'
 import apiClient from '@/services/api/client'
-
-// Minimum time between visibility refetches (30 seconds)
-const VISIBILITY_REFETCH_COOLDOWN = 30 * 1000
+import { useAuthStore } from '@/stores/authStore'
 
 /**
- * Fetch user credits with Firestore Realtime updates (instant)
+ * Get userId from multiple sources
+ */
+function getUserId() {
+  // Try localStorage first
+  const storedId = localStorage.getItem('userId')
+  if (storedId) return storedId
+  
+  // Try user object in localStorage
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}')
+    return user.userId || user.uid || user.id || null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Fetch user credits
  */
 export function useCredits(options = {}) {
   const queryClient = useQueryClient()
   const unsubscribeRef = useRef(null)
-  const lastVisibilityRefetchRef = useRef(0)
+  const hasSetupRealtimeRef = useRef(false)
+  
+  // Get auth state
+  const user = useAuthStore((state) => state.user)
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  
+  // Get userId from auth store or localStorage
+  const userId = user?.userId || user?.uid || user?.id || getUserId()
 
   const query = useQuery({
     queryKey: queryKeys.user.credits(),
     queryFn: async () => {
-      // Get userId from localStorage
-      const userId = localStorage.getItem('userId')
-      if (!userId) {
+      const id = userId || getUserId()
+      if (!id) {
         return { balance: 0, used: 0 }
       }
-      const { data } = await apiClient.get(`/api/credits/balance?user_id=${userId}`)
-      if (data.success) {
-        return data.credits
-      }
-      return data?.credits || data
+      const { data } = await apiClient.get(`/api/credits/balance?user_id=${id}`)
+      return data?.credits || { balance: 0, used: 0 }
     },
-    staleTime: 60 * 1000, // 1 minute - Firestore Realtime handles instant updates
-    refetchInterval: false, // Firestore Realtime handles updates, no polling needed
-    refetchOnWindowFocus: false, // We handle this manually below
-    refetchOnReconnect: true, // Refetch when network reconnects
+    staleTime: 30 * 1000, // 30 seconds
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    enabled: isAuthenticated && !!userId,
     ...options,
   })
 
-  // Refetch credits - used for visibility change and payment success
-  const refetchCredits = useCallback(() => {
-    const now = Date.now()
-    if (now - lastVisibilityRefetchRef.current > VISIBILITY_REFETCH_COOLDOWN) {
-      lastVisibilityRefetchRef.current = now
-      logger.log('[Credits] Refetching credits...')
-      queryClient.invalidateQueries({ queryKey: queryKeys.user.credits() })
-    }
-  }, [queryClient])
-
-  // Subscribe to Firestore Realtime credit updates + visibility change handler
+  // Setup realtime subscription (once)
   useEffect(() => {
+    if (hasSetupRealtimeRef.current) return
+    
     const setupRealtime = async () => {
       try {
-        // Dynamic import to avoid circular dependency
         const { default: realtimeService } = await import('@/services/realtimeService')
         
         unsubscribeRef.current = realtimeService.subscribe('credits', (data) => {
-          logger.log('[REALTIME] Credit update received:', data)
-          const creditsData = data.credits || data
-          queryClient.setQueryData(queryKeys.user.credits(), creditsData)
+          if (data?.credits) {
+            logger.log('[Credits] Realtime update:', data.credits.balance)
+            queryClient.setQueryData(queryKeys.user.credits(), data.credits)
+          }
         })
+        
+        hasSetupRealtimeRef.current = true
       } catch (err) {
-        console.warn('Could not setup realtime credit updates:', err.message)
+        // Realtime not available, API fetch is fallback
       }
     }
 
     setupRealtime()
 
-    // Handle visibility change - refetch when tab becomes visible
-    // Firestore Realtime should handle most updates, this is a fallback
-    const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible') {
-        try {
-          const { default: realtimeService } = await import('@/services/realtimeService')
-          // Only refetch if not connected (Firestore handles updates when connected)
-          const isStale = query.dataUpdatedAt && (Date.now() - query.dataUpdatedAt > 60000)
-          
-          if (!realtimeService.isConnected() || isStale) {
-            logger.log('[Credits] Tab visible, connected:', realtimeService.isConnected(), 'isStale:', isStale)
-            refetchCredits()
-          }
-        } catch (err) {
-          refetchCredits()
-        }
-      }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-
-    // Also listen for payment success event to immediately refetch
+    // Listen for payment success to refetch
     const handlePaymentSuccess = () => {
-      logger.log('[Credits] Payment success detected, refetching...')
-      lastVisibilityRefetchRef.current = 0 // Reset cooldown
+      logger.log('[Credits] Payment success, refetching...')
       queryClient.invalidateQueries({ queryKey: queryKeys.user.credits() })
     }
-    
     window.addEventListener('payment-success', handlePaymentSuccess)
 
     return () => {
@@ -105,10 +100,10 @@ export function useCredits(options = {}) {
         unsubscribeRef.current()
         unsubscribeRef.current = null
       }
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      hasSetupRealtimeRef.current = false
       window.removeEventListener('payment-success', handlePaymentSuccess)
     }
-  }, [queryClient, refetchCredits, query.dataUpdatedAt])
+  }, [queryClient])
 
   return {
     ...query,
@@ -130,7 +125,6 @@ export function useConsumeCredits() {
       return data
     },
     onSuccess: (data) => {
-      // Update cache with new balance
       if (data?.credits) {
         queryClient.setQueryData(queryKeys.user.credits(), data.credits)
       } else {

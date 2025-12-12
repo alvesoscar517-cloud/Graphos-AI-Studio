@@ -46,8 +46,7 @@ export function validateEnv() {
   }
   
   if (warnings.length > 0) {
-    console.warn('[WARNING] Environment Configuration Warnings:')
-    warnings.forEach(w => console.warn(`  - ${w}`))
+    logger.warn('Env', `Environment Configuration Warnings: ${warnings.join(', ')}`)
   }
   
   return warnings.length === 0

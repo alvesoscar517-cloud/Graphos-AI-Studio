@@ -11,6 +11,8 @@
  */
 
 // Re-export from authStore for backward compatibility
+import { useAuth as useAuthFromStore } from '../stores/authStore'
+
 export { 
   useAuth,
   useAuthStore,
@@ -26,4 +28,4 @@ export {
 // Legacy AuthProvider - now a no-op wrapper
 export const AuthProvider = ({ children }) => children
 
-export default { AuthProvider, useAuth: () => require('../stores/authStore').useAuth() }
+export default { AuthProvider, useAuth: useAuthFromStore }

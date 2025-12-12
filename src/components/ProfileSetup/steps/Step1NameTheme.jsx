@@ -22,17 +22,24 @@ const Step1NameTheme = ({
   const { t } = useTranslation()
 
   return (
-    <div className="block animate-fade-in-slow h-[calc(100%-100px)] relative">
-      <div className="grid grid-cols-2 h-full gap-0 relative min-h-0 overflow-hidden max-lg:grid-cols-1">
-        {/* Animation Container */}
-        <div className="flex items-center justify-center w-full h-full p-10 box-border bg-transparent">
+    <div className="block animate-fade-in-slow h-[calc(100%-100px)] relative max-lg:h-auto">
+      <div className="grid grid-cols-2 h-full gap-0 relative min-h-0 overflow-hidden max-lg:grid-cols-1 max-lg:overflow-visible">
+        {/* Animation Container - Hidden on tablet portrait for better space usage */}
+        <div className="flex items-center justify-center w-full h-full p-10 box-border bg-transparent max-lg:hidden">
           <div className="!w-lottie-md !h-lottie-md max-w-full max-h-full max-lg:!w-lottie-sm max-lg:!h-lottie-sm">
             <LottieWrapper key={`step1-${animationKey}`} animationData={loaderCatAnimation} loop={true} />
           </div>
         </div>
         
+        {/* Compact Animation for tablet/mobile - shown inline with form */}
+        <div className="hidden max-lg:flex items-center justify-center py-6 bg-transparent">
+          <div className="!w-lottie-xs !h-lottie-xs">
+            <LottieWrapper key={`step1-mobile-${animationKey}`} animationData={loaderCatAnimation} loop={true} />
+          </div>
+        </div>
+        
         {/* Form Container */}
-        <div className="py-2.5 pl-0 pr-10 flex flex-col justify-between bg-transparent overflow-y-auto h-full relative scrollbar-hidden max-md:px-5">
+        <div className="py-2.5 pl-0 pr-10 flex flex-col justify-between bg-transparent overflow-y-auto h-full relative scrollbar-hidden max-lg:h-auto max-lg:overflow-visible max-lg:px-6 max-md:px-5">
           <div className="w-[95%] max-lg:w-full">
             <h1 className="text-2xl font-semibold text-gray-800 mb-3 leading-tight">
               {t('profileSetup.startRefining')}

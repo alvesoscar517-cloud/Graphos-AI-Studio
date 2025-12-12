@@ -26,7 +26,7 @@ const USE_CLI = process.argv.includes('--use-cli');
  * Deploy indexes using Google Cloud REST API
  */
 async function deployViaAPI() {
-  console.log('🔥 Deploying Firestore Indexes via API...');
+  console.log('[CRITICAL] Deploying Firestore Indexes via API...');
   
   const { GoogleAuth } = require('google-auth-library');
   const auth = new GoogleAuth({
@@ -44,7 +44,7 @@ async function deployViaAPI() {
   const indexesContent = JSON.parse(fs.readFileSync(INDEXES_FILE, 'utf8'));
   const indexes = indexesContent.indexes || [];
   
-  console.log(`📋 Found ${indexes.length} indexes to deploy`);
+  console.log(`[INFO] Found ${indexes.length} indexes to deploy`);
   console.log('');
 
   // Get existing indexes
@@ -55,7 +55,7 @@ async function deployViaAPI() {
   const existingData = await existingResponse.json();
   const existingIndexes = existingData.indexes || [];
   
-  console.log(`📊 Found ${existingIndexes.length} existing indexes`);
+  console.log(`[CHART] Found ${existingIndexes.length} existing indexes`);
   console.log('');
 
   let created = 0;
@@ -79,7 +79,7 @@ async function deployViaAPI() {
     });
 
     if (exists) {
-      console.log(`   ⏭️  ${index.collectionGroup}: ${fields} (already exists)`);
+      console.log(`   [SKIP]️  ${index.collectionGroup}: ${fields} (already exists)`);
       skipped++;
       continue;
     }
@@ -101,24 +101,24 @@ async function deployViaAPI() {
     });
 
     if (response.ok) {
-      console.log(`   ✅ ${index.collectionGroup}: ${fields} (created)`);
+      console.log(`   [SUCCESS] ${index.collectionGroup}: ${fields} (created)`);
       created++;
     } else if (response.status === 409) {
-      console.log(`   ⏭️  ${index.collectionGroup}: ${fields} (already building)`);
+      console.log(`   [SKIP]️  ${index.collectionGroup}: ${fields} (already building)`);
       skipped++;
     } else {
       const error = await response.text();
-      console.log(`   ❌ ${index.collectionGroup}: ${fields} (failed: ${response.status})`);
+      console.log(`   [FAIL] ${index.collectionGroup}: ${fields} (failed: ${response.status})`);
       failed++;
     }
   }
 
   console.log('');
-  console.log(`📊 Summary: ${created} created, ${skipped} skipped, ${failed} failed`);
+  console.log(`[CHART] Summary: ${created} created, ${skipped} skipped, ${failed} failed`);
   
   if (created > 0) {
     console.log('');
-    console.log('⏳ Note: New indexes may take a few minutes to build.');
+    console.log('[WAITING] Note: New indexes may take a few minutes to build.');
     console.log(`   Check status: https://console.firebase.google.com/project/${PROJECT_ID}/firestore/indexes`);
   }
 }
@@ -127,7 +127,7 @@ async function deployViaAPI() {
  * Deploy indexes using Firebase CLI
  */
 async function deployViaCLI() {
-  console.log('🔥 Deploying Firestore Indexes via Firebase CLI...');
+  console.log('[CRITICAL] Deploying Firestore Indexes via Firebase CLI...');
   
   execSync(`firebase deploy --only firestore:indexes --project ${PROJECT_ID}`, {
     stdio: 'inherit',
@@ -135,7 +135,7 @@ async function deployViaCLI() {
   });
   
   console.log('');
-  console.log('✅ Indexes deployed successfully!');
+  console.log('[SUCCESS] Indexes deployed successfully!');
 }
 
 async function deployIndexes() {
@@ -145,7 +145,7 @@ async function deployIndexes() {
 
   // Check if indexes file exists
   if (!fs.existsSync(INDEXES_FILE)) {
-    console.error('❌ Indexes file not found:', INDEXES_FILE);
+    console.error('[FAIL] Indexes file not found:', INDEXES_FILE);
     process.exit(1);
   }
 
@@ -153,25 +153,25 @@ async function deployIndexes() {
     try {
       await deployViaCLI();
     } catch (error) {
-      console.error('❌ Firebase CLI failed:', error.message);
+      console.error('[FAIL] Firebase CLI failed:', error.message);
       console.log('');
-      console.log('💡 Try running without --use-cli flag to use API instead');
+      console.log('[HINT] Try running without --use-cli flag to use API instead');
       process.exit(1);
     }
   } else {
     try {
       await deployViaAPI();
     } catch (error) {
-      console.error('❌ API deployment failed:', error.message);
+      console.error('[FAIL] API deployment failed:', error.message);
       console.log('');
-      console.log('💡 Trying Firebase CLI as fallback...');
+      console.log('[HINT] Trying Firebase CLI as fallback...');
       
       try {
         await deployViaCLI();
       } catch (cliError) {
-        console.error('❌ Firebase CLI also failed:', cliError.message);
+        console.error('[FAIL] Firebase CLI also failed:', cliError.message);
         console.log('');
-        console.log('📝 To deploy indexes manually:');
+        console.log('[INFO] To deploy indexes manually:');
         console.log('   1. Install Firebase CLI: npm install -g firebase-tools');
         console.log('   2. Login: firebase login');
         console.log(`   3. Deploy: firebase deploy --only firestore:indexes --project ${PROJECT_ID}`);
@@ -186,6 +186,6 @@ async function deployIndexes() {
 
 // Run
 deployIndexes().catch(err => {
-  console.error('❌ Error:', err.message);
+  console.error('[FAIL] Error:', err.message);
   process.exit(1);
 });

@@ -7,7 +7,46 @@ import { logger } from './logger'
  * - Token encryption/decryption
  * - Secure storage with obfuscation
  * - Single source of truth for auth storage operations
+ * - SessionStorage when Remember Me is OFF (industry standard)
+ * - LocalStorage when Remember Me is ON (persistent across browser sessions)
  */
+
+// ============================================================================
+// STORAGE MODE MANAGEMENT
+// ============================================================================
+
+/**
+ * Get the appropriate storage based on Remember Me preference
+ * - Remember Me ON: localStorage (persists across browser sessions)
+ * - Remember Me OFF: sessionStorage (cleared when browser closes)
+ * 
+ * This follows industry standards (Google, GitHub, Facebook)
+ */
+function getStorage() {
+  // Check if Remember Me is enabled
+  // Note: REMEMBER_ME flag itself is always in localStorage
+  const rememberMe = localStorage.getItem('rememberMe') === 'true'
+  return rememberMe ? localStorage : sessionStorage
+}
+
+/**
+ * Check if Remember Me is enabled
+ */
+export function isRememberMeEnabled() {
+  return localStorage.getItem('rememberMe') === 'true'
+}
+
+/**
+ * Set Remember Me preference
+ * This determines which storage to use for auth data
+ */
+export function setRememberMe(enabled) {
+  if (enabled) {
+    localStorage.setItem('rememberMe', 'true')
+  } else {
+    localStorage.removeItem('rememberMe')
+  }
+}
 
 // ============================================================================
 // ENCRYPTION UTILITIES
@@ -57,7 +96,7 @@ export function encryptData(data) {
     // Base64 encode for safe storage
     return btoa(encodeURIComponent(encrypted))
   } catch (error) {
-    console.error('[AuthStorage] Encryption failed:', error)
+    logger.error('AuthStorage', 'Encryption failed', error)
     return null
   }
 }
@@ -85,9 +124,9 @@ export function decryptData(encryptedData) {
       return decrypted
     }
   } catch (error) {
-    console.error('[AuthStorage] Decryption failed:', error)
+    logger.error('AuthStorage', 'Decryption failed', error)
     // Token is corrupted - trigger session expired to force re-login
-    console.warn('[AuthStorage] Token corrupted, user needs to re-login')
+    logger.warn('AuthStorage', 'Token corrupted, user needs to re-login')
     return null
   }
 }
@@ -98,7 +137,16 @@ export function decryptData(encryptedData) {
  */
 export function isTokenValid() {
   try {
-    const rawToken = localStorage.getItem(AUTH_STORAGE_KEYS.AUTH_TOKEN)
+    // Use getStorage() to check the correct storage based on Remember Me preference
+    const storage = getStorage()
+    let rawToken = storage.getItem(AUTH_STORAGE_KEYS.AUTH_TOKEN)
+    
+    // Fallback: check the other storage for migration compatibility
+    if (!rawToken) {
+      const otherStorage = storage === localStorage ? sessionStorage : localStorage
+      rawToken = otherStorage.getItem(AUTH_STORAGE_KEYS.AUTH_TOKEN)
+    }
+    
     if (!rawToken) return false
     
     const decrypted = decryptData(rawToken)
@@ -139,23 +187,38 @@ const SENSITIVE_KEYS = [
 // SECURE STORAGE OPERATIONS
 // ============================================================================
 
+// Keys that should ALWAYS use localStorage (not sensitive, needed for app state)
+const PERSISTENT_KEYS = [
+  AUTH_STORAGE_KEYS.USER_ID,
+  AUTH_STORAGE_KEYS.USER,
+  AUTH_STORAGE_KEYS.AUTH_METHOD,
+  AUTH_STORAGE_KEYS.ACTIVE_PROFILE_ID,
+  AUTH_STORAGE_KEYS.ACTIVE_PROFILE_NAME,
+]
+
 /**
  * Securely store a value
  * Automatically encrypts sensitive data
+ * Uses sessionStorage or localStorage based on Remember Me preference
+ * Exception: USER_ID and USER always use localStorage for app stability
  */
 export function secureSet(key, value) {
   try {
     const shouldEncrypt = SENSITIVE_KEYS.includes(key)
     const storedValue = shouldEncrypt ? encryptData(value) : value
     
+    // Use localStorage for persistent keys (userId, user data)
+    // Use rememberMe-based storage for sensitive tokens
+    const storage = PERSISTENT_KEYS.includes(key) ? localStorage : getStorage()
+    
     if (typeof storedValue === 'object') {
-      localStorage.setItem(key, JSON.stringify(storedValue))
+      storage.setItem(key, JSON.stringify(storedValue))
     } else {
-      localStorage.setItem(key, storedValue)
+      storage.setItem(key, storedValue)
     }
     return true
   } catch (error) {
-    console.error(`[AuthStorage] Failed to set ${key}:`, error)
+    logger.error('AuthStorage', `Failed to set ${key}`, error)
     return false
   }
 }
@@ -163,10 +226,20 @@ export function secureSet(key, value) {
 /**
  * Securely retrieve a value
  * Automatically decrypts sensitive data
+ * Checks both sessionStorage and localStorage for migration compatibility
  */
 export function secureGet(key) {
   try {
-    const value = localStorage.getItem(key)
+    // Use localStorage for persistent keys
+    const storage = PERSISTENT_KEYS.includes(key) ? localStorage : getStorage()
+    let value = storage.getItem(key)
+    
+    // Fallback: check the other storage for migration compatibility
+    if (value === null) {
+      const otherStorage = storage === localStorage ? sessionStorage : localStorage
+      value = otherStorage.getItem(key)
+    }
+    
     if (value === null) return null
     
     const shouldDecrypt = SENSITIVE_KEYS.includes(key)
@@ -182,20 +255,22 @@ export function secureGet(key) {
       return value
     }
   } catch (error) {
-    console.error(`[AuthStorage] Failed to get ${key}:`, error)
+    logger.error('AuthStorage', `Failed to get ${key}`, error)
     return null
   }
 }
 
 /**
  * Remove a value from storage
+ * Removes from both storages to ensure cleanup
  */
 export function secureRemove(key) {
   try {
     localStorage.removeItem(key)
+    sessionStorage.removeItem(key)
     return true
   } catch (error) {
-    console.error(`[AuthStorage] Failed to remove ${key}:`, error)
+    logger.error('AuthStorage', `Failed to remove ${key}`, error)
     return false
   }
 }
@@ -207,6 +282,7 @@ export function secureRemove(key) {
 /**
  * Clear all authentication storage
  * Single source of truth for auth cleanup
+ * Clears both localStorage and sessionStorage for complete cleanup
  */
 export function clearAuthStorage() {
   // Get current user email before clearing to clean user-specific data
@@ -230,6 +306,7 @@ export function clearAuthStorage() {
     AUTH_STORAGE_KEYS.ACTIVE_PROFILE_ID,
     AUTH_STORAGE_KEYS.ACTIVE_PROFILE_NAME,
     AUTH_STORAGE_KEYS.PROFILE_CACHE_INVALIDATED,
+    AUTH_STORAGE_KEYS.REMEMBER_ME, // Clear Remember Me preference on logout
   ]
 
   keysToRemove.forEach(key => secureRemove(key))
@@ -239,29 +316,34 @@ export function clearAuthStorage() {
     secureRemove(`workspace_conversations_${userEmail}`)
   }
 
-  // Clear ALL user data from localStorage to prevent data leakage
-  try {
-    const keysToDelete = []
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key && (
-        key.startsWith('workspace_conversations_') ||
-        key.startsWith('notes_') ||
-        key.startsWith('user_') ||
-        key === 'auth-storage' ||  // Zustand persist storage
-        key === 'theme-storage' ||
-        key === 'notes-storage' ||
-        key === 'payment_listening_state'
-      )) {
-        keysToDelete.push(key)
+  // Clear ALL user data from both storages to prevent data leakage
+  const clearStorageData = (storage) => {
+    try {
+      const keysToDelete = []
+      for (let i = 0; i < storage.length; i++) {
+        const key = storage.key(i)
+        if (key && (
+          key.startsWith('workspace_conversations_') ||
+          key.startsWith('notes_') ||
+          key.startsWith('user_') ||
+          key === 'auth-storage' ||  // Zustand persist storage
+          key === 'theme-storage' ||
+          key === 'notes-storage' ||
+          key === 'payment_listening_state'
+        )) {
+          keysToDelete.push(key)
+        }
       }
+      keysToDelete.forEach(key => storage.removeItem(key))
+    } catch (e) {
+      // Ignore errors during cleanup
     }
-    keysToDelete.forEach(key => localStorage.removeItem(key))
-  } catch (e) {
-    // Ignore errors during cleanup
   }
+  
+  clearStorageData(localStorage)
+  clearStorageData(sessionStorage)
 
-  logger.log('[SECURITY] Auth storage cleared')
+  logger.log('[SECURITY] Auth storage cleared (both localStorage and sessionStorage)')
 }
 
 /**
@@ -273,7 +355,7 @@ export function setUserData(user) {
   const success = secureSet(AUTH_STORAGE_KEYS.USER, user)
   
   if (!success) {
-    console.error('[AuthStorage] Failed to store user data')
+    logger.error('AuthStorage', 'Failed to store user data')
     return false
   }
   
@@ -284,7 +366,7 @@ export function setUserData(user) {
   // Verify data was stored correctly
   const stored = secureGet(AUTH_STORAGE_KEYS.USER)
   if (!stored || !stored.userId) {
-    console.error('[AuthStorage] User data verification failed')
+    logger.error('AuthStorage', 'User data verification failed')
     return false
   }
   
@@ -399,6 +481,7 @@ export function clearActiveProfile() {
 
 /**
  * Migrate existing unencrypted tokens to encrypted format
+ * Also handles migration between localStorage and sessionStorage based on Remember Me
  * Call this once on app startup
  */
 export function migrateToSecureStorage() {
@@ -424,8 +507,16 @@ export function migrateToSecureStorage() {
       
       logger.log('[AuthStorage] Migration complete')
     }
+    
+    // Migrate existing users: if they have tokens in localStorage but no rememberMe flag,
+    // assume they want to be remembered (backward compatibility)
+    const hasRememberMeFlag = localStorage.getItem('rememberMe') !== null
+    if (!hasRememberMeFlag && rawToken) {
+      logger.log('[AuthStorage] Setting rememberMe=true for existing user (backward compatibility)')
+      localStorage.setItem('rememberMe', 'true')
+    }
   } catch (error) {
-    console.error('[AuthStorage] Migration failed:', error)
+    logger.error('AuthStorage', 'Migration failed', error)
   }
 }
 
@@ -458,6 +549,10 @@ export default {
   
   // Migration
   migrateToSecureStorage,
+  
+  // Remember Me
+  isRememberMeEnabled,
+  setRememberMe,
   
   // Constants
   AUTH_STORAGE_KEYS,

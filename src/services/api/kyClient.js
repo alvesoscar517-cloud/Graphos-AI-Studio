@@ -55,7 +55,7 @@ async function getAuthTokenWithType() {
       if (token) return { token, authType: 'email' };
     }
   } catch (error) {
-    console.warn('[kyClient] Failed to get email auth token:', error.message);
+    logger.warn('kyClient', `Failed to get email auth token: ${error.message}`);
   }
   
   // Try Chrome extension (Google OAuth)
@@ -110,7 +110,7 @@ async function getUserId() {
       return userId;
     }
   } catch (error) {
-    console.warn('[kyClient] Failed to get user ID:', error.message);
+    logger.warn('kyClient', `Failed to get user ID: ${error.message}`);
   }
   
   return null;
@@ -216,7 +216,7 @@ const kyInstance = ky.create({
               request.headers.set('Authorization', `Bearer ${newToken}`);
             }
           } catch (refreshError) {
-            console.warn('[ky] Token refresh failed:', refreshError.message);
+            logger.warn('kyClient', `Token refresh failed: ${refreshError.message}`);
           }
         }
       }

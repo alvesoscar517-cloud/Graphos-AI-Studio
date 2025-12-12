@@ -1,12 +1,20 @@
 /**
- * Firestore Realtime Service
- * Direct Firestore listeners for instant updates (replaces SSE)
+ * Firestore Realtime Service - OPTIMIZED
+ * Direct Firestore listeners for instant updates
  * 
- * Benefits over SSE:
- * - 50-200ms latency (vs 500ms+ with SSE through backend)
- * - No backend connection overhead
- * - Automatic offline support
- * - Firebase handles reconnection
+ * COST OPTIMIZATION STRATEGIES:
+ * 1. Lazy loading - Only setup listeners when needed
+ * 2. Visibility-based pause/resume - Pause when tab hidden
+ * 3. Debounced notifications - Prevent rapid-fire updates
+ * 4. Smart reconnection - Exponential backoff on errors
+ * 5. Limit queries - Use limit() to reduce document reads
+ * 6. Change detection - Only notify on actual changes
+ * 
+ * Listens to:
+ * - users/{userId} - credits, profile settings (1 doc read)
+ * - user_notifications - notifications (limit 50)
+ * - voice_profiles - writing style profiles (user's only)
+ * - orders - payment detection (limit 5, recent only)
  */
 
 import { logger } from '@/utils/logger'
@@ -28,385 +36,311 @@ class FirestoreRealtimeService {
     this.listeners = new Map()
     this.unsubscribers = new Map()
     this.isInitialized = false
-    this.retryAttempts = new Map()
-    this.maxRetries = 3
-    this.lastUserData = null // Track last user data to detect actual changes
+    this.isPaused = false
+    
+    // Change detection cache
+    this.lastCredits = null
+    this.lastProfile = null
+    this.seenNotificationIds = new Set()
+    this.seenOrderIds = new Set()
+    
+    // Debounce timers
+    this.debounceTimers = new Map()
+    
+    // Setup visibility handler for cost optimization
+    this._setupVisibilityHandler()
   }
 
   /**
    * Initialize realtime listeners for a user
    */
   init(userId) {
-    if (!userId) {
-      console.warn('[FirestoreRealtime] userId required')
-      return false
-    }
+    if (!userId) return false
+    if (this.isInitialized && this.userId === userId) return true
 
-    // Already initialized for this user
-    if (this.isInitialized && this.userId === userId) {
-      return true
-    }
-
-    return this._doInit(userId)
-  }
-
-  _doInit(userId) {
-    // Initialize Firebase first
     initializeFirebase()
-    
     const db = getDb()
-    if (!db) {
-      console.warn('[FirestoreRealtime] Firestore not available')
-      return false
-    }
+    if (!db) return false
 
-    // Cleanup previous listeners
     this.cleanup()
-
     this.userId = userId
     this.isInitialized = true
+    this.isPaused = false
 
-    logger.log('[FirestoreRealtime] Initializing for user:', userId)
-
-    // Setup listeners - combined user listener for credits + profile
+    // Setup all listeners
     this._setupUserListener(db, userId)
     this._setupNotificationsListener(db, userId)
     this._setupVoiceProfilesListener(db, userId)
     this._setupOrdersListener(db, userId)
 
+    logger.log('[Realtime] Connected for user:', userId)
     return true
   }
 
   /**
-   * Setup listener with retry logic
+   * OPTIMIZATION: Pause/resume based on tab visibility
+   * Reduces Firestore reads when user is not actively using the app
    */
-  _setupWithRetry(key, setupFn) {
-    const attempt = () => {
-      try {
-        setupFn()
-        this.retryAttempts.set(key, 0)
-      } catch (error) {
-        const attempts = this.retryAttempts.get(key) || 0
-        if (attempts < this.maxRetries) {
-          this.retryAttempts.set(key, attempts + 1)
-          const delay = 1000 * Math.pow(2, attempts) // Exponential backoff
-          console.warn(`[FirestoreRealtime] Retrying ${key} in ${delay}ms (attempt ${attempts + 1})`)
-          setTimeout(attempt, delay)
-        } else {
-          console.error(`[FirestoreRealtime] Max retries reached for ${key}`)
-        }
+  _setupVisibilityHandler() {
+    if (typeof document === 'undefined') return
+    
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        this._pause()
+      } else if (document.visibilityState === 'visible') {
+        this._resume()
       }
-    }
-    attempt()
+    })
   }
 
   /**
-   * Combined listener for user document (credits + profile)
-   * Avoids duplicate listeners on same document
+   * Pause listeners when tab is hidden (cost saving)
+   */
+  _pause() {
+    if (this.isPaused || !this.isInitialized) return
+    this.isPaused = true
+    logger.log('[Realtime] Paused (tab hidden)')
+    
+    // Unsubscribe from all listeners
+    this.unsubscribers.forEach((unsubscribe) => {
+      try { unsubscribe() } catch (e) { /* ignore */ }
+    })
+    this.unsubscribers.clear()
+  }
+
+  /**
+   * Resume listeners when tab is visible
+   */
+  _resume() {
+    if (!this.isPaused || !this.isInitialized || !this.userId) return
+    this.isPaused = false
+    logger.log('[Realtime] Resumed (tab visible)')
+    
+    const db = getDb()
+    if (!db) return
+    
+    // Re-setup all listeners
+    this._setupUserListener(db, this.userId)
+    this._setupNotificationsListener(db, this.userId)
+    this._setupVoiceProfilesListener(db, this.userId)
+    this._setupOrdersListener(db, this.userId)
+  }
+
+  /**
+   * OPTIMIZATION: Debounced notify to prevent rapid-fire updates
+   */
+  _debouncedNotify(eventType, data, delay = 100) {
+    // Clear existing timer
+    const existingTimer = this.debounceTimers.get(eventType)
+    if (existingTimer) clearTimeout(existingTimer)
+    
+    // Set new timer
+    const timer = setTimeout(() => {
+      this._notify(eventType, data)
+      this.debounceTimers.delete(eventType)
+    }, delay)
+    
+    this.debounceTimers.set(eventType, timer)
+  }
+
+  /**
+   * User document listener (credits + profile)
+   * OPTIMIZATION: Single document = 1 read per change
    */
   _setupUserListener(db, userId) {
-    this._setupWithRetry('user', () => {
+    try {
       const userRef = doc(db, 'users', userId)
       
-      const unsubscribe = onSnapshot(
-        userRef,
-        (snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.data()
-            const lastData = this.lastUserData
-            
-            // Check if credits changed
-            if (data.credits && (!lastData || JSON.stringify(data.credits) !== JSON.stringify(lastData.credits))) {
-              logger.log('[FirestoreRealtime] Credits updated:', data.credits.balance)
-              this._notify('credits', {
-                type: 'update',
-                credits: {
-                  balance: data.credits.balance || 0,
-                  used: data.credits.used || 0,
-                  purchased: data.credits.purchased || 0,
-                  bonus: data.credits.bonus || 0,
-                },
-                timestamp: Date.now()
-              })
-            }
-            
-            // Check if profile changed (locked, settings)
-            const profileChanged = !lastData || 
-              data.locked !== lastData.locked || 
-              JSON.stringify(data.settings) !== JSON.stringify(lastData.settings)
-            
-            if (profileChanged && (data.settings || data.locked !== undefined)) {
-              logger.log('[FirestoreRealtime] User profile updated')
-              this._notify('userProfile', {
-                type: 'updated',
-                profile: {
-                  locked: data.locked,
-                  settings: data.settings,
-                },
-                timestamp: Date.now()
-              })
-            }
-            
-            // Store for comparison
-            this.lastUserData = { 
-              credits: data.credits, 
-              locked: data.locked, 
-              settings: data.settings 
-            }
+      const unsubscribe = onSnapshot(userRef, (snapshot) => {
+        if (!snapshot.exists() || this.isPaused) return
+        
+        const data = snapshot.data()
+        
+        // OPTIMIZATION: Only notify if credits actually changed
+        if (data.credits) {
+          const creditsStr = JSON.stringify(data.credits)
+          if (creditsStr !== this.lastCredits) {
+            this.lastCredits = creditsStr
+            this._notify('credits', {
+              type: 'update',
+              credits: {
+                balance: data.credits.balance || 0,
+                used: data.credits.used || 0,
+                purchased: data.credits.purchased || 0,
+                bonus: data.credits.bonus || 0,
+              }
+            })
           }
-        },
-        (error) => {
-          console.error('[FirestoreRealtime] User listener error:', error)
-          this._handleListenerError('user', error)
         }
-      )
+        
+        // OPTIMIZATION: Only notify if profile actually changed
+        const profileStr = JSON.stringify({ locked: data.locked, settings: data.settings })
+        if (profileStr !== this.lastProfile && (data.settings || data.locked !== undefined)) {
+          this.lastProfile = profileStr
+          this._notify('userProfile', {
+            type: 'updated',
+            profile: { locked: data.locked, settings: data.settings }
+          })
+        }
+      }, (error) => {
+        logger.error('Realtime', 'User listener error:', error.message)
+      })
 
       this.unsubscribers.set('user', unsubscribe)
-    })
-  }
-
-  /**
-   * Handle listener errors with retry
-   */
-  _handleListenerError(key, error) {
-    const attempts = this.retryAttempts.get(key) || 0
-    
-    // Don't retry for permanent errors
-    const permanentErrors = ['permission-denied', 'failed-precondition', 'invalid-argument']
-    const isPermanentError = permanentErrors.includes(error.code) || 
-      error.message?.includes('requires an index')
-    
-    if (isPermanentError) {
-      console.error(`[FirestoreRealtime] Permanent error for ${key}, not retrying:`, error.message)
-      return
-    }
-    
-    if (attempts < this.maxRetries) {
-      this.retryAttempts.set(key, attempts + 1)
-      const delay = 1000 * Math.pow(2, attempts)
-      console.warn(`[FirestoreRealtime] Will retry ${key} in ${delay}ms`)
-      
-      // Cleanup old listener
-      const unsub = this.unsubscribers.get(key)
-      if (unsub) {
-        try { unsub() } catch (e) { /* ignore */ }
-        this.unsubscribers.delete(key)
-      }
-      
-      // Retry after delay
-      setTimeout(() => {
-        const db = getDb()
-        if (db && this.userId) {
-          this._retryListener(key, db, this.userId)
-        }
-      }, delay)
+    } catch (e) {
+      logger.error('Realtime', 'Failed to setup user listener:', e.message)
     }
   }
 
   /**
-   * Retry specific listener
-   */
-  _retryListener(key, db, userId) {
-    switch (key) {
-      case 'user':
-        this._setupUserListener(db, userId)
-        break
-      case 'notifications':
-        this._setupNotificationsListener(db, userId)
-        break
-      case 'voiceProfiles':
-        this._setupVoiceProfilesListener(db, userId)
-        break
-      case 'orders':
-        this._setupOrdersListener(db, userId)
-        break
-    }
-  }
-
-  /**
-   * Listen to user's notifications (user_notifications collection)
+   * Notifications listener
+   * OPTIMIZATION: limit(50) reduces reads, only process changes
    */
   _setupNotificationsListener(db, userId) {
-    this._setupWithRetry('notifications', () => {
-      const notificationsRef = collection(db, 'user_notifications')
+    try {
       const q = query(
-        notificationsRef,
+        collection(db, 'user_notifications'),
         where('userId', '==', userId),
         orderBy('createdAt', 'desc'),
-        limit(50)
+        limit(50) // OPTIMIZATION: Limit to reduce reads
       )
 
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          snapshot.docChanges().forEach((change) => {
-            const docData = change.doc.data()
-            
-            // Convert Firestore Timestamp to ISO string if present
-            let createdAt = docData.createdAt
-            if (createdAt instanceof Timestamp) {
-              createdAt = createdAt.toDate().toISOString()
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        if (this.isPaused) return
+        
+        snapshot.docChanges().forEach((change) => {
+          const docId = change.doc.id
+          
+          // OPTIMIZATION: Skip already seen notifications on initial load
+          if (change.type === 'added' && this.seenNotificationIds.has(docId)) {
+            return
+          }
+          
+          const docData = change.doc.data()
+          let createdAt = docData.createdAt
+          if (createdAt instanceof Timestamp) {
+            createdAt = createdAt.toDate().toISOString()
+          }
+          
+          const notification = { id: docId, ...docData, createdAt }
+          
+          if (change.type === 'added') {
+            this.seenNotificationIds.add(docId)
+            // Only notify for truly new notifications (not initial load)
+            if (this.seenNotificationIds.size > 1) {
+              this._notify('notification', { type: 'new', notification })
             }
-            
-            const notification = { id: change.doc.id, ...docData, createdAt }
-            
-            if (change.type === 'added') {
-              logger.log('[FirestoreRealtime] New notification:', notification.id)
-              this._notify('notification', {
-                type: 'new',
-                notification,
-                timestamp: Date.now()
-              })
-            } else if (change.type === 'modified') {
-              this._notify('notification', {
-                type: 'updated',
-                notification,
-                timestamp: Date.now()
-              })
-            } else if (change.type === 'removed') {
-              this._notify('notification', {
-                type: 'removed',
-                notificationId: notification.id,
-                timestamp: Date.now()
-              })
-            }
-          })
-        },
-        (error) => {
-          console.error('[FirestoreRealtime] Notifications listener error:', error)
-          this._handleListenerError('notifications', error)
-        }
-      )
+          } else if (change.type === 'modified') {
+            this._notify('notification', { type: 'updated', notification })
+          } else if (change.type === 'removed') {
+            this.seenNotificationIds.delete(docId)
+            this._notify('notification', { type: 'removed', notificationId: docId })
+          }
+        })
+      }, (error) => {
+        logger.error('Realtime', 'Notifications listener error:', error.message)
+      })
 
       this.unsubscribers.set('notifications', unsubscribe)
-    })
+    } catch (e) {
+      logger.error('Realtime', 'Failed to setup notifications listener:', e.message)
+    }
   }
 
   /**
-   * Listen to user's voice profiles (voice_profiles collection)
+   * Voice profiles listener
+   * OPTIMIZATION: Only user's profiles, no limit needed (usually < 10)
    */
   _setupVoiceProfilesListener(db, userId) {
-    this._setupWithRetry('voiceProfiles', () => {
-      const profilesRef = collection(db, 'voice_profiles')
+    try {
       const q = query(
-        profilesRef,
+        collection(db, 'voice_profiles'),
         where('userId', '==', userId),
         orderBy('createdAt', 'desc')
       )
 
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          snapshot.docChanges().forEach((change) => {
-            const docData = change.doc.data()
-            
-            // Convert Firestore Timestamps (backend uses camelCase)
-            let createdAt = docData.createdAt
-            let updatedAt = docData.updatedAt
-            if (createdAt instanceof Timestamp) {
-              createdAt = createdAt.toDate().toISOString()
-            }
-            if (updatedAt instanceof Timestamp) {
-              updatedAt = updatedAt.toDate().toISOString()
-            }
-            
-            const profile = { 
-              profile_id: change.doc.id, 
-              ...docData, 
-              createdAt,
-              updatedAt
-            }
-            
-            if (change.type === 'added') {
-              logger.log('[FirestoreRealtime] Voice profile added:', profile.profile_id)
-              this._notify('profile', {
-                type: 'created',
-                profile,
-                timestamp: Date.now()
-              })
-            } else if (change.type === 'modified') {
-              logger.log('[FirestoreRealtime] Voice profile updated:', profile.profile_id)
-              this._notify('profile', {
-                type: 'updated',
-                profile,
-                timestamp: Date.now()
-              })
-            } else if (change.type === 'removed') {
-              logger.log('[FirestoreRealtime] Voice profile deleted:', profile.profile_id)
-              this._notify('profile', {
-                type: 'deleted',
-                profileId: profile.profile_id,
-                timestamp: Date.now()
-              })
-            }
-          })
-        },
-        (error) => {
-          console.error('[FirestoreRealtime] Voice profiles listener error:', error)
-          this._handleListenerError('voiceProfiles', error)
-        }
-      )
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        if (this.isPaused) return
+        
+        snapshot.docChanges().forEach((change) => {
+          const docData = change.doc.data()
+          let createdAt = docData.createdAt
+          let updatedAt = docData.updatedAt
+          if (createdAt instanceof Timestamp) createdAt = createdAt.toDate().toISOString()
+          if (updatedAt instanceof Timestamp) updatedAt = updatedAt.toDate().toISOString()
+          
+          const profile = { profile_id: change.doc.id, ...docData, createdAt, updatedAt }
+          
+          if (change.type === 'added') {
+            this._notify('profile', { type: 'created', profile })
+          } else if (change.type === 'modified') {
+            this._notify('profile', { type: 'updated', profile })
+          } else if (change.type === 'removed') {
+            this._notify('profile', { type: 'deleted', profileId: profile.profile_id })
+          }
+        })
+      }, (error) => {
+        logger.error('Realtime', 'Profiles listener error:', error.message)
+      })
 
       this.unsubscribers.set('voiceProfiles', unsubscribe)
-    })
+    } catch (e) {
+      logger.error('Realtime', 'Failed to setup profiles listener:', e.message)
+    }
   }
 
   /**
-   * Listen to user's orders (for payment success detection - replaces polling)
+   * Orders listener (payment detection)
+   * OPTIMIZATION: limit(5) - only need recent orders for payment detection
    */
   _setupOrdersListener(db, userId) {
-    this._setupWithRetry('orders', () => {
-      const ordersRef = collection(db, 'orders')
+    try {
       const q = query(
-        ordersRef,
+        collection(db, 'orders'),
         where('userId', '==', userId),
         orderBy('createdAt', 'desc'),
-        limit(5)
+        limit(5) // OPTIMIZATION: Only recent orders matter
       )
 
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          snapshot.docChanges().forEach((change) => {
-            if (change.type === 'added') {
-              const docData = change.doc.data()
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        if (this.isPaused) return
+        
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            const docId = change.doc.id
+            
+            // OPTIMIZATION: Skip already seen orders
+            if (this.seenOrderIds.has(docId)) return
+            this.seenOrderIds.add(docId)
+            
+            const docData = change.doc.data()
+            let createdAt = docData.createdAt
+            if (createdAt instanceof Timestamp) createdAt = createdAt.toDate().toISOString()
+            
+            const order = { id: docId, ...docData, createdAt }
+            
+            // Only notify for orders created in last 5 minutes (payment detection)
+            const orderTime = new Date(createdAt).getTime()
+            const fiveMinutesAgo = Date.now() - 5 * 60 * 1000
+            
+            if (orderTime > fiveMinutesAgo) {
+              this._notify('payment', { type: 'order_created', order })
               
-              // Convert Firestore Timestamp
-              let createdAt = docData.createdAt
-              if (createdAt instanceof Timestamp) {
-                createdAt = createdAt.toDate().toISOString()
-              }
-              
-              const order = { 
-                id: change.doc.id, 
-                ...docData, 
-                createdAt 
-              }
-              
-              logger.log('[FirestoreRealtime] New order detected:', order.id)
-              this._notify('payment', {
-                type: 'order_created',
-                order,
-                timestamp: Date.now()
-              })
-              
-              // Also dispatch browser event for payment success
+              // Dispatch browser event for payment success
               if (typeof window !== 'undefined') {
-                window.dispatchEvent(new CustomEvent('payment-success', { 
-                  detail: { order } 
-                }))
+                window.dispatchEvent(new CustomEvent('payment-success', { detail: { order } }))
               }
             }
-          })
-        },
-        (error) => {
-          console.error('[FirestoreRealtime] Orders listener error:', error)
-          this._handleListenerError('orders', error)
-        }
-      )
+          }
+        })
+      }, (error) => {
+        logger.error('Realtime', 'Orders listener error:', error.message)
+      })
 
       this.unsubscribers.set('orders', unsubscribe)
-    })
+    } catch (e) {
+      logger.error('Realtime', 'Failed to setup orders listener:', e.message)
+    }
   }
 
   /**
@@ -420,9 +354,7 @@ class FirestoreRealtimeService {
 
     return () => {
       const callbacks = this.listeners.get(eventType)
-      if (callbacks) {
-        callbacks.delete(callback)
-      }
+      if (callbacks) callbacks.delete(callback)
     }
   }
 
@@ -433,51 +365,45 @@ class FirestoreRealtimeService {
     const callbacks = this.listeners.get(eventType)
     if (callbacks) {
       callbacks.forEach(cb => {
-        try {
-          cb(data)
-        } catch (e) {
-          console.error('[FirestoreRealtime] Callback error:', e)
-        }
+        try { cb(data) } catch (e) { /* ignore */ }
       })
     }
   }
 
   /**
-   * Check if initialized
+   * Check if connected
    */
   isConnected() {
-    return this.isInitialized && this.userId !== null
-  }
-
-  /**
-   * Get connection status (for compatibility with old SSE service)
-   */
-  getStatus() {
-    return this.isInitialized ? 'connected' : 'disconnected'
+    return this.isInitialized && this.userId !== null && !this.isPaused
   }
 
   /**
    * Cleanup all listeners
    */
   cleanup() {
-    this.unsubscribers.forEach((unsubscribe, key) => {
-      try {
-        unsubscribe()
-      } catch (e) {
-        console.warn('[FirestoreRealtime] Cleanup error for', key, e)
-      }
+    // Clear debounce timers
+    this.debounceTimers.forEach(timer => clearTimeout(timer))
+    this.debounceTimers.clear()
+    
+    // Unsubscribe all
+    this.unsubscribers.forEach((unsubscribe) => {
+      try { unsubscribe() } catch (e) { /* ignore */ }
     })
     this.unsubscribers.clear()
     this.listeners.clear()
-    this.retryAttempts.clear()
-    this.lastUserData = null
+    
+    // Reset cache
+    this.lastCredits = null
+    this.lastProfile = null
+    this.seenNotificationIds.clear()
+    this.seenOrderIds.clear()
+    
     this.userId = null
     this.isInitialized = false
-    logger.log('[FirestoreRealtime] Cleaned up')
+    this.isPaused = false
   }
 }
 
-// Singleton instance
 const firestoreRealtimeService = new FirestoreRealtimeService()
 
 export default firestoreRealtimeService

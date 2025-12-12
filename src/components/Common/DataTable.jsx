@@ -5,7 +5,7 @@
 
 import { useState, useMemo } from 'react'
 import { cn } from '@/lib/utils'
-import { LoadingSpinner } from './LoadingSpinner'
+import { SkeletonTableRow } from '@/components/ui/skeleton'
 import { EmptyState } from './EmptyState'
 
 export function DataTable({
@@ -56,8 +56,15 @@ export function DataTable({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-8">
-        <LoadingSpinner size="lg" />
+      <div className="overflow-x-auto">
+        <div className="border-b border-gray-200 py-3 px-4 flex gap-4">
+          {columns.map((col) => (
+            <div key={col.key} className="h-4 w-20 bg-fill-secondary rounded animate-pulse" />
+          ))}
+        </div>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <SkeletonTableRow key={i} columns={columns.length} />
+        ))}
       </div>
     )
   }

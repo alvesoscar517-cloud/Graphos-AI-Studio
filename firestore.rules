@@ -1,0 +1,118 @@
+rules_version = '2';
+/**
+ * Firestore Security Rules for Graphos AI Studio
+ * 
+ * SECURITY MODEL:
+ * ================
+ * - Backend uses Admin SDK (bypasses all rules) for write operations
+ * - Frontend uses Web SDK for read-only realtime listeners
+ * - Authentication is handled by backend (JWT/session), not Firebase Auth
+ * - Data isolation is enforced by:
+ *   1. Frontend queries always filter by userId (client-side)
+ *   2. Backend validates userId before any write operation
+ *   3. Sensitive data (passwords, tokens) is never exposed to frontend
+ * 
+ * COLLECTIONS:
+ * - users: User profiles, credits, settings (read by owner)
+ * - notifications: User notifications (read by owner, filtered by userId)
+ * - user_notifications: User notifications realtime (read by owner, filtered by userId)
+ * - voice_profiles: Voice profiles (read by owner, filtered by user_id)
+ * - orders: Purchase orders (read by owner, filtered by userId)
+ * - support_tickets: Support tickets (read by admin panel only)
+ * - system_settings: System config (read by admin panel only)
+ * 
+ * NOTE: Write operations are ALWAYS denied for Web SDK.
+ * All writes go through authenticated backend API → Admin SDK.
+ */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // =========================================================================
+    // HELPER FUNCTIONS
+    // =========================================================================
+    
+    // Check if request is a read operation
+    function isReadOnly() {
+      return request.method == 'get' || request.method == 'list';
+    }
+    
+    // =========================================================================
+    // USERS COLLECTION
+    // Read: Allowed (frontend reads own user doc by userId)
+    // Write: Denied (backend only via Admin SDK)
+    // =========================================================================
+    match /users/{userId} {
+      allow read: if isReadOnly();
+      allow write: if false;
+    }
+    
+    // =========================================================================
+    // NOTIFICATIONS COLLECTION
+    // Read: Allowed (frontend queries with userId filter)
+    // Write: Denied (backend only via Admin SDK)
+    // =========================================================================
+    match /notifications/{notificationId} {
+      allow read: if isReadOnly();
+      allow write: if false;
+    }
+    
+    // =========================================================================
+    // USER NOTIFICATIONS COLLECTION
+    // Read: Allowed (frontend realtime listener queries with userId filter)
+    // Write: Denied (backend only via Admin SDK)
+    // =========================================================================
+    match /user_notifications/{notificationId} {
+      allow read: if isReadOnly();
+      allow write: if false;
+    }
+    
+    // =========================================================================
+    // VOICE PROFILES COLLECTION
+    // Read: Allowed (frontend queries with user_id filter)
+    // Write: Denied (backend only via Admin SDK)
+    // =========================================================================
+    match /voice_profiles/{profileId} {
+      allow read: if isReadOnly();
+      allow write: if false;
+    }
+    
+    // =========================================================================
+    // ORDERS COLLECTION
+    // Read: Allowed (frontend queries with userId filter for payment detection)
+    // Write: Denied (backend only via Admin SDK)
+    // =========================================================================
+    match /orders/{orderId} {
+      allow read: if isReadOnly();
+      allow write: if false;
+    }
+    
+    // =========================================================================
+    // SUPPORT TICKETS COLLECTION (Admin Panel)
+    // Read: Allowed (admin panel reads all tickets)
+    // Write: Denied (backend only via Admin SDK)
+    // =========================================================================
+    match /support_tickets/{ticketId} {
+      allow read: if isReadOnly();
+      allow write: if false;
+    }
+    
+    // =========================================================================
+    // SYSTEM SETTINGS (Admin Panel)
+    // Read: Allowed (admin panel reads system config)
+    // Write: Denied (backend only via Admin SDK)
+    // =========================================================================
+    match /system_settings/{settingId} {
+      allow read: if isReadOnly();
+      allow write: if false;
+    }
+    
+    // =========================================================================
+    // DEFAULT: Deny all other access
+    // Any collection not explicitly listed above is blocked
+    // =========================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

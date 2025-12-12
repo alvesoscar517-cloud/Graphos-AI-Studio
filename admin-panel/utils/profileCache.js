@@ -13,7 +13,7 @@ export function getCachedProfiles() {
 
   const now = Date.now()
   if (now - profilesCache.timestamp > profilesCache.expiryTime) {
-    logger.log('⏰ Profile cache expired')
+    logger.log('[TIMER] Profile cache expired')
     return null
   }
 

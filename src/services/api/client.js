@@ -80,6 +80,16 @@ class ApiClient {
     
     const requestId = generateRequestId()
     
+    // Validate baseUrl
+    if (!this.baseUrl) {
+      const configError = new ApiError('API base URL is not configured', {
+        code: 'CONFIG_ERROR',
+        requestId
+      })
+      logError(configError, { context: 'API', endpoint })
+      throw configError
+    }
+    
     // Build URL with query params for GET requests
     let url = `${this.baseUrl}${endpoint}`
     if (params && typeof params === 'object') {
@@ -119,7 +129,8 @@ class ApiClient {
         // Add auth token and type hint if available
         // X-Auth-Type header helps backend verify token efficiently
         const { token: authToken, authType } = await this.getAuthTokenWithType()
-        if (authToken) {
+        // Only add Authorization header if token is a valid non-empty string
+        if (authToken && typeof authToken === 'string' && authToken.trim()) {
           requestHeaders['Authorization'] = `Bearer ${authToken}`
           // Add auth type hint for backend optimization
           if (authType) {
@@ -135,10 +146,15 @@ class ApiClient {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), timeout)
     
+    // Clean headers - remove any undefined/null values
+    const cleanHeaders = Object.fromEntries(
+      Object.entries(requestHeaders).filter(([, value]) => value != null && value !== '')
+    )
+    
     // Build fetch options
     const fetchOptions = {
       method,
-      headers: requestHeaders,
+      headers: cleanHeaders,
       signal: signal || controller.signal
     }
     
@@ -151,6 +167,11 @@ class ApiClient {
       const startTime = Date.now()
       
       try {
+        // Validate URL before fetch
+        if (!url || typeof url !== 'string') {
+          throw new ApiError('Invalid request URL', { code: 'INVALID_URL', requestId })
+        }
+        
         const response = await fetch(url, fetchOptions)
         const duration = Date.now() - startTime
         
@@ -220,6 +241,17 @@ class ApiClient {
           throw networkError
         }
         
+        // Handle invalid fetch parameters (e.g., invalid URL or headers)
+        if (error.name === 'TypeError' && error.message?.includes('Invalid value')) {
+          logger.error('API', 'Invalid fetch parameters', { url, headers: Object.keys(cleanHeaders) })
+          const invalidError = new ApiError('Invalid request parameters', {
+            code: 'INVALID_REQUEST',
+            requestId
+          })
+          logError(invalidError, { context: 'API', endpoint, method, requestId })
+          throw invalidError
+        }
+        
         throw error
       } finally {
         clearTimeout(timeoutId)
@@ -239,22 +271,17 @@ class ApiClient {
    * @returns {Promise<{token: string|null, authType: 'email'|'google'|null}>}
    */
   async getAuthTokenWithType() {
-    // First check localStorage for email auth token (with auto-refresh)
+    // Try email auth first (web app mode)
     try {
-      const { getAuthMethod, isTokenValid } = await import('../../utils/authStorage')
+      const { getAuthMethod } = await import('../../utils/authStorage')
       const authMethod = getAuthMethod()
       
-      if (authMethod === 'email') {
-        // Check if token is valid (not corrupted)
-        if (!isTokenValid()) {
-          console.warn('[API] Token corrupted or invalid, clearing auth')
-          this.handleSessionExpired()
-          return { token: null, authType: null }
-        }
-        
-        // Use tokenService to get valid token (auto-refreshes if needed)
+      // Try to get token if authMethod is 'email' or not set
+      if (authMethod === 'email' || !authMethod) {
         const token = await tokenService.getValidToken()
-        if (token) return { token, authType: 'email' }
+        if (token && typeof token === 'string' && token.trim()) {
+          return { token, authType: 'email' }
+        }
       }
     } catch (error) {
       logError(error, { context: 'getAuthToken' })
@@ -264,7 +291,7 @@ class ApiClient {
     try {
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
         const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' })
-        if (response?.token) {
+        if (response?.token && typeof response.token === 'string') {
           return { token: response.token, authType: 'google' }
         }
       }

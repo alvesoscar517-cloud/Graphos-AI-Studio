@@ -74,10 +74,9 @@ export async function getOrCreateAppFolder() {
     driveFolderId = createData.id
     await chrome.storage.local.set({ driveFolderId })
 
-    logger.log('[SUCCESS] Created Drive folder:', driveFolderId)
     return driveFolderId
   } catch (error) {
-    console.error('[FAIL] Error with Drive folder:', error)
+    logger.error('Drive', 'Error with Drive folder', error)
     throw error
   }
 }
@@ -146,10 +145,9 @@ export async function syncNotesToDrive(notes) {
       }
     }
 
-    logger.log('[SUCCESS] Notes synced to Drive')
     return true
   } catch (error) {
-    console.error('[FAIL] Error syncing to Drive:', error)
+    logger.error('Drive', 'Error syncing to Drive', error)
     throw error
   }
 }
@@ -163,8 +161,6 @@ export async function loadNotesFromDrive() {
     const result = await chrome.storage.local.get(['accessToken'])
     const token = result.accessToken
 
-    logger.log('📋 Loading notes from Drive folder:', folderId)
-
     // List all files in folder
     const response = await fetch(
       `https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents and trashed=false&fields=files(id,name,modifiedTime)&orderBy=modifiedTime desc`,
@@ -176,7 +172,7 @@ export async function loadNotesFromDrive() {
     )
 
     if (!response.ok) {
-      console.error('[FAIL] Drive API error:', response.status, response.statusText)
+      logger.error('Drive', `Drive API error: ${response.status} ${response.statusText}`)
       
       // If 401 or 403, token doesn't have Drive permission
       if (response.status === 401 || response.status === 403) {
@@ -216,14 +212,13 @@ export async function loadNotesFromDrive() {
           })
         }
       } catch (error) {
-        console.error(`[FAIL] Failed to load file ${file.name}:`, error)
+        logger.error('Drive', `Failed to load file ${file.name}`, error)
       }
     }
 
-    logger.log('[SUCCESS] Loaded notes from Drive:', notes.length)
     return notes
   } catch (error) {
-    console.error('[FAIL] Error loading notes from Drive:', error)
+    logger.error('Drive', 'Error loading notes from Drive', error)
     throw error
   }
 }
@@ -267,7 +262,6 @@ export async function saveNoteToDrive(note) {
         }
       )
       
-      logger.log('[SUCCESS] Updated note in Drive:', fileName)
       return note.driveId
     }
 
@@ -294,10 +288,9 @@ export async function saveNoteToDrive(note) {
     )
 
     const data = await response.json()
-    logger.log('[SUCCESS] Created note in Drive:', fileName)
     return data.id
   } catch (error) {
-    console.error('[FAIL] Error saving note to Drive:', error)
+    logger.error('Drive', 'Error saving note to Drive', error)
     throw error
   }
 }
@@ -320,10 +313,9 @@ export async function deleteNoteFromDrive(driveId) {
       }
     )
 
-    logger.log('[SUCCESS] Deleted note from Drive')
     return true
   } catch (error) {
-    console.error('[FAIL] Error deleting note from Drive:', error)
+    logger.error('Drive', 'Error deleting note from Drive', error)
     throw error
   }
 }
@@ -348,13 +340,13 @@ export async function openDriveFolder(notes) {
     // Sync notes in background
     if (notes && notes.length > 0) {
       syncNotesToDrive(notes).catch(error => {
-        console.error('[FAIL] Failed to sync notes:', error)
+        logger.error('Drive', 'Failed to sync notes', error)
       })
     }
 
     return true
   } catch (error) {
-    console.error('[FAIL] Error opening Drive folder:', error)
+    logger.error('Drive', 'Error opening Drive folder', error)
     throw error
   }
 }
@@ -431,10 +423,9 @@ export async function getOrCreateConversationsFolder() {
     conversationsFolderId = createData.id
     await chrome.storage.local.set({ conversationsFolderId })
 
-    logger.log('[SUCCESS] Created Workspace folder:', conversationsFolderId)
     return conversationsFolderId
   } catch (error) {
-    console.error('[FAIL] Error with Workspace folder:', error)
+    logger.error('Drive', 'Error with Workspace folder', error)
     throw error
   }
 }
@@ -530,10 +521,9 @@ export async function syncConversationsToDrive(conversations) {
       synced++
     }
 
-    logger.log(`[SUCCESS] Synced ${synced} conversations to Drive`)
     return { synced, total: conversations.length }
   } catch (error) {
-    console.error('[FAIL] Error syncing conversations to Drive:', error)
+    logger.error('Drive', 'Error syncing conversations to Drive', error)
     throw error
   }
 }
@@ -547,8 +537,6 @@ export async function loadConversationsFromDrive() {
     const folderId = await getOrCreateConversationsFolder()
     const result = await chrome.storage.local.get(['accessToken'])
     const token = result.accessToken
-
-    logger.log('📋 Loading conversations from Drive folder:', folderId)
 
     // List all JSON files in folder
     const response = await fetch(
@@ -594,14 +582,13 @@ export async function loadConversationsFromDrive() {
           conversations.push(conv)
         }
       } catch (error) {
-        console.error(`[FAIL] Failed to load conversation ${file.name}:`, error)
+        logger.error('Drive', `Failed to load conversation ${file.name}`, error)
       }
     }
 
-    logger.log(`[SUCCESS] Loaded ${conversations.length} conversations from Drive`)
     return conversations
   } catch (error) {
-    console.error('[FAIL] Error loading conversations from Drive:', error)
+    logger.error('Drive', 'Error loading conversations from Drive', error)
     throw error
   }
 }
@@ -635,12 +622,11 @@ export async function deleteConversationFromDrive(conversationId) {
           headers: { Authorization: `Bearer ${token}` }
         }
       )
-      logger.log('[SUCCESS] Deleted conversation from Drive:', conversationId)
     }
 
     return true
   } catch (error) {
-    console.error('[FAIL] Error deleting conversation from Drive:', error)
+    logger.error('Drive', 'Error deleting conversation from Drive', error)
     throw error
   }
 }
@@ -661,7 +647,7 @@ export async function openWorkspaceDriveFolder() {
 
     return true
   } catch (error) {
-    console.error('[FAIL] Error opening Workspace Drive folder:', error)
+    logger.error('Drive', 'Error opening Workspace Drive folder', error)
     throw error
   }
 }

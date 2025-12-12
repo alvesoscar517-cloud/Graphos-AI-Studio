@@ -2,6 +2,13 @@ import { logger } from '../utils/logger'
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../stores/authStore'
 import { logError } from '../utils/errors'
+import { useProfiles } from './ProfileContext'
+import {
+  getConversationsFromDB,
+  saveConversationToDB,
+  deleteConversationFromDB,
+  clearConversationsDB
+} from '../services/indexedDB'
 
 const WorkspaceContext = createContext()
 
@@ -27,8 +34,6 @@ const ERROR_MESSAGES = {
 // Safe hook to get current profile - doesn't throw if context missing
 const useSafeProfiles = () => {
   try {
-    // Dynamic import to avoid circular dependency issues
-    const { useProfiles } = require('./ProfileContext')
     return useProfiles()
   } catch {
     return { currentProfile: null, profiles: [], loading: false }
@@ -64,7 +69,7 @@ export const WorkspaceProvider = ({ children }) => {
   // Track previous user to detect account changes
   const prevUserRef = useRef(null)
 
-  // Load conversations from localStorage and clear on user change
+  // Load conversations from IndexedDB and clear on user change
   useEffect(() => {
     const prevUser = prevUserRef.current
     const currentUserEmail = user?.email || user?.id
@@ -83,49 +88,88 @@ export const WorkspaceProvider = ({ children }) => {
 
     if (user) {
       const userKey = user.email || user.id
-      const saved = localStorage.getItem(`workspace_conversations_${userKey}`)
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved)
-          const limited = parsed.slice(0, MAX_CONVERSATIONS)
-          setConversations(limited)
-          
-          if (parsed.length > MAX_CONVERSATIONS) {
-            logger.log(`[WARNING] Loaded ${MAX_CONVERSATIONS} of ${parsed.length} conversations`)
+      // Load from IndexedDB
+      getConversationsFromDB(userKey)
+        .then(async loaded => {
+          // Migration: Check if there's old data in localStorage
+          const oldKey = `workspace_conversations_${userKey}`
+          const oldData = localStorage.getItem(oldKey)
+          if (oldData && loaded.length === 0) {
+            try {
+              const parsed = JSON.parse(oldData)
+              const migrated = parsed
+                .filter(c => c.messages && c.messages.length > 0)
+                .map(conv => ({
+                  ...conv,
+                  created: conv.created ? new Date(conv.created) : new Date(),
+                  updated: conv.updated ? new Date(conv.updated) : new Date(),
+                  messages: conv.messages?.map(m => ({
+                    ...m,
+                    timestamp: m.timestamp ? new Date(m.timestamp) : new Date()
+                  })) || []
+                }))
+              
+              // Save migrated data to IndexedDB
+              for (const conv of migrated) {
+                await saveConversationToDB(userKey, conv)
+              }
+              
+              // Remove old localStorage data
+              localStorage.removeItem(oldKey)
+              logger.log(`[WORKSPACE] Migrated ${migrated.length} conversations from localStorage to IndexedDB`)
+              
+              setConversations(migrated.slice(0, MAX_CONVERSATIONS))
+              return
+            } catch (err) {
+              logger.error('Workspace', 'Failed to migrate from localStorage', err)
+            }
           }
-        } catch (err) {
-          console.error('Failed to load conversations:', err)
+
+          const limited = loaded
+            .sort((a, b) => new Date(b.updated) - new Date(a.updated))
+            .slice(0, MAX_CONVERSATIONS)
+          setConversations(limited)
+          logger.log(`[WORKSPACE] Loaded ${limited.length} conversations from IndexedDB`)
+        })
+        .catch(err => {
+          logger.error('Workspace', 'Failed to load conversations from IndexedDB', err)
           setConversations([])
-        }
-      } else {
-        // No saved data for this user, ensure clean state
-        setConversations([])
-      }
+        })
     } else {
       // User logged out, clear everything
-      logger.log('[INFO] User logged out, clearing workspace state')
       setConversations([])
       setCurrentConversation(null)
     }
   }, [user])
 
-  // Save conversations to localStorage
+  // Save ref to track last saved state (avoid unnecessary writes)
+  const lastSavedRef = useRef(null)
+
+  // Save conversations to IndexedDB (debounced, only when changed)
   useEffect(() => {
-    if (user) {
-      const conversationsWithContent = conversations.filter(c => 
-        (c.messages && c.messages.length > 0) || 
-        (c.title && c.title.trim() !== '' && c.title !== 'New Chat')
-      )
-      
-      const limited = conversationsWithContent.slice(0, MAX_CONVERSATIONS)
-      
-      if (limited.length > 0) {
-        localStorage.setItem(
-          `workspace_conversations_${user.email}`,
-          JSON.stringify(limited)
-        )
-      }
-    }
+    if (!user) return
+
+    const userKey = user.email || user.id
+    // Only save conversations with actual content (messages)
+    const conversationsWithContent = conversations.filter(
+      c => c.messages && c.messages.length > 0
+    )
+
+    // Skip if nothing changed
+    const currentHash = JSON.stringify(conversationsWithContent.map(c => c.id + c.updated))
+    if (lastSavedRef.current === currentHash) return
+    lastSavedRef.current = currentHash
+
+    // Debounce save to IndexedDB
+    const saveTimeout = setTimeout(() => {
+      conversationsWithContent.forEach(conv => {
+        saveConversationToDB(userKey, conv).catch(err => {
+          logger.error('Workspace', 'Failed to save conversation to IndexedDB', err)
+        })
+      })
+    }, 500)
+
+    return () => clearTimeout(saveTimeout)
   }, [conversations, user])
   
   // Periodic cleanup - with proper cleanup ref to prevent memory leaks
@@ -139,13 +183,29 @@ export const WorkspaceProvider = ({ children }) => {
     
     cleanupIntervalRef.current = setInterval(() => {
       setConversations(prev => {
-        if (prev.length <= MAX_CONVERSATIONS) return prev
+        // First, remove empty conversations (no messages)
+        const withContent = prev.filter(c => 
+          c.messages && c.messages.length > 0
+        )
         
-        const sorted = [...prev].sort((a, b) => 
+        // Log if we removed any empty ones
+        if (withContent.length < prev.length) {
+          const removed = prev.length - withContent.length
+          logger.log(`🧹 Auto-cleanup: Removed ${removed} empty conversations`)
+          // Delete empty ones from IndexedDB
+          prev.filter(c => !c.messages || c.messages.length === 0).forEach(c => {
+            deleteConversationFromDB(c.id).catch(() => {})
+          })
+        }
+        
+        // Then limit to MAX_CONVERSATIONS
+        if (withContent.length <= MAX_CONVERSATIONS) return withContent
+        
+        const sorted = [...withContent].sort((a, b) => 
           new Date(b.updated || b.created) - new Date(a.updated || a.created)
         )
         
-        logger.log(`🧹 Auto-cleanup: Keeping ${MAX_CONVERSATIONS} of ${prev.length} conversations`)
+        logger.log(`🧹 Auto-cleanup: Keeping ${MAX_CONVERSATIONS} of ${sorted.length} conversations`)
         return sorted.slice(0, MAX_CONVERSATIONS)
       })
     }, 5 * 60 * 1000)
@@ -185,21 +245,28 @@ export const WorkspaceProvider = ({ children }) => {
     return prompt
   }, [currentProfile])
 
-  // Check if conversation has content
+  // Check if conversation has content (only messages count, not title)
   const hasContent = useCallback((conversation) => {
     if (!conversation) return false
     const messages = conversation.messages || []
-    const title = conversation.title?.trim() || ''
-    return messages.length > 0 || (title.length > 0 && title !== 'New Chat')
+    // Only count as having content if there are actual messages
+    return messages.length > 0
   }, [])
 
-  // Clean up empty conversations
-  const cleanupEmptyConversations = useCallback(() => {
+  // Clean up empty conversations (except current one being edited)
+  const cleanupEmptyConversations = useCallback((excludeId = null) => {
     setConversations(prev => {
-      const emptyConvs = prev.filter(c => !hasContent(c) && c.id !== currentConversation?.id)
+      const currentId = excludeId || currentConversation?.id
+      const emptyConvs = prev.filter(c => !hasContent(c) && c.id !== currentId)
       if (emptyConvs.length > 0) {
         logger.log(`🧹 Cleaning up ${emptyConvs.length} empty conversations`)
-        return prev.filter(c => hasContent(c) || c.id === currentConversation?.id)
+        // Also delete from IndexedDB
+        emptyConvs.forEach(c => {
+          deleteConversationFromDB(c.id).catch(err => {
+            logger.error('Workspace', 'Failed to delete empty conversation from IndexedDB', err)
+          })
+        })
+        return prev.filter(c => hasContent(c) || c.id === currentId)
       }
       return prev
     })
@@ -230,11 +297,14 @@ export const WorkspaceProvider = ({ children }) => {
 
   // Load conversation
   const loadConversation = useCallback((id) => {
+    // Clean up empty conversations when switching (except the one we're loading)
+    cleanupEmptyConversations(id)
+    
     const conversation = conversations.find(c => c.id === id)
     if (conversation) {
       setCurrentConversation(conversation)
     }
-  }, [conversations])
+  }, [conversations, cleanupEmptyConversations])
 
   // Truncate title to max words
   const truncateTitleToWords = useCallback((title, maxWords = 7) => {
@@ -361,6 +431,7 @@ export const WorkspaceProvider = ({ children }) => {
       let isAnimating = false
       let newSummary = conversation?.summary || null
       let humanizationResult = null
+      let followUpSuggestions = [] // Store follow-up suggestions from AI
 
       const animateText = () => {
         if (displayedText.length < fullText.length) {
@@ -410,7 +481,7 @@ export const WorkspaceProvider = ({ children }) => {
 
       // Use humanized or standard chat based on settings
       if (useHumanizedChat) {
-        logger.log('🎭 Using humanized chat', currentProfile ? 'with voice profile' : 'with generic voice')
+        logger.log('[PERSONA] Using humanized chat', currentProfile ? 'with voice profile' : 'with generic voice')
         await streamFunction(
           apiMessages,
           currentConversation?.systemPrompt || generateSystemPrompt(),
@@ -435,11 +506,10 @@ export const WorkspaceProvider = ({ children }) => {
             },
             onHumanizing: (humanizingInfo) => {
               // Humanization in progress - show status
-              logger.log(`🔄 Humanizing: AI probability ${humanizingInfo.aiProbability}% -> target ${humanizingInfo.target}%`)
+              logger.log(`[SYNC] Humanizing: AI probability ${humanizingInfo.aiProbability}% -> target ${humanizingInfo.target}%`)
             },
             onHumanized: (humanizedText) => {
               // Replace with fully humanized text
-              logger.log('✨ Received humanized text')
               fullText = humanizedText
               displayedText = humanizedText
               setCurrentConversation(prev => ({
@@ -457,6 +527,9 @@ export const WorkspaceProvider = ({ children }) => {
               }
               if (completeInfo.humanization) {
                 humanizationResult = completeInfo.humanization
+              }
+              if (completeInfo.suggestions) {
+                followUpSuggestions = completeInfo.suggestions
               }
             }
           }
@@ -488,6 +561,9 @@ export const WorkspaceProvider = ({ children }) => {
               if (completeInfo.summary) {
                 newSummary = completeInfo.summary
               }
+              if (completeInfo.suggestions) {
+                followUpSuggestions = completeInfo.suggestions
+              }
             }
           }
         )
@@ -513,7 +589,8 @@ export const WorkspaceProvider = ({ children }) => {
       const finalAiMessage = {
         ...aiMessage,
         content: fullText,
-        streaming: false
+        streaming: false,
+        suggestions: followUpSuggestions // Add follow-up suggestions to message
       }
 
       const finalMessages = [...updatedMessages, finalAiMessage]
@@ -577,10 +654,16 @@ export const WorkspaceProvider = ({ children }) => {
   }, [currentConversation, generateSystemPrompt, createConversation, modelSettings, currentProfile, generateTitle, formatErrorMessage, truncateTitleToWords])
 
   // Delete conversation
-  const deleteConversation = useCallback((id) => {
+  const deleteConversation = useCallback(async (id) => {
     setConversations(prev => prev.filter(c => c.id !== id))
     if (currentConversation?.id === id) {
       setCurrentConversation(null)
+    }
+    // Also delete from IndexedDB
+    try {
+      await deleteConversationFromDB(id)
+    } catch (err) {
+      logger.error('Workspace', 'Failed to delete conversation from IndexedDB', err)
     }
   }, [currentConversation])
 
@@ -597,8 +680,10 @@ export const WorkspaceProvider = ({ children }) => {
 
   // Clear current conversation
   const clearConversation = useCallback(() => {
+    // Clean up empty conversations when clearing
+    cleanupEmptyConversations()
     setCurrentConversation(null)
-  }, [])
+  }, [cleanupEmptyConversations])
 
   // Update model settings
   const updateModelSettings = useCallback((settings) => {
@@ -661,10 +746,10 @@ export const WorkspaceProvider = ({ children }) => {
       )
       
       const result = await syncToDrive(conversationsToSync)
-      logger.log(`📤 Synced ${result.synced} conversations to Drive`)
+      logger.log(`[UPLOAD] Synced ${result.synced} conversations to Drive`)
       return result
     } catch (error) {
-      console.error('Failed to sync conversations to Drive:', error)
+      logger.error('Workspace', 'Failed to sync conversations to Drive', error)
       throw error
     }
   }, [user, conversations])
@@ -697,11 +782,11 @@ export const WorkspaceProvider = ({ children }) => {
         .sort((a, b) => new Date(b.updated) - new Date(a.updated))
       
       setConversations(allConversations)
-      logger.log(`📥 Loaded ${driveConversations.length} conversations from Drive, ${newFromDrive.length} new`)
+      logger.log(`[DOWNLOAD] Loaded ${driveConversations.length} conversations from Drive, ${newFromDrive.length} new`)
       
       return { loaded: driveConversations.length, new: newFromDrive.length }
     } catch (error) {
-      console.error('Failed to load conversations from Drive:', error)
+      logger.error('Workspace', 'Failed to load conversations from Drive', error)
       throw error
     }
   }, [user, conversations])

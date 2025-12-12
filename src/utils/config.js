@@ -145,17 +145,17 @@ export function debugLog(...args) {
  * Warning log - always logs but with context
  */
 export function warnLog(...args) {
-  console.warn('[WARN]', ...args);
+  logger.warn('Config', ...args);
 }
 
 /**
  * Error log with optional details
  */
 export function errorLog(message, error, details = null) {
-  console.error('[ERROR]', message, error);
+  logger.error('Config', message, error);
   
   if (CONFIG.ENABLE_ERROR_DETAILS && details) {
-    console.error('[DETAILS]', details);
+    logger.error('Config', 'Details', { details });
   }
 }
 
@@ -195,7 +195,7 @@ export function validateConfig() {
   }
   
   if (errors.length > 0) {
-    console.error('[CONFIG] Configuration errors:', errors);
+    logger.error('Config', 'Configuration errors', { errors });
     return false;
   }
   

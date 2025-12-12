@@ -906,6 +906,33 @@ exports.revokeOtherSessions = async (req, res) => {
 };
 
 /**
+ * Revoke ALL sessions (including current) - Sign out from all devices
+ * POST /auth/email/sessions/revoke-all
+ */
+exports.revokeAllSessions = async (req, res) => {
+  try {
+    const userId = req.userId;
+    
+    const result = await emailAuthService.revokeAllSessions(userId);
+    
+    res.json({
+      success: true,
+      message: `Signed out from all ${result.revokedCount} device(s)`,
+      revokedCount: result.revokedCount
+    });
+    
+  } catch (error) {
+    logger.error('Revoke all sessions error', { error: error.message });
+    
+    res.status(500).json({
+      success: false,
+      error: 'Failed to sign out from all devices',
+      code: 'REVOKE_ALL_SESSIONS_ERROR'
+    });
+  }
+};
+
+/**
  * Get login history
  * GET /auth/email/login-history
  */

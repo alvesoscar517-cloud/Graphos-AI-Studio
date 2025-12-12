@@ -34,63 +34,73 @@ const LoginOverlay = () => {
 
   useEffect(() => {
     // Show overlay when loading OR not authenticated
-    logger.log('[SECURE] LoginOverlay state:', { authLoading, isAuthenticated, shouldShow })
-    if (authLoading || !isAuthenticated) {
-      logger.log('[WARNING] Showing login overlay')
-      setShouldShow(true)
-    } else {
-      logger.log('[SUCCESS] Hiding login overlay')
-      setShouldShow(false)
-    }
+    setShouldShow(authLoading || !isAuthenticated)
   }, [authLoading, isAuthenticated])
 
-  // Vanta.js fog effect
+  // Preload Three.js and Vanta.js immediately on mount (no lazy loading)
   useEffect(() => {
-    if (!shouldShow || !vantaRef.current) return
+    const preloadScripts = () => {
+      // Preload Three.js immediately
+      if (!window.THREE && !document.querySelector('script[src*="three.min.js"]')) {
+        const threeScript = document.createElement('script')
+        threeScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js'
+        threeScript.async = false // Load synchronously for faster availability
+        document.head.appendChild(threeScript)
+      }
 
-    const loadVanta = async () => {
-      try {
-        // Load Three.js and Vanta dynamically
-        if (!window.THREE) {
-          const threeScript = document.createElement('script')
-          threeScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js'
-          threeScript.async = true
-          document.head.appendChild(threeScript)
-          await new Promise(resolve => { threeScript.onload = resolve })
-        }
-
-        if (!window.VANTA) {
-          const vantaScript = document.createElement('script')
-          vantaScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.fog.min.js'
-          vantaScript.async = true
-          document.head.appendChild(vantaScript)
-          await new Promise(resolve => { vantaScript.onload = resolve })
-        }
-
-        // Initialize Vanta effect with Apple System Blue colors
-        if (window.VANTA && vantaRef.current && !vantaEffect.current) {
-          vantaEffect.current = window.VANTA.FOG({
-            el: vantaRef.current,
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            highlightColor: 0x5AC8FA,  // Apple System Teal
-            midtoneColor: 0x007AFF,    // Apple System Blue
-            lowlightColor: 0x5856D6,   // Apple System Indigo
-            baseColor: 0x0051D5,       // Apple Blue Hover (darker)
-            blurFactor: 0.6,
-            speed: 1.2,
-            zoom: 1.0
-          })
-        }
-      } catch (error) {
-        console.error('Vanta.js load error:', error)
+      // Preload Vanta.js immediately
+      if (!window.VANTA && !document.querySelector('script[src*="vanta.fog.min.js"]')) {
+        const vantaScript = document.createElement('script')
+        vantaScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.fog.min.js'
+        vantaScript.async = false // Load synchronously for faster availability
+        document.head.appendChild(vantaScript)
       }
     }
 
-    loadVanta()
+    // Start preloading immediately
+    preloadScripts()
+  }, [])
+
+  // Vanta.js fog effect - initialize when ready
+  useEffect(() => {
+    if (!shouldShow || !vantaRef.current) return
+
+    const initVanta = () => {
+      // Initialize Vanta effect with Apple System Blue colors
+      if (window.VANTA && vantaRef.current && !vantaEffect.current) {
+        vantaEffect.current = window.VANTA.FOG({
+          el: vantaRef.current,
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.00,
+          minWidth: 200.00,
+          highlightColor: 0x5AC8FA,  // Apple System Teal
+          midtoneColor: 0x007AFF,    // Apple System Blue
+          lowlightColor: 0x5856D6,   // Apple System Indigo
+          baseColor: 0x0051D5,       // Apple Blue Hover (darker)
+          blurFactor: 0.6,
+          speed: 1.2,
+          zoom: 1.0
+        })
+      }
+    }
+
+    // Try to initialize immediately if scripts are already loaded
+    if (window.THREE && window.VANTA) {
+      initVanta()
+    } else {
+      // Poll for script availability (scripts are preloading)
+      const checkInterval = setInterval(() => {
+        if (window.THREE && window.VANTA) {
+          clearInterval(checkInterval)
+          initVanta()
+        }
+      }, 50)
+
+      // Cleanup interval after 5 seconds max
+      setTimeout(() => clearInterval(checkInterval), 5000)
+    }
 
     return () => {
       if (vantaEffect.current) {
@@ -181,7 +191,7 @@ const LoginOverlay = () => {
         }
       }
     } catch (error) {
-      console.error('Sign in error:', error)
+      logger.error('Auth', 'Sign in error', error)
       const errorMessage = getGoogleSignInErrorMessage(error)
       if (errorMessage) {
         alert(errorMessage)
@@ -202,7 +212,7 @@ const LoginOverlay = () => {
         throw error
       }
     } catch (error) {
-      console.error('Email login error:', error)
+      logger.error('Auth', 'Email login error', error)
       throw error
     } finally {
       setIsLoading(false)
@@ -212,18 +222,16 @@ const LoginOverlay = () => {
   const handleEmailRegister = async (email, password, displayName) => {
     setIsLoading(true)
     try {
-      logger.log('[DEBUG] Registering with email:', email)
       const result = await registerWithEmail(email, password, displayName)
       if (!result.success) {
         const error = new Error(result.error || 'Registration failed')
         error.code = result.code
         throw error
       }
-      logger.log('[DEBUG] Registration successful, setting pendingEmail:', email)
       setPendingEmail(email)
       setAuthMode('otp')
     } catch (error) {
-      console.error('Registration error:', error)
+      logger.error('Auth', 'Registration error', error)
       throw error
     } finally {
       setIsLoading(false)
@@ -233,7 +241,6 @@ const LoginOverlay = () => {
   const handleVerifyOTP = async (otp) => {
     setIsLoading(true)
     try {
-      logger.log('[DEBUG] Verifying OTP for email:', pendingEmail, 'OTP:', otp)
       const result = await verifyEmail(pendingEmail, otp)
 
       if (!result.success && !result.needsLogin) {
@@ -244,13 +251,11 @@ const LoginOverlay = () => {
 
       // If server couldn't generate token, redirect to login
       if (result?.needsLogin) {
-        logger.log('[INFO] Account verified but needs manual login')
         setAuthMode('email-login')
-        // Show success message - user needs to login
         return
       }
     } catch (error) {
-      console.error('OTP verification error:', error, 'Email:', pendingEmail)
+      logger.error('Auth', 'OTP verification error', error)
       throw error
     } finally {
       setIsLoading(false)
@@ -266,7 +271,7 @@ const LoginOverlay = () => {
         throw error
       }
     } catch (error) {
-      console.error('Resend OTP error:', error)
+      logger.error('Auth', 'Resend OTP error', error)
       throw error
     }
   }
@@ -294,11 +299,8 @@ const LoginOverlay = () => {
 
   // Don't show overlay while checking auth or if already authenticated
   if (!shouldShow) {
-    logger.log('🚫 LoginOverlay: Not rendering (shouldShow = false)')
     return null
   }
-
-  logger.log('✨ LoginOverlay: Rendering overlay')
 
   const renderAuthContent = () => {
     if (authLoading) {

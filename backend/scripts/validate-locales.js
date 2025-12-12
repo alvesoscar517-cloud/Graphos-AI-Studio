@@ -210,7 +210,7 @@ function main() {
     results.push(result);
     
     if (result.error) {
-      console.log(`${colors.red}✗ ${lang}:${colors.reset} ${result.error}`);
+      console.log(`${colors.red}[FAIL] ${lang}:${colors.reset} ${result.error}`);
       continue;
     }
     
@@ -221,7 +221,7 @@ function main() {
     
     // Status icon
     const hasIssues = missing.length > 0 || empty.length > 0;
-    const icon = hasIssues ? `${colors.yellow}⚠${colors.reset}` : `${colors.green}✓${colors.reset}`;
+    const icon = hasIssues ? `${colors.yellow}[WARNING]${colors.reset}` : `${colors.green}[SUCCESS]${colors.reset}`;
     
     console.log(`${icon} ${colors.cyan}${lang}${colors.reset}`);
     
@@ -274,13 +274,13 @@ function main() {
   
   // Exit code
   if (totalMissing > 0 || totalEmpty > 0) {
-    console.log(`\n${colors.yellow}⚠ Validation completed with warnings${colors.reset}`);
+    console.log(`\n${colors.yellow}[WARNING] Validation completed with warnings${colors.reset}`);
     if (!FIX_MODE) {
       console.log(`${colors.dim}Run with --fix to auto-add missing keys${colors.reset}`);
     }
     process.exit(1);
   } else {
-    console.log(`\n${colors.green}✓ All locales are valid${colors.reset}`);
+    console.log(`\n${colors.green}[SUCCESS] All locales are valid${colors.reset}`);
     process.exit(0);
   }
 }

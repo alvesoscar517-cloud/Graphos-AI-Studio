@@ -183,6 +183,7 @@
   --width-label-md: 60px;
   --width-label-lg: 100px;
   --width-label-xl: 120px;
+  --width-lottie-xs: 180px;
   --width-lottie-sm: 300px;
   --width-lottie-md: 380px;
   
@@ -613,13 +614,36 @@
   * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Ẩn scrollbar toàn cục */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
   }
 
-  *::-webkit-scrollbar {
-    display: none;
+  /* Apple-style scrollbar - giống admin panel, luôn hiển thị */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 100px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.35);
+  }
+
+  /* Dark mode scrollbar */
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.35);
   }
 
   html, body {
@@ -729,7 +753,7 @@
   }
 }
 
-/* Workspace chat scrollbar - simple auto-hide on hover */
+/* Apple-style scrollbar - matches admin panel design with auto-hide */
 /* Override global scrollbar:none with higher specificity */
 .workspace-scrollbar {
   /* Firefox */
@@ -739,7 +763,7 @@
 
 /* Show scrollbar on hover - Firefox */
 .workspace-scrollbar:hover {
-  scrollbar-color: var(--color-border) transparent !important;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
 }
 
 /* Webkit browsers (Chrome, Safari, Edge) */
@@ -755,22 +779,40 @@
 
 .workspace-scrollbar::-webkit-scrollbar-thumb {
   background-color: transparent !important;
-  border-radius: 9999px !important;
+  border-radius: 100px !important;
   border: 2px solid transparent !important;
-  background-clip: content-box !important;
+  background-clip: padding-box !important;
+  transition: background-color 0.2s ease !important;
 }
 
 /* Show scrollbar thumb on container hover */
 .workspace-scrollbar:hover::-webkit-scrollbar-thumb {
-  background-color: var(--color-border) !important;
+  background-color: rgba(0, 0, 0, 0.2) !important;
 }
 
 .workspace-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-border-hover) !important;
+  background-color: rgba(0, 0, 0, 0.35) !important;
 }
 
 .workspace-scrollbar::-webkit-scrollbar-thumb:active {
-  background-color: var(--color-border-hover) !important;
+  background-color: rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Dark mode support */
+.dark .workspace-scrollbar:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent !important;
+}
+
+.dark .workspace-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .workspace-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.dark .workspace-scrollbar::-webkit-scrollbar-thumb:active {
+  background-color: rgba(255, 255, 255, 0.35) !important;
 }
 
 /* Text truncation utilities */
@@ -2353,9 +2395,9 @@
    ============================================ */
 
 .empty-profile-animation {
-  transform: translateX(-3rem) !important;
-  width: 13rem !important;
-  height: 13rem !important;
+  transform: translateX(0) !important;
+  width: 11rem !important;
+  height: 11rem !important;
 }
 
 /* Dark mode: invert animation to white on dark background */
@@ -2364,11 +2406,25 @@
   filter: invert(1) brightness(1.5) !important;
 }
 
+@media (max-width: 1024px) {
+  .empty-profile-animation {
+    width: 10rem !important;
+    height: 10rem !important;
+  }
+}
+
 @media (max-width: 768px) {
   .empty-profile-animation {
     transform: translateX(0) !important;
     width: 9rem !important;
     height: 9rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .empty-profile-animation {
+    width: 7rem !important;
+    height: 7rem !important;
   }
 }
 

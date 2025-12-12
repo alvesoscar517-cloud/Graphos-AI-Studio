@@ -18,7 +18,6 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
   const [searchTerm, setSearchTerm] = useState('')
 
   const handleClick = () => {
-    logger.log('🖱️ ProfileSelector clicked, opening modal')
     setShowModal(true)
   }
 

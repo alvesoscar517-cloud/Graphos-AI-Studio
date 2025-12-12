@@ -416,6 +416,8 @@
 .admin-content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
+  height: 0; /* Force flex item to respect overflow */
 }
 
 /* Mobile content padding adjustment */

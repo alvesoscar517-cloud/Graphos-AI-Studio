@@ -160,6 +160,19 @@ export const notificationsApi = {
       body: JSON.stringify({ templateType, data, targetSegments }),
     });
   },
+
+  // Send notification with email (bulk email to all recipients)
+  sendWithEmail: async (id, options = {}) => {
+    return apiCall(`/api/notifications/${id}/send-with-email`, {
+      method: 'POST',
+      body: JSON.stringify(options),
+    });
+  },
+
+  // Get email sending progress
+  getEmailProgress: async (id) => {
+    return apiCall(`/api/notifications/${id}/email-progress`);
+  },
 };
 
 // ============================================================================

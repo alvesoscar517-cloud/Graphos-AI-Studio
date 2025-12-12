@@ -9,6 +9,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queryKeys'
 import { loadProfiles as loadProfilesAPI } from '@/services/api'
 import apiClient from '@/services/api/client'
+import { getActiveProfile, setActiveProfile as setStorageProfile, clearActiveProfile } from '@/utils/authStorage'
+import { useAuthStore } from '@/stores/authStore'
 
 /**
  * Fetch all profiles using TanStack Query with real-time updates
@@ -17,6 +19,11 @@ export function useProfilesQuery(options = {}) {
   const queryClient = useQueryClient()
   const unsubscribeRef = useRef(null)
   const hasSetupRealtimeRef = useRef(false)
+  
+  // Get auth state to refetch when user logs in
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const user = useAuthStore((state) => state.user)
+  const isLoading = useAuthStore((state) => state.isLoading)
 
   const query = useQuery({
     queryKey: queryKeys.profiles.list(),
@@ -24,12 +31,27 @@ export function useProfilesQuery(options = {}) {
       const profiles = await loadProfilesAPI()
       return profiles || []
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes - reduced to ensure fresher data
-    refetchOnWindowFocus: true, // Enable to catch updates when returning to tab
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    refetchOnMount: 'always', // Always refetch when component mounts to ensure fresh data
+    refetchOnMount: true,
+    retry: 2,
+    retryDelay: 1000,
+    // Only fetch when authenticated and auth is not loading
+    enabled: isAuthenticated && !!user && !isLoading,
     ...options,
   })
+  
+  // Refetch when auth state changes from loading to authenticated
+  useEffect(() => {
+    if (isAuthenticated && user && !isLoading) {
+      // Delay to ensure auth is fully ready
+      const timer = setTimeout(() => {
+        query.refetch()
+      }, 200)
+      return () => clearTimeout(timer)
+    }
+  }, [isAuthenticated, user, isLoading])
 
   // Subscribe to real-time profile updates
   useEffect(() => {
@@ -142,9 +164,8 @@ export function useDeleteProfile() {
       queryClient.setQueryData(queryKeys.profiles.list(), (old = []) => {
         return old.filter(p => p.profile_id !== profileId)
       })
-      // Clear active profile if deleted - use authStorage
+      // Clear active profile if deleted
       try {
-        const { getActiveProfile, clearActiveProfile } = require('@/utils/authStorage')
         const { id: activeId } = getActiveProfile()
         if (activeId === profileId) {
           clearActiveProfile()
@@ -167,10 +188,8 @@ export function useDeleteProfile() {
 export function useActiveProfile() {
   const { data: profiles = [] } = useProfilesQuery()
   
-  // Import dynamically to avoid circular dependencies
   const getActiveProfileId = () => {
     try {
-      const { getActiveProfile } = require('@/utils/authStorage')
       return getActiveProfile().id
     } catch {
       return localStorage.getItem('activeProfileId')
@@ -182,7 +201,6 @@ export function useActiveProfile() {
   
   const setActiveProfile = (profile) => {
     try {
-      const { setActiveProfile: setStorageProfile, clearActiveProfile } = require('@/utils/authStorage')
       if (profile) {
         setStorageProfile(profile.profile_id, profile.profile_name)
       } else {

@@ -121,9 +121,9 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
           "max-sm:mb-8 max-sm:gap-2.5"
         )}>
           {[
-            { icon: '/icon/user-round.svg', title: t('home.createStyleProfile'), onClick: handleCreateProfile },
-            { icon: '/icon/file-search.svg', title: t('home.analyzeContent'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) },
-            { icon: '/icon/bar-chart.svg', title: t('home.trackStatistics'), onClick: () => onViewChange('history') }
+            { icon: '/icon/message-square.svg', title: t('home.startAIChat'), onClick: () => onViewChange('workspace') },
+            { icon: '/icon/play.svg', title: t('home.openAIStudio'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) },
+            { icon: '/icon/fingerprint.svg', title: t('home.createStyleProfile'), onClick: handleCreateProfile }
           ].map((action, i) => (
             <div 
               key={i}
@@ -174,10 +174,10 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
           </h3>
           <div className="grid grid-cols-2 gap-4 max-lg:gap-3 max-md:grid-cols-1 max-sm:gap-2.5">
             {[
-              { icon: '/icon/fingerprint.svg', title: t('home.styleRefinement'), desc: t('home.styleRefinementDesc'), onClick: handleCreateProfile },
-              { icon: '/icon/shield-check.svg', title: t('home.aiDetection'), desc: t('home.aiDetectionDesc'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) },
-              { icon: '/icon/wand-sparkles.svg', title: t('home.smartRewriting'), desc: t('home.smartRewritingDesc'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) },
-              { icon: '/icon/chart-line.svg', title: t('home.statisticalAnalysis'), desc: t('home.statisticalAnalysisDesc'), onClick: () => onViewChange('history') }
+              { icon: '/icon/message-circle.svg', title: t('home.aiChat'), desc: t('home.aiChatDesc'), onClick: () => onViewChange('workspace') },
+              { icon: '/icon/wand-sparkles.svg', title: t('home.contentHumanization'), desc: t('home.contentHumanizationDesc'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) },
+              { icon: '/icon/pen.svg', title: t('home.styleRewriting'), desc: t('home.styleRewritingDesc'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) },
+              { icon: '/icon/shield-check.svg', title: t('home.aiDetection'), desc: t('home.aiDetectionDesc'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) }
             ].map((item, i) => (
               <div 
                 key={i}

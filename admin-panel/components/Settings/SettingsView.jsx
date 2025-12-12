@@ -578,7 +578,7 @@ export default function SettingsView() {
                           <div className="text-xs text-muted flex items-center gap-2">
                             <span>{new Date(backup.created).toLocaleString()}</span>
                             {backup.driveSynced && (
-                              <span className="px-1.5 py-0.5 bg-green-500/10 text-green-600 rounded text-[10px]">Drive ✓</span>
+                              <span className="px-1.5 py-0.5 bg-green-500/10 text-green-600 rounded text-[10px]">Drive [SUCCESS]</span>
                             )}
                           </div>
                         </div>

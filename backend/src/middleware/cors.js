@@ -41,8 +41,8 @@ function isOriginAllowed(origin) {
   // Check chrome extension
   if (origin.startsWith('chrome-extension://')) return true;
   
-  // Check subdomains of graphosai.com
-  if (origin.match(/^https?:\/\/([a-z0-9-]+\.)?graphosai\.com$/)) return true;
+  // Check all subdomains of graphosai.com (supports multiple levels like api.admin.graphosai.com)
+  if (origin.match(/^https:\/\/([a-z0-9-]+\.)*graphosai\.com$/)) return true;
   
   return false;
 }

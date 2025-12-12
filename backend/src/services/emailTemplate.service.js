@@ -91,6 +91,12 @@ const translations = {
       goToDashboard: 'Go to Dashboard',
       footerText: 'Automated message from Graphos AI Studio',
       preheader: 'Your account is ready'
+    },
+    notification: {
+      footerText: 'Notification from Graphos AI Studio',
+      learnMore: 'Learn More',
+      viewDetails: 'View Details',
+      preheader: 'You have a new notification'
     }
   },
 
@@ -172,6 +178,12 @@ const translations = {
       goToDashboard: 'Đi đến Dashboard',
       footerText: 'Tin nhắn tự động từ Graphos AI Studio',
       preheader: 'Tài khoản của bạn đã sẵn sàng'
+    },
+    notification: {
+      footerText: 'Thông báo từ Graphos AI Studio',
+      learnMore: 'Tìm hiểu thêm',
+      viewDetails: 'Xem chi tiết',
+      preheader: 'Bạn có thông báo mới'
     }
   },
 
@@ -1568,8 +1580,8 @@ function newDeviceLoginEmail({ userName, deviceInfo, ipAddress, location, loginT
         <!-- Was this you? -->
         <div style="background-color:#f5f5f7;border-radius:20px;padding:24px;margin-bottom:24px;">
           <p style="margin:0 0 16px;color:#1d1d1f;font-size:15px;font-weight:600;">${t('newDeviceLogin.wasYou', lang)}</p>
-          <p style="margin:0 0 12px;color:#1d1d1f;font-size:14px;line-height:1.5;"><strong>${t('hi', lang) === 'مرحباً' ? '✓' : '✓'}</strong> ${t('newDeviceLogin.wasYouYes', lang)}</p>
-          <p style="margin:0;color:#1d1d1f;font-size:14px;line-height:1.5;"><strong>✗</strong> ${t('newDeviceLogin.wasYouNo', lang)}</p>
+          <p style="margin:0 0 12px;color:#1d1d1f;font-size:14px;line-height:1.5;"><img src="${ICON_BASE_URL}/circle-check-black.png" alt="Yes" width="16" height="16" style="display:inline-block;vertical-align:middle;margin-right:6px;"/> ${t('newDeviceLogin.wasYouYes', lang)}</p>
+          <p style="margin:0;color:#1d1d1f;font-size:14px;line-height:1.5;"><img src="${ICON_BASE_URL}/circle-alert-black.png" alt="No" width="16" height="16" style="display:inline-block;vertical-align:middle;margin-right:6px;"/> ${t('newDeviceLogin.wasYouNo', lang)}</p>
         </div>
         
         <!-- CTA -->
@@ -1791,6 +1803,66 @@ function newTicketEmail({ ticketId, ticketType, userName, userEmail, title, cont
 }
 
 // ============================================================================
+// NOTIFICATION EMAIL - Apple Style
+// ============================================================================
+
+/**
+ * Notification Email Template - Apple Style
+ * Used for bulk notifications and individual user notifications
+ * 
+ * @param {Object} options
+ * @param {string} options.title - Notification title
+ * @param {string} options.message - Notification message
+ * @param {string} [options.ctaText] - CTA button text
+ * @param {string} [options.ctaUrl] - CTA button URL
+ * @param {string} [options.type='info'] - Notification type (info, success, warning, announcement)
+ * @param {string} [options.lang='en'] - Language code
+ */
+function notificationEmail({ title, message, ctaText, ctaUrl, type = 'info', lang = DEFAULT_LANG }) {
+  // Icon based on notification type
+  const typeIcons = {
+    info: 'info',
+    success: 'check',
+    warning: 'alertCircle',
+    error: 'alertCircle',
+    announcement: 'message'
+  };
+  const iconName = typeIcons[type] || 'info';
+  
+  // Get CTA text from translations if not provided
+  const buttonText = ctaText || t('notification.learnMore', lang) || 'Learn More';
+  
+  const content = `
+    <!-- Header -->
+    <tr>
+      <td style="padding:48px 40px 32px;text-align:center;">
+        ${headerIcon(iconName, 'black', 32)}
+        <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">${title}</h1>
+      </td>
+    </tr>
+    <!-- Content -->
+    <tr>
+      <td style="padding:0 40px 40px;">
+        <div style="background-color:#f5f5f7;border-radius:20px;padding:28px;margin:0 0 24px;">
+          <p style="margin:0;color:#1d1d1f;font-size:15px;line-height:1.6;">${message}</p>
+        </div>
+        
+        ${ctaUrl ? `
+        <!-- CTA Button -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center" style="padding:8px 0 24px;">
+              <a href="${ctaUrl}" style="display:inline-block;padding:16px 40px;background-color:#1d1d1f;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;border-radius:980px;">${buttonText}</a>
+            </td>
+          </tr>
+        </table>` : ''}
+      </td>
+    </tr>`;
+
+  return appleBase({ content, footerText: t('notification.footerText', lang) || 'Notification from Graphos AI Studio', lang });
+}
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 module.exports = {
@@ -1802,6 +1874,7 @@ module.exports = {
   passwordChangedEmail,
   supportReplyEmail,
   newTicketEmail,
+  notificationEmail,
   
   // Helpers
   t,

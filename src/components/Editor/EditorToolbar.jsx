@@ -197,7 +197,7 @@ const ToolbarDropdown = ({
       
       {isOpen && (
         <div 
-          className="overflow-hidden bg-bg-primary border border-border-light rounded-lg shadow-popup"
+          className="bg-bg-primary border border-border-light rounded-xl shadow-popup p-1.5"
           style={{
             position: 'fixed',
             zIndex: 9999,
@@ -206,7 +206,7 @@ const ToolbarDropdown = ({
             left: dropdownRef.current?.getBoundingClientRect().left
           }}
         >
-          {options.map((option, index) => (
+          {options.map((option) => (
             <button
               key={option.value}
               type="button"
@@ -214,14 +214,13 @@ const ToolbarDropdown = ({
                 onChange(option.value)
                 setIsOpen(false)
               }}
-              className="px-3 py-1.5 text-left whitespace-nowrap text-sm text-text-primary hover:bg-bg-hover transition-colors border-none bg-transparent cursor-pointer"
-              style={{
-                display: 'block',
-                width: '100%',
-                borderRadius: index === 0 ? '7px 7px 0 0' : index === options.length - 1 ? '0 0 7px 7px' : '0',
-                ...option.style,
-                ...(value === option.label && { backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' })
-              }}
+              className={cn(
+                "block w-full px-3 py-1.5 text-left whitespace-nowrap text-sm rounded-lg",
+                "border-none bg-transparent cursor-pointer transition-colors",
+                "hover:bg-fill-tertiary",
+                value === option.label ? "bg-fill-tertiary text-primary font-medium" : "text-text-primary"
+              )}
+              style={option.style}
             >
               {option.label}
             </button>

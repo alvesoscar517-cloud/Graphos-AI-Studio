@@ -22,6 +22,9 @@ const {
 const { validateModel } = require('../utils/validation');
 const activityLogService = require('../services/activityLog.service');
 const { createLocalizer } = require('../utils/localized-messages.util');
+const { detectAppIntent, getPrimaryTopic, mapTopicToContextKey, detectLanguage } = require('../utils/intentDetector');
+const { formatAppContext, getTopicContext } = require('../data/app-context');
+const { generateFollowUpSuggestions } = require('../utils/suggestionsGenerator');
 
 /**
  * Build response style instructions based on chatSettings
@@ -82,6 +85,91 @@ CREATIVITY LEVEL: CREATIVE
 }
 
 /**
+ * Build app context instructions when user asks about the application
+ * Uses intent detection to determine if context should be injected
+ * @param {Array} messages - Conversation messages
+ * @param {string} userLanguage - Detected user language
+ * @returns {Object} - { shouldInject, context, topics, cleanMessage }
+ */
+function buildAppContextInstructions(messages, userLanguage = 'en') {
+  if (!messages || messages.length === 0) {
+    return { shouldInject: false, context: '', topics: [], cleanMessage: null };
+  }
+
+  // Get the last user message
+  const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
+  if (!lastUserMessage) {
+    return { shouldInject: false, context: '', topics: [], cleanMessage: null };
+  }
+
+  // Detect if user is asking about the app
+  const intentResult = detectAppIntent(lastUserMessage.content, userLanguage);
+  
+  if (!intentResult.isAppRelated) {
+    return { shouldInject: false, context: '', topics: [], cleanMessage: null, isAppHelpMode: false };
+  }
+  
+  // If message had help prefix, return the clean message for processing
+  const cleanMessage = intentResult.hasHelpPrefix ? intentResult.cleanMessage : null;
+  
+  // Determine if this is a pure app help mode (should bypass profile/humanization)
+  // App help mode is triggered by explicit help prefix OR high confidence app-related detection
+  const isAppHelpMode = intentResult.isAppHelpMode || (intentResult.confidence >= 80 && intentResult.hasHelpPrefix);
+
+  logger.info(`[APP_CONTEXT] Injecting app context for topics: ${intentResult.topics.join(', ')} (confidence: ${intentResult.confidence}%)`);
+
+  // Get primary topic for targeted context
+  const primaryTopic = getPrimaryTopic(intentResult.topics);
+  const contextKey = mapTopicToContextKey(primaryTopic);
+
+  let context = '';
+  
+  if (contextKey) {
+    // Use targeted context for specific topics
+    const topicContext = getTopicContext(contextKey);
+    if (topicContext) {
+      context = `
+=== APP KNOWLEDGE (Topic: ${primaryTopic}) ===
+${topicContext}
+
+IMPORTANT: 
+- Use this information to answer the user's question about Graphos AI Studio
+- Respond in the SAME LANGUAGE as the user's message
+- Be helpful and guide users to use features effectively
+- If the user's language is not English, translate your response naturally
+=== END APP KNOWLEDGE ===
+`;
+    }
+  }
+  
+  // Fallback to full context if no specific topic or context not found
+  if (!context) {
+    context = formatAppContext({
+      includeModels: intentResult.topics.includes('models'),
+      includeFeatures: true,
+      includeFaq: intentResult.confidence < 70, // Include FAQ for less confident matches
+      includeTroubleshooting: false,
+      maxLength: 3500
+    });
+    
+    // Add language instruction
+    context += `
+IMPORTANT: Respond in the SAME LANGUAGE as the user's message. The user appears to be using: ${userLanguage}
+`;
+  }
+
+  return {
+    shouldInject: true,
+    context,
+    topics: intentResult.topics,
+    confidence: intentResult.confidence,
+    cleanMessage,
+    // When true, controller should bypass profile/humanization for accurate app help answers
+    isAppHelpMode
+  };
+}
+
+/**
  * Send chat message (non-streaming)
  */
 exports.sendMessage = async (req, res) => {
@@ -111,9 +199,35 @@ exports.sendMessage = async (req, res) => {
 
     logger.info(`[INFO] Chat request: ${messages.length} messages, model: ${model}`);
 
-    // Load profile and build enhanced system prompt
-    const profile = await loadProfile(profileId);
-    let enhancedSystemPrompt = buildEnhancedSystemPrompt(systemPrompt, profile, writingPreferences);
+    // Detect user language and check for app-related questions FIRST
+    // This determines if we should bypass profile/humanization
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
+    const userLanguage = lastUserMsg ? detectLanguage(lastUserMsg.content) : 'en';
+    const appContextResult = buildAppContextInstructions(messages, userLanguage);
+    
+    // In App Help mode, bypass profile to give accurate app information
+    // Profile customization doesn't make sense for app help responses
+    const shouldBypassProfile = appContextResult.isAppHelpMode;
+    
+    // Load profile and build enhanced system prompt (skip profile in app help mode)
+    const profile = shouldBypassProfile ? null : await loadProfile(profileId);
+    let enhancedSystemPrompt = buildEnhancedSystemPrompt(
+      systemPrompt, 
+      shouldBypassProfile ? null : profile, 
+      shouldBypassProfile ? null : writingPreferences
+    );
+
+    // Inject app context if user is asking about the application
+    if (appContextResult.shouldInject) {
+      enhancedSystemPrompt += '\n' + appContextResult.context;
+      logger.info(`[APP_CONTEXT] Injected context for topics: ${appContextResult.topics.join(', ')}${shouldBypassProfile ? ' (bypassing profile)' : ''}`);
+      
+      // Strip [APP_HELP] prefix from message if present
+      if (appContextResult.cleanMessage !== null) {
+        const lastIdx = messages.length - 1;
+        messages[lastIdx] = { ...messages[lastIdx], content: appContextResult.cleanMessage };
+      }
+    }
 
     // Manage conversation context (summarize if needed)
     const contextResult = await manageConversationContext(
@@ -248,14 +362,41 @@ exports.sendMessageStream = async (req, res) => {
 
     logger.info(`[INFO] Chat stream request: ${messages.length} messages, model: ${model}`);
 
-    // Load profile and build enhanced system prompt
-    const profile = await loadProfile(profileId);
-    let enhancedSystemPrompt = buildEnhancedSystemPrompt(systemPrompt, profile, writingPreferences);
+    // Detect user language and check for app-related questions FIRST
+    // This determines if we should bypass profile/humanization
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
+    const userLanguage = lastUserMsg ? detectLanguage(lastUserMsg.content) : 'en';
+    const appContextResult = buildAppContextInstructions(messages, userLanguage);
     
-    // Add response style instructions if provided
-    const responseStyleInstructions = buildResponseStyleInstructions(chatSettings);
-    if (responseStyleInstructions) {
-      enhancedSystemPrompt += responseStyleInstructions;
+    // In App Help mode, bypass profile to give accurate app information
+    const shouldBypassProfile = appContextResult.isAppHelpMode;
+
+    // Load profile and build enhanced system prompt (skip profile in app help mode)
+    const profile = shouldBypassProfile ? null : await loadProfile(profileId);
+    let enhancedSystemPrompt = buildEnhancedSystemPrompt(
+      systemPrompt, 
+      shouldBypassProfile ? null : profile, 
+      shouldBypassProfile ? null : writingPreferences
+    );
+    
+    // Add response style instructions if provided (skip in app help mode)
+    if (!shouldBypassProfile) {
+      const responseStyleInstructions = buildResponseStyleInstructions(chatSettings);
+      if (responseStyleInstructions) {
+        enhancedSystemPrompt += responseStyleInstructions;
+      }
+    }
+
+    // Inject app context if user is asking about the application
+    if (appContextResult.shouldInject) {
+      enhancedSystemPrompt += '\n' + appContextResult.context;
+      logger.info(`[APP_CONTEXT] Injected context for topics: ${appContextResult.topics.join(', ')}${shouldBypassProfile ? ' (bypassing profile/style)' : ''}`);
+      
+      // Strip [APP_HELP] prefix from message if present
+      if (appContextResult.cleanMessage !== null) {
+        const lastIdx = messages.length - 1;
+        messages[lastIdx] = { ...messages[lastIdx], content: appContextResult.cleanMessage };
+      }
     }
 
     // Manage conversation context (summarize if needed)
@@ -340,6 +481,7 @@ exports.sendMessageStream = async (req, res) => {
     }
 
     let totalChars = 0;
+    let fullResponseText = ''; // Collect full response for suggestions
     
     for await (const chunk of streamResult.stream) {
       try {
@@ -359,6 +501,7 @@ exports.sendMessageStream = async (req, res) => {
         
         if (chunkText) {
           totalChars += chunkText.length;
+          fullResponseText += chunkText; // Collect for suggestions
           res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
         }
       } catch (chunkError) {
@@ -366,11 +509,31 @@ exports.sendMessageStream = async (req, res) => {
       }
     }
 
-    // Send completion with metadata
+    // Generate follow-up suggestions (async, non-blocking)
+    const lastUserMessage = optimizedMessages[optimizedMessages.length - 1]?.content || '';
+    let suggestions = [];
+    
+    // Only generate suggestions if response is substantial and not app help mode
+    if (totalChars > 100 && !appContextResult.isAppHelpMode) {
+      try {
+        // Use a lighter model for suggestions to minimize cost
+        suggestions = await generateFollowUpSuggestions(
+          fullResponseText.substring(0, 1000), // Use first 1000 chars of response
+          lastUserMessage,
+          userLanguage,
+          { maxSuggestions: 3, model: 'gemini-2.5-flash-lite' }
+        );
+      } catch (suggestError) {
+        logger.warn('[SUGGESTIONS] Failed to generate suggestions:', suggestError.message);
+      }
+    }
+
+    // Send completion with metadata and suggestions
     res.write(`data: ${JSON.stringify({ 
       type: 'complete',
       summary: contextResult.summary,
-      outputTokens: Math.ceil(totalChars / 4)
+      outputTokens: Math.ceil(totalChars / 4),
+      suggestions: suggestions
     })}\n\n`);
     
     res.write('data: [DONE]\n\n');
@@ -572,28 +735,54 @@ exports.sendMessageHumanized = async (req, res) => {
 
     logger.info(`[INFO] Humanized chat request: ${messages.length} messages, model: ${model}, profileId: ${profileId || 'none'}`);
 
-    // Load profile (optional - can be null for generic humanization)
-    const profile = await loadProfile(profileId);
+    // Detect user language and check for app-related questions FIRST
+    // This determines if we should bypass profile/humanization
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
+    const userLanguage = lastUserMsg ? detectLanguage(lastUserMsg.content) : 'en';
+    const appContextResult = buildAppContextInstructions(messages, userLanguage);
     
-    // Use profile voice or generic voice
-    const voiceProfile = profile?.voice_profile || {
+    // In App Help mode, bypass profile AND humanization for accurate app information
+    // App help responses should be clear and informative, not humanized
+    const shouldBypassProfile = appContextResult.isAppHelpMode;
+
+    // Load profile (optional - can be null for generic humanization, or bypassed for app help)
+    const profile = shouldBypassProfile ? null : await loadProfile(profileId);
+    
+    // Use profile voice or generic voice (skip in app help mode)
+    const voiceProfile = shouldBypassProfile ? null : (profile?.voice_profile || {
       tone: 'natural',
       formality_level: 5,
       key_characteristics: ['clear', 'engaging', 'authentic']
-    };
-    const sampleText = profile?.sample_text || null;
+    });
+    const sampleText = shouldBypassProfile ? null : (profile?.sample_text || null);
 
-    // Build enhanced system prompt with humanization instructions
-    let enhancedSystemPrompt = buildEnhancedSystemPrompt(systemPrompt, profile, writingPreferences);
+    // Build enhanced system prompt with humanization instructions (skip in app help mode)
+    let enhancedSystemPrompt = buildEnhancedSystemPrompt(
+      systemPrompt, 
+      shouldBypassProfile ? null : profile, 
+      shouldBypassProfile ? null : writingPreferences
+    );
     
-    // Add humanization instructions to system prompt
-    if (chatSettings?.useAntiAIDetection || chatSettings?.humanizeResponse) {
+    // Add humanization instructions to system prompt (skip in app help mode)
+    if (!shouldBypassProfile && (chatSettings?.useAntiAIDetection || chatSettings?.humanizeResponse)) {
       enhancedSystemPrompt = humanizeService.buildEnhancedRewritePrompt(
         enhancedSystemPrompt,
         voiceProfile,
         sampleText,
         { isSystemPrompt: true, writingPreferences }
       );
+    }
+
+    // Inject app context if user is asking about the application
+    if (appContextResult.shouldInject) {
+      enhancedSystemPrompt += '\n' + appContextResult.context;
+      logger.info(`[APP_CONTEXT] Injected context for topics: ${appContextResult.topics.join(', ')}${shouldBypassProfile ? ' (bypassing profile/humanization)' : ''}`);
+      
+      // Strip [APP_HELP] prefix from message if present
+      if (appContextResult.cleanMessage !== null) {
+        const lastIdx = messages.length - 1;
+        messages[lastIdx] = { ...messages[lastIdx], content: appContextResult.cleanMessage };
+      }
     }
 
     // Manage conversation context
@@ -634,8 +823,9 @@ exports.sendMessageHumanized = async (req, res) => {
     logger.info(`[INFO] Initial response generated (${text.length} chars)`);
 
     // Smart humanization based on text length and settings
+    // SKIP humanization entirely in App Help mode - we want accurate, clear app information
     let humanizationResult = null;
-    if (chatSettings?.humanizeResponse && text.length > 100) {
+    if (!shouldBypassProfile && chatSettings?.humanizeResponse && text.length > 100) {
       const targetProbability = chatSettings.targetAIProbability || 35;
       
       try {
@@ -697,10 +887,14 @@ exports.sendMessageHumanized = async (req, res) => {
         logger.error('[WARN] Humanization failed:', humanizeError.message);
         humanizationResult = { applied: false, error: humanizeError.message };
       }
-    } else if (chatSettings?.useAntiAIDetection && text.length > 100) {
+    } else if (!shouldBypassProfile && chatSettings?.useAntiAIDetection && text.length > 100) {
       // Apply lighter humanization (just imperfection injection)
       text = humanizeService.injectHumanImperfections(text, voiceProfile);
       humanizationResult = { applied: true, method: 'anti-ai' };
+    } else if (shouldBypassProfile) {
+      // Log that we skipped humanization due to app help mode
+      humanizationResult = { applied: false, reason: 'app_help_mode' };
+      logger.info('[INFO] Skipped humanization - App Help mode active');
     }
 
     // Log activity
@@ -768,27 +962,42 @@ exports.sendMessageHumanizedStream = async (req, res) => {
 
     logger.info(`[INFO] Humanized stream request: ${messages.length} messages, model: ${model}, profileId: ${profileId || 'none'}`);
 
-    // Load profile (optional - can be null for generic humanization)
-    const profile = await loadProfile(profileId);
+    // Detect user language and check for app-related questions FIRST
+    // This determines if we should bypass profile/humanization
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
+    const userLanguage = lastUserMsg ? detectLanguage(lastUserMsg.content) : 'en';
+    const appContextResult = buildAppContextInstructions(messages, userLanguage);
     
-    // Use profile voice or generic voice
-    const voiceProfile = profile?.voice_profile || {
+    // In App Help mode, bypass profile AND humanization for accurate app information
+    const shouldBypassProfile = appContextResult.isAppHelpMode;
+
+    // Load profile (optional - can be null for generic humanization, or bypassed for app help)
+    const profile = shouldBypassProfile ? null : await loadProfile(profileId);
+    
+    // Use profile voice or generic voice (skip in app help mode)
+    const voiceProfile = shouldBypassProfile ? null : (profile?.voice_profile || {
       tone: 'natural',
       formality_level: 5,
       key_characteristics: ['clear', 'engaging', 'authentic']
-    };
+    });
     
-    // Build enhanced system prompt
-    let enhancedSystemPrompt = buildEnhancedSystemPrompt(systemPrompt, profile, writingPreferences);
+    // Build enhanced system prompt (skip profile in app help mode)
+    let enhancedSystemPrompt = buildEnhancedSystemPrompt(
+      systemPrompt, 
+      shouldBypassProfile ? null : profile, 
+      shouldBypassProfile ? null : writingPreferences
+    );
     
-    // Add response style instructions if provided
-    const responseStyleInstructions = buildResponseStyleInstructions(chatSettings);
-    if (responseStyleInstructions) {
-      enhancedSystemPrompt += responseStyleInstructions;
+    // Add response style instructions if provided (skip in app help mode)
+    if (!shouldBypassProfile) {
+      const responseStyleInstructions = buildResponseStyleInstructions(chatSettings);
+      if (responseStyleInstructions) {
+        enhancedSystemPrompt += responseStyleInstructions;
+      }
     }
     
-    // Add anti-AI detection rules to system prompt
-    if (chatSettings?.useAntiAIDetection || chatSettings?.humanizeResponse) {
+    // Add anti-AI detection rules to system prompt (skip in app help mode)
+    if (!shouldBypassProfile && (chatSettings?.useAntiAIDetection || chatSettings?.humanizeResponse)) {
       
       // Add comprehensive anti-AI instructions
       enhancedSystemPrompt += `
@@ -812,12 +1021,24 @@ REQUIRED HUMAN PATTERNS:
 6. Use simple connectors: "and", "but", "so", "then" instead of formal ones
 
 VOICE PROFILE TO MATCH:
-- Tone: ${voiceProfile.tone || 'natural'}
-- Formality: ${voiceProfile.formality_level || 5}/10
-- Characteristics: ${(voiceProfile.key_characteristics || []).slice(0, 3).join(', ')}
-${voiceProfile.rewrite_instructions ? `- Special instructions: ${voiceProfile.rewrite_instructions}` : ''}
+- Tone: ${voiceProfile?.tone || 'natural'}
+- Formality: ${voiceProfile?.formality_level || 5}/10
+- Characteristics: ${(voiceProfile?.key_characteristics || []).slice(0, 3).join(', ')}
+${voiceProfile?.rewrite_instructions ? `- Special instructions: ${voiceProfile.rewrite_instructions}` : ''}
 
 Write naturally as if you ARE this person, not an AI pretending to be them.`;
+    }
+
+    // Inject app context if user is asking about the application
+    if (appContextResult.shouldInject) {
+      enhancedSystemPrompt += '\n' + appContextResult.context;
+      logger.info(`[APP_CONTEXT] Injected context for topics: ${appContextResult.topics.join(', ')}${shouldBypassProfile ? ' (bypassing profile/humanization)' : ''}`);
+      
+      // Strip [APP_HELP] prefix from message if present
+      if (appContextResult.cleanMessage !== null) {
+        const lastIdx = messages.length - 1;
+        messages[lastIdx] = { ...messages[lastIdx], content: appContextResult.cleanMessage };
+      }
     }
 
     // Manage conversation context
@@ -908,10 +1129,11 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
     }
 
     // Smart humanization based on text length and settings
+    // SKIP humanization entirely in App Help mode - we want accurate, clear app information
     let humanizationResult = null;
     let finalText = fullText;
     
-    if (chatSettings?.humanizeResponse && fullText.length > 100) {
+    if (!shouldBypassProfile && chatSettings?.humanizeResponse && fullText.length > 100) {
       try {
         const targetProbability = chatSettings.targetAIProbability || 35;
         
@@ -1000,7 +1222,7 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
         logger.warn('[WARN] Post-humanization failed:', e.message);
         humanizationResult = { applied: false, error: e.message };
       }
-    } else if (chatSettings?.useAntiAIDetection && fullText.length > 100) {
+    } else if (!shouldBypassProfile && chatSettings?.useAntiAIDetection && fullText.length > 100) {
       // Anti-AI detection only (no full humanization) - just apply imperfections
       try {
         finalText = humanizeService.injectHumanImperfections(fullText, voiceProfile);
@@ -1014,6 +1236,28 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
       } catch (e) {
         logger.warn('[WARN] Anti-AI imperfection injection failed:', e.message);
       }
+    } else if (shouldBypassProfile) {
+      // Log that we skipped humanization due to app help mode
+      humanizationResult = { applied: false, reason: 'app_help_mode' };
+      logger.info('[INFO] Skipped humanization - App Help mode active');
+    }
+
+    // Generate follow-up suggestions
+    const lastUserMessage = optimizedMessages[optimizedMessages.length - 1]?.content || '';
+    let suggestions = [];
+    
+    // Only generate suggestions if response is substantial and not app help mode
+    if (totalChars > 100 && !shouldBypassProfile) {
+      try {
+        suggestions = await generateFollowUpSuggestions(
+          finalText.substring(0, 1000),
+          lastUserMessage,
+          userLanguage,
+          { maxSuggestions: 3, model: 'gemini-2.5-flash-lite' }
+        );
+      } catch (suggestError) {
+        logger.warn('[SUGGESTIONS] Failed to generate suggestions:', suggestError.message);
+      }
     }
 
     // Send completion
@@ -1021,7 +1265,8 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
       type: 'complete',
       summary: contextResult.summary,
       outputTokens: Math.ceil(totalChars / 4),
-      humanization: humanizationResult
+      humanization: humanizationResult,
+      suggestions: suggestions
     })}\n\n`);
     
     res.write('data: [DONE]\n\n');

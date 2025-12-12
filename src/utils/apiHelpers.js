@@ -229,7 +229,10 @@ export async function createStream(endpoint, { onMessage, onError, onComplete })
         onMessage(data);
       }
     } catch (error) {
-      console.error('[STREAM] Parse error:', error);
+      // Log error synchronously - avoid async in event handler
+      import('./logger').then(({ logger }) => {
+        logger.error('Stream', 'Parse error', error);
+      });
     }
   };
   
@@ -324,7 +327,8 @@ export async function checkCredits(required) {
       balance
     };
   } catch (error) {
-    console.error('[API] Failed to check credits:', error);
+    const { logger } = await import('./logger');
+    logger.error('API', 'Failed to check credits', error);
     return { sufficient: false, balance: 0 };
   }
 }

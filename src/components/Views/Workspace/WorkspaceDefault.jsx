@@ -7,7 +7,7 @@ const WorkspaceDefault = ({
   onToggleLeftSidebar, 
   onToggleRightSidebar, 
   rightSidebarHidden, 
-  onQuickAction,
+  onSendMessage,
   chatInput // Render prop for SharedChatInput
 }) => {
   const { t } = useTranslation()
@@ -67,7 +67,7 @@ const WorkspaceDefault = ({
         </div>
         
         {/* Quick Actions */}
-        <QuickActions onActionClick={onQuickAction} />
+        <QuickActions onSendMessage={onSendMessage} />
       </div>
     </div>
   )

@@ -6,23 +6,43 @@
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queryKeys'
 import apiClient from '@/services/api/client'
+import { useAuthStore } from '@/stores/authStore'
+
+/**
+ * Get userId from multiple sources
+ */
+function getUserId() {
+  const storedId = localStorage.getItem('userId')
+  if (storedId) return storedId
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}')
+    return user.userId || user.uid || user.id || null
+  } catch {
+    return null
+  }
+}
 
 /**
  * Fetch credit history with pagination and filters
  */
 export function useCreditHistory(filters = {}, options = {}) {
   const { type = 'all', feature = 'all', startDate, endDate, limit = 20 } = filters
+  
+  // Get auth state
+  const user = useAuthStore((state) => state.user)
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const userId = user?.userId || user?.uid || user?.id || getUserId()
 
   return useInfiniteQuery({
     queryKey: queryKeys.user.creditHistory(filters),
     queryFn: async ({ pageParam = null }) => {
-      const userId = localStorage.getItem('userId')
-      if (!userId) {
+      const id = userId || getUserId()
+      if (!id) {
         return { transactions: [], hasMore: false, nextCursor: null }
       }
 
       const params = new URLSearchParams({
-        user_id: userId,
+        user_id: id,
         limit: limit.toString(),
       })
 
@@ -43,6 +63,7 @@ export function useCreditHistory(filters = {}, options = {}) {
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: null,
     staleTime: 30 * 1000, // 30 seconds
+    enabled: isAuthenticated && !!userId,
     ...options,
   })
 }
@@ -51,19 +72,32 @@ export function useCreditHistory(filters = {}, options = {}) {
  * Fetch credit history summary/stats
  */
 export function useCreditHistorySummary(days = 30, options = {}) {
+  // Get auth state
+  const user = useAuthStore((state) => state.user)
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const userId = user?.userId || user?.uid || user?.id || getUserId()
+
   return useQuery({
     queryKey: queryKeys.user.creditHistorySummary(days),
     queryFn: async () => {
-      const userId = localStorage.getItem('userId')
-      if (!userId) {
+      const id = userId || getUserId()
+      if (!id) {
         return null
       }
 
-      const { data } = await apiClient.get(`/api/credits/history/summary?user_id=${userId}&days=${days}`)
-      
-      return data.success ? { summary: data.summary, period: data.period } : null
+      try {
+        const { data } = await apiClient.get(`/api/credits/history/summary?user_id=${id}&days=${days}`, {
+          retry: false // Don't retry on error
+        })
+        return data.success ? { summary: data.summary, period: data.period } : null
+      } catch {
+        // API might not be implemented yet, return null
+        return null
+      }
     },
     staleTime: 60 * 1000, // 1 minute
+    enabled: isAuthenticated && !!userId,
+    retry: false, // Don't retry failed requests
     ...options,
   })
 }

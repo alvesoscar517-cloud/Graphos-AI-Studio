@@ -6,7 +6,7 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import { getValidToken } from '@/services/tokenService'
+import { getValidToken, tokenService } from '@/services/tokenService'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://graphosai-472729326429.us-central1.run.app'
 
@@ -170,8 +170,9 @@ export function useSendErrorReport() {
         return { success: true, alreadyReported: true }
       }
       
-      // Get auth token for server to identify user
-      const token = await getValidToken()
+      // Get current token without triggering refresh (to avoid session expired during error reporting)
+      // Error reports can be sent without auth, token is optional for user identification
+      const token = tokenService.getAccessToken()
       
       // Build error content with useful debugging info
       const errorContent = [

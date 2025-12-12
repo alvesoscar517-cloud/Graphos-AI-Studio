@@ -124,6 +124,13 @@ router.delete('/sessions/:sessionId', authenticate, emailAuthController.revokeSe
 router.post('/sessions/revoke-others', authenticate, emailAuthController.revokeOtherSessions);
 
 /**
+ * Revoke ALL sessions (including current) - Sign out from all devices
+ * POST /auth/email/sessions/revoke-all
+ * Requires: Bearer token
+ */
+router.post('/sessions/revoke-all', authenticate, emailAuthController.revokeAllSessions);
+
+/**
  * Get login history
  * GET /auth/email/login-history
  * Query: { limit }

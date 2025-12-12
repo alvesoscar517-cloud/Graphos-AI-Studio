@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCreditHistory, useCreditHistorySummary } from '@/hooks/queries/useCreditHistory'
 import { useCredits } from '@/hooks/queries'
+import { SkeletonCreditRow, Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
 // Feature name to display text and icon mapping
@@ -66,12 +67,7 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
   const { data: credits, isLoading: creditsLoading } = useCredits()
   const { data: summaryData, isLoading: summaryLoading, error: summaryError } = useCreditHistorySummary(filterDays)
   
-  // Debug: Log summary data
-  useEffect(() => {
-    logger.log('[CreditHistory] Summary data:', summaryData)
-    logger.log('[CreditHistory] Summary loading:', summaryLoading)
-    logger.log('[CreditHistory] Summary error:', summaryError)
-  }, [summaryData, summaryLoading, summaryError])
+
   
   const {
     data: historyData,
@@ -192,7 +188,7 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
         <td className="py-2.5 pr-3 border-b border-border-light text-text-primary align-middle text-sm h-11 pl-4 min-w-40">
           <div className="flex items-center gap-3 font-normal text-text-primary overflow-hidden">
             <TransactionIcon tx={tx} />
-            <span className="overflow-hidden text-ellipsis whitespace-nowrap" title={displayText}>
+            <span className="overflow-hidden text-ellipsis whitespace-nowrap">
               {displayText}
             </span>
           </div>
@@ -337,15 +333,15 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
                     className={cn(
                       'absolute top-full right-0 mt-1 z-dropdown',
                       'bg-bg-primary border border-border rounded-lg shadow-lg',
-                      'py-1 min-w-[140px]'
+                      'p-1.5 min-w-[140px]'
                     )}
                   >
                     {[7, 30, 90, 365].map((days) => (
                       <button
                         key={days}
                         className={cn(
-                          'w-full px-3 py-2 text-left text-sm',
-                          'hover:bg-bg-hover transition-colors',
+                          'w-full px-3 py-2 text-left text-sm rounded-lg',
+                          'hover:bg-fill-tertiary transition-colors',
                           filterDays === days ? 'text-text-primary font-medium' : 'text-text-secondary'
                         )}
                         onClick={() => {
@@ -371,7 +367,7 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
           <div className="flex items-center gap-2">
             <span className="text-xs text-text-muted uppercase tracking-wide">{t('credits.currentBalance', 'Balance')}</span>
             {creditsLoading ? (
-              <span className="text-sm text-text-secondary animate-pulse">...</span>
+              <Skeleton className="h-4 w-14 rounded" />
             ) : (
               <span className="text-sm font-medium text-text-primary tabular-nums">{balance.toFixed(2)}</span>
             )}
@@ -380,7 +376,7 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
           <div className="flex items-center gap-2">
             <span className="text-xs text-text-muted uppercase tracking-wide">{t('credits.totalUsed', 'Used')}</span>
             {summaryLoading ? (
-              <span className="text-sm text-text-secondary animate-pulse">...</span>
+              <Skeleton className="h-4 w-14 rounded" />
             ) : (
               <span className="text-sm text-text-secondary tabular-nums">-{summary.used?.toFixed(2) || '0.00'}</span>
             )}
@@ -389,7 +385,7 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
           <div className="flex items-center gap-2">
             <span className="text-xs text-text-muted uppercase tracking-wide">{t('credits.totalAdded', 'Added')}</span>
             {summaryLoading ? (
-              <span className="text-sm text-text-secondary animate-pulse">...</span>
+              <Skeleton className="h-4 w-14 rounded" />
             ) : (
               <span className="text-sm text-text-primary tabular-nums">+{summary.added?.toFixed(2) || '0.00'}</span>
             )}
@@ -398,7 +394,7 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
           <div className="flex items-center gap-2">
             <span className="text-xs text-text-muted uppercase tracking-wide">{t('credits.totalTransactions', 'Transactions')}</span>
             {summaryLoading ? (
-              <span className="text-sm text-text-secondary animate-pulse">...</span>
+              <Skeleton className="h-4 w-10 rounded" />
             ) : (
               <span className="text-sm text-text-secondary tabular-nums">{summary.transactions || 0}</span>
             )}
@@ -408,16 +404,10 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
         {/* Transaction List */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] pb-4 pr-0 scrollbar-thin-hover">
           {historyLoading ? (
-            // Loading skeleton
-            <div className="space-y-2 pt-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 animate-pulse">
-                  <div className="w-5 h-5 rounded-full bg-bg-secondary" />
-                  <div className="flex-1">
-                    <div className="h-4 w-32 bg-bg-secondary rounded" />
-                  </div>
-                  <div className="h-4 w-16 bg-bg-secondary rounded" />
-                </div>
+            // Loading skeleton - matching admin panel style
+            <div className="pt-2">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <SkeletonCreditRow key={i} />
               ))}
             </div>
           ) : transactions.length === 0 ? (

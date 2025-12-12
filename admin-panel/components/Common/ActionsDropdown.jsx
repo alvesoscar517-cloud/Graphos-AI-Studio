@@ -138,7 +138,7 @@ export default function ActionsDropdown({
       {isOpen && (
         <div
           className={cn(
-            'absolute z-[100] min-w-[180px] mt-1 py-1 rounded-xl',
+            'absolute z-[100] min-w-[180px] mt-1 p-1.5 rounded-xl',
             'border border-border bg-surface shadow-xl',
             'animate-in fade-in-0 zoom-in-95 duration-150',
             align === 'end' && 'right-0',
@@ -151,7 +151,7 @@ export default function ActionsDropdown({
               <div className="px-3 py-1.5 text-xs font-medium text-muted uppercase tracking-wider">
                 {label}
               </div>
-              <div className="h-px bg-border my-1" />
+              <div className="h-px bg-border my-1 mx-1.5" />
             </>
           )}
 
@@ -163,18 +163,18 @@ export default function ActionsDropdown({
                   onRowClick()
                   setIsOpen(false)
                 }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-primary hover:bg-surface-secondary transition-colors text-left"
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-primary rounded-lg hover:bg-surface-secondary transition-colors text-left"
               >
                 <img src="/icon/eye.svg" alt="" className="w-4 h-4 icon-gray" />
                 Xem chi tiết
               </button>
-              {actions.length > 0 && <div className="h-px bg-border my-1" />}
+              {actions.length > 0 && <div className="h-px bg-border my-1 mx-1.5" />}
             </>
           )}
 
           {actions.map((action, index) => {
             if (action.separator) {
-              return <div key={`sep-${index}`} className="h-px bg-border my-1" />
+              return <div key={`sep-${index}`} className="h-px bg-border my-1 mx-1.5" />
             }
 
             return (
@@ -184,7 +184,7 @@ export default function ActionsDropdown({
                 onClick={() => handleItemClick(action)}
                 disabled={action.disabled}
                 className={cn(
-                  'flex items-center gap-2 w-full px-3 py-2 text-sm text-left transition-colors',
+                  'flex items-center gap-2 w-full px-3 py-2 text-sm text-left transition-colors rounded-lg',
                   'hover:bg-surface-secondary focus:bg-surface-secondary focus:outline-none',
                   action.disabled && 'opacity-50 cursor-not-allowed',
                   action.variant === 'destructive' 

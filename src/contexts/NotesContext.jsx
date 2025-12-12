@@ -92,7 +92,6 @@ export const NotesProvider = ({ children }) => {
 
     // User logged out
     if (!isAuthenticated && prevUser) {
-      logger.log('[INFO] User logged out, clearing notes')
       setCurrentNoteId(null)
       setNeedsReauth(false)
       queryClient.removeQueries({ queryKey: queryKeys.notes.all })

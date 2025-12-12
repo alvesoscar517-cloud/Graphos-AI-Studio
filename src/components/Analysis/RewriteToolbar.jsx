@@ -264,7 +264,7 @@ const RewriteToolbar = ({
             animateText()
           }
           
-          logger.log(`✍️ Buffer: ${fullText.length} chars, Displayed: ${displayedText.length} chars`)
+          logger.log(`[WRITE] Buffer: ${fullText.length} chars, Displayed: ${displayedText.length} chars`)
         }
       )
       

@@ -40,12 +40,14 @@ export default function NotificationEditor() {
     target: { type: 'all', userIds: [], segments: [] },
     scheduledAt: '',
     expiresAt: '',
-    ctaAction: null
+    ctaAction: null,
+    sendEmail: false // Option to send email along with notification
   });
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [translating, setTranslating] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     if (isEditMode) loadNotification();
@@ -155,19 +157,39 @@ export default function NotificationEditor() {
 
       if (isEditMode) {
         await notificationsApi.update(id, notificationData);
-        if (sendNow) await notificationsApi.send(id);
+        if (sendNow) {
+          if (notification.sendEmail) {
+            setSendingEmail(true);
+            const result = await notificationsApi.sendWithEmail(id);
+            notify.success(`Notification sent! Email queued for ${result.stats?.emailQueued || 0} recipients. ${result.stats?.estimatedEmailTime || ''}`);
+          } else {
+            await notificationsApi.send(id);
+            notify.success('Notification sent!');
+          }
+        }
       } else {
         const response = await notificationsApi.create(notificationData);
-        if (sendNow && response.notificationId) await notificationsApi.send(response.notificationId);
+        if (sendNow && response.notificationId) {
+          if (notification.sendEmail) {
+            setSendingEmail(true);
+            const result = await notificationsApi.sendWithEmail(response.notificationId);
+            notify.success(`Notification sent! Email queued for ${result.stats?.emailQueued || 0} recipients. ${result.stats?.estimatedEmailTime || ''}`);
+          } else {
+            await notificationsApi.send(response.notificationId);
+            notify.success('Notification sent!');
+          }
+        } else {
+          notify.success('Notification saved!');
+        }
       }
 
-      notify.success(sendNow ? 'Notification sent!' : 'Notification saved!');
       navigate('/notifications');
     } catch (err) {
       notify.error('Error: ' + err.message);
     } finally {
       setSaving(false);
       setTranslating(false);
+      setSendingEmail(false);
     }
   };
 
@@ -219,7 +241,7 @@ export default function NotificationEditor() {
                   onChange={(e) => handleContentChange('message', e.target.value)}
                   placeholder="Notification message"
                   rows={8}
-                  className="w-full px-4 py-3 rounded-lg border-2 border-border bg-surface text-primary placeholder:text-muted focus:outline-none focus:border-primary resize-y"
+                  className="w-full px-4 py-3 rounded-xl border border-border/40 bg-surface-secondary text-primary placeholder:text-muted/70 hover:bg-surface hover:border-border/60 focus:outline-none focus:bg-surface focus:border-[rgba(0,122,255,0.4)] transition-all duration-[250ms] ease-[cubic-bezier(0.25,0.1,0.25,1)] resize-y"
                 />
               </div>
               <Input
@@ -241,10 +263,10 @@ export default function NotificationEditor() {
                 <button
                   key={opt.type}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 p-4 rounded-lg border-2 transition-all",
+                    "flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border transition-all duration-200",
                     notification.target.type === opt.type
                       ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary"
+                      : "border-border/40 hover:border-border/60 hover:bg-surface-secondary"
                   )}
                   onClick={() => setNotification({ ...notification, target: { type: opt.type, segments: [] } })}
                 >
@@ -293,10 +315,10 @@ export default function NotificationEditor() {
                 <label 
                   key={lang.code} 
                   className={cn(
-                    "flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-all",
+                    "flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all duration-200 border",
                     notification.targetLanguages?.includes(lang.code)
-                      ? "bg-primary/10 border-2 border-primary"
-                      : "bg-surface-secondary border-2 border-transparent hover:border-border"
+                      ? "bg-primary/5 border-primary"
+                      : "bg-surface-secondary border-transparent hover:border-border/40"
                   )}
                 >
                   <input
@@ -331,10 +353,10 @@ export default function NotificationEditor() {
                     <button
                       key={type.value}
                       className={cn(
-                        "flex flex-col items-center gap-1 p-3 rounded-lg border-2 transition-all",
+                        "flex flex-col items-center gap-1 p-3 rounded-xl border transition-all duration-200",
                         notification.type === type.value
                           ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary"
+                          : "border-border/40 hover:border-border/60 hover:bg-surface-secondary"
                       )}
                       onClick={() => setNotification({ ...notification, type: type.value })}
                     >
@@ -351,10 +373,10 @@ export default function NotificationEditor() {
                     <button
                       key={p}
                       className={cn(
-                        "py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all",
+                        "py-2 px-3 rounded-xl border text-sm font-medium transition-all duration-200",
                         notification.priority === p
                           ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border hover:border-primary"
+                          : "border-border/40 hover:border-border/60 hover:bg-surface-secondary"
                       )}
                       onClick={() => setNotification({ ...notification, priority: p })}
                     >
@@ -392,6 +414,28 @@ export default function NotificationEditor() {
                 containerClassName="mt-3"
               />
             )}
+            {notification.ctaAction?.type === 'view' && (
+              <Select
+                value={notification.ctaAction.action || ''}
+                onChange={(e) => setNotification({
+                  ...notification,
+                  ctaAction: { ...notification.ctaAction, action: e.target.value }
+                })}
+                containerClassName="mt-3"
+                options={[
+                  { value: '', label: 'Select view...' },
+                  { value: 'home', label: 'Home / Dashboard' },
+                  { value: 'profiles', label: 'Voice Profiles' },
+                  { value: 'analysis', label: 'Analysis' },
+                  { value: 'rewrite', label: 'Rewrite' },
+                  { value: 'history', label: 'History' },
+                  { value: 'settings', label: 'Settings' },
+                  { value: 'upgrade', label: 'Upgrade / Pricing' },
+                  { value: 'credits', label: 'Buy Credits' },
+                  { value: 'support', label: 'Support' }
+                ]}
+              />
+            )}
           </Card>
 
           <Card className="p-6">
@@ -411,6 +455,39 @@ export default function NotificationEditor() {
               />
             </div>
           </Card>
+
+          {/* Email Option */}
+          <Card className="p-6">
+            <h3 className="text-base font-semibold text-primary mb-4 flex items-center gap-2">
+              <img src="/icon/mail.svg" alt="" className="w-5 h-5 icon-dark" />
+              Email Delivery
+            </h3>
+            <label className={cn(
+              "flex items-start gap-3 p-4 rounded-xl cursor-pointer transition-all duration-200 border",
+              notification.sendEmail
+                ? "bg-primary/5 border-primary"
+                : "bg-surface-secondary border-transparent hover:border-border/40"
+            )}>
+              <input
+                type="checkbox"
+                checked={notification.sendEmail || false}
+                onChange={(e) => setNotification({ ...notification, sendEmail: e.target.checked })}
+                className="mt-0.5 w-4 h-4"
+              />
+              <div>
+                <span className="font-medium block">Also send via Email</span>
+                <span className="text-xs text-muted block mt-1">
+                  Send email to all recipients. Emails are sent in batches to avoid spam filters (may take several minutes for large audiences).
+                </span>
+              </div>
+            </label>
+            {notification.sendEmail && (
+              <div className="mt-3 p-3 bg-surface-secondary border border-border/40 text-secondary rounded-xl text-sm flex items-start gap-2">
+                <img src="/icon/alert-triangle.svg" alt="" className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>Email sending uses smart rate limiting. For 1000 users, expect ~80 minutes delivery time.</span>
+              </div>
+            )}
+          </Card>
         </div>
       </div>
 
@@ -419,8 +496,15 @@ export default function NotificationEditor() {
         <Button variant="secondary" onClick={() => handleSave(false)} disabled={saving} loading={saving}>
           Save Draft
         </Button>
-        <Button onClick={() => handleSave(true)} disabled={saving || translating} loading={saving || translating}>
-          {`Send Now${notification.targetLanguages?.length > 0 ? ` (+${notification.targetLanguages.length})` : ''}`}
+        <Button 
+          onClick={() => handleSave(true)} 
+          disabled={saving || translating || sendingEmail} 
+          loading={saving || translating || sendingEmail}
+        >
+          {sendingEmail 
+            ? 'Sending emails...' 
+            : `Send Now${notification.sendEmail ? ' + Email' : ''}${notification.targetLanguages?.length > 0 ? ` (+${notification.targetLanguages.length} langs)` : ''}`
+          }
         </Button>
       </div>
     </div>

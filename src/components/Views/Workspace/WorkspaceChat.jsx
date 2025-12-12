@@ -5,6 +5,7 @@ import { truncateTitleByWords } from '../../../utils/titleUtils'
 import { cn } from '../../../lib/utils'
 import ChatMessage from './ChatMessage'
 import EditTitleModal from '../../Common/EditTitleModal'
+import LazyLottie from '../../Common/LazyLottie'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
 
 const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden, chatInput }) => {
@@ -146,7 +147,6 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <div 
               className={`text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-xl shrink-0 ${isTypingTitle ? 'animate-pulse' : ''}`}
-              title={currentConversation?.title || ''}
             >
               {displayTitle}
             </div>
@@ -186,7 +186,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
       {/* Messages Area */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto py-6 workspace-scrollbar"
+        className="flex-1 overflow-y-auto py-6"
         style={{ paddingBottom: '100px', scrollbarGutter: 'stable' }}
       >
         <div className="max-w-3xl mx-auto px-4 flex flex-col gap-6">
@@ -200,8 +200,12 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
             </div>
           ) : (
             <>
-              {currentConversation.messages.map((message) => (
-                <ChatMessage key={message.id} message={message} />
+              {currentConversation.messages.map((message, index) => (
+                <ChatMessage 
+                  key={message.id} 
+                  message={message} 
+                  isLastMessage={index === currentConversation.messages.length - 1}
+                />
               ))}
               
               {/* Show loading only when isLoading AND last message is not streaming with content */}

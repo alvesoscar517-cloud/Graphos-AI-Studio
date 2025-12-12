@@ -26,7 +26,7 @@ export async function rewriteText(profileId, text, model = 'gemini-2.5-flash', w
       }
     }
     
-    logger.log('[CHART] Rewrite text stats:', validation.stats.display)
+
     
     // Use deduplicated request to prevent duplicate concurrent rewrite calls
     const { data } = await apiClient.postDeduplicated('/rewrite', {
@@ -44,7 +44,7 @@ export async function rewriteText(profileId, text, model = 'gemini-2.5-flash', w
       textStats: validation.stats
     }
   } catch (error) {
-    console.error('Error rewriting text:', error)
+    logger.error('Rewrite', 'Error rewriting text', error)
     return { success: false, error: error.message }
   }
 }
@@ -87,11 +87,10 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
       throw new Error(validation.errors.join(', '))
     }
     
-    logger.log('[CHART] Stream rewrite text stats:', validation.stats.display)
+
     
     const userInfo = await getUserInfo()
     const headers = await getAuthHeaders()
-    logger.log('📡 Sending rewrite_stream request...')
     
     const response = await fetch(`${CONFIG.API_BASE_URL}/rewrite_stream`, {
       method: 'POST',
@@ -109,7 +108,6 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     
-    logger.log('📡 Response received, starting to read stream...')
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
@@ -117,10 +115,7 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
     while (true) {
       const { done, value } = await reader.read()
       
-      if (done) {
-        logger.log('📡 Stream ended')
-        break
-      }
+      if (done) break
       
       // Decode chunk and add to buffer
       buffer += decoder.decode(value, { stream: true })
@@ -133,31 +128,25 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
         if (line.startsWith('data: ')) {
           const data = line.slice(6).trim()
           
-          if (data === '[DONE]') {
-            logger.log('📡 Received [DONE] signal')
-            return
-          }
+          if (data === '[DONE]') return
           
           if (data) {
             try {
               const json = JSON.parse(data)
               if (json.chunk) {
-                // Content chunk
-                logger.log('[PACKAGE] Chunk received:', json.chunk.substring(0, 30) + '...')
                 onChunk(json.chunk, 'content')
               } else if (json.error) {
-                console.error('[FAIL] Server error:', json.error)
                 throw new Error(json.error)
               }
             } catch (e) {
-              console.warn('[WARNING] Failed to parse JSON:', data, e)
+              // Ignore JSON parse errors for incomplete chunks
             }
           }
         }
       }
     }
   } catch (error) {
-    console.error('[FAIL] Error streaming rewrite:', error)
+    logger.error('Rewrite', 'Error streaming rewrite', error)
     throw error
   }
 }
@@ -177,7 +166,7 @@ export async function checkHumanization(text) {
       error: data.error 
     }
   } catch (error) {
-    console.error('Error checking humanization:', error)
+    logger.error('Rewrite', 'Error checking humanization', error)
     return { success: false, error: error.message }
   }
 }
@@ -214,7 +203,7 @@ export async function iterativeHumanize(profileId, text, options = {}) {
       error: data.error 
     }
   } catch (error) {
-    console.error('Error in iterative humanize:', error)
+    logger.error('Rewrite', 'Error in iterative humanize', error)
     return { success: false, error: error.message }
   }
 }
@@ -260,7 +249,7 @@ export async function startIterativeHumanize(profileId, text, options = {}) {
       error: data.error 
     }
   } catch (error) {
-    console.error('Error starting iterative humanize:', error)
+    logger.error('Rewrite', 'Error starting iterative humanize', error)
     return { success: false, error: error.message }
   }
 }
@@ -279,7 +268,7 @@ export async function getHumanizeJobStatus(jobId) {
       error: data.error 
     }
   } catch (error) {
-    console.error('Error getting humanize job status:', error)
+    logger.error('Rewrite', 'Error getting humanize job status', error)
     return { success: false, error: error.message }
   }
 }
@@ -402,16 +391,14 @@ export async function streamHumanizeJobResult(jobId, onChunk, onComplete = () =>
                 throw new Error(json.error)
               }
             } catch (e) {
-              if (e.message !== 'Unexpected end of JSON input') {
-                console.warn('[WARNING] Failed to parse JSON:', data, e)
-              }
+              // Ignore JSON parse errors for incomplete chunks
             }
           }
         }
       }
     }
   } catch (error) {
-    console.error('[FAIL] Error streaming humanize result:', error)
+    logger.error('Rewrite', 'Error streaming humanize result', error)
     throw error
   }
 }
@@ -445,7 +432,7 @@ export async function pollAndStreamHumanizeJob(jobId, options = {}) {
     
     const { data } = result
     
-    logger.log(`[POLL #${pollCount}] Status: ${data.status}, Step: ${data.progress?.currentStep}`)
+
     
     onProgress({
       status: data.status,
@@ -463,7 +450,7 @@ export async function pollAndStreamHumanizeJob(jobId, options = {}) {
           streamed: true
         }
       } catch (streamError) {
-        console.warn('[WARNING] Streaming failed, falling back to direct result:', streamError)
+        logger.warn('Rewrite', 'Streaming failed, falling back to direct result')
         // Fallback to direct result if streaming fails
         return {
           success: true,

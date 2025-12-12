@@ -13,21 +13,49 @@ export function SessionExpiredModal() {
   const { t } = useTranslation()
   const [isVisible, setIsVisible] = useState(false)
   const [message, setMessage] = useState('')
+  const [pendingMessage, setPendingMessage] = useState(null)
   const { hasActiveError } = useErrorBoundaryState()
 
   useEffect(() => {
     const handleSessionExpired = (event) => {
-      setMessage(event.detail?.message || t('auth.sessionExpired', 'Your session has expired. Please sign in again.'))
+      const msg = event.detail?.message || t('auth.sessionExpired', 'Your session has expired. Please sign in again.')
+      
+      // If error page is active, queue the message for later
+      if (window.__errorPageActive || hasActiveError) {
+        setPendingMessage(msg)
+        return
+      }
+      
+      setMessage(msg)
       setIsVisible(true)
     }
 
     window.addEventListener('sessionExpired', handleSessionExpired)
     return () => window.removeEventListener('sessionExpired', handleSessionExpired)
-  }, [t])
+  }, [t, hasActiveError])
+
+  // Expose function to clear pending session expired (called from ErrorPage)
+  useEffect(() => {
+    window.__clearPendingSessionExpired = () => {
+      setPendingMessage(null)
+    }
+    return () => {
+      delete window.__clearPendingSessionExpired
+    }
+  }, [])
+
+  // Show pending session expired after error page closes (with delay to let navigation complete)
+  // Only show if user didn't navigate away (page reload/redirect will clear this anyway)
+  useEffect(() => {
+    if (pendingMessage && !hasActiveError && !window.__errorPageActive) {
+      // Don't show pending message - user is navigating away from error page
+      // The new page will handle auth check naturally
+      setPendingMessage(null)
+    }
+  }, [pendingMessage, hasActiveError])
 
   // Don't show modal if ErrorBoundary is displaying an error
-  // This allows users to report errors before being redirected to login
-  const shouldShow = isVisible && !hasActiveError
+  const shouldShow = isVisible && !hasActiveError && !window.__errorPageActive
 
   const handleClose = () => {
     setIsVisible(false)

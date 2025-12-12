@@ -66,7 +66,6 @@ const SharedChatInput = ({
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files)
-    logger.log('Files selected:', files)
     e.target.value = ''
   }
 

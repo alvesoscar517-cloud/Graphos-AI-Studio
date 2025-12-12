@@ -273,8 +273,8 @@ export default function EnvironmentConfig() {
         </div>
         <div className="flex items-center gap-2">
           <span className={cn(
-            "px-3 py-1 rounded-full text-xs font-medium",
-            configs[activeTab]?.isConfigured ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
+            "px-3 py-1.5 rounded-full text-xs font-medium",
+            configs[activeTab]?.isConfigured ? "bg-success/10 text-success" : "bg-surface-secondary text-muted border border-border/40"
           )}>
             {configs[activeTab]?.isConfigured ? 'Configured' : 'Using Defaults'}
           </span>
@@ -331,10 +331,10 @@ export default function EnvironmentConfig() {
                       <label className="text-sm font-medium text-primary flex items-center gap-2">
                         {variable.label}
                         {variable.sensitive && (
-                          <span className="px-1.5 py-0.5 bg-warning/10 text-warning text-xs rounded">Sensitive</span>
+                          <span className="px-1.5 py-0.5 bg-surface-secondary text-muted text-xs rounded-md border border-border/40">Sensitive</span>
                         )}
                         {source === 'env' && !hasFirestoreValue && (
-                          <span className="px-1.5 py-0.5 bg-info/10 text-info text-xs rounded">From ENV</span>
+                          <span className="px-1.5 py-0.5 bg-info/10 text-info text-xs rounded-md">From ENV</span>
                         )}
                       </label>
                       {renderVariableInput(variable, activeTab)}
@@ -482,9 +482,9 @@ function CustomVariablesTab({
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <code className="text-sm font-medium text-primary">{variable.key}</code>
-                    <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded">{variable.target}</span>
+                    <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-md">{variable.target}</span>
                     {variable.sensitive && (
-                      <span className="px-2 py-0.5 bg-warning/10 text-warning text-xs rounded">Sensitive</span>
+                      <span className="px-2 py-0.5 bg-surface-secondary text-muted text-xs rounded-md border border-border/40">Sensitive</span>
                     )}
                   </div>
                   <p className="text-xs text-muted mt-1">{variable.label || variable.key} • {variable.category}</p>

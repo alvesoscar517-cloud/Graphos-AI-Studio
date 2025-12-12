@@ -817,18 +817,29 @@ async function changePassword(userId, currentPassword, newPassword) {
     passwordChangedAt: new Date()
   });
   
-  // Revoke all existing sessions
+  // Revoke all existing sessions (industry standard security practice)
+  // This forces re-login on all devices after password change
   try {
+    // Revoke Firebase refresh tokens
     await admin.auth().revokeRefreshTokens(userId);
   } catch (error) {
-    logger.warn('Failed to revoke refresh tokens', { userId, error: error.message });
+    logger.warn('Failed to revoke Firebase refresh tokens', { userId, error: error.message });
+  }
+  
+  // Revoke all JWT sessions in database
+  try {
+    const result = await revokeAllSessions(userId);
+    logger.info('All JWT sessions revoked after password change', { userId, revokedCount: result.revokedCount });
+  } catch (error) {
+    logger.warn('Failed to revoke JWT sessions', { userId, error: error.message });
   }
   
   logger.info('Password changed successfully', { userId });
   
   return {
     success: true,
-    message: 'Password changed successfully. Please login again with your new password.'
+    message: 'Password changed successfully. Please login again with your new password.',
+    requireRelogin: true // Signal frontend to force re-login
   };
 }
 
@@ -976,6 +987,33 @@ async function revokeAllOtherSessions(userId, currentSessionId) {
   await batch.commit();
   
   logger.info('All other sessions revoked', { userId, revokedCount });
+  
+  return { success: true, revokedCount };
+}
+
+/**
+ * Revoke ALL sessions for a user (including current)
+ * Used when password is changed - industry standard security practice
+ * 
+ * @param {string} userId - User ID
+ * @returns {Promise<{success: boolean, revokedCount: number}>}
+ */
+async function revokeAllSessions(userId) {
+  const sessionsSnapshot = await db.collection(SESSION_COLLECTION)
+    .where('userId', '==', userId)
+    .get();
+  
+  const batch = db.batch();
+  let revokedCount = 0;
+  
+  sessionsSnapshot.docs.forEach(doc => {
+    batch.delete(doc.ref);
+    revokedCount++;
+  });
+  
+  await batch.commit();
+  
+  logger.info('All sessions revoked', { userId, revokedCount });
   
   return { success: true, revokedCount };
 }
@@ -1401,6 +1439,7 @@ module.exports = {
   getActiveSessions,
   revokeSession,
   revokeAllOtherSessions,
+  revokeAllSessions,
   getLoginHistory,
   cleanupExpiredRegistrations,
   cleanupOldLoginHistory,

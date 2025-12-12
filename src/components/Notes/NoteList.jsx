@@ -9,6 +9,7 @@ import { useNotes, useDeleteNote } from '@/hooks/queries'
 import { useDisclosure } from '@/hooks'
 import { useToasts } from '@/stores/uiStore'
 import NoteEditor from './NoteEditor'
+import { ErrorReportButton } from '@/components/Common/ErrorReportButton'
 
 export function NoteList() {
   const { t } = useTranslation()
@@ -52,8 +53,6 @@ export function NoteList() {
   }
 
   if (error) {
-    // Lazy import to avoid circular dependency
-    const { ErrorReportButton } = require('@/components/Common/ErrorReportButton')
     return (
       <div className="p-4 text-center">
         <p className="text-red-500 mb-2">{t('notes.failedToLoad')}</p>
@@ -133,13 +132,13 @@ export function NoteList() {
                     onClick={() => handleEdit(note)}
                     className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded"
                   >
-                    ✏️
+                    [EDIT]
                   </button>
                   <button
                     onClick={() => handleDelete(note.id)}
                     className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"
                   >
-                    🗑️
+                    [TRASH]️
                   </button>
                 </div>
               </div>

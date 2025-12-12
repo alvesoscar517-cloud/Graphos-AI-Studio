@@ -7,7 +7,7 @@ import ChangePasswordV2 from './ChangePasswordV2'
 const SecuritySettings = () => {
   const { t } = useTranslation()
   const authMethod = useAuthMethod() // Use Zustand store
-  const { changePassword, deleteAccount, getActiveSessions, revokeSession, revokeAllOtherSessions, getLoginHistory } = useAuth()
+  const { changePassword, deleteAccount, getActiveSessions, revokeSession, revokeAllOtherSessions, revokeAllSessions, getLoginHistory } = useAuth()
   const [activeTab, setActiveTab] = useState('password')
   const [sessions, setSessions] = useState([])
   const [loginHistory, setLoginHistory] = useState([])
@@ -47,6 +47,17 @@ const SecuritySettings = () => {
     try { const count = await revokeAllOtherSessions(); await loadSessions(); alert(t('auth.email.sessionsRevoked', { count })) }
     catch (err) { setError(err.message) }
     finally { setIsLoading(false) }
+  }
+
+  const handleRevokeAllSessions = async () => {
+    if (!window.confirm(t('auth.email.signOutAllConfirm'))) return
+    setIsLoading(true)
+    try { 
+      const result = await revokeAllSessions()
+      // User will be logged out automatically, no need to show alert
+      if (!result.success) throw new Error(result.error)
+    }
+    catch (err) { setError(err.message); setIsLoading(false) }
   }
 
   const handleDeleteAccount = async () => {
@@ -92,7 +103,10 @@ const SecuritySettings = () => {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h4 className="m-0 text-base font-semibold text-text-primary">{t('auth.email.activeSessions')}</h4>
-              {sessions.length > 1 && <button onClick={handleRevokeAllOthers} disabled={isLoading} className="text-red-600 text-sm font-medium hover:text-red-700 disabled:opacity-60">{t('auth.email.revokeAllOthers')}</button>}
+              <div className="flex gap-3">
+                {sessions.length > 1 && <button onClick={handleRevokeAllOthers} disabled={isLoading} className="text-red-600 text-sm font-medium hover:text-red-700 disabled:opacity-60">{t('auth.email.revokeAllOthers')}</button>}
+                {sessions.length > 0 && <button onClick={handleRevokeAllSessions} disabled={isLoading} className="text-red-600 text-sm font-medium hover:text-red-700 disabled:opacity-60 border-l border-red-200 pl-3">{t('auth.email.signOutAllDevices')}</button>}
+              </div>
             </div>
             {isLoading ? <div className="text-center py-10 text-text-muted">{t('common.loading')}</div>
               : sessions.length === 0 ? <p className="text-center py-10 text-sm text-text-muted">{t('auth.email.noSessions')}</p>
@@ -100,7 +114,7 @@ const SecuritySettings = () => {
                 {sessions.map((session) => (
                   <div key={session.sessionId} className="flex justify-between items-center p-4 bg-bg-secondary rounded-lg border border-border-light">
                     <div>
-                      <div className="flex items-center gap-2 mb-1"><span>💻</span><span className="text-sm font-medium text-text-primary">{parseUserAgent(session.deviceInfo?.userAgent)}</span></div>
+                      <div className="flex items-center gap-2 mb-1"><span>[COMPUTER]</span><span className="text-sm font-medium text-text-primary">{parseUserAgent(session.deviceInfo?.userAgent)}</span></div>
                       <div className="flex gap-4 text-xs text-text-muted">
                         <span>{t('auth.email.lastActive')}: {formatDate(session.lastActiveAt)}</span>
                         <span>{t('auth.email.created')}: {formatDate(session.createdAt)}</span>
@@ -124,7 +138,7 @@ const SecuritySettings = () => {
                   <div key={index} className={cn("flex justify-between items-center p-4 rounded-lg border", entry.isNewDevice ? "bg-amber-50 border-amber-300" : "bg-bg-secondary border-border-light")}>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span>{entry.isNewDevice ? '🆕' : '💻'}</span>
+                        <span>{entry.isNewDevice ? '[NEW]' : '[COMPUTER]'}</span>
                         <span className="text-sm font-medium text-text-primary">{parseUserAgent(entry.deviceInfo?.userAgent)}</span>
                         {entry.isNewDevice && <span className="px-2 py-0.5 bg-amber-400 text-amber-900 text-2xs font-semibold rounded-full uppercase">{t('auth.email.newDevice')}</span>}
                       </div>

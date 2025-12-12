@@ -73,7 +73,7 @@ export async function getUserInfo() {
 export async function loadProfiles() {
   try {
     const userInfo = await getUserInfo()
-    logger.log('📋 Loading profiles for user:', userInfo.userId)
+    logger.log('[INFO] Loading profiles for user:', userInfo.userId)
     
     // Use new endpoint instead of deprecated /get_profiles
     const url = `${CONFIG.API_BASE_URL}/profiles?user_id=${userInfo.userId}`
@@ -337,7 +337,7 @@ export async function finalizeProfile(profileId) {
 
 export async function getProfileDetails(profileId) {
   try {
-    logger.log('📋 Loading profile details for:', profileId)
+    logger.log('[INFO] Loading profile details for:', profileId)
     
     const url = `${CONFIG.API_BASE_URL}/get_profile?profile_id=${profileId}`
     logger.log('[LINK] API URL:', url)
@@ -363,7 +363,7 @@ export async function getProfileDetails(profileId) {
 // Suggestion API - NEW
 export async function getSuggestions(profileId, sentence, sentenceScore, context = {}) {
   try {
-    logger.log('💡 Getting suggestions for sentence...')
+    logger.log('[HINT] Getting suggestions for sentence...')
     
     const response = await fetch(`${CONFIG.API_BASE_URL}/suggest_improvements`, {
       method: 'POST',
@@ -437,7 +437,7 @@ export async function analyzeTextOptimized(profileId, text) {
     const cached = getCachedData(cacheKey)
     
     if (cached) {
-      logger.log('⚡ Using cached analysis result')
+      logger.log('[FAST] Using cached analysis result')
       return { success: true, data: cached }
     }
     
@@ -488,7 +488,7 @@ export async function getSuggestionsOptimized(profileId, sentence, sentenceScore
     const cached = getCachedData(cacheKey)
     
     if (cached) {
-      logger.log('⚡ Using cached suggestions')
+      logger.log('[FAST] Using cached suggestions')
       return { success: true, data: cached }
     }
     

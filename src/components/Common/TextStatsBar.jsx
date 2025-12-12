@@ -51,7 +51,7 @@ const TextStatsBar = ({
           <span>{stats.words.toLocaleString()} {t('common.words')}</span>
         )}
         {isTooLong && (
-          <span className="ml-auto text-amber-500" title={t('tokens.textQuiteLong')}>
+          <span className="ml-auto text-amber-500" data-tooltip={t('tokens.textQuiteLong')}>
             [{t('common.warning').toUpperCase()}]
           </span>
         )}
@@ -71,31 +71,31 @@ const TextStatsBar = ({
       className
     )}>
       <div className="flex items-center gap-4 flex-wrap">
-        <span className="flex items-center gap-1 whitespace-nowrap" title={t('tokens.characters')}>
+        <span className="flex items-center gap-1 whitespace-nowrap">
           <span className="text-2xs opacity-80">[NOTE]</span>
           {stats.chars.toLocaleString()}
         </span>
         
-        <span className="flex items-center gap-1 whitespace-nowrap" title={t('common.words')}>
-          <span className="text-2xs opacity-80">📖</span>
+        <span className="flex items-center gap-1 whitespace-nowrap">
+          <span className="text-2xs opacity-80">[BOOK]</span>
           {stats.words.toLocaleString()} {t('common.words')}
         </span>
         
-        <span className="flex items-center gap-1 whitespace-nowrap" title={t('tokens.tokens')}>
+        <span className="flex items-center gap-1 whitespace-nowrap">
           <span className="text-2xs opacity-80">[TARGET]</span>
           ~{stats.tokens.toLocaleString()} {t('tokens.tokens')}
         </span>
         
         {stats.pages > 1 && (
-          <span className="flex items-center gap-1 whitespace-nowrap" title={t('tokens.pages')}>
-            <span className="text-2xs opacity-80">📄</span>
+          <span className="flex items-center gap-1 whitespace-nowrap">
+            <span className="text-2xs opacity-80">[INFO]</span>
             ~{stats.pages} {t('tokens.pages')}
           </span>
         )}
 
         {showCost && (
-          <span className="flex items-center gap-1 whitespace-nowrap text-amber-400" title={t('credits.credits')}>
-            <span className="text-2xs opacity-80">💰</span>
+          <span className="flex items-center gap-1 whitespace-nowrap text-amber-400">
+            <span className="text-2xs opacity-80">[MONEY]</span>
             {estimatedCost}
           </span>
         )}
@@ -123,7 +123,7 @@ const TextStatsBar = ({
 
       {showModelHint && modelRecommendation.model !== model && (
         <div className="text-2xs text-blue-400 mt-1">
-          💡 {t('analysis.suggestions')}: {modelRecommendation.reason}
+          [HINT] {t('analysis.suggestions')}: {modelRecommendation.reason}
         </div>
       )}
     </div>

@@ -12,6 +12,7 @@ import {
   useDismissNotification 
 } from '@/hooks/queries'
 import { useUser } from '@/stores/authStore'
+import { SkeletonListItem } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
 const NotificationDropdown = ({ isOpen, onClose }) => {
@@ -98,8 +99,10 @@ const NotificationDropdown = ({ isOpen, onClose }) => {
       {/* Content */}
       <div className="max-h-80 overflow-y-auto">
         {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="w-6 h-6 border-2 border-system-blue border-t-transparent rounded-full animate-spin" />
+          <div className="py-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <SkeletonListItem key={i} className="border-none" />
+            ))}
           </div>
         ) : error ? (
           <div className="py-8 text-center text-sm text-red-500">

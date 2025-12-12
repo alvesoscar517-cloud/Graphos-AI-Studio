@@ -1,39 +1,42 @@
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/utils'
 
-const QuickActions = ({ onActionClick, disabled = false }) => {
+const QuickActions = ({ onSendMessage, disabled = false }) => {
   const { t } = useTranslation()
+
+  // Help prefix for app context detection
+  const HELP_PREFIX = '[APP_HELP] '
 
   const actions = [
     {
-      id: 'essay',
-      icon: '/icon/file-text.svg',
-      label: t('workspace.quickActions.writeEssay'),
-      prompt: t('workspace.quickActions.writeEssayPrompt')
+      id: 'howToUse',
+      icon: '/icon/book-open.svg',
+      label: t('workspace.helpActions.howToUse'),
+      prompt: HELP_PREFIX + t('workspace.helpActions.howToUsePrompt')
     },
     {
-      id: 'email',
-      icon: '/icon/mail.svg',
-      label: t('workspace.quickActions.composeEmail'),
-      prompt: t('workspace.quickActions.composeEmailPrompt')
+      id: 'voiceProfile',
+      icon: '/icon/user.svg',
+      label: t('workspace.helpActions.voiceProfile'),
+      prompt: HELP_PREFIX + t('workspace.helpActions.voiceProfilePrompt')
     },
     {
-      id: 'rewrite',
-      icon: '/icon/refresh-cw.svg',
-      label: t('workspace.quickActions.rewriteText'),
-      prompt: t('workspace.quickActions.rewriteTextPrompt')
+      id: 'credits',
+      icon: '/icon/credit-card.svg',
+      label: t('workspace.helpActions.credits'),
+      prompt: HELP_PREFIX + t('workspace.helpActions.creditsPrompt')
     },
     {
-      id: 'research',
-      icon: '/icon/search.svg',
-      label: t('workspace.quickActions.researchTopic'),
-      prompt: t('workspace.quickActions.researchTopicPrompt')
+      id: 'support',
+      icon: '/icon/headphones.svg',
+      label: t('workspace.helpActions.support'),
+      prompt: HELP_PREFIX + t('workspace.helpActions.supportPrompt')
     }
   ]
 
   const handleClick = (action) => {
-    if (!disabled) {
-      onActionClick?.(action.prompt)
+    if (!disabled && onSendMessage) {
+      onSendMessage(action.prompt)
     }
   }
 
