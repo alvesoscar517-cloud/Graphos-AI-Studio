@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Graphos AI Studio",
+  "name": "__MSG_extName__",
   "version": "1.0.1",
-  "description": "A Chrome extension for AI content authentication and verification",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
   "action": {
-    "default_title": "Open Graphos AI Studio"
+    "default_title": "__MSG_extActionTitle__"
   },
   "background": {
     "service_worker": "background.js"

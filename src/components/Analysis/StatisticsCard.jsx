@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { useAIProcessingActions } from '@/stores'
-import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
+import { getCachedAnalysis, setCachedAnalysis, getLatestAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import modal from '../../utils/modal'
@@ -12,7 +12,7 @@ import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
 import LazyLottie from '../Common/LazyLottie'
 
-const StatisticsCard = ({ disabled, currentProfile, text }) => {
+const StatisticsCard = ({ disabled, currentProfile, text, onAnalysisStart, onAnalysisEnd }) => {
   const { t } = useTranslation()
   const [stats, setStats] = useState(null)
   const [benchmarkData, setBenchmarkData] = useState(null)
@@ -24,26 +24,46 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
   const { currentNote } = useNotes()
   const { startProcessing, stopProcessing } = useAIProcessingActions()
 
+  // Load cached data when note or profile changes
   useEffect(() => {
-    setStats(null)
-    setBenchmarkData(null)
-    setSuggestions([])
-    setTextChanged(true)
+    if (!currentNote || !currentProfile) {
+      setStats(null)
+      setBenchmarkData(null)
+      setSuggestions([])
+      setTextChanged(true)
+      return
+    }
 
-    if (!currentNote || !currentProfile) return
-
+    const cacheKey = `stats_${currentProfile.profile_id}`
+    
+    // Try exact match first
     if (text) {
-      const cacheKey = `stats_${currentProfile.profile_id}`
       const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
       if (cached) {
         setStats(cached.stats || cached)
         setBenchmarkData(cached.benchmarkData || null)
         setSuggestions(cached.suggestions || [])
         setTextChanged(false)
+        return
       }
+    }
+    
+    // Try to get latest analysis for this note (show stale results)
+    const latest = getLatestAnalysis(currentNote.id, cacheKey)
+    if (latest?.data) {
+      setStats(latest.data.stats || latest.data)
+      setBenchmarkData(latest.data.benchmarkData || null)
+      setSuggestions(latest.data.suggestions || [])
+      setTextChanged(true) // Mark as stale
+    } else {
+      setStats(null)
+      setBenchmarkData(null)
+      setSuggestions([])
+      setTextChanged(true)
     }
   }, [currentNote?.id, currentProfile?.profile_id])
 
+  // Check if text matches cached analysis when text changes
   useEffect(() => {
     if (!currentNote || !text || !currentProfile) {
       setTextChanged(true)
@@ -58,9 +78,7 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
       setSuggestions(cached.suggestions || [])
       setTextChanged(false)
     } else {
-      setStats(null)
-      setBenchmarkData(null)
-      setSuggestions([])
+      // Text changed but keep showing previous results (marked as stale)
       setTextChanged(true)
     }
   }, [currentNote?.id, text, currentProfile?.profile_id])
@@ -79,6 +97,9 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
       modal.error(t('analysis.profileLoading') || 'Profile is still loading, please wait...')
       return
     }
+    
+    // Save scroll position before analysis
+    onAnalysisStart?.()
     
     setIsLoading(true)
     startProcessing('analyze')
@@ -135,6 +156,8 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
     } finally {
       setIsLoading(false)
       stopProcessing()
+      // Restore scroll position after analysis
+      onAnalysisEnd?.()
     }
   }
 
@@ -216,18 +239,25 @@ const StatisticsCard = ({ disabled, currentProfile, text }) => {
             isLoading && "pointer-events-none opacity-70"
           )}
           onClick={analyzeStats}
-          disabled={disabled || isLoading || !textChanged}
+          disabled={disabled || isLoading || (!textChanged && stats !== null)}
         >
           {isLoading ? (
             <LazyLottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
           ) : (
             <>
-              <span>{!textChanged ? t('analysis.analyzed') : t('analysis.analyze')}</span>
+              <span>
+                {stats === null 
+                  ? t('analysis.analyze') 
+                  : textChanged 
+                    ? t('analysis.reanalyze') 
+                    : t('analysis.analyzed')
+                }
+              </span>
               <Icon name="arrow-right" size="md" color="muted" />
             </>
           )}
         </button>
-
+        
         {/* Result Section */}
         {stats && showResult && (
           <div className="mt-2 block animate-slide-down">

@@ -627,7 +627,9 @@ exports.linkGoogle = async (req, res) => {
     const errorMessage = error.message.split(': ')[1] || error.message;
     
     let statusCode = 500;
-    if (errorCode === 'AUTH_GOOGLE_ALREADY_LINKED') {
+    if (errorCode === 'AUTH_GOOGLE_ALREADY_LINKED' || 
+        errorCode === 'AUTH_GOOGLE_EMAIL_IN_USE' || 
+        errorCode === 'AUTH_GOOGLE_EMAIL_HAS_ACCOUNT') {
       statusCode = 409;
     } else if (errorCode === 'AUTH_USER_NOT_FOUND' || errorCode === 'AUTH_INVALID_OPERATION') {
       statusCode = 400;

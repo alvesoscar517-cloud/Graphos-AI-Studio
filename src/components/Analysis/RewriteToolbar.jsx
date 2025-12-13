@@ -2,6 +2,7 @@ import { logger } from '@/utils/logger'
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+import { motion, MotionConfig } from 'framer-motion'
 import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
 import { useRewrite, useAIProcessingActions } from '@/stores'
 import { getLocalizedContentError } from '../../utils/errorMessages'
@@ -9,6 +10,7 @@ import { handleCreditError } from '../../utils/creditHandler'
 import modal from '../../utils/modal'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
+import LazyLottie from '../Common/LazyLottie'
 
 const transition = {
   type: 'spring',

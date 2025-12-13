@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "Graphos AI Studio"
+  },
+  "extDescription": {
+    "message": "Trợ lý viết AI giúp tạo nội dung chân thực. Phát hiện AI, phân tích phong cách viết và viết lại với giọng văn riêng của bạn."
+  },
+  "extActionTitle": {
+    "message": "Mở Graphos AI Studio"
+  }
+}

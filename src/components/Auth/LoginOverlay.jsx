@@ -37,70 +37,43 @@ const LoginOverlay = () => {
     setShouldShow(authLoading || !isAuthenticated)
   }, [authLoading, isAuthenticated])
 
-  // Preload Three.js and Vanta.js immediately on mount (no lazy loading)
+  // Vanta.js fog effect - load from node_modules (Chrome extension CSP blocks CDN)
   useEffect(() => {
-    const preloadScripts = () => {
-      // Preload Three.js immediately
-      if (!window.THREE && !document.querySelector('script[src*="three.min.js"]')) {
-        const threeScript = document.createElement('script')
-        threeScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js'
-        threeScript.async = false // Load synchronously for faster availability
-        document.head.appendChild(threeScript)
-      }
+    if (!shouldShow || !vantaRef.current || vantaEffect.current) return
 
-      // Preload Vanta.js immediately
-      if (!window.VANTA && !document.querySelector('script[src*="vanta.fog.min.js"]')) {
-        const vantaScript = document.createElement('script')
-        vantaScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.fog.min.js'
-        vantaScript.async = false // Load synchronously for faster availability
-        document.head.appendChild(vantaScript)
-      }
-    }
-
-    // Start preloading immediately
-    preloadScripts()
-  }, [])
-
-  // Vanta.js fog effect - initialize when ready
-  useEffect(() => {
-    if (!shouldShow || !vantaRef.current) return
-
-    const initVanta = () => {
-      // Initialize Vanta effect with Apple System Blue colors
-      if (window.VANTA && vantaRef.current && !vantaEffect.current) {
-        vantaEffect.current = window.VANTA.FOG({
-          el: vantaRef.current,
-          mouseControls: true,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 200.00,
-          minWidth: 200.00,
-          highlightColor: 0x5AC8FA,  // Apple System Teal
-          midtoneColor: 0x007AFF,    // Apple System Blue
-          lowlightColor: 0x5856D6,   // Apple System Indigo
-          baseColor: 0x0051D5,       // Apple Blue Hover (darker)
-          blurFactor: 0.6,
-          speed: 1.2,
-          zoom: 1.0
-        })
-      }
-    }
-
-    // Try to initialize immediately if scripts are already loaded
-    if (window.THREE && window.VANTA) {
-      initVanta()
-    } else {
-      // Poll for script availability (scripts are preloading)
-      const checkInterval = setInterval(() => {
-        if (window.THREE && window.VANTA) {
-          clearInterval(checkInterval)
-          initVanta()
+    const initVanta = async () => {
+      try {
+        // Import Three.js first
+        const THREE = await import('three')
+        
+        // Import Vanta FOG effect - it's a function that takes THREE as parameter
+        const FOG = (await import('vanta/dist/vanta.fog.min')).default
+        
+        // Initialize Vanta effect with Apple System Blue colors
+        if (vantaRef.current && !vantaEffect.current) {
+          vantaEffect.current = FOG({
+            THREE: THREE,
+            el: vantaRef.current,
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            highlightColor: 0x5AC8FA,  // Apple System Teal
+            midtoneColor: 0x007AFF,    // Apple System Blue
+            lowlightColor: 0x5856D6,   // Apple System Indigo
+            baseColor: 0x0051D5,       // Apple Blue Hover (darker)
+            blurFactor: 0.6,
+            speed: 1.2,
+            zoom: 1.0
+          })
         }
-      }, 50)
-
-      // Cleanup interval after 5 seconds max
-      setTimeout(() => clearInterval(checkInterval), 5000)
+      } catch (error) {
+        console.warn('Failed to load Vanta effect:', error)
+      }
     }
+
+    initVanta()
 
     return () => {
       if (vantaEffect.current) {

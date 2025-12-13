@@ -405,7 +405,7 @@ export const useProfileSetup = () => {
         setProfileData(prev => ({ ...prev, pastedChunks: truncatedChunks, pastedTextOriginal: text }))
         setHasPastedText(true)
         setShowPasteModal(false)
-        modal.toast(`Saved ${truncatedChunks.length} sections (${allowedWords} words, trimmed)`, '', 'success')
+        modal.toastLight(`Saved ${truncatedChunks.length} sections (${allowedWords} words, trimmed)`, '', 'success')
         return
       }
 
@@ -433,7 +433,7 @@ export const useProfileSetup = () => {
           setProfileData(prev => ({ ...prev, pastedChunks: uniqueChunks, pastedTextOriginal: text }))
           setHasPastedText(true)
           setShowPasteModal(false)
-          modal.toast(`Saved ${uniqueChunks.length} sections (${uniqueWords} words)`, '', 'success')
+          modal.toastLight(`Saved ${uniqueChunks.length} sections (${uniqueWords} words)`, '', 'success')
           return
         }
       }
@@ -447,7 +447,7 @@ export const useProfileSetup = () => {
       setProfileData(prev => ({ ...prev, pastedChunks: chunks, pastedTextOriginal: text }))
       setHasPastedText(true)
       setShowPasteModal(false)
-      modal.toast(`Saved ${chunks.length} sections (${newWords} words)`, '', 'success')
+      modal.toastLight(`Saved ${chunks.length} sections (${newWords} words)`, '', 'success')
     } catch (error) {
       modal.alert('Unable to process text.', '[ERROR]', 'error', true)
     }
@@ -460,7 +460,7 @@ export const useProfileSetup = () => {
         setProfileData(prev => ({ ...prev, uploadedChunks: [], uploadedFiles: [] }))
         setHasUploadedFiles(false)
         setShowUploadModal(false)
-        modal.toast('All files deleted', '', 'success')
+        modal.toastLight('All files deleted', '', 'success')
         return
       }
 
@@ -548,7 +548,7 @@ export const useProfileSetup = () => {
       setProfileData(prev => ({ ...prev, uploadedChunks: allChunks, uploadedFiles: fileData }))
       setHasUploadedFiles(true)
       setShowUploadModal(false)
-      modal.toast(`Processed ${allChunks.length} chunks from ${fileData.length} file (${uploadedWords} words)`, '', 'success')
+      modal.toastLight(`Processed ${allChunks.length} chunks from ${fileData.length} file (${uploadedWords} words)`, '', 'success')
     } catch (error) {
       console.error('Error processing uploaded files:', error)
       modal.alert('Unable to process file.', '[ERROR]', 'error', true)
@@ -626,13 +626,13 @@ export const useProfileSetup = () => {
       newSamples[currentSampleIndex] = text
       setSamples(newSamples)
       setProfileData(prev => ({ ...prev, shortSamples: newSamples }))
-      modal.toast(`Updated sample #${currentSampleIndex + 1} (${wordCount} words)`, '', 'success')
+      modal.toastLight(`Updated sample #${currentSampleIndex + 1} (${wordCount} words)`, '', 'success')
       setIsEditingMode(false)
       setCurrentSampleIndex(-1)
     } else {
       setProfileData(prev => ({ ...prev, shortSamples: [...prev.shortSamples, text] }))
       setSamples(prev => [...prev, text])
-      modal.toast(`Added sample (${wordCount} words)`, '', 'success')
+      modal.toastLight(`Added sample (${wordCount} words)`, '', 'success')
     }
     
     setShortText('')
@@ -764,11 +764,11 @@ export const useProfileSetup = () => {
       setHasDraft(false)
       setDraftInfo(null)
       
-      modal.toast('Draft restored', '', 'success')
+      modal.toastLight('Draft restored', '', 'success')
       return true
     } catch (error) {
       console.error('Error restoring draft:', error)
-      modal.toast('Unable to restore draft', '', 'error')
+      modal.toastLight('Unable to restore draft', '', 'error')
       return false
     }
   }, [draftInfo])

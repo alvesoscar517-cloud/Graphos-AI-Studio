@@ -658,7 +658,20 @@ export const useAuthStore = create(
             const data = await response.json()
             
             if (!response.ok) {
-              throw new Error(data.error || 'Failed to link Google account')
+              // Map error codes to i18n keys for better UX
+              const errorCode = data.code || ''
+              let errorKey = 'auth.email.linkFailed'
+              if (errorCode === 'AUTH_GOOGLE_EMAIL_IN_USE') {
+                errorKey = 'auth.email.googleEmailInUse'
+              } else if (errorCode === 'AUTH_GOOGLE_EMAIL_HAS_ACCOUNT') {
+                errorKey = 'auth.email.googleEmailHasAccount'
+              } else if (errorCode === 'AUTH_GOOGLE_ALREADY_LINKED') {
+                errorKey = 'auth.email.googleAlreadyLinked'
+              }
+              const error = new Error(data.error || 'Failed to link Google account')
+              error.i18nKey = errorKey
+              error.code = errorCode
+              throw error
             }
             
             // Update state

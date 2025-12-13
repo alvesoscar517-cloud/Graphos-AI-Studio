@@ -130,7 +130,12 @@ class ModalSystem {
     return this.alert(message, title, 'info')
   }
 
-  toast(message, title = '', type = 'info') {
+  toast(message, title = '', type = 'info', options = {}) {
+    const { forceLight = false } = options
+    
+    // Check if dark mode is active (unless forceLight is true)
+    const isDarkMode = !forceLight && document.documentElement.classList.contains('dark')
+    
     // Simple toast notification with inline styles for consistency
     const toast = document.createElement('div')
     toast.style.cssText = `
@@ -145,10 +150,10 @@ class ModalSystem {
       z-index: 10001;
       opacity: 0;
       transition: all 0.2s ease;
-      background: #fff;
-      color: #333;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-      border: 1px solid rgba(0,0,0,0.06);
+      background: ${isDarkMode ? '#2C2C2E' : '#fff'};
+      color: ${isDarkMode ? '#F5F5F7' : '#333'};
+      box-shadow: ${isDarkMode ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 20px rgba(0,0,0,0.12)'};
+      border: 1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'};
     `
     toast.innerHTML = `
       <span>${this.escapeHtml(message)}</span>
@@ -170,6 +175,11 @@ class ModalSystem {
     }, 3000)
     
     return Promise.resolve()
+  }
+
+  // Toast with forced light theme (for profile setup)
+  toastLight(message, title = '', type = 'info') {
+    return this.toast(message, title, type, { forceLight: true })
   }
 
   loading(message = 'Processing...') {

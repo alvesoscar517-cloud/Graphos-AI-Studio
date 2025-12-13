@@ -12,6 +12,7 @@
 import { memo } from 'react'
 import sparklesAnimation from '../../animation/Sparkles Loop Loader AI.json'
 import { cn } from '../../lib/utils'
+import LazyLottie from './LazyLottie'
 
 const SparklesLoader = memo(function SparklesLoader(props) {
   const { 
@@ -21,9 +22,9 @@ const SparklesLoader = memo(function SparklesLoader(props) {
     overlayClassName = ''
   } = props
   const sizeStyles = {
-    sm: { width: 96, height: 96 },
-    md: { width: 144, height: 144 },
-    lg: { width: 192, height: 192 }
+    sm: { width: 192, height: 192 },
+    md: { width: 288, height: 288 },
+    lg: { width: 384, height: 384 }
   }
 
   const loader = (

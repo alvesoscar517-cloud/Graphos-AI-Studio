@@ -25,7 +25,6 @@ const activityLogService = require('../services/activityLog.service');
 const { createLocalizer } = require('../utils/localized-messages.util');
 const { detectAppIntent, getPrimaryTopic, mapTopicToContextKey, detectLanguage } = require('../utils/intentDetector');
 const { formatAppContext, getTopicContext } = require('../data/app-context');
-const { generateFollowUpSuggestions } = require('../utils/suggestionsGenerator');
 
 /**
  * Build response style instructions based on chatSettings
@@ -553,25 +552,6 @@ exports.sendMessageStream = async (req, res) => {
       logger.info(`[INFO] Stream finished with reason: ${finishReason}`);
     }
 
-    // Generate follow-up suggestions (async, non-blocking)
-    const lastUserMessage = optimizedMessages[optimizedMessages.length - 1]?.content || '';
-    let suggestions = [];
-    
-    // Only generate suggestions if response is substantial and not app help mode
-    if (totalChars > 100 && !appContextResult.isAppHelpMode) {
-      try {
-        // Use a lighter model for suggestions to minimize cost
-        suggestions = await generateFollowUpSuggestions(
-          fullResponseText.substring(0, 1000), // Use first 1000 chars of response
-          lastUserMessage,
-          userLanguage,
-          { maxSuggestions: 3, model: 'gemini-2.5-flash-lite' }
-        );
-      } catch (suggestError) {
-        logger.warn('[SUGGESTIONS] Failed to generate suggestions:', suggestError.message);
-      }
-    }
-
     // Calculate output tokens and deduct output credits (Phase 2)
     const outputTokens = Math.ceil(totalChars / 4);
     const userId = req.body.user_id || req.headers['x-user-id'];
@@ -588,12 +568,11 @@ exports.sendMessageStream = async (req, res) => {
       );
     }
 
-    // Send completion with metadata, suggestions, and credit info
+    // Send completion with metadata and credit info
     res.write(`data: ${JSON.stringify({ 
       type: 'complete',
       summary: contextResult.summary,
       outputTokens: outputTokens,
-      suggestions: suggestions,
       finishReason: finishReason,
       wasIncomplete: wasIncomplete,
       credits: {
@@ -1353,24 +1332,6 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
       logger.info('[INFO] Skipped humanization - App Help mode active');
     }
 
-    // Generate follow-up suggestions
-    const lastUserMessage = optimizedMessages[optimizedMessages.length - 1]?.content || '';
-    let suggestions = [];
-    
-    // Only generate suggestions if response is substantial and not app help mode
-    if (totalChars > 100 && !shouldBypassProfile) {
-      try {
-        suggestions = await generateFollowUpSuggestions(
-          finalText.substring(0, 1000),
-          lastUserMessage,
-          userLanguage,
-          { maxSuggestions: 3, model: 'gemini-2.5-flash-lite' }
-        );
-      } catch (suggestError) {
-        logger.warn('[SUGGESTIONS] Failed to generate suggestions:', suggestError.message);
-      }
-    }
-
     // Calculate output tokens and deduct output credits (Phase 2)
     const outputTokens = Math.ceil(totalChars / 4);
     const userId = req.body.user_id || req.headers['x-user-id'];
@@ -1393,7 +1354,6 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
       summary: contextResult.summary,
       outputTokens: outputTokens,
       humanization: humanizationResult,
-      suggestions: suggestions,
       finishReason: finishReason,
       wasIncomplete: wasIncomplete,
       credits: {

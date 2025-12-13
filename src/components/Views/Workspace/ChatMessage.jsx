@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
 import Icon from '../../Common/Icon'
 import MarkdownResponse from './MarkdownResponse'
-import ChatSuggestions from './ChatSuggestions'
 import ImportToWorkspacePopup from '../../Popups/ImportToWorkspacePopup'
 import { cn } from '../../../lib/utils'
 import { useSpeech } from '../../../hooks'
@@ -15,21 +14,10 @@ const ChatMessage = ({ message, isLastMessage = false }) => {
   const { t, i18n } = useTranslation()
   const [copied, setCopied] = useState(false)
   const [showImportPopup, setShowImportPopup] = useState(false)
-  const { retryLastMessage, isLoading, sendMessage } = useWorkspace()
+  const { retryLastMessage, isLoading } = useWorkspace()
   const { speak, stop, isSpeaking, isSupported } = useSpeech()
   const isUser = message.role === 'user'
   const isError = message.error
-  const isAssistant = message.role === 'assistant'
-  
-  // Show suggestions only for last AI message that's not streaming and has suggestions
-  const showSuggestions = isLastMessage && isAssistant && !message.streaming && !isError && message.suggestions?.length > 0
-  
-  // Handle suggestion click - send as new message
-  const handleSuggestionClick = (suggestion) => {
-    if (!isLoading) {
-      sendMessage(suggestion)
-    }
-  }
   
   // Check if message has help prefix and get clean content (strip prefix for display)
   const displayContent = message.content?.startsWith(HELP_PREFIX) 
@@ -311,14 +299,7 @@ const ChatMessage = ({ message, isLastMessage = false }) => {
                   </div>
                 )}
                 
-                {/* Follow-up Suggestions - only for last AI message */}
-                {showSuggestions && (
-                  <ChatSuggestions
-                    suggestions={message.suggestions}
-                    onSuggestionClick={handleSuggestionClick}
-                    disabled={isLoading}
-                  />
-                )}
+
               </>
             )}
           </div>

@@ -61,6 +61,8 @@ const ERROR_CODE_MAP = {
   // Conflict errors (409)
   'AUTH_EMAIL_EXISTS': (msg) => conflictError(msg || 'Email already registered'),
   'AUTH_GOOGLE_ALREADY_LINKED': (msg) => conflictError(msg || 'Google account already linked'),
+  'AUTH_GOOGLE_EMAIL_IN_USE': (msg) => conflictError(msg || 'Google email already registered as another account'),
+  'AUTH_GOOGLE_EMAIL_HAS_ACCOUNT': (msg) => conflictError(msg || 'Google email already has a separate account'),
   'DUPLICATE_PROFILE_NAME': (msg) => conflictError(msg || 'Profile name already exists'),
   
   // Gone errors (410)

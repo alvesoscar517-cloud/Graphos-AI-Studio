@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { useAIProcessingActions } from '@/stores'
-import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
+import { getCachedAnalysis, setCachedAnalysis, getLatestAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import modal from '../../utils/modal'
@@ -11,7 +11,7 @@ import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
 import LazyLottie from '../Common/LazyLottie'
 
-const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) => {
+const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete, onAnalysisStart, onAnalysisEnd }) => {
   const { t } = useTranslation()
   const [deviations, setDeviations] = useState([])
   const [analysisData, setAnalysisData] = useState(null)
@@ -21,14 +21,47 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
   const { currentNote } = useNotes()
   const { startProcessing, stopProcessing } = useAIProcessingActions()
 
-  // Single useEffect to handle cache loading - avoid duplicate calls
+  // Load cached data when note or profile changes
   useEffect(() => {
-    // Reset state when note or profile changes
-    setDeviations([])
-    setAnalysisData(null)
-    setTextChanged(true)
+    if (!currentNote || !currentProfile) {
+      setDeviations([])
+      setAnalysisData(null)
+      setTextChanged(true)
+      return
+    }
 
-    if (!currentNote || !currentProfile || !text) return
+    const cacheKey = `deviation_${currentProfile.profile_id}`
+    
+    // Try exact match first
+    if (text) {
+      const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
+      if (cached) {
+        setDeviations(cached.deviant_sentences || [])
+        setAnalysisData(cached)
+        setTextChanged(false)
+        return
+      }
+    }
+    
+    // Try to get latest analysis for this note (show stale results)
+    const latest = getLatestAnalysis(currentNote.id, cacheKey)
+    if (latest?.data) {
+      setDeviations(latest.data.deviant_sentences || [])
+      setAnalysisData(latest.data)
+      setTextChanged(true) // Mark as stale
+    } else {
+      setDeviations([])
+      setAnalysisData(null)
+      setTextChanged(true)
+    }
+  }, [currentNote?.id, currentProfile?.profile_id])
+
+  // Check if text matches cached analysis when text changes
+  useEffect(() => {
+    if (!currentNote || !text || !currentProfile) {
+      setTextChanged(true)
+      return
+    }
 
     const cacheKey = `deviation_${currentProfile.profile_id}`
     const cached = getCachedAnalysis(currentNote.id, text, cacheKey)
@@ -36,8 +69,9 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
       setDeviations(cached.deviant_sentences || [])
       setAnalysisData(cached)
       setTextChanged(false)
-      // Don't call onAnalysisComplete here to avoid infinite loops
-      // User needs to click "Search" button to trigger analysis
+    } else {
+      // Text changed but keep showing previous results (marked as stale)
+      setTextChanged(true)
     }
   }, [currentNote?.id, text, currentProfile?.profile_id])
 
@@ -52,6 +86,9 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
       modal.error(t('analysis.profileLoading') || 'Profile is still loading, please wait...')
       return
     }
+    
+    // Save scroll position before analysis
+    onAnalysisStart?.()
     
     setIsLoading(true)
     startProcessing('analyze')
@@ -90,6 +127,8 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
     } finally {
       setIsLoading(false)
       stopProcessing()
+      // Restore scroll position after analysis
+      onAnalysisEnd?.()
     }
   }
 
@@ -135,13 +174,20 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete }) =
           isLoading && "pointer-events-none opacity-70"
         )}
         onClick={findDeviations}
-        disabled={disabled || isLoading || !textChanged}
+        disabled={disabled || isLoading || (!textChanged && analysisData !== null)}
       >
         {isLoading ? (
           <LazyLottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
         ) : (
           <>
-            <span>{!textChanged ? t('analysis.alreadySearched') : t('common.search')}</span>
+            <span>
+              {analysisData === null 
+                ? t('analysis.search') 
+                : textChanged 
+                  ? t('analysis.research') 
+                  : t('analysis.searched')
+              }
+            </span>
             <Icon name="arrow-right" size="md" color="muted" />
           </>
         )}

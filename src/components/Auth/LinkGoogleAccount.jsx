@@ -11,7 +11,11 @@ const LinkGoogleAccount = ({ isLinked, linkedEmail, onLink, onUnlink, isLoading 
     setError('')
     setLocalLoading(true)
     try { await onLink() }
-    catch (err) { setError(err.message || t('auth.email.linkFailed')) }
+    catch (err) { 
+      // Use i18n key if available, otherwise fallback to error message
+      const errorMessage = err.i18nKey ? t(err.i18nKey) : (err.message || t('auth.email.linkFailed'))
+      setError(errorMessage)
+    }
     finally { setLocalLoading(false) }
   }
 

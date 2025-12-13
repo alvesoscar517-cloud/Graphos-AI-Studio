@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { analyzeText } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { useAIProcessingActions } from '@/stores'
-import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
+import { getCachedAnalysis, setCachedAnalysis, getLatestAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import modal from '../../utils/modal'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
@@ -12,7 +12,7 @@ import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
 import LazyLottie from '../Common/LazyLottie'
 
-const CompatibilityCard = ({ disabled, currentProfile, text }) => {
+const CompatibilityCard = ({ disabled, currentProfile, text, onAnalysisStart, onAnalysisEnd }) => {
   const { t } = useTranslation()
   const { startProcessing, stopProcessing } = useAIProcessingActions()
 
@@ -38,24 +38,43 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
   const [textChanged, setTextChanged] = useState(true)
   const { currentNote } = useNotes()
 
+  // Load cached data when note or profile changes
   useEffect(() => {
-    setScore(null)
-    setAnalysisDetails(null)
-    setTextChanged(true)
+    if (!currentNote || !currentProfile) {
+      setScore(null)
+      setAnalysisDetails(null)
+      setTextChanged(true)
+      return
+    }
 
-    if (!currentNote || !currentProfile) return
-
+    const cacheKey = currentProfile.profile_id ? `compatibility_${currentProfile.profile_id}` : 'compatibility'
+    
+    // Try exact match first
     if (text) {
-      const cacheKey = `${currentProfile.profile_id}_${text}`
-      const cached = getCachedAnalysis(currentNote.id, cacheKey, 'compatibility')
+      const exactCacheKey = `${currentProfile.profile_id}_${text}`
+      const cached = getCachedAnalysis(currentNote.id, exactCacheKey, 'compatibility')
       if (cached) {
         setScore(cached.score)
         setAnalysisDetails(cached.details)
         setTextChanged(false)
+        return
       }
+    }
+    
+    // Try to get latest analysis for this note (show stale results)
+    const latest = getLatestAnalysis(currentNote.id, cacheKey)
+    if (latest?.data) {
+      setScore(latest.data.score)
+      setAnalysisDetails(latest.data.details)
+      setTextChanged(true) // Mark as stale
+    } else {
+      setScore(null)
+      setAnalysisDetails(null)
+      setTextChanged(true)
     }
   }, [currentNote?.id, currentProfile?.profile_id])
 
+  // Check if text matches cached analysis when text changes
   useEffect(() => {
     if (!currentNote || !text || !currentProfile) {
       setTextChanged(true)
@@ -69,8 +88,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
       setAnalysisDetails(cached.details)
       setTextChanged(false)
     } else {
-      setScore(null)
-      setAnalysisDetails(null)
+      // Text changed but keep showing previous results (marked as stale)
       setTextChanged(true)
     }
   }, [currentNote?.id, text, currentProfile?.profile_id])
@@ -95,6 +113,9 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
       modal.error(t('analysis.profileIdMissing') || 'Profile ID is missing')
       return
     }
+
+    // Save scroll position before analysis
+    onAnalysisStart?.()
 
     setIsLoading(true)
     startProcessing('analyze')
@@ -128,6 +149,8 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
     } finally {
       setIsLoading(false)
       stopProcessing()
+      // Restore scroll position after analysis
+      onAnalysisEnd?.()
     }
   }
 
@@ -208,13 +231,20 @@ const CompatibilityCard = ({ disabled, currentProfile, text }) => {
             isLoading && "pointer-events-none opacity-70"
           )}
           onClick={calculateScore}
-          disabled={disabled || isLoading || !textChanged}
+          disabled={disabled || isLoading || (!textChanged && score !== null)}
         >
           {isLoading ? (
             <LazyLottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
           ) : (
             <>
-              <span>{!textChanged ? t('analysis.calculated') : t('analysis.calculateScore')}</span>
+              <span>
+                {score === null 
+                  ? t('analysis.calculateScore') 
+                  : textChanged 
+                    ? t('analysis.recalculate') 
+                    : t('analysis.calculated')
+                }
+              </span>
               <Icon name="arrow-right" size="md" color="muted" />
             </>
           )}

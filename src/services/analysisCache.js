@@ -130,6 +130,73 @@ export function hasTextChanged(noteId, text, type) {
 }
 
 /**
+ * Get the latest analysis result for a note (regardless of text content)
+ * This allows showing previous results even when text has changed
+ * @param {string} noteId - Note ID
+ * @param {string} type - Analysis type
+ * @returns {object|null} Latest cached result with metadata or null
+ */
+export function getLatestAnalysis(noteId, type) {
+  if (!noteId || !type) return null
+  
+  const cache = loadCache()
+  const noteCache = cache[noteId]
+  if (!noteCache) return null
+  
+  let latestResult = null
+  let latestTimestamp = 0
+  let latestTextHash = null
+  
+  // Find the most recent analysis of this type for this note
+  Object.entries(noteCache).forEach(([textHash, textCache]) => {
+    const entry = textCache[type]
+    if (entry && entry.timestamp > latestTimestamp) {
+      latestTimestamp = entry.timestamp
+      latestResult = entry.data
+      latestTextHash = textHash
+    }
+  })
+  
+  if (!latestResult) return null
+  
+  return {
+    data: latestResult,
+    timestamp: latestTimestamp,
+    textHash: latestTextHash
+  }
+}
+
+/**
+ * Check if current text matches the cached analysis
+ * @param {string} noteId - Note ID
+ * @param {string} text - Current text content
+ * @param {string} type - Analysis type
+ * @returns {object} { hasCache: boolean, isStale: boolean, data: object|null }
+ */
+export function getAnalysisStatus(noteId, text, type) {
+  if (!noteId || !type) {
+    return { hasCache: false, isStale: true, data: null }
+  }
+  
+  const cache = loadCache()
+  const textHash = text ? simpleHash(text) : null
+  
+  // Check if exact match exists
+  const exactMatch = textHash ? cache[noteId]?.[textHash]?.[type] : null
+  if (exactMatch) {
+    return { hasCache: true, isStale: false, data: exactMatch.data }
+  }
+  
+  // Get latest analysis for this note
+  const latest = getLatestAnalysis(noteId, type)
+  if (latest) {
+    return { hasCache: true, isStale: true, data: latest.data }
+  }
+  
+  return { hasCache: false, isStale: true, data: null }
+}
+
+/**
  * Clear cache for a specific note
  * @param {string} noteId - Note ID
  */

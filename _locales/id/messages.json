@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "Graphos AI Studio"
+  },
+  "extDescription": {
+    "message": "Asisten penulisan AI untuk konten autentik. Deteksi AI, analisis gaya penulisan, dan tulis ulang dengan suara unik Anda."
+  },
+  "extActionTitle": {
+    "message": "Buka Graphos AI Studio"
+  }
+}

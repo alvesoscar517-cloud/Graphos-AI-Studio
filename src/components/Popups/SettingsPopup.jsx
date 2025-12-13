@@ -7,13 +7,34 @@ import Portal from '../Common/Portal'
 import { cn } from '../../lib/utils'
 import { useTheme } from '../../stores/themeStore'
 
+// Language options with native names and country codes (lowercase for flag-icons)
+const LANGUAGES = [
+  { code: 'en', name: 'English', country: 'us' },
+  { code: 'vi', name: 'Tiếng Việt', country: 'vn' },
+  { code: 'zh-CN', name: '简体中文', country: 'cn' },
+  { code: 'ja', name: '日本語', country: 'jp' },
+  { code: 'ko', name: '한국어', country: 'kr' },
+  { code: 'fr', name: 'Français', country: 'fr' },
+  { code: 'de', name: 'Deutsch', country: 'de' },
+  { code: 'es', name: 'Español', country: 'es' },
+  { code: 'pt', name: 'Português', country: 'br' },
+  { code: 'ru', name: 'Русский', country: 'ru' },
+  { code: 'it', name: 'Italiano', country: 'it' },
+  { code: 'th', name: 'ไทย', country: 'th' },
+  { code: 'id', name: 'Indonesia', country: 'id' },
+  { code: 'ar', name: 'العربية', country: 'sa' },
+  { code: 'hi', name: 'हिन्दी', country: 'in' }
+]
+
 const SettingsPopup = ({ onClose, onViewChange }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const popupRef = useRef(null)
   const themeSubmenuRef = useRef(null)
+  const languageSubmenuRef = useRef(null)
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
   const [showBillingModal, setShowBillingModal] = useState(false)
   const [showThemeSubmenu, setShowThemeSubmenu] = useState(false)
+  const [showLanguageSubmenu, setShowLanguageSubmenu] = useState(false)
   const { themeMode, setTheme } = useTheme()
 
   useEffect(() => {
@@ -21,6 +42,10 @@ const SettingsPopup = ({ onClose, onViewChange }) => {
       // Close theme submenu if clicking outside of it
       if (themeSubmenuRef.current && !themeSubmenuRef.current.contains(e.target)) {
         setShowThemeSubmenu(false)
+      }
+      // Close language submenu if clicking outside of it
+      if (languageSubmenuRef.current && !languageSubmenuRef.current.contains(e.target)) {
+        setShowLanguageSubmenu(false)
       }
       // Close main popup if clicking outside
       if (popupRef.current && !popupRef.current.contains(e.target)) {
@@ -31,6 +56,25 @@ const SettingsPopup = ({ onClose, onViewChange }) => {
     document.addEventListener('click', handleClickOutside)
     return () => document.removeEventListener('click', handleClickOutside)
   }, [onClose])
+
+  // Normalize language code (e.g., 'vi-VN' -> 'vi', 'zh-CN' stays 'zh-CN')
+  const normalizeLanguageCode = (code) => {
+    if (!code) return 'en'
+    // Check if exact match exists
+    if (LANGUAGES.some((l) => l.code === code)) return code
+    // Try base language (e.g., 'vi-VN' -> 'vi')
+    const baseCode = code.split('-')[0]
+    if (LANGUAGES.some((l) => l.code === baseCode)) return baseCode
+    return 'en'
+  }
+
+  const currentLangCode = normalizeLanguageCode(i18n.language)
+  const currentLanguage = LANGUAGES.find((l) => l.code === currentLangCode) || LANGUAGES[0]
+
+  const handleLanguageSelect = (code) => {
+    i18n.changeLanguage(code)
+    setShowLanguageSubmenu(false)
+  }
 
   const themeOptions = [
     { value: 'light', icon: 'sun', label: t('settings.light') },
@@ -52,8 +96,8 @@ const SettingsPopup = ({ onClose, onViewChange }) => {
         {/* Theme with submenu */}
         <div 
           className="dropdown-item justify-between relative"
-          onMouseEnter={() => setShowThemeSubmenu(true)}
-          onClick={() => setShowThemeSubmenu(!showThemeSubmenu)}
+          onMouseEnter={() => { setShowThemeSubmenu(true); setShowLanguageSubmenu(false) }}
+          onClick={() => { setShowThemeSubmenu(!showThemeSubmenu); setShowLanguageSubmenu(false) }}
         >
           <div className="flex items-center gap-3">
             <Icon name="palette" alt={t('settings.theme') || 'Theme'} size="md" />
@@ -99,6 +143,64 @@ const SettingsPopup = ({ onClose, onViewChange }) => {
                 <span className="text-sm">{option.label}</span>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Language with submenu */}
+        <div 
+          className="dropdown-item justify-between relative"
+          onMouseEnter={() => { setShowLanguageSubmenu(true); setShowThemeSubmenu(false) }}
+          onClick={() => { setShowLanguageSubmenu(!showLanguageSubmenu); setShowThemeSubmenu(false) }}
+        >
+          <div className="flex items-center gap-3">
+            <Icon name="globe" alt={t('settings.language')} size="md" />
+            <span className="flex-1 text-sm whitespace-nowrap">
+              {t('settings.language')}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={`fi fis fi-${currentLanguage.country} rounded-full`} style={{ fontSize: '16px' }} />
+            <Icon name="chevron-right" size="sm" className="opacity-50" />
+          </div>
+        </div>
+
+        {/* Language Submenu */}
+        {showLanguageSubmenu && (
+          <div 
+            ref={languageSubmenuRef}
+            className={cn(
+              "popup fixed w-[200px] z-popup-submenu max-h-[320px] overflow-hidden",
+              "animate-fade-in"
+            )}
+            style={{
+              bottom: 'auto',
+              top: popupRef.current?.getBoundingClientRect().top + 'px',
+              left: (popupRef.current?.getBoundingClientRect().right + 8) + 'px'
+            }}
+            onMouseLeave={() => setShowLanguageSubmenu(false)}
+          >
+            <div className="py-2 max-h-[320px] overflow-y-auto">
+              {LANGUAGES.map((lang) => (
+                <div 
+                  key={lang.code}
+                  className="dropdown-item gap-2.5 pr-3"
+                  onClick={() => handleLanguageSelect(lang.code)}
+                >
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border-2 shrink-0 relative",
+                    currentLangCode === lang.code 
+                      ? "border-text-primary" 
+                      : "border-text-muted"
+                  )}>
+                    {currentLangCode === lang.code && (
+                      <div className="w-2 h-2 rounded-full bg-text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                    )}
+                  </div>
+                  <span className={`fi fis fi-${lang.country} rounded-full shrink-0`} style={{ fontSize: '16px' }} />
+                  <span className="text-sm whitespace-nowrap truncate">{lang.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

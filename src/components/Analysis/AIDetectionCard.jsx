@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { detectAI as detectAIAPI } from '../../services/api'
 import { useNotes } from '../../contexts/NotesContext'
 import { useAIProcessingActions } from '@/stores'
-import { getCachedAnalysis, setCachedAnalysis } from '../../services/analysisCache'
+import { getCachedAnalysis, setCachedAnalysis, getLatestAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
 import { handleCreditError } from '../../utils/creditHandler'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
@@ -26,7 +26,7 @@ const formatEvidenceText = (text) => {
   return text
 }
 
-const AIDetectionCard = ({ disabled, text }) => {
+const AIDetectionCard = ({ disabled, text, onAnalysisStart, onAnalysisEnd }) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [result, setResult] = useState(null)
@@ -44,18 +44,21 @@ const AIDetectionCard = ({ disabled, text }) => {
   const { currentNote } = useNotes()
   const { startProcessing, stopProcessing } = useAIProcessingActions()
 
+  // Load cached data when note changes
   useEffect(() => {
-    setResult(null)
-    setConfidence(null)
-    setEvidence([])
-    setHumanIndicators([])
-    setAiIndicators([])
-    setVerdict('')
-    setAnalysisDetails(null)
-    setTextChanged(true)
+    if (!currentNote) {
+      setResult(null)
+      setConfidence(null)
+      setEvidence([])
+      setHumanIndicators([])
+      setAiIndicators([])
+      setVerdict('')
+      setAnalysisDetails(null)
+      setTextChanged(true)
+      return
+    }
 
-    if (!currentNote) return
-
+    // Try to get exact match first
     if (text) {
       const cached = getCachedAnalysis(currentNote.id, text, 'detect')
       if (cached) {
@@ -68,10 +71,36 @@ const AIDetectionCard = ({ disabled, text }) => {
         setAiIndicators(cached.aiIndicators || [])
         setAnalysisDetails(cached.analysisDetails || null)
         setTextChanged(false)
+        return
       }
+    }
+    
+    // If no exact match, try to get latest analysis for this note (show stale results)
+    const latest = getLatestAnalysis(currentNote.id, 'detect')
+    if (latest?.data) {
+      const cached = latest.data
+      const verdictText = cached.verdict ? cached.verdict.charAt(0).toUpperCase() + cached.verdict.slice(1) : cached.verdict
+      setResult(cached.aiScore)
+      setConfidence(cached.confidence || null)
+      setVerdict(verdictText)
+      setEvidence(cached.evidence || [])
+      setHumanIndicators(cached.humanIndicators || [])
+      setAiIndicators(cached.aiIndicators || [])
+      setAnalysisDetails(cached.analysisDetails || null)
+      setTextChanged(true) // Mark as stale
+    } else {
+      setResult(null)
+      setConfidence(null)
+      setEvidence([])
+      setHumanIndicators([])
+      setAiIndicators([])
+      setVerdict('')
+      setAnalysisDetails(null)
+      setTextChanged(true)
     }
   }, [currentNote?.id])
 
+  // Check if text matches cached analysis when text changes
   useEffect(() => {
     if (!currentNote || !text) {
       setTextChanged(true)
@@ -90,13 +119,7 @@ const AIDetectionCard = ({ disabled, text }) => {
       setAnalysisDetails(cached.analysisDetails || null)
       setTextChanged(false)
     } else {
-      setResult(null)
-      setConfidence(null)
-      setEvidence([])
-      setHumanIndicators([])
-      setAiIndicators([])
-      setVerdict('')
-      setAnalysisDetails(null)
+      // Text changed but keep showing previous results (marked as stale)
       setTextChanged(true)
     }
   }, [currentNote?.id, text])
@@ -117,6 +140,9 @@ const AIDetectionCard = ({ disabled, text }) => {
       modal.error(t('analysis.currentNoteNotFound'))
       return
     }
+    
+    // Save scroll position before analysis
+    onAnalysisStart?.()
     
     setIsLoading(true)
     startProcessing('detect')
@@ -188,6 +214,8 @@ const AIDetectionCard = ({ disabled, text }) => {
     } finally {
       setIsLoading(false)
       stopProcessing()
+      // Restore scroll position after analysis
+      onAnalysisEnd?.()
     }
   }
 
@@ -246,13 +274,20 @@ const AIDetectionCard = ({ disabled, text }) => {
             isLoading && "pointer-events-none opacity-70"
           )}
           onClick={detectAI}
-          disabled={disabled || isLoading || !textChanged}
+          disabled={disabled || isLoading || (!textChanged && result !== null)}
         >
           {isLoading ? (
             <LazyLottie animationData={threeDotsAnimation} loop={true} style={{ width: 50, height: 16 }} />
           ) : (
             <>
-              <span>{!textChanged ? t('analysis.detected') : t('analysis.detect')}</span>
+              <span>
+                {result === null 
+                  ? t('analysis.detect') 
+                  : textChanged 
+                    ? t('analysis.redetect') 
+                    : t('analysis.detected')
+                }
+              </span>
               <Icon name="arrow-right" size="md" color="muted" />
             </>
           )}

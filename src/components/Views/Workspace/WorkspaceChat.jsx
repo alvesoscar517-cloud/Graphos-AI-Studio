@@ -79,6 +79,13 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
     }
   }, [currentConversation?.id])
 
+  // Get last message for scroll tracking
+  const lastMessage = currentConversation?.messages?.[currentConversation?.messages?.length - 1]
+  const isStreamingMessage = lastMessage?.streaming
+  
+  // Track if user is near bottom for auto-scroll during streaming
+  const isNearBottomRef = useRef(true)
+
   // Auto-scroll to bottom only for new messages, not when loading from history
   useEffect(() => {
     if (!currentConversation?.messages?.length) return
@@ -95,9 +102,17 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
     
     // Auto-scroll for new messages
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [currentConversation?.messages])
+  }, [currentConversation?.messages?.length])
 
-  // Detect scroll position to show/hide scroll button
+  // Auto-scroll during streaming if user is near bottom
+  useEffect(() => {
+    if (!isStreamingMessage || !isNearBottomRef.current) return
+    
+    // Scroll smoothly during streaming
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [isStreamingMessage, lastMessage?.content])
+
+  // Detect scroll position to show/hide scroll button and track if near bottom
   useEffect(() => {
     const container = messagesContainerRef.current
     if (!container) return
@@ -106,6 +121,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
       const { scrollTop, scrollHeight, clientHeight } = container
       const isNearBottom = scrollHeight - scrollTop - clientHeight < 100
       setShowScrollButton(!isNearBottom)
+      isNearBottomRef.current = isNearBottom
     }
 
     container.addEventListener('scroll', handleScroll)

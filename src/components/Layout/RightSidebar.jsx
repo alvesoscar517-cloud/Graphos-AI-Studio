@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { logger } from '@/utils/logger'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -46,6 +46,28 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
   const [isRewriting, setIsRewriting] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
+  
+  // Ref for scroll container to preserve scroll position
+  const scrollContainerRef = useRef(null)
+  const scrollPositionRef = useRef(0)
+  
+  // Save scroll position before any state update that might cause re-render
+  const saveScrollPosition = useCallback(() => {
+    if (scrollContainerRef.current) {
+      scrollPositionRef.current = scrollContainerRef.current.scrollTop
+    }
+  }, [])
+  
+  // Restore scroll position after render
+  const restoreScrollPosition = useCallback(() => {
+    if (scrollContainerRef.current && scrollPositionRef.current > 0) {
+      requestAnimationFrame(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = scrollPositionRef.current
+        }
+      })
+    }
+  }, [])
 
   // Detect screen size for responsive behavior
   useEffect(() => {
@@ -122,6 +144,9 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       setIsRewriting(true)
       startProcessing('humanize')
       
+      // Clear editor content immediately to show loading animation
+      updateNote(currentNote.id, { content: '' })
+      
       try {
         // Start async job - profile_id is optional for generic humanization
         const startResult = await startIterativeHumanize(
@@ -150,7 +175,8 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
         const animateText = () => {
           if (displayedText.length < fullText.length) {
             const remaining = fullText.length - displayedText.length
-            const charsToAdd = Math.max(1, Math.min(3, Math.ceil(remaining / 20)))
+            // Adaptive speed: faster when buffer is large, slower when catching up (synced with Workspace)
+            const charsToAdd = Math.max(1, Math.min(5, Math.ceil(remaining / 15)))
             displayedText = fullText.substring(0, displayedText.length + charsToAdd)
             updateNote(currentNote.id, { content: displayedText })
             requestAnimationFrame(animateText)
@@ -237,6 +263,9 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
     setIsRewriting(true)
     startProcessing('rewrite')
     
+    // Clear editor content immediately to show loading animation
+    updateNote(currentNote.id, { content: '' })
+    
     try {
       let fullText = ''
       let displayedText = ''
@@ -247,7 +276,8 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       const animateText = () => {
         if (displayedText.length < fullText.length) {
           const remaining = fullText.length - displayedText.length
-          const charsToAdd = Math.max(1, Math.min(3, Math.ceil(remaining / 20)))
+          // Adaptive speed: faster when buffer is large, slower when catching up (synced with Workspace)
+          const charsToAdd = Math.max(1, Math.min(5, Math.ceil(remaining / 15)))
           
           displayedText = fullText.substring(0, displayedText.length + charsToAdd)
           updateNote(currentNote.id, { content: displayedText })
@@ -484,10 +514,13 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       </div>
 
       {/* Settings Panel */}
-      <div className={cn(
-        "flex flex-col gap-4 p-4 flex-1 overflow-y-auto overflow-x-hidden",
-        isMobile && "gap-3 p-3"
-      )}>
+      <div 
+        ref={scrollContainerRef}
+        className={cn(
+          "flex flex-col gap-4 p-4 flex-1 overflow-y-auto overflow-x-hidden",
+          isMobile && "gap-3 p-3"
+        )}
+      >
         <ProfileSelector 
           currentProfile={currentProfile}
           onProfileSelect={handleProfileSelect}
@@ -499,11 +532,15 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
               disabled={!hasText || !hasProfile}
               currentProfile={currentProfile}
               text={currentNote?.content || ''}
+              onAnalysisStart={saveScrollPosition}
+              onAnalysisEnd={restoreScrollPosition}
             />
 
             <AIDetectionCard 
               disabled={!hasText}
               text={currentNote?.content || ''}
+              onAnalysisStart={saveScrollPosition}
+              onAnalysisEnd={restoreScrollPosition}
             />
 
             <DeviationCard 
@@ -511,12 +548,16 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
               currentProfile={currentProfile}
               text={currentNote?.content || ''}
               onAnalysisComplete={onAnalysisComplete}
+              onAnalysisStart={saveScrollPosition}
+              onAnalysisEnd={restoreScrollPosition}
             />
 
             <StatisticsCard 
               disabled={!hasText || !hasProfile}
               currentProfile={currentProfile}
               text={currentNote?.content || ''}
+              onAnalysisStart={saveScrollPosition}
+              onAnalysisEnd={restoreScrollPosition}
             />
           </div>
         ) : (
@@ -570,7 +611,6 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
                   )}
                 </button>
               </BackgroundGradient>
-              
             </div>
           </>
         )}

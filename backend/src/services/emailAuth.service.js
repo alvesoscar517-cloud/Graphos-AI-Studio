@@ -1116,6 +1116,7 @@ async function cleanupOldLoginHistory() {
  */
 async function linkGoogleWithOAuth(userId, googleData) {
   const { accessToken, email, name } = googleData;
+  const normalizedGoogleEmail = normalizeEmail(email);
   
   // Verify the access token by calling Google API
   try {
@@ -1126,7 +1127,7 @@ async function linkGoogleWithOAuth(userId, googleData) {
     });
     
     // Verify email matches
-    if (googleUserInfo.email !== email) {
+    if (normalizeEmail(googleUserInfo.email) !== normalizedGoogleEmail) {
       throw new Error('AUTH_INVALID_TOKEN: Email mismatch');
     }
   } catch (error) {
@@ -1137,14 +1138,32 @@ async function linkGoogleWithOAuth(userId, googleData) {
     throw new Error('AUTH_INVALID_TOKEN: Failed to verify Google token');
   }
   
-  // Check if Google email is already linked to another user
+  // Check if Google email is already linked to another email user
   const existingLink = await db.collection(USERS_COLLECTION)
-    .where('googleLinked.googleEmail', '==', email)
+    .where('googleLinked.googleEmail', '==', normalizedGoogleEmail)
     .limit(1)
     .get();
   
   if (!existingLink.empty && existingLink.docs[0].id !== userId) {
     throw new Error('AUTH_GOOGLE_ALREADY_LINKED: This Google account is already linked to another user');
+  }
+  
+  // NEW: Check if Google email exists as a registered user (email or Google OAuth)
+  // This prevents conflicts where same email exists in multiple accounts
+  const existingUserWithEmail = await db.collection(USERS_COLLECTION)
+    .where('email', '==', normalizedGoogleEmail)
+    .limit(1)
+    .get();
+  
+  if (!existingUserWithEmail.empty && existingUserWithEmail.docs[0].id !== userId) {
+    const existingUserData = existingUserWithEmail.docs[0].data();
+    if (existingUserData.authProvider === 'google') {
+      // Google OAuth user exists with this email
+      throw new Error('AUTH_GOOGLE_EMAIL_HAS_ACCOUNT: This Google email is already registered as a separate account. Please sign in with Google instead.');
+    } else {
+      // Email user exists with this email
+      throw new Error('AUTH_GOOGLE_EMAIL_IN_USE: This Google email is already registered as another account. Please use a different Google account.');
+    }
   }
   
   // Get user document
@@ -1163,18 +1182,18 @@ async function linkGoogleWithOAuth(userId, googleData) {
   // Link Google account
   await db.collection(USERS_COLLECTION).doc(userId).update({
     googleLinked: {
-      googleEmail: email,
-      googleName: name || email.split('@')[0],
+      googleEmail: normalizedGoogleEmail,
+      googleName: name || normalizedGoogleEmail.split('@')[0],
       linkedAt: new Date(),
       driveEnabled: true // Flag to indicate Drive sync is available
     }
   });
   
-  logger.info('Google account linked via OAuth', { userId, googleEmail: email });
+  logger.info('Google account linked via OAuth', { userId, googleEmail: normalizedGoogleEmail });
   
   return {
     success: true,
-    googleEmail: email
+    googleEmail: normalizedGoogleEmail
   };
 }
 

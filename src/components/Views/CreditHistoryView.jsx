@@ -404,9 +404,10 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
         {/* Transaction List */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden w-[80%] mx-auto max-lg:w-[90%] max-md:w-[95%] pb-4 pr-0 scrollbar-thin-hover">
           {historyLoading ? (
-            // Loading skeleton - matching admin panel style
+            // Loading skeleton - full height based on viewport
+            // Each row is h-11 (44px), calculate rows to fill available space
             <div className="pt-2">
-              {Array.from({ length: 8 }).map((_, i) => (
+              {Array.from({ length: Math.max(12, Math.floor((window.innerHeight - 250) / 44)) }).map((_, i) => (
                 <SkeletonCreditRow key={i} />
               ))}
             </div>

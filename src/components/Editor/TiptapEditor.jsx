@@ -14,9 +14,10 @@ import FontFamily from '@tiptap/extension-font-family'
 import SearchHighlightExtension from './extensions/SearchHighlightExtension'
 import DeviationHighlightExtension from './extensions/DeviationHighlightExtension'
 import SparklesLoader from '../Common/SparklesLoader'
+import EditorTextLoader from './EditorTextLoader'
 import { AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { useIsStreaming } from '@/stores'
+import { useIsStreaming, useProcessingType } from '@/stores'
 import { cn } from '../../lib/utils'
 import { serializeToPlainText, parseFromPlainText, isHtmlContent } from './utils/serialization'
 import SuggestionTooltip from '../Analysis/SuggestionTooltip'
@@ -43,6 +44,12 @@ function TiptapEditorComponent({
 }, ref) {
   const { t } = useTranslation()
   const isStreaming = useIsStreaming()
+  const processingType = useProcessingType()
+  
+  // Check if this is a rewrite/humanize operation (needs text loader)
+  const isRewriteOrHumanize = processingType === 'rewrite' || processingType === 'humanize'
+  // Show text loader only when processing rewrite/humanize and NOT streaming yet
+  const showTextLoader = isProcessing && isRewriteOrHumanize && !isStreaming
   
   const [activeTooltip, setActiveTooltip] = useState(null)
   const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set())
@@ -270,9 +277,12 @@ function TiptapEditorComponent({
           />
         </div>
 
-        {/* SparklesLoader overlay for detect/analyze */}
+        {/* EditorTextLoader for rewrite/humanize operations */}
+        <EditorTextLoader visible={showTextLoader} />
+
+        {/* SparklesLoader overlay for detect/analyze (not rewrite/humanize) */}
         <AnimatePresence>
-          {isProcessing && !isStreaming && (
+          {isProcessing && !isStreaming && !isRewriteOrHumanize && (
             <SparklesLoader size="md" overlayClassName="bg-bg-tertiary/30 backdrop-blur-[1px]" />
           )}
         </AnimatePresence>

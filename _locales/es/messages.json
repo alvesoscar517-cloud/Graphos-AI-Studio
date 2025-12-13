@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "Graphos AI Studio"
+  },
+  "extDescription": {
+    "message": "Asistente de escritura IA para contenido auténtico. Detecta IA, analiza estilo de escritura y reescribe con tu voz única."
+  },
+  "extActionTitle": {
+    "message": "Abrir Graphos AI Studio"
+  }
+}

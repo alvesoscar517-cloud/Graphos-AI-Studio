@@ -429,14 +429,15 @@ export const WorkspaceProvider = ({ children }) => {
       let displayedText = ''
       let animationFrameId = null
       let isAnimating = false
+      let streamingComplete = false // Flag to track when streaming is done
       let newSummary = conversation?.summary || null
       let humanizationResult = null
-      let followUpSuggestions = [] // Store follow-up suggestions from AI
 
       const animateText = () => {
         if (displayedText.length < fullText.length) {
           const remaining = fullText.length - displayedText.length
-          const charsToAdd = Math.max(1, Math.min(3, Math.ceil(remaining / 20)))
+          // Adaptive speed: faster when buffer is large, slower when catching up
+          const charsToAdd = Math.max(1, Math.min(5, Math.ceil(remaining / 15)))
           
           displayedText = fullText.substring(0, displayedText.length + charsToAdd)
           
@@ -450,7 +451,11 @@ export const WorkspaceProvider = ({ children }) => {
           }))
           
           animationFrameId = requestAnimationFrame(animateText)
+        } else if (!streamingComplete) {
+          // Text caught up but streaming not done - keep checking for new content
+          animationFrameId = requestAnimationFrame(animateText)
         } else {
+          // Streaming complete and all text displayed
           isAnimating = false
           animationFrameId = null
         }
@@ -528,9 +533,6 @@ export const WorkspaceProvider = ({ children }) => {
               if (completeInfo.humanization) {
                 humanizationResult = completeInfo.humanization
               }
-              if (completeInfo.suggestions) {
-                followUpSuggestions = completeInfo.suggestions
-              }
               // Log if response was incomplete
               if (completeInfo.wasIncomplete) {
                 logger.warn('[WORKSPACE] Response was truncated due to token limit')
@@ -565,9 +567,6 @@ export const WorkspaceProvider = ({ children }) => {
               if (completeInfo.summary) {
                 newSummary = completeInfo.summary
               }
-              if (completeInfo.suggestions) {
-                followUpSuggestions = completeInfo.suggestions
-              }
               // Log if response was incomplete
               if (completeInfo.wasIncomplete) {
                 logger.warn('[WORKSPACE] Response was truncated due to token limit')
@@ -577,13 +576,34 @@ export const WorkspaceProvider = ({ children }) => {
         )
       }
 
-      // Wait for animation to complete
+      // Mark streaming as complete so animation knows to stop
+      streamingComplete = true
+
+      // Wait for animation to complete with proper final update
       const waitForAnimation = () => {
         return new Promise((resolve) => {
           const checkAnimation = () => {
+            // Check if animation is done AND displayed text matches full text
             if (!isAnimating && displayedText.length >= fullText.length) {
+              // Ensure final content is fully displayed
+              if (displayedText !== fullText) {
+                displayedText = fullText
+                setCurrentConversation(prev => ({
+                  ...prev,
+                  messages: prev.messages.map(m => 
+                    m.id === aiMessageId 
+                      ? { ...m, content: fullText }
+                      : m
+                  )
+                }))
+              }
               resolve()
             } else {
+              // If animation stopped but text not complete, restart it
+              if (!isAnimating && displayedText.length < fullText.length) {
+                isAnimating = true
+                animateText()
+              }
               requestAnimationFrame(checkAnimation)
             }
           }
@@ -592,13 +612,11 @@ export const WorkspaceProvider = ({ children }) => {
       }
       
       await waitForAnimation()
-      displayedText = fullText
 
       const finalAiMessage = {
         ...aiMessage,
         content: fullText,
-        streaming: false,
-        suggestions: followUpSuggestions // Add follow-up suggestions to message
+        streaming: false
       }
 
       const finalMessages = [...updatedMessages, finalAiMessage]

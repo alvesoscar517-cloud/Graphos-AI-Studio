@@ -201,6 +201,9 @@
       "linkFailed": "Failed to link Google account",
       "unlinkFailed": "Failed to unlink Google account",
       "linkGoogleNote": "Linking allows you to sync notes with Google Drive",
+      "googleEmailInUse": "This Google email is already registered as another account. Please use a different Google account.",
+      "googleEmailHasAccount": "This Google email is already registered as a separate account. Please sign in with Google instead.",
+      "googleAlreadyLinked": "This Google account is already linked to another user.",
       "pwdSpecial": "Add special characters (!@#$%)",
       "passwordSameAsCurrent": "New password must be different from current password",
       "changePasswordFailed": "Failed to change password",
@@ -453,9 +456,6 @@
       "creditsPrompt": "How do credits work? What are the pricing options?",
       "support": "Contact Support",
       "supportPrompt": "How can I contact support or report an issue?"
-    },
-    "suggestions": {
-      "title": "Continue exploring"
     }
   },
   "errors": {
@@ -637,11 +637,18 @@
     "mild": "mild",
     "detect": "Detect",
     "detected": "Detected",
+    "redetect": "Re-detect",
     "calculateScore": "Calculate Score",
     "calculated": "Calculated",
+    "recalculate": "Recalculate",
     "alreadySearched": "Already searched",
     "analyze": "Analyze",
     "analyzed": "Analyzed",
+    "reanalyze": "Re-analyze",
+    "search": "Search",
+    "searched": "Searched",
+    "research": "Re-search",
+    "resultsOutdated": "Results may be outdated",
     "veryCompatible": "Very Compatible",
     "goodCompatibility": "Good Compatibility",
     "averageCompatibility": "Average Compatibility",
@@ -858,6 +865,7 @@
     "dark": "Dark",
     "system": "System",
     "darkMode": "Dark Mode",
+    "language": "Language",
     "submitPromptKey": "Submit prompt key",
     "viewStatus": "View status",
     "termsOfService": "Terms of service",
