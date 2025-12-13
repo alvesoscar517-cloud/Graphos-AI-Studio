@@ -81,7 +81,8 @@
     "empty": "Kosong",
     "userAvatar": "Avatar pengguna",
     "google": "Google",
-    "supportEmail": "Email"
+    "supportEmail": "Email",
+    "untitled": "Tanpa judul"
   },
   "auth": {
     "login": "Masuk",
@@ -379,7 +380,11 @@
   },
   "workspace": {
     "title": "Ruang Kerja AI",
+    "newDocument": "Dokumen Baru",
     "newChat": "Obrolan Baru",
+    "regenerate": "Buat Ulang",
+    "listen": "Dengarkan",
+    "stopListening": "Berhenti",
     "startChat": "Mulai percakapan baru",
     "startConversation": "Mulai percakapan",
     "askAnythingAI": "Tanyakan apa saja, AI akan merespons dengan gaya Anda",
@@ -835,7 +840,17 @@
     "analyzingPatterns": "Menganalisis pola penulisan",
     "generatingVoice": "Membuat profil suara",
     "savingProfile": "Menyimpan profil",
-    "insufficientCredits": "Kredit Tidak Cukup"
+    "insufficientCredits": "Kredit Tidak Cukup",
+    "themes": {
+      "work": "Kerja",
+      "personal": "Pribadi",
+      "academic": "Akademis",
+      "creative": "Kreatif",
+      "business": "Bisnis",
+      "social": "Media Sosial",
+      "technical": "Teknis",
+      "other": "Lainnya"
+    }
   },
   "settings": {
     "theme": "Tema",

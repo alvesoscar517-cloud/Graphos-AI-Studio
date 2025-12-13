@@ -18,7 +18,7 @@ import { AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useIsStreaming } from '@/stores'
 import { cn } from '../../lib/utils'
-import { serializeToPlainText, parseFromPlainText } from './utils/serialization'
+import { serializeToPlainText, parseFromPlainText, isHtmlContent } from './utils/serialization'
 import SuggestionTooltip from '../Analysis/SuggestionTooltip'
 import EditorToolbar from './EditorToolbar'
 import './TiptapEditor.css'
@@ -91,14 +91,15 @@ function TiptapEditorComponent({
         },
       }),
     ],
-    content: parseFromPlainText(value),
+    content: isHtmlContent(value) ? value : parseFromPlainText(value),
     editable: !disabled && !isProcessing,
     onUpdate: ({ editor }) => {
       if (isExternalUpdate.current) return
       
-      const plainText = serializeToPlainText(editor.getJSON())
-      lastValueRef.current = plainText
-      onChange?.(plainText)
+      // Use HTML to preserve formatting (bold, lists, headers, etc.)
+      const htmlContent = editor.getHTML()
+      lastValueRef.current = htmlContent
+      onChange?.(htmlContent)
     },
     editorProps: {
       attributes: {
@@ -115,7 +116,8 @@ function TiptapEditorComponent({
     setContent: (text) => {
       if (editor) {
         isExternalUpdate.current = true
-        editor.commands.setContent(parseFromPlainText(text))
+        const content = isHtmlContent(text) ? text : parseFromPlainText(text)
+        editor.commands.setContent(content)
         isExternalUpdate.current = false
       }
     },
@@ -136,7 +138,9 @@ function TiptapEditorComponent({
     
     isExternalUpdate.current = true
     const currentPos = editor.state.selection.from
-    editor.commands.setContent(parseFromPlainText(value))
+    // Auto-detect HTML or plain text content
+    const content = isHtmlContent(value) ? value : parseFromPlainText(value)
+    editor.commands.setContent(content)
     
     // Try to restore cursor position (only when not streaming)
     if (!isStreaming) {

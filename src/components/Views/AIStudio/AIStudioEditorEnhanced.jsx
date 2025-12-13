@@ -66,12 +66,14 @@ const AIStudioEditorEnhanced = ({
     prevContentRef.current = content
     
     // Skip if title already generated or user edited
-    if (note.userEditedTitle || note.titleGenerated || note.title !== 'Untitled') {
+    // Note: title can be '' (empty) or 'Untitled' for new notes
+    const isDefaultTitle = !note.title || note.title === 'Untitled' || note.title === ''
+    if (note.userEditedTitle || note.titleGenerated || !isDefaultTitle) {
       return
     }
     
-    // Need at least 15 characters to generate title
-    if (!content || content.length < 15 || isGeneratingTitleRef.current) {
+    // Generate title from any content (even short text for sidebar display)
+    if (!content || isGeneratingTitleRef.current) {
       return
     }
 
@@ -85,14 +87,27 @@ const AIStudioEditorEnhanced = ({
       const currentNoteNow = currentNoteRef.current
       if (!currentNoteNow || currentNoteNow.id !== noteId) return
       if (isGeneratingTitleRef.current) return
-      if (currentNoteNow.title !== 'Untitled' || currentNoteNow.userEditedTitle || currentNoteNow.titleGenerated) return
+      const isDefaultTitleNow = !currentNoteNow.title || currentNoteNow.title === 'Untitled' || currentNoteNow.title === ''
+      if (!isDefaultTitleNow || currentNoteNow.userEditedTitle || currentNoteNow.titleGenerated) return
       
       isGeneratingTitleRef.current = true
       try {
         const currentContent = currentNoteNow.content?.trim() || ''
-        if (currentContent.length < 15) return
+        if (!currentContent) return
         
-        const firstSentence = currentContent.split(/[.!?。\n]/)[0]?.trim() || currentContent
+        // Strip HTML tags to get plain text for title
+        const plainText = currentContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+        if (!plainText) return
+        
+        // Get first sentence, but if too short, use more content
+        let firstSentence = plainText.split(/[.!?。\n]/)[0]?.trim() || plainText
+        const wordCount = firstSentence.split(/\s+/).length
+        
+        // If first sentence is too short (< 5 words), take first 7 words from content instead
+        if (wordCount < 5) {
+          firstSentence = plainText
+        }
+        
         const newTitle = truncateTitleByWords(firstSentence, 7)
         if (newTitle && newTitle.length > 0) {
           updateNoteRef.current(currentNoteNow.id, { title: newTitle, titleGenerated: true })
@@ -139,7 +154,8 @@ const AIStudioEditorEnhanced = ({
     if (prevTitleRef.current === newTitle) return
     prevTitleRef.current = newTitle
     
-    if (currentNote.titleGenerated && !currentNote.userEditedTitle && newTitle !== 'Untitled') {
+    const isDefaultTitleForTyping = !newTitle || newTitle === 'Untitled' || newTitle === ''
+    if (currentNote.titleGenerated && !currentNote.userEditedTitle && !isDefaultTitleForTyping) {
       setIsTypingTitle(true)
       let currentIndex = 0
       let timeoutId

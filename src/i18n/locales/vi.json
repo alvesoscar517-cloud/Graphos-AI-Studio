@@ -81,7 +81,8 @@
     "empty": "Trống",
     "userAvatar": "Ảnh đại diện",
     "google": "Google",
-    "supportEmail": "Email"
+    "supportEmail": "Email",
+    "untitled": "Chưa đặt tên"
   },
   "auth": {
     "login": "Đăng nhập",
@@ -378,7 +379,11 @@
   },
   "workspace": {
     "title": "Không gian làm việc AI",
+    "newDocument": "Tài liệu mới",
     "newChat": "Đoạn chat mới",
+    "regenerate": "Tạo lại",
+    "listen": "Nghe",
+    "stopListening": "Dừng",
     "startChat": "Bắt đầu cuộc trò chuyện mới",
     "startConversation": "Bắt đầu trò chuyện",
     "askAnythingAI": "Hỏi bất cứ điều gì, AI sẽ trả lời theo phong cách của bạn",
@@ -834,7 +839,17 @@
     "creatingEmbeddings": "Đang tạo embeddings ({{count}} mẫu)",
     "analyzingPatterns": "Đang phân tích mẫu viết",
     "generatingVoice": "Đang tạo hồ sơ giọng văn",
-    "savingProfile": "Đang lưu hồ sơ"
+    "savingProfile": "Đang lưu hồ sơ",
+    "themes": {
+      "work": "Công việc",
+      "personal": "Cá nhân",
+      "academic": "Học thuật",
+      "creative": "Sáng tạo",
+      "business": "Kinh doanh",
+      "social": "Mạng xã hội",
+      "technical": "Kỹ thuật",
+      "other": "Khác"
+    }
   },
   "settings": {
     "theme": "Giao diện",

@@ -531,6 +531,10 @@ export const WorkspaceProvider = ({ children }) => {
               if (completeInfo.suggestions) {
                 followUpSuggestions = completeInfo.suggestions
               }
+              // Log if response was incomplete
+              if (completeInfo.wasIncomplete) {
+                logger.warn('[WORKSPACE] Response was truncated due to token limit')
+              }
             }
           }
         )
@@ -563,6 +567,10 @@ export const WorkspaceProvider = ({ children }) => {
               }
               if (completeInfo.suggestions) {
                 followUpSuggestions = completeInfo.suggestions
+              }
+              // Log if response was incomplete
+              if (completeInfo.wasIncomplete) {
+                logger.warn('[WORKSPACE] Response was truncated due to token limit')
               }
             }
           }

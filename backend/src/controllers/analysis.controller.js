@@ -31,7 +31,7 @@ exports.authenticateContent = async (req, res) => {
       userId: user_id 
     });
 
-    const validText = validateText(text, 50, 20000);
+    const validText = validateText(text, 50, 50000);
 
     // Use enhanced detection by default for better accuracy
     const detectionResult = enhanced 
@@ -135,7 +135,7 @@ exports.analyzeText = async (req, res) => {
     });
 
     const profileId = validateProfileId(profile_id);
-    const validText = validateText(text, 10, 20000);
+    const validText = validateText(text, 10, 50000);
 
     if (use_cache) {
       const cachedResult = await cacheService.getCachedAnalysis(profileId, validText);

@@ -16,11 +16,11 @@ const { getVertexAI } = require('../config/gemini');
 const vertexAI = getVertexAI();
 
 // Configuration - Optimized for cost and performance
-const MAX_CONTEXT_TOKENS = 6000; // Conservative limit to leave room for response
-const SUMMARY_TRIGGER_MESSAGES = 12; // Trigger earlier for better UX
-const KEEP_RECENT_MESSAGES = 4; // Keep fewer but most relevant messages
-const MAX_MESSAGE_LENGTH = 800; // Truncate individual messages if too long
-const SUMMARY_MAX_TOKENS = 300; // Keep summaries concise
+const MAX_CONTEXT_TOKENS = 8000; // Increased to handle longer conversations
+const SUMMARY_TRIGGER_MESSAGES = 15; // Trigger at 15 messages for better context retention
+const KEEP_RECENT_MESSAGES = 6; // Keep more recent messages for better continuity
+const MAX_MESSAGE_LENGTH = 1200; // Allow longer individual messages
+const SUMMARY_MAX_TOKENS = 800; // Increased for more detailed summaries (supports all languages)
 
 /**
  * Estimate tokens for a single message

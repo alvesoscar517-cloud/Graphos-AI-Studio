@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useWorkspace } from '../../../contexts/WorkspaceContext'
-import { truncateTitleByWords } from '../../../utils/titleUtils'
+import { truncateTitleByWords, stripHelpPrefix, hasHelpPrefix } from '../../../utils/titleUtils'
 import { cn } from '../../../lib/utils'
 import ChatMessage from './ChatMessage'
 import EditTitleModal from '../../Common/EditTitleModal'
@@ -145,10 +145,17 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
           </button>
 
           <div className="flex items-center gap-2 min-w-0 flex-1">
+            {hasHelpPrefix(title) && (
+              <img 
+                src="/icon/help-circle.svg" 
+                alt="Help" 
+                className="w-4 h-4 opacity-60 icon-invert shrink-0" 
+              />
+            )}
             <div 
               className={`text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-xl shrink-0 ${isTypingTitle ? 'animate-pulse' : ''}`}
             >
-              {displayTitle}
+              {stripHelpPrefix(displayTitle)}
             </div>
             <button 
               className="bg-transparent border-none p-1.5 cursor-pointer rounded-md shrink-0 flex items-center justify-center opacity-50 transition-all duration-200 hover:opacity-100 hover:bg-bg-hover hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed"
@@ -189,7 +196,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
         className="flex-1 overflow-y-auto py-6"
         style={{ paddingBottom: '100px', scrollbarGutter: 'stable' }}
       >
-        <div className="max-w-3xl mx-auto px-4 flex flex-col gap-6">
+        <div className="max-w-3xl mx-auto px-4 flex flex-col gap-6 workspace-chat-content">
           {currentConversation?.messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <img src="/icon/message-circle.svg" alt="Empty" className="w-12 h-12 opacity-30 mb-4 icon-invert" />

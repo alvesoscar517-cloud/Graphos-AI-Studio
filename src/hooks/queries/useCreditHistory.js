@@ -34,7 +34,7 @@ export function useCreditHistory(filters = {}, options = {}) {
   const userId = user?.userId || user?.uid || user?.id || getUserId()
 
   return useInfiniteQuery({
-    queryKey: queryKeys.user.creditHistory(filters),
+    queryKey: queryKeys.user.creditHistory({ type, feature, startDate, endDate, limit }),
     queryFn: async ({ pageParam = null }) => {
       const id = userId || getUserId()
       if (!id) {
@@ -52,18 +52,25 @@ export function useCreditHistory(filters = {}, options = {}) {
       if (endDate) params.append('end_date', endDate)
       if (pageParam) params.append('cursor', pageParam)
 
-      const { data } = await apiClient.get(`/api/credits/history?${params.toString()}`)
-      
-      return {
-        transactions: data.transactions || [],
-        hasMore: data.hasMore || false,
-        nextCursor: data.nextCursor || null,
+      try {
+        const { data } = await apiClient.get(`/api/credits/history?${params.toString()}`)
+        
+        return {
+          transactions: data.transactions || [],
+          hasMore: data.hasMore || false,
+          nextCursor: data.nextCursor || null,
+        }
+      } catch (error) {
+        // Return empty result on error instead of throwing
+        console.error('Failed to fetch credit history:', error)
+        return { transactions: [], hasMore: false, nextCursor: null }
       }
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: null,
     staleTime: 30 * 1000, // 30 seconds
     enabled: isAuthenticated && !!userId,
+    retry: 1, // Only retry once
     ...options,
   })
 }

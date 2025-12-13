@@ -119,4 +119,5 @@ const useAutoScrollbar = (options = {}) => {
   }
 }
 
+export { useAutoScrollbar }
 export default useAutoScrollbar

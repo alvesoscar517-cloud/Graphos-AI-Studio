@@ -420,6 +420,18 @@ async function startServer() {
         console.warn('[STARTUP] [WARNING] Environment config from Firestore failed, using process.env:', envError.message);
       }
       
+      // Check and deploy Firestore indexes (one-time, non-blocking)
+      try {
+        const { deployIndexes } = require('./scripts/deploy-indexes');
+        // Run in background, don't block server startup
+        deployIndexes().catch(err => {
+          console.warn('[STARTUP] [WARNING] Index deployment check failed:', err.message);
+        });
+      } catch (indexError) {
+        // Script not found or error - not critical
+        console.log('[STARTUP] [INFO] Skipping index deployment check');
+      }
+      
       console.log('');
       console.log('========================================================');
       console.log('   Graphos AI Studio - Backend Server v2.1');

@@ -7,6 +7,7 @@
 const { v4: uuidv4 } = require('uuid');
 const geminiService = require('../services/gemini.service');
 const humanizeService = require('../services/humanize.service');
+const creditService = require('../services/credit.service');
 const logger = require('../utils/logger');
 const { 
   loadProfile, 
@@ -243,11 +244,12 @@ exports.sendMessage = async (req, res) => {
     const tokenEstimate = estimateConversationTokens(optimizedMessages, enhancedSystemPrompt);
     logger.info(`[INFO] Estimated tokens: ${tokenEstimate.total}`);
 
+    // No maxOutputTokens limit - let AI decide response length naturally
+    // Credits are calculated based on actual output tokens used
     const generativeModel = geminiService.vertexAI.getGenerativeModel({
       model: model,
       generationConfig: {
         temperature: temperature,
-        maxOutputTokens: 2048,
       },
     });
 
@@ -295,17 +297,34 @@ exports.sendMessage = async (req, res) => {
 
     logger.info(`[SUCCESS] Chat response generated (${text.length} chars)`);
 
-    // Log activity if user_id is available from request
+    // Calculate output tokens and deduct output credits (Phase 2)
+    const outputTokens = Math.ceil(text.length / 4);
     const userId = req.body.user_id || req.headers['x-user-id'];
+    let outputCreditResult = { outputCost: 0 };
+    
     if (userId) {
+      // Deduct output credits based on actual response length
+      outputCreditResult = await creditService.deductOutputCredits(
+        userId,
+        outputTokens,
+        'chat_message',
+        model,
+        { endpoint: req.path, inputLength: messages.reduce((sum, m) => sum + (m.content?.length || 0), 0) }
+      );
+      
+      // Log activity with both input and output costs
+      const totalCreditsUsed = (req.creditCost || 0) + outputCreditResult.outputCost;
       activityLogService.logFeatureUsage(userId, 'chat_message', {
         profileId,
         model,
         inputLength: messages.reduce((sum, m) => sum + (m.content?.length || 0), 0),
         outputLength: text.length,
-        creditsUsed: req.creditCost || 0,
+        outputTokens,
+        inputCredits: req.creditCost || 0,
+        outputCredits: outputCreditResult.outputCost,
+        creditsUsed: totalCreditsUsed,
         creditsBefore: req.creditsBefore,
-        creditsAfter: req.creditsAfter
+        creditsAfter: (req.creditsAfter || 0) - outputCreditResult.outputCost
       });
     }
 
@@ -313,8 +332,13 @@ exports.sendMessage = async (req, res) => {
       message: text,
       usage: {
         inputTokens: tokenEstimate.inputTokens,
-        outputTokens: Math.ceil(text.length / 4),
-        totalTokens: tokenEstimate.inputTokens + Math.ceil(text.length / 4)
+        outputTokens: outputTokens,
+        totalTokens: tokenEstimate.inputTokens + outputTokens
+      },
+      credits: {
+        inputCost: req.creditCost || 0,
+        outputCost: outputCreditResult.outputCost,
+        totalCost: (req.creditCost || 0) + outputCreditResult.outputCost
       },
       context: {
         wasSummarized: contextResult.wasSummarized,
@@ -437,9 +461,10 @@ exports.sendMessageStream = async (req, res) => {
     const finalSystemPrompt = enhancedSystemPrompt;
     
     // Build generation config
+    // No maxOutputTokens limit - let AI decide response length naturally
+    // Credits are calculated based on actual output tokens used
     const generationConfig = {
       temperature: temperature,
-      maxOutputTokens: 2048,
     };
     
     // Build model config
@@ -482,6 +507,8 @@ exports.sendMessageStream = async (req, res) => {
 
     let totalChars = 0;
     let fullResponseText = ''; // Collect full response for suggestions
+    let finishReason = null;
+    let wasIncomplete = false;
     
     for await (const chunk of streamResult.stream) {
       try {
@@ -495,6 +522,18 @@ exports.sendMessageStream = async (req, res) => {
           if (candidate.content && candidate.content.parts && candidate.content.parts[0]) {
             chunkText = candidate.content.parts[0].text;
           }
+          // Check finish reason from candidate
+          if (candidate.finishReason) {
+            finishReason = candidate.finishReason;
+            if (finishReason === 'MAX_TOKENS') {
+              wasIncomplete = true;
+              logger.warn('[WARN] Response truncated due to MAX_TOKENS limit');
+            } else if (finishReason === 'SAFETY') {
+              logger.warn('[WARN] Response blocked by safety filter');
+            } else if (finishReason === 'RECITATION') {
+              logger.warn('[WARN] Response blocked due to recitation');
+            }
+          }
         } else if (chunk.text) {
           chunkText = chunk.text;
         }
@@ -507,6 +546,11 @@ exports.sendMessageStream = async (req, res) => {
       } catch (chunkError) {
         logger.error('[ERROR] Error processing chunk:', chunkError);
       }
+    }
+    
+    // Log finish reason for debugging
+    if (finishReason) {
+      logger.info(`[INFO] Stream finished with reason: ${finishReason}`);
     }
 
     // Generate follow-up suggestions (async, non-blocking)
@@ -528,29 +572,55 @@ exports.sendMessageStream = async (req, res) => {
       }
     }
 
-    // Send completion with metadata and suggestions
+    // Calculate output tokens and deduct output credits (Phase 2)
+    const outputTokens = Math.ceil(totalChars / 4);
+    const userId = req.body.user_id || req.headers['x-user-id'];
+    let outputCreditResult = { outputCost: 0 };
+    
+    if (userId) {
+      // Deduct output credits based on actual response length
+      outputCreditResult = await creditService.deductOutputCredits(
+        userId,
+        outputTokens,
+        'chat_message',
+        model,
+        { endpoint: req.path, streaming: true }
+      );
+    }
+
+    // Send completion with metadata, suggestions, and credit info
     res.write(`data: ${JSON.stringify({ 
       type: 'complete',
       summary: contextResult.summary,
-      outputTokens: Math.ceil(totalChars / 4),
-      suggestions: suggestions
+      outputTokens: outputTokens,
+      suggestions: suggestions,
+      finishReason: finishReason,
+      wasIncomplete: wasIncomplete,
+      credits: {
+        inputCost: req.creditCost || 0,
+        outputCost: outputCreditResult.outputCost,
+        totalCost: (req.creditCost || 0) + outputCreditResult.outputCost
+      }
     })}\n\n`);
     
     res.write('data: [DONE]\n\n');
     res.end();
 
-    // Log activity if user_id is available from request
-    const userId = req.body.user_id || req.headers['x-user-id'];
+    // Log activity with both input and output costs
     if (userId) {
+      const totalCreditsUsed = (req.creditCost || 0) + outputCreditResult.outputCost;
       activityLogService.logFeatureUsage(userId, 'chat_message', {
         profileId,
         model,
         inputLength: messages.reduce((sum, m) => sum + (m.content?.length || 0), 0),
         outputLength: totalChars,
+        outputTokens,
         streaming: true,
-        creditsUsed: req.creditCost || 0,
+        inputCredits: req.creditCost || 0,
+        outputCredits: outputCreditResult.outputCost,
+        creditsUsed: totalCreditsUsed,
         creditsBefore: req.creditsBefore,
-        creditsAfter: req.creditsAfter
+        creditsAfter: (req.creditsAfter || 0) - outputCreditResult.outputCost
       });
     }
 
@@ -796,11 +866,12 @@ exports.sendMessageHumanized = async (req, res) => {
     const optimizedMessages = contextResult.messages;
 
     // Generate initial response
+    // No maxOutputTokens limit - let AI decide response length naturally
+    // Credits are calculated based on actual output tokens used
     const generativeModel = geminiService.vertexAI.getGenerativeModel({
       model: model,
       generationConfig: {
         temperature: chatSettings?.humanizeResponse ? 0.8 : temperature,
-        maxOutputTokens: 2048,
       },
     });
 
@@ -897,25 +968,47 @@ exports.sendMessageHumanized = async (req, res) => {
       logger.info('[INFO] Skipped humanization - App Help mode active');
     }
 
-    // Log activity
+    // Calculate output tokens and deduct output credits (Phase 2)
+    const outputTokens = Math.ceil(text.length / 4);
     const userId = req.body.user_id || req.headers['x-user-id'];
+    let outputCreditResult = { outputCost: 0 };
+    
     if (userId) {
+      // Deduct output credits based on actual response length
+      outputCreditResult = await creditService.deductOutputCredits(
+        userId,
+        outputTokens,
+        'chat_humanized',
+        model,
+        { endpoint: req.path, humanized: !!humanizationResult }
+      );
+      
+      // Log activity with both input and output costs
+      const totalCreditsUsed = (req.creditCost || 0) + outputCreditResult.outputCost;
       activityLogService.logFeatureUsage(userId, 'chat_humanized', {
         profileId,
         model,
         inputLength: messages.reduce((sum, m) => sum + (m.content?.length || 0), 0),
         outputLength: text.length,
+        outputTokens,
         humanized: !!humanizationResult,
         iterations: humanizationResult?.iterations,
-        creditsUsed: req.creditCost || 0,
+        inputCredits: req.creditCost || 0,
+        outputCredits: outputCreditResult.outputCost,
+        creditsUsed: totalCreditsUsed,
         creditsBefore: req.creditsBefore,
-        creditsAfter: req.creditsAfter
+        creditsAfter: (req.creditsAfter || 0) - outputCreditResult.outputCost
       });
     }
 
     res.json({
       message: text,
       humanization: humanizationResult,
+      credits: {
+        inputCost: req.creditCost || 0,
+        outputCost: outputCreditResult.outputCost,
+        totalCost: (req.creditCost || 0) + outputCreditResult.outputCost
+      },
       context: {
         wasSummarized: contextResult.wasSummarized,
         summary: contextResult.summary
@@ -1076,13 +1169,14 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
       })}\n\n`);
     }
 
+    // No maxOutputTokens limit - let AI decide response length naturally
+    // Credits are calculated based on actual output tokens used
     const generativeModel = geminiService.vertexAI.getGenerativeModel({
       model: model,
       generationConfig: {
         temperature: chatSettings?.humanizeResponse ? 0.85 : temperature,
         topP: 0.9,
         topK: 40,
-        maxOutputTokens: 2048,
       },
     });
 
@@ -1101,6 +1195,8 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
 
     let totalChars = 0;
     let fullText = '';
+    let finishReason = null;
+    let wasIncomplete = false;
     
     for await (const chunk of streamResult.stream) {
       try {
@@ -1114,6 +1210,16 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
           if (candidate.content && candidate.content.parts && candidate.content.parts[0]) {
             chunkText = candidate.content.parts[0].text;
           }
+          // Check finish reason from candidate
+          if (candidate.finishReason) {
+            finishReason = candidate.finishReason;
+            if (finishReason === 'MAX_TOKENS') {
+              wasIncomplete = true;
+              logger.warn('[WARN] Humanized response truncated due to MAX_TOKENS limit');
+            } else if (finishReason === 'SAFETY') {
+              logger.warn('[WARN] Humanized response blocked by safety filter');
+            }
+          }
         } else if (chunk.text) {
           chunkText = chunk.text;
         }
@@ -1126,6 +1232,11 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
       } catch (chunkError) {
         logger.error('[ERROR] Error processing chunk:', chunkError);
       }
+    }
+    
+    // Log finish reason for debugging
+    if (finishReason) {
+      logger.info(`[INFO] Humanized stream finished with reason: ${finishReason}`);
     }
 
     // Smart humanization based on text length and settings
@@ -1260,35 +1371,62 @@ Write naturally as if you ARE this person, not an AI pretending to be them.`;
       }
     }
 
-    // Send completion
+    // Calculate output tokens and deduct output credits (Phase 2)
+    const outputTokens = Math.ceil(totalChars / 4);
+    const userId = req.body.user_id || req.headers['x-user-id'];
+    let outputCreditResult = { outputCost: 0 };
+    
+    if (userId) {
+      // Deduct output credits based on actual response length
+      outputCreditResult = await creditService.deductOutputCredits(
+        userId,
+        outputTokens,
+        'chat_humanized',
+        model,
+        { endpoint: req.path, streaming: true, humanized: !!humanizationResult }
+      );
+    }
+
+    // Send completion with credit info
     res.write(`data: ${JSON.stringify({ 
       type: 'complete',
       summary: contextResult.summary,
-      outputTokens: Math.ceil(totalChars / 4),
+      outputTokens: outputTokens,
       humanization: humanizationResult,
-      suggestions: suggestions
+      suggestions: suggestions,
+      finishReason: finishReason,
+      wasIncomplete: wasIncomplete,
+      credits: {
+        inputCost: req.creditCost || 0,
+        outputCost: outputCreditResult.outputCost,
+        totalCost: (req.creditCost || 0) + outputCreditResult.outputCost
+      }
     })}\n\n`);
     
     res.write('data: [DONE]\n\n');
     res.end();
 
-    // Log activity
-    const userId = req.body.user_id || req.headers['x-user-id'];
+    // Log activity with both input and output costs
     if (userId) {
+      const totalCreditsUsed = (req.creditCost || 0) + outputCreditResult.outputCost;
       activityLogService.logFeatureUsage(userId, 'chat_humanized', {
         profileId,
         model,
         inputLength: messages.reduce((sum, m) => sum + (m.content?.length || 0), 0),
         outputLength: totalChars,
+        outputTokens,
         streaming: true,
         humanized: !!humanizationResult,
-        creditsUsed: req.creditCost || 0,
+        finishReason: finishReason,
+        inputCredits: req.creditCost || 0,
+        outputCredits: outputCreditResult.outputCost,
+        creditsUsed: totalCreditsUsed,
         creditsBefore: req.creditsBefore,
-        creditsAfter: req.creditsAfter
+        creditsAfter: (req.creditsAfter || 0) - outputCreditResult.outputCost
       });
     }
 
-    logger.info(`[SUCCESS] Humanized stream completed (${totalChars} chars)`);
+    logger.info(`[SUCCESS] Humanized stream completed (${totalChars} chars, finishReason: ${finishReason || 'STOP'}, outputCredits: ${outputCreditResult.outputCost})`);
 
   } catch (error) {
     logger.error('[ERROR] Humanized stream error:', error);

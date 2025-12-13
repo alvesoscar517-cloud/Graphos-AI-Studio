@@ -81,7 +81,8 @@
     "empty": "空",
     "userAvatar": "ユーザーアバター",
     "google": "Google",
-    "supportEmail": "メール"
+    "supportEmail": "メール",
+    "untitled": "無題"
   },
   "auth": {
     "login": "ログイン",
@@ -379,7 +380,11 @@
   },
   "workspace": {
     "title": "AIワークスペース",
+    "newDocument": "新規ドキュメント",
     "newChat": "新しいチャット",
+    "regenerate": "再生成",
+    "listen": "読み上げ",
+    "stopListening": "停止",
     "startChat": "新しい会話を始める",
     "startConversation": "会話を始める",
     "askAnythingAI": "何でも聞いてください。AIがあなたのスタイルで答えます",
@@ -832,7 +837,17 @@
     "analyzingPatterns": "文章パターンを分析中",
     "generatingVoice": "音声プロファイルを生成中",
     "savingProfile": "プロファイルを保存中",
-    "insufficientCredits": "クレジット不足"
+    "insufficientCredits": "クレジット不足",
+    "themes": {
+      "work": "仕事",
+      "personal": "個人",
+      "academic": "学術",
+      "creative": "クリエイティブ",
+      "business": "ビジネス",
+      "social": "ソーシャルメディア",
+      "technical": "技術",
+      "other": "その他"
+    }
   },
   "settings": {
     "theme": "テーマ",

@@ -6,7 +6,7 @@ import { useNotes } from '../../contexts/NotesContext'
 import { useWorkspace } from '../../contexts/WorkspaceContext'
 import { useUser, useAuthMethod, useHasGoogleLinked, useAuth } from '../../stores/authStore'
 import { openDriveFolder } from '../../services/drive'
-import { truncateTitleByWords } from '../../utils/titleUtils'
+import { truncateTitleByWords, stripHelpPrefix, hasHelpPrefix } from '../../utils/titleUtils'
 import modal from '../../utils/modal'
 
 import LinkGooglePrompt from '../Auth/LinkGooglePrompt'
@@ -354,12 +354,12 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         <td className="py-2.5 pr-3 border-b border-border-light text-text-primary align-middle text-sm h-11 pl-4 min-w-40">
           <div className="flex items-center gap-3 font-normal text-text-primary overflow-hidden">
             <img 
-              src={item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg"} 
-              alt={item.type === 'chat' ? "Chat" : "Text"} 
+              src={hasHelpPrefix(item.title) ? "/icon/help-circle.svg" : (item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg")} 
+              alt={hasHelpPrefix(item.title) ? "Help" : (item.type === 'chat' ? "Chat" : "Text")} 
               className="w-5 h-5 opacity-55 shrink-0 icon-invert"
             />
             <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-              <HighlightText text={truncateTitleByWords(item.title, 7)} searchTerm={searchTerm} regex={searchRegex} />
+              <HighlightText text={truncateTitleByWords(stripHelpPrefix(item.title), 7)} searchTerm={searchTerm} regex={searchRegex} />
             </span>
           </div>
         </td>
@@ -435,12 +435,12 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         <div className={cn("flex items-center justify-between mb-2", isSelectionMode && isSelected && "ml-8")}>
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <img 
-              src={item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg"} 
-              alt={item.type === 'chat' ? t('history.chat') : t('history.text')} 
+              src={hasHelpPrefix(item.title) ? "/icon/help-circle.svg" : (item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg")} 
+              alt={hasHelpPrefix(item.title) ? "Help" : (item.type === 'chat' ? t('history.chat') : t('history.text'))} 
               className="w-5 h-5 opacity-55 shrink-0 icon-invert"
             />
             <span className="text-md font-medium text-text-primary overflow-hidden text-ellipsis whitespace-nowrap">
-              <HighlightText text={truncateTitleByWords(item.title, 7)} searchTerm={searchTerm} regex={searchRegex} />
+              <HighlightText text={truncateTitleByWords(stripHelpPrefix(item.title), 7)} searchTerm={searchTerm} regex={searchRegex} />
             </span>
           </div>
           <button 

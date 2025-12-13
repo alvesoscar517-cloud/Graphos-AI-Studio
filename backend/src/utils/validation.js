@@ -120,7 +120,11 @@ function validateContentQuality(text) {
  * @returns {string} Validated and trimmed text
  * @throws {Error} If validation fails
  */
-function validateText(text, minLength = 1, maxLength = 20000) {
+function validateText(text, minLength = 1, maxLength = 50000) {
+  // Default max increased to 50000 chars (~10000 words) to support:
+  // - Long articles, essays, reports
+  // - Academic papers, documentation
+  // - Book chapters, long-form content
   const schema = z.string()
     .min(minLength, `Text must be at least ${minLength} characters`)
     .max(maxLength, `Text must not exceed ${maxLength} characters`)

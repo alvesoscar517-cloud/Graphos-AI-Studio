@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/utils'
 import { Icon } from '../../Common'
 import LottieWrapper from '../LottieWrapper'
-import { THEMES } from '../hooks/useProfileSetup'
+import { getThemes } from '../hooks/useProfileSetup'
 import loaderCatAnimation from '../../../animation/loader-cat.json'
 
 const Step1NameTheme = ({
@@ -20,6 +20,7 @@ const Step1NameTheme = ({
   isCancelling
 }) => {
   const { t } = useTranslation()
+  const themes = getThemes(t)
 
   return (
     <div className="block animate-fade-in-slow h-[calc(100%-100px)] relative max-lg:h-auto">
@@ -83,7 +84,7 @@ const Step1NameTheme = ({
                 aria-labelledby="theme-label"
               >
                 <div className="grid grid-cols-4 gap-2.5 max-sm:grid-cols-2">
-                  {THEMES.map((theme, index) => (
+                  {themes.map((theme, index) => (
                     <button
                       key={theme.id}
                       className={cn(
@@ -98,17 +99,17 @@ const Step1NameTheme = ({
                       onClick={() => setSelectedTheme(theme.id)}
                       role="radio"
                       aria-checked={selectedTheme === theme.id}
-                      aria-label={`${t('common.select')} ${t(`themes.${theme.id}`)}`}
+                      aria-label={`${t('common.select')} ${theme.name}`}
                       tabIndex={selectedTheme === theme.id ? 0 : -1}
                       onKeyDown={(e) => {
                         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
                           e.preventDefault()
-                          const nextIndex = (index + 1) % THEMES.length
-                          setSelectedTheme(THEMES[nextIndex].id)
+                          const nextIndex = (index + 1) % themes.length
+                          setSelectedTheme(themes[nextIndex].id)
                         } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
                           e.preventDefault()
-                          const prevIndex = (index - 1 + THEMES.length) % THEMES.length
-                          setSelectedTheme(THEMES[prevIndex].id)
+                          const prevIndex = (index - 1 + themes.length) % themes.length
+                          setSelectedTheme(themes[prevIndex].id)
                         }
                       }}
                     >
@@ -127,7 +128,7 @@ const Step1NameTheme = ({
                         "tracking-tight leading-tight",
                         selectedTheme === theme.id && "text-text-link font-semibold"
                       )}>
-                        {t(`themes.${theme.id}`)}
+                        {theme.name}
                       </span>
                     </button>
                   ))}

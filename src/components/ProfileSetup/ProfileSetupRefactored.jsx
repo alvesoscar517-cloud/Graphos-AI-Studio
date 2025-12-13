@@ -225,6 +225,24 @@ const ProfileSetup = () => {
                   setQualityScore(result.quality_score)
                 }
                 clearAllProfileDetailCaches()
+                
+                // Optimistically add new profile to cache immediately
+                // This ensures profile appears instantly when navigating to home
+                const newProfile = {
+                  profile_id: result.profile_id,
+                  profile_name: profileData.name,
+                  theme: profileData.theme,
+                  created_at: new Date().toISOString(),
+                  quality_score: result.quality_score,
+                }
+                queryClient.setQueryData(queryKeys.profiles.list(), (oldData) => {
+                  const oldProfiles = Array.isArray(oldData) ? oldData : []
+                  const exists = oldProfiles.some(p => p.profile_id === result.profile_id)
+                  if (exists) return oldProfiles
+                  return [newProfile, ...oldProfiles]
+                })
+                
+                // Also invalidate to get full data from server
                 queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })
                 setProcessing(false)
                 setShowCompletion(true)
@@ -245,6 +263,22 @@ const ProfileSetup = () => {
             setQualityScore(response.quality_score)
           }
           clearAllProfileDetailCaches()
+          
+          // Optimistically add new profile to cache immediately
+          const newProfile = {
+            profile_id: response.profile_id,
+            profile_name: profileData.name,
+            theme: profileData.theme,
+            created_at: new Date().toISOString(),
+            quality_score: response.quality_score,
+          }
+          queryClient.setQueryData(queryKeys.profiles.list(), (oldData) => {
+            const oldProfiles = Array.isArray(oldData) ? oldData : []
+            const exists = oldProfiles.some(p => p.profile_id === response.profile_id)
+            if (exists) return oldProfiles
+            return [newProfile, ...oldProfiles]
+          })
+          
           queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })
           setProcessing(false)
           setShowCompletion(true)

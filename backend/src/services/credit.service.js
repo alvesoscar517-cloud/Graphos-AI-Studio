@@ -5,7 +5,9 @@
 
 const { db, FieldValue } = require('../config/firebase');
 const { 
-  calculateFeatureCost, 
+  calculateFeatureCost,
+  calculateOutputCost,
+  getFeaturePricingInfo,
   countWords, 
   countSentences,
   FREE_CREDITS
@@ -308,27 +310,82 @@ function calculateSuggestionsCost(textOrWordCount) {
 }
 
 /**
- * Calculate cost for chat message
+ * Calculate PRE-CHARGE cost for chat message (Phase 1: Input-based)
+ * This is charged BEFORE the AI responds
+ * Output cost is calculated separately after response is complete
  */
 function calculateChatCost(text, model = 'gemini-2.5-flash') {
-  const wordCount = countWords(text);
+  const inputWordCount = countWords(text);
   
   return calculateFeatureCost('chat_message', {
-    wordCount,
+    inputWordCount,
     model
   });
 }
 
 /**
- * Calculate cost for humanized chat message
+ * Calculate PRE-CHARGE cost for humanized chat message (Phase 1: Input-based)
+ * This is charged BEFORE the AI responds
+ * Output cost is calculated separately after response is complete
  */
 function calculateHumanizedChatCost(text, model = 'gemini-2.5-flash') {
-  const wordCount = countWords(text);
+  const inputWordCount = countWords(text);
   
   return calculateFeatureCost('chat_humanized', {
-    wordCount,
+    inputWordCount,
     model
   });
+}
+
+/**
+ * Calculate POST-CHARGE cost for chat output (Phase 2: Output-based)
+ * Called after AI response is complete
+ * @param {string} featureName - 'chat_message' or 'chat_humanized'
+ * @param {number} outputTokens - Actual output tokens (chars / 4 approximation)
+ * @param {string} model - Model used
+ * @returns {number} Additional credits to charge for output
+ */
+function calculateChatOutputCost(featureName, outputTokens, model = 'gemini-2.5-flash') {
+  return calculateOutputCost(featureName, outputTokens, model);
+}
+
+/**
+ * Deduct additional credits for chat output (Phase 2)
+ * Called after streaming/response is complete
+ */
+async function deductOutputCredits(userId, outputTokens, featureName, model, metadata = {}) {
+  const outputCost = calculateChatOutputCost(featureName, outputTokens, model);
+  
+  if (outputCost <= 0) {
+    return { outputCost: 0, success: true };
+  }
+  
+  try {
+    await deductCredits(userId, outputCost, `${featureName}_output`, {
+      ...metadata,
+      outputTokens,
+      model,
+      phase: 'output'
+    });
+    
+    logger.info('Output credits deducted', { 
+      userId, 
+      featureName, 
+      outputTokens, 
+      outputCost,
+      model 
+    });
+    
+    return { outputCost, success: true };
+  } catch (error) {
+    logger.error('Failed to deduct output credits', { 
+      userId, 
+      featureName, 
+      outputCost, 
+      error: error.message 
+    });
+    return { outputCost, success: false, error: error.message };
+  }
 }
 
 /**
@@ -524,9 +581,11 @@ module.exports = {
   calculateCheckHumanizationCost,
   calculateIterativeHumanizeCost,
   
-  // Cost calculations - Chat
-  calculateChatCost,
-  calculateHumanizedChatCost,
+  // Cost calculations - Chat (Two-phase pricing)
+  calculateChatCost,           // Phase 1: Input pre-charge
+  calculateHumanizedChatCost,  // Phase 1: Input pre-charge
+  calculateChatOutputCost,     // Phase 2: Output post-charge
+  deductOutputCredits,         // Phase 2: Deduct output credits
   calculateSummarizeCost,
   
   // Cost calculations - Profile

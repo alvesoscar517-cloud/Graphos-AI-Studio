@@ -20,97 +20,32 @@ const DUPLICATE_THRESHOLD = 0.8
 const DRAFT_STORAGE_KEY = 'profile_setup_draft'
 const DRAFT_EXPIRY_HOURS = 24
 
-// Theme options with descriptions and sample templates
-export const THEMES = [
-  { 
-    id: 'work', 
-    name: 'Work', 
-    icon: 'briefcase',
-    description: 'Email, reports, office communication',
-    sampleTemplates: [
-      'Dear Sir/Madam,\n\nI am sending the project progress report for this week. Completed tasks include...',
-      'Thank you for your response. I will review and update you as soon as possible.',
-      'Hello team,\n\nAs discussed in yesterday\'s meeting, we need to complete the following tasks before the deadline...'
-    ]
-  },
-  { 
-    id: 'personal', 
-    name: 'Personal', 
-    icon: 'user',
-    description: 'Diary, thoughts, personal sharing',
-    sampleTemplates: [
-      'Today was quite an interesting day. I had the opportunity to meet new friends and learn many things...',
-      'I realized that life is not always smooth, but it\'s the difficulties that help me grow stronger.',
-      'This weekend I plan to spend time with family and rest after a stressful week of work.'
-    ]
-  },
-  { 
-    id: 'academic', 
-    name: 'Academic', 
-    icon: 'graduation-cap',
-    description: 'Thesis, research papers, academic writing',
-    sampleTemplates: [
-      'Nghiên cứu này nhằm mục đích phân tích và đánh giá tác động của các yếu tố kinh tế vĩ mô đến thị trường chứng khoán Việt Nam.',
-      'Theo lý thuyết của Maslow (1943), nhu cầu của con người được phân chia thành 5 cấp bậc words cơ bản đến cao cấp.',
-      'Kết quả phân tích cho thấy có mối tương quan thuận giữa biến độc lập X và biến phụ thuộc Y với hệ số r = 0.85.'
-    ]
-  },
-  { 
-    id: 'creative', 
-    name: 'Creative', 
-    icon: 'palette',
-    description: 'Write stories, poetry, creative content',
-    sampleTemplates: [
-      'Afternoon sunlight filtered through the leaves, painting shimmering streaks on the calm lake surface. The girl sat there, gazing into the distance...',
-      'In a world where magic exists, an ordinary young man discovers he possesses a special ability.',
-      'Every painting tells a story. And this story begins with a drop of ink accidentally falling on a blank page.'
-    ]
-  },
-  { 
-    id: 'business', 
-    name: 'Business', 
-    icon: 'trending-up',
-    description: 'Proposals, pitches, B2B communication',
-    sampleTemplates: [
-      'Dear Valued Partner,\n\nWe are pleased to introduce our new solution to optimize your business operations.',
-      'With 10 years of experience in the industry, we are confident in delivering the highest quality products to our customers.',
-      'The expected ROI for this project is 150% in the first year, based on market analysis and current customer data.'
-    ]
-  },
-  { 
-    id: 'social', 
-    name: 'Social Media', 
-    icon: 'message-circle',
-    description: 'Facebook posts, captions, messages',
-    sampleTemplates: [
-      'Weekend is here! Anyone have plans? I\'m thinking about going to a cafe and reading a book, just chilling [COFFEE][BOOKS]',
-      'Just tried a new dish at this place, absolutely delicious! If you\'re nearby, you should definitely try it, guaranteed you won\'t be disappointed [FOOD]',
-      'Thank you everyone for always supporting me. This journey wouldn\'t be possible without you [HEART]'
-    ]
-  },
-  { 
-    id: 'technical', 
-    name: 'Technical', 
-    icon: 'code',
-    description: 'Technical documentation, guides',
-    sampleTemplates: [
-      'To install the system, first ensure your server meets the minimum requirements: 8GB RAM, 4-core CPU, 100GB SSD.',
-      'This API endpoint supports GET and POST methods. Required parameters include: user_id (string), timestamp (integer).',
-      'Error 500 Internal Server Error usually occurs due to incorrect database configuration. Check config.json file and restart the service.'
-    ]
-  },
-  { 
-    id: 'other', 
-    name: 'Other', 
-    icon: 'more-horizontal',
-    description: 'Combined writing style',
-    sampleTemplates: [
-      'This is a sample text. You can replace it with your own content for AI to learn your writing style.',
-      'Everyone has their own way of expressing themselves. Provide texts that truly reflect your writing style.',
-      'The more diverse text samples, the better AI understands how you use language and sentence structure.'
-    ]
-  }
-]
+// Theme options - use getThemes(t) for localized names
+export const THEME_IDS = ['work', 'personal', 'academic', 'creative', 'business', 'social', 'technical', 'other']
+
+export const THEME_ICONS = {
+  work: 'briefcase',
+  personal: 'user',
+  academic: 'graduation-cap',
+  creative: 'palette',
+  business: 'trending-up',
+  social: 'message-circle',
+  technical: 'code',
+  other: 'more-horizontal'
+}
+
+/**
+ * Get localized themes with i18n
+ * @param {Function} t - i18n translation function
+ * @returns {Array} - Array of theme objects with localized content
+ */
+export const getThemes = (t) => {
+  return THEME_IDS.map(id => ({
+    id,
+    name: t(`profileSetup.themes.${id}`),
+    icon: THEME_ICONS[id]
+  }))
+}
 
 /**
  * Save draft to localStorage
@@ -752,7 +687,7 @@ export const useProfileSetup = () => {
   }, [])
 
   // Complete setup
-  const handleComplete = useCallback(() => {
+  const handleComplete = useCallback(async () => {
     // Clear draft on successful completion
     clearDraft()
     
@@ -760,15 +695,36 @@ export const useProfileSetup = () => {
     localStorage.setItem('activeProfileId', profileData.profileId)
     localStorage.setItem('activeProfileName', profileData.name)
     
-    // Invalidate TanStack Query cache to force refetch on HomeView
-    // This ensures the new profile appears immediately even if realtime hasn't synced yet
+    // Set flag to show loading in HomeView while waiting for profile data
+    // This prevents showing empty state when profile is being synced
+    localStorage.setItem('profileJustCreated', Date.now().toString())
+    
+    // Optimistically add new profile to cache immediately
+    // This ensures the profile appears instantly without waiting for refetch
+    const newProfile = {
+      profile_id: profileData.profileId,
+      profile_name: profileData.name,
+      theme: profileData.theme,
+      created_at: new Date().toISOString(),
+      // Add minimal required fields for display
+    }
+    
+    queryClient.setQueryData(queryKeys.profiles.list(), (oldData) => {
+      // Check if profile already exists (from realtime update)
+      const oldProfiles = Array.isArray(oldData) ? oldData : []
+      const exists = oldProfiles.some(p => p.profile_id === profileData.profileId)
+      if (exists) return oldProfiles
+      return [newProfile, ...oldProfiles]
+    })
+    
+    // Also invalidate to ensure fresh data from server eventually
     queryClient.invalidateQueries({ queryKey: queryKeys.profiles.list() })
     
     // Also keep legacy flag for backward compatibility
     localStorage.setItem('profileCacheInvalidated', 'true')
     
     navigate('/')
-  }, [profileData.profileId, profileData.name, navigate, queryClient])
+  }, [profileData.profileId, profileData.name, profileData.theme, navigate, queryClient])
 
   // Restore draft
   const handleRestoreDraft = useCallback(async () => {

@@ -81,7 +81,8 @@
     "empty": "Vacío",
     "userAvatar": "Avatar de usuario",
     "google": "Google",
-    "supportEmail": "Correo electrónico"
+    "supportEmail": "Correo electrónico",
+    "untitled": "Sin título"
   },
   "auth": {
     "login": "Iniciar sesión",
@@ -379,7 +380,11 @@
   },
   "workspace": {
     "title": "Espacio de trabajo IA",
+    "newDocument": "Nuevo Documento",
     "newChat": "Nuevo Chat",
+    "regenerate": "Regenerar",
+    "listen": "Escuchar",
+    "stopListening": "Detener",
     "startChat": "Iniciar nueva conversación",
     "startConversation": "Iniciar una conversación",
     "askAnythingAI": "Pregunte lo que sea, la IA responderá en su estilo",
@@ -835,7 +840,17 @@
     "analyzingPatterns": "Analizando patrones de escritura",
     "generatingVoice": "Generando perfil de voz",
     "savingProfile": "Guardando perfil",
-    "insufficientCredits": "Créditos insuficientes"
+    "insufficientCredits": "Créditos insuficientes",
+    "themes": {
+      "work": "Trabajo",
+      "personal": "Personal",
+      "academic": "Académico",
+      "creative": "Creativo",
+      "business": "Negocios",
+      "social": "Redes sociales",
+      "technical": "Técnico",
+      "other": "Otro"
+    }
   },
   "settings": {
     "theme": "Tema",

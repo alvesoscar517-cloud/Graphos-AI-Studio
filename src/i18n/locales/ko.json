@@ -81,7 +81,8 @@
     "empty": "비어 있음",
     "userAvatar": "사용자 아바타",
     "google": "Google",
-    "supportEmail": "이메일"
+    "supportEmail": "이메일",
+    "untitled": "제목 없음"
   },
   "auth": {
     "login": "로그인",
@@ -379,7 +380,11 @@
   },
   "workspace": {
     "title": "AI 워크스페이스",
+    "newDocument": "새 문서",
     "newChat": "새 채팅",
+    "regenerate": "다시 생성",
+    "listen": "듣기",
+    "stopListening": "중지",
     "startChat": "새 대화 시작",
     "startConversation": "대화 시작",
     "askAnythingAI": "무엇이든 물어보세요. AI가 당신의 스타일로 답변합니다",
@@ -835,7 +840,17 @@
     "analyzingPatterns": "글쓰기 패턴 분석 중",
     "generatingVoice": "음성 프로필 생성 중",
     "savingProfile": "프로필 저장 중",
-    "insufficientCredits": "크레딧 부족"
+    "insufficientCredits": "크레딧 부족",
+    "themes": {
+      "work": "업무",
+      "personal": "개인",
+      "academic": "학술",
+      "creative": "창작",
+      "business": "비즈니스",
+      "social": "소셜 미디어",
+      "technical": "기술",
+      "other": "기타"
+    }
   },
   "settings": {
     "theme": "테마",

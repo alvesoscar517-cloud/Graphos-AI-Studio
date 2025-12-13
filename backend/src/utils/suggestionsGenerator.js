@@ -24,11 +24,13 @@ async function generateFollowUpSuggestions(aiResponse, userMessage, userLanguage
   }
 
   try {
+    // 512 tokens is enough for 3 follow-up questions in any language
+    // (Vietnamese, Chinese, Japanese need more tokens than English)
     const generativeModel = geminiService.vertexAI.getGenerativeModel({
       model: model,
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 256,
+        maxOutputTokens: 512,
       },
     });
 

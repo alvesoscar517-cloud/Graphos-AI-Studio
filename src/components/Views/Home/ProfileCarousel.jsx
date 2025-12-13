@@ -11,12 +11,42 @@ const BREAKPOINT_SM = 640
 const BREAKPOINT_MD = 768
 const BREAKPOINT_LG = 1024
 
+// Max time to show loading after profile creation (10 seconds)
+const PROFILE_CREATED_TIMEOUT = 10000
+
 const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile, loading }) => {
   const { t } = useTranslation()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loadingProfileId, setLoadingProfileId] = useState(null)
   const [visibleCards, setVisibleCards] = useState(3)
   const [isResizing, setIsResizing] = useState(false)
+  const [waitingForNewProfile, setWaitingForNewProfile] = useState(false)
+
+  // Check if we just created a profile and should show loading instead of empty state
+  useEffect(() => {
+    const checkProfileCreated = () => {
+      const createdTimestamp = localStorage.getItem('profileJustCreated')
+      if (createdTimestamp) {
+        const elapsed = Date.now() - parseInt(createdTimestamp, 10)
+        // If within timeout and no profiles yet, show loading
+        if (elapsed < PROFILE_CREATED_TIMEOUT && profiles.length === 0) {
+          setWaitingForNewProfile(true)
+        } else {
+          // Clear flag if timeout exceeded or profiles loaded
+          localStorage.removeItem('profileJustCreated')
+          setWaitingForNewProfile(false)
+        }
+      }
+    }
+    
+    checkProfileCreated()
+    
+    // Re-check when profiles change
+    if (profiles.length > 0) {
+      localStorage.removeItem('profileJustCreated')
+      setWaitingForNewProfile(false)
+    }
+  }, [profiles.length])
 
   // Detect screen size and adjust visible cards with debounce for smooth transition
   useEffect(() => {
@@ -135,7 +165,7 @@ const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile, loading }) =
       </div>
 
       {/* Content */}
-      {loading ? (
+      {loading || waitingForNewProfile ? (
         <div className="flex gap-5 max-lg:gap-4 max-md:gap-3 overflow-hidden">
           {Array.from({ length: visibleCards }).map((_, i) => (
             <SkeletonProfileCard 

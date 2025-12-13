@@ -181,53 +181,100 @@ exports.getCreditHistory = async (req, res) => {
       return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
-    let query = db.collection('credit_transactions')
-      .where('userId', '==', user_id);
+    const parsedLimit = parseInt(limit);
     
-    // Filter by type
-    if (type && type !== 'all') {
-      query = query.where('type', '==', type);
-    }
-    
-    // Filter by feature
-    if (feature && feature !== 'all') {
-      query = query.where('feature', '==', feature);
-    }
-    
-    // Filter by date range
-    if (start_date) {
-      query = query.where('timestamp', '>=', start_date);
-    }
-    if (end_date) {
-      query = query.where('timestamp', '<=', end_date);
-    }
-    
-    // Order and limit
-    query = query.orderBy('timestamp', 'desc').limit(parseInt(limit) + 1);
-    
-    // Pagination cursor
-    if (cursor) {
-      const cursorDoc = await db.collection('credit_transactions').doc(cursor).get();
-      if (cursorDoc.exists) {
-        query = query.startAfter(cursorDoc);
-      }
-    }
-    
-    const transactionsSnapshot = await query.get();
-    
-    const transactions = [];
+    // Try with composite index first, fallback to in-memory filtering if index not available
+    let transactions = [];
     let hasMore = false;
     
-    transactionsSnapshot.docs.forEach((doc, index) => {
-      if (index < parseInt(limit)) {
-        transactions.push({
-          id: doc.id,
-          ...doc.data()
-        });
-      } else {
-        hasMore = true;
+    try {
+      // Build query with filters (requires composite indexes)
+      let query = db.collection('credit_transactions')
+        .where('userId', '==', user_id);
+      
+      // Filter by type (requires userId + type + timestamp index)
+      if (type && type !== 'all') {
+        query = query.where('type', '==', type);
       }
-    });
+      
+      // Filter by feature (requires userId + feature + timestamp index)
+      if (feature && feature !== 'all') {
+        query = query.where('feature', '==', feature);
+      }
+      
+      // Order and limit
+      query = query.orderBy('timestamp', 'desc').limit(parsedLimit + 1);
+      
+      // Pagination cursor
+      if (cursor) {
+        const cursorDoc = await db.collection('credit_transactions').doc(cursor).get();
+        if (cursorDoc.exists) {
+          query = query.startAfter(cursorDoc);
+        }
+      }
+      
+      const transactionsSnapshot = await query.get();
+      
+      transactionsSnapshot.docs.forEach((doc, index) => {
+        if (index < parsedLimit) {
+          transactions.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        } else {
+          hasMore = true;
+        }
+      });
+    } catch (indexError) {
+      // Fallback: fetch all and filter in memory (when composite index not available)
+      logger.warn('Credit history index not available, using fallback', { 
+        error: indexError.message,
+        type,
+        feature 
+      });
+      
+      let query = db.collection('credit_transactions')
+        .where('userId', '==', user_id)
+        .orderBy('timestamp', 'desc')
+        .limit(500); // Fetch more to filter in memory
+      
+      const transactionsSnapshot = await query.get();
+      
+      let allTransactions = transactionsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      
+      // Filter in memory
+      if (type && type !== 'all') {
+        allTransactions = allTransactions.filter(tx => tx.type === type);
+      }
+      if (feature && feature !== 'all') {
+        allTransactions = allTransactions.filter(tx => tx.feature === feature);
+      }
+      
+      // Handle cursor pagination in memory
+      if (cursor) {
+        const cursorIndex = allTransactions.findIndex(tx => tx.id === cursor);
+        if (cursorIndex !== -1) {
+          allTransactions = allTransactions.slice(cursorIndex + 1);
+        }
+      }
+      
+      // Apply limit
+      hasMore = allTransactions.length > parsedLimit;
+      transactions = allTransactions.slice(0, parsedLimit);
+    }
+    
+    // Filter by date range (always in memory for simplicity)
+    if (start_date || end_date) {
+      transactions = transactions.filter(tx => {
+        const txDate = new Date(tx.timestamp);
+        if (start_date && txDate < new Date(start_date)) return false;
+        if (end_date && txDate > new Date(end_date)) return false;
+        return true;
+      });
+    }
     
     // Get next cursor
     const nextCursor = hasMore && transactions.length > 0 

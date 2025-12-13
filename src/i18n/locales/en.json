@@ -81,7 +81,8 @@
     "empty": "Empty",
     "userAvatar": "User Avatar",
     "google": "Google",
-    "supportEmail": "Email"
+    "supportEmail": "Email",
+    "untitled": "Untitled"
   },
   "auth": {
     "login": "Login",
@@ -379,7 +380,11 @@
   },
   "workspace": {
     "title": "AI Workspace",
+    "newDocument": "New Document",
     "newChat": "New Chat",
+    "regenerate": "Regenerate",
+    "listen": "Listen",
+    "stopListening": "Stop",
     "startChat": "Start a new conversation",
     "startConversation": "Start a conversation",
     "askAnythingAI": "Ask anything, AI will respond in your style",
@@ -835,7 +840,17 @@
     "creatingEmbeddings": "Creating embeddings ({{count}} samples)",
     "analyzingPatterns": "Analyzing writing patterns",
     "generatingVoice": "Generating voice profile",
-    "savingProfile": "Saving profile"
+    "savingProfile": "Saving profile",
+    "themes": {
+      "work": "Work",
+      "personal": "Personal",
+      "academic": "Academic",
+      "creative": "Creative",
+      "business": "Business",
+      "social": "Social Media",
+      "technical": "Technical",
+      "other": "Other"
+    }
   },
   "settings": {
     "theme": "Theme",

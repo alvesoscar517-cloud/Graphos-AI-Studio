@@ -81,7 +81,8 @@
     "empty": "فارغ",
     "userAvatar": "صورة المستخدم",
     "google": "Google",
-    "supportEmail": "البريد الإلكتروني"
+    "supportEmail": "البريد الإلكتروني",
+    "untitled": "بدون عنوان"
   },
   "auth": {
     "login": "تسجيل الدخول",
@@ -379,7 +380,11 @@
   },
   "workspace": {
     "title": "مساحة عمل الذكاء الاصطناعي",
+    "newDocument": "مستند جديد",
     "newChat": "محادثة جديدة",
+    "regenerate": "إعادة التوليد",
+    "listen": "استماع",
+    "stopListening": "إيقاف",
     "startChat": "بدء محادثة جديدة",
     "startConversation": "ابدأ محادثة",
     "askAnythingAI": "اسأل أي شيء، وسيجيب الذكاء الاصطناعي بأسلوبك",
@@ -832,7 +837,17 @@
     "analyzingPatterns": "تحليل أنماط الكتابة",
     "generatingVoice": "إنشاء ملف تعريف الصوت",
     "savingProfile": "حفظ الملف الشخصي",
-    "insufficientCredits": "رصيد غير كافي"
+    "insufficientCredits": "رصيد غير كافي",
+    "themes": {
+      "work": "العمل",
+      "personal": "شخصي",
+      "academic": "أكاديمي",
+      "creative": "إبداعي",
+      "business": "الأعمال",
+      "social": "وسائل التواصل",
+      "technical": "تقني",
+      "other": "أخرى"
+    }
   },
   "settings": {
     "theme": "المظهر",

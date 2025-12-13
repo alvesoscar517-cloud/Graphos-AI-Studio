@@ -89,9 +89,19 @@ const ErrorPage = ({
           <img 
             src={ghostIcon} 
             alt="Error" 
-            className="w-full h-full object-contain opacity-80 dark:invert dark:opacity-70"
+            className="w-full h-full object-contain ghost-icon-invert"
           />
         </div>
+        <style>{`
+          .ghost-icon-invert {
+            opacity: 0.6;
+          }
+          .dark .ghost-icon-invert,
+          [data-theme="dark"] .ghost-icon-invert {
+            filter: invert(1) brightness(2);
+            opacity: 0.7;
+          }
+        `}</style>
 
         {/* Error Title */}
         <h1 className="text-xl font-semibold text-text-primary m-0 mb-2">

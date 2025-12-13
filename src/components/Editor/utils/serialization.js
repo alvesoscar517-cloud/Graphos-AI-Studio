@@ -147,3 +147,40 @@ export function setPlainText(editor, text) {
   const doc = parseFromPlainText(text)
   editor.commands.setContent(doc)
 }
+
+
+/**
+ * Check if content is HTML
+ * @param {string} content - Content to check
+ * @returns {boolean} True if content contains HTML tags
+ */
+export function isHtmlContent(content) {
+  if (!content || typeof content !== 'string') return false
+  // Check for common HTML tags
+  return /<[a-z][\s\S]*>/i.test(content)
+}
+
+/**
+ * Parse content - auto-detect HTML or plain text
+ * @param {string} content - Content to parse (HTML or plain text)
+ * @returns {string} Content ready for Tiptap (HTML string or parsed plain text)
+ */
+export function parseContent(content) {
+  if (!content || typeof content !== 'string') {
+    return ''
+  }
+  
+  // If content is HTML, return as-is (Tiptap can parse HTML directly)
+  if (isHtmlContent(content)) {
+    return content
+  }
+  
+  // Otherwise, convert plain text to simple HTML paragraphs
+  const paragraphs = content.split(/\n\n+/)
+  return paragraphs
+    .map(p => {
+      const lines = p.split('\n').map(line => line || '<br>').join('<br>')
+      return `<p>${lines}</p>`
+    })
+    .join('')
+}

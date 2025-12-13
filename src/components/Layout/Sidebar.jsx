@@ -5,7 +5,7 @@ import { useUser } from '../../stores/authStore'
 import { useNotes } from '../../contexts/NotesContext'
 import { useWorkspace } from '../../contexts/WorkspaceContext'
 import { useUnreadCount } from '../../stores/notificationStore'
-import { truncateTitleByWords } from '../../utils/titleUtils'
+import { truncateTitleByWords, stripHelpPrefix, hasHelpPrefix } from '../../utils/titleUtils'
 import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
 import NotificationPopup from '../Popups/NotificationPopup'
@@ -259,15 +259,25 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
                     isActive && "bg-fill-tertiary"
                   )} onClick={() => handleItemClick(item)}>
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <Icon 
-                        name={item.source === 'workspace' ? 'message-square' : 'file-text'} 
-                        alt={item.source === 'workspace' ? t('nav.aiWorkspace') : t('nav.aiStudio')} 
-                        size="sm" 
-                        color="muted"
-                        className="shrink-0"
-                      />
+                      {hasHelpPrefix(item.title) ? (
+                        <Icon 
+                          name="help-circle" 
+                          alt="Help" 
+                          size="sm" 
+                          color="muted"
+                          className="shrink-0"
+                        />
+                      ) : (
+                        <Icon 
+                          name={item.source === 'workspace' ? 'message-square' : 'file-text'} 
+                          alt={item.source === 'workspace' ? t('nav.aiWorkspace') : t('nav.aiStudio')} 
+                          size="sm" 
+                          color="muted"
+                          className="shrink-0"
+                        />
+                      )}
                       <span className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis text-body text-text-secondary leading-tight font-normal">
-                        {truncateTitle(item.title)}
+                        {truncateTitle(stripHelpPrefix(item.title))}
                       </span>
                     </div>
                     <button className={cn(

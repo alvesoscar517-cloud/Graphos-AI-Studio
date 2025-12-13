@@ -161,27 +161,33 @@ const FEATURE_COSTS = {
   },
   
   // ============================================================================
-  // CHAT OPERATIONS (Updated: Dec 2025 - removed maxCost for fair pricing)
+  // CHAT OPERATIONS (Updated: Dec 2025 - Two-phase pricing)
+  // Phase 1 (Pre-charge): baseCost + (inputWords * perInputWordCost)
+  // Phase 2 (Post-charge): outputTokens * perOutputTokenCost * modelMultiplier
+  // This ensures dev costs are covered while being fair to users
   // ============================================================================
   'chat_message': {
-    baseCost: 1,
-    perWordCost: 0.0008,
-    // maxCost removed - cost scales linearly with text length
+    baseCost: 0.3,                // Reduced base cost (was 0.5)
+    perInputWordCost: 0.0003,     // Cost for user's input message
+    perOutputTokenCost: 0.0008,   // Cost per output token (calculated after completion)
+    // Output pricing: ~0.8 credits per 1000 output tokens (base model)
+    // Example: 500 token response = 0.4 credits output cost
     modelMultiplier: true,
-    description: 'Chat message'
+    description: 'Chat message (input pre-charge + output post-charge)'
   },
   'chat_humanized': {
-    baseCost: 2,
-    perWordCost: 0.001,
-    // maxCost removed - cost scales linearly with text length
+    baseCost: 0.5,                // Reduced base cost (was 1)
+    perInputWordCost: 0.0004,     // Slightly higher for humanized
+    perOutputTokenCost: 0.001,    // Higher output cost due to humanization processing
+    // Output pricing: ~1 credit per 1000 output tokens (base model)
     modelMultiplier: true,
-    description: 'Humanized chat message'
+    description: 'Humanized chat message (input pre-charge + output post-charge)'
   },
   'conversation_summarize': {
     baseCost: 1,
-    perMessageCost: 0.1,
-    maxCost: 5,
-    description: 'Conversation summarization'
+    perMessageCost: 0.15,
+    maxCost: 8,
+    description: 'Conversation summarization (enhanced with 800 tokens)'
   },
   
   // ============================================================================
@@ -295,7 +301,7 @@ function getPackageByPrice(priceInCents) {
 // ============================================================================
 
 /**
- * Calculate credits for a feature
+ * Calculate credits for a feature (Phase 1: Pre-charge based on input)
  */
 function calculateFeatureCost(featureName, params = {}) {
   const feature = FEATURE_COSTS[featureName];
@@ -306,9 +312,14 @@ function calculateFeatureCost(featureName, params = {}) {
   
   let cost = feature.baseCost;
   
-  // Add per-word cost
+  // Add per-word cost (input)
   if (params.wordCount && feature.perWordCost) {
     cost += params.wordCount * feature.perWordCost;
+  }
+  
+  // Add per-input-word cost (for chat - more explicit naming)
+  if (params.inputWordCount && feature.perInputWordCost) {
+    cost += params.inputWordCount * feature.perInputWordCost;
   }
   
   // Add per-sentence cost
@@ -346,10 +357,56 @@ function calculateFeatureCost(featureName, params = {}) {
   
   // NOTE: maxCost cap removed (Dec 2025) - cost now scales linearly with text length
   // This is fairer for both users (short text = low cost) and developers (long text = appropriate cost)
-  // Old code: if (feature.maxCost) { cost = Math.min(cost, feature.maxCost); }
   
   // Round to 2 decimal places
   return Math.round(cost * 100) / 100;
+}
+
+/**
+ * Calculate output cost for chat features (Phase 2: Post-charge based on output)
+ * Called after AI response is complete to charge for actual output tokens
+ * @param {string} featureName - 'chat_message' or 'chat_humanized'
+ * @param {number} outputTokens - Actual output tokens from AI response
+ * @param {string} model - Model used for generation
+ * @returns {number} Additional credits to charge for output
+ */
+function calculateOutputCost(featureName, outputTokens, model = 'gemini-2.5-flash') {
+  const feature = FEATURE_COSTS[featureName];
+  if (!feature || !feature.perOutputTokenCost) {
+    return 0;
+  }
+  
+  let outputCost = outputTokens * feature.perOutputTokenCost;
+  
+  // Apply model multiplier for output cost
+  if (feature.modelMultiplier && model) {
+    const modelConfig = MODEL_COSTS[model];
+    if (modelConfig) {
+      outputCost *= modelConfig.multiplier;
+    }
+  }
+  
+  // Round to 2 decimal places
+  return Math.round(outputCost * 100) / 100;
+}
+
+/**
+ * Get feature pricing info for transparency
+ * @param {string} featureName - Feature name
+ * @returns {Object} Pricing details for the feature
+ */
+function getFeaturePricingInfo(featureName) {
+  const feature = FEATURE_COSTS[featureName];
+  if (!feature) return null;
+  
+  return {
+    baseCost: feature.baseCost,
+    perInputWordCost: feature.perInputWordCost || feature.perWordCost || 0,
+    perOutputTokenCost: feature.perOutputTokenCost || 0,
+    hasOutputPricing: !!feature.perOutputTokenCost,
+    modelMultiplier: feature.modelMultiplier || false,
+    description: feature.description
+  };
 }
 
 /**
@@ -380,6 +437,8 @@ module.exports = {
   FEATURE_COSTS,
   CREDIT_PACKAGES,
   calculateFeatureCost,
+  calculateOutputCost,
+  getFeaturePricingInfo,
   estimateTokens,
   countWords,
   countSentences,

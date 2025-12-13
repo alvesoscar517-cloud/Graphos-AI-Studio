@@ -81,7 +81,8 @@
     "empty": "खाली",
     "userAvatar": "उपयोगकर्ता अवतार",
     "google": "Google",
-    "supportEmail": "ईमेल"
+    "supportEmail": "ईमेल",
+    "untitled": "शीर्षकहीन"
   },
   "auth": {
     "login": "लॉगिन",
@@ -379,7 +380,11 @@
   },
   "workspace": {
     "title": "AI वर्कस्पेस",
+    "newDocument": "नया दस्तावेज़",
     "newChat": "नई चैट",
+    "regenerate": "पुनः उत्पन्न करें",
+    "listen": "सुनें",
+    "stopListening": "रोकें",
     "startChat": "नई बातचीत शुरू करें",
     "startConversation": "बातचीत शुरू करें",
     "askAnythingAI": "कुछ भी पूछें, AI आपकी शैली में जवाब देगा",
@@ -832,7 +837,17 @@
     "analyzingPatterns": "लेखन पैटर्न का विश्लेषण कर रहे हैं",
     "generatingVoice": "वॉइस प्रोफ़ाइल बना रहे हैं",
     "savingProfile": "प्रोफ़ाइल सहेज रहे हैं",
-    "insufficientCredits": "अपर्याप्त क्रेडिट"
+    "insufficientCredits": "अपर्याप्त क्रेडिट",
+    "themes": {
+      "work": "कार्य",
+      "personal": "व्यक्तिगत",
+      "academic": "शैक्षणिक",
+      "creative": "रचनात्मक",
+      "business": "व्यापार",
+      "social": "सोशल मीडिया",
+      "technical": "तकनीकी",
+      "other": "अन्य"
+    }
   },
   "settings": {
     "theme": "थीम",

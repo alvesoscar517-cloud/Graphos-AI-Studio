@@ -141,11 +141,13 @@ async function buildMultimodalContent(textContent, attachments) {
  */
 async function analyzeImage(base64Image, mimeType, prompt = 'Describe this image in detail.') {
   try {
+    // 2048 tokens allows for detailed image descriptions
+    // Complex images (diagrams, documents, screenshots) need more tokens
     const model = vertexAI.getGenerativeModel({
       model: 'gemini-2.5-flash', // Graphos Hyper
       generationConfig: {
         temperature: 0.4,
-        maxOutputTokens: 1024
+        maxOutputTokens: 2048
       }
     });
     

@@ -81,7 +81,8 @@
     "empty": "Leer",
     "userAvatar": "Benutzer-Avatar",
     "google": "Google",
-    "supportEmail": "E-Mail"
+    "supportEmail": "E-Mail",
+    "untitled": "Ohne Titel"
   },
   "auth": {
     "login": "Anmelden",
@@ -379,7 +380,11 @@
   },
   "workspace": {
     "title": "KI-Arbeitsbereich",
+    "newDocument": "Neues Dokument",
     "newChat": "Neuer Chat",
+    "regenerate": "Neu generieren",
+    "listen": "Anhören",
+    "stopListening": "Stopp",
     "startChat": "Neue Unterhaltung beginnen",
     "startConversation": "Unterhaltung starten",
     "askAnythingAI": "Fragen Sie alles, die KI antwortet in Ihrem Stil",
@@ -835,7 +840,17 @@
     "analyzingPatterns": "Schreibmuster analysieren",
     "generatingVoice": "Stimmprofil generieren",
     "savingProfile": "Profil speichern",
-    "insufficientCredits": "Unzureichende Gutschriften"
+    "insufficientCredits": "Unzureichende Gutschriften",
+    "themes": {
+      "work": "Arbeit",
+      "personal": "Persönlich",
+      "academic": "Akademisch",
+      "creative": "Kreativ",
+      "business": "Geschäft",
+      "social": "Soziale Medien",
+      "technical": "Technisch",
+      "other": "Sonstiges"
+    }
   },
   "settings": {
     "theme": "Design",

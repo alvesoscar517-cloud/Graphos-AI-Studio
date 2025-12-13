@@ -142,7 +142,37 @@ export async function sendChatMessageStream(
       
       if (done) {
         logger.log('[API] Stream ended, total chunks received:', chunkCount)
-        logger.log('[API] Remaining buffer:', buffer)
+        
+        // Process any remaining data in buffer before ending
+        if (buffer.trim()) {
+          logger.log('[API] Processing remaining buffer:', buffer.substring(0, 100))
+          if (buffer.startsWith('data: ')) {
+            const data = buffer.slice(6).trim()
+            if (data && data !== '[DONE]') {
+              try {
+                const json = JSON.parse(data)
+                if (json.chunk) {
+                  chunkCount++
+                  onChunk(json.chunk)
+                } else if (json.type === 'complete') {
+                  summary = json.summary
+                  outputTokens = json.outputTokens
+                  if (onComplete) {
+                    onComplete({ 
+                      summary, 
+                      outputTokens, 
+                      suggestions: json.suggestions,
+                      finishReason: json.finishReason,
+                      wasIncomplete: json.wasIncomplete
+                    })
+                  }
+                }
+              } catch (e) {
+                logger.warn('Chat', `Failed to parse remaining buffer: ${buffer}`)
+              }
+            }
+          }
+        }
         break
       }
       
@@ -176,9 +206,16 @@ export async function sendChatMessageStream(
               } else if (json.type === 'complete') {
                 summary = json.summary
                 outputTokens = json.outputTokens
-                // Pass suggestions to onComplete callback
+                // Pass suggestions, completion info, and credits to onComplete callback
                 if (onComplete) {
-                  onComplete({ summary, outputTokens, suggestions: json.suggestions })
+                  onComplete({ 
+                    summary, 
+                    outputTokens, 
+                    suggestions: json.suggestions,
+                    finishReason: json.finishReason,
+                    wasIncomplete: json.wasIncomplete,
+                    credits: json.credits // { inputCost, outputCost, totalCost }
+                  })
                 }
               } else if (json.chunk) {
                 chunkCount++
@@ -365,7 +402,40 @@ export async function sendHumanizedChatStream(
     while (true) {
       const { done, value } = await reader.read()
       
-      if (done) break
+      if (done) {
+        // Process any remaining data in buffer before ending
+        if (buffer.trim()) {
+          logger.log('[API] Processing remaining buffer in humanized stream:', buffer.substring(0, 100))
+          if (buffer.startsWith('data: ')) {
+            const data = buffer.slice(6).trim()
+            if (data && data !== '[DONE]') {
+              try {
+                const json = JSON.parse(data)
+                if (json.chunk) {
+                  onChunk(json.chunk)
+                } else if (json.type === 'complete') {
+                  summary = json.summary
+                  outputTokens = json.outputTokens
+                  humanizationResult = json.humanization
+                  if (onComplete) {
+                    onComplete({ 
+                      summary, 
+                      outputTokens, 
+                      humanization: humanizationResult, 
+                      suggestions: json.suggestions,
+                      finishReason: json.finishReason,
+                      wasIncomplete: json.wasIncomplete
+                    })
+                  }
+                }
+              } catch (e) {
+                logger.warn('Chat', `Failed to parse remaining buffer: ${buffer}`)
+              }
+            }
+          }
+        }
+        break
+      }
       
       buffer += decoder.decode(value, { stream: true })
       
@@ -399,9 +469,17 @@ export async function sendHumanizedChatStream(
                 summary = json.summary
                 outputTokens = json.outputTokens
                 humanizationResult = json.humanization
-                // Pass suggestions to onComplete callback
+                // Pass suggestions, completion info, and credits to onComplete callback
                 if (onComplete) {
-                  onComplete({ summary, outputTokens, humanization: humanizationResult, suggestions: json.suggestions })
+                  onComplete({ 
+                    summary, 
+                    outputTokens, 
+                    humanization: humanizationResult, 
+                    suggestions: json.suggestions,
+                    finishReason: json.finishReason,
+                    wasIncomplete: json.wasIncomplete,
+                    credits: json.credits // { inputCost, outputCost, totalCost }
+                  })
                 }
               } else if (json.chunk) {
                 onChunk(json.chunk)

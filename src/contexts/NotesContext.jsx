@@ -35,9 +35,11 @@ const MAX_VISIBLE_NOTES = 5
 // Check if note has meaningful content
 const hasContent = (note) => {
   if (!note) return false
-  const content = note.content?.trim() || ''
+  let content = note.content?.trim() || ''
+  // Strip HTML tags to check for actual text content
+  const plainText = content.replace(/<[^>]*>/g, '').trim()
   const title = note.title?.trim() || ''
-  return content.length > 0 || (title.length > 0 && title !== 'Untitled')
+  return plainText.length > 0 || (title.length > 0 && title !== 'Untitled')
 }
 
 export const NotesProvider = ({ children }) => {

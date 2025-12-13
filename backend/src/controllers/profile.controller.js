@@ -102,7 +102,8 @@ exports.addSample = async (req, res) => {
     const { profile_id, text } = req.body;
 
     const profileId = validateProfileId(profile_id);
-    const validText = validateText(text, 10, 10000);
+    // Profile samples can be up to 15000 chars for better voice analysis
+    const validText = validateText(text, 10, 15000);
 
     const profileDoc = await db.collection('voice_profiles').doc(profileId).get();
     if (!profileDoc.exists) {
@@ -405,10 +406,10 @@ exports.createProfileComplete = async (req, res) => {
       });
     }
 
-    // Validate each sample content
+    // Validate each sample content (up to 25000 chars per sample for batch)
     for (let i = 0; i < samples.length; i++) {
       try {
-        validateText(samples[i].text, 20, 20000);
+        validateText(samples[i].text, 20, 25000);
       } catch (error) {
         return res.status(400).json({
           success: false,
@@ -861,10 +862,10 @@ exports.createProfileCompleteStream = async (req, res) => {
       return res.end();
     }
 
-    // Validate each sample content
+    // Validate each sample content (up to 25000 chars per sample)
     for (let i = 0; i < samples.length; i++) {
       try {
-        validateText(samples[i].text, 20, 20000);
+        validateText(samples[i].text, 20, 25000);
       } catch (error) {
         sendEvent({
           type: 'error',

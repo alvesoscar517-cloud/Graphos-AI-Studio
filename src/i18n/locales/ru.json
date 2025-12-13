@@ -81,7 +81,8 @@
     "empty": "Пусто",
     "userAvatar": "Аватар пользователя",
     "google": "Google",
-    "supportEmail": "Эл. почта"
+    "supportEmail": "Эл. почта",
+    "untitled": "Без названия"
   },
   "auth": {
     "login": "Вход",
@@ -379,7 +380,11 @@
   },
   "workspace": {
     "title": "Рабочая среда ИИ",
+    "newDocument": "Новый документ",
     "newChat": "Новый чат",
+    "regenerate": "Сгенерировать заново",
+    "listen": "Прослушать",
+    "stopListening": "Стоп",
     "startChat": "Начать новый диалог",
     "startConversation": "Начать диалог",
     "askAnythingAI": "Спросите что угодно, ИИ ответит в вашем стиле",
@@ -835,7 +840,17 @@
     "analyzingPatterns": "Анализ паттернов письма",
     "generatingVoice": "Генерация голосового профиля",
     "savingProfile": "Сохранение профиля",
-    "insufficientCredits": "Недостаточно кредитов"
+    "insufficientCredits": "Недостаточно кредитов",
+    "themes": {
+      "work": "Работа",
+      "personal": "Личное",
+      "academic": "Академический",
+      "creative": "Творческий",
+      "business": "Бизнес",
+      "social": "Социальные сети",
+      "technical": "Технический",
+      "other": "Другое"
+    }
   },
   "settings": {
     "theme": "Тема",

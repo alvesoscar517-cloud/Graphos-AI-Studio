@@ -81,7 +81,8 @@
     "empty": "ว่างเปล่า",
     "userAvatar": "รูปโปรไฟล์ผู้ใช้",
     "google": "Google",
-    "supportEmail": "อีเมล"
+    "supportEmail": "อีเมล",
+    "untitled": "ไม่มีชื่อ"
   },
   "auth": {
     "login": "เข้าสู่ระบบ",
@@ -379,7 +380,11 @@
   },
   "workspace": {
     "title": "พื้นที่ทำงาน AI",
+    "newDocument": "เอกสารใหม่",
     "newChat": "แชทใหม่",
+    "regenerate": "สร้างใหม่",
+    "listen": "ฟัง",
+    "stopListening": "หยุด",
     "startChat": "เริ่มบทสนทนาใหม่",
     "startConversation": "เริ่มการสนทนา",
     "askAnythingAI": "ถามอะไรก็ได้ AI จะตอบในสไตล์ของคุณ",
@@ -835,7 +840,17 @@
     "analyzingPatterns": "กำลังวิเคราะห์รูปแบบการเขียน",
     "generatingVoice": "กำลังสร้างโปรไฟล์เสียง",
     "savingProfile": "กำลังบันทึกโปรไฟล์",
-    "insufficientCredits": "เครดิตไม่เพียงพอ"
+    "insufficientCredits": "เครดิตไม่เพียงพอ",
+    "themes": {
+      "work": "งาน",
+      "personal": "ส่วนตัว",
+      "academic": "วิชาการ",
+      "creative": "สร้างสรรค์",
+      "business": "ธุรกิจ",
+      "social": "โซเชียลมีเดีย",
+      "technical": "เทคนิค",
+      "other": "อื่นๆ"
+    }
   },
   "settings": {
     "theme": "ธีม",

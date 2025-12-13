@@ -3,6 +3,28 @@
  * Utility functions for handling and displaying titles
  */
 
+// Help prefix for app context detection
+const HELP_PREFIX = '[APP_HELP] '
+
+/**
+ * Check if title has help prefix
+ * @param {string} title - Title to check
+ * @returns {boolean} True if has help prefix
+ */
+export const hasHelpPrefix = (title) => {
+  return title?.startsWith(HELP_PREFIX) || false
+}
+
+/**
+ * Strip help prefix from title
+ * @param {string} title - Title to strip
+ * @returns {string} Title without help prefix
+ */
+export const stripHelpPrefix = (title) => {
+  if (!title) return title
+  return hasHelpPrefix(title) ? title.slice(HELP_PREFIX.length) : title
+}
+
 /**
  * Truncate title by word count
  * @param {string} title - Original title

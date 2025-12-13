@@ -81,7 +81,8 @@
     "empty": "空",
     "userAvatar": "用户头像",
     "google": "Google",
-    "supportEmail": "邮箱"
+    "supportEmail": "邮箱",
+    "untitled": "无标题"
   },
   "auth": {
     "login": "登录",
@@ -379,7 +380,11 @@
   },
   "workspace": {
     "title": "AI 工作区",
+    "newDocument": "新建文档",
     "newChat": "新对话",
+    "regenerate": "重新生成",
+    "listen": "朗读",
+    "stopListening": "停止",
     "startChat": "开始新对话",
     "startConversation": "开始对话",
     "askAnythingAI": "随便问，AI 将以您的风格回答",
@@ -832,7 +837,17 @@
     "analyzingPatterns": "正在分析写作模式",
     "generatingVoice": "正在生成语音配置文件",
     "savingProfile": "正在保存配置文件",
-    "insufficientCredits": "积分不足"
+    "insufficientCredits": "积分不足",
+    "themes": {
+      "work": "工作",
+      "personal": "个人",
+      "academic": "学术",
+      "creative": "创意",
+      "business": "商务",
+      "social": "社交媒体",
+      "technical": "技术",
+      "other": "其他"
+    }
   },
   "settings": {
     "theme": "主题",
