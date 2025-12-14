@@ -122,6 +122,18 @@ export async function sendChatMessageStream(
         }))
       }
       
+      // Handle 402 - insufficient credits
+      if (response.status === 402) {
+        throw {
+          code: 'INSUFFICIENT_CREDITS',
+          message: errorData.error || 'Insufficient credits',
+          statusCode: 402,
+          required: errorData.required,
+          available: errorData.available,
+          shortfall: errorData.shortfall
+        }
+      }
+      
       throw {
         code: errorData.code || (response.status === 401 ? 'UNAUTHORIZED' : 'INTERNAL_ERROR'),
         message: errorData.error || `HTTP error! status: ${response.status}`,
@@ -385,6 +397,19 @@ export async function sendHumanizedChatStream(
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
+      
+      // Handle 402 - insufficient credits
+      if (response.status === 402) {
+        throw {
+          code: 'INSUFFICIENT_CREDITS',
+          message: errorData.error || 'Insufficient credits',
+          statusCode: 402,
+          required: errorData.required,
+          available: errorData.available,
+          shortfall: errorData.shortfall
+        }
+      }
+      
       throw {
         code: errorData.code || 'INTERNAL_ERROR',
         message: errorData.error || `HTTP error! status: ${response.status}`,

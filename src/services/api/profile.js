@@ -288,6 +288,18 @@ export async function createProfileCompleteStream(profileName, theme, samples, c
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
+      
+      // Handle 402 - insufficient credits
+      if (response.status === 402) {
+        const error = new Error(errorData.error || 'Insufficient credits')
+        error.code = 'INSUFFICIENT_CREDITS'
+        error.statusCode = 402
+        error.required = errorData.required
+        error.available = errorData.available
+        error.shortfall = errorData.shortfall
+        throw error
+      }
+      
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
     }
     

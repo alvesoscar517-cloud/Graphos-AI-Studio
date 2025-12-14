@@ -7,10 +7,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { usePayment } from '../contexts/PaymentContext';
 import { usePackages, useCreateCheckout } from '@/hooks/queries';
 import { useToasts } from '@/stores/uiStore';
 import { useUser } from '@/stores/authStore';
+import { queryKeys } from '@/lib/queryKeys';
 import { cn } from '../lib/utils';
 
 // Currency mapping by language code with exchange rates (approximate, updated periodically)
@@ -82,6 +84,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
   const [loadingPackageId, setLoadingPackageId] = useState(null);
   const { startPolling } = usePayment();
   const { showError } = useToasts();
+  const queryClient = useQueryClient();
   const user = useUser();
   const userId = user?.userId || user?.id;
 
@@ -92,10 +95,14 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
   const createCheckout = useCreateCheckout();
 
   useEffect(() => {
-    const handlePaymentSuccess = () => onPurchaseSuccess?.();
+    const handlePaymentSuccess = () => {
+      // Invalidate packages to refresh first purchase eligibility
+      queryClient.invalidateQueries({ queryKey: queryKeys.payment.packages(userId) });
+      onPurchaseSuccess?.();
+    };
     window.addEventListener('payment-success', handlePaymentSuccess);
     return () => window.removeEventListener('payment-success', handlePaymentSuccess);
-  }, [onPurchaseSuccess]);
+  }, [onPurchaseSuccess, queryClient, userId]);
 
   const handlePurchasePackage = async (pkg) => {
     // Prevent double-clicks while processing

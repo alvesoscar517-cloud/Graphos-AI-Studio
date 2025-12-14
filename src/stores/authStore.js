@@ -28,6 +28,7 @@ import {
   secureGet,
   AUTH_STORAGE_KEYS,
   migrateToSecureStorage,
+  initStorageCache,
   setRememberMe,
   setRememberedEmail,
   clearRememberedEmail,
@@ -51,6 +52,8 @@ export const useAuthStore = create(
         authMethod: null, // 'google' | 'email'
         hasGoogleLinked: false,
         error: null,
+        // Session persistence flag - synced with rememberMe
+        _sessionPersisted: false,
 
         // ========================================================================
         // INTERNAL ACTIONS
@@ -75,7 +78,8 @@ export const useAuthStore = create(
             isAuthenticated: false, 
             authMethod: null, 
             hasGoogleLinked: false, 
-            error: null 
+            error: null,
+            _sessionPersisted: false
           })
         },
 
@@ -109,8 +113,12 @@ export const useAuthStore = create(
           set({ isLoading: true })
           
           try {
-            // Migrate old unencrypted tokens
-            migrateToSecureStorage()
+            // CRITICAL: Initialize storage cache FIRST for Chrome Extension
+            // This loads data from chrome.storage.local into memory for sync access
+            await initStorageCache()
+            
+            // Migrate old localStorage/sessionStorage tokens to chrome.storage.local
+            await migrateToSecureStorage()
             
             // Initialize token service for auto-refresh
             tokenService.init()
@@ -123,29 +131,51 @@ export const useAuthStore = create(
               }
             })
             
+            // Check rememberMe preference FIRST
+            const rememberMeEnabled = secureGet('rememberMe') === 'true' || secureGet('rememberMe') === true
+            logger.log('[AUTH] initAuth - rememberMe:', rememberMeEnabled)
+            
             // Check for stored email auth
             const storedToken = secureGet(AUTH_STORAGE_KEYS.AUTH_TOKEN)
             const storedMethod = getStorageAuthMethod()
             const storedUser = getUserData()
             
-            // If Zustand restored isAuthenticated but no token, clear auth
-            // This prevents inconsistent state
+            logger.log('[AUTH] initAuth - storedToken exists:', !!storedToken)
+            logger.log('[AUTH] initAuth - storedMethod:', storedMethod)
+            logger.log('[AUTH] initAuth - storedUser exists:', !!storedUser)
+            
+            // CRITICAL: Sync check between Zustand persist and actual token storage
+            // This handles the case where:
+            // - rememberMe=false → tokens in sessionStorage (cleared on browser close)
+            // - Zustand persist → isAuthenticated in localStorage (persists)
+            // Result: Zustand says authenticated but no token exists
             const currentState = get()
+            const wasSessionPersisted = currentState._sessionPersisted
+            
             if (currentState.isAuthenticated && !storedToken) {
-              logger.warn('Auth', 'Zustand restored auth but no token found, clearing')
+              // Check if this is expected (rememberMe was off, browser was closed)
+              if (!wasSessionPersisted || !rememberMeEnabled) {
+                logger.log('[AUTH] Session not persisted (rememberMe=false or _sessionPersisted=false), clearing auth silently')
+              } else {
+                logger.warn('Auth', 'Zustand restored auth but no token found, clearing')
+              }
               get()._clearAuth()
               set({ isLoading: false })
               return
             }
             
+            // If rememberMe is enabled and we have valid stored data, restore session
             if (storedToken && storedMethod === 'email' && storedUser) {
+              logger.log('[AUTH] Restoring session from storage')
+              
               // Set authenticated state immediately
               set({ 
                 user: storedUser, 
                 token: storedToken, 
                 isAuthenticated: true, 
                 authMethod: 'email', 
-                hasGoogleLinked: storedUser.hasGoogleLinked || false 
+                hasGoogleLinked: storedUser.hasGoogleLinked || false,
+                _sessionPersisted: rememberMeEnabled // Sync with current rememberMe preference
               })
               
               // Check if token needs refresh
@@ -157,16 +187,20 @@ export const useAuthStore = create(
               // Verify token in background (don't block UI)
               try {
                 const validToken = await tokenService.getValidToken()
-                const response = await fetch(`${API_BASE_URL}/auth/email/sessions`, { 
-                  headers: { 'Authorization': `Bearer ${validToken}` } 
-                })
-                
-                if (response.status === 401) { 
-                  logger.log('[AUTH] Token invalid')
-                  get()._clearAuth() 
+                if (validToken) {
+                  const response = await fetch(`${API_BASE_URL}/auth/email/sessions`, { 
+                    headers: { 'Authorization': `Bearer ${validToken}` } 
+                  })
+                  
+                  if (response.status === 401) { 
+                    logger.log('[AUTH] Token invalid on server, clearing auth')
+                    get()._clearAuth() 
+                  } else {
+                    logger.log('[AUTH] Session verified successfully')
+                  }
                 }
               } catch (networkError) { 
-                logger.log('[AUTH] Network error, keeping session') 
+                logger.log('[AUTH] Network error during verification, keeping session') 
               }
               
               set({ isLoading: false })
@@ -180,12 +214,85 @@ export const useAuthStore = create(
                 if (response) {
                   const userInfo = await chrome.runtime.sendMessage({ action: 'getUserInfo' })
                   if (userInfo?.email) {
-                    const userId = userInfo.id || `user_${userInfo.email.replace(/[^a-zA-Z0-9]/g, '_')}`
+                    // Check if this Google email is linked to an existing email user
+                    let userId = userInfo.id || `user_${userInfo.email.replace(/[^a-zA-Z0-9]/g, '_')}`
+                    let linkedUser = null
+                    let hasGoogleLinked = false
+                    
+                    try {
+                      const checkResponse = await fetch(`${API_BASE_URL}/auth/email/check-google-linked`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ googleEmail: userInfo.email })
+                      })
+                      
+                      const checkData = await checkResponse.json()
+                      
+                      if (checkData.success && checkData.linked && checkData.user) {
+                        // Google email is linked - login with that account to get tokens
+                        logger.log('[AUTH] initAuth - Google email linked to email user, getting tokens:', checkData.userId)
+                        
+                        // Get Google access token for verification
+                        const storageResult = await chrome.storage.local.get(['accessToken'])
+                        const googleAccessToken = storageResult.accessToken
+                        
+                        if (googleAccessToken) {
+                          // Call login-with-google endpoint to get JWT tokens
+                          const loginResponse = await fetch(`${API_BASE_URL}/auth/email/login-with-google`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                              googleEmail: userInfo.email,
+                              googleAccessToken
+                            })
+                          })
+                          
+                          const loginData = await loginResponse.json()
+                          
+                          if (loginResponse.ok && loginData.success) {
+                            userId = loginData.user.userId
+                            linkedUser = {
+                              ...loginData.user,
+                              id: loginData.user.userId,
+                              picture: userInfo.picture || loginData.user.picture
+                            }
+                            hasGoogleLinked = true
+                            
+                            // Store tokens
+                            setUserData(linkedUser)
+                            setStorageAuthMethod('email')
+                            setRememberMe(true)
+                            tokenService.setTokens({
+                              accessToken: loginData.accessToken,
+                              refreshToken: loginData.refreshToken,
+                              expiresIn: loginData.expiresIn || 3600
+                            })
+                            
+                            secureSet(AUTH_STORAGE_KEYS.USER_ID, userId)
+                            set({ 
+                              user: linkedUser, 
+                              token: loginData.accessToken,
+                              isAuthenticated: true, 
+                              authMethod: 'email',
+                              hasGoogleLinked: true,
+                              _sessionPersisted: true
+                            })
+                            return // Exit early, we're done
+                          }
+                        }
+                      }
+                    } catch (checkError) {
+                      logger.log('[AUTH] initAuth - Check Google linked failed:', checkError.message)
+                    }
+                    
+                    // No linked account or login failed - use Google-only auth
                     secureSet(AUTH_STORAGE_KEYS.USER_ID, userId)
                     set({ 
-                      user: { ...userInfo, id: userId }, 
+                      user: linkedUser || { ...userInfo, id: userId }, 
                       isAuthenticated: true, 
-                      authMethod: 'google' 
+                      authMethod: 'google',
+                      hasGoogleLinked,
+                      _sessionPersisted: true
                     })
                   }
                 }
@@ -214,7 +321,95 @@ export const useAuthStore = create(
             const response = await chrome.runtime.sendMessage({ action: 'signIn' })
             
             if (response?.success) {
-              const userId = response.userInfo.id || `user_${response.userInfo.email.replace(/[^a-zA-Z0-9]/g, '_')}`
+              const googleEmail = response.userInfo.email
+              
+              // Check if this Google email is linked to an existing email user
+              // This prevents creating a new account when user has already linked Google to their email account
+              try {
+                const checkResponse = await fetch(`${API_BASE_URL}/auth/email/check-google-linked`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ googleEmail })
+                })
+                
+                const checkData = await checkResponse.json()
+                
+                if (checkData.success && checkData.linked && checkData.user) {
+                  // Google email is linked to an email user - login with that account
+                  logger.log('[AUTH] Google email is linked to email user, logging in with existing account', checkData.user.userId)
+                  
+                  // Get Google access token for verification
+                  const storageResult = await chrome.storage.local.get(['accessToken'])
+                  const googleAccessToken = storageResult.accessToken
+                  
+                  // Call login-with-google endpoint to get JWT tokens
+                  const loginResponse = await fetch(`${API_BASE_URL}/auth/email/login-with-google`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                      googleEmail,
+                      googleAccessToken
+                    })
+                  })
+                  
+                  const loginData = await loginResponse.json()
+                  
+                  if (!loginResponse.ok) {
+                    const error = new Error(loginData.error || 'Failed to login with linked Google account')
+                    error.code = loginData.code
+                    throw error
+                  }
+                  
+                  const linkedUser = {
+                    ...loginData.user,
+                    id: loginData.user.userId,
+                    picture: response.userInfo.picture || loginData.user.picture
+                  }
+                  
+                  // Store user and tokens
+                  setUserData(linkedUser)
+                  secureSet(AUTH_STORAGE_KEYS.USER_ID, loginData.user.userId)
+                  setStorageAuthMethod('email') // Use email auth method since we have JWT tokens
+                  setRememberMe(true) // Google login always remembers
+                  
+                  // Store tokens via tokenService
+                  tokenService.setTokens({
+                    accessToken: loginData.accessToken,
+                    refreshToken: loginData.refreshToken,
+                    expiresIn: loginData.expiresIn || 3600
+                  })
+                  
+                  set({ 
+                    user: linkedUser, 
+                    token: loginData.accessToken,
+                    isAuthenticated: true, 
+                    authMethod: 'email', // Use email since we have JWT
+                    hasGoogleLinked: true,
+                    error: null,
+                    _sessionPersisted: true
+                  })
+                  
+                  return { success: true, linkedAccount: true }
+                }
+                
+                if (checkData.emailUserExists) {
+                  // Email user exists with same email but not linked
+                  // User should sign in with email and link Google first
+                  const error = new Error(checkData.message || 'Please sign in with email/password and link your Google account')
+                  error.code = 'EMAIL_USER_EXISTS'
+                  error.i18nKey = 'auth.email.googleEmailInUse'
+                  throw error
+                }
+              } catch (checkError) {
+                // If check fails due to network, continue with normal Google sign in
+                if (checkError.code === 'EMAIL_USER_EXISTS') {
+                  throw checkError
+                }
+                logger.log('[AUTH] Check Google linked failed, continuing with normal sign in:', checkError.message)
+              }
+              
+              // No linked account found - create new Google-only user ID
+              const userId = response.userInfo.id || `user_${googleEmail.replace(/[^a-zA-Z0-9]/g, '_')}`
               secureSet(AUTH_STORAGE_KEYS.USER_ID, userId)
               
               set({ 
@@ -231,7 +426,7 @@ export const useAuthStore = create(
           } catch (error) {
             logError(error, { context: 'signInWithGoogle' })
             set({ error: error.message })
-            return { success: false, error: error.message }
+            return { success: false, error: error.message, code: error.code }
           }
         },
 
@@ -277,7 +472,9 @@ export const useAuthStore = create(
               isAuthenticated: true, 
               authMethod: 'email', 
               hasGoogleLinked: data.user.hasGoogleLinked || false, 
-              error: null 
+              error: null,
+              // Track if session should persist across browser restarts
+              _sessionPersisted: rememberMe
             })
             
             // Save credentials to browser password manager if rememberMe
@@ -352,12 +549,17 @@ export const useAuthStore = create(
               expiresIn: data.expiresIn || 3600
             })
 
+            // After email verification, default to persistent session
+            // User can change this on next login with rememberMe option
+            setRememberMe(true)
+            
             set({ 
               user: data.user, 
               token: data.accessToken,
               isAuthenticated: true, 
               authMethod: 'email', 
-              error: null 
+              error: null,
+              _sessionPersisted: true
             })
 
             return { success: true }
@@ -797,13 +999,87 @@ export const useAuthStore = create(
       }),
       {
         name: 'auth-storage',
+        // Use chrome.storage.local for Chrome Extension, localStorage for web
+        storage: {
+          getItem: async (name) => {
+            try {
+              if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+                const result = await chrome.storage.local.get(name)
+                const value = result[name]
+                // Zustand expects the raw string or null
+                return value ?? null
+              }
+              return localStorage.getItem(name)
+            } catch (e) {
+              logger.error('Auth', 'Storage getItem failed', e)
+              return null
+            }
+          },
+          setItem: async (name, value) => {
+            try {
+              if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+                await chrome.storage.local.set({ [name]: value })
+              } else {
+                localStorage.setItem(name, typeof value === 'string' ? value : JSON.stringify(value))
+              }
+            } catch (e) {
+              logger.error('Auth', 'Storage setItem failed', e)
+            }
+          },
+          removeItem: async (name) => {
+            try {
+              if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+                await chrome.storage.local.remove(name)
+              } else {
+                localStorage.removeItem(name)
+              }
+            } catch (e) {
+              logger.error('Auth', 'Storage removeItem failed', e)
+            }
+          },
+        },
         partialize: (state) => ({ 
           user: state.user, 
           token: state.token, 
           isAuthenticated: state.isAuthenticated, 
           authMethod: state.authMethod, 
-          hasGoogleLinked: state.hasGoogleLinked 
+          hasGoogleLinked: state.hasGoogleLinked,
+          // Sync session persistence with rememberMe preference
+          _sessionPersisted: state._sessionPersisted
         }),
+        // Custom merge to handle session persistence correctly
+        merge: (persistedState, currentState) => {
+          // @ts-ignore - Zustand persist types are complex
+          const persisted = persistedState || {}
+          const current = currentState || {}
+          
+          logger.log('[AUTH] Zustand merge - persisted.isAuthenticated:', persisted.isAuthenticated)
+          logger.log('[AUTH] Zustand merge - persisted._sessionPersisted:', persisted._sessionPersisted)
+          
+          // If session was not persisted (rememberMe was off), clear auth
+          // @ts-ignore - accessing dynamic property
+          if (persisted.isAuthenticated && !persisted._sessionPersisted) {
+            logger.log('[AUTH] _sessionPersisted=false, clearing persisted auth state')
+            return {
+              ...current,
+              ...persisted,
+              isAuthenticated: false,
+              user: null,
+              token: null,
+              _sessionPersisted: false
+            }
+          }
+          
+          // Session was persisted, restore auth state
+          if (persisted.isAuthenticated && persisted._sessionPersisted) {
+            logger.log('[AUTH] Restoring auth state from Zustand persist')
+          }
+          
+          return {
+            ...current,
+            ...persisted
+          }
+        }
       }
     )
   )

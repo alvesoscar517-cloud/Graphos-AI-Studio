@@ -105,13 +105,13 @@ const UserProfilePopup = ({ onClose }) => {
           </button>
         </div>
         <div className="py-2 px-5 text-center text-[10px] text-text-muted">
-          <a href="#" className="text-text-muted no-underline hover:underline">
+          <span className="text-text-muted cursor-pointer hover:underline">
             {t('auth.privacyPolicy')}
-          </a>
+          </span>
           <span className="mx-1.5">•</span>
-          <a href="#" className="text-text-muted no-underline hover:underline">
+          <span className="text-text-muted cursor-pointer hover:underline">
             {t('auth.termsOfService')}
-          </a>
+          </span>
         </div>
       </div>
 

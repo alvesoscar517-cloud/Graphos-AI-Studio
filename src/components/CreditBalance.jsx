@@ -36,13 +36,15 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
       if (e.detail?.credits) {
         updateCreditsCache(e.detail.credits)
       }
+      // Invalidate packages query to refresh first purchase eligibility
+      queryClient.invalidateQueries({ queryKey: queryKeys.payment.packages(userId) })
     }
     window.addEventListener('payment-success', handlePaymentSuccess)
 
     return () => {
       window.removeEventListener('payment-success', handlePaymentSuccess)
     }
-  }, [userId, isAuthenticated, updateCreditsCache])
+  }, [userId, isAuthenticated, updateCreditsCache, queryClient])
 
   const balance = credits?.balance != null ? credits.balance.toFixed(2) : '0'
   const isLowCredit = parseFloat(balance) < 10

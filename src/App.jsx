@@ -27,6 +27,18 @@ function AppContent() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   
+  // Listen for showUpgradeModal event from creditHandler
+  useEffect(() => {
+    const handleShowUpgradeModal = () => {
+      setShowUpgradeModal(true)
+    }
+    
+    window.addEventListener('showUpgradeModal', handleShowUpgradeModal)
+    return () => {
+      window.removeEventListener('showUpgradeModal', handleShowUpgradeModal)
+    }
+  }, [])
+  
   return (
     <>
       <Routes>

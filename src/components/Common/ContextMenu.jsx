@@ -7,7 +7,7 @@ import { useUISelectionActions } from '@/stores/uiSelectionStore'
 import { useProfiles } from '../../contexts/ProfileContext'
 import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
 import { getLocalizedContentError } from '../../utils/errorMessages'
-import { handleCreditError } from '../../utils/creditHandler'
+import { handleCreditError, showUpgradeModal } from '../../utils/creditHandler'
 import modal from '../../utils/modal'
 import Portal from './Portal'
 
@@ -276,7 +276,7 @@ const ContextMenu = () => {
     } catch (error) {
       console.error('[CONTEXT MENU FAIL]', error)
       
-      const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+      const wasCreditError = handleCreditError(error, t, showUpgradeModal)
       
       if (!wasCreditError) {
         const localizedError = getLocalizedContentError(error.message, t)

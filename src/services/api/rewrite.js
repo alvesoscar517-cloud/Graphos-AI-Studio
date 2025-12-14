@@ -105,6 +105,17 @@ export async function rewriteTextStream(profileId, text, model, writingPreferenc
     })
     
     if (!response.ok) {
+      // Handle 402 Payment Required (insufficient credits) specially
+      if (response.status === 402) {
+        const errorData = await response.json().catch(() => ({}))
+        const error = new Error(errorData.error || 'Insufficient credits')
+        error.code = 'INSUFFICIENT_CREDITS'
+        error.statusCode = 402
+        error.required = errorData.required
+        error.available = errorData.available
+        error.shortfall = errorData.shortfall
+        throw error
+      }
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     
@@ -348,6 +359,17 @@ export async function streamHumanizeJobResult(jobId, onChunk, onComplete = () =>
     })
     
     if (!response.ok) {
+      // Handle 402 Payment Required (insufficient credits) specially
+      if (response.status === 402) {
+        const errorData = await response.json().catch(() => ({}))
+        const error = new Error(errorData.error || 'Insufficient credits')
+        error.code = 'INSUFFICIENT_CREDITS'
+        error.statusCode = 402
+        error.required = errorData.required
+        error.available = errorData.available
+        error.shortfall = errorData.shortfall
+        throw error
+      }
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     

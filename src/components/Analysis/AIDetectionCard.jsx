@@ -7,7 +7,7 @@ import { useNotes } from '../../contexts/NotesContext'
 import { useAIProcessingActions } from '@/stores'
 import { getCachedAnalysis, setCachedAnalysis, getLatestAnalysis } from '../../services/analysisCache'
 import { getLocalizedContentError } from '../../utils/errorMessages'
-import { handleCreditError } from '../../utils/creditHandler'
+import { handleCreditError, showUpgradeModal } from '../../utils/creditHandler'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import modal from '../../utils/modal'
 import { cn } from '../../lib/utils'
@@ -196,7 +196,7 @@ const AIDetectionCard = ({ disabled, text, onAnalysisStart, onAnalysisEnd }) => 
       console.error('[FAIL] Error detecting AI:', error)
       
       // Check if it's a credit error first
-      const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+      const wasCreditError = handleCreditError(error, t, showUpgradeModal)
       
       if (!wasCreditError) {
         // Get localized error message for other errors

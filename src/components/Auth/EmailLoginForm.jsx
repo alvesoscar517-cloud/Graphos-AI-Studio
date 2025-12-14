@@ -283,8 +283,8 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
       {/* Terms */}
       <p className="mt-2.5 sm:mt-3 text-[9px] sm:text-[10px] text-gray-400 leading-relaxed text-center">
         {t('auth.termsAgreement')}{' '}
-        <a href="#" className="text-system-blue no-underline font-medium hover:underline">{t('auth.termsOfService')}</a> {t('auth.and')}{' '}
-        <a href="#" className="text-system-blue no-underline font-medium hover:underline">{t('auth.privacyPolicy')}</a>
+        <span className="text-system-blue font-medium cursor-pointer hover:underline">{t('auth.termsOfService')}</span> {t('auth.and')}{' '}
+        <span className="text-system-blue font-medium cursor-pointer hover:underline">{t('auth.privacyPolicy')}</span>
       </p>
     </form>
   )

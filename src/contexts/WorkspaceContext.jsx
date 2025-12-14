@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef } f
 import { useAuth } from '../stores/authStore'
 import { logError } from '../utils/errors'
 import { useProfiles } from './ProfileContext'
+import { handleCreditError, showUpgradeModal } from '../utils/creditHandler'
 import {
   getConversationsFromDB,
   saveConversationToDB,
@@ -658,22 +659,34 @@ export const WorkspaceProvider = ({ children }) => {
 
     } catch (err) {
       logError(err, { context: 'sendMessage', conversationId: conversation?.id })
-      const errorMessage = formatErrorMessage(err)
-      setError(errorMessage)
       
-      const errorMessageObj = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: errorMessage,
-        error: true,
-        errorCode: err.code,
-        timestamp: new Date()
-      }
+      // Check if it's a credit error - show friendly modal instead of inline error
+      const wasCreditError = handleCreditError(err, null, showUpgradeModal)
+      
+      if (wasCreditError) {
+        // Remove the streaming AI message since we're showing a modal
+        setCurrentConversation(prev => ({
+          ...(prev || conversation),
+          messages: updatedMessages // Remove the AI message that was being streamed
+        }))
+      } else {
+        const errorMessage = formatErrorMessage(err)
+        setError(errorMessage)
+        
+        const errorMessageObj = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: errorMessage,
+          error: true,
+          errorCode: err.code,
+          timestamp: new Date()
+        }
 
-      setCurrentConversation(prev => ({
-        ...(prev || conversation),
-        messages: [...updatedMessages, errorMessageObj]
-      }))
+        setCurrentConversation(prev => ({
+          ...(prev || conversation),
+          messages: [...updatedMessages, errorMessageObj]
+        }))
+      }
     } finally {
       setIsLoading(false)
     }

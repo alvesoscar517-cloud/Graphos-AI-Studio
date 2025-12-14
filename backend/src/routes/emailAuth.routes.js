@@ -53,6 +53,26 @@ router.post('/resend-otp', emailAuthController.resendOTP);
 router.post('/forgot-password', emailAuthController.forgotPassword);
 
 /**
+ * Check if Google email is linked to an existing email user
+ * POST /auth/email/check-google-linked
+ * Body: { googleEmail }
+ * 
+ * Used when Google user signs in to check if they should use
+ * an existing email account instead of creating a new account
+ */
+router.post('/check-google-linked', emailAuthController.checkGoogleLinked);
+
+/**
+ * Login with Google for a linked email account
+ * POST /auth/email/login-with-google
+ * Body: { googleEmail, googleAccessToken }
+ * 
+ * Used when Google user signs in and their Google email is linked
+ * to an existing email account - returns JWT tokens for the email account
+ */
+router.post('/login-with-google', emailAuthController.loginWithLinkedGoogle);
+
+/**
  * Reset password with OTP
  * POST /auth/email/reset-password
  * Body: { email, otp, newPassword }

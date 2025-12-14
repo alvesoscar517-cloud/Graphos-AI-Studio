@@ -16,6 +16,7 @@ export function isCreditError(error) {
   return errorCode === 'INSUFFICIENT_CREDITS' || 
          errorMessage.includes('insufficient credits') ||
          errorMessage.includes('credit') ||
+         errorMessage.includes('status: 402') ||
          error?.statusCode === 402
 }
 
@@ -161,18 +162,20 @@ export function handleCreditError(error, t, onBuyCredits = null) {
 }
 
 /**
- * Navigate to credits/pricing page
+ * Show upgrade modal to buy credits
  * Can be used as onBuyCredits callback
  */
+export function showUpgradeModal() {
+  // Dispatch custom event for App to show UpgradePlanModal
+  window.dispatchEvent(new CustomEvent('showUpgradeModal'))
+}
+
+/**
+ * Navigate to credits/pricing page
+ * Can be used as onBuyCredits callback
+ * @deprecated Use showUpgradeModal() instead
+ */
 export function navigateToBuyCredits() {
-  // Dispatch custom event for app to handle navigation
-  const event = new CustomEvent('navigateTo', {
-    detail: { path: '/pricing' }
-  })
-  window.dispatchEvent(event)
-  
-  // Fallback: try to use React Router if available
-  if (window.__REACT_ROUTER_NAVIGATE__) {
-    window.__REACT_ROUTER_NAVIGATE__('/pricing')
-  }
+  // Use showUpgradeModal instead of navigation
+  showUpgradeModal()
 }

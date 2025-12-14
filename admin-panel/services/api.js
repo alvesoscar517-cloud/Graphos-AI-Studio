@@ -146,6 +146,14 @@ export async function detectAI(text) {
     })
     
     if (!response.ok) {
+      // Handle 402 - insufficient credits
+      if (response.status === 402) {
+        const errorData = await response.json().catch(() => ({}))
+        const error = new Error(errorData.error || 'Insufficient credits')
+        error.code = 'INSUFFICIENT_CREDITS'
+        error.statusCode = 402
+        throw error
+      }
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     
@@ -204,6 +212,14 @@ export async function rewriteTextStream(profileId, text, model, onChunk) {
     })
     
     if (!response.ok) {
+      // Handle 402 - insufficient credits
+      if (response.status === 402) {
+        const errorData = await response.json().catch(() => ({}))
+        const error = new Error(errorData.error || 'Insufficient credits')
+        error.code = 'INSUFFICIENT_CREDITS'
+        error.statusCode = 402
+        throw error
+      }
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     

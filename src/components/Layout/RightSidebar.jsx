@@ -9,7 +9,7 @@ import { useProfiles } from '../../contexts/ProfileContext'
 import { useRewrite, useAIProcessingActions, useAIProcessing } from '@/stores'
 import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
 import { getLocalizedContentError } from '../../utils/errorMessages'
-import { handleCreditError } from '../../utils/creditHandler'
+import { handleCreditError, showUpgradeModal } from '../../utils/creditHandler'
 import modal from '../../utils/modal'
 import ProfileSelector from '../Analysis/ProfileSelector'
 import CompatibilityCard from '../Analysis/CompatibilityCard'
@@ -244,7 +244,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
         // Restore original text on error
         updateNote(currentNote.id, { content: originalText })
         
-        const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+        const wasCreditError = handleCreditError(error, t, showUpgradeModal)
         
         if (!wasCreditError) {
           const localizedError = getLocalizedContentError(error.message, t)
@@ -343,7 +343,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       // Restore original text on error
       updateNote(currentNote.id, { content: originalText })
       
-      const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+      const wasCreditError = handleCreditError(error, t, showUpgradeModal)
       
       if (!wasCreditError) {
         const localizedError = getLocalizedContentError(error.message, t)

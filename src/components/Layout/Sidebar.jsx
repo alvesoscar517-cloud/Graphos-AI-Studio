@@ -190,32 +190,32 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
       </div>
 
       <nav className={cn("py-3 flex-1", isCollapsed ? "px-1" : "px-2")}>
-        <a href="#" className={cn(
-          "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
+        <div className={cn(
+          "flex items-center gap-3 py-2.5 px-3 rounded-2xl",
           "text-text-primary text-body cursor-pointer relative my-0.5",
           "transition-all duration-200",
           "focus:outline-none hover:bg-fill-tertiary", 
           currentView === 'home' && "bg-fill-secondary",
           isCollapsed && "justify-center px-2"
-        )} onClick={(e) => { e.preventDefault(); onViewChange('home') }} data-tooltip-collapsed={t('nav.home')}>
+        )} onClick={() => onViewChange('home')} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onViewChange('home')} data-tooltip-collapsed={t('nav.home')}>
           <Icon name="home" alt={t('nav.home')} size="lg" />
           {!isCollapsed && <span>{t('nav.home')}</span>}
-        </a>
+        </div>
 
         {(() => {
           const isAIStudioActive = currentView === 'aistudio-editor' && (!currentNote || !recentItems.some(item => item.source === 'aistudio' && item.id === currentNote?.id));
           return (
-            <a href="#" className={cn(
-              "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
+            <div className={cn(
+              "flex items-center gap-3 py-2.5 px-3 rounded-2xl",
               "text-text-primary text-body cursor-pointer relative my-0.5",
               "transition-all duration-200",
               "focus:outline-none hover:bg-fill-tertiary",
               isAIStudioActive && "bg-fill-secondary",
               isCollapsed && "justify-center px-2"
-            )} onClick={(e) => { e.preventDefault(); onViewChange('aistudio-editor', { createNew: true }) }} data-tooltip-collapsed={t('nav.aiStudio')}>
+            )} onClick={() => onViewChange('aistudio-editor', { createNew: true })} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onViewChange('aistudio-editor', { createNew: true })} data-tooltip-collapsed={t('nav.aiStudio')}>
               <Icon name="play" alt={t('nav.aiStudio')} size="lg" />
               {!isCollapsed && <span>{t('nav.aiStudio')}</span>}
-            </a>
+            </div>
           );
         })()}
 
@@ -224,17 +224,17 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
           const isWorkspaceActive = currentView === 'workspace' && 
             (!currentConversation || !recentItems.some(item => item.source === 'workspace' && item.id === currentConversation?.id));
           return (
-            <a href="#" className={cn(
-              "flex items-center gap-3 py-2.5 px-3 rounded-2xl no-underline",
+            <div className={cn(
+              "flex items-center gap-3 py-2.5 px-3 rounded-2xl",
               "text-text-primary text-body cursor-pointer relative my-0.5",
               "transition-all duration-200",
               "focus:outline-none hover:bg-fill-tertiary", 
               isWorkspaceActive && "bg-fill-secondary",
               isCollapsed && "justify-center px-2"
-            )} onClick={(e) => { e.preventDefault(); onViewChange('workspace', { createNew: true }) }} data-tooltip-collapsed={t('nav.aiWorkspace')}>
+            )} onClick={() => onViewChange('workspace', { createNew: true })} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onViewChange('workspace', { createNew: true })} data-tooltip-collapsed={t('nav.aiWorkspace')}>
               <Icon name="message-square" alt={t('nav.aiWorkspace')} size="lg" />
               {!isCollapsed && <span>{t('nav.aiWorkspace')}</span>}
-            </a>
+            </div>
           );
         })()}
 
@@ -292,26 +292,26 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
               })}
             </div>
 
-            <a href="#" className={cn(
-              "block py-2.5 px-3 text-system-blue text-body no-underline rounded-2xl m-0 font-medium",
+            <div className={cn(
+              "block py-2.5 px-3 text-system-blue text-body rounded-2xl m-0 font-medium cursor-pointer",
               "hover:bg-fill-tertiary focus:outline-none transition-all duration-200",
               currentView === 'history' && "bg-fill-tertiary"
-            )} onClick={(e) => { e.preventDefault(); onViewChange('history') }}>
+            )} onClick={() => onViewChange('history')} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onViewChange('history')}>
               {t('nav.viewAllHistory')} →
-            </a>
+            </div>
           </>
         )}
 
         {isCollapsed && (
-          <a href="#" className={cn(
-            "flex items-center justify-center py-2.5 px-2 rounded-2xl no-underline my-0.5",
+          <div className={cn(
+            "flex items-center justify-center py-2.5 px-2 rounded-2xl my-0.5",
             "text-text-secondary text-body cursor-pointer",
             "transition-all duration-200",
             "focus:outline-none hover:bg-fill-tertiary", 
             currentView === 'history' && "bg-fill-tertiary"
-          )} onClick={(e) => { e.preventDefault(); onViewChange('history') }} data-tooltip-collapsed={t('nav.viewAllHistory')}>
+          )} onClick={() => onViewChange('history')} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onViewChange('history')} data-tooltip-collapsed={t('nav.viewAllHistory')}>
             <Icon name="clock" alt={t('nav.viewAllHistory')} size="lg" color="muted" />
-          </a>
+          </div>
         )}
       </nav>
 

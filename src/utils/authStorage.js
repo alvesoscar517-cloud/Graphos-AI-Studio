@@ -7,44 +7,115 @@ import { logger } from './logger'
  * - Token encryption/decryption
  * - Secure storage with obfuscation
  * - Single source of truth for auth storage operations
- * - SessionStorage when Remember Me is OFF (industry standard)
- * - LocalStorage when Remember Me is ON (persistent across browser sessions)
+ * - Uses chrome.storage.local for Chrome Extension (persists across popup closes)
+ * - Falls back to localStorage for web app
+ * 
+ * IMPORTANT: In Chrome Extension, localStorage is cleared when popup closes!
+ * We must use chrome.storage.local for persistent data.
  */
+
+// ============================================================================
+// CHROME EXTENSION STORAGE WRAPPER
+// ============================================================================
+
+/**
+ * Check if running in Chrome Extension context
+ */
+function isChromeExtension() {
+  return typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local
+}
+
+/**
+ * In-memory cache for chrome.storage.local data
+ * This allows synchronous access while chrome.storage is async
+ */
+let storageCache = {}
+let storageCacheInitialized = false
+
+/**
+ * Initialize storage cache from chrome.storage.local
+ * Must be called on app startup before any storage operations
+ */
+export async function initStorageCache() {
+  if (!isChromeExtension()) {
+    storageCacheInitialized = true
+    return
+  }
+  
+  try {
+    const result = await chrome.storage.local.get(null) // Get all data
+    storageCache = result || {}
+    storageCacheInitialized = true
+    logger.log('[AuthStorage] Storage cache initialized with', Object.keys(storageCache).length, 'keys')
+  } catch (error) {
+    logger.error('AuthStorage', 'Failed to initialize storage cache', error)
+    storageCacheInitialized = true // Continue anyway
+  }
+}
+
+/**
+ * Get value from storage (sync from cache, async from chrome.storage)
+ */
+function getFromStorage(key) {
+  if (isChromeExtension()) {
+    // Return from cache for sync access
+    return storageCache[key] ?? null
+  }
+  return localStorage.getItem(key)
+}
+
+/**
+ * Set value to storage (updates cache and chrome.storage)
+ */
+function setToStorage(key, value) {
+  if (isChromeExtension()) {
+    // Update cache immediately for sync access
+    storageCache[key] = value
+    // Persist to chrome.storage.local asynchronously
+    chrome.storage.local.set({ [key]: value }).catch(err => {
+      logger.error('AuthStorage', `Failed to persist ${key} to chrome.storage`, err)
+    })
+    return true
+  }
+  localStorage.setItem(key, value)
+  return true
+}
+
+/**
+ * Remove value from storage
+ */
+function removeFromStorage(key) {
+  if (isChromeExtension()) {
+    delete storageCache[key]
+    chrome.storage.local.remove(key).catch(err => {
+      logger.error('AuthStorage', `Failed to remove ${key} from chrome.storage`, err)
+    })
+    return true
+  }
+  localStorage.removeItem(key)
+  sessionStorage.removeItem(key)
+  return true
+}
 
 // ============================================================================
 // STORAGE MODE MANAGEMENT
 // ============================================================================
 
 /**
- * Get the appropriate storage based on Remember Me preference
- * - Remember Me ON: localStorage (persists across browser sessions)
- * - Remember Me OFF: sessionStorage (cleared when browser closes)
- * 
- * This follows industry standards (Google, GitHub, Facebook)
- */
-function getStorage() {
-  // Check if Remember Me is enabled
-  // Note: REMEMBER_ME flag itself is always in localStorage
-  const rememberMe = localStorage.getItem('rememberMe') === 'true'
-  return rememberMe ? localStorage : sessionStorage
-}
-
-/**
  * Check if Remember Me is enabled
  */
 export function isRememberMeEnabled() {
-  return localStorage.getItem('rememberMe') === 'true'
+  return getFromStorage('rememberMe') === 'true' || getFromStorage('rememberMe') === true
 }
 
 /**
  * Set Remember Me preference
- * This determines which storage to use for auth data
  */
 export function setRememberMe(enabled) {
   if (enabled) {
-    localStorage.setItem('rememberMe', 'true')
+    setToStorage('rememberMe', 'true')
   } else {
-    localStorage.removeItem('rememberMe')
+    removeFromStorage('rememberMe')
   }
 }
 
@@ -58,7 +129,7 @@ export function setRememberMe(enabled) {
  */
 export function setRememberedEmail(email) {
   if (email) {
-    localStorage.setItem(AUTH_STORAGE_KEYS.REMEMBERED_EMAIL, email)
+    setToStorage(AUTH_STORAGE_KEYS.REMEMBERED_EMAIL, email)
   }
 }
 
@@ -66,14 +137,14 @@ export function setRememberedEmail(email) {
  * Lấy email đã được nhớ để auto-fill vào form đăng nhập
  */
 export function getRememberedEmail() {
-  return localStorage.getItem(AUTH_STORAGE_KEYS.REMEMBERED_EMAIL)
+  return getFromStorage(AUTH_STORAGE_KEYS.REMEMBERED_EMAIL)
 }
 
 /**
  * Xóa email đã nhớ (khi user không muốn remember nữa)
  */
 export function clearRememberedEmail() {
-  localStorage.removeItem(AUTH_STORAGE_KEYS.REMEMBERED_EMAIL)
+  removeFromStorage(AUTH_STORAGE_KEYS.REMEMBERED_EMAIL)
 }
 
 // ============================================================================
@@ -84,9 +155,37 @@ export function clearRememberedEmail() {
  * Simple encryption key derived from browser fingerprint
  * This provides basic obfuscation - not military-grade encryption
  * but prevents casual inspection of localStorage
+ * 
+ * IMPORTANT: Key must be STABLE across sessions to decrypt stored tokens
+ * - Removed getTimezoneOffset() as it can change with DST
+ * - Using only truly stable browser properties
  */
 const getEncryptionKey = () => {
-  // Use a combination of stable browser properties
+  // Use ONLY stable browser properties that don't change between sessions
+  // Removed: new Date().getTimezoneOffset() - changes with DST!
+  const fingerprint = [
+    navigator.userAgent.slice(0, 20),
+    navigator.language,
+    screen.colorDepth,
+    // Use a fixed salt instead of timezone
+    'graphos-salt-v1'
+  ].join('|')
+  
+  // Simple hash
+  let hash = 0
+  for (let i = 0; i < fingerprint.length; i++) {
+    const char = fingerprint.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+  return Math.abs(hash).toString(36)
+}
+
+/**
+ * Legacy encryption key for migration
+ * Used to decrypt tokens encrypted with old key (with timezone)
+ */
+const getLegacyEncryptionKey = () => {
   const fingerprint = [
     navigator.userAgent.slice(0, 20),
     navigator.language,
@@ -94,7 +193,6 @@ const getEncryptionKey = () => {
     new Date().getTimezoneOffset()
   ].join('|')
   
-  // Simple hash
   let hash = 0
   for (let i = 0; i < fingerprint.length; i++) {
     const char = fingerprint.charCodeAt(i)
@@ -131,30 +229,54 @@ export function encryptData(data) {
 
 /**
  * Decrypt sensitive data
+ * Tries new key first, falls back to legacy key for migration
  */
 export function decryptData(encryptedData) {
   if (!encryptedData) return null
   
-  try {
-    const key = getEncryptionKey()
-    const encrypted = decodeURIComponent(atob(encryptedData))
-    
-    let decrypted = ''
-    for (let i = 0; i < encrypted.length; i++) {
-      const charCode = encrypted.charCodeAt(i) ^ key.charCodeAt(i % key.length)
-      decrypted += String.fromCharCode(charCode)
-    }
-    
-    // Try to parse as JSON, return string if fails
+  // Helper to attempt decryption with a specific key
+  const tryDecrypt = (key) => {
     try {
-      return JSON.parse(decrypted)
+      const encrypted = decodeURIComponent(atob(encryptedData))
+      
+      let decrypted = ''
+      for (let i = 0; i < encrypted.length; i++) {
+        const charCode = encrypted.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+        decrypted += String.fromCharCode(charCode)
+      }
+      
+      // Validate: JWT tokens should contain dots
+      if (decrypted && decrypted.includes('.')) {
+        return decrypted
+      }
+      
+      // Try to parse as JSON
+      try {
+        return JSON.parse(decrypted)
+      } catch {
+        return decrypted
+      }
     } catch {
-      return decrypted
+      return null
     }
+  }
+  
+  try {
+    // Try with new stable key first
+    const result = tryDecrypt(getEncryptionKey())
+    if (result) return result
+    
+    // Fallback: try with legacy key (for tokens encrypted before fix)
+    const legacyResult = tryDecrypt(getLegacyEncryptionKey())
+    if (legacyResult) {
+      logger.log('[AuthStorage] Decrypted with legacy key, will re-encrypt on next save')
+      return legacyResult
+    }
+    
+    logger.warn('AuthStorage', 'Token decryption failed with both keys')
+    return null
   } catch (error) {
     logger.error('AuthStorage', 'Decryption failed', error)
-    // Token is corrupted - trigger session expired to force re-login
-    logger.warn('AuthStorage', 'Token corrupted, user needs to re-login')
     return null
   }
 }
@@ -228,22 +350,19 @@ const PERSISTENT_KEYS = [
 /**
  * Securely store a value
  * Automatically encrypts sensitive data
- * Uses sessionStorage or localStorage based on Remember Me preference
- * Exception: USER_ID and USER always use localStorage for app stability
+ * Uses chrome.storage.local for Chrome Extension (persists across popup closes)
  */
 export function secureSet(key, value) {
   try {
     const shouldEncrypt = SENSITIVE_KEYS.includes(key)
     const storedValue = shouldEncrypt ? encryptData(value) : value
     
-    // Use localStorage for persistent keys (userId, user data)
-    // Use rememberMe-based storage for sensitive tokens
-    const storage = PERSISTENT_KEYS.includes(key) ? localStorage : getStorage()
-    
+    // For Chrome Extension, always use chrome.storage.local
+    // For web app, use localStorage
     if (typeof storedValue === 'object') {
-      storage.setItem(key, JSON.stringify(storedValue))
+      setToStorage(key, JSON.stringify(storedValue))
     } else {
-      storage.setItem(key, storedValue)
+      setToStorage(key, storedValue)
     }
     return true
   } catch (error) {
@@ -255,26 +374,32 @@ export function secureSet(key, value) {
 /**
  * Securely retrieve a value
  * Automatically decrypts sensitive data
- * Checks both sessionStorage and localStorage for migration compatibility
+ * Uses chrome.storage.local for Chrome Extension
  */
 export function secureGet(key) {
   try {
-    // Use localStorage for persistent keys
-    const storage = PERSISTENT_KEYS.includes(key) ? localStorage : getStorage()
-    let value = storage.getItem(key)
+    let value = getFromStorage(key)
     
-    // Fallback: check the other storage for migration compatibility
-    if (value === null) {
-      const otherStorage = storage === localStorage ? sessionStorage : localStorage
-      value = otherStorage.getItem(key)
+    // Fallback: check localStorage/sessionStorage for migration from old storage
+    if (value === null && !isChromeExtension()) {
+      value = localStorage.getItem(key) || sessionStorage.getItem(key)
     }
     
-    if (value === null) return null
+    if (value === null || value === undefined) {
+      if (key === AUTH_STORAGE_KEYS.AUTH_TOKEN) {
+        logger.log(`[AuthStorage] secureGet(${key}) - not found`)
+      }
+      return null
+    }
     
     const shouldDecrypt = SENSITIVE_KEYS.includes(key)
     
     if (shouldDecrypt) {
-      return decryptData(value)
+      const decrypted = decryptData(value)
+      if (key === AUTH_STORAGE_KEYS.AUTH_TOKEN) {
+        logger.log(`[AuthStorage] secureGet(${key}) - found, decrypted: ${!!decrypted}`)
+      }
+      return decrypted
     }
     
     // Try to parse as JSON
@@ -291,12 +416,18 @@ export function secureGet(key) {
 
 /**
  * Remove a value from storage
- * Removes from both storages to ensure cleanup
+ * Removes from all storages to ensure cleanup
  */
 export function secureRemove(key) {
   try {
-    localStorage.removeItem(key)
-    sessionStorage.removeItem(key)
+    removeFromStorage(key)
+    // Also clean up old localStorage/sessionStorage if exists
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(key)
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(key)
+    }
     return true
   } catch (error) {
     logger.error('AuthStorage', `Failed to remove ${key}`, error)
@@ -311,7 +442,7 @@ export function secureRemove(key) {
 /**
  * Clear all authentication storage
  * Single source of truth for auth cleanup
- * Clears both localStorage and sessionStorage for complete cleanup
+ * Clears chrome.storage.local, localStorage and sessionStorage
  */
 export function clearAuthStorage() {
   // Get current user email before clearing to clean user-specific data
@@ -345,7 +476,7 @@ export function clearAuthStorage() {
     secureRemove(`workspace_conversations_${userEmail}`)
   }
 
-  // Clear ALL user data from both storages to prevent data leakage
+  // Clear ALL user data from localStorage/sessionStorage to prevent data leakage
   const clearStorageData = (storage) => {
     try {
       const keysToDelete = []
@@ -369,10 +500,17 @@ export function clearAuthStorage() {
     }
   }
   
-  clearStorageData(localStorage)
-  clearStorageData(sessionStorage)
+  if (typeof localStorage !== 'undefined') {
+    clearStorageData(localStorage)
+  }
+  if (typeof sessionStorage !== 'undefined') {
+    clearStorageData(sessionStorage)
+  }
+  
+  // Clear storage cache
+  storageCache = {}
 
-  logger.log('[SECURITY] Auth storage cleared (both localStorage and sessionStorage)')
+  logger.log('[SECURITY] Auth storage cleared')
 }
 
 /**
@@ -413,8 +551,13 @@ export function getUserData() {
  * Store tokens securely
  */
 export function setTokens({ accessToken, refreshToken, expiresIn }) {
+  const rememberMe = isRememberMeEnabled()
+  const targetStorage = rememberMe ? 'localStorage' : 'sessionStorage'
+  logger.log(`[AuthStorage] setTokens - rememberMe: ${rememberMe}, using: ${targetStorage}`)
+  
   if (accessToken) {
-    secureSet(AUTH_STORAGE_KEYS.AUTH_TOKEN, accessToken)
+    const success = secureSet(AUTH_STORAGE_KEYS.AUTH_TOKEN, accessToken)
+    logger.log(`[AuthStorage] setTokens - accessToken stored: ${success}`)
   }
   
   if (refreshToken) {
@@ -509,14 +652,51 @@ export function clearActiveProfile() {
 // ============================================================================
 
 /**
- * Migrate existing unencrypted tokens to encrypted format
- * Also handles migration between localStorage and sessionStorage based on Remember Me
- * Call this once on app startup
+ * Migrate existing tokens from localStorage/sessionStorage to chrome.storage.local
+ * Also handles encryption migration
+ * Call this once on app startup AFTER initStorageCache()
  */
-export function migrateToSecureStorage() {
+export async function migrateToSecureStorage() {
   try {
-    // Check if migration is needed
-    const rawToken = localStorage.getItem(AUTH_STORAGE_KEYS.AUTH_TOKEN)
+    // First, check if we have tokens in old localStorage/sessionStorage
+    // and migrate them to chrome.storage.local
+    if (isChromeExtension()) {
+      const oldLocalToken = localStorage.getItem(AUTH_STORAGE_KEYS.AUTH_TOKEN)
+      const oldSessionToken = sessionStorage.getItem(AUTH_STORAGE_KEYS.AUTH_TOKEN)
+      const oldToken = oldLocalToken || oldSessionToken
+      
+      if (oldToken) {
+        logger.log('[AuthStorage] Found token in old storage, migrating to chrome.storage.local...')
+        
+        // Migrate all auth data
+        const keysToMigrate = [
+          AUTH_STORAGE_KEYS.AUTH_TOKEN,
+          AUTH_STORAGE_KEYS.REFRESH_TOKEN,
+          AUTH_STORAGE_KEYS.TOKEN_EXPIRY,
+          AUTH_STORAGE_KEYS.USER,
+          AUTH_STORAGE_KEYS.USER_ID,
+          AUTH_STORAGE_KEYS.AUTH_METHOD,
+          AUTH_STORAGE_KEYS.SESSION_ID,
+          'rememberMe',
+          AUTH_STORAGE_KEYS.REMEMBERED_EMAIL,
+        ]
+        
+        for (const key of keysToMigrate) {
+          const value = localStorage.getItem(key) || sessionStorage.getItem(key)
+          if (value) {
+            setToStorage(key, value)
+            localStorage.removeItem(key)
+            sessionStorage.removeItem(key)
+          }
+        }
+        
+        logger.log('[AuthStorage] Migration to chrome.storage.local complete')
+      }
+    }
+    
+    // Now check current storage for token
+    let rawToken = getFromStorage(AUTH_STORAGE_KEYS.AUTH_TOKEN)
+    
     if (!rawToken) return
     
     // If token doesn't look encrypted (not base64), encrypt it
@@ -524,25 +704,48 @@ export function migrateToSecureStorage() {
     
     if (!isEncrypted && rawToken.length < 500) {
       // Likely unencrypted, migrate
-      logger.log('[AuthStorage] Migrating to secure storage...')
+      logger.log('[AuthStorage] Migrating unencrypted tokens to secure storage...')
       
-      const refreshToken = localStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN)
-      const sessionId = localStorage.getItem(AUTH_STORAGE_KEYS.SESSION_ID)
+      const refreshToken = getFromStorage(AUTH_STORAGE_KEYS.REFRESH_TOKEN)
+      const sessionId = getFromStorage(AUTH_STORAGE_KEYS.SESSION_ID)
       
       // Re-store with encryption
       if (rawToken) secureSet(AUTH_STORAGE_KEYS.AUTH_TOKEN, rawToken)
       if (refreshToken) secureSet(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken)
       if (sessionId) secureSet(AUTH_STORAGE_KEYS.SESSION_ID, sessionId)
       
-      logger.log('[AuthStorage] Migration complete')
+      logger.log('[AuthStorage] Encryption migration complete')
+    } else if (isEncrypted) {
+      // Token is encrypted, try to decrypt and re-encrypt with new key
+      const decrypted = decryptData(rawToken)
+      if (decrypted && typeof decrypted === 'string' && decrypted.includes('.')) {
+        // Successfully decrypted, re-encrypt with new stable key
+        const newEncrypted = encryptData(decrypted)
+        if (newEncrypted && newEncrypted !== rawToken) {
+          logger.log('[AuthStorage] Re-encrypting token with stable key...')
+          setToStorage(AUTH_STORAGE_KEYS.AUTH_TOKEN, newEncrypted)
+          
+          // Also re-encrypt refresh token if exists
+          const encryptedRefresh = getFromStorage(AUTH_STORAGE_KEYS.REFRESH_TOKEN)
+          if (encryptedRefresh) {
+            const decryptedRefresh = decryptData(encryptedRefresh)
+            if (decryptedRefresh) {
+              const newRefresh = encryptData(decryptedRefresh)
+              if (newRefresh) {
+                setToStorage(AUTH_STORAGE_KEYS.REFRESH_TOKEN, newRefresh)
+              }
+            }
+          }
+        }
+      }
     }
     
-    // Migrate existing users: if they have tokens in localStorage but no rememberMe flag,
+    // Migrate existing users: if they have tokens but no rememberMe flag,
     // assume they want to be remembered (backward compatibility)
-    const hasRememberMeFlag = localStorage.getItem('rememberMe') !== null
+    const hasRememberMeFlag = getFromStorage('rememberMe') !== null
     if (!hasRememberMeFlag && rawToken) {
       logger.log('[AuthStorage] Setting rememberMe=true for existing user (backward compatibility)')
-      localStorage.setItem('rememberMe', 'true')
+      setToStorage('rememberMe', 'true')
     }
   } catch (error) {
     logger.error('AuthStorage', 'Migration failed', error)
@@ -550,6 +753,9 @@ export function migrateToSecureStorage() {
 }
 
 export default {
+  // Initialization (MUST be called first in Chrome Extension)
+  initStorageCache,
+  
   // Encryption
   encryptData,
   decryptData,

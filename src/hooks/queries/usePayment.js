@@ -62,10 +62,14 @@ export function useCreateCheckout() {
         userId: userInfo.userId,
         email: userInfo.email
       }, { retry: false })
-      return data
+      return { ...data, userId: userInfo.userId }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.user.credits() })
+      // Invalidate packages to refresh first purchase eligibility after checkout
+      if (data?.userId) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.payment.packages(data.userId) })
+      }
     },
     // Don't retry on error - payment endpoints should not be retried automatically
     retry: false,

@@ -23,7 +23,7 @@ import { cn } from '../../lib/utils'
 import { serializeToPlainText, parseFromPlainText, isHtmlContent } from './utils/serialization'
 import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
 import { getLocalizedContentError } from '../../utils/errorMessages'
-import { handleCreditError } from '../../utils/creditHandler'
+import { handleCreditError, showUpgradeModal } from '../../utils/creditHandler'
 import modal from '../../utils/modal'
 import { logger } from '@/utils/logger'
 import SuggestionTooltip from '../Analysis/SuggestionTooltip'
@@ -158,22 +158,20 @@ function TiptapEditorComponent({
   // Text selection hook for floating toolbar - use editor directly
   const selection = useTextSelection(editor)
   
-  // Track streaming state for selection rewrite
-  const streamingRangeRef = useRef(null)
+  // Track original text for selection rewrite rollback
   const originalTextRef = useRef(null)
   
-  // Handle selection rewrite - dùng shimmer toàn editor như rewrite thường
+  // Handle selection rewrite - giống như rewrite thông thường
+  // Thay thế selected text trong HTML content, rồi update toàn bộ qua onChange
   const handleSelectionRewrite = useCallback(async (params) => {
     if (!editor) return
     
-    const { text, from, to, useIterative, profileId, model, writingPreferences, processingType } = params
+    const { text, useIterative, profileId, model, writingPreferences, processingType } = params
     
-    // Lưu text gốc và vị trí để rollback nếu lỗi
-    originalTextRef.current = text
-    const originalFrom = from
-    const originalTo = to
+    // Lưu text gốc để thay thế sau
+    const selectedText = text
     
-    // Lưu toàn bộ content để rollback
+    // Lưu toàn bộ content để rollback nếu lỗi
     const fullOriginalContent = value
     
     // Save to undo stack
@@ -184,35 +182,50 @@ function TiptapEditorComponent({
     setIsSelectionProcessing(true)
     startProcessing(processingType)
     
-    // Lưu range để streaming vào đúng vị trí
-    streamingRangeRef.current = { from: originalFrom, to: originalTo }
-    
-    // Variables for streaming animation
+    // Variables for streaming animation - giống RightSidebar
     let fullText = ''
     let displayedText = ''
     let isAnimating = false
     let hasStartedStreaming = false
-    let animationFrameId = null
     
-    // Animation function - streaming text vào đúng vị trí selection
+    // Helper: thay thế selected text trong HTML content
+    const replaceSelectedTextInContent = (newText) => {
+      // Lấy HTML hiện tại từ editor
+      const currentHtml = editor.getHTML()
+      
+      // Tìm và thay thế selected text trong HTML
+      // Cần escape special regex characters trong selectedText
+      const escapedSelectedText = selectedText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const regex = new RegExp(escapedSelectedText, 'g')
+      
+      // Chỉ thay thế lần xuất hiện đầu tiên
+      let replaced = false
+      const newHtml = currentHtml.replace(regex, (match) => {
+        if (!replaced) {
+          replaced = true
+          return newText
+        }
+        return match
+      })
+      
+      return newHtml
+    }
+    
+    // Animation function - giống RightSidebar
     const animateText = () => {
       if (displayedText.length < fullText.length) {
         const remaining = fullText.length - displayedText.length
         const charsToAdd = Math.max(1, Math.min(5, Math.ceil(remaining / 15)))
         displayedText = fullText.substring(0, displayedText.length + charsToAdd)
         
-        // Update text trong editor tại vị trí selection
-        const range = streamingRangeRef.current
-        if (range && editor) {
-          const newTo = range.from + displayedText.length
-          editor.chain()
-            .deleteRange({ from: range.from, to: range.to })
-            .insertContentAt(range.from, displayedText)
-            .run()
-          streamingRangeRef.current = { from: range.from, to: newTo }
-        }
+        // Thay thế selected text bằng displayedText trong content
+        const newContent = replaceSelectedTextInContent(displayedText)
         
-        animationFrameId = requestAnimationFrame(animateText)
+        // Update qua onChange như rewrite thông thường
+        lastValueRef.current = newContent
+        onChange?.(newContent)
+        
+        requestAnimationFrame(animateText)
       } else {
         isAnimating = false
       }
@@ -235,7 +248,7 @@ function TiptapEditorComponent({
       if (useIterative) {
         logger.log('[SELECTION] Starting iterative humanization...')
         
-        const startResult = await startIterativeHumanize(profileId, text, {
+        const startResult = await startIterativeHumanize(profileId, selectedText, {
           maxIterations: 3,
           targetProbability: writingPreferences?.targetAIProbability || 35,
           model,
@@ -252,12 +265,6 @@ function TiptapEditorComponent({
             if (!hasStartedStreaming) {
               hasStartedStreaming = true
               startStreaming()
-              // Xóa text gốc khi có chunk đầu tiên
-              const range = streamingRangeRef.current
-              if (range && editor) {
-                editor.chain().deleteRange({ from: range.from, to: range.to }).run()
-                streamingRangeRef.current = { from: range.from, to: range.from }
-              }
             }
             fullText += chunk
             if (!isAnimating) {
@@ -278,18 +285,12 @@ function TiptapEditorComponent({
       } else {
         logger.log('[SELECTION] Starting rewrite...')
         
-        await rewriteTextStream(profileId, text, model, writingPreferences, (chunk, type) => {
+        await rewriteTextStream(profileId, selectedText, model, writingPreferences, (chunk, type) => {
           if (type === 'reasoning') return
           
           if (!hasStartedStreaming) {
             hasStartedStreaming = true
             startStreaming()
-            // Xóa text gốc khi có chunk đầu tiên
-            const range = streamingRangeRef.current
-            if (range && editor) {
-              editor.chain().deleteRange({ from: range.from, to: range.to }).run()
-              streamingRangeRef.current = { from: range.from, to: range.from }
-            }
           }
           fullText += chunk
           if (!isAnimating) {
@@ -301,35 +302,28 @@ function TiptapEditorComponent({
         await waitForAnimation()
       }
       
-      // Sync content với parent sau khi streaming hoàn tất
-      if (editor) {
-        const htmlContent = editor.getHTML()
-        lastValueRef.current = htmlContent
-        onChange?.(htmlContent)
+      // Final sync - đảm bảo content cuối cùng được lưu đúng
+      if (fullText) {
+        const finalContent = replaceSelectedTextInContent(fullText)
+        lastValueRef.current = finalContent
+        onChange?.(finalContent)
       }
     } catch (error) {
       console.error('[SELECTION FAIL]', error)
       
-      // Cancel animation
-      if (animationFrameId) cancelAnimationFrame(animationFrameId)
-      
       // Rollback - khôi phục toàn bộ content gốc
       if (fullOriginalContent) {
-        isExternalUpdate.current = true
-        const content = isHtmlContent(fullOriginalContent) ? fullOriginalContent : parseFromPlainText(fullOriginalContent)
-        editor.commands.setContent(content)
-        isExternalUpdate.current = false
+        lastValueRef.current = fullOriginalContent
         onChange?.(fullOriginalContent)
       }
       
-      const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+      const wasCreditError = handleCreditError(error, t, showUpgradeModal)
       if (!wasCreditError) {
         const localizedError = getLocalizedContentError(error.message, t)
         modal.errorWithReport(localizedError || 'Rewrite failed', error, 'Error', 'TiptapEditor.handleSelectionRewrite')
       }
     } finally {
       setIsSelectionProcessing(false)
-      streamingRangeRef.current = null
       originalTextRef.current = null
       stopProcessing()
     }

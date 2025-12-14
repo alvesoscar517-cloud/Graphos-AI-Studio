@@ -92,8 +92,10 @@ export function WelcomeBanner() {
     
     const startInterval = () => {
       if (intervalId) clearInterval(intervalId)
+      console.log('[WelcomeBanner] Starting auto-slide interval')
       intervalId = setInterval(() => {
         lastSlideTime = Date.now()
+        console.log('[WelcomeBanner] Auto-sliding to next')
         setCurrentIndex((prev) => (prev + 1) % BANNER_IMAGES.length)
       }, AUTO_SLIDE_INTERVAL)
     }
@@ -118,6 +120,7 @@ export function WelcomeBanner() {
     }
     
     // Start interval immediately
+    console.log('[WelcomeBanner] useEffect triggered - isVisible:', isVisible, 'isPaused:', isPaused)
     startInterval()
     
     // Listen for visibility changes

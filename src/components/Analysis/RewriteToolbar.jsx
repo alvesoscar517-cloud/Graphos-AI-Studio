@@ -6,7 +6,7 @@ import { motion, MotionConfig } from 'framer-motion'
 import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
 import { useRewrite, useAIProcessingActions } from '@/stores'
 import { getLocalizedContentError } from '../../utils/errorMessages'
-import { handleCreditError } from '../../utils/creditHandler'
+import { handleCreditError, showUpgradeModal } from '../../utils/creditHandler'
 import modal from '../../utils/modal'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
@@ -191,7 +191,7 @@ const RewriteToolbar = ({
         onTextChange(originalText)
         
         // Check if it's a credit error first
-        const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+        const wasCreditError = handleCreditError(error, t, showUpgradeModal)
         
         if (!wasCreditError) {
           const localizedError = getLocalizedContentError(error.message, t)
@@ -296,7 +296,7 @@ const RewriteToolbar = ({
       onTextChange(originalText)
       
       // Check if it's a credit error first
-      const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+      const wasCreditError = handleCreditError(error, t, showUpgradeModal)
       
       if (!wasCreditError) {
         const localizedError = getLocalizedContentError(error.message, t)

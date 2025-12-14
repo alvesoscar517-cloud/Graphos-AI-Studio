@@ -1,10 +1,21 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 // Vite config for Main App (Chrome Extension)
 export default defineConfig(({ mode }) => ({
-  plugins: [react()],
+  plugins: [
+    react(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: '_locales',
+          dest: '.'
+        }
+      ]
+    })
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

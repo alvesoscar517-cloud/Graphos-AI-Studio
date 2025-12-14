@@ -727,6 +727,72 @@
   line-height: 1.4;
 }
 
+/* Apple Typography Utilities - matching design system */
+@utility text-caption2 {
+  font-size: var(--font-size-caption2);
+  line-height: 1.33;
+  letter-spacing: 0.01em;
+}
+
+@utility text-caption1 {
+  font-size: var(--font-size-caption1);
+  line-height: 1.33;
+  letter-spacing: 0;
+}
+
+@utility text-footnote {
+  font-size: var(--font-size-footnote);
+  line-height: 1.38;
+  letter-spacing: -0.008em;
+}
+
+@utility text-body {
+  font-size: var(--font-size-subhead);
+  line-height: 1.47;
+  letter-spacing: -0.022em;
+}
+
+@utility text-callout {
+  font-size: var(--font-size-callout);
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+
+@utility text-headline {
+  font-size: var(--font-size-headline);
+  line-height: 1.24;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+@utility text-title3 {
+  font-size: var(--font-size-title3);
+  line-height: 1.2;
+  letter-spacing: -0.018em;
+  font-weight: 600;
+}
+
+@utility text-title2 {
+  font-size: var(--font-size-title2);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+@utility text-title1 {
+  font-size: var(--font-size-title1);
+  line-height: 1.14;
+  letter-spacing: -0.022em;
+  font-weight: 700;
+}
+
+@utility text-largeTitle {
+  font-size: var(--font-size-largeTitle);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
 /* Scrollbar utilities */
 @utility scrollbar-hidden {
   scrollbar-width: none;

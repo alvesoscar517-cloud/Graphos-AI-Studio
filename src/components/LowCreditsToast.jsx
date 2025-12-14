@@ -101,7 +101,7 @@ const LowCreditsToast = ({ onBuyCredits }) => {
       <div className="flex items-start gap-3 p-4 pb-3">
         <div className="w-10 h-10 rounded-full bg-fill-secondary flex items-center justify-center shrink-0">
           <img 
-            src="/icon/coins.svg" 
+            src="/icon/bell.svg" 
             alt="" 
             className="w-5 h-5 icon-invert opacity-70"
           />

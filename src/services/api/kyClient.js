@@ -354,6 +354,19 @@ class KyApiClient {
     
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
+      
+      // Handle 402 - insufficient credits
+      if (response.status === 402) {
+        const error = new ApiError(data.error || 'Insufficient credits', {
+          code: 'INSUFFICIENT_CREDITS',
+          statusCode: 402
+        });
+        error.required = data.required;
+        error.available = data.available;
+        error.shortfall = data.shortfall;
+        throw error;
+      }
+      
       throw new ApiError(data.error || 'Stream request failed', {
         code: data.code || 'STREAM_ERROR',
         statusCode: response.status

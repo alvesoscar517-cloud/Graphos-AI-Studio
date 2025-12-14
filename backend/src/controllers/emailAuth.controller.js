@@ -1006,3 +1006,89 @@ exports.refreshToken = async (req, res) => {
     });
   }
 };
+
+/**
+ * Check if Google email is linked to an existing email user
+ * POST /auth/google/check-linked
+ * Body: { googleEmail }
+ * 
+ * This endpoint is called when a user signs in with Google to check
+ * if they should use an existing email account (that has Google linked)
+ * instead of creating a new Google-only account.
+ */
+exports.checkGoogleLinked = async (req, res) => {
+  try {
+    const { googleEmail } = req.body;
+    
+    if (!googleEmail) {
+      return res.status(400).json({
+        success: false,
+        error: 'Google email is required',
+        code: 'MISSING_EMAIL'
+      });
+    }
+    
+    const result = await emailAuthService.checkGoogleLinked(googleEmail);
+    
+    res.json({
+      success: true,
+      ...result
+    });
+    
+  } catch (error) {
+    logger.error('Check Google linked error', { error: error.message });
+    
+    res.status(500).json({
+      success: false,
+      error: 'Failed to check Google linked status',
+      code: 'CHECK_LINKED_ERROR'
+    });
+  }
+};
+
+/**
+ * Login with Google for a linked email account
+ * POST /auth/email/login-with-google
+ * Body: { googleEmail, googleAccessToken }
+ * 
+ * This endpoint is used when a user signs in with Google and their
+ * Google email is linked to an existing email account.
+ */
+exports.loginWithLinkedGoogle = async (req, res) => {
+  try {
+    const { googleEmail, googleAccessToken } = req.body;
+    
+    if (!googleEmail || !googleAccessToken) {
+      return res.status(400).json({
+        success: false,
+        error: 'Google email and access token are required',
+        code: 'MISSING_FIELDS'
+      });
+    }
+    
+    const result = await emailAuthService.loginWithLinkedGoogle(googleEmail, googleAccessToken);
+    
+    res.json(result);
+    
+  } catch (error) {
+    logger.error('Login with linked Google error', { error: error.message });
+    
+    const errorCode = error.message.split(':')[0];
+    const errorMessage = error.message.split(': ')[1] || error.message;
+    
+    let statusCode = 500;
+    if (errorCode === 'AUTH_INVALID_TOKEN') {
+      statusCode = 401;
+    } else if (errorCode === 'AUTH_NO_LINKED_ACCOUNT') {
+      statusCode = 404;
+    } else if (errorCode === 'AUTH_ACCOUNT_DELETED' || errorCode === 'AUTH_ACCOUNT_SUSPENDED') {
+      statusCode = 403;
+    }
+    
+    res.status(statusCode).json({
+      success: false,
+      error: errorMessage,
+      code: errorCode
+    });
+  }
+};

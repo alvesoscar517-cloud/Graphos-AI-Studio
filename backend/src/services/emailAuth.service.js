@@ -1441,6 +1441,170 @@ async function cleanupExpiredRefreshTokens() {
   return { deletedCount: expiredDocs.size };
 }
 
+/**
+ * Check if a Google email is linked to an existing email user
+ * This is used when Google user signs in to check if they should use
+ * an existing email account instead of creating a new Google-only account
+ * 
+ * @param {string} googleEmail - Google email to check
+ * @returns {Promise<{linked: boolean, userId?: string, user?: Object}>}
+ */
+async function checkGoogleLinked(googleEmail) {
+  const normalizedEmail = normalizeEmail(googleEmail);
+  
+  // Check if this Google email is linked to an email user
+  const linkedUserSnapshot = await db.collection(USERS_COLLECTION)
+    .where('googleLinked.googleEmail', '==', normalizedEmail)
+    .limit(1)
+    .get();
+  
+  if (!linkedUserSnapshot.empty) {
+    const userDoc = linkedUserSnapshot.docs[0];
+    const userData = userDoc.data();
+    
+    logger.info('Found linked email user for Google account', { 
+      googleEmail: normalizedEmail, 
+      userId: userDoc.id 
+    });
+    
+    return {
+      linked: true,
+      userId: userDoc.id,
+      user: {
+        userId: userDoc.id,
+        email: userData.email,
+        displayName: userData.displayName,
+        picture: userData.picture || userData.googleLinked?.googlePicture,
+        tier: userData.tier,
+        authProvider: 'email',
+        hasGoogleLinked: true,
+        googleLinked: {
+          googleEmail: userData.googleLinked.googleEmail
+        }
+      }
+    };
+  }
+  
+  // Also check if this email exists as a standalone email user (same email, not linked)
+  const emailUserSnapshot = await db.collection(USERS_COLLECTION)
+    .where('email', '==', normalizedEmail)
+    .where('authProvider', '==', 'email')
+    .limit(1)
+    .get();
+  
+  if (!emailUserSnapshot.empty) {
+    // Email user exists with same email but not linked
+    // This means user should link their Google account first
+    logger.info('Found email user with same email (not linked)', { 
+      googleEmail: normalizedEmail 
+    });
+    
+    return {
+      linked: false,
+      emailUserExists: true,
+      message: 'An email account exists with this email. Please sign in with email/password and link your Google account.'
+    };
+  }
+  
+  return { linked: false };
+}
+
+/**
+ * Login with Google for a linked email account
+ * This is used when a user signs in with Google and their Google email
+ * is linked to an existing email account.
+ * 
+ * @param {string} googleEmail - Google email
+ * @param {string} googleAccessToken - Google OAuth access token for verification
+ * @returns {Promise<{success: boolean, user: Object, accessToken: string, refreshToken: string, expiresIn: number}>}
+ */
+async function loginWithLinkedGoogle(googleEmail, googleAccessToken) {
+  const normalizedEmail = normalizeEmail(googleEmail);
+  
+  // Verify Google token
+  try {
+    const googleUserInfo = await httpGet('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        'Authorization': `Bearer ${googleAccessToken}`
+      }
+    });
+    
+    if (normalizeEmail(googleUserInfo.email) !== normalizedEmail) {
+      throw new Error('AUTH_INVALID_TOKEN: Email mismatch');
+    }
+  } catch (error) {
+    if (error.message.startsWith('AUTH_')) {
+      throw error;
+    }
+    logger.error('Google token verification failed', { error: error.message });
+    throw new Error('AUTH_INVALID_TOKEN: Failed to verify Google token');
+  }
+  
+  // Find user with this Google email linked
+  const linkedUserSnapshot = await db.collection(USERS_COLLECTION)
+    .where('googleLinked.googleEmail', '==', normalizedEmail)
+    .limit(1)
+    .get();
+  
+  if (linkedUserSnapshot.empty) {
+    throw new Error('AUTH_NO_LINKED_ACCOUNT: No account is linked to this Google email');
+  }
+  
+  const userDoc = linkedUserSnapshot.docs[0];
+  const userData = userDoc.data();
+  const userId = userDoc.id;
+  
+  // Check if account is deleted
+  if (userData.deleted === true) {
+    throw new Error('AUTH_ACCOUNT_DELETED: This account has been deleted.');
+  }
+  
+  // Check if account is locked
+  if (userData.locked === true) {
+    throw new Error(`AUTH_ACCOUNT_SUSPENDED: Your account has been suspended.${userData.lockReason ? ` Reason: ${userData.lockReason}` : ''}`);
+  }
+  
+  // Update last login
+  const now = new Date();
+  await db.collection(USERS_COLLECTION).doc(userId).update({
+    lastLoginAt: now,
+    'googleLinked.lastUsedAt': now
+  });
+  
+  // Generate tokens
+  const tokens = await generateTokens(userId, {
+    rememberMe: true, // Google login always remembers
+    userInfo: {
+      email: userData.email,
+      name: userData.displayName || userData.name,
+      picture: userData.picture || userData.googleLinked?.googlePicture || '',
+      emailVerified: true
+    }
+  });
+  
+  logger.info('User logged in via linked Google', { userId, googleEmail: normalizedEmail });
+  
+  return {
+    success: true,
+    user: {
+      userId,
+      email: userData.email,
+      displayName: userData.displayName || userData.name,
+      name: userData.displayName || userData.name,
+      picture: userData.picture || userData.googleLinked?.googlePicture || '',
+      tier: userData.tier,
+      authProvider: 'email',
+      hasGoogleLinked: true,
+      googleLinked: {
+        googleEmail: userData.googleLinked.googleEmail
+      }
+    },
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
+    expiresIn: tokens.expiresIn
+  };
+}
+
 module.exports = {
   register,
   verifyEmail,
@@ -1453,6 +1617,8 @@ module.exports = {
   linkGoogle,
   linkGoogleWithOAuth,
   unlinkGoogle,
+  checkGoogleLinked,
+  loginWithLinkedGoogle,
   resendVerificationOTP,
   getUserByEmail,
   getActiveSessions,
