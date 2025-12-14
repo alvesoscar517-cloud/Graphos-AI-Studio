@@ -113,7 +113,7 @@ const SettingsPopup = ({ onClose, onViewChange }) => {
           <div 
             ref={themeSubmenuRef}
             className={cn(
-              "popup fixed w-[160px] py-2 pr-2 z-popup-submenu",
+              "popup fixed w-auto min-w-[140px] py-2 pr-2 z-popup-submenu",
               "animate-fade-in"
             )}
             style={{
@@ -140,7 +140,7 @@ const SettingsPopup = ({ onClose, onViewChange }) => {
                   )}
                 </div>
                 <Icon name={option.icon} size="md" />
-                <span className="text-sm">{option.label}</span>
+                <span className="text-sm whitespace-nowrap">{option.label}</span>
               </div>
             ))}
           </div>

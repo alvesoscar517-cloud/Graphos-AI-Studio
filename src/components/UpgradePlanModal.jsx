@@ -36,22 +36,38 @@ const CURRENCY_CONFIG = {
 /**
  * Format local currency with smart display for large numbers
  * For currencies like VND, IDR, KRW - shows abbreviated format with smaller trailing zeros
+ * @param {number} usdPrice - Price in USD
+ * @param {string} langCode - Language code
+ * @param {boolean} isPerCredit - If true, format for per-credit display (no rounding to thousands)
  */
-const formatLocalCurrency = (usdPrice, langCode) => {
+const formatLocalCurrency = (usdPrice, langCode, isPerCredit = false) => {
   const config = CURRENCY_CONFIG[langCode];
   if (!config) return null;
   
-  const localPrice = Math.round(usdPrice * config.rate);
+  const localPrice = usdPrice * config.rate;
   
   let formattedPrice;
   if (config.largeNumber) {
-    // For large number currencies (VND, IDR, KRW)
-    // Round to nearest thousand for cleaner display
-    const roundedPrice = Math.round(localPrice / 1000) * 1000;
-    const mainPart = Math.floor(roundedPrice / 1000);
-    formattedPrice = { main: mainPart.toLocaleString(), suffix: '.000' };
+    if (isPerCredit) {
+      // For per-credit pricing: show actual value without rounding to thousands
+      // Round to nearest integer, no thousand separators
+      const roundedPrice = Math.round(localPrice);
+      formattedPrice = { main: String(roundedPrice), suffix: '' };
+    } else {
+      // For package prices: round to nearest thousand, no thousand separators
+      const roundedPrice = Math.round(localPrice / 1000) * 1000;
+      const mainPart = Math.floor(roundedPrice / 1000);
+      // Format without thousand separators: e.g., 127.000 instead of 127,000
+      formattedPrice = { main: String(mainPart).replace(/\B(?=(\d{3})+(?!\d))/g, ','), suffix: '.000' };
+    }
   } else {
-    formattedPrice = { main: localPrice.toLocaleString(), suffix: '' };
+    // For non-large number currencies
+    if (isPerCredit) {
+      // Show 2-3 decimal places for per-credit
+      formattedPrice = { main: localPrice.toFixed(localPrice < 1 ? 3 : 2), suffix: '' };
+    } else {
+      formattedPrice = { main: String(Math.round(localPrice)), suffix: '' };
+    }
   }
   
   return {
@@ -124,8 +140,10 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
   const getBonusPercent = (pkg) => pkg.bonus > 0 ? Math.round((pkg.bonus / pkg.credits) * 100) : null;
   
   // Format local price with smart display
-  const renderLocalPrice = (usdPrice, isLarge = false) => {
-    const localData = formatLocalCurrency(usdPrice, i18n.language) || formatLocalCurrency(usdPrice, currentLang);
+  // isLarge: for package price display (big text)
+  // isPerCredit: for per-credit pricing (no rounding to thousands)
+  const renderLocalPrice = (usdPrice, isLarge = false, isPerCredit = false) => {
+    const localData = formatLocalCurrency(usdPrice, i18n.language, isPerCredit) || formatLocalCurrency(usdPrice, currentLang, isPerCredit);
     if (!localData) return null;
     
     const { symbol, position, formatted } = localData;
@@ -133,7 +151,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
     if (isLarge) {
       return (
         <span className="text-2xl font-bold text-text-primary tracking-tight max-sm:text-xl">
-          ~{position === 'before' && symbol}
+          {position === 'before' && symbol}
           {formatted.main}
           {formatted.suffix && <span className="text-base opacity-60">{formatted.suffix}</span>}
           {position === 'after' && symbol}
@@ -143,7 +161,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
     
     return (
       <span className="text-xs text-text-muted">
-        ~{position === 'before' && symbol}
+        {position === 'before' && symbol}
         {formatted.main}
         {formatted.suffix && <span className="text-[10px] opacity-70">{formatted.suffix}</span>}
         {position === 'after' && symbol}
@@ -156,7 +174,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
   return createPortal(
     <div 
       className={cn(
-        "fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-toast p-5",
+        "fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-toast p-5",
         "animate-overlay-fade",
         "max-md:p-3 max-md:items-end"
       )}
@@ -308,7 +326,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                     <div className="text-center mb-3.5 max-sm:hidden">
                       {showLocalCurrency ? (
                         <span className="text-xs text-text-muted">
-                          {renderLocalPrice(pkg.price / pkg.totalCredits)}{t('billing.perCredit')}
+                          {renderLocalPrice(pkg.price / pkg.totalCredits, false, true)}{t('billing.perCredit')}
                         </span>
                       ) : (
                         <span className="text-xs text-text-muted">{formatPrice(pkg.price / pkg.totalCredits)}{t('billing.perCredit')}</span>
@@ -348,6 +366,12 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
 
         {/* Footer */}
         <div className="py-3.5 px-6 flex flex-col items-center gap-1.5 max-sm:p-3.5">
+          {showLocalCurrency && (
+            <div className="flex items-center gap-1 text-[10px] text-text-muted opacity-70 italic">
+              <img src="/icon/info.svg" alt="" className="w-3 h-3 opacity-50 icon-invert" />
+              <span>{t('billing.localCurrencyDisclaimer', 'Prices shown are estimates and may vary based on current exchange rates')}</span>
+            </div>
+          )}
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-text-secondary">{t('billing.securePayment')}</span>
             <img src="/icon/lemonsqueezy-with-name.svg" alt="Lemon Squeezy" className="h-4 w-auto opacity-90 icon-invert" />

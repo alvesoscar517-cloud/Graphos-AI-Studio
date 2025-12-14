@@ -7,6 +7,7 @@ import { cn } from '../../lib/utils'
 
 const MainContent = ({ 
   currentView, 
+  viewParams = {},
   onViewChange, 
   onToggleLeftSidebar, 
   onToggleRightSidebar,
@@ -48,6 +49,7 @@ const MainContent = ({
           onToggleRightSidebar={onToggleRightSidebar}
           rightSidebarHidden={rightSidebarHidden}
           leftSidebarHidden={leftSidebarHidden}
+          initialHelpMode={viewParams.helpMode}
         />
       )}
       

@@ -17,6 +17,44 @@ const PROJECT_ID = config.PROJECT_ID;
 const LOCATION = config.LOCATION;
 
 // ============================================================================
+// LANGUAGE HELPERS
+// ============================================================================
+
+/**
+ * Get full language name from language code
+ * Used for AI prompts to generate content in specific languages
+ */
+const LANGUAGE_NAMES = {
+  'en': 'English',
+  'vi': 'Vietnamese',
+  'zh': 'Chinese',
+  'zh-CN': 'Simplified Chinese',
+  'zh-TW': 'Traditional Chinese',
+  'ja': 'Japanese',
+  'ko': 'Korean',
+  'th': 'Thai',
+  'id': 'Indonesian',
+  'ms': 'Malay',
+  'hi': 'Hindi',
+  'ar': 'Arabic',
+  'de': 'German',
+  'fr': 'French',
+  'es': 'Spanish',
+  'pt': 'Portuguese',
+  'it': 'Italian',
+  'ru': 'Russian',
+  'nl': 'Dutch',
+  'pl': 'Polish',
+  'tr': 'Turkish'
+};
+
+function getLanguageName(langCode) {
+  // Handle codes like 'zh-CN', 'pt-BR' etc.
+  const code = langCode?.toLowerCase() || 'en';
+  return LANGUAGE_NAMES[code] || LANGUAGE_NAMES[code.split('-')[0]] || 'English';
+}
+
+// ============================================================================
 // EMBEDDING CACHE WITH PERIODIC CLEANUP
 // ============================================================================
 
@@ -369,18 +407,18 @@ function preprocessTextForDetection(text) {
  * @param {string} text - Text to analyze
  * @returns {Promise<Object>} - Detection result
  */
-async function detectAIContent(text) {
+async function detectAIContent(text, outputLanguage = null) {
   try {
     const chunks = preprocessTextForDetection(text);
     
     // If multiple chunks, analyze each and combine results
     if (chunks.length > 1) {
       logger.info(`[PROCESS] Analyzing ${chunks.length} text chunks for AI detection...`);
-      const results = await Promise.all(chunks.map(chunk => detectAIContentSingle(chunk)));
+      const results = await Promise.all(chunks.map(chunk => detectAIContentSingle(chunk, outputLanguage)));
       return combineDetectionResults(results);
     }
     
-    return await detectAIContentSingle(chunks[0]);
+    return await detectAIContentSingle(chunks[0], outputLanguage);
   } catch (error) {
     logger.error('[ERROR] AI detection failed:', error);
     return detectAIContentHeuristic(text);
@@ -390,7 +428,7 @@ async function detectAIContent(text) {
 /**
  * Analyze a single text chunk for AI content
  */
-async function detectAIContentSingle(text) {
+async function detectAIContentSingle(text, outputLanguage = null) {
   try {
     const model = vertexAI.getGenerativeModel({ 
       model: 'gemini-2.5-flash',
@@ -400,7 +438,14 @@ async function detectAIContentSingle(text) {
       }
     });
 
-    const prompt = `You are an expert linguist specializing in detecting AI-generated content. Analyze the text with extreme precision.
+    // Detect text language for output
+    const detectedLang = languageProcessor.detectLanguage(text);
+    const responseLang = outputLanguage || detectedLang || 'en';
+    const langInstruction = responseLang !== 'en' 
+      ? `\n\nIMPORTANT: Write all human_indicators, ai_indicators, evidence findings, and analysis_summary in ${languageProcessor.getConfig(responseLang)?.name || responseLang} language to match the analyzed text.`
+      : '';
+
+    const prompt = `You are an expert linguist specializing in detecting AI-generated content. Analyze the text with extreme precision.${langInstruction}
 
 TEXT TO ANALYZE:
 """
@@ -617,7 +662,7 @@ function combineDetectionResults(results) {
  * Enhanced AI detection with multi-pass for uncertain results
  * Thresholds are configurable via environment variables
  */
-async function detectAIContentEnhanced(text) {
+async function detectAIContentEnhanced(text, outputLanguage = null) {
   // Get configurable thresholds
   const UNCERTAIN_LOW = mainConfig.AI_DETECTION?.UNCERTAIN_RANGE_LOW || 35;
   const UNCERTAIN_HIGH = mainConfig.AI_DETECTION?.UNCERTAIN_RANGE_HIGH || 65;
@@ -625,7 +670,7 @@ async function detectAIContentEnhanced(text) {
   
   try {
     // Pass 1: Standard detection
-    const quickResult = await detectAIContent(text);
+    const quickResult = await detectAIContent(text, outputLanguage);
     
     logger.info(`[AI-DETECT] Pass 1 result: ${quickResult.aiProbability}% (confidence: ${quickResult.confidence}%)`);
     
@@ -860,7 +905,7 @@ function detectAIContentHeuristic(text) {
 // VOICE PROFILE GENERATION
 // ============================================================================
 
-async function generateVoiceSummary(sampleTexts, statisticalFeatures) {
+async function generateVoiceSummary(sampleTexts, statisticalFeatures, language = 'en') {
   try {
     // Use Graphos Zenith for voice profile analysis
     const model = vertexAI.getGenerativeModel({ 
@@ -870,7 +915,7 @@ async function generateVoiceSummary(sampleTexts, statisticalFeatures) {
       }
     });
     
-    logger.info('[PROFILE] Using Graphos Zenith for voice analysis');
+    logger.info(`[PROFILE] Using Graphos Zenith for voice analysis (language: ${language})`);
 
     const selectedSamples = sampleTexts
       .sort(() => Math.random() - 0.5)
@@ -878,7 +923,12 @@ async function generateVoiceSummary(sampleTexts, statisticalFeatures) {
 
     const combinedText = selectedSamples.join('\n\n---\n\n');
 
-    const prompt = `Analyze the author's writing style based on text samples.
+    // Language instruction for output
+    const languageInstruction = language !== 'en' 
+      ? `\n\nIMPORTANT: Generate ALL text content (key_characteristics, rewrite_instructions, punctuation_style, opening_style descriptions) in ${getLanguageName(language)} language. Keep JSON keys in English but values should be in ${getLanguageName(language)}.`
+      : '';
+
+    const prompt = `Analyze the author's writing style based on text samples.${languageInstruction}
 
 WRITING STYLE STATISTICS:
 - Average sentence length: ${statisticalFeatures.avgSentenceLength} words

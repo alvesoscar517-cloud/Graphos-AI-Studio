@@ -215,6 +215,9 @@ export async function createProfileComplete(profileName, theme, samples, options
       throw new Error('User not authenticated')
     }
     
+    // Get current UI language for profile content generation
+    const currentLanguage = localStorage.getItem('i18nextLng') || navigator.language?.split('-')[0] || 'en'
+    
     // Use deduplicated request to prevent duplicate concurrent profile creation
     // This is critical to prevent multiple credits being deducted
     const { data } = await apiClient.postDeduplicated('/create_profile_complete', {
@@ -222,7 +225,8 @@ export async function createProfileComplete(profileName, theme, samples, options
       email: userInfo.email,
       name: userInfo.name,
       theme: theme,
-      samples: samples
+      samples: samples,
+      language: currentLanguage
     }, {
       signal: options.signal
     })
@@ -264,6 +268,9 @@ export async function createProfileCompleteStream(profileName, theme, samples, c
     
     const headers = await getAuthHeaders()
     
+    // Get current UI language for profile content generation
+    const currentLanguage = localStorage.getItem('i18nextLng') || navigator.language?.split('-')[0] || 'en'
+    
     const response = await fetch(`${CONFIG.API_BASE_URL}/create_profile_complete/stream`, {
       method: 'POST',
       headers,
@@ -273,7 +280,8 @@ export async function createProfileCompleteStream(profileName, theme, samples, c
         email: userInfo.email,
         name: userInfo.name,
         theme: theme,
-        samples: samples
+        samples: samples,
+        language: currentLanguage
       }),
       signal: options.signal
     })

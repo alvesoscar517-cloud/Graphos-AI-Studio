@@ -1,14 +1,31 @@
 /**
  * Error Page Component
  * Beautiful error page with ghost icon for app-wide error handling
- * Note: This component does NOT use React Router hooks because it may render
- * outside of Router context (e.g., when ErrorBoundary catches errors at app level)
+ * Note: This component does NOT use React Router hooks or QueryClient hooks
+ * because it may render outside of those contexts (e.g., when ErrorBoundary catches errors at app level)
  */
 
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSendErrorReport } from '@/hooks/queries'
 import ghostIcon from '../../../icon for background/ghost-with-raised-arms.svg'
+
+// Direct API call for error reporting (no QueryClient dependency)
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://graphosai-472729326429.us-central1.run.app'
+
+// Simple hash function for error deduplication
+const generateErrorHash = (error) => {
+  const str = `${error?.name || ''}:${error?.message || ''}:${(error?.stack || '').slice(0, 200)}`
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+  return hash.toString(16)
+}
+
+// Track reported errors in session
+const reportedErrors = new Set()
 
 const ErrorPage = ({ 
   error, 
@@ -22,12 +39,10 @@ const ErrorPage = ({
 }) => {
   const { t } = useTranslation()
   const [reportStatus, setReportStatus] = useState('idle') // idle | sending | sent | already_reported | error
-  const sendErrorReport = useSendErrorReport()
 
   // Suppress sessionExpired modal while on error page
   useEffect(() => {
     window.__errorPageActive = true
-    // Clear any pending session expired when entering error page
     window.__clearPendingSessionExpired?.()
     return () => {
       window.__errorPageActive = false
@@ -35,7 +50,6 @@ const ErrorPage = ({
   }, [])
 
   const handleGoHome = () => {
-    // Use window.location instead of navigate() to avoid Router dependency
     window.location.href = '/'
   }
 
@@ -46,23 +60,70 @@ const ErrorPage = ({
   const handleReportError = async () => {
     if (reportStatus === 'sending' || reportStatus === 'sent' || reportStatus === 'already_reported') return
     
+    const errorHash = generateErrorHash(error)
+    
+    // Check if already reported this session
+    if (reportedErrors.has(errorHash)) {
+      setReportStatus('already_reported')
+      return
+    }
+    
     setReportStatus('sending')
     try {
-      const result = await sendErrorReport.mutateAsync({
-        error,
-        url: window.location.href,
-        componentStack
-      })
-      
-      if (result.alreadyReported) {
-        setReportStatus('already_reported')
-      } else {
-        setReportStatus('sent')
+      // Get token if available (optional for error reports)
+      let token = null
+      try {
+        token = localStorage.getItem('accessToken')
+      } catch {
+        // Ignore storage errors
       }
+      
+      const errorContent = [
+        `Error: ${error?.message || 'Unknown error'}`,
+        '',
+        '--- Stack Trace ---',
+        error?.stack || 'No stack trace available',
+        '',
+        '--- Environment ---',
+        `URL: ${window.location.href}`,
+        `User Agent: ${navigator.userAgent}`,
+        `Timestamp: ${new Date().toISOString()}`,
+        `Viewport: ${window.innerWidth}x${window.innerHeight}`,
+        componentStack ? `\n--- Component Stack ---\n${componentStack}` : ''
+      ].filter(Boolean).join('\n')
+      
+      const response = await fetch(`${API_BASE_URL}/send-feedback`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify({
+          type: 'error_report',
+          priority: 'high',
+          title: `[Error] ${error?.name || 'Error'}: ${(error?.message || 'Unknown error').slice(0, 80)}`,
+          content: errorContent,
+          metadata: {
+            errorName: error?.name,
+            errorMessage: error?.message,
+            errorHash,
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            viewport: `${window.innerWidth}x${window.innerHeight}`,
+            timestamp: new Date().toISOString()
+          }
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to send error report')
+      }
+      
+      reportedErrors.add(errorHash)
+      setReportStatus('sent')
     } catch (err) {
       console.error('Failed to report error:', err)
       setReportStatus('error')
-      // Reset after 3 seconds to allow retry
       setTimeout(() => setReportStatus('idle'), 3000)
     }
   }
@@ -125,7 +186,7 @@ const ErrorPage = ({
           </details>
         )}
 
-        {/* Action Buttons - 3 buttons in a row */}
+        {/* Action Buttons */}
         <div className="flex flex-nowrap gap-3 justify-center mb-6">
           {onRetry && (
             <button 

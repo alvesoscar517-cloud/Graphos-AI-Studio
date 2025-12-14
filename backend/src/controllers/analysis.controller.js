@@ -33,10 +33,13 @@ exports.authenticateContent = async (req, res) => {
 
     const validText = validateText(text, 50, 50000);
 
+    // Get language from request for localized output
+    const requestedLanguage = req.body.language || null;
+
     // Use enhanced detection by default for better accuracy
     const detectionResult = enhanced 
-      ? await geminiService.detectAIContentEnhanced(validText)
-      : await geminiService.detectAIContent(validText);
+      ? await geminiService.detectAIContentEnhanced(validText, requestedLanguage)
+      : await geminiService.detectAIContent(validText, requestedLanguage);
     
     const { 
       aiProbability, 

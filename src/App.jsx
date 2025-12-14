@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AppProviders } from './providers/AppProviders'
 import { useAuth, useAuthStore } from './stores/authStore'
@@ -7,10 +7,14 @@ import LoginOverlay from './components/Auth/LoginOverlay'
 import MainLayout from './components/Layout/MainLayout'
 import ProfileSetupWrapper from './components/ProfileSetup/ProfileSetupWrapper'
 import ErrorBoundary from './components/Common/ErrorBoundary'
+import GlobalErrorHandler from './components/Common/GlobalErrorHandler'
 import ContextMenu from './components/Common/ContextMenu'
 import ToastContainer from './components/Common/ToastContainer'
 import ErrorReportListener from './components/Common/ErrorReportListener'
 import SessionExpiredModal from './components/Auth/SessionExpiredModal'
+import WelcomeBanner from './components/Common/WelcomeBanner'
+import LowCreditsToast from './components/LowCreditsToast'
+import UpgradePlanModal from './components/UpgradePlanModal'
 import { ErrorBoundaryProvider } from './contexts/ErrorBoundaryContext'
 import modal from './utils/modal'
 import { initTooltips } from './utils/tooltips'
@@ -21,31 +25,46 @@ import { migrateToSecureStorage } from './utils/authStorage'
 function AppContent() {
   const { isLoading } = useAuth()
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  
   return (
-    <Routes>
-      <Route 
-        path="/profile-setup" 
-        element={
+    <>
+      <Routes>
+        <Route 
+          path="/profile-setup" 
+          element={
+            <ErrorBoundary>
+              {!isLoading && isAuthenticated ? (
+                <ProfileSetupWrapper />
+              ) : (
+                <div className="app">
+                  <LoginOverlay />
+                </div>
+              )}
+            </ErrorBoundary>
+          } 
+        />
+        <Route path="*" element={
           <ErrorBoundary>
-            {!isLoading && isAuthenticated ? (
-              <ProfileSetupWrapper />
-            ) : (
-              <div className="app">
-                <LoginOverlay />
-              </div>
-            )}
+            <div className="app">
+              {(isLoading || !isAuthenticated) && <LoginOverlay />}
+              {!isLoading && isAuthenticated && <MainLayout />}
+            </div>
           </ErrorBoundary>
-        } 
+        } />
+      </Routes>
+      
+      {/* Low Credits Toast - Windows-style notification */}
+      {isAuthenticated && (
+        <LowCreditsToast onBuyCredits={() => setShowUpgradeModal(true)} />
+      )}
+      
+      {/* Upgrade Plan Modal */}
+      <UpgradePlanModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
       />
-      <Route path="*" element={
-        <ErrorBoundary>
-          <div className="app">
-            {(isLoading || !isAuthenticated) && <LoginOverlay />}
-            {!isLoading && isAuthenticated && <MainLayout />}
-          </div>
-        </ErrorBoundary>
-      } />
-    </Routes>
+    </>
   )
 }
 
@@ -92,15 +111,18 @@ function App() {
   return (
     <ErrorBoundaryProvider>
       <ErrorBoundary>
-        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <AppProviders>
-            <AppContent />
-            <ContextMenu />
-            <ToastContainer />
-            <SessionExpiredModal />
-            <ErrorReportListener />
-          </AppProviders>
-        </Router>
+        <GlobalErrorHandler>
+          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <AppProviders>
+              <AppContent />
+              <ContextMenu />
+              <ToastContainer />
+              <SessionExpiredModal />
+              <WelcomeBanner />
+              <ErrorReportListener />
+            </AppProviders>
+          </Router>
+        </GlobalErrorHandler>
       </ErrorBoundary>
     </ErrorBoundaryProvider>
   )

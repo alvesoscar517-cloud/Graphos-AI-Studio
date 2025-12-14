@@ -238,6 +238,14 @@ class ApiClient {
             requestId
           })
           logError(networkError, { context: 'API', endpoint, method, requestId })
+          
+          // Dispatch event for GlobalErrorHandler to catch
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('app:network-error', { 
+              detail: { error: networkError } 
+            }))
+          }
+          
           throw networkError
         }
         

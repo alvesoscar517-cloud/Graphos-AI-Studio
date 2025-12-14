@@ -318,6 +318,7 @@
     "createStyleProfile": "Créer un profil",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "Découvrir l'App",
     "featuredFeatures": "Fonctionnalités vedettes",
     "aiChat": "Chat IA",
     "aiChatDesc": "Discutez naturellement avec l'IA qui répond dans votre style d'écriture unique",
@@ -707,6 +708,11 @@
     "completedIterations": "Terminé après {{count}} itérations",
     "aiProbability": "Probabilité IA : {{percent}}%",
     "readingFile": "Lecture du fichier...",
+    "rewriteSelection": "Réécrire la sélection",
+    "humanizeSelection": "Humaniser la sélection",
+    "selectionRewritten": "Sélection réécrite !",
+    "selectionHumanized": "Sélection humanisée !",
+    "enableFeatureFirst": "Activez d'abord au moins une fonction de réécriture dans la barre latérale",
     "humanizeProgress": {
       "queued": "En attente...",
       "loading_profile": "Chargement du profil...",
@@ -934,6 +940,7 @@
     "credits": "crédits",
     "bonus": "bonus",
     "perCredit": "/crédit",
+    "localCurrencyDisclaimer": "Les prix affichés sont des estimations et peuvent varier selon le taux de change",
     "billingIssue": "Problème de facturation",
     "paymentFailed": "Paiement échoué",
     "refundRequest": "Demande de remboursement",
@@ -1024,6 +1031,13 @@
       "refund": "Remboursement",
       "subscriptionRenewal": "Renouvellement d'abonnement"
     }
+  },
+  "lowCredits": {
+    "title": "Crédits insuffisants",
+    "message": "Il ne vous reste que {{credits}} crédits. Rechargez maintenant pour continuer à utiliser toutes les fonctionnalités.",
+    "remaining": "restants",
+    "buyNow": "Acheter des crédits",
+    "remindLater": "Plus tard"
   },
   "editor": {
     "enterYourText": "Saisissez votre texte...",
@@ -1316,6 +1330,22 @@
     "reported": "Signalé !",
     "alreadyReported": "Déjà signalé",
     "reportFailed": "Échec"
+  },
+  "globalError": {
+    "offlineTitle": "Pas de connexion Internet",
+    "offlineMessage": "Veuillez vérifier votre connexion Internet et réessayer.",
+    "networkTitle": "Erreur de connexion",
+    "networkMessage": "Impossible de se connecter au serveur. Veuillez vérifier votre réseau et réessayer.",
+    "serverTitle": "Erreur du serveur",
+    "serverMessage": "Le serveur est temporairement indisponible. Veuillez réessayer plus tard.",
+    "timeoutTitle": "Délai d'attente dépassé",
+    "timeoutMessage": "La demande a pris trop de temps. Veuillez réessayer.",
+    "maintenanceTitle": "En maintenance",
+    "maintenanceMessage": "Nous effectuons une maintenance programmée. Veuillez réessayer dans quelques minutes.",
+    "forbiddenTitle": "Accès refusé",
+    "forbiddenMessage": "Vous n'avez pas la permission d'accéder à cette ressource.",
+    "quotaTitle": "Quota dépassé",
+    "quotaMessage": "Vous avez dépassé votre limite d'utilisation. Veuillez mettre à niveau votre plan ou réessayer plus tard."
   },
   "pagination": {
     "firstPage": "Première page",

@@ -35,10 +35,14 @@ export async function analyzeText(profileId, text, options = {}) {
       logger.warn('Analysis', `Warnings: ${validation.warnings.join(', ')}`)
     }
     
+    // Get language from localStorage for localized responses
+    const lang = localStorage.getItem('i18nextLng') || 'en'
+    
     const requestPayload = {
       profile_id: profileId,
       text: text,
-      text_stats: validation.stats
+      text_stats: validation.stats,
+      language: lang.substring(0, 2)
     }
     
     // Use deduplicated request to prevent duplicate concurrent analysis calls

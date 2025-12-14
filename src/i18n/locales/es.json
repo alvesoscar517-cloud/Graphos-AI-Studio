@@ -318,6 +318,7 @@
     "createStyleProfile": "Crear Perfil",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "Conocer la App",
     "featuredFeatures": "Características destacadas",
     "aiChat": "Chat IA",
     "aiChatDesc": "Chatea naturalmente con la IA que responde en tu estilo de escritura único",
@@ -707,6 +708,11 @@
     "completedIterations": "Completado después de {{count}} iteraciones",
     "aiProbability": "Probabilidad IA: {{percent}}%",
     "readingFile": "Leyendo archivo...",
+    "rewriteSelection": "Reescribir selección",
+    "humanizeSelection": "Humanizar selección",
+    "selectionRewritten": "¡Selección reescrita!",
+    "selectionHumanized": "¡Selección humanizada!",
+    "enableFeatureFirst": "Primero active al menos una función de reescritura en la barra lateral",
     "humanizeProgress": {
       "queued": "En cola...",
       "loading_profile": "Cargando perfil...",
@@ -936,6 +942,7 @@
     "credits": "credits",
     "bonus": "bonus",
     "perCredit": "/credit",
+    "localCurrencyDisclaimer": "Los precios mostrados son estimaciones y pueden variar según el tipo de cambio",
     "billingIssue": "Problema de facturación",
     "paymentFailed": "Pago fallido",
     "refundRequest": "Solicitud de reembolso",
@@ -1016,14 +1023,21 @@
       "refund": "Reembolso",
       "subscriptionRenewal": "Renovación de suscripción"
     },
-    "credits": "credits",
-    "insufficientCredits": "Insufficient Credits",
-    "buyCredits": "Buy Credits",
-    "buyCreditsNow": "Buy Credits Now",
-    "balance": "{{balance}} credits / {{used}} used",
-    "upgradePlan": "Upgrade Plan",
-    "newBalance": "New balance: {{balance}} credits",
-    "used": "used"
+    "credits": "créditos",
+    "insufficientCredits": "Créditos insuficientes",
+    "buyCredits": "Comprar créditos",
+    "buyCreditsNow": "Comprar créditos ahora",
+    "balance": "{{balance}} créditos / {{used}} usados",
+    "upgradePlan": "Mejorar plan",
+    "newBalance": "Nuevo saldo: {{balance}} créditos",
+    "used": "usados"
+  },
+  "lowCredits": {
+    "title": "Advertencia de créditos bajos",
+    "message": "Solo te quedan {{credits}} créditos. Recarga ahora para seguir usando todas las funciones.",
+    "remaining": "restantes",
+    "buyNow": "Comprar créditos",
+    "remindLater": "Más tarde"
   },
   "editor": {
     "textStyle": "Estilo de texto",
@@ -1316,6 +1330,22 @@
     "reported": "¡Reportado!",
     "alreadyReported": "Ya reportado",
     "reportFailed": "Falló"
+  },
+  "globalError": {
+    "offlineTitle": "Sin conexión a Internet",
+    "offlineMessage": "Por favor, verifica tu conexión a Internet e intenta de nuevo.",
+    "networkTitle": "Error de conexión",
+    "networkMessage": "No se puede conectar al servidor. Por favor, verifica tu red e intenta de nuevo.",
+    "serverTitle": "Error del servidor",
+    "serverMessage": "El servidor no está disponible temporalmente. Por favor, intenta más tarde.",
+    "timeoutTitle": "Tiempo de espera agotado",
+    "timeoutMessage": "La solicitud tardó demasiado. Por favor, intenta de nuevo.",
+    "maintenanceTitle": "En mantenimiento",
+    "maintenanceMessage": "Estamos realizando mantenimiento programado. Por favor, intenta de nuevo en unos minutos.",
+    "forbiddenTitle": "Acceso denegado",
+    "forbiddenMessage": "No tienes permiso para acceder a este recurso.",
+    "quotaTitle": "Cuota excedida",
+    "quotaMessage": "Has excedido tu límite de uso. Por favor, actualiza tu plan o intenta más tarde."
   },
   "pagination": {
     "firstPage": "Primera página",

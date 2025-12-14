@@ -556,11 +556,11 @@ const AIStudioEditorEnhanced = ({
           </div>
         </div>
 
-        {/* Toolbar row */}
+        {/* Toolbar row - always visible but disabled when processing */}
         <div className="px-4 pb-2">
           <EditorToolbar 
             editor={tiptapEditor}
-            visible={!isProcessing}
+            visible={true}
             disabled={isProcessing}
             className="border-none shadow-none rounded-lg"
           />

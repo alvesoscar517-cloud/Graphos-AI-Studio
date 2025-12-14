@@ -600,6 +600,15 @@
   to { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-12px); }
@@ -1206,9 +1215,9 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background-color: rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1622,13 +1631,37 @@
 }
 
 .rewrite-toolbar-btn.variant-primary {
-  background: linear-gradient(135deg, var(--color-primary), #8b5cf6);
-  color: white;
+  /* Gradient border using background-clip technique - prevents misalignment */
+  position: relative;
+  background: 
+    linear-gradient(var(--color-bg-primary), var(--color-bg-primary)) padding-box,
+    linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6) border-box;
+  border: 2px solid transparent;
+  color: var(--color-primary);
+}
+
+.dark .rewrite-toolbar-btn.variant-primary {
+  background: 
+    linear-gradient(var(--color-bg-secondary), var(--color-bg-secondary)) padding-box,
+    linear-gradient(135deg, #22d3ee, #60a5fa, #a78bfa) border-box;
+  border: 2px solid transparent;
+  color: #60a5fa;
 }
 
 .rewrite-toolbar-btn.variant-primary:hover:not(:disabled):not(.active) {
-  background: linear-gradient(135deg, var(--color-primary-hover), #7c3aed);
-  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.4);
+  background: 
+    linear-gradient(var(--color-bg-hover), var(--color-bg-hover)) padding-box,
+    linear-gradient(135deg, #0891b2, #2563eb, #7c3aed) border-box;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
+.dark .rewrite-toolbar-btn.variant-primary:hover:not(:disabled):not(.active) {
+  background: 
+    linear-gradient(var(--color-bg-tertiary), var(--color-bg-tertiary)) padding-box,
+    linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6) border-box;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 24px rgba(96, 165, 250, 0.35);
 }
 
 
@@ -1642,6 +1675,16 @@
 
 .dark .icon-invert {
   filter: invert(1) brightness(2);
+}
+
+/* Reverse icon invert - for icons on inverted backgrounds (black button in light mode, white button in dark mode) */
+.icon-invert-reverse {
+  filter: invert(1) brightness(2);
+  transition: filter var(--transition-fast);
+}
+
+.dark .icon-invert-reverse {
+  filter: none;
 }
 
 /* Modal overlay dark mode */
@@ -1807,9 +1850,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2308,29 +2351,26 @@
 
 /* ============================================
    Custom Context Menu Styles
-   Apple macOS style context menu
+   Native-like context menu
    ============================================ */
 .context-menu {
-  min-width: 200px;
-  background-color: var(--color-bg-secondary);
-  border: 0.5px solid var(--color-border-light);
-  border-radius: var(--radius-xl); /* 22px - macOS Sonoma style */
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 6px;
+  min-width: 180px;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 4px;
   z-index: var(--z-toast);
-  animation: context-menu-in 0.12s var(--ease-apple);
-  backdrop-filter: blur(50px) saturate(180%);
-  -webkit-backdrop-filter: blur(50px) saturate(180%);
+  transform-origin: top left;
+  animation: context-menu-in 0.08s ease-out;
 }
 
 @keyframes context-menu-in {
   from {
-    opacity: 0;
-    transform: scale(0.96) translateY(-4px);
+    opacity: 0.5;
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
   }
 }
 
@@ -2339,12 +2379,12 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 6px 10px;
+  padding: 8px 12px;
   background: transparent;
   border: none;
-  border-radius: var(--radius-sm); /* 8px - Apple standard for menu items */
+  border-radius: var(--radius-md);
   cursor: pointer;
-  font-size: var(--font-size-sm);
+  font-size: 13px;
   color: var(--color-text-primary);
   text-align: left;
   transition: background-color 0.1s ease;
@@ -2352,25 +2392,14 @@
 
 .context-menu-item:hover:not(.disabled) {
   background-color: var(--color-fill-tertiary);
-  color: var(--color-text-primary);
-}
-
-.context-menu-item:hover:not(.disabled) .context-menu-icon {
-  color: var(--color-text-primary);
-  opacity: 0.9;
-}
-
-.context-menu-item:hover:not(.disabled) .context-menu-shortcut {
-  color: var(--color-text-secondary);
 }
 
 .context-menu-item:active:not(.disabled) {
   background-color: var(--color-fill-secondary);
-  transform: scale(0.98);
 }
 
 .context-menu-item.disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
@@ -2382,12 +2411,11 @@
   height: 16px;
   color: var(--color-text-secondary);
   flex-shrink: 0;
-  opacity: 0.7;
 }
 
 .context-menu-label {
   flex: 1;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .context-menu-shortcut {
@@ -2399,15 +2427,77 @@
 
 .context-menu-divider {
   height: 1px;
-  background-color: var(--color-separator);
-  margin: 6px 4px;
+  background-color: var(--color-border-light);
+  margin: 4px 8px;
 }
 
 /* Dark mode adjustments */
 .dark .context-menu {
   background-color: var(--color-bg-secondary);
-  border-color: var(--color-border-light);
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-color: var(--color-border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Context menu header for selection info */
+.context-menu-header {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px 4px;
+  border-bottom: 1px solid var(--color-border-light);
+  margin-bottom: 4px;
+}
+
+.context-menu-selection-info {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* AI action items in context menu - normal color, not highlighted */
+.context-menu-item.ai-action {
+  color: var(--color-text-primary);
+}
+
+.context-menu-item.ai-action .context-menu-icon {
+  color: var(--color-text-secondary);
+}
+
+.context-menu-item.ai-action:hover:not(.disabled) {
+  background-color: var(--color-fill-tertiary);
+}
+
+/* Show tooltip on disabled items */
+.context-menu-item.disabled[data-tooltip] {
+  position: relative;
+}
+
+/* AI badge in context menu */
+.context-menu-badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   Selection Floating Toolbar Styles
+   ============================================ */
+.selection-floating-toolbar {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.selection-floating-toolbar button:focus {
+  outline: none;
+}
+
+.selection-floating-toolbar button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* ============================================

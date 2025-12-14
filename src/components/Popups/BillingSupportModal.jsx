@@ -116,7 +116,7 @@ const BillingSupportModal = ({ onClose }) => {
   return createPortal(
     <div 
       className={cn(
-        "fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-toast animate-fade-in",
+        "fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-toast animate-fade-in",
         "p-4 max-md:p-3 max-md:items-end"
       )}
       onClick={(e) => {

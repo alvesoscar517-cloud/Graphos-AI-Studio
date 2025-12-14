@@ -25,61 +25,28 @@ export function isCreditError(error) {
 export function showCreditErrorModal(error, onUpgradeClick) {
   const required = error?.required || 0;
   const available = error?.available || 0;
-  const shortfall = error?.shortfall || (required - available);
+  const shortfall = Math.max(0, error?.shortfall || (required - available));
 
-  const message = `
-    <div style="text-align: center; padding: 20px;">
-      <div style="font-size: 48px; margin-bottom: 16px;">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="5" width="20" height="14" rx="2"/>
-          <path d="M2 10h20"/>
-        </svg>
-      </div>
-      <h3 style="margin: 0 0 12px; color: #202124;">Insufficient Credits</h3>
-      <p style="margin: 0 0 8px; color: #5f6368;">
-        You need <strong>${required.toFixed(2)}</strong> credits to perform this action.
-      </p>
-      <p style="margin: 0 0 20px; color: #5f6368;">
-        You currently have <strong>${available.toFixed(2)}</strong> credits.
-        <br/>
-        You need <strong style="color: #d93025;">${shortfall.toFixed(2)}</strong> more credits.
-      </p>
-      <button 
-        onclick="window.handleUpgradeClick()" 
-        style="
-          padding: 10px 24px;
-          background: #1a73e8;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          font-size: 14px;
-          font-weight: 500;
-          cursor: pointer;
-        "
-      >
-        Buy Credits Now
-      </button>
-    </div>
-  `;
-
-  // Store callback globally
-  window.handleUpgradeClick = () => {
-    if (window.modal) {
-      window.modal.close();
-    }
-    if (onUpgradeClick) {
-      onUpgradeClick();
-    }
-  };
-
-  if (window.modal) {
-    window.modal.show(message);
-  } else {
-    alert(`Insufficient credits! Need ${required.toFixed(2)} credits, you have ${available.toFixed(2)} credits.`);
-    if (onUpgradeClick) {
-      onUpgradeClick();
-    }
+  // Build message
+  let message = `You need ${required.toFixed(2)} credits to perform this action.\n\n`;
+  message += `You currently have ${available.toFixed(2)} credits.`;
+  
+  // Only show shortfall if actually insufficient
+  if (shortfall > 0) {
+    message += `\nYou need ${shortfall.toFixed(2)} more credits.`;
   }
+
+  // Use modal.confirm with Buy Credits button
+  modal.confirm(message, 'Insufficient Credits', {
+    type: 'warning',
+    confirmText: 'Buy Credits Now',
+    cancelText: 'Close',
+    confirmStyle: 'primary'
+  }).then((confirmed) => {
+    if (confirmed && onUpgradeClick) {
+      onUpgradeClick();
+    }
+  });
 }
 
 /**

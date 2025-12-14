@@ -4,6 +4,7 @@ import MainContent from './MainContent'
 import RightSidebar from './RightSidebar'
 import WorkspaceSidebar from '../Views/Workspace/WorkspaceSidebar'
 import { useNotes } from '../../contexts/NotesContext'
+import { useWorkspace } from '../../contexts/WorkspaceContext'
 import { cn } from '../../lib/utils'
 
 // Breakpoints for responsive behavior
@@ -51,20 +52,27 @@ const MainLayout = () => {
     }
   }, [leftSidebarHidden])
   const [currentView, setCurrentView] = useState('home') // Default open Home
+  const [viewParams, setViewParams] = useState({}) // NEW: For passing params to views
   const [highlightedSentence, setHighlightedSentence] = useState(null) // NEW: For highlighting sentence in editor
   const [analysisData, setAnalysisData] = useState(null) // NEW: For inline highlighting
   const [rewriteMode, setRewriteMode] = useState(false) // NEW: For showing rewrite toolbar
   const { createNote } = useNotes()
+  const { clearConversation } = useWorkspace()
 
   // Reset right sidebar state when switching to workspace
   const handleViewChange = (view, options = {}) => {
     if (view === 'workspace') {
       setRightSidebarHidden(false) // Show workspace sidebar by default
+      // Clear current conversation when createNew flag is set (clicking AI Workspace menu)
+      if (options.createNew) {
+        clearConversation()
+      }
     }
     // Only create new note when createNew flag is set
     if (view === 'aistudio-editor' && options.createNew) {
       createNote()
     }
+    setViewParams(options) // Store view params
     setCurrentView(view)
   }
 
@@ -90,6 +98,7 @@ const MainLayout = () => {
       />
       <MainContent 
         currentView={currentView}
+        viewParams={viewParams}
         onViewChange={handleViewChange}
         onToggleLeftSidebar={() => setLeftSidebarHidden(!leftSidebarHidden)}
         onToggleRightSidebar={() => setRightSidebarHidden(!rightSidebarHidden)}

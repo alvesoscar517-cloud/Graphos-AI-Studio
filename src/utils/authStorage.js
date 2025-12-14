@@ -49,6 +49,34 @@ export function setRememberMe(enabled) {
 }
 
 // ============================================================================
+// REMEMBERED EMAIL (Auto-fill feature like Google, GitHub, Facebook)
+// ============================================================================
+
+/**
+ * Lưu email để tự động điền khi đăng nhập lại
+ * Chỉ lưu khi user tick "Remember me"
+ */
+export function setRememberedEmail(email) {
+  if (email) {
+    localStorage.setItem(AUTH_STORAGE_KEYS.REMEMBERED_EMAIL, email)
+  }
+}
+
+/**
+ * Lấy email đã được nhớ để auto-fill vào form đăng nhập
+ */
+export function getRememberedEmail() {
+  return localStorage.getItem(AUTH_STORAGE_KEYS.REMEMBERED_EMAIL)
+}
+
+/**
+ * Xóa email đã nhớ (khi user không muốn remember nữa)
+ */
+export function clearRememberedEmail() {
+  localStorage.removeItem(AUTH_STORAGE_KEYS.REMEMBERED_EMAIL)
+}
+
+// ============================================================================
 // ENCRYPTION UTILITIES
 // ============================================================================
 
@@ -174,6 +202,7 @@ export const AUTH_STORAGE_KEYS = {
   ACTIVE_PROFILE_NAME: 'activeProfileName',
   PROFILE_CACHE_INVALIDATED: 'profileCacheInvalidated',
   REMEMBER_ME: 'rememberMe',
+  REMEMBERED_EMAIL: 'rememberedEmail', // Email được nhớ để auto-fill khi đăng nhập lại
 }
 
 // Keys that should be encrypted
@@ -553,6 +582,11 @@ export default {
   // Remember Me
   isRememberMeEnabled,
   setRememberMe,
+  
+  // Remembered Email (auto-fill)
+  setRememberedEmail,
+  getRememberedEmail,
+  clearRememberedEmail,
   
   // Constants
   AUTH_STORAGE_KEYS,

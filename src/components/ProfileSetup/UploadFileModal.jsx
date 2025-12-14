@@ -148,7 +148,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [] }) => {
   if (!isOpen) return null
 
   return (
-    <div className={cn("fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-modal p-5 animate-fade-in")} onClick={onClose}>
+    <div className={cn("fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-modal p-5 animate-fade-in")} onClick={onClose}>
       <div className={cn("bg-white rounded-3xl w-full max-w-[580px] max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up-bounce max-md:max-w-[95%]")} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-start gap-3 px-6 pt-6 pb-4 shrink-0">

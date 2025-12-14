@@ -317,6 +317,7 @@
     "createStyleProfile": "Tạo hồ sơ",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "Tìm hiểu ứng dụng",
     "featuredFeatures": "Tính năng nổi bật",
     "aiChat": "Chat AI",
     "aiChatDesc": "Trò chuyện tự nhiên với AI phản hồi theo phong cách viết của bạn",
@@ -706,6 +707,11 @@
     "completedIterations": "Hoàn thành sau {{count}} lần lặp",
     "aiProbability": "Xác suất AI: {{percent}}%",
     "readingFile": "Đang đọc tệp...",
+    "rewriteSelection": "Viết lại đoạn chọn",
+    "humanizeSelection": "Tự nhiên hóa đoạn chọn",
+    "selectionRewritten": "Đã viết lại đoạn chọn!",
+    "selectionHumanized": "Đã tự nhiên hóa đoạn chọn!",
+    "enableFeatureFirst": "Bật ít nhất một tính năng viết lại ở thanh bên trước",
     "humanizeProgress": {
       "queued": "Đang chờ...",
       "loading_profile": "Đang tải hồ sơ...",
@@ -976,6 +982,7 @@
     "credits": "credit",
     "bonus": "thưởng",
     "perCredit": "/credit",
+    "localCurrencyDisclaimer": "Giá hiển thị chỉ mang tính ước tính và có thể thay đổi theo tỷ giá",
     "firstPurchaseTitle": "ƯU ĐÃI CHÀO MỪNG",
     "firstPurchaseDesc": "Nhân đôi credit cho lần mua đầu tiên!",
     "billingIssue": "Vấn đề thanh toán",
@@ -1055,6 +1062,7 @@
     "transaction": "Giao dịch",
     "feature": {
       "chatMessage": "Tin nhắn Chat",
+      "chatHumanized": "Chat Nhân hóa",
       "humanize": "Nhân hóa văn bản",
       "detect": "Phát hiện AI",
       "rewrite": "Viết lại văn bản",
@@ -1066,6 +1074,13 @@
       "refund": "Hoàn tiền",
       "subscriptionRenewal": "Gia hạn gói"
     }
+  },
+  "lowCredits": {
+    "title": "Cảnh báo Credits thấp",
+    "message": "Bạn chỉ còn {{credits}} credits. Nạp thêm ngay để tiếp tục sử dụng tất cả tính năng mà không bị gián đoạn.",
+    "remaining": "còn lại",
+    "buyNow": "Mua Credits",
+    "remindLater": "Để sau"
   },
   "editor": {
     "enterYourText": "Nhập văn bản của bạn...",
@@ -1289,6 +1304,22 @@
     "reported": "Đã báo cáo!",
     "alreadyReported": "Đã báo cáo trước đó",
     "reportFailed": "Thất bại"
+  },
+  "globalError": {
+    "offlineTitle": "Mất kết nối Internet",
+    "offlineMessage": "Vui lòng kiểm tra kết nối mạng và thử lại.",
+    "networkTitle": "Lỗi kết nối",
+    "networkMessage": "Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng và thử lại.",
+    "serverTitle": "Lỗi máy chủ",
+    "serverMessage": "Máy chủ tạm thời không khả dụng. Vui lòng thử lại sau.",
+    "timeoutTitle": "Hết thời gian chờ",
+    "timeoutMessage": "Yêu cầu mất quá nhiều thời gian. Vui lòng thử lại.",
+    "maintenanceTitle": "Đang bảo trì",
+    "maintenanceMessage": "Chúng tôi đang thực hiện bảo trì định kỳ. Vui lòng thử lại sau vài phút.",
+    "forbiddenTitle": "Truy cập bị từ chối",
+    "forbiddenMessage": "Bạn không có quyền truy cập tài nguyên này.",
+    "quotaTitle": "Vượt quá giới hạn",
+    "quotaMessage": "Bạn đã vượt quá giới hạn sử dụng. Vui lòng nâng cấp gói hoặc thử lại sau."
   },
   "profileSetupErrors": {
     "atLeast3Samples": "Cần ít nhất 3 mẫu văn bản để tạo hồ sơ",

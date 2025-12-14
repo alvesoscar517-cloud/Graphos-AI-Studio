@@ -20,7 +20,6 @@ import ModelSelector from '../Analysis/ModelSelector'
 import WritingPreferences from '../Analysis/WritingPreferences'
 import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
-import BackgroundGradient from '../Common/BackgroundGradient'
 import Icon from '../Common/Icon'
 import LazyLottie from '../Common/LazyLottie'
 
@@ -374,7 +373,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
   // Mobile overlay backdrop
   const MobileBackdrop = () => (
     <motion.div
-      className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[99]"
+      className="fixed inset-0 bg-black/5 backdrop-blur-[1px] z-[99]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -575,42 +574,39 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
             
             {/* Rewrite Button */}
             <div className="flex flex-col gap-2">
-              <BackgroundGradient 
-                className="rounded-xl bg-bg-primary"
-                containerClassName="w-full"
-                animate={!isRewriting && hasText && hasAnyFeatureEnabled()}
+              <button
+                className={cn(
+                  "w-full flex items-center justify-center gap-2 py-3 px-4",
+                  "rounded-xl font-semibold text-sm cursor-pointer",
+                  "transition-all duration-200",
+                  "bg-bg-secondary text-accent",
+                  "border border-border-light",
+                  "hover:bg-bg-hover hover:border-border-hover",
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                )}
+                onClick={handleRewrite}
+                disabled={!hasText || !hasAnyFeatureEnabled() || isRewriting || isProcessing}
               >
-                <button
-                  className={cn(
-                    "w-full flex items-center justify-center gap-2 py-3 px-4",
-                    "rounded-xl font-semibold text-sm cursor-pointer",
-                    "transition-all duration-200",
-                    "bg-bg-primary text-blue-600",
-                    "hover:bg-bg-hover",
-                    "disabled:opacity-50 disabled:cursor-not-allowed"
-                  )}
-                  onClick={handleRewrite}
-                  disabled={!hasText || !hasAnyFeatureEnabled() || isRewriting || isProcessing}
-                >
-                  {isRewriting ? (
-                    // @ts-ignore - LazyLottie props are correct
-                    <LazyLottie 
-                      animationData={threeDotsAnimation} 
-                      loop={true}
-                      style={{ width: 40, height: 16 }}
+                {(isRewriting || isProcessing) ? (
+                  // @ts-ignore - LazyLottie props are correct
+                  <LazyLottie 
+                    animationData={threeDotsAnimation} 
+                    loop={true}
+                    style={{ width: 40, height: 16 }}
+                  />
+                ) : (
+                  <>
+                    <Icon 
+                      name={writingPreferences?.useIterativeRefinement ? "user-check" : "pen"}
+                      alt={rewriteLabel}
+                      size="md"
+                      color="primary"
+                      themed={false}
                     />
-                  ) : (
-                    <>
-                      <img 
-                        src={`/icon/${writingPreferences?.useIterativeRefinement ? "user-check" : "pen"}.svg`}
-                        alt={rewriteLabel}
-                        className="w-4 h-4 filter-icon-primary"
-                      />
-                      <span>{rewriteLabel}</span>
-                    </>
-                  )}
-                </button>
-              </BackgroundGradient>
+                    <span>{rewriteLabel}</span>
+                  </>
+                )}
+              </button>
             </div>
           </>
         )}

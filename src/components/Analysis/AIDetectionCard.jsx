@@ -478,8 +478,8 @@ const AIDetectionCard = ({ disabled, text, onAnalysisStart, onAnalysisEnd }) => 
                   <div className="flex flex-col gap-3 p-4 bg-fill-tertiary border border-border-light rounded-xl">
                     {humanIndicators.map((item, index) => (
                       <div key={index} className="flex items-center gap-2 text-xs">
-                        <span className="flex-shrink-0 p-1 rounded bg-success/15">
-                          <Icon name="check" size="xs" color="success" />
+                        <span className="flex-shrink-0 p-1.5 rounded-lg bg-fill-secondary">
+                          <Icon name="check" size="xs" color="muted" />
                         </span>
                         <span className="text-text-primary leading-normal">{item}</span>
                       </div>
@@ -498,8 +498,8 @@ const AIDetectionCard = ({ disabled, text, onAnalysisStart, onAnalysisEnd }) => 
                   <div className="flex flex-col gap-3 p-4 bg-fill-tertiary border border-border-light rounded-xl">
                     {aiIndicators.map((item, index) => (
                       <div key={index} className="flex items-center gap-2 text-xs">
-                        <span className="flex-shrink-0 p-1 rounded bg-warning/15">
-                          <Icon name="alert-triangle" size="xs" color="warning" />
+                        <span className="flex-shrink-0 p-1.5 rounded-lg bg-fill-secondary">
+                          <Icon name="alert-triangle" size="xs" color="muted" />
                         </span>
                         <span className="text-text-primary leading-normal">{item}</span>
                       </div>

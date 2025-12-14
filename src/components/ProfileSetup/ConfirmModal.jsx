@@ -55,7 +55,7 @@ const ConfirmModal = ({
   return (
     <div 
       className={cn(
-        "absolute inset-0 bg-black/30 backdrop-blur-sm",
+        "absolute inset-0 bg-black/5 backdrop-blur-[1px]",
         "flex items-center justify-center z-sidebar",
         "animate-fade-in"
       )}

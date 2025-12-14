@@ -318,6 +318,7 @@
     "createStyleProfile": "إنشاء ملف",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "تعرف على التطبيق",
     "featuredFeatures": "الميزات البارزة",
     "aiChat": "دردشة الذكاء الاصطناعي",
     "aiChatDesc": "تحدث بشكل طبيعي مع الذكاء الاصطناعي الذي يرد بأسلوب كتابتك الفريد",
@@ -707,6 +708,11 @@
     "completedIterations": "اكتمل بعد {{count}} تكرارات",
     "aiProbability": "احتمالية AI: {{percent}}%",
     "readingFile": "جاري قراءة الملف...",
+    "rewriteSelection": "إعادة كتابة التحديد",
+    "humanizeSelection": "إضفاء الطابع البشري على التحديد",
+    "selectionRewritten": "تمت إعادة كتابة التحديد!",
+    "selectionHumanized": "تم إضفاء الطابع البشري على التحديد!",
+    "enableFeatureFirst": "قم أولاً بتمكين ميزة إعادة كتابة واحدة على الأقل في الشريط الجانبي",
     "humanizeProgress": {
       "queued": "في الانتظار...",
       "loading_profile": "جاري تحميل الملف...",
@@ -936,6 +942,7 @@
     "credits": "credits",
     "bonus": "bonus",
     "perCredit": "/credit",
+    "localCurrencyDisclaimer": "الأسعار المعروضة تقديرية وقد تتغير حسب سعر الصرف",
     "billingIssue": "مشكلة في الفواتير",
     "paymentFailed": "فشل الدفع",
     "refundRequest": "طلب استرداد",
@@ -1016,14 +1023,21 @@
       "refund": "الاسترجاع",
       "subscriptionRenewal": "تجديد الاشتراك"
     },
-    "credits": "credits",
-    "insufficientCredits": "Insufficient Credits",
-    "buyCredits": "Buy Credits",
-    "buyCreditsNow": "Buy Credits Now",
-    "balance": "{{balance}} credits / {{used}} used",
-    "upgradePlan": "Upgrade Plan",
-    "newBalance": "New balance: {{balance}} credits",
-    "used": "used"
+    "credits": "رصيد",
+    "insufficientCredits": "رصيد غير كافٍ",
+    "buyCredits": "شراء رصيد",
+    "buyCreditsNow": "اشترِ رصيدًا الآن",
+    "balance": "{{balance}} رصيد / {{used}} مستخدم",
+    "upgradePlan": "ترقية الخطة",
+    "newBalance": "الرصيد الجديد: {{balance}} رصيد",
+    "used": "مستخدم"
+  },
+  "lowCredits": {
+    "title": "تحذير: رصيد منخفض",
+    "message": "لديك {{credits}} رصيد فقط متبقي. اشحن الآن لمواصلة استخدام جميع الميزات.",
+    "remaining": "متبقي",
+    "buyNow": "شراء رصيد",
+    "remindLater": "لاحقًا"
   },
   "editor": {
     "textStyle": "نمط النص",
@@ -1316,6 +1330,22 @@
     "reported": "تم الإبلاغ!",
     "alreadyReported": "تم الإبلاغ مسبقاً",
     "reportFailed": "فشل"
+  },
+  "globalError": {
+    "offlineTitle": "لا يوجد اتصال بالإنترنت",
+    "offlineMessage": "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.",
+    "networkTitle": "خطأ في الاتصال",
+    "networkMessage": "تعذر الاتصال بالخادم. يرجى التحقق من شبكتك والمحاولة مرة أخرى.",
+    "serverTitle": "خطأ في الخادم",
+    "serverMessage": "الخادم غير متاح مؤقتاً. يرجى المحاولة لاحقاً.",
+    "timeoutTitle": "انتهت مهلة الطلب",
+    "timeoutMessage": "استغرق الطلب وقتاً طويلاً. يرجى المحاولة مرة أخرى.",
+    "maintenanceTitle": "تحت الصيانة",
+    "maintenanceMessage": "نقوم بإجراء صيانة مجدولة. يرجى المحاولة مرة أخرى بعد بضع دقائق.",
+    "forbiddenTitle": "تم رفض الوصول",
+    "forbiddenMessage": "ليس لديك إذن للوصول إلى هذا المورد.",
+    "quotaTitle": "تم تجاوز الحصة",
+    "quotaMessage": "لقد تجاوزت حد الاستخدام الخاص بك. يرجى ترقية خطتك أو المحاولة لاحقاً."
   },
   "pagination": {
     "firstPage": "الصفحة الأولى",

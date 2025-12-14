@@ -165,7 +165,16 @@ async function handleKyError(error, requestId) {
   
   // Handle network errors
   if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
-    return new ApiError(ERROR_MESSAGES.NETWORK_ERROR, { code: 'NETWORK_ERROR', requestId });
+    const networkError = new ApiError(ERROR_MESSAGES.NETWORK_ERROR, { code: 'NETWORK_ERROR', requestId });
+    
+    // Dispatch event for GlobalErrorHandler to catch
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('app:network-error', { 
+        detail: { error: networkError } 
+      }));
+    }
+    
+    return networkError;
   }
   
   return new ApiError(error.message || ERROR_MESSAGES.UNKNOWN, { code: 'UNKNOWN', requestId });

@@ -226,6 +226,7 @@ export async function startIterativeHumanize(profileId, text, options = {}) {
       }
     }
     
+    // Get language from localStorage for localized responses
     // Build request body - profile_id is optional
     const requestBody = {
       text: text,

@@ -94,9 +94,9 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
       source: 'aistudio'
     }))
 
-    // Map conversations to unified format (only those with content)
+    // Map conversations to unified format (only those with actual messages)
     const conversationItems = conversations
-      .filter(conv => conv.messages?.length > 0 || (conv.title && conv.title !== 'New Chat'))
+      .filter(conv => conv.messages && conv.messages.length > 0)
       .map(conv => ({
         id: conv.id,
         title: conv.title || 'New Chat',
@@ -231,7 +231,7 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
               "focus:outline-none hover:bg-fill-tertiary", 
               isWorkspaceActive && "bg-fill-secondary",
               isCollapsed && "justify-center px-2"
-            )} onClick={(e) => { e.preventDefault(); onViewChange('workspace') }} data-tooltip-collapsed={t('nav.aiWorkspace')}>
+            )} onClick={(e) => { e.preventDefault(); onViewChange('workspace', { createNew: true }) }} data-tooltip-collapsed={t('nav.aiWorkspace')}>
               <Icon name="message-square" alt={t('nav.aiWorkspace')} size="lg" />
               {!isCollapsed && <span>{t('nav.aiWorkspace')}</span>}
             </a>

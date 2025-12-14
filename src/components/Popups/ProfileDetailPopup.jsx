@@ -88,7 +88,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
 
   return createPortal(
     <div className={cn(
-      "fixed inset-0 bg-black/75 backdrop-blur-lg flex items-center justify-center z-overlay-high p-5 animate-fade-in",
+      "fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-overlay-high p-5 animate-fade-in",
       "transition-all duration-300",
       "max-lg:p-4 max-md:p-3 max-md:items-end max-sm:p-2"
     )}>

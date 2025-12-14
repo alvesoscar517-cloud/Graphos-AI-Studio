@@ -123,9 +123,26 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     } catch { return null }
   }, [searchTerm])
 
+  // Check if note has meaningful content (same logic as NotesContext)
+  const noteHasContent = useCallback((note) => {
+    if (!note) return false
+    const content = note.content?.trim() || ''
+    // Strip HTML tags to check for actual text content
+    const plainText = content.replace(/<[^>]*>/g, '').trim()
+    const title = note.title?.trim() || ''
+    return plainText.length > 0 || (title.length > 0 && title !== 'Untitled' && title !== t('common.untitled'))
+  }, [t])
+
+  // Check if conversation has meaningful content
+  const conversationHasContent = useCallback((conv) => {
+    if (!conv) return false
+    return conv.messages && conv.messages.length > 0
+  }, [])
+
   const allItems = useMemo(() => {
     const items = []
-    notes.forEach(note => {
+    // Filter notes with actual content
+    notes.filter(noteHasContent).forEach(note => {
       // Fallback title for notes: use first content or "Untitled"
       const noteTitle = note.title?.trim() || 
         (note.content?.trim()?.split(/[.!?\n]/)[0]?.slice(0, 50)) || 
@@ -139,7 +156,8 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         data: note
       })
     })
-    conversations.forEach(conv => {
+    // Filter conversations with actual messages
+    conversations.filter(conversationHasContent).forEach(conv => {
       // Fallback title for conversations: use first message or "New Chat"
       const convTitle = conv.title?.trim() || 
         (conv.messages?.[0]?.content?.trim()?.split(/[.!?\n]/)[0]?.slice(0, 50)) || 
@@ -154,7 +172,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       })
     })
     return items
-  }, [notes, conversations])
+  }, [notes, conversations, noteHasContent, conversationHasContent, t])
 
   const filteredItems = useMemo(() => {
     return allItems.filter(item => {

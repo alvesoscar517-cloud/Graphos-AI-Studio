@@ -318,6 +318,7 @@
     "createStyleProfile": "创建配置",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "了解应用",
     "featuredFeatures": "特色功能",
     "aiChat": "AI 聊天",
     "aiChatDesc": "与以您独特写作风格回应的 AI 自然对话",
@@ -707,6 +708,11 @@
     "completedIterations": "在 {{count}} 次迭代后完成",
     "aiProbability": "AI 概率：{{percent}}%",
     "readingFile": "正在读取文件...",
+    "rewriteSelection": "重写选中内容",
+    "humanizeSelection": "人性化选中内容",
+    "selectionRewritten": "选中内容已重写！",
+    "selectionHumanized": "选中内容已人性化！",
+    "enableFeatureFirst": "请先在侧边栏启用至少一个重写功能",
     "humanizeProgress": {
       "queued": "排队中...",
       "loading_profile": "加载配置文件中...",
@@ -934,6 +940,7 @@
     "credits": "积分",
     "bonus": "奖励",
     "perCredit": "/积分",
+    "localCurrencyDisclaimer": "显示的价格仅为估算，可能会根据汇率变化",
     "billingIssue": "账单问题",
     "paymentFailed": "支付失败",
     "refundRequest": "退款请求",
@@ -1024,6 +1031,13 @@
       "refund": "退款",
       "subscriptionRenewal": "订阅续期"
     }
+  },
+  "lowCredits": {
+    "title": "积分不足警告",
+    "message": "您只剩 {{credits}} 积分。立即充值以继续使用所有功能。",
+    "remaining": "剩余",
+    "buyNow": "购买积分",
+    "remindLater": "稍后"
   },
   "editor": {
     "enterYourText": "输入您的文本...",
@@ -1316,6 +1330,22 @@
     "reported": "已报告！",
     "alreadyReported": "已报告过",
     "reportFailed": "失败"
+  },
+  "globalError": {
+    "offlineTitle": "无网络连接",
+    "offlineMessage": "请检查您的网络连接后重试。",
+    "networkTitle": "连接错误",
+    "networkMessage": "无法连接到服务器。请检查您的网络后重试。",
+    "serverTitle": "服务器错误",
+    "serverMessage": "服务器暂时不可用。请稍后重试。",
+    "timeoutTitle": "请求超时",
+    "timeoutMessage": "请求时间过长。请重试。",
+    "maintenanceTitle": "维护中",
+    "maintenanceMessage": "我们正在进行定期维护。请几分钟后重试。",
+    "forbiddenTitle": "访问被拒绝",
+    "forbiddenMessage": "您没有权限访问此资源。",
+    "quotaTitle": "配额已超",
+    "quotaMessage": "您已超出使用限制。请升级您的计划或稍后重试。"
   },
   "pagination": {
     "firstPage": "第一页",

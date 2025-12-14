@@ -318,6 +318,7 @@
     "createStyleProfile": "프로필 생성",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "앱 알아보기",
     "featuredFeatures": "주요 기능",
     "aiChat": "AI 채팅",
     "aiChatDesc": "당신만의 글쓰기 스타일로 응답하는 AI와 자연스럽게 대화하세요",
@@ -707,6 +708,11 @@
     "completedIterations": "{{count}}회 반복 후 완료",
     "aiProbability": "AI 확률: {{percent}}%",
     "readingFile": "파일 읽는 중...",
+    "rewriteSelection": "선택 영역 다시 쓰기",
+    "humanizeSelection": "선택 영역 자연스럽게",
+    "selectionRewritten": "선택 영역이 다시 작성되었습니다!",
+    "selectionHumanized": "선택 영역이 자연스럽게 변환되었습니다!",
+    "enableFeatureFirst": "먼저 사이드바에서 최소 하나의 다시 쓰기 기능을 활성화하세요",
     "humanizeProgress": {
       "queued": "Queued...",
       "loading_profile": "Loading profile...",
@@ -934,6 +940,7 @@
     "credits": "크레딧",
     "bonus": "보너스",
     "perCredit": "/크레딧",
+    "localCurrencyDisclaimer": "표시된 가격은 추정치이며 환율에 따라 변동될 수 있습니다",
     "billingIssue": "결제 문제",
     "paymentFailed": "결제 실패",
     "refundRequest": "환불 요청",
@@ -1024,6 +1031,13 @@
       "refund": "환불",
       "subscriptionRenewal": "구독 갱신"
     }
+  },
+  "lowCredits": {
+    "title": "크레딧 부족 경고",
+    "message": "{{credits}} 크레딧만 남았습니다. 모든 기능을 중단 없이 사용하려면 지금 충전하세요.",
+    "remaining": "남음",
+    "buyNow": "크레딧 구매",
+    "remindLater": "나중에"
   },
   "editor": {
     "enterYourText": "텍스트를 입력하세요...",
@@ -1316,6 +1330,22 @@
     "reported": "신고됨!",
     "alreadyReported": "이미 신고됨",
     "reportFailed": "실패"
+  },
+  "globalError": {
+    "offlineTitle": "인터넷 연결 없음",
+    "offlineMessage": "인터넷 연결을 확인하고 다시 시도해 주세요.",
+    "networkTitle": "연결 오류",
+    "networkMessage": "서버에 연결할 수 없습니다. 네트워크를 확인하고 다시 시도해 주세요.",
+    "serverTitle": "서버 오류",
+    "serverMessage": "서버를 일시적으로 사용할 수 없습니다. 나중에 다시 시도해 주세요.",
+    "timeoutTitle": "요청 시간 초과",
+    "timeoutMessage": "요청 시간이 너무 오래 걸렸습니다. 다시 시도해 주세요.",
+    "maintenanceTitle": "점검 중",
+    "maintenanceMessage": "정기 점검을 진행 중입니다. 몇 분 후에 다시 시도해 주세요.",
+    "forbiddenTitle": "접근 거부",
+    "forbiddenMessage": "이 리소스에 접근할 권한이 없습니다.",
+    "quotaTitle": "할당량 초과",
+    "quotaMessage": "사용 한도를 초과했습니다. 플랜을 업그레이드하거나 나중에 다시 시도해 주세요."
   },
   "pagination": {
     "firstPage": "첫 페이지",

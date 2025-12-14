@@ -9,7 +9,8 @@ const WorkspaceView = ({
   onToggleLeftSidebar, 
   onToggleRightSidebar,
   rightSidebarHidden,
-  leftSidebarHidden
+  leftSidebarHidden,
+  initialHelpMode = false
 }) => {
   const { currentConversation, sendMessage, isLoading, clearConversation, modelSettings, updateModelSettings } = useWorkspace()
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -65,6 +66,7 @@ const WorkspaceView = ({
                   selectedModel={modelSettings?.model || 'gemini-2.5-flash'}
                   onModelChange={handleModelChange}
                   showModelSelector={true}
+                  initialHelpMode={initialHelpMode}
                 />
               }
             />

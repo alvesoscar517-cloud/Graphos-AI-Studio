@@ -45,22 +45,22 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
   }, [userId, isAuthenticated, updateCreditsCache])
 
   const balance = credits?.balance != null ? credits.balance.toFixed(2) : '0'
-  const used = credits?.used != null ? credits.used.toFixed(2) : '0'
   const isLowCredit = parseFloat(balance) < 10
   const isOutOfCredit = parseFloat(balance) <= 0
 
   return (
     <div className="px-5 pb-3.5 text-center">
-      <div className="mb-3 py-1.5 px-3.5 inline-block">
+      <div className="mb-3 py-1.5 px-3.5 inline-flex items-center justify-center gap-1.5">
         {isLoading ? (
-          <Skeleton className="h-4 w-32 rounded mx-auto" />
+          <Skeleton className="h-4 w-20 rounded mx-auto" />
         ) : (
           <span className={cn(
-            "text-sm tracking-wide text-text-secondary",
+            "inline-flex items-center gap-1.5 text-sm tracking-wide text-text-secondary",
             isLowCredit && !isOutOfCredit && "text-warning font-medium",
             isOutOfCredit && "text-error font-semibold"
           )}>
-            {balance} {t('credits.credits')} / {used} {t('credits.used')}
+            <img src="/icon/coins.svg" alt="" className="w-3.5 h-3.5 icon-invert opacity-70" />
+            {balance} {t('credits.credits')}
           </span>
         )}
       </div>

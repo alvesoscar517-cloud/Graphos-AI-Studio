@@ -81,7 +81,7 @@ const ErrorView = ({ animationKey, errorMessage, errorCode, onBack, onRetry, t }
     errorMessage?.toLowerCase().includes('insufficient')
   
   return (
-    <div className="fixed inset-0 bg-white/98 backdrop-blur-xl flex items-center justify-center z-overlay-high" role="alert" aria-live="assertive">
+    <div className="fixed inset-0 bg-white/98 backdrop-blur-[1px] flex items-center justify-center z-overlay-high" role="alert" aria-live="assertive">
       <div className="text-center animate-scale-in">
         <div className="w-thumbnail-xl h-thumbnail-xl mx-auto mb-10 flex items-center justify-center" aria-hidden="true">
           <LottieWrapper key={`error-${animationKey}`} animationData={error404Animation} loop={true} />
@@ -108,7 +108,7 @@ const ErrorView = ({ animationKey, errorMessage, errorCode, onBack, onRetry, t }
 }
 
 const CompletionView = ({ animationKey, qualityScore, onComplete, t }) => (
-  <div className="fixed inset-0 bg-white/98 backdrop-blur-xl flex items-center justify-center z-overlay-high" role="status" aria-live="polite">
+  <div className="fixed inset-0 bg-white/98 backdrop-blur-[1px] flex items-center justify-center z-overlay-high" role="status" aria-live="polite">
     <div className="text-center animate-scale-in">
       <div className="w-thumbnail-xl h-thumbnail-xl mx-auto mb-10 flex items-center justify-center" aria-hidden="true">
         <LottieWrapper key={`completion-${animationKey}`} animationData={faceIdAnimation} loop={false} />

@@ -375,6 +375,7 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                 className="notif-detail-body-scroll"
                 style={{
                   padding: '16px',
+                  paddingBottom: selectedNotif.translations?.[userLang]?.cta && selectedNotif.ctaAction ? '80px' : '16px',
                   flex: 1,
                   overflowY: 'auto',
                   scrollbarWidth: 'none',
@@ -393,22 +394,27 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                 </p>
               </div>
 
-              {/* CTA Button */}
+              {/* CTA Button - Overlay style */}
               {selectedNotif.translations?.[userLang]?.cta && selectedNotif.ctaAction && (
                 <div style={{
-                  padding: '14px 16px',
-                  borderTop: '1px solid var(--color-border-light)',
-                  flexShrink: 0
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  padding: '16px',
+                  background: 'linear-gradient(to top, var(--color-bg-primary) 70%, transparent)',
+                  paddingTop: '32px',
+                  pointerEvents: 'none'
                 }}>
                   <button 
                     onClick={() => handleCtaClick(selectedNotif)}
                     style={{
                       width: '100%',
                       padding: '12px 16px',
-                      borderRadius: '10px',
+                      borderRadius: '9999px',
                       border: 'none',
-                      background: 'var(--color-system-blue)',
-                      color: '#fff',
+                      background: 'var(--color-fill-secondary)',
+                      color: 'var(--color-text-primary)',
                       fontSize: '14px',
                       fontWeight: 500,
                       cursor: 'pointer',
@@ -416,14 +422,15 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '8px',
-                      transition: 'all 0.15s ease'
+                      transition: 'all 0.15s ease',
+                      pointerEvents: 'auto'
                     }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.background = 'var(--color-primary-hover)';
+                      e.currentTarget.style.background = 'var(--color-fill-tertiary)';
                       e.currentTarget.style.transform = 'translateY(-1px)';
                     }}
                     onMouseLeave={e => {
-                      e.currentTarget.style.background = 'var(--color-system-blue)';
+                      e.currentTarget.style.background = 'var(--color-fill-secondary)';
                       e.currentTarget.style.transform = 'translateY(0)';
                     }}
                   >
@@ -431,7 +438,7 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                     <img 
                       src="/icon/arrow-right.svg" 
                       alt="" 
-                      className="w-3.5 h-3.5 brightness-0 invert" 
+                      className="w-3.5 h-3.5 icon-invert"
                     />
                   </button>
                 </div>

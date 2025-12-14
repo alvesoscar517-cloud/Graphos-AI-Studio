@@ -318,6 +318,7 @@
     "createStyleProfile": "Create Profile",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "Learn About App",
     "featuredFeatures": "Featured Features",
     "aiChat": "AI Chat",
     "aiChatDesc": "Chat naturally with AI that responds in your unique writing style",
@@ -707,6 +708,11 @@
     "completedIterations": "Completed after {{count}} iterations",
     "aiProbability": "AI Probability: {{percent}}%",
     "readingFile": "Reading file...",
+    "rewriteSelection": "Rewrite Selection",
+    "humanizeSelection": "Humanize Selection",
+    "selectionRewritten": "Selection rewritten!",
+    "selectionHumanized": "Selection humanized!",
+    "enableFeatureFirst": "Enable at least one rewrite feature in sidebar first",
     "humanizeProgress": {
       "queued": "Queued...",
       "loading_profile": "Loading profile...",
@@ -977,6 +983,7 @@
     "credits": "credits",
     "bonus": "bonus",
     "perCredit": "/credit",
+    "localCurrencyDisclaimer": "Prices shown are estimates and may vary based on current exchange rates",
     "firstPurchaseTitle": "WELCOME OFFER",
     "firstPurchaseDesc": "Double credits on your first purchase!",
     "billingIssue": "Billing Issue",
@@ -1056,6 +1063,7 @@
     "transaction": "Transaction",
     "feature": {
       "chatMessage": "Chat Message",
+      "chatHumanized": "Humanized Chat",
       "humanize": "Humanize Text",
       "detect": "AI Detection",
       "rewrite": "Rewrite Text",
@@ -1067,6 +1075,13 @@
       "refund": "Refund",
       "subscriptionRenewal": "Subscription Renewal"
     }
+  },
+  "lowCredits": {
+    "title": "Low Credits Warning",
+    "message": "You only have {{credits}} credits remaining. Top up now to continue using all features without interruption.",
+    "remaining": "remaining",
+    "buyNow": "Buy Credits",
+    "remindLater": "Later"
   },
   "editor": {
     "enterYourText": "Enter your text...",
@@ -1290,6 +1305,22 @@
     "reported": "Reported!",
     "alreadyReported": "Already Reported",
     "reportFailed": "Failed"
+  },
+  "globalError": {
+    "offlineTitle": "No Internet Connection",
+    "offlineMessage": "Please check your internet connection and try again.",
+    "networkTitle": "Connection Error",
+    "networkMessage": "Unable to connect to the server. Please check your network and try again.",
+    "serverTitle": "Server Error",
+    "serverMessage": "The server is temporarily unavailable. Please try again later.",
+    "timeoutTitle": "Request Timeout",
+    "timeoutMessage": "The request took too long. Please try again.",
+    "maintenanceTitle": "Under Maintenance",
+    "maintenanceMessage": "We are performing scheduled maintenance. Please try again in a few minutes.",
+    "forbiddenTitle": "Access Denied",
+    "forbiddenMessage": "You do not have permission to access this resource.",
+    "quotaTitle": "Quota Exceeded",
+    "quotaMessage": "You have exceeded your usage limit. Please upgrade your plan or try again later."
   },
   "profileSetupErrors": {
     "atLeast3Samples": "At least 3 text samples are required to create a profile",

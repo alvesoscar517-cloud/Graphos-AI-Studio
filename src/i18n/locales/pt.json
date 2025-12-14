@@ -318,6 +318,7 @@
     "createStyleProfile": "Criar Perfil",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "Conhecer o App",
     "featuredFeatures": "Recursos em Destaque",
     "aiChat": "Chat IA",
     "aiChatDesc": "Converse naturalmente com a IA que responde no seu estilo de escrita único",
@@ -707,6 +708,11 @@
     "completedIterations": "Concluído após {{count}} iterações",
     "aiProbability": "Probabilidade de IA: {{percent}}%",
     "readingFile": "Lendo arquivo...",
+    "rewriteSelection": "Reescrever seleção",
+    "humanizeSelection": "Humanizar seleção",
+    "selectionRewritten": "Seleção reescrita!",
+    "selectionHumanized": "Seleção humanizada!",
+    "enableFeatureFirst": "Primeiro ative pelo menos um recurso de reescrita na barra lateral",
     "humanizeProgress": {
       "queued": "Na fila...",
       "loading_profile": "Carregando perfil...",
@@ -934,6 +940,7 @@
     "credits": "créditos",
     "bonus": "bônus",
     "perCredit": "/crédito",
+    "localCurrencyDisclaimer": "Os preços exibidos são estimativas e podem variar de acordo com a taxa de câmbio",
     "billingIssue": "Problema de Cobrança",
     "paymentFailed": "Falha no Pagamento",
     "refundRequest": "Solicitação de Reembolso",
@@ -1024,6 +1031,13 @@
       "refund": "Reembolso",
       "subscriptionRenewal": "Renovação de Assinatura"
     }
+  },
+  "lowCredits": {
+    "title": "Créditos baixos",
+    "message": "Você só tem {{credits}} créditos restantes. Recarregue agora para continuar usando todos os recursos.",
+    "remaining": "restantes",
+    "buyNow": "Comprar créditos",
+    "remindLater": "Mais tarde"
   },
   "editor": {
     "enterYourText": "Digite seu texto...",
@@ -1316,6 +1330,22 @@
     "reported": "Reportado!",
     "alreadyReported": "Já reportado",
     "reportFailed": "Falhou"
+  },
+  "globalError": {
+    "offlineTitle": "Sem conexão com a internet",
+    "offlineMessage": "Por favor, verifique sua conexão com a internet e tente novamente.",
+    "networkTitle": "Erro de conexão",
+    "networkMessage": "Não foi possível conectar ao servidor. Por favor, verifique sua rede e tente novamente.",
+    "serverTitle": "Erro do servidor",
+    "serverMessage": "O servidor está temporariamente indisponível. Por favor, tente novamente mais tarde.",
+    "timeoutTitle": "Tempo limite da solicitação",
+    "timeoutMessage": "A solicitação demorou muito. Por favor, tente novamente.",
+    "maintenanceTitle": "Em manutenção",
+    "maintenanceMessage": "Estamos realizando manutenção programada. Por favor, tente novamente em alguns minutos.",
+    "forbiddenTitle": "Acesso negado",
+    "forbiddenMessage": "Você não tem permissão para acessar este recurso.",
+    "quotaTitle": "Cota excedida",
+    "quotaMessage": "Você excedeu seu limite de uso. Por favor, atualize seu plano ou tente novamente mais tarde."
   },
   "pagination": {
     "firstPage": "Primeira página",

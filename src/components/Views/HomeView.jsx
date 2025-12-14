@@ -123,7 +123,7 @@ const HomeView = ({ onToggleLeftSidebar, onViewChange }) => {
           {[
             { icon: '/icon/message-square.svg', title: t('home.startAIChat'), onClick: () => onViewChange('workspace') },
             { icon: '/icon/play.svg', title: t('home.openAIStudio'), onClick: () => onViewChange('aistudio-editor', { createNew: true }) },
-            { icon: '/icon/fingerprint.svg', title: t('home.createStyleProfile'), onClick: handleCreateProfile }
+            { icon: '/icon/info.svg', title: t('home.learnAboutApp'), onClick: () => onViewChange('workspace', { helpMode: true }) }
           ].map((action, i) => (
             <div 
               key={i}

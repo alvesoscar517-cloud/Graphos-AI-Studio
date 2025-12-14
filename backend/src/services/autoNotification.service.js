@@ -720,6 +720,7 @@ function createFromTemplate(templateKey, data = {}) {
   }
 
   const notification = {
+    templateId: templateKey, // Store template ID for duplicate checking
     type: template.type,
     priority: template.priority,
     translations: {},
@@ -751,6 +752,7 @@ async function sendToUser(userId, notification) {
     id: userNotifId,
     userId,
     notificationId: null, // Auto-generated, not from admin
+    templateId: notification.templateId || null, // For duplicate checking (e.g., LOW_CREDITS)
     type: notification.type,
     priority: notification.priority,
     translations: notification.translations,
@@ -829,16 +831,19 @@ async function sendPurchaseNotification(userId, packageName, creditsAdded, newBa
  */
 async function sendLowCreditsWarning(userId, remainingCredits) {
   try {
-    // Check if already sent recently (within 7 days)
+    // Check if LOW_CREDITS warning already sent recently (within 7 days)
+    // Must check by title to distinguish from other warning types
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const existingSnapshot = await db.collection('user_notifications')
       .where('userId', '==', userId)
       .where('type', '==', 'warning')
+      .where('templateId', '==', 'LOW_CREDITS')
       .where('createdAt', '>', sevenDaysAgo)
       .limit(1)
       .get();
 
     if (!existingSnapshot.empty) {
+      logger.debug('[AUTO-NOTIF] Low credits warning already sent recently', { userId });
       return null; // Already warned recently
     }
 

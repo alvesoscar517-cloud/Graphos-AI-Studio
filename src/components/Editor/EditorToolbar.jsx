@@ -206,25 +206,28 @@ const ToolbarDropdown = ({
             left: dropdownRef.current?.getBoundingClientRect().left
           }}
         >
-          {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => {
-                onChange(option.value)
-                setIsOpen(false)
-              }}
-              className={cn(
-                "block w-full px-3 py-1.5 text-left whitespace-nowrap text-sm rounded-lg",
-                "border-none bg-transparent cursor-pointer transition-colors",
-                "hover:bg-fill-tertiary",
-                value === option.label ? "bg-fill-tertiary text-primary font-medium" : "text-text-primary"
-              )}
-              style={option.style}
-            >
-              {option.label}
-            </button>
-          ))}
+          {options.map((option) => {
+            const isActive = value === option.label
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  onChange(option.value)
+                  setIsOpen(false)
+                }}
+                className={cn(
+                  "block w-full px-3 py-1.5 text-left whitespace-nowrap text-sm rounded-lg",
+                  "border-none bg-transparent cursor-pointer transition-colors",
+                  !isActive && "hover:bg-fill-tertiary",
+                  isActive ? "text-primary font-medium" : "text-text-primary"
+                )}
+                style={option.style}
+              >
+                {option.label}
+              </button>
+            )
+          })}
         </div>
       )}
     </div>
@@ -428,6 +431,8 @@ const EditorToolbar = ({
         "bg-fill-tertiary rounded-2xl",
         "overflow-x-auto scrollbar-hidden",
         "max-md:px-2 max-md:py-1 max-md:rounded-xl max-md:gap-0",
+        "transition-opacity duration-200",
+        disabled && "opacity-50 pointer-events-none",
         className
       )}
     >

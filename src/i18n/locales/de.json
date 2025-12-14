@@ -318,6 +318,7 @@
     "createStyleProfile": "Profil erstellen",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "App kennenlernen",
     "featuredFeatures": "Hauptfunktionen",
     "aiChat": "KI-Chat",
     "aiChatDesc": "Chatten Sie natürlich mit der KI, die in Ihrem einzigartigen Schreibstil antwortet",
@@ -707,6 +708,11 @@
     "completedIterations": "Abgeschlossen nach {{count}} Iterationen",
     "aiProbability": "KI-Wahrscheinlichkeit: {{percent}}%",
     "readingFile": "Lese Datei...",
+    "rewriteSelection": "Auswahl umschreiben",
+    "humanizeSelection": "Auswahl humanisieren",
+    "selectionRewritten": "Auswahl umgeschrieben!",
+    "selectionHumanized": "Auswahl humanisiert!",
+    "enableFeatureFirst": "Aktivieren Sie zuerst mindestens eine Umschreibfunktion in der Seitenleiste",
     "humanizeProgress": {
       "queued": "In der Warteschlange...",
       "loading_profile": "Profil wird geladen...",
@@ -936,6 +942,7 @@
     "credits": "Credits",
     "bonus": "Bonus",
     "perCredit": "/Credit",
+    "localCurrencyDisclaimer": "Die angezeigten Preise sind Schätzungen und können je nach Wechselkurs variieren",
     "billingIssue": "Abrechnungsproblem",
     "paymentFailed": "Zahlung fehlgeschlagen",
     "refundRequest": "Rückerstattungsanfrage",
@@ -1024,6 +1031,13 @@
     "upgradePlan": "Plan upgraden",
     "newBalance": "Neuer Kontostand: {{balance}} Credits",
     "used": "verwendet"
+  },
+  "lowCredits": {
+    "title": "Warnung: Wenig Credits",
+    "message": "Sie haben nur noch {{credits}} Credits. Laden Sie jetzt auf, um alle Funktionen weiter nutzen zu können.",
+    "remaining": "übrig",
+    "buyNow": "Credits kaufen",
+    "remindLater": "Später"
   },
   "editor": {
     "textStyle": "Textstil",
@@ -1316,6 +1330,22 @@
     "reported": "Gemeldet!",
     "alreadyReported": "Bereits gemeldet",
     "reportFailed": "Fehlgeschlagen"
+  },
+  "globalError": {
+    "offlineTitle": "Keine Internetverbindung",
+    "offlineMessage": "Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+    "networkTitle": "Verbindungsfehler",
+    "networkMessage": "Verbindung zum Server nicht möglich. Bitte überprüfen Sie Ihr Netzwerk und versuchen Sie es erneut.",
+    "serverTitle": "Serverfehler",
+    "serverMessage": "Der Server ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.",
+    "timeoutTitle": "Zeitüberschreitung",
+    "timeoutMessage": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
+    "maintenanceTitle": "Wartungsarbeiten",
+    "maintenanceMessage": "Wir führen geplante Wartungsarbeiten durch. Bitte versuchen Sie es in wenigen Minuten erneut.",
+    "forbiddenTitle": "Zugriff verweigert",
+    "forbiddenMessage": "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen.",
+    "quotaTitle": "Kontingent überschritten",
+    "quotaMessage": "Sie haben Ihr Nutzungslimit überschritten. Bitte upgraden Sie Ihren Plan oder versuchen Sie es später erneut."
   },
   "pagination": {
     "firstPage": "Erste Seite",

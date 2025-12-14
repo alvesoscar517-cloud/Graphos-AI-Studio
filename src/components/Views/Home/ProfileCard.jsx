@@ -157,7 +157,7 @@ const ProfileCard = ({ profile, onSelect, onUse, isLoading, visibleCards = 3 }) 
         </div>
       </div>
 
-      {/* Tags */}
+      {/* Theme Tag */}
       <div className="flex flex-wrap gap-2 mb-4 max-lg:gap-1.5 max-lg:mb-3 max-sm:gap-1">
         <span className={cn(
           "inline-flex items-center gap-1 py-1 px-2.5 rounded-md text-xs font-medium",
@@ -165,17 +165,8 @@ const ProfileCard = ({ profile, onSelect, onUse, isLoading, visibleCards = 3 }) 
           "max-lg:py-0.5 max-lg:px-2 max-lg:text-[11px]",
           "max-sm:px-1.5 max-sm:text-[10px]"
         )}>
-          <img src="/icon/briefcase.svg" alt="" className="w-3 h-3 opacity-60 icon-invert max-sm:w-2.5 max-sm:h-2.5" />
-          {t('profile.office')}
-        </span>
-        <span className={cn(
-          "inline-flex items-center gap-1 py-1 px-2.5 rounded-md text-xs font-medium",
-          "bg-fill-tertiary text-text-secondary border border-border-light",
-          "max-lg:py-0.5 max-lg:px-2 max-lg:text-[11px]",
-          "max-sm:px-1.5 max-sm:text-[10px]"
-        )}>
-          <img src="/icon/user.svg" alt="" className="w-3 h-3 opacity-60 icon-invert max-sm:w-2.5 max-sm:h-2.5" />
-          {t('profile.personal')}
+          <img src={`/icon/${getThemeIcon(profile.theme)}.svg`} alt="" className="w-3 h-3 opacity-60 icon-invert max-sm:w-2.5 max-sm:h-2.5" />
+          {t(`profileSetup.themes.${profile.theme}`, profile.theme)}
         </span>
       </div>
 

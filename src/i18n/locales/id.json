@@ -318,6 +318,7 @@
     "createStyleProfile": "Buat Profil",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "Pelajari Aplikasi",
     "featuredFeatures": "Fitur Unggulan",
     "aiChat": "Chat AI",
     "aiChatDesc": "Ngobrol secara alami dengan AI yang merespons dalam gaya penulisan unik Anda",
@@ -707,6 +708,11 @@
     "completedIterations": "Selesai setelah {{count}} iterasi",
     "aiProbability": "Probabilitas AI: {{percent}}%",
     "readingFile": "Membaca file...",
+    "rewriteSelection": "Tulis ulang pilihan",
+    "humanizeSelection": "Humanisasi pilihan",
+    "selectionRewritten": "Pilihan telah ditulis ulang!",
+    "selectionHumanized": "Pilihan telah dihumanisasi!",
+    "enableFeatureFirst": "Aktifkan setidaknya satu fitur penulisan ulang di sidebar terlebih dahulu",
     "humanizeProgress": {
       "queued": "Antri...",
       "loading_profile": "Memuat profil...",
@@ -934,6 +940,7 @@
     "credits": "kredit",
     "bonus": "bonus",
     "perCredit": "/kredit",
+    "localCurrencyDisclaimer": "Harga yang ditampilkan adalah perkiraan dan dapat berubah sesuai kurs",
     "billingIssue": "Masalah Penagihan",
     "paymentFailed": "Pembayaran Gagal",
     "refundRequest": "Permintaan Pengembalian Dana",
@@ -1024,6 +1031,13 @@
       "refund": "Pengembalian Dana",
       "subscriptionRenewal": "Pembaruan Langganan"
     }
+  },
+  "lowCredits": {
+    "title": "Kredit Hampir Habis",
+    "message": "Anda hanya memiliki {{credits}} kredit tersisa. Isi ulang sekarang untuk terus menggunakan semua fitur.",
+    "remaining": "tersisa",
+    "buyNow": "Beli Kredit",
+    "remindLater": "Nanti"
   },
   "editor": {
     "enterYourText": "Masukkan teks Anda...",
@@ -1316,6 +1330,22 @@
     "reported": "Dilaporkan!",
     "alreadyReported": "Sudah dilaporkan",
     "reportFailed": "Gagal"
+  },
+  "globalError": {
+    "offlineTitle": "Tidak Ada Koneksi Internet",
+    "offlineMessage": "Silakan periksa koneksi internet Anda dan coba lagi.",
+    "networkTitle": "Kesalahan Koneksi",
+    "networkMessage": "Tidak dapat terhubung ke server. Silakan periksa jaringan Anda dan coba lagi.",
+    "serverTitle": "Kesalahan Server",
+    "serverMessage": "Server sementara tidak tersedia. Silakan coba lagi nanti.",
+    "timeoutTitle": "Waktu Permintaan Habis",
+    "timeoutMessage": "Permintaan memakan waktu terlalu lama. Silakan coba lagi.",
+    "maintenanceTitle": "Sedang Pemeliharaan",
+    "maintenanceMessage": "Kami sedang melakukan pemeliharaan terjadwal. Silakan coba lagi dalam beberapa menit.",
+    "forbiddenTitle": "Akses Ditolak",
+    "forbiddenMessage": "Anda tidak memiliki izin untuk mengakses sumber daya ini.",
+    "quotaTitle": "Kuota Terlampaui",
+    "quotaMessage": "Anda telah melebihi batas penggunaan. Silakan tingkatkan paket Anda atau coba lagi nanti."
   },
   "pagination": {
     "firstPage": "Halaman pertama",

@@ -318,6 +318,7 @@
     "createStyleProfile": "สร้างโปรไฟล์",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "เรียนรู้เกี่ยวกับแอป",
     "featuredFeatures": "ฟีเจอร์เด่น",
     "aiChat": "แชท AI",
     "aiChatDesc": "แชทอย่างเป็นธรรมชาติกับ AI ที่ตอบในสไตล์การเขียนเฉพาะของคุณ",
@@ -707,6 +708,11 @@
     "completedIterations": "เสร็จสิ้นหลังจาก {{count}} รอบ",
     "aiProbability": "ความน่าจะเป็น AI: {{percent}}%",
     "readingFile": "กำลังอ่านไฟล์...",
+    "rewriteSelection": "เขียนใหม่ส่วนที่เลือก",
+    "humanizeSelection": "ทำให้เป็นธรรมชาติส่วนที่เลือก",
+    "selectionRewritten": "เขียนใหม่ส่วนที่เลือกแล้ว!",
+    "selectionHumanized": "ทำให้เป็นธรรมชาติส่วนที่เลือกแล้ว!",
+    "enableFeatureFirst": "กรุณาเปิดใช้งานอย่างน้อยหนึ่งฟีเจอร์การเขียนใหม่ในแถบด้านข้างก่อน",
     "humanizeProgress": {
       "queued": "รอคิว...",
       "loading_profile": "กำลังโหลดโปรไฟล์...",
@@ -934,6 +940,7 @@
     "credits": "เครดิต",
     "bonus": "โบนัส",
     "perCredit": "/เครดิต",
+    "localCurrencyDisclaimer": "ราคาที่แสดงเป็นการประมาณและอาจเปลี่ยนแปลงตามอัตราแลกเปลี่ยน",
     "billingIssue": "ปัญหาการเรียกเก็บเงิน",
     "paymentFailed": "การชำระเงินล้มเหลว",
     "refundRequest": "คำขอคืนเงิน",
@@ -1024,6 +1031,13 @@
       "refund": "คืนเงิน",
       "subscriptionRenewal": "การต่ออายุการสมัครสมาชิก"
     }
+  },
+  "lowCredits": {
+    "title": "เครดิตเหลือน้อย",
+    "message": "คุณเหลือเพียง {{credits}} เครดิต เติมเงินตอนนี้เพื่อใช้งานฟีเจอร์ทั้งหมดต่อไป",
+    "remaining": "เหลือ",
+    "buyNow": "ซื้อเครดิต",
+    "remindLater": "ภายหลัง"
   },
   "editor": {
     "enterYourText": "ใส่ข้อความของคุณ...",
@@ -1316,6 +1330,22 @@
     "reported": "รายงานแล้ว!",
     "alreadyReported": "รายงานแล้วก่อนหน้านี้",
     "reportFailed": "ล้มเหลว"
+  },
+  "globalError": {
+    "offlineTitle": "ไม่มีการเชื่อมต่ออินเทอร์เน็ต",
+    "offlineMessage": "กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วลองอีกครั้ง",
+    "networkTitle": "ข้อผิดพลาดการเชื่อมต่อ",
+    "networkMessage": "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบเครือข่ายแล้วลองอีกครั้ง",
+    "serverTitle": "ข้อผิดพลาดเซิร์ฟเวอร์",
+    "serverMessage": "เซิร์ฟเวอร์ไม่พร้อมใช้งานชั่วคราว กรุณาลองอีกครั้งในภายหลัง",
+    "timeoutTitle": "หมดเวลาคำขอ",
+    "timeoutMessage": "คำขอใช้เวลานานเกินไป กรุณาลองอีกครั้ง",
+    "maintenanceTitle": "อยู่ระหว่างการบำรุงรักษา",
+    "maintenanceMessage": "เรากำลังดำเนินการบำรุงรักษาตามกำหนด กรุณาลองอีกครั้งในอีกไม่กี่นาที",
+    "forbiddenTitle": "การเข้าถึงถูกปฏิเสธ",
+    "forbiddenMessage": "คุณไม่มีสิทธิ์เข้าถึงทรัพยากรนี้",
+    "quotaTitle": "เกินโควต้า",
+    "quotaMessage": "คุณใช้งานเกินขีดจำกัดแล้ว กรุณาอัปเกรดแผนของคุณหรือลองอีกครั้งในภายหลัง"
   },
   "pagination": {
     "firstPage": "หน้าแรก",

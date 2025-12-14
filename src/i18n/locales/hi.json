@@ -318,6 +318,7 @@
     "createStyleProfile": "प्रोफाइल बनाएं",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "ऐप के बारे में जानें",
     "featuredFeatures": "विशेष सुविधाएँ",
     "aiChat": "AI चैट",
     "aiChatDesc": "AI के साथ स्वाभाविक रूप से बातचीत करें जो आपकी अनूठी लेखन शैली में जवाब देता है",
@@ -707,6 +708,11 @@
     "completedIterations": "{{count}} पुनरावृत्तियों के बाद पूर्ण",
     "aiProbability": "AI संभावना: {{percent}}%",
     "readingFile": "फ़ाइल पढ़ी जा रही है...",
+    "rewriteSelection": "चयन को फिर से लिखें",
+    "humanizeSelection": "चयन को मानवीय बनाएं",
+    "selectionRewritten": "चयन फिर से लिखा गया!",
+    "selectionHumanized": "चयन मानवीय बनाया गया!",
+    "enableFeatureFirst": "पहले साइडबार में कम से कम एक पुनर्लेखन सुविधा सक्षम करें",
     "humanizeProgress": {
       "queued": "कतार में...",
       "loading_profile": "प्रोफाइल लोड हो रहा है...",
@@ -934,6 +940,7 @@
     "credits": "क्रेडिट्स",
     "bonus": "बोनस",
     "perCredit": "/क्रेडिट",
+    "localCurrencyDisclaimer": "दिखाई गई कीमतें अनुमानित हैं और विनिमय दर के अनुसार बदल सकती हैं",
     "billingIssue": "बिलिंग समस्या",
     "paymentFailed": "भुगतान विफल",
     "refundRequest": "रिफंड अनुरोध",
@@ -1024,6 +1031,13 @@
       "refund": "वापसी",
       "subscriptionRenewal": "सदस्यता नवीनीकरण"
     }
+  },
+  "lowCredits": {
+    "title": "क्रेडिट कम हैं",
+    "message": "आपके पास केवल {{credits}} क्रेडिट बचे हैं। सभी सुविधाओं का उपयोग जारी रखने के लिए अभी रिचार्ज करें।",
+    "remaining": "शेष",
+    "buyNow": "क्रेडिट खरीदें",
+    "remindLater": "बाद में"
   },
   "editor": {
     "enterYourText": "अपना टेक्स्ट दर्ज करें...",
@@ -1316,6 +1330,22 @@
     "reported": "रिपोर्ट किया गया!",
     "alreadyReported": "पहले से रिपोर्ट किया गया",
     "reportFailed": "विफल"
+  },
+  "globalError": {
+    "offlineTitle": "इंटरनेट कनेक्शन नहीं है",
+    "offlineMessage": "कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।",
+    "networkTitle": "कनेक्शन त्रुटि",
+    "networkMessage": "सर्वर से कनेक्ट नहीं हो पा रहा है। कृपया अपना नेटवर्क जांचें और पुनः प्रयास करें।",
+    "serverTitle": "सर्वर त्रुटि",
+    "serverMessage": "सर्वर अस्थायी रूप से अनुपलब्ध है। कृपया बाद में पुनः प्रयास करें।",
+    "timeoutTitle": "अनुरोध समय समाप्त",
+    "timeoutMessage": "अनुरोध में बहुत समय लगा। कृपया पुनः प्रयास करें।",
+    "maintenanceTitle": "रखरखाव जारी",
+    "maintenanceMessage": "हम निर्धारित रखरखाव कर रहे हैं। कृपया कुछ मिनटों में पुनः प्रयास करें।",
+    "forbiddenTitle": "पहुँच अस्वीकृत",
+    "forbiddenMessage": "आपको इस संसाधन तक पहुँचने की अनुमति नहीं है।",
+    "quotaTitle": "कोटा पार",
+    "quotaMessage": "आपने अपनी उपयोग सीमा पार कर ली है। कृपया अपनी योजना अपग्रेड करें या बाद में पुनः प्रयास करें।"
   },
   "pagination": {
     "firstPage": "पहला पृष्ठ",

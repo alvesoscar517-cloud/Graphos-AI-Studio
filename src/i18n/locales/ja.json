@@ -318,6 +318,7 @@
     "createStyleProfile": "プロフィール作成",
     "startAIChat": "AI Workspace",
     "openAIStudio": "AI Studio",
+    "learnAboutApp": "アプリについて",
     "featuredFeatures": "主な機能",
     "aiChat": "AIチャット",
     "aiChatDesc": "あなた独自の文体で応答するAIと自然に会話できます",
@@ -707,6 +708,11 @@
     "completedIterations": "{{count}} 回の反復で完了",
     "aiProbability": "AI確率: {{percent}}%",
     "readingFile": "ファイルを読み込み中...",
+    "rewriteSelection": "選択範囲を書き換え",
+    "humanizeSelection": "選択範囲を自然化",
+    "selectionRewritten": "選択範囲を書き換えました！",
+    "selectionHumanized": "選択範囲を自然化しました！",
+    "enableFeatureFirst": "まずサイドバーで少なくとも1つの書き換え機能を有効にしてください",
     "humanizeProgress": {
       "queued": "キューに入っています...",
       "loading_profile": "プロフィールを読み込み中...",
@@ -934,6 +940,7 @@
     "credits": "クレジット",
     "bonus": "ボーナス",
     "perCredit": "/クレジット",
+    "localCurrencyDisclaimer": "表示価格は概算であり、為替レートにより変動する場合があります",
     "billingIssue": "請求の問題",
     "paymentFailed": "支払い失敗",
     "refundRequest": "返金リクエスト",
@@ -1024,6 +1031,13 @@
       "refund": "払い戻し",
       "subscriptionRenewal": "サブスクリプション更新"
     }
+  },
+  "lowCredits": {
+    "title": "クレジット残高不足",
+    "message": "残り {{credits}} クレジットです。すべての機能を中断なく使用するには、今すぐチャージしてください。",
+    "remaining": "残り",
+    "buyNow": "クレジット購入",
+    "remindLater": "後で"
   },
   "editor": {
     "enterYourText": "テキストを入力...",
@@ -1316,6 +1330,22 @@
     "reported": "報告済み！",
     "alreadyReported": "報告済み",
     "reportFailed": "失敗"
+  },
+  "globalError": {
+    "offlineTitle": "インターネット接続がありません",
+    "offlineMessage": "インターネット接続を確認して、もう一度お試しください。",
+    "networkTitle": "接続エラー",
+    "networkMessage": "サーバーに接続できません。ネットワークを確認して、もう一度お試しください。",
+    "serverTitle": "サーバーエラー",
+    "serverMessage": "サーバーが一時的に利用できません。後でもう一度お試しください。",
+    "timeoutTitle": "リクエストタイムアウト",
+    "timeoutMessage": "リクエストに時間がかかりすぎました。もう一度お試しください。",
+    "maintenanceTitle": "メンテナンス中",
+    "maintenanceMessage": "定期メンテナンスを実施中です。数分後にもう一度お試しください。",
+    "forbiddenTitle": "アクセス拒否",
+    "forbiddenMessage": "このリソースにアクセスする権限がありません。",
+    "quotaTitle": "クォータ超過",
+    "quotaMessage": "使用制限を超えました。プランをアップグレードするか、後でもう一度お試しください。"
   },
   "pagination": {
     "firstPage": "最初のページ",

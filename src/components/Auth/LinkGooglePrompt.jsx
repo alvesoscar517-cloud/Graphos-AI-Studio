@@ -19,7 +19,7 @@ const LinkGooglePrompt = ({ onLink, onClose }) => {
   return createPortal(
     <div 
       className={cn(
-        "fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center p-5 animate-fade-in",
+        "fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center p-5 animate-fade-in",
         "max-md:p-3 max-md:items-end"
       )}
       style={{ zIndex: 999999 }}

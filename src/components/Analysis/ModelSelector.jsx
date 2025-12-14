@@ -81,7 +81,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
       {/* Modal */}
       {showModal && createPortal(
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-modal-nested animate-fade-in"
+          className="fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-modal-nested animate-fade-in"
           onClick={() => setShowModal(false)}
         >
           <div 

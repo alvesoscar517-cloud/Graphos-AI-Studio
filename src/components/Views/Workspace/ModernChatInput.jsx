@@ -29,7 +29,8 @@ const ModernChatInput = ({
   initialMessage = '',
   selectedModel = 'gemini-2.5-flash',
   onModelChange,
-  showModelSelector = true
+  showModelSelector = true,
+  initialHelpMode = false
 }) => {
   const { t } = useTranslation()
   const defaultPlaceholder = placeholder || t('workspace.askAnything')
@@ -41,7 +42,7 @@ const ModernChatInput = ({
   const [showPlusMenu, setShowPlusMenu] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [status, setStatus] = useState('ready') // ready, submitted, streaming
-  const [isHelpMode, setIsHelpMode] = useState(false) // Help mode for app context
+  const [isHelpMode, setIsHelpMode] = useState(initialHelpMode) // Help mode for app context
   
   const textareaRef = useRef(null)
   const fileInputRef = useRef(null)
@@ -77,6 +78,14 @@ const ModernChatInput = ({
       }
     }
   }, [initialMessage])
+
+  // Update help mode when initialHelpMode changes
+  useEffect(() => {
+    if (initialHelpMode) {
+      setIsHelpMode(true)
+      textareaRef.current?.focus()
+    }
+  }, [initialHelpMode])
 
   // Auto-resize textarea
   useEffect(() => {

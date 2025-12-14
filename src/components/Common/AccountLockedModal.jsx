@@ -35,8 +35,8 @@ export default function AccountLockedModal() {
 
   return (
     <div className={cn(
-      "fixed inset-0 bg-black/80 flex items-center justify-center z-toast p-5",
-      "backdrop-blur-sm"
+      "fixed inset-0 bg-black/5 flex items-center justify-center z-toast p-5",
+      "backdrop-blur-[1px]"
     )}>
       <div className={cn(
         "bg-bg-primary rounded-2xl p-10 max-w-modal-md w-full",

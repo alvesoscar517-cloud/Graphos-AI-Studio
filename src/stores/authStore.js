@@ -29,6 +29,8 @@ import {
   AUTH_STORAGE_KEYS,
   migrateToSecureStorage,
   setRememberMe,
+  setRememberedEmail,
+  clearRememberedEmail,
 } from '../utils/authStorage'
 import { logError } from '../utils/errors'
 import { saveCredentials, preventAutoSignIn } from '../utils/credentialManager'
@@ -281,6 +283,11 @@ export const useAuthStore = create(
             // Save credentials to browser password manager if rememberMe
             if (rememberMe) {
               saveCredentials(email, password, data.user.name || data.user.displayName)
+              // Lưu email để auto-fill khi đăng nhập lại (giống Google, GitHub, Facebook)
+              setRememberedEmail(email)
+            } else {
+              // Nếu không tick Remember me, xóa email đã nhớ trước đó
+              clearRememberedEmail()
             }
             
             return { success: true }

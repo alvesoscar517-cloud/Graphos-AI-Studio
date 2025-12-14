@@ -1,22 +1,58 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { logger } from '@/utils/logger'
+import { useRewrite, useAIProcessingActions } from '@/stores'
+import { useUISelectionActions } from '@/stores/uiSelectionStore'
+import { useProfiles } from '../../contexts/ProfileContext'
+import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
+import { getLocalizedContentError } from '../../utils/errorMessages'
+import { handleCreditError } from '../../utils/creditHandler'
+import modal from '../../utils/modal'
 import Portal from './Portal'
 
 /**
  * Custom Context Menu Component
  * Hoạt động trên input và textarea trong toàn bộ hệ thống
+ * Hỗ trợ Rewrite/Humanize cho text selection trong TiptapEditor
  */
 const ContextMenu = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { currentProfile } = useProfiles()
+  const { selectedModel, writingPreferences } = useRewrite()
+  const { startProcessing, stopProcessing } = useAIProcessingActions()
+  const { showContextMenu, hideAll } = useUISelectionActions()
+  
   const [isVisible, setIsVisible] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [targetElement, setTargetElement] = useState(null)
   const [hasSelection, setHasSelection] = useState(false)
   const [canPaste, setCanPaste] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
   const menuRef = useRef(null)
 
-  // Menu items configuration
-  const menuItems = [
+  const [isTextSelection, setIsTextSelection] = useState(false)
+  const [isTiptapSelection, setIsTiptapSelection] = useState(false)
+  const [selectedText, setSelectedText] = useState('')
+  const [tiptapEditor, setTiptapEditor] = useState(null)
+  const [selectionRange, setSelectionRange] = useState({ from: 0, to: 0 })
+
+  // Check if features are enabled for rewrite/humanize
+  const hasAnyFeatureEnabled = useCallback(() => {
+    const prefs = writingPreferences || {}
+    const hasProfile = currentProfile !== null
+    
+    if (!hasProfile) {
+      return prefs.useAntiAIDetection || prefs.useIterativeRefinement
+    }
+    return prefs.useAntiAIDetection || prefs.useIterativeRefinement ||
+           prefs.useVocabularyPreferences || prefs.useKeyCharacteristics ||
+           prefs.useSentencePatterns || prefs.useRewriteInstructions
+  }, [currentProfile, writingPreferences])
+
+  // Menu items for editable elements
+  const editableMenuItems = [
     { id: 'cut', labelKey: 'common.cut', shortcut: 'Ctrl+X', icon: 'cut', requiresSelection: true },
     { id: 'copy', labelKey: 'common.copy', shortcut: 'Ctrl+C', icon: 'copy', requiresSelection: true },
     { id: 'paste', labelKey: 'common.paste', shortcut: 'Ctrl+V', icon: 'paste', requiresPaste: true },
@@ -27,34 +63,96 @@ const ContextMenu = () => {
     { id: 'redo', labelKey: 'common.redo', shortcut: 'Ctrl+Shift+Z', icon: 'redo' },
   ]
 
+  // Menu items for text selection (non-editable)
+  const textSelectionMenuItems = [
+    { id: 'copy', labelKey: 'common.copy', shortcut: 'Ctrl+C', icon: 'copy' },
+  ]
+  
+  // Menu items for TiptapEditor selection (with AI features)
+  const tiptapSelectionMenuItems = [
+    { id: 'copy', labelKey: 'common.copy', shortcut: 'Ctrl+C', icon: 'copy' },
+    { id: 'cut', labelKey: 'common.cut', shortcut: 'Ctrl+X', icon: 'cut' },
+    { id: 'divider-ai', type: 'divider' },
+    { id: 'rewrite', labelKey: 'rewrite.rewriteSelection', icon: 'rewrite', isAI: true },
+    { id: 'humanize', labelKey: 'rewrite.humanizeSelection', icon: 'humanize', isAI: true },
+  ]
+
+  const menuItems = isTiptapSelection 
+    ? tiptapSelectionMenuItems 
+    : (isTextSelection ? textSelectionMenuItems : editableMenuItems)
+
   // Check if element is input or textarea
   const isEditableElement = (element) => {
     if (!element) return false
     const tagName = element.tagName?.toLowerCase()
     return tagName === 'input' || tagName === 'textarea' || element.isContentEditable
   }
+  
+  // Check if element is inside TiptapEditor
+  const isTiptapElement = (element) => {
+    if (!element) return false
+    return element.closest('.tiptap-editor') || element.closest('.ProseMirror')
+  }
+  
+  // Get TiptapEditor instance from DOM
+  const getTiptapEditor = (element) => {
+    const proseMirror = element.closest('.ProseMirror')
+    if (proseMirror && proseMirror.pmViewDesc?.node) {
+      // Access editor through ProseMirror view
+      return proseMirror.pmViewDesc
+    }
+    return null
+  }
 
   // Handle context menu event
-  const handleContextMenu = useCallback(async (e) => {
+  const handleContextMenu = useCallback((e) => {
     const target = e.target
     
-    if (!isEditableElement(target)) return
+    // Check for text selection first
+    const windowSelection = window.getSelection()
+    const selectedTextValue = windowSelection?.toString()?.trim()
     
-    e.preventDefault()
-    
-    // Check selection
-    const selection = target.selectionStart !== target.selectionEnd
-    setHasSelection(selection)
-    
-    // Check clipboard
-    try {
-      const clipboardText = await navigator.clipboard.readText()
-      setCanPaste(!!clipboardText)
-    } catch {
-      setCanPaste(true) // Assume paste is available if can't check
+    // Check if inside TiptapEditor with selection
+    if (isTiptapElement(target) && selectedTextValue) {
+      e.preventDefault()
+      setIsTextSelection(false)
+      setIsTiptapSelection(true)
+      setHasSelection(true)
+      setCanPaste(false)
+      setSelectedText(selectedTextValue)
+      setTargetElement(target)
+      
+      // Try to get selection range from ProseMirror
+      const proseMirror = target.closest('.ProseMirror')
+      if (proseMirror) {
+        // Store reference for later use
+        setTiptapEditor(proseMirror)
+      }
+    } else if (isEditableElement(target)) {
+      e.preventDefault()
+      setIsTextSelection(false)
+      setIsTiptapSelection(false)
+      
+      // Check selection in input/textarea
+      const selection = target.selectionStart !== target.selectionEnd
+      setHasSelection(selection)
+      setCanPaste(true)
+      setTargetElement(target)
+      setSelectedText('')
+    } else if (selectedTextValue) {
+      // Has text selection in non-editable element
+      e.preventDefault()
+      setIsTextSelection(true)
+      setIsTiptapSelection(false)
+      setHasSelection(true)
+      setCanPaste(false)
+      setTargetElement(null)
+      setSelectedText(selectedTextValue)
+    } else {
+      // Block default context menu for other elements
+      e.preventDefault()
+      return
     }
-    
-    setTargetElement(target)
     
     // Calculate position
     let x = e.clientX
@@ -62,42 +160,181 @@ const ContextMenu = () => {
     
     // Adjust position to stay within viewport
     const menuWidth = 200
-    const menuHeight = 280
+    const menuHeight = isTiptapSelection ? 180 : (isTextSelection ? 50 : 260)
     
     if (x + menuWidth > window.innerWidth) {
-      x = window.innerWidth - menuWidth - 10
+      x = window.innerWidth - menuWidth - 8
     }
     if (y + menuHeight > window.innerHeight) {
-      y = window.innerHeight - menuHeight - 10
+      y = window.innerHeight - menuHeight - 8
     }
     
     setPosition({ x, y })
     setIsVisible(true)
-  }, [])
+    showContextMenu() // Hide floating toolbar when context menu opens
+  }, [showContextMenu])
 
   // Handle click outside to close menu
   const handleClickOutside = useCallback((e) => {
     if (isVisible && menuRef.current && !menuRef.current.contains(e.target)) {
       setIsVisible(false)
+      hideAll() // Allow floating toolbar to show again
     }
-  }, [isVisible])
+  }, [isVisible, hideAll])
 
   // Handle escape key
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Escape') {
       setIsVisible(false)
+      hideAll()
     }
-  }, [])
+  }, [hideAll])
 
   // Handle scroll to close menu
   const handleScroll = useCallback(() => {
     if (isVisible) {
       setIsVisible(false)
+      hideAll()
     }
-  }, [isVisible])
+  }, [isVisible, hideAll])
+
+
+  // Handle rewrite for selection
+  const handleRewriteSelection = async (useIterative = false) => {
+    if (!selectedText || isProcessing) return
+    
+    setIsProcessing(true)
+    startProcessing(useIterative ? 'humanize' : 'rewrite')
+    setIsVisible(false)
+    
+    const originalText = selectedText
+    
+    try {
+      let resultText = ''
+      
+      if (useIterative) {
+        logger.log('[CONTEXT MENU] Starting iterative humanization for selection...')
+        
+        const startResult = await startIterativeHumanize(
+          currentProfile?.profile_id || null,
+          originalText,
+          {
+            maxIterations: 3,
+            targetProbability: writingPreferences?.targetAIProbability || 35,
+            model: selectedModel,
+            writingPreferences: writingPreferences
+          }
+        )
+        
+        if (!startResult.success) {
+          throw new Error(startResult.error || t('rewrite.humanizationFailed'))
+        }
+        
+        const result = await pollAndStreamHumanizeJob(startResult.jobId, {
+          onProgress: (progress) => {
+            logger.log('[CONTEXT MENU PROGRESS]', progress)
+          },
+          onChunk: (chunk) => {
+            resultText += chunk
+          },
+          onComplete: (metadata) => {
+            logger.log('[CONTEXT MENU COMPLETE]', metadata)
+          },
+          pollInterval: 1500,
+          maxWaitTime: 300000
+        })
+        
+        if (!result.success) {
+          throw new Error(result.error || t('rewrite.humanizationFailed'))
+        }
+        
+        resultText = resultText || result.data?.rewritten_text
+      } else {
+        logger.log('[CONTEXT MENU] Starting rewrite for selection...')
+        
+        await rewriteTextStream(
+          currentProfile?.profile_id || null,
+          originalText,
+          selectedModel,
+          writingPreferences,
+          (chunk, type) => {
+            if (type === 'reasoning') return
+            resultText += chunk
+          }
+        )
+      }
+      
+      // Replace selection in TiptapEditor
+      if (resultText && tiptapEditor) {
+        // Use document.execCommand for contenteditable
+        document.execCommand('insertText', false, resultText)
+        modal.success(useIterative 
+          ? (t('rewrite.selectionHumanized') || 'Selection humanized!')
+          : (t('rewrite.selectionRewritten') || 'Selection rewritten!')
+        )
+      }
+    } catch (error) {
+      console.error('[CONTEXT MENU FAIL]', error)
+      
+      const wasCreditError = handleCreditError(error, t, () => navigate('/pricing'))
+      
+      if (!wasCreditError) {
+        const localizedError = getLocalizedContentError(error.message, t)
+        modal.errorWithReport(
+          localizedError || t('rewrite.rewriteFailed'),
+          error,
+          'Error',
+          'ContextMenu.handleRewriteSelection'
+        )
+      }
+    } finally {
+      setIsProcessing(false)
+      stopProcessing()
+    }
+  }
 
   // Execute menu action
   const executeAction = useCallback((actionId) => {
+    // Handle AI actions for TiptapEditor
+    if (isTiptapSelection) {
+      if (actionId === 'rewrite') {
+        handleRewriteSelection(false)
+        return
+      }
+      if (actionId === 'humanize') {
+        handleRewriteSelection(true)
+        return
+      }
+      if (actionId === 'copy') {
+        navigator.clipboard.writeText(selectedText).catch(() => {
+          document.execCommand('copy')
+        })
+        setIsVisible(false)
+        return
+      }
+      if (actionId === 'cut') {
+        navigator.clipboard.writeText(selectedText).then(() => {
+          document.execCommand('delete')
+        }).catch(() => {
+          document.execCommand('cut')
+        })
+        setIsVisible(false)
+        return
+      }
+    }
+    
+    // Handle copy for text selection (non-editable)
+    if (isTextSelection && actionId === 'copy') {
+      const selectedTextValue = window.getSelection()?.toString()
+      if (selectedTextValue) {
+        navigator.clipboard.writeText(selectedTextValue).catch(() => {
+          document.execCommand('copy')
+        })
+      }
+      setIsVisible(false)
+      return
+    }
+    
     if (!targetElement) return
     
     targetElement.focus()
@@ -136,7 +373,7 @@ const ContextMenu = () => {
     }
     
     setIsVisible(false)
-  }, [targetElement])
+  }, [targetElement, isTextSelection, isTiptapSelection, selectedText, handleRewriteSelection])
 
   // Setup event listeners
   useEffect(() => {
@@ -195,6 +432,19 @@ const ContextMenu = () => {
           <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/>
         </svg>
       ),
+      'rewrite': (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+          <path d="m15 5 4 4"/>
+        </svg>
+      ),
+      'humanize': (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <polyline points="16 11 18 13 22 9"/>
+        </svg>
+      ),
     }
     return icons[iconName] || null
   }
@@ -212,14 +462,31 @@ const ContextMenu = () => {
           top: position.y,
         }}
       >
+        {/* Selection info for TiptapEditor */}
+        {isTiptapSelection && selectedText && (
+          <div className="context-menu-header">
+            <span className="context-menu-selection-info">
+              {selectedText.split(/\s+/).filter(w => w.length > 0).length} {t('common.words') || 'words'}
+            </span>
+          </div>
+        )}
+        
         {menuItems.map((item) => {
           if (item.type === 'divider') {
             return <div key={item.id} className="context-menu-divider" />
           }
           
+          const isAIDisabled = item.isAI && !hasAnyFeatureEnabled()
           const isDisabled = 
             (item.requiresSelection && !hasSelection) ||
-            (item.requiresPaste && !canPaste)
+            (item.requiresPaste && !canPaste) ||
+            isAIDisabled ||
+            isProcessing
+          
+          // Tooltip for disabled AI actions
+          const tooltipText = isAIDisabled 
+            ? (t('rewrite.enableFeatureFirst') || 'Enable at least one rewrite feature in sidebar first')
+            : undefined
           
           return (
             <button
@@ -227,10 +494,13 @@ const ContextMenu = () => {
               className={`context-menu-item ${isDisabled ? 'disabled' : ''}`}
               onClick={() => !isDisabled && executeAction(item.id)}
               disabled={isDisabled}
+              data-tooltip={tooltipText}
+              data-tooltip-position="right"
             >
               <span className="context-menu-icon">{getIcon(item.icon)}</span>
               <span className="context-menu-label">{t(item.labelKey)}</span>
-              <span className="context-menu-shortcut">{item.shortcut}</span>
+              {item.shortcut && <span className="context-menu-shortcut">{item.shortcut}</span>}
+              {item.isAI && <span className="context-menu-badge">AI</span>}
             </button>
           )
         })}

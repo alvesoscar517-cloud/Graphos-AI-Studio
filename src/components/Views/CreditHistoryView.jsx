@@ -15,10 +15,17 @@ import { cn } from '@/lib/utils'
 const FEATURE_CONFIG = {
   // Usage features (deduction)
   chat_message: { icon: '/icon/message-circle.svg', labelKey: 'credits.feature.chatMessage' },
+  chat_message_output: { icon: '/icon/message-circle.svg', labelKey: 'credits.feature.chatMessage', mergeWith: 'chat_message' },
+  chat_humanized: { icon: '/icon/message-circle.svg', labelKey: 'credits.feature.chatHumanized' },
+  chat_humanized_output: { icon: '/icon/message-circle.svg', labelKey: 'credits.feature.chatHumanized', mergeWith: 'chat_humanized' },
   humanize: { icon: '/icon/wand-sparkles.svg', labelKey: 'credits.feature.humanize' },
+  iterative_humanize: { icon: '/icon/wand-sparkles.svg', labelKey: 'credits.feature.humanize' },
   detect: { icon: '/icon/scan-search.svg', labelKey: 'credits.feature.detect' },
   rewrite: { icon: '/icon/pencil.svg', labelKey: 'credits.feature.rewrite' },
+  text_rewrite: { icon: '/icon/pencil.svg', labelKey: 'credits.feature.rewrite' },
   analyze: { icon: '/icon/bar-chart.svg', labelKey: 'credits.feature.analyze' },
+  text_analysis: { icon: '/icon/bar-chart.svg', labelKey: 'credits.feature.analyze' },
+  ai_detection: { icon: '/icon/scan-search.svg', labelKey: 'credits.feature.detect' },
   // Addition features
   purchase: { icon: '/icon/credit-card.svg', labelKey: 'credits.feature.purchase' },
   first_purchase: { icon: '/icon/gift.svg', labelKey: 'credits.feature.firstPurchase' },
@@ -28,12 +35,25 @@ const FEATURE_CONFIG = {
   subscription_renewal: { icon: '/icon/refresh-cw.svg', labelKey: 'credits.feature.subscriptionRenewal' },
 }
 
+// Features that should be merged (output transactions merged into input)
+const MERGE_FEATURES = {
+  chat_message_output: 'chat_message',
+  chat_humanized_output: 'chat_humanized',
+}
+
+// Get base feature name (without _output suffix)
+const getBaseFeature = (feature) => {
+  if (!feature) return null
+  return MERGE_FEATURES[feature] || feature
+}
+
 // Get icon for transaction based on feature or type
 const getTransactionIcon = (tx) => {
   const { feature, type } = tx
+  const baseFeature = getBaseFeature(feature)
   // Check feature first
-  if (feature && FEATURE_CONFIG[feature]) {
-    return FEATURE_CONFIG[feature].icon
+  if (baseFeature && FEATURE_CONFIG[baseFeature]) {
+    return FEATURE_CONFIG[baseFeature].icon
   }
   // Fallback to type
   if (type === 'addition') return '/icon/plus-circle.svg'
@@ -77,10 +97,56 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
     isFetchingNextPage,
   } = useCreditHistory({ type: filterType === 'all' ? 'all' : filterType, limit: 20 })
 
-  // Flatten paginated data
+  // Flatten paginated data and merge input/output transactions
   const transactions = useMemo(() => {
     if (!historyData?.pages) return []
-    return historyData.pages.flatMap((page) => page.transactions || [])
+    const rawTransactions = historyData.pages.flatMap((page) => page.transactions || [])
+    
+    // Group and merge input/output transactions
+    const mergedMap = new Map()
+    const result = []
+    
+    for (const tx of rawTransactions) {
+      const feature = tx.feature
+      const mergeTarget = MERGE_FEATURES[feature]
+      
+      if (mergeTarget) {
+        // This is an output transaction, try to find and merge with input
+        // Look for a recent input transaction (within 2 minutes)
+        const txTime = new Date(tx.timestamp).getTime()
+        let merged = false
+        
+        for (const [key, existingTx] of mergedMap) {
+          if (existingTx.feature === mergeTarget) {
+            const existingTime = new Date(existingTx.timestamp).getTime()
+            // Merge if within 2 minutes
+            if (Math.abs(txTime - existingTime) < 2 * 60 * 1000) {
+              existingTx.amount += tx.amount
+              existingTx.balanceAfter = tx.balanceAfter // Use the later balance
+              existingTx._merged = true
+              merged = true
+              break
+            }
+          }
+        }
+        
+        // If not merged, add as standalone (shouldn't happen often)
+        if (!merged) {
+          // Convert to parent feature for display
+          const displayTx = { ...tx, feature: mergeTarget, _outputOnly: true }
+          const key = `${tx.id || tx.timestamp}`
+          mergedMap.set(key, displayTx)
+          result.push(displayTx)
+        }
+      } else {
+        // Regular transaction or input transaction
+        const key = `${tx.id || tx.timestamp}`
+        mergedMap.set(key, { ...tx })
+        result.push(mergedMap.get(key))
+      }
+    }
+    
+    return result
   }, [historyData])
 
   // Close filter dropdown on outside click
@@ -136,13 +202,17 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
   // Get display text for transaction
   const getTransactionDisplay = (tx) => {
     const { description, feature, metadata } = tx
+    const baseFeature = getBaseFeature(feature)
 
-    // If has description, use it
-    if (description) return description
+    // If has description and not an output-only transaction, use it
+    // Skip description for merged transactions to show clean feature name
+    if (description && !tx._merged && !tx._outputOnly && !feature?.endsWith('_output')) {
+      return description
+    }
 
-    // Check feature config for translation
-    if (feature && FEATURE_CONFIG[feature]) {
-      return t(FEATURE_CONFIG[feature].labelKey, feature)
+    // Check feature config for translation (use base feature)
+    if (baseFeature && FEATURE_CONFIG[baseFeature]) {
+      return t(FEATURE_CONFIG[baseFeature].labelKey, baseFeature)
     }
 
     // Check metadata for more info
@@ -151,9 +221,9 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
     }
 
     // Fallback to feature name formatted
-    if (feature) {
+    if (baseFeature) {
       // Convert snake_case to Title Case
-      return feature
+      return baseFeature
         .split('_')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')

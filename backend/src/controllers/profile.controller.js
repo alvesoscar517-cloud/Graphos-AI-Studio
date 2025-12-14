@@ -378,7 +378,7 @@ exports.createProfileComplete = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const { user_id, profile_name = 'Default Profile', email, name = 'User', theme = 'work', samples } = req.body;
+    const { user_id, profile_name = 'Default Profile', email, name = 'User', theme = 'work', samples, language = 'en' } = req.body;
 
     logger.info('createProfileComplete started', { 
       user_id: user_id ? 'present' : 'missing',
@@ -590,13 +590,13 @@ exports.createProfileComplete = async (req, res) => {
     
     let voiceProfile;
     try {
-      const voicePromise = geminiService.generateVoiceSummary(texts, statisticalFeatures);
+      const voicePromise = geminiService.generateVoiceSummary(texts, statisticalFeatures, language);
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('VOICE_SUMMARY_TIMEOUT')), VOICE_SUMMARY_TIMEOUT)
       );
       
       voiceProfile = await Promise.race([voicePromise, timeoutPromise]);
-      logger.info('Voice profile generated', { profileId, tone: voiceProfile?.tone });
+      logger.info('Voice profile generated', { profileId, tone: voiceProfile?.tone, language });
     } catch (voiceError) {
       logger.error('Voice profile generation failed', { 
         error: voiceError.message, 
@@ -646,6 +646,7 @@ Characteristics: ${voiceProfile.key_characteristics.join(', ')}
       userId,
       name: profile_name,
       theme,
+      language, // Store the language used to generate profile content
       status: 'ready',
       samplesCount: samples.length,
       statisticalFeatures,
@@ -838,7 +839,7 @@ exports.createProfileCompleteStream = async (req, res) => {
   };
   
   try {
-    const { user_id, profile_name = 'Default Profile', email, name = 'User', theme = 'work', samples } = req.body;
+    const { user_id, profile_name = 'Default Profile', email, name = 'User', theme = 'work', samples, language = 'en' } = req.body;
 
     // Step 0: Validation
     sendEvent({ type: 'step', step: 0, message: l.t('profile_stream.validating') });
@@ -1012,7 +1013,7 @@ exports.createProfileCompleteStream = async (req, res) => {
     let voiceProfile;
     
     try {
-      const voicePromise = geminiService.generateVoiceSummary(texts, statisticalFeatures);
+      const voicePromise = geminiService.generateVoiceSummary(texts, statisticalFeatures, language);
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('VOICE_SUMMARY_TIMEOUT')), VOICE_SUMMARY_TIMEOUT)
       );
@@ -1055,6 +1056,7 @@ exports.createProfileCompleteStream = async (req, res) => {
       userId,
       name: profile_name,
       theme,
+      language, // Store the language used to generate profile content
       status: 'ready',
       samplesCount: samples.length,
       statisticalFeatures,

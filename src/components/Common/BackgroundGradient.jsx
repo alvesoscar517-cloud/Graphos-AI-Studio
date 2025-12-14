@@ -6,7 +6,6 @@ export const BackgroundGradient = ({
   className,
   containerClassName,
   borderRadius = "rounded-xl",
-  borderWidth = "p-[0.5px]",
   animate = true,
 }) => {
   const variants = {
@@ -19,29 +18,8 @@ export const BackgroundGradient = ({
   }
 
   return (
-    <div className={cn("relative group", borderWidth, containerClassName)}>
-      <motion.div
-        variants={animate ? variants : undefined}
-        initial={animate ? "initial" : undefined}
-        animate={animate ? "animate" : undefined}
-        transition={
-          animate
-            ? {
-                duration: 5,
-                repeat: Infinity,
-                repeatType: "reverse",
-              }
-            : undefined
-        }
-        style={{
-          backgroundSize: animate ? "400% 400%" : undefined,
-        }}
-        className={cn(
-          "absolute inset-0 z-[1] opacity-60 group-hover:opacity-100 blur-sm transition duration-500",
-          borderRadius,
-          "bg-[radial-gradient(circle_farthest-side_at_0_100%,#00ccb1,transparent),radial-gradient(circle_farthest-side_at_100%_0,#7b61ff,transparent),radial-gradient(circle_farthest-side_at_100%_100%,#ffc414,transparent),radial-gradient(circle_farthest-side_at_0_0,#1ca0fb,#141316)]"
-        )}
-      />
+    <div className={cn("relative group", containerClassName)}>
+      {/* Gradient border - only visible as thin border around content */}
       <motion.div
         variants={animate ? variants : undefined}
         initial={animate ? "initial" : undefined}
@@ -61,11 +39,38 @@ export const BackgroundGradient = ({
         className={cn(
           "absolute inset-0 z-[1]",
           borderRadius,
-          "bg-[radial-gradient(circle_farthest-side_at_0_100%,#00ccb1,transparent),radial-gradient(circle_farthest-side_at_100%_0,#7b61ff,transparent),radial-gradient(circle_farthest-side_at_100%_100%,#ffc414,transparent),radial-gradient(circle_farthest-side_at_0_0,#1ca0fb,#141316)]"
+          "p-[1px]", // Border thickness - matches standard border width
+          "bg-[conic-gradient(from_var(--gradient-angle,0deg),#00ccb1,#7b61ff,#1ca0fb,#00ccb1)]",
+          animate && "animate-gradient-rotate"
         )}
-      />
+      >
+        {/* Inner mask to create border effect */}
+        <div className={cn(
+          "w-full h-full bg-bg-primary",
+          borderRadius
+        )} />
+      </motion.div>
 
+      {/* Content */}
       <div className={cn("relative z-10", className)}>{children}</div>
+      
+      {/* CSS for gradient rotation animation */}
+      <style>{`
+        @property --gradient-angle {
+          syntax: '<angle>';
+          initial-value: 0deg;
+          inherits: false;
+        }
+        
+        .animate-gradient-rotate {
+          animation: gradient-rotate 3s linear infinite;
+        }
+        
+        @keyframes gradient-rotate {
+          0% { --gradient-angle: 0deg; }
+          100% { --gradient-angle: 360deg; }
+        }
+      `}</style>
     </div>
   )
 }

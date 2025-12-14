@@ -10,26 +10,34 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 /**
- * Single shimmer line with staggered animation
+ * Single shimmer line with looping staggered animation
  * @param {Object} props
  * @param {string} props.width - Width of the line (CSS value)
  * @param {number} [props.delay] - Animation delay in seconds
  * @param {string} [props.height] - Tailwind height class
+ * @param {number} [props.loopDelay] - Delay before loop restarts
  */
 const ShimmerLine = memo(function ShimmerLine({ 
   width, 
   delay = 0,
-  height = 'h-4'
+  height = 'h-4',
+  loopDelay = 0
 }) {
   return (
     <motion.div
       className="flex items-center"
       initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: 1, x: 0 }}
+      animate={{ 
+        opacity: [0, 1, 1, 0],
+        x: [-8, 0, 0, -8]
+      }}
       transition={{ 
-        duration: 0.3, 
-        delay,
-        ease: [0.25, 0.46, 0.45, 0.94]
+        duration: 2.5,
+        delay: delay + loopDelay,
+        ease: [0.25, 0.46, 0.45, 0.94],
+        repeat: Infinity,
+        repeatDelay: 0.5,
+        times: [0, 0.15, 0.85, 1]
       }}
     >
       <div
@@ -62,15 +70,17 @@ const ShimmerLine = memo(function ShimmerLine({
 })
 
 /**
- * Paragraph block with multiple shimmer lines
+ * Paragraph block with multiple shimmer lines - looping animation
  * @param {Object} props
  * @param {number} [props.lines] - Number of lines in paragraph
  * @param {number} [props.baseDelay] - Base animation delay
+ * @param {number} [props.loopDelay] - Delay for loop cycle
  * @param {string} [props.className] - Additional CSS classes
  */
 const ShimmerParagraph = memo(function ShimmerParagraph({ 
   lines = 4, 
   baseDelay = 0,
+  loopDelay = 0,
   className = ''
 }) {
   // Generate varied line widths for natural text appearance
@@ -95,6 +105,7 @@ const ShimmerParagraph = memo(function ShimmerParagraph({
           key={index}
           width={width}
           delay={baseDelay + index * 0.08}
+          loopDelay={loopDelay}
         />
       ))}
     </div>
@@ -237,6 +248,7 @@ const EditorTextLoader = memo(function EditorTextLoader({
                       : layout.linesPerParagraph
                   }
                   baseDelay={pIndex * 0.12}
+                  loopDelay={pIndex * 0.15}
                 />
               ))}
             </div>
