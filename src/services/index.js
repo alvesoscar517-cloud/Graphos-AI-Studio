@@ -42,3 +42,4 @@ export { default as analysisCache } from './analysisCache';
 
 // Drive Service
 export { default as driveService } from './drive';
+export { requestGoogleAuth } from './drive';

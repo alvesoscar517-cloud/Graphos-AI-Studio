@@ -597,7 +597,7 @@ exports.linkGoogle = async (req, res) => {
   const l = createLocalizer(req);
   
   try {
-    const { googleAccessToken, googleEmail, googleName } = req.body;
+    const { googleAccessToken, googleEmail, googleName, googlePicture } = req.body;
     const userId = req.userId; // From auth middleware
     
     if (!googleAccessToken || !googleEmail) {
@@ -611,12 +611,14 @@ exports.linkGoogle = async (req, res) => {
     const result = await emailAuthService.linkGoogleWithOAuth(userId, {
       accessToken: googleAccessToken,
       email: googleEmail,
-      name: googleName
+      name: googleName,
+      picture: googlePicture
     });
     
     res.json({
       success: true,
       googleEmail: result.googleEmail,
+      googlePicture: result.googlePicture,
       message: 'Google account linked successfully. Drive sync is now enabled.'
     });
     

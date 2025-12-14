@@ -4,17 +4,83 @@ import { CONFIG } from '../utils/config'
 let driveFolderId = null
 
 /**
+ * Get Google access token for Drive operations
+ * Works for both Google-only users and email users with linked Google
+ * 
+ * Priority:
+ * 1. Try to get token from chrome.identity (works if user has Google linked)
+ * 2. Fall back to stored accessToken (for Google-only users)
+ */
+async function getGoogleAccessToken() {
+  // First, try chrome.identity.getAuthToken (works for linked Google accounts)
+  if (typeof chrome !== 'undefined' && chrome.identity?.getAuthToken) {
+    try {
+      // Try non-interactive first (silent)
+      const tokenResult = await chrome.identity.getAuthToken({ interactive: false })
+      const token = typeof tokenResult === 'string' ? tokenResult : tokenResult?.token
+      
+      if (token && typeof token === 'string') {
+        // Verify token is valid
+        const verifyResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        
+        if (verifyResponse.ok) {
+          // Token is valid, also update storage for consistency
+          await chrome.storage.local.set({ accessToken: token })
+          return token
+        }
+        
+        // Token invalid, remove it
+        await chrome.identity.removeCachedAuthToken({ token })
+      }
+    } catch (e) {
+      logger.log('[Drive] Non-interactive token failed, will try interactive')
+    }
+  }
+  
+  // Fall back to stored token
+  const result = await chrome.storage.local.get(['accessToken'])
+  if (result.accessToken) {
+    return result.accessToken
+  }
+  
+  // No token available - user needs to link Google or sign in with Google
+  throw new Error('NEED_GOOGLE_AUTH')
+}
+
+/**
+ * Request Google authorization interactively
+ * Used when user needs to authorize Drive access
+ */
+export async function requestGoogleAuth() {
+  if (typeof chrome === 'undefined' || !chrome.identity?.getAuthToken) {
+    throw new Error('Chrome extension context not available')
+  }
+  
+  try {
+    const tokenResult = await chrome.identity.getAuthToken({ interactive: true })
+    const token = typeof tokenResult === 'string' ? tokenResult : tokenResult?.token
+    
+    if (token && typeof token === 'string') {
+      await chrome.storage.local.set({ accessToken: token })
+      return token
+    }
+    
+    throw new Error('Failed to get Google authorization')
+  } catch (error) {
+    logger.error('Drive', 'Failed to get Google auth', error)
+    throw error
+  }
+}
+
+/**
  * Get or create app folder in Google Drive
  */
 export async function getOrCreateAppFolder() {
   try {
-    // Get access token
-    const result = await chrome.storage.local.get(['accessToken'])
-    if (!result.accessToken) {
-      throw new Error('Not authenticated')
-    }
-
-    const token = result.accessToken
+    // Get access token (works for both Google and email users with linked Google)
+    const token = await getGoogleAccessToken()
 
     // Check if we already have the folder ID
     const folderResult = await chrome.storage.local.get(['driveFolderId'])
@@ -87,8 +153,7 @@ export async function getOrCreateAppFolder() {
 export async function syncNotesToDrive(notes) {
   try {
     const folderId = await getOrCreateAppFolder()
-    const result = await chrome.storage.local.get(['accessToken'])
-    const token = result.accessToken
+    const token = await getGoogleAccessToken()
 
     for (const note of notes) {
       const fileName = `${note.title || 'Untitled'}.txt`
@@ -158,8 +223,7 @@ export async function syncNotesToDrive(notes) {
 export async function loadNotesFromDrive() {
   try {
     const folderId = await getOrCreateAppFolder()
-    const result = await chrome.storage.local.get(['accessToken'])
-    const token = result.accessToken
+    const token = await getGoogleAccessToken()
 
     // List all files in folder
     const response = await fetch(
@@ -229,8 +293,7 @@ export async function loadNotesFromDrive() {
 export async function saveNoteToDrive(note) {
   try {
     const folderId = await getOrCreateAppFolder()
-    const result = await chrome.storage.local.get(['accessToken'])
-    const token = result.accessToken
+    const token = await getGoogleAccessToken()
 
     const fileName = `${note.title || 'Untitled'}.txt`
     const content = note.content || ''
@@ -300,8 +363,7 @@ export async function saveNoteToDrive(note) {
  */
 export async function deleteNoteFromDrive(driveId) {
   try {
-    const result = await chrome.storage.local.get(['accessToken'])
-    const token = result.accessToken
+    const token = await getGoogleAccessToken()
 
     await fetch(
       `https://www.googleapis.com/drive/v3/files/${driveId}`,
@@ -325,12 +387,9 @@ export async function deleteNoteFromDrive(driveId) {
  */
 export async function openDriveFolder(notes) {
   try {
-    // Check if user is authenticated
-    const result = await chrome.storage.local.get(['accessToken'])
-    if (!result.accessToken) {
-      throw new Error('Not authenticated')
-    }
-
+    // Verify we have Google access
+    await getGoogleAccessToken()
+    
     const folderId = await getOrCreateAppFolder()
 
     // Open folder in new tab
@@ -364,12 +423,7 @@ let conversationsFolderId = null
  */
 export async function getOrCreateConversationsFolder() {
   try {
-    const result = await chrome.storage.local.get(['accessToken'])
-    if (!result.accessToken) {
-      throw new Error('Not authenticated')
-    }
-
-    const token = result.accessToken
+    const token = await getGoogleAccessToken()
 
     // Check if we already have the folder ID cached
     const folderResult = await chrome.storage.local.get(['conversationsFolderId'])
@@ -438,8 +492,7 @@ export async function getOrCreateConversationsFolder() {
 export async function syncConversationsToDrive(conversations) {
   try {
     const folderId = await getOrCreateConversationsFolder()
-    const result = await chrome.storage.local.get(['accessToken'])
-    const token = result.accessToken
+    const token = await getGoogleAccessToken()
 
     let synced = 0
     
@@ -535,8 +588,7 @@ export async function syncConversationsToDrive(conversations) {
 export async function loadConversationsFromDrive() {
   try {
     const folderId = await getOrCreateConversationsFolder()
-    const result = await chrome.storage.local.get(['accessToken'])
-    const token = result.accessToken
+    const token = await getGoogleAccessToken()
 
     // List all JSON files in folder
     const response = await fetch(
@@ -600,8 +652,7 @@ export async function loadConversationsFromDrive() {
 export async function deleteConversationFromDrive(conversationId) {
   try {
     const folderId = await getOrCreateConversationsFolder()
-    const result = await chrome.storage.local.get(['accessToken'])
-    const token = result.accessToken
+    const token = await getGoogleAccessToken()
 
     const fileName = `${conversationId}.json`
     
@@ -636,11 +687,9 @@ export async function deleteConversationFromDrive(conversationId) {
  */
 export async function openWorkspaceDriveFolder() {
   try {
-    const result = await chrome.storage.local.get(['accessToken'])
-    if (!result.accessToken) {
-      throw new Error('Not authenticated')
-    }
-
+    // Verify we have Google access
+    await getGoogleAccessToken()
+    
     const folderId = await getOrCreateConversationsFolder()
     const driveUrl = `https://drive.google.com/drive/folders/${folderId}`
     window.open(driveUrl, '_blank')

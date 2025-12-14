@@ -860,7 +860,8 @@ export const useAuthStore = create(
               body: JSON.stringify({ 
                 googleAccessToken,
                 googleEmail: googleResponse.userInfo?.email,
-                googleName: googleResponse.userInfo?.name
+                googleName: googleResponse.userInfo?.name,
+                googlePicture: googleResponse.userInfo?.picture
               })
             })
             
@@ -886,13 +887,18 @@ export const useAuthStore = create(
             // Update state
             set({ hasGoogleLinked: true })
             
-            // Update stored user
+            // Update stored user with full Google linked info
             const currentUser = get().user
             if (currentUser) {
               const updatedUser = {
                 ...currentUser,
                 hasGoogleLinked: true,
-                googleLinked: { googleEmail: googleResponse.userInfo?.email },
+                googleLinked: { 
+                  googleEmail: googleResponse.userInfo?.email,
+                  googleName: googleResponse.userInfo?.name,
+                  googlePicture: data.googlePicture || googleResponse.userInfo?.picture,
+                  driveEnabled: true
+                },
                 picture: googleResponse.userInfo?.picture || currentUser.picture
               }
               setUserData(updatedUser)

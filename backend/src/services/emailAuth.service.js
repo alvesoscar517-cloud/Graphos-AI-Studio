@@ -425,10 +425,18 @@ async function login(email, password, options = {}) {
       userId,
       email: normalizedEmail,
       name: userData.name,
-      picture: userData.picture || '',
+      displayName: userData.displayName || userData.name,
+      picture: userData.picture || userData.googleLinked?.googlePicture || '',
       tier: userData.tier,
       authProvider: 'email',
-      hasGoogleLinked: !!userData.googleLinked
+      hasGoogleLinked: !!userData.googleLinked,
+      // Include Google linked info if available (for Drive sync, avatar, etc.)
+      googleLinked: userData.googleLinked ? {
+        googleEmail: userData.googleLinked.googleEmail,
+        googleName: userData.googleLinked.googleName,
+        googlePicture: userData.googleLinked.googlePicture,
+        driveEnabled: userData.googleLinked.driveEnabled
+      } : null
     },
     accessToken: tokens.accessToken,
     refreshToken: tokens.refreshToken,
@@ -1115,8 +1123,9 @@ async function cleanupOldLoginHistory() {
  * @returns {Promise<{success: boolean, googleEmail: string}>}
  */
 async function linkGoogleWithOAuth(userId, googleData) {
-  const { accessToken, email, name } = googleData;
+  const { accessToken, email, name, picture } = googleData;
   const normalizedGoogleEmail = normalizeEmail(email);
+  let googlePicture = picture || '';
   
   // Verify the access token by calling Google API
   try {
@@ -1129,6 +1138,11 @@ async function linkGoogleWithOAuth(userId, googleData) {
     // Verify email matches
     if (normalizeEmail(googleUserInfo.email) !== normalizedGoogleEmail) {
       throw new Error('AUTH_INVALID_TOKEN: Email mismatch');
+    }
+    
+    // Get picture from Google API if not provided
+    if (!googlePicture && googleUserInfo.picture) {
+      googlePicture = googleUserInfo.picture;
     }
   } catch (error) {
     if (error.message.startsWith('AUTH_')) {
@@ -1184,6 +1198,7 @@ async function linkGoogleWithOAuth(userId, googleData) {
     googleLinked: {
       googleEmail: normalizedGoogleEmail,
       googleName: name || normalizedGoogleEmail.split('@')[0],
+      googlePicture: googlePicture,
       linkedAt: new Date(),
       driveEnabled: true // Flag to indicate Drive sync is available
     }
@@ -1193,7 +1208,8 @@ async function linkGoogleWithOAuth(userId, googleData) {
   
   return {
     success: true,
-    googleEmail: normalizedGoogleEmail
+    googleEmail: normalizedGoogleEmail,
+    googlePicture: googlePicture
   };
 }
 

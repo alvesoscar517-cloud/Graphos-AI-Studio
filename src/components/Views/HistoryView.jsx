@@ -292,9 +292,19 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       modal.toast(t('history.driveFolderOpened'), '', 'success')
     } catch (error) {
       if (error.message === 'Not authenticated') modal.alert(t('auth.pleaseSignIn'), t('auth.notSignedIn'))
-      else if (error.message === 'NEED_REAUTH') {
-        const confirmed = await modal.confirm(t('auth.needReauth'), t('auth.drivePermissionRequired'), { confirmText: t('auth.signInAgain'), danger: false })
-        if (confirmed) { await signOut(); modal.info(t('history.needSignInAgain')) }
+      else if (error.message === 'NEED_REAUTH' || error.message === 'NEED_GOOGLE_AUTH') {
+        // New device needs Google authorization
+        const { requestGoogleAuth } = await import('../../services/drive')
+        const confirmed = await modal.confirm(
+          t('auth.googleAuthRequired') || 'Google Authorization Required',
+          t('auth.googleAuthRequiredDesc') || 'This device needs to authorize Google Drive access.',
+          { confirmText: t('common.authorize') || 'Authorize', danger: false }
+        )
+        if (confirmed) {
+          await requestGoogleAuth()
+          // Retry after authorization
+          await handleOpenInDrive()
+        }
       } else modal.errorWithReport(t('history.unableToOpenDrive') + ': ' + error.message, error, 'Error', 'HistoryView.handleOpenInDrive')
     }
   }
@@ -316,11 +326,42 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       
       const errors = [notesResult, convsResult].filter(r => r.status === 'rejected')
       if (errors.length > 0) {
+        // Check if any error is NEED_GOOGLE_AUTH (new device needs authorization)
+        const needsAuth = errors.some(e => e.reason?.message === 'NEED_GOOGLE_AUTH')
+        if (needsAuth) {
+          // Request Google authorization interactively
+          const { requestGoogleAuth } = await import('../../services/drive')
+          const confirmed = await modal.confirm(
+            t('auth.googleAuthRequired') || 'Google Authorization Required',
+            t('auth.googleAuthRequiredDesc') || 'This device needs to authorize Google Drive access. Click OK to sign in with Google.',
+            { confirmText: t('common.authorize') || 'Authorize', danger: false }
+          )
+          if (confirmed) {
+            await requestGoogleAuth()
+            // Retry sync after authorization
+            await handleSyncNotes()
+          }
+          return
+        }
         console.warn('Some sync operations failed:', errors)
       }
       
       modal.toast(t('history.synced'), t('history.notesSynced'), 'success')
     } catch (error) {
+      // Handle NEED_GOOGLE_AUTH at top level too
+      if (error.message === 'NEED_GOOGLE_AUTH') {
+        const { requestGoogleAuth } = await import('../../services/drive')
+        const confirmed = await modal.confirm(
+          t('auth.googleAuthRequired') || 'Google Authorization Required',
+          t('auth.googleAuthRequiredDesc') || 'This device needs to authorize Google Drive access.',
+          { confirmText: t('common.authorize') || 'Authorize', danger: false }
+        )
+        if (confirmed) {
+          await requestGoogleAuth()
+          await handleSyncNotes()
+        }
+        return
+      }
       modal.errorWithReport(t('history.unableToSync') + ': ' + error.message, error, 'Error', 'HistoryView.handleSyncNotes')
     } finally { setIsSyncing(false) }
   }
