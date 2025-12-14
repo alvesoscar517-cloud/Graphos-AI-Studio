@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "Graphos AI Studio"
+  },
+  "extDescription": {
+    "message": "本物のコンテンツを作成するAIライティングアシスタント。AI検出、文体分析、あなた独自の声で書き直し。"
+  },
+  "extActionTitle": {
+    "message": "Graphos AI Studioを開く"
+  }
+}

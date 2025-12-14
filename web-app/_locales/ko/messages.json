@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "Graphos AI Studio"
+  },
+  "extDescription": {
+    "message": "진정성 있는 콘텐츠를 위한 AI 글쓰기 도우미. AI 감지, 글쓰기 스타일 분석, 당신만의 목소리로 다시 쓰기."
+  },
+  "extActionTitle": {
+    "message": "Graphos AI Studio 열기"
+  }
+}

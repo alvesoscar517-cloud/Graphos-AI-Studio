@@ -1,0 +1,88 @@
+import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
+import { cn } from '../../lib/utils';
+
+export default function ConfirmDialog({ 
+  title, 
+  message, 
+  confirmText, 
+  cancelText,
+  type = 'warning',
+  onConfirm, 
+  onCancel 
+}) {
+  const { t } = useTranslation();
+  
+  const icons = {
+    warning: '/icon/alert-triangle.svg',
+    danger: '/icon/alert-octagon.svg',
+    info: '/icon/info.svg'
+  };
+
+  return createPortal(
+    <div 
+      className={cn(
+        "modal-overlay p-5",
+        "max-md:p-3 max-md:items-end"
+      )}
+      onClick={onCancel}
+    >
+      <div 
+        className={cn(
+          "modal-content p-6 max-w-modal-sm w-full text-center",
+          "max-md:max-w-full max-md:rounded-t-2xl max-md:rounded-b-none max-md:p-5"
+        )}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Icon */}
+        <div className={cn(
+          "w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5",
+          type === 'warning' && "bg-system-orange/15",
+          type === 'danger' && "bg-system-red/15",
+          type === 'info' && "bg-system-blue/15"
+        )}>
+          <img 
+            src={icons[type]} 
+            alt={type} 
+            className={cn(
+              "w-7 h-7",
+              type === 'warning' && "filter-icon-warning",
+              type === 'danger' && "filter-icon-error",
+              type === 'info' && "filter-icon-primary"
+            )} 
+          />
+        </div>
+
+        {/* Title */}
+        <h2 className="m-0 mb-2 text-title3 font-semibold text-text-primary">
+          {title}
+        </h2>
+
+        {/* Message */}
+        <p className="m-0 mb-6 text-body text-label-secondary leading-relaxed whitespace-pre-line">
+          {message}
+        </p>
+
+        {/* Actions */}
+        <div className="flex gap-3 max-md:flex-col-reverse">
+          <button 
+            className="btn btn-secondary flex-1"
+            onClick={onCancel}
+          >
+            {cancelText || t('common.cancel')}
+          </button>
+          <button 
+            className={cn(
+              "btn flex-1",
+              type === 'danger' ? "btn-danger" : "btn-primary"
+            )}
+            onClick={onConfirm}
+          >
+            {confirmText || t('common.confirm')}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}

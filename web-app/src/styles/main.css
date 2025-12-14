@@ -1,0 +1,2662 @@
+/* Main CSS - Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* ============================================
+   Theme Configuration - Design System Tokens
+   ============================================ */
+@theme {
+  /* ========== Apple Design System - Color Tokens ========== */
+  
+  /* Apple System Colors - Light Mode */
+  --color-system-blue: #0071E3;
+  --color-system-green: #34C759;
+  --color-system-indigo: #5856D6;
+  --color-system-orange: #FF9500;
+  --color-system-pink: #FF2D55;
+  --color-system-purple: #AF52DE;
+  --color-system-red: #FF3B30;
+  --color-system-teal: #5AC8FA;
+  --color-system-yellow: #FFCC00;
+  
+  /* Primary colors - Apple Blue */
+  --color-primary: #0071E3;
+  --color-primary-hover: #0077ED;
+  --color-primary-light: rgba(0, 113, 227, 0.1);
+  
+  /* Accent colors */
+  --color-accent: #0071E3;
+  --color-accent-hover: #0077ED;
+  
+  /* Shimmer effect colors - Light Mode (sweep effect like Facebook/LinkedIn) */
+  --shimmer-base-color: rgba(60, 60, 67, 0.6);
+  --shimmer-highlight-color: rgba(0, 113, 227, 1);
+  /* Legacy variables for compatibility */
+  --shimmer-color-start: rgba(60, 60, 67, 0.6);
+  --shimmer-color-mid: rgba(0, 113, 227, 1);
+  
+  /* Apple Label Colors - Light Mode (Text) */
+  --color-label-primary: rgba(0, 0, 0, 1);
+  --color-label-secondary: rgba(60, 60, 67, 0.6);
+  --color-label-tertiary: rgba(60, 60, 67, 0.3);
+  --color-label-quaternary: rgba(60, 60, 67, 0.18);
+  
+  /* Text colors - Light mode (mapped to Apple labels) */
+  --color-text-primary: rgba(0, 0, 0, 1);
+  --color-text-secondary: rgba(60, 60, 67, 0.7);
+  --color-text-muted: rgba(60, 60, 67, 0.55);
+  --color-text-link: #0071E3;
+  
+  /* Apple Background Colors - Light Mode */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F2F2F7;
+  --color-bg-tertiary: #FFFFFF;
+  --color-bg-grouped-primary: #F2F2F7;
+  --color-bg-grouped-secondary: #FFFFFF;
+  --color-bg-hover: rgba(120, 120, 128, 0.12);
+  
+  /* Apple Fill Colors - Light Mode */
+  --color-fill-primary: rgba(120, 120, 128, 0.2);
+  --color-fill-secondary: rgba(120, 120, 128, 0.16);
+  --color-fill-tertiary: rgba(118, 118, 128, 0.12);
+  --color-fill-quaternary: rgba(116, 116, 128, 0.08);
+  
+  /* Apple Separator Colors - Light Mode */
+  --color-separator: rgba(60, 60, 67, 0.29);
+  --color-separator-opaque: #C6C6C8;
+  
+  /* Border colors - Light mode (mapped to Apple separator) */
+  --color-border: rgba(60, 60, 67, 0.29);
+  --color-border-light: rgba(60, 60, 67, 0.2);
+  --color-border-hover: rgba(60, 60, 67, 0.4);
+  
+  /* Status colors - Apple System Colors */
+  --color-success: #34C759;
+  --color-warning: #FF9500;
+  --color-error: #FF3B30;
+  --color-info: #0071E3;
+  
+  /* Toast/Dark surface colors */
+  --color-toast-bg: #1C1C1E;
+  --color-toast-border: #38383A;
+  
+  /* Social media brand colors */
+  --color-linkedin: #0077b5;
+  --color-facebook: #1877f2;
+  --color-reddit: #ff4500;
+  --color-whatsapp: #25d366;
+  --color-google-blue: #4285F4;
+  --color-google-green: #34A853;
+  --color-google-yellow: #FBBC05;
+  --color-google-red: #EA4335;
+  --color-apple-blue: #0071E3;
+  --color-apple-blue-hover: #0077ED;
+  
+  /* Gradient colors */
+  --color-gradient-purple-start: #667eea;
+  --color-gradient-purple-end: #764ba2;
+  --color-gradient-orange-start: #ff9a56;
+  --color-gradient-orange-end: #ff6b9d;
+  
+  /* Apple Gray Colors - Light Mode */
+  --color-gray-50: #F2F2F7;
+  --color-gray-100: #E5E5EA;
+  --color-gray-200: #D1D1D6;
+  --color-gray-300: #C7C7CC;
+  --color-gray-400: #AEAEB2;
+  --color-gray-500: #8E8E93;
+  --color-gray-600: #636366;
+  --color-gray-700: #48484A;
+  --color-gray-800: #3A3A3C;
+  --color-gray-900: #1C1C1E;
+  
+  /* Form/Input specific colors */
+  --color-input-border: rgba(60, 60, 67, 0.29);
+  --color-input-placeholder: rgba(60, 60, 67, 0.3);
+  
+  /* ========== Apple Shadow Tokens ========== */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.15);
+  --shadow-2xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+  --shadow-popup: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --shadow-float: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.15);
+  --shadow-glow-primary: 0 4px 12px rgba(0, 113, 227, 0.3);
+  --shadow-glow-purple: 0 4px 12px rgba(102, 126, 234, 0.4);
+  --shadow-glow-purple-lg: 0 6px 16px rgba(102, 126, 234, 0.6);
+  --shadow-glow-error: 0 4px 12px rgba(255, 59, 48, 0.3);
+  --shadow-ring-primary: 0 0 0 3px rgba(0, 113, 227, 0.25);
+  --shadow-ring-subtle: 0 0 0 3px rgba(0, 0, 0, 0.03);
+  --shadow-ring-2: 0 0 0 2px;
+  
+  /* ========== Spacing Tokens ========== */
+  --spacing-0: 0;
+  --spacing-px: 1px;
+  --spacing-0\.5: 0.125rem;
+  --spacing-1: 0.25rem;
+  --spacing-1\.5: 0.375rem;
+  --spacing-2: 0.5rem;
+  --spacing-2\.5: 0.625rem;
+  --spacing-3: 0.75rem;
+  --spacing-3\.5: 0.875rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-7: 1.75rem;
+  --spacing-8: 2rem;
+  --spacing-9: 2.25rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-14: 3.5rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  
+  /* ========== Width Tokens (for min-w, max-w, w utilities) ========== */
+  --width-toast: 320px;
+  --width-toast-max: 500px;
+  --width-modal-xs: 320px;
+  --width-modal-sm: 400px;
+  --width-modal-md: 550px;
+  --width-modal-lg: 650px;
+  --width-modal-xl: 900px;
+  --width-modal-2xl: 1400px;
+  --width-sidebar: 260px;
+  --width-sidebar-right: 300px;
+  --width-content: 800px;
+  --width-content-lg: 1200px;
+  --width-attachment: 200px;
+  --width-share-btn: 52px;
+  --width-chat-input: 700px;
+  --width-chat-input-lg: 800px;
+  --width-form: 600px;
+  --width-form-sm: 360px;
+  --width-form-lg: 700px;
+  --width-popup-sm: 220px;
+  --width-popup-md: 306px;
+  --width-popup-lg: 320px;
+  --width-label-sm: 50px;
+  --width-label-md: 60px;
+  --width-label-lg: 100px;
+  --width-label-xl: 120px;
+  --width-lottie-xs: 180px;
+  --width-lottie-sm: 300px;
+  --width-lottie-md: 380px;
+  
+  /* ========== Sizing Tokens ========== */
+  --size-icon-2xs: 0.6875rem;
+  --size-icon-xs: 0.75rem;
+  --size-icon-sm: 0.875rem;
+  --size-icon-md: 1rem;
+  --size-icon-lg: 1.125rem;
+  --size-icon-xl: 1.25rem;
+  --size-icon-2xl: 1.375rem;
+  --size-icon-3xl: 1.5rem;
+  
+  --size-btn-xs: 1.5rem;
+  --size-btn-sm: 1.75rem;
+  --size-btn-md: 2rem;
+  --size-btn-lg: 2.5rem;
+  --size-btn-xl: 3rem;
+  --size-btn-2xl: 3.25rem;
+  
+  --size-avatar-xs: 1.5rem;
+  --size-avatar-sm: 2rem;
+  --size-avatar-md: 2.5rem;
+  --size-avatar-lg: 3rem;
+  --size-avatar-xl: 3.5rem;
+  --size-avatar-2xl: 4rem;
+  --size-avatar-3xl: 4.25rem;
+  
+  /* Thumbnail/Preview sizes */
+  --size-thumbnail-sm: 6.25rem;
+  --size-thumbnail-md: 12.5rem;
+  --size-thumbnail-lg: 18.75rem;
+  --size-thumbnail-xl: 25rem;
+  
+  /* Score circle sizes */
+  --size-score-circle: 6.25rem;
+  
+  /* OTP Input sizes */
+  --size-otp-width: 3.125rem;
+  --size-otp-height: 3.625rem;
+  
+  --size-card-icon: 3.5rem;
+  
+  /* ========== Width/Height Utilities ========== */
+  --width-icon-2xs: var(--size-icon-2xs);
+  --width-icon-xs: var(--size-icon-xs);
+  --width-icon-sm: var(--size-icon-sm);
+  --width-icon-md: var(--size-icon-md);
+  --width-icon-lg: var(--size-icon-lg);
+  --width-icon-xl: var(--size-icon-xl);
+  --width-icon-2xl: var(--size-icon-2xl);
+  --width-icon-3xl: var(--size-icon-3xl);
+  
+  --width-avatar-xs: var(--size-avatar-xs);
+  --width-avatar-sm: var(--size-avatar-sm);
+  --width-avatar-md: var(--size-avatar-md);
+  --width-avatar-lg: var(--size-avatar-lg);
+  --width-avatar-xl: var(--size-avatar-xl);
+  --width-avatar-2xl: var(--size-avatar-2xl);
+  --width-avatar-3xl: var(--size-avatar-3xl);
+  
+  --width-thumbnail-sm: var(--size-thumbnail-sm);
+  --width-thumbnail-md: var(--size-thumbnail-md);
+  --width-thumbnail-lg: var(--size-thumbnail-lg);
+  --width-thumbnail-xl: var(--size-thumbnail-xl);
+  
+  --width-score-circle: var(--size-score-circle);
+  --width-otp: var(--size-otp-width);
+  
+  --height-score-circle: var(--size-score-circle);
+  --height-otp: var(--size-otp-height);
+  --size-feature-icon: 11.25rem;
+  
+  /* ========== Layout Tokens ========== */
+  --sidebar-width: 238px;
+  --right-sidebar-width: 300px;
+  --header-height: 56px;
+  --content-max-width: 1200px;
+  --content-padding: 5rem;
+  --content-padding-md: 2.5rem;
+  --content-padding-sm: 1rem;
+  
+  /* ========== Apple Border Radius Tokens ========== */
+  --radius-none: 0;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-2xl: 28px;
+  --radius-3xl: 32px;
+  --radius-4xl: 38px;
+  --radius-pill: 9999px;
+  --radius-full: 9999px;
+  
+  /* ========== Apple Typography Tokens ========== */
+  /* Apple Type Sizes */
+  --font-size-caption2: 11px;
+  --font-size-caption1: 12px;
+  --font-size-footnote: 13px;
+  --font-size-subhead: 15px;
+  --font-size-callout: 16px;
+  --font-size-body: 17px;
+  --font-size-headline: 17px;
+  --font-size-title3: 20px;
+  --font-size-title2: 22px;
+  --font-size-title1: 28px;
+  --font-size-largeTitle: 34px;
+  
+  /* Legacy size mappings */
+  --font-size-2xs: 10px;
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
+  --font-size-md: 16px;
+  --font-size-lg: 17px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 22px;
+  --font-size-3xl: 28px;
+  --font-size-4xl: 34px;
+  --font-size-5xl: 40px;
+  
+  /* Apple Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.3;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.5;
+  --line-height-loose: 1.6;
+  
+  /* Apple Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* ========== Apple Transition Tokens ========== */
+  --transition-fast: 150ms;
+  --transition-normal: 200ms;
+  --transition-slow: 300ms;
+  --transition-slower: 500ms;
+  --transition-sidebar: 350ms;
+  
+  /* Apple Easing */
+  --ease-apple: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-apple-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* ========== Z-Index Tokens ========== */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-sidebar: 100;
+  --z-toolbar: 100;
+  --z-menu-backdrop: 999;
+  --z-menu: 1000;
+  --z-popup: 1001;
+  --z-popup-submenu: 1002;
+  --z-modal-backdrop: 9999;
+  --z-modal: 10000;
+  --z-modal-nested: 10001;
+  --z-overlay-high: 20000;
+  --z-toast: 999999;
+  
+  /* ========== Blur Tokens ========== */
+  --blur-none: 0;
+  --blur-xs: 2px;
+  --blur-sm: 4px;
+  --blur-md: 10px;
+  --blur-lg: 12px;
+  --blur-xl: 20px;
+  --blur-2xl: 25px;
+  
+  /* ========== Breakpoints ========== */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  
+  /* ========== Animation Tokens ========== */
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-fade-in-fast: fade-in 0.15s ease-out;
+  --animate-fade-in-slow: fade-in 0.3s ease-out;
+  --animate-slide-up: slide-up 0.3s ease-out;
+  --animate-slide-up-fast: slide-up 0.2s ease-out;
+  --animate-slide-up-slow: slide-up 0.4s ease;
+  --animate-slide-up-bounce: slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-slide-down: slide-down 0.3s ease-out;
+  --animate-slide-in: slide-in 0.3s ease-out;
+  --animate-scale-in: scale-in 0.2s ease-out;
+  --animate-scale-in-bounce: scale-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-shimmer: shimmer 1.5s infinite;
+  --animate-processing: processing-shimmer 2.5s ease-in-out infinite;
+  --animate-shake: shake 0.3s ease;
+  --animate-message-in: message-slide-in 0.3s ease-out;
+  --animate-overlay-fade: overlay-fade-in 0.15s ease-out;
+  --animate-modal-slide: modal-slide-up 0.2s ease-out;
+  --animate-slide-to-bottom: slide-to-bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* ========== Icon Filter Tokens ========== */
+  /* These are used for coloring SVG icons */
+  --filter-icon-primary: brightness(0) saturate(100%) invert(38%) sepia(98%) saturate(2618%) hue-rotate(203deg) brightness(95%) contrast(89%);
+  --filter-icon-success: brightness(0) saturate(100%) invert(61%) sepia(70%) saturate(459%) hue-rotate(93deg) brightness(95%) contrast(92%);
+  --filter-icon-warning: brightness(0) saturate(100%) invert(55%) sepia(98%) saturate(456%) hue-rotate(2deg) brightness(103%) contrast(101%);
+  --filter-icon-error: brightness(0) saturate(100%) invert(35%) sepia(95%) saturate(1500%) hue-rotate(343deg) brightness(95%) contrast(95%);
+  --filter-icon-google-blue: brightness(0) saturate(100%) invert(38%) sepia(98%) saturate(2618%) hue-rotate(203deg) brightness(95%) contrast(89%);
+  
+  /* ========== Additional Color Tokens ========== */
+  /* Icon background colors for different states */
+  --color-icon-bg-warning: rgba(251, 188, 4, 0.15);
+  --color-icon-bg-info: rgba(66, 133, 244, 0.15);
+  --color-icon-bg-success: rgba(34, 197, 94, 0.15);
+  --color-icon-bg-error: rgba(239, 68, 68, 0.15);
+  
+  /* Selection color */
+  --color-selection: rgba(79, 172, 254, 0.2);
+  
+  /* Background selection for utilities */
+  --background-color-selection: var(--color-selection);
+}
+
+/* ============================================
+   Dark Mode Theme Overrides
+   ============================================ */
+.dark {
+  /* Apple System Colors - Dark Mode */
+  --color-system-blue: #0071E3;
+  --color-system-green: #30D158;
+  --color-system-indigo: #5E5CE6;
+  --color-system-orange: #FF9F0A;
+  --color-system-pink: #FF375F;
+  --color-system-purple: #BF5AF2;
+  --color-system-red: #FF453A;
+  --color-system-teal: #64D2FF;
+  --color-system-yellow: #FFD60A;
+  
+  /* Primary colors - Apple Blue Dark */
+  --color-primary: #0071E3;
+  --color-primary-hover: #0077ED;
+  --color-primary-light: rgba(0, 113, 227, 0.15);
+  
+  /* Accent colors */
+  --color-accent: #0071E3;
+  --color-accent-hover: #0077ED;
+  
+  /* Shimmer effect colors - Dark Mode (sweep effect like Facebook/LinkedIn) */
+  --shimmer-base-color: rgba(235, 235, 245, 0.7);
+  --shimmer-highlight-color: #4da6ff;
+  /* Legacy variables for compatibility */
+  --shimmer-color-start: rgba(235, 235, 245, 0.7);
+  --shimmer-color-mid: #4da6ff;
+  
+  /* Apple Label Colors - Dark Mode (Text) */
+  --color-label-primary: rgba(255, 255, 255, 1);
+  --color-label-secondary: rgba(235, 235, 245, 0.6);
+  --color-label-tertiary: rgba(235, 235, 245, 0.3);
+  --color-label-quaternary: rgba(235, 235, 245, 0.18);
+  
+  /* Text colors - Dark mode */
+  --color-text-primary: rgba(255, 255, 255, 1);
+  --color-text-secondary: rgba(235, 235, 245, 0.75);
+  --color-text-muted: rgba(235, 235, 245, 0.6);
+  --color-text-link: #0071E3;
+  
+  /* Apple Background Colors - Dark Mode */
+  --color-bg-primary: #191919;
+  --color-bg-secondary: #1F1F1F;
+  --color-bg-tertiary: #191919;
+  --color-bg-grouped-primary: #191919;
+  --color-bg-grouped-secondary: #1F1F1F;
+  --color-bg-hover: #2A2A2A;
+  
+  /* Apple Fill Colors - Dark Mode */
+  --color-fill-primary: #2A2A2A;
+  --color-fill-secondary: #2A2A2A;
+  --color-fill-tertiary: #2A2A2A;
+  --color-fill-quaternary: #2A2A2A;
+  
+  /* Apple Separator Colors - Dark Mode */
+  --color-separator: rgba(84, 84, 88, 0.65);
+  --color-separator-opaque: #38383A;
+  
+  /* Border colors - Dark mode */
+  --color-border: rgba(84, 84, 88, 0.65);
+  --color-border-light: rgba(84, 84, 88, 0.4);
+  --color-border-hover: rgba(84, 84, 88, 0.8);
+  
+  /* Status colors - Apple System Colors Dark */
+  --color-success: #30D158;
+  --color-warning: #FF9F0A;
+  --color-error: #FF453A;
+  --color-info: #0071E3;
+  
+  /* Toast/Dark surface colors */
+  --color-toast-bg: #2C2C2E;
+  --color-toast-border: #48484A;
+  
+  /* Apple Gray Colors - Dark Mode */
+  --color-gray-50: #1C1C1E;
+  --color-gray-100: #2C2C2E;
+  --color-gray-200: #3A3A3C;
+  --color-gray-300: #48484A;
+  --color-gray-400: #636366;
+  --color-gray-500: #8E8E93;
+  --color-gray-600: #AEAEB2;
+  --color-gray-700: #C7C7CC;
+  --color-gray-800: #D1D1D6;
+  --color-gray-900: #E5E5EA;
+  
+  /* Form/Input specific colors - Dark Mode */
+  --color-input-border: rgba(84, 84, 88, 0.65);
+  --color-input-placeholder: rgba(235, 235, 245, 0.3);
+  
+  /* Shadow adjustments for dark mode */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --shadow-2xl: 0 20px 60px rgba(0, 0, 0, 0.5);
+  --shadow-popup: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow-primary: 0 4px 12px rgba(0, 113, 227, 0.4);
+  --shadow-glow-purple: 0 4px 12px rgba(102, 126, 234, 0.5);
+  --shadow-glow-purple-lg: 0 6px 16px rgba(102, 126, 234, 0.7);
+  --shadow-glow-error: 0 4px 12px rgba(255, 69, 58, 0.4);
+  --shadow-ring-primary: 0 0 0 3px rgba(0, 113, 227, 0.35);
+  --shadow-ring-subtle: 0 0 0 3px rgba(255, 255, 255, 0.05);
+  
+  /* Icon background colors - Dark Mode */
+  --color-icon-bg-warning: #2A2A2A;
+  --color-icon-bg-info: #2A2A2A;
+  --color-icon-bg-success: #2A2A2A;
+  --color-icon-bg-error: #2A2A2A;
+  
+  /* Selection color - Dark Mode */
+  --color-selection: rgba(0, 113, 227, 0.3);
+}
+
+/* ============================================
+   Keyframes for Tailwind Animations
+   ============================================ */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Shimmer sweep effect - ánh sáng quét từ trái sang phải (kiểu Facebook/LinkedIn/YouTube) */
+@keyframes shimmer-sweep {
+  0% { 
+    background-position: 100% center; 
+  }
+  100% { 
+    background-position: -100% center; 
+  }
+}
+
+/* Legacy shimmer animation for compatibility */
+@keyframes shimmer {
+  0% { background-position: 100% center; }
+  100% { background-position: -100% center; }
+}
+
+@keyframes processing-shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+@keyframes slide-down {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes message-slide-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes overlay-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-slide-up {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes slide-to-bottom {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+
+
+/* ============================================
+   Base styles
+   ============================================ */
+@layer base {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Apple-style scrollbar - giống admin panel, luôn hiển thị */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 100px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.35);
+  }
+
+  /* Dark mode scrollbar */
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.35);
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    font-size: 15px;
+    line-height: 1.4;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    /* Chặn select text toàn bộ app */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  /* Cho phép select text trong các vùng cần thiết */
+  input,
+  textarea,
+  [contenteditable="true"],
+  .selectable,
+  pre,
+  code,
+  .ProseMirror,
+  .workspace-chat-content,
+  .workspace-chat-content * {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+  }
+
+  #root {
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Text selection - Light mode (inspired by Apple/Notion) */
+  ::selection {
+    background-color: rgba(0, 122, 255, 0.25);
+    color: inherit;
+  }
+  
+  ::-moz-selection {
+    background-color: rgba(0, 122, 255, 0.25);
+    color: inherit;
+  }
+}
+
+/* Text selection - Dark mode (inspired by Linear/Discord) */
+.dark ::selection {
+  background-color: rgba(99, 102, 241, 0.4);
+  color: inherit;
+}
+
+.dark ::-moz-selection {
+  background-color: rgba(99, 102, 241, 0.4);
+  color: inherit;
+}
+
+/* ============================================
+   Custom Utilities via @utility
+   ============================================ */
+
+/* Text size utilities */
+@utility text-2xs {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Apple Typography Utilities - matching design system */
+@utility text-caption2 {
+  font-size: var(--font-size-caption2);
+  line-height: 1.33;
+  letter-spacing: 0.01em;
+}
+
+@utility text-caption1 {
+  font-size: var(--font-size-caption1);
+  line-height: 1.33;
+  letter-spacing: 0;
+}
+
+@utility text-footnote {
+  font-size: var(--font-size-footnote);
+  line-height: 1.38;
+  letter-spacing: -0.008em;
+}
+
+@utility text-body {
+  font-size: var(--font-size-subhead);
+  line-height: 1.47;
+  letter-spacing: -0.022em;
+}
+
+@utility text-callout {
+  font-size: var(--font-size-callout);
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+
+@utility text-headline {
+  font-size: var(--font-size-headline);
+  line-height: 1.24;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+@utility text-title3 {
+  font-size: var(--font-size-title3);
+  line-height: 1.2;
+  letter-spacing: -0.018em;
+  font-weight: 600;
+}
+
+@utility text-title2 {
+  font-size: var(--font-size-title2);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+@utility text-title1 {
+  font-size: var(--font-size-title1);
+  line-height: 1.14;
+  letter-spacing: -0.022em;
+  font-weight: 700;
+}
+
+@utility text-largeTitle {
+  font-size: var(--font-size-largeTitle);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+/* Scrollbar utilities */
+@utility scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+  &::-webkit-scrollbar {
+    display: block;
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: var(--radius-full);
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-border-hover);
+  }
+}
+
+@utility scrollbar-thin-hover {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: var(--radius-full);
+    transition: background-color 0.2s ease;
+  }
+  &:hover {
+    scrollbar-color: var(--color-border) transparent;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-border-hover);
+  }
+}
+
+/* Apple-style scrollbar - matches admin panel design with auto-hide */
+/* Override global scrollbar:none with higher specificity */
+.workspace-scrollbar {
+  /* Firefox */
+  scrollbar-width: thin !important;
+  scrollbar-color: transparent transparent !important;
+}
+
+/* Show scrollbar on hover - Firefox */
+.workspace-scrollbar:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.workspace-scrollbar::-webkit-scrollbar {
+  display: block !important;
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.workspace-scrollbar::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.workspace-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent !important;
+  border-radius: 100px !important;
+  border: 2px solid transparent !important;
+  background-clip: padding-box !important;
+  transition: background-color 0.2s ease !important;
+}
+
+/* Show scrollbar thumb on container hover */
+.workspace-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.workspace-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.35) !important;
+}
+
+.workspace-scrollbar::-webkit-scrollbar-thumb:active {
+  background-color: rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Dark mode support */
+.dark .workspace-scrollbar:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent !important;
+}
+
+.dark .workspace-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .workspace-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.dark .workspace-scrollbar::-webkit-scrollbar-thumb:active {
+  background-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Text truncation utilities */
+@utility line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@utility line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Processing shimmer effect */
+@utility text-shimmer {
+  background: linear-gradient(
+    110deg,
+    currentColor 0%,
+    currentColor 30%,
+    var(--color-text-link) 50%,
+    currentColor 70%,
+    currentColor 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: var(--animate-processing);
+}
+
+/* Processing shimmer for textarea/editor - shimmer effect on text while AI is processing */
+@utility processing-shimmer {
+  background: linear-gradient(
+    110deg,
+    var(--color-text-primary) 0%,
+    var(--color-text-primary) 30%,
+    var(--color-text-link) 50%,
+    var(--color-text-primary) 70%,
+    var(--color-text-primary) 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: processing-shimmer 2.5s ease-in-out infinite;
+}
+
+
+
+/* Focus ring utility */
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Icon filter utilities */
+@utility filter-icon-primary {
+  filter: var(--filter-icon-primary);
+}
+
+@utility filter-icon-success {
+  filter: var(--filter-icon-success);
+}
+
+@utility filter-icon-warning {
+  filter: var(--filter-icon-warning);
+}
+
+@utility filter-icon-error {
+  filter: var(--filter-icon-error);
+}
+
+/* Icon background utilities */
+@utility bg-icon-warning {
+  background-color: var(--color-icon-bg-warning);
+}
+
+@utility bg-icon-info {
+  background-color: var(--color-icon-bg-info);
+}
+
+@utility bg-icon-success {
+  background-color: var(--color-icon-bg-success);
+}
+
+@utility bg-icon-error {
+  background-color: var(--color-icon-bg-error);
+}
+
+/* Selection utility */
+@utility selection-primary {
+  &::selection {
+    background-color: var(--color-selection);
+    color: inherit;
+  }
+}
+
+/* Smooth easing utility */
+@utility ease-smooth {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Range slider utility */
+@utility slider-primary {
+  appearance: none;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: var(--shadow-glow-primary);
+    transition: transform 0.2s;
+  }
+  
+  &::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+  }
+  
+  &::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: var(--shadow-glow-primary);
+  }
+}
+
+/* ============================================
+   Component Utilities - Reusable Patterns
+   ============================================ */
+
+/* Toolbar Button - Compact action buttons */
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.4375rem 1rem;
+  min-width: 5.5rem;
+  height: 2rem;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.toolbar-btn:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border-hover);
+}
+
+.toolbar-btn:active {
+  transform: scale(0.96);
+  background-color: var(--color-fill-secondary);
+}
+
+.toolbar-btn.active {
+  background-color: transparent;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.toolbar-btn.danger {
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--color-error);
+}
+
+.toolbar-btn.danger:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: var(--color-error);
+}
+
+/* Apple Toggle Switch - Compact Blue Version */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.toggle-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.toggle-switch-track {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-fill-secondary);
+  border-radius: 12px;
+  transition: background-color 0.2s var(--ease-apple);
+  display: flex;
+  align-items: center;
+}
+
+.toggle-switch input:checked + .toggle-switch-track {
+  background-color: var(--color-system-blue);
+}
+
+.toggle-switch input:disabled + .toggle-switch-track {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+.toggle-switch-thumb {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s var(--ease-apple-spring);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked ~ .toggle-switch-track .toggle-switch-thumb,
+.toggle-switch input:checked + .toggle-switch-track .toggle-switch-thumb {
+  transform: translateX(16px);
+  background-color: white;
+}
+
+/* Apple Card Component */
+.card {
+  padding: 16px;
+  border: none;
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-primary);
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-normal) var(--ease-apple);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.card:active {
+  transform: scale(0.99);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-bordered {
+  border: 0.5px solid var(--color-separator);
+  box-shadow: none;
+}
+
+.card-lg {
+  border-radius: var(--radius-lg);
+}
+
+/* Card Icon Container - Apple-style squircle */
+.card-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 28%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: var(--color-fill-tertiary);
+  transition: all 0.2s;
+}
+
+.card-icon:hover {
+  background-color: var(--color-fill-secondary);
+  transform: scale(1.05);
+}
+
+.card-icon:active {
+  transform: scale(0.95);
+}
+
+/* Stat Box - For statistics display */
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 1rem 0.75rem;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-light);
+  border-radius: 1rem;
+  text-align: center;
+}
+
+.stat-box-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.375rem;
+  background-color: var(--color-fill-tertiary);
+}
+
+.stat-box-label {
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.stat-box-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Action Button - For card actions */
+.action-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 0.875rem;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-light);
+  border-radius: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Apple Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  padding: 16px;
+  animation: overlay-fade-in 0.2s var(--ease-apple);
+}
+
+/* Apple Modal Content */
+.modal-content {
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-3xl);
+  width: 100%;
+  max-width: 650px;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-modal);
+  animation: modal-slide-up 0.3s var(--ease-apple);
+}
+
+/* Modal responsive - Mobile */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+  
+  .modal-content {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    margin-bottom: 0;
+  }
+}
+
+
+
+/* ============================================
+   Icon Button - Consistent icon button styles
+   ============================================ */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-btn-md);
+  height: var(--size-btn-md);
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.icon-btn:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
+  background-color: var(--color-fill-secondary);
+}
+
+.icon-btn img {
+  width: var(--size-icon-lg);
+  height: var(--size-icon-lg);
+  opacity: 0.7;
+}
+
+
+
+/* ============================================
+   Apple Button Variants
+   ============================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: 10px 20px;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal) var(--ease-apple);
+  border: none;
+  outline: none;
+}
+
+.btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+  filter: brightness(0.95);
+}
+
+.btn-primary {
+  background-color: var(--color-system-blue);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.97);
+  filter: brightness(0.92);
+}
+
+.btn-secondary {
+  background-color: var(--color-fill-tertiary);
+  color: var(--color-text-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-fill-secondary);
+}
+
+.btn-secondary:active:not(:disabled) {
+  transform: scale(0.97);
+  background-color: var(--color-fill-primary);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-system-blue);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: rgba(0, 122, 255, 0.1);
+}
+
+.btn-ghost:active:not(:disabled) {
+  background-color: rgba(0, 122, 255, 0.15);
+  transform: scale(0.97);
+}
+
+.btn-danger {
+  background-color: var(--color-system-red);
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.btn-danger:active:not(:disabled) {
+  transform: scale(0.97);
+  filter: brightness(0.92);
+}
+
+.btn-destructive {
+  background-color: transparent;
+  color: var(--color-system-red);
+}
+
+.btn-destructive:hover:not(:disabled) {
+  background-color: rgba(255, 59, 48, 0.1);
+}
+
+/* ============================================
+   Apple Input Styles
+   ============================================ */
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  background-color: var(--color-fill-quaternary);
+  border: none;
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: all var(--transition-normal) var(--ease-apple);
+}
+
+.input:focus {
+  outline: 2px solid var(--color-system-blue);
+  outline-offset: 0;
+  background-color: var(--color-bg-primary);
+}
+
+.input::placeholder {
+  color: var(--color-label-tertiary);
+}
+
+.input:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.input-error {
+  outline: 2px solid var(--color-system-red);
+  outline-offset: 0;
+}
+
+.input-bordered {
+  background-color: var(--color-bg-primary);
+  border: 0.5px solid var(--color-separator);
+}
+
+.input-bordered:focus {
+  border-color: var(--color-system-blue);
+}
+
+/* ============================================
+   Apple Badge Styles
+   ============================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: var(--font-size-caption1);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+}
+
+.badge-success {
+  background-color: rgba(52, 199, 89, 0.15);
+  color: var(--color-system-green);
+}
+
+.badge-warning {
+  background-color: rgba(255, 149, 0, 0.15);
+  color: var(--color-system-orange);
+}
+
+.badge-error {
+  background-color: rgba(255, 59, 48, 0.15);
+  color: var(--color-system-red);
+}
+
+.badge-info {
+  background-color: rgba(0, 122, 255, 0.15);
+  color: var(--color-system-blue);
+}
+
+/* ============================================
+   Apple Divider - Horizontal/Vertical separators
+   ============================================ */
+.divider {
+  width: 100%;
+  height: 0.5px;
+  background-color: var(--color-separator);
+  margin: 16px 0;
+}
+
+.divider-hairline {
+  height: 0.5px;
+}
+
+.divider-inset {
+  margin-left: 16px;
+}
+
+.divider-vertical {
+  width: 0.5px;
+  height: 100%;
+  background-color: var(--color-separator);
+  margin: 0 8px;
+}
+
+/* ============================================
+   Apple Skeleton Loading
+   ============================================ */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #E5E5EA 25%,
+    #F2F2F7 50%,
+    #E5E5EA 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    #3A3A3C 25%,
+    #48484A 50%,
+    #3A3A3C 75%
+  );
+  background-size: 200% 100%;
+}
+
+
+
+
+
+
+/* ============================================
+   Apple Popup & Dropdown Styles
+   ============================================ */
+.popup {
+  background-color: var(--color-bg-primary);
+  border: none;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-elevated);
+  animation: var(--animate-scale-in);
+}
+
+
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin: 2px 8px;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background-color var(--transition-fast) var(--ease-apple);
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-fill-tertiary);
+}
+
+.dropdown-item:active {
+  background-color: var(--color-fill-secondary);
+  transform: scale(0.98);
+}
+
+.dropdown-item img {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+
+
+/* Radio button in dropdown */
+.dropdown-item .radio {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-system-blue);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+
+/* ============================================
+   Rewrite Toolbar
+   ============================================ */
+.rewrite-toolbar-container {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-light);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.dark .rewrite-toolbar-container {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-light);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.rewrite-toolbar-container:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dark .rewrite-toolbar-container:hover {
+  box-shadow: 0 16px 56px rgba(0, 0, 0, 0.5), 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.rewrite-toolbar-btn {
+  background-color: var(--color-fill-tertiary);
+  color: var(--color-text-secondary);
+}
+
+.dark .rewrite-toolbar-btn {
+  background-color: var(--color-fill-tertiary);
+  color: var(--color-text-secondary);
+}
+
+.rewrite-toolbar-btn:hover:not(:disabled):not(.active) {
+  background-color: var(--color-fill-secondary);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
+}
+
+.dark .rewrite-toolbar-btn:hover:not(:disabled):not(.active) {
+  background-color: var(--color-fill-secondary);
+  color: var(--color-text-primary);
+}
+
+.rewrite-toolbar-btn:active:not(:disabled):not(.active) {
+  transform: scale(0.97);
+}
+
+.rewrite-toolbar-btn.active {
+  background-color: var(--color-primary);
+  background-color: rgba(var(--color-primary-rgb), 0.15);
+  color: var(--color-primary);
+  pointer-events: none;
+}
+
+.dark .rewrite-toolbar-btn.active {
+  background-color: rgba(var(--color-primary-rgb), 0.2);
+  color: var(--color-primary);
+}
+
+.rewrite-toolbar-btn.variant-primary {
+  /* Gradient border using background-clip technique - prevents misalignment */
+  position: relative;
+  background: 
+    linear-gradient(var(--color-bg-primary), var(--color-bg-primary)) padding-box,
+    linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6) border-box;
+  border: 2px solid transparent;
+  color: var(--color-primary);
+}
+
+.dark .rewrite-toolbar-btn.variant-primary {
+  background: 
+    linear-gradient(var(--color-bg-secondary), var(--color-bg-secondary)) padding-box,
+    linear-gradient(135deg, #22d3ee, #60a5fa, #a78bfa) border-box;
+  border: 2px solid transparent;
+  color: #60a5fa;
+}
+
+.rewrite-toolbar-btn.variant-primary:hover:not(:disabled):not(.active) {
+  background: 
+    linear-gradient(var(--color-bg-hover), var(--color-bg-hover)) padding-box,
+    linear-gradient(135deg, #0891b2, #2563eb, #7c3aed) border-box;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
+.dark .rewrite-toolbar-btn.variant-primary:hover:not(:disabled):not(.active) {
+  background: 
+    linear-gradient(var(--color-bg-tertiary), var(--color-bg-tertiary)) padding-box,
+    linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6) border-box;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 24px rgba(96, 165, 250, 0.35);
+}
+
+
+
+/* ============================================
+   Dark Mode Icon Invert Utility
+   ============================================ */
+.icon-invert {
+  transition: filter var(--transition-fast);
+}
+
+.dark .icon-invert {
+  filter: invert(1) brightness(2);
+}
+
+/* Reverse icon invert - for icons on inverted backgrounds (black button in light mode, white button in dark mode) */
+.icon-invert-reverse {
+  filter: invert(1) brightness(2);
+  transition: filter var(--transition-fast);
+}
+
+.dark .icon-invert-reverse {
+  filter: none;
+}
+
+/* Modal overlay dark mode */
+.dark .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Modal content dark mode */
+.dark .modal-content {
+  background-color: var(--color-bg-secondary);
+}
+
+/* Card dark mode */
+.dark .card {
+  background-color: var(--color-bg-secondary);
+}
+
+.dark .card-bordered {
+  border-color: var(--color-separator);
+}
+
+/* Popup dark mode */
+.dark .popup {
+  background-color: var(--color-bg-secondary);
+}
+
+/* Toggle switch dark mode */
+.dark .toggle-switch-track {
+  background-color: var(--color-fill-tertiary);
+}
+
+/* Toolbar button dark mode */
+.dark .toolbar-btn {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.dark .toolbar-btn:hover {
+  background-color: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+}
+
+.dark .toolbar-btn.active {
+  background-color: transparent;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Stat box dark mode */
+.dark .stat-box {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border);
+}
+
+.dark .stat-box-icon {
+  background-color: var(--color-fill-secondary);
+}
+
+/* Action button dark mode */
+.dark .action-btn {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.dark .action-btn:hover {
+  border-color: var(--color-border-hover);
+}
+
+/* Card icon dark mode */
+.dark .card-icon {
+  background-color: var(--color-fill-tertiary);
+}
+
+.dark .card-icon:hover {
+  background-color: var(--color-fill-secondary);
+}
+
+/* Card icon when parent card is hovered - slightly lighter background */
+.dark .group:hover .card-icon {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .group:hover .card-icon:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+
+/* ============================================
+   Light Mode Only - Override dark mode for specific sections
+   ============================================ */
+.light-mode-only,
+.light-mode-only * {
+  /* Reset to light mode colors */
+  --color-text-primary: rgba(0, 0, 0, 1);
+  --color-text-secondary: rgba(60, 60, 67, 0.6);
+  --color-text-muted: rgba(60, 60, 67, 0.3);
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F2F2F7;
+  --color-bg-tertiary: #FFFFFF;
+  --color-border: rgba(60, 60, 67, 0.29);
+  --color-separator: rgba(60, 60, 67, 0.29);
+  --color-fill-primary: rgba(120, 120, 128, 0.2);
+  --color-fill-secondary: rgba(120, 120, 128, 0.16);
+  --color-fill-tertiary: rgba(118, 118, 128, 0.12);
+  --color-fill-quaternary: rgba(116, 116, 128, 0.08);
+  --color-input-border: rgba(60, 60, 67, 0.29);
+  --color-input-placeholder: rgba(60, 60, 67, 0.3);
+  
+  /* Force Tailwind gray colors to light mode */
+  --color-gray-50: #F2F2F7 !important;
+  --color-gray-100: #E5E5EA !important;
+  --color-gray-200: #D1D1D6 !important;
+  --color-gray-300: #C7C7CC !important;
+  --color-gray-400: #AEAEB2 !important;
+  --color-gray-500: #8E8E93 !important;
+  --color-gray-600: #636366 !important;
+  --color-gray-700: #48484A !important;
+  --color-gray-800: #3A3A3C !important;
+  --color-gray-900: #1C1C1E !important;
+  
+  /* Force system colors to light mode */
+  --color-system-blue: #0071E3 !important;
+  --color-system-red: #FF3B30 !important;
+  --color-system-green: #34C759 !important;
+  --color-primary: #0071E3 !important;
+  --color-error: #FF3B30 !important;
+  --color-success: #34C759 !important;
+}
+
+/* Force specific Tailwind classes in light-mode-only */
+.light-mode-only .text-gray-900 { color: #1C1C1E !important; }
+.light-mode-only .text-gray-800 { color: #3A3A3C !important; }
+.light-mode-only .text-gray-700 { color: #48484A !important; }
+.light-mode-only .text-gray-600 { color: #636366 !important; }
+.light-mode-only .text-gray-500 { color: #8E8E93 !important; }
+.light-mode-only .text-gray-400 { color: #AEAEB2 !important; }
+.light-mode-only .text-gray-300 { color: #C7C7CC !important; }
+.light-mode-only .text-gray-200 { color: #D1D1D6 !important; }
+.light-mode-only .bg-white { background-color: #FFFFFF !important; }
+.light-mode-only .bg-gray-50 { background-color: #F9FAFB !important; }
+.light-mode-only .bg-gray-100 { background-color: #F3F4F6 !important; }
+.light-mode-only .bg-gray-200 { background-color: #E5E7EB !important; }
+.light-mode-only .border-gray-200 { border-color: #E5E7EB !important; }
+.light-mode-only .border-gray-300 { border-color: #D1D5DB !important; }
+.light-mode-only .bg-red-50 { background-color: #FEF2F2 !important; }
+.light-mode-only .border-red-200 { border-color: #FECACA !important; }
+.light-mode-only .text-red-600 { color: #DC2626 !important; }
+.light-mode-only .placeholder\:text-gray-400::placeholder { color: #9CA3AF !important; }
+
+.light-mode-only .icon-invert {
+  filter: none !important;
+}
+
+
+/* ============================================
+   Notification Modal System
+   ============================================ */
+.notification-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.notification-modal-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.notification-modal-container {
+  background: var(--color-bg-primary);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  max-width: 420px;
+  width: 90%;
+  overflow: hidden;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.2s ease;
+  border: 1px solid var(--color-border-light);
+}
+
+.notification-modal-overlay.show .notification-modal-container {
+  transform: scale(1) translateY(0);
+}
+
+.notification-modal-header {
+  padding: 24px 24px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.notification-modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-modal-icon img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+.notification-modal-icon.success {
+  background: var(--color-system-green);
+}
+
+.notification-modal-icon.error {
+  background: var(--color-system-red);
+}
+
+.notification-modal-icon.warning {
+  background: var(--color-system-orange);
+}
+
+.notification-modal-icon.info {
+  background: var(--color-system-blue);
+}
+
+.notification-modal-icon.question {
+  background: var(--color-fill-secondary);
+}
+
+.notification-modal-icon.question img {
+  filter: none;
+  opacity: 0.6;
+}
+
+.notification-modal-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.notification-modal-message {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.notification-modal-footer {
+  padding: 16px 24px 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.notification-modal-button {
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.notification-modal-button:hover {
+  transform: translateY(-1px);
+}
+
+.notification-modal-button:active {
+  transform: translateY(0);
+}
+
+.notification-modal-button.primary {
+  background: var(--color-text-primary);
+  color: var(--color-bg-primary);
+}
+
+.notification-modal-button.primary:hover {
+  opacity: 0.9;
+}
+
+.notification-modal-button.danger {
+  background: var(--color-system-red);
+  color: white;
+}
+
+.notification-modal-button.danger:hover {
+  opacity: 0.9;
+}
+
+.notification-modal-button.secondary {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-light);
+}
+
+.notification-modal-button.secondary:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+}
+
+/* Loading state */
+.notification-modal-loading {
+  padding: 32px;
+  text-align: center;
+}
+
+.notification-modal-spinner {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  border: 4px solid var(--color-fill-tertiary);
+  border-top-color: var(--color-system-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.notification-modal-loading-text {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Dark mode */
+.dark .notification-modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.dark .notification-modal-container {
+  background: var(--color-bg-secondary);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  border-color: var(--color-border-light);
+}
+
+/* Force light theme for modal */
+.notification-modal-overlay.force-light-theme .notification-modal-container {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.notification-modal-overlay.force-light-theme .notification-modal-title {
+  color: #1f2937;
+}
+
+.notification-modal-overlay.force-light-theme .notification-modal-message {
+  color: #6b7280;
+}
+
+.notification-modal-overlay.force-light-theme .notification-modal-button.secondary {
+  background: #f3f4f6;
+  color: #4b5563;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.notification-modal-overlay.force-light-theme .notification-modal-button.secondary:hover {
+  background: #e5e7eb;
+}
+
+.notification-modal-overlay.force-light-theme .notification-modal-icon img {
+  filter: brightness(0) invert(1);
+}
+
+
+/* ============================================
+   Notification Popup Styles
+   ============================================ */
+.notif-list {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.notif-list::-webkit-scrollbar {
+  display: none;
+}
+
+.notif-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  margin: 4px 8px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast) var(--ease-apple);
+}
+
+.notif-item:hover {
+  background-color: var(--color-fill-tertiary) !important;
+}
+
+.notif-item.selected {
+  background-color: var(--color-fill-tertiary) !important;
+  border-color: var(--color-border) !important;
+}
+
+.dark .notif-item.unread {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+.dark .notif-item.selected {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .notif-item:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.notif-item-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-fill-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notif-item-icon img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+.notif-item-icon.unread img {
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(100%) contrast(98%);
+  opacity: 1;
+}
+
+.dark .notif-item-icon img {
+  filter: invert(1) brightness(2);
+}
+
+.dark .notif-item-icon.unread img {
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(118%) contrast(98%);
+}
+
+.notif-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-item-title {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+  line-height: 1.3;
+}
+
+.notif-item-message {
+  font-size: var(--font-size-caption1);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.notif-item-time {
+  font-size: var(--font-size-caption2);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.notif-item-delete {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-fast), background-color var(--transition-fast);
+}
+
+.notif-item:hover .notif-item-delete {
+  opacity: 0.6;
+}
+
+.notif-item-delete:hover {
+  opacity: 1 !important;
+  background-color: var(--color-fill-secondary);
+}
+
+.notif-item-delete img {
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+}
+
+.dark .notif-item-delete img {
+  filter: invert(1) brightness(2);
+}
+
+.notif-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.notif-empty img {
+  width: 48px;
+  height: 48px;
+  opacity: 0.4;
+  margin-bottom: 12px;
+}
+
+.dark .notif-empty img {
+  filter: invert(1) brightness(2);
+}
+
+.notif-empty p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.notif-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 20px;
+}
+
+.notif-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-fill-tertiary);
+  border-top-color: var(--color-system-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 12px;
+}
+
+.notif-loading p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* Detail popup animation */
+@keyframes notifDetailSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Centered modal animation with cat */
+@keyframes notifModalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Auto notification toast animation */
+@keyframes notifToastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes notifToastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes notifModalSlideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+
+/* ============================================
+   Custom Context Menu Styles
+   Native-like context menu
+   ============================================ */
+.context-menu {
+  min-width: 180px;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 4px;
+  z-index: var(--z-toast);
+  transform-origin: top left;
+  animation: context-menu-in 0.08s ease-out;
+}
+
+@keyframes context-menu-in {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  text-align: left;
+  transition: background-color 0.1s ease;
+}
+
+.context-menu-item:hover:not(.disabled) {
+  background-color: var(--color-fill-tertiary);
+}
+
+.context-menu-item:active:not(.disabled) {
+  background-color: var(--color-fill-secondary);
+}
+
+.context-menu-item.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.context-menu-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.context-menu-label {
+  flex: 1;
+  font-weight: 400;
+}
+
+.context-menu-shortcut {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-left: auto;
+  font-weight: 400;
+}
+
+.context-menu-divider {
+  height: 1px;
+  background-color: var(--color-border-light);
+  margin: 4px 8px;
+}
+
+/* Dark mode adjustments */
+.dark .context-menu {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Context menu header for selection info */
+.context-menu-header {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px 4px;
+  border-bottom: 1px solid var(--color-border-light);
+  margin-bottom: 4px;
+}
+
+.context-menu-selection-info {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* AI action items in context menu - normal color, not highlighted */
+.context-menu-item.ai-action {
+  color: var(--color-text-primary);
+}
+
+.context-menu-item.ai-action .context-menu-icon {
+  color: var(--color-text-secondary);
+}
+
+.context-menu-item.ai-action:hover:not(.disabled) {
+  background-color: var(--color-fill-tertiary);
+}
+
+/* Show tooltip on disabled items */
+.context-menu-item.disabled[data-tooltip] {
+  position: relative;
+}
+
+/* AI badge in context menu */
+.context-menu-badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   Empty Profile Card Styles
+   ============================================ */
+
+.empty-profile-animation {
+  transform: translateX(0) !important;
+  width: 11rem !important;
+  height: 11rem !important;
+}
+
+/* Dark mode: invert animation to white on dark background */
+.dark .empty-profile-animation svg,
+.dark .empty-profile-animation canvas {
+  filter: invert(1) brightness(1.5) !important;
+}
+
+@media (max-width: 1024px) {
+  .empty-profile-animation {
+    width: 10rem !important;
+    height: 10rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .empty-profile-animation {
+    transform: translateX(0) !important;
+    width: 9rem !important;
+    height: 9rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .empty-profile-animation {
+    width: 7rem !important;
+    height: 7rem !important;
+  }
+}
+
+/* Notification modal close button */
+.notif-modal-close-btn img {
+  opacity: 0.6;
+}
+
+.dark .notif-modal-close-btn img {
+  filter: invert(1) brightness(2);
+}
+
+/* Notification detail modal dark mode */
+.dark .notif-detail-popup {
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   Color Filter - Yellow to Blue
+   ============================================ */
+.filter-yellow-to-blue {
+  filter: hue-rotate(180deg) saturate(1.1);
+}
+
+/* ============================================
+   Z-Index Utility Classes
+   ============================================ */
+.z-base { z-index: var(--z-base); }
+.z-dropdown { z-index: var(--z-dropdown); }
+.z-sticky { z-index: var(--z-sticky); }
+.z-fixed { z-index: var(--z-fixed); }
+.z-sidebar { z-index: var(--z-sidebar); }
+.z-toolbar { z-index: var(--z-toolbar); }
+.z-menu-backdrop { z-index: var(--z-menu-backdrop); }
+.z-menu { z-index: var(--z-menu); }
+.z-popup { z-index: var(--z-popup); }
+.z-popup-submenu { z-index: var(--z-popup-submenu); }
+.z-modal-backdrop { z-index: var(--z-modal-backdrop); }
+.z-modal { z-index: var(--z-modal); }
+.z-modal-nested { z-index: var(--z-modal-nested); }
+.z-overlay-high { z-index: var(--z-overlay-high); }
+.z-toast { z-index: var(--z-toast); }
+
+/* ============================================
+   Custom Tooltip System (Simple)
+   ============================================ */
+.tooltip {
+  position: fixed;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: var(--z-toast);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  max-width: 280px;
+  background: #fff;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.tooltip.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.dark .tooltip {
+  background: #2a2a2a;
+  color: #eee;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
