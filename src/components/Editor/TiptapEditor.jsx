@@ -12,23 +12,15 @@ import Superscript from '@tiptap/extension-superscript'
 import { TextStyle } from '@tiptap/extension-text-style'
 import { Color } from '@tiptap/extension-color'
 import FontFamily from '@tiptap/extension-font-family'
-import { useNavigate } from 'react-router-dom'
 import SearchHighlightExtension from './extensions/SearchHighlightExtension'
 import DeviationHighlightExtension from './extensions/DeviationHighlightExtension'
 import EditorTextLoader from './EditorTextLoader'
-import SelectionFloatingToolbar from './SelectionFloatingToolbar'
 import { useTranslation } from 'react-i18next'
-import { useIsStreaming, useProcessingType, useAIProcessingActions } from '@/stores'
+import { useIsStreaming, useProcessingType } from '@/stores'
 import { cn } from '../../lib/utils'
 import { serializeToPlainText, parseFromPlainText, isHtmlContent } from './utils/serialization'
-import { rewriteTextStream, startIterativeHumanize, pollAndStreamHumanizeJob } from '../../services/api'
-import { getLocalizedContentError } from '../../utils/errorMessages'
-import { handleCreditError, showUpgradeModal } from '../../utils/creditHandler'
-import modal from '../../utils/modal'
-import { logger } from '@/utils/logger'
 import SuggestionTooltip from '../Analysis/SuggestionTooltip'
 import EditorToolbar from './EditorToolbar'
-import useTextSelection from '../../hooks/useTextSelection'
 import './TiptapEditor.css'
 
 /**
@@ -47,25 +39,18 @@ function TiptapEditorComponent({
   className = '',
   showToolbar = true,
   toolbarClassName = '',
-  onEditorReady,
-  showSelectionToolbar = true // New prop to enable/disable selection toolbar
+  onEditorReady
 }, ref) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const isStreaming = useIsStreaming()
   const processingType = useProcessingType()
-  const { startProcessing, stopProcessing, startStreaming } = useAIProcessingActions()
   
   // Check if this is an AI operation that needs text loader on editor
   const isAIOperation = processingType === 'rewrite' || processingType === 'humanize' || 
                         processingType === 'detect' || processingType === 'analyze'
   
-  // Track if selection rewrite is in progress
-  const [isSelectionProcessing, setIsSelectionProcessing] = useState(false)
-  
-  // Show text loader for AI operations (including selection rewrite) - hide when streaming
-  // isSelectionProcessing tự động hiển thị shimmer vì nó là rewrite/humanize operation
-  const showTextLoader = ((isProcessing && isAIOperation) || isSelectionProcessing) && !isStreaming
+  // Show text loader for AI operations - hide when streaming
+  const showTextLoader = (isProcessing && isAIOperation) && !isStreaming
   
   const [activeTooltip, setActiveTooltip] = useState(null)
   const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set())
@@ -154,180 +139,6 @@ function TiptapEditorComponent({
       onEditorReady(editor)
     }
   }, [editor, onEditorReady])
-  
-  // Text selection hook for floating toolbar - use editor directly
-  const selection = useTextSelection(editor)
-  
-  // Track original text for selection rewrite rollback
-  const originalTextRef = useRef(null)
-  
-  // Handle selection rewrite - giống như rewrite thông thường
-  // Thay thế selected text trong HTML content, rồi update toàn bộ qua onChange
-  const handleSelectionRewrite = useCallback(async (params) => {
-    if (!editor) return
-    
-    const { text, useIterative, profileId, model, writingPreferences, processingType } = params
-    
-    // Lưu text gốc để thay thế sau
-    const selectedText = text
-    
-    // Lưu toàn bộ content để rollback nếu lỗi
-    const fullOriginalContent = value
-    
-    // Save to undo stack
-    setUndoStack(prev => [...prev.slice(-19), { text: value, timestamp: Date.now() }])
-    setRedoStack([])
-    
-    // Bắt đầu processing - shimmer toàn editor + three dots ở sidebar
-    setIsSelectionProcessing(true)
-    startProcessing(processingType)
-    
-    // Variables for streaming animation - giống RightSidebar
-    let fullText = ''
-    let displayedText = ''
-    let isAnimating = false
-    let hasStartedStreaming = false
-    
-    // Helper: thay thế selected text trong HTML content
-    const replaceSelectedTextInContent = (newText) => {
-      // Lấy HTML hiện tại từ editor
-      const currentHtml = editor.getHTML()
-      
-      // Tìm và thay thế selected text trong HTML
-      // Cần escape special regex characters trong selectedText
-      const escapedSelectedText = selectedText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      const regex = new RegExp(escapedSelectedText, 'g')
-      
-      // Chỉ thay thế lần xuất hiện đầu tiên
-      let replaced = false
-      const newHtml = currentHtml.replace(regex, (match) => {
-        if (!replaced) {
-          replaced = true
-          return newText
-        }
-        return match
-      })
-      
-      return newHtml
-    }
-    
-    // Animation function - giống RightSidebar
-    const animateText = () => {
-      if (displayedText.length < fullText.length) {
-        const remaining = fullText.length - displayedText.length
-        const charsToAdd = Math.max(1, Math.min(5, Math.ceil(remaining / 15)))
-        displayedText = fullText.substring(0, displayedText.length + charsToAdd)
-        
-        // Thay thế selected text bằng displayedText trong content
-        const newContent = replaceSelectedTextInContent(displayedText)
-        
-        // Update qua onChange như rewrite thông thường
-        lastValueRef.current = newContent
-        onChange?.(newContent)
-        
-        requestAnimationFrame(animateText)
-      } else {
-        isAnimating = false
-      }
-    }
-    
-    const waitForAnimation = () => {
-      return new Promise((resolve) => {
-        const checkAnimation = () => {
-          if (!isAnimating && displayedText.length >= fullText.length) {
-            resolve()
-          } else {
-            setTimeout(checkAnimation, 50)
-          }
-        }
-        checkAnimation()
-      })
-    }
-    
-    try {
-      if (useIterative) {
-        logger.log('[SELECTION] Starting iterative humanization...')
-        
-        const startResult = await startIterativeHumanize(profileId, selectedText, {
-          maxIterations: 3,
-          targetProbability: writingPreferences?.targetAIProbability || 35,
-          model,
-          writingPreferences
-        })
-        
-        if (!startResult.success) {
-          throw new Error(startResult.error || 'Humanization failed')
-        }
-        
-        const result = await pollAndStreamHumanizeJob(startResult.jobId, {
-          onProgress: (progress) => logger.log('[SELECTION PROGRESS]', progress),
-          onChunk: (chunk) => {
-            if (!hasStartedStreaming) {
-              hasStartedStreaming = true
-              startStreaming()
-            }
-            fullText += chunk
-            if (!isAnimating) {
-              isAnimating = true
-              animateText()
-            }
-          },
-          onComplete: (metadata) => logger.log('[SELECTION COMPLETE]', metadata),
-          pollInterval: 1500,
-          maxWaitTime: 300000
-        })
-        
-        await waitForAnimation()
-        
-        if (!result.success) {
-          throw new Error(result.error || 'Humanization failed')
-        }
-      } else {
-        logger.log('[SELECTION] Starting rewrite...')
-        
-        await rewriteTextStream(profileId, selectedText, model, writingPreferences, (chunk, type) => {
-          if (type === 'reasoning') return
-          
-          if (!hasStartedStreaming) {
-            hasStartedStreaming = true
-            startStreaming()
-          }
-          fullText += chunk
-          if (!isAnimating) {
-            isAnimating = true
-            animateText()
-          }
-        })
-        
-        await waitForAnimation()
-      }
-      
-      // Final sync - đảm bảo content cuối cùng được lưu đúng
-      if (fullText) {
-        const finalContent = replaceSelectedTextInContent(fullText)
-        lastValueRef.current = finalContent
-        onChange?.(finalContent)
-      }
-    } catch (error) {
-      console.error('[SELECTION FAIL]', error)
-      
-      // Rollback - khôi phục toàn bộ content gốc
-      if (fullOriginalContent) {
-        lastValueRef.current = fullOriginalContent
-        onChange?.(fullOriginalContent)
-      }
-      
-      const wasCreditError = handleCreditError(error, t, showUpgradeModal)
-      if (!wasCreditError) {
-        const localizedError = getLocalizedContentError(error.message, t)
-        modal.errorWithReport(localizedError || 'Rewrite failed', error, 'Error', 'TiptapEditor.handleSelectionRewrite')
-      }
-    } finally {
-      setIsSelectionProcessing(false)
-      originalTextRef.current = null
-      stopProcessing()
-    }
-  }, [editor, value, onChange, t, navigate, startProcessing, stopProcessing, startStreaming])
 
   // Sync external value changes
   useEffect(() => {
@@ -429,8 +240,6 @@ function TiptapEditorComponent({
     }
   }, [editor, analysis, showHighlights, onHighlightsChange, dismissedSuggestions])
 
-
-
   // Apply suggestion
   const handleApplySuggestion = useCallback((rewrittenText) => {
     if (!activeTooltip || !editor) return
@@ -495,10 +304,8 @@ function TiptapEditorComponent({
           />
         </div>
 
-        {/* EditorTextLoader for rewrite/humanize operations (including selection rewrite) */}
+        {/* EditorTextLoader for rewrite/humanize operations */}
         <EditorTextLoader visible={showTextLoader} />
-
-        {/* SparklesLoader overlay removed - EditorTextLoader now handles all AI operations */}
 
         {/* Suggestion tooltip */}
         {activeTooltip && (
@@ -514,15 +321,6 @@ function TiptapEditorComponent({
           />
         )}
       </div>
-      
-      {/* Selection Floating Toolbar - appears when text is selected */}
-      {showSelectionToolbar && !disabled && !isSelectionProcessing && (
-        <SelectionFloatingToolbar
-          selection={selection}
-          onSelectionRewrite={handleSelectionRewrite}
-          disabled={isProcessing || disabled}
-        />
-      )}
     </div>
   )
 }

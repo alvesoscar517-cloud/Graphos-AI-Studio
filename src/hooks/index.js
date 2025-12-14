@@ -101,7 +101,4 @@ export { useTextStats } from './useTextStats'
 export { useLanguage } from './useLanguage'
 export { useSpeech } from './useSpeech'
 
-// ============================================
-// Editor hooks
-// ============================================
-export { useTextSelection } from './useTextSelection'
+

@@ -1,0 +1,13 @@
+{
+  "hosting": {
+    "site": "notes-sync-472107-admin",
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

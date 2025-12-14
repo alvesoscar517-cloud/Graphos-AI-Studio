@@ -2550,23 +2550,6 @@
 }
 
 /* ============================================
-   Selection Floating Toolbar Styles
-   ============================================ */
-.selection-floating-toolbar {
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.selection-floating-toolbar button:focus {
-  outline: none;
-}
-
-.selection-floating-toolbar button:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* ============================================
    Empty Profile Card Styles
    ============================================ */
 
