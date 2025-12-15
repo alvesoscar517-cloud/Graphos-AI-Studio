@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "home": "首頁",
+    "features": "功能",
+    "aiDetection": "AI偵測",
+    "humanization": "人性化",
+    "voiceProfile": "聲音檔案",
+    "aiWorkspace": "AI工作區",
+    "privacy": "隱私政策",
+    "terms": "服務條款",
+    "legal": "法律資訊"
+  },
+  "cta": {
+    "getStarted": "開始使用",
+    "tryFree": "免費試用",
+    "learnMore": "了解更多",
+    "signUp": "註冊"
+  },
+  "home": {
+    "meta": {
+      "title": "Graphos AI Studio - 真實的AI寫作",
+      "description": "使用AI偵測、人性化和聲音檔案功能撰寫真實內容。將AI文字轉換為自然的人類寫作。"
+    },
+    "hero": {
+      "title": "用AI撰寫真實內容",
+      "subtitle": "偵測AI生成的文字，人性化內容，並使用您獨特的聲音檔案進行創作。"
+    },
+    "features": {
+      "title": "強大功能"
+    },
+    "cta": {
+      "title": "準備好撰寫真實內容了嗎？",
+      "description": "加入數千名使用Graphos AI Studio創建真實、自然內容的作家行列。"
+    }
+  },
+  "aiDetection": {
+    "meta": {
+      "title": "AI偵測 - Graphos AI Studio",
+      "description": "高精度偵測AI生成的內容。識別ChatGPT、GPT-4和其他AI寫作。"
+    },
+    "title": "AI偵測",
+    "description": "精準可靠地識別AI生成的內容。"
+  },
+  "humanization": {
+    "meta": {
+      "title": "內容人性化 - Graphos AI Studio",
+      "description": "在保留含義的同時將AI生成的文字轉換為自然的人類內容。"
+    },
+    "title": "內容人性化",
+    "description": "將AI文字轉換為自然、真實的人類寫作。"
+  },
+  "voiceProfile": {
+    "meta": {
+      "title": "聲音檔案 - Graphos AI Studio",
+      "description": "創建您獨特的寫作聲音檔案，生成聽起來像您的內容。"
+    },
+    "title": "聲音檔案",
+    "description": "捕捉您獨特的寫作風格，創建真正屬於您的內容。"
+  },
+  "aiWorkspace": {
+    "meta": {
+      "title": "AI工作區 - Graphos AI Studio",
+      "description": "使用您的聲音檔案與AI聊天。獲得個人化的寫作幫助。"
+    },
+    "title": "AI工作區",
+    "description": "用您獨特的寫作風格與AI聊天。"
+  },
+  "privacy": {
+    "meta": {
+      "title": "隱私政策 - Graphos AI Studio",
+      "description": "了解Graphos AI Studio如何收集、使用和保護您的個人資料。"
+    },
+    "title": "隱私政策",
+    "lastUpdated": "最後更新"
+  },
+  "terms": {
+    "meta": {
+      "title": "服務條款 - Graphos AI Studio",
+      "description": "閱讀Graphos AI Studio服務的使用條款和條件。"
+    },
+    "title": "服務條款",
+    "lastUpdated": "最後更新"
+  },
+  "footer": {
+    "description": "Graphos AI Studio透過AI偵測、人性化和聲音檔案功能幫助您撰寫真實內容。",
+    "copyright": "版權所有。"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "nav": { "home": "होम", "features": "विशेषताएं", "aiDetection": "AI पहचान", "humanization": "मानवीकरण", "voiceProfile": "वॉइस प्रोफाइल", "aiWorkspace": "AI कार्यक्षेत्र", "privacy": "गोपनीयता नीति", "terms": "सेवा की शर्तें", "legal": "कानूनी" },
+  "cta": { "getStarted": "शुरू करें", "tryFree": "मुफ्त में आज़माएं", "learnMore": "और जानें", "signUp": "साइन अप करें" },
+  "home": { "meta": { "title": "Graphos AI Studio - प्रामाणिक AI लेखन", "description": "AI पहचान, मानवीकरण और वॉइस प्रोफाइल सुविधाओं के साथ प्रामाणिक सामग्री लिखें।" }, "hero": { "title": "AI के साथ प्रामाणिक सामग्री लिखें", "subtitle": "AI-जनित टेक्स्ट का पता लगाएं, सामग्री को मानवीय बनाएं, और अपनी अनूठी वॉइस प्रोफाइल के साथ बनाएं।" }, "features": { "title": "शक्तिशाली विशेषताएं" }, "cta": { "title": "प्रामाणिक सामग्री लिखने के लिए तैयार हैं?", "description": "हजारों लेखकों से जुड़ें जो प्रामाणिक, मानवीय सामग्री बनाने के लिए Graphos AI Studio का उपयोग करते हैं।" } },
+  "aiDetection": { "meta": { "title": "AI पहचान - Graphos AI Studio", "description": "उच्च सटीकता के साथ AI-जनित सामग्री का पता लगाएं।" }, "title": "AI पहचान", "description": "सटीकता और विश्वास के साथ AI-जनित सामग्री की पहचान करें।" },
+  "humanization": { "meta": { "title": "सामग्री मानवीकरण - Graphos AI Studio", "description": "AI टेक्स्ट को प्राकृतिक, मानवीय सामग्री में बदलें।" }, "title": "सामग्री मानवीकरण", "description": "AI टेक्स्ट को प्राकृतिक, प्रामाणिक मानवीय लेखन में बदलें।" },
+  "voiceProfile": { "meta": { "title": "वॉइस प्रोफाइल - Graphos AI Studio", "description": "अपनी अनूठी लेखन वॉइस प्रोफाइल बनाएं।" }, "title": "वॉइस प्रोफाइल", "description": "अपनी अनूठी लेखन शैली को कैप्चर करें और ऐसी सामग्री बनाएं जो प्रामाणिक रूप से आपकी तरह लगे।" },
+  "aiWorkspace": { "meta": { "title": "AI कार्यक्षेत्र - Graphos AI Studio", "description": "अपनी वॉइस प्रोफाइल का उपयोग करके AI के साथ चैट करें।" }, "title": "AI कार्यक्षेत्र", "description": "अपनी अनूठी लेखन शैली में AI के साथ चैट करें।" },
+  "privacy": { "meta": { "title": "गोपनीयता नीति - Graphos AI Studio", "description": "जानें कि हम आपके डेटा की सुरक्षा कैसे करते हैं।" }, "title": "गोपनीयता नीति", "lastUpdated": "अंतिम अपडेट" },
+  "terms": { "meta": { "title": "सेवा की शर्तें - Graphos AI Studio", "description": "हमारी सेवा की शर्तें पढ़ें।" }, "title": "सेवा की शर्तें", "lastUpdated": "अंतिम अपडेट" },
+  "footer": { "description": "Graphos AI Studio आपको AI पहचान, मानवीकरण और वॉइस प्रोफाइल के साथ प्रामाणिक सामग्री लिखने में मदद करता है।", "copyright": "सर्वाधिकार सुरक्षित।" }
+}

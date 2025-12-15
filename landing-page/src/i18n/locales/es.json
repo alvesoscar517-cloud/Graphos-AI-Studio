@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "features": "Características",
+    "aiDetection": "Detección de IA",
+    "humanization": "Humanización",
+    "voiceProfile": "Perfil de Voz",
+    "aiWorkspace": "Espacio de Trabajo IA",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "legal": "Legal"
+  },
+  "cta": {
+    "getStarted": "Comenzar",
+    "tryFree": "Probar Gratis",
+    "learnMore": "Saber Más",
+    "signUp": "Registrarse"
+  },
+  "home": {
+    "meta": {
+      "title": "Graphos AI Studio - Escritura IA Auténtica",
+      "description": "Escribe contenido auténtico con detección de IA, humanización y funciones de perfil de voz. Transforma texto IA en escritura natural y humana."
+    },
+    "hero": {
+      "title": "Escribe Contenido Auténtico con IA",
+      "subtitle": "Detecta texto generado por IA, humaniza contenido y crea con tu perfil de voz único."
+    },
+    "features": {
+      "title": "Características Poderosas"
+    },
+    "cta": {
+      "title": "¿Listo para Escribir Contenido Auténtico?",
+      "description": "Únete a miles de escritores que usan Graphos AI Studio para crear contenido auténtico y humano."
+    }
+  },
+  "aiDetection": {
+    "meta": {
+      "title": "Detección de IA - Graphos AI Studio",
+      "description": "Detecta contenido generado por IA con alta precisión. Identifica ChatGPT, GPT-4 y otras escrituras IA."
+    },
+    "title": "Detección de IA",
+    "description": "Identifica contenido generado por IA con precisión y confianza."
+  },
+  "humanization": {
+    "meta": {
+      "title": "Humanización de Contenido - Graphos AI Studio",
+      "description": "Transforma texto generado por IA en contenido natural y humano preservando el significado."
+    },
+    "title": "Humanización de Contenido",
+    "description": "Transforma texto IA en escritura humana natural y auténtica."
+  },
+  "voiceProfile": {
+    "meta": {
+      "title": "Perfil de Voz - Graphos AI Studio",
+      "description": "Crea tu perfil de voz de escritura único y genera contenido que suene como tú."
+    },
+    "title": "Perfil de Voz",
+    "description": "Captura tu estilo de escritura único y crea contenido que suene auténticamente como tú."
+  },
+  "aiWorkspace": {
+    "meta": {
+      "title": "Espacio de Trabajo IA - Graphos AI Studio",
+      "description": "Chatea con IA usando tu perfil de voz. Obtén asistencia de escritura personalizada."
+    },
+    "title": "Espacio de Trabajo IA",
+    "description": "Chatea con IA en tu estilo de escritura único."
+  },
+  "privacy": {
+    "meta": {
+      "title": "Política de Privacidad - Graphos AI Studio",
+      "description": "Aprende cómo Graphos AI Studio recopila, usa y protege tus datos personales."
+    },
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última Actualización"
+  },
+  "terms": {
+    "meta": {
+      "title": "Términos de Servicio - Graphos AI Studio",
+      "description": "Lee los términos y condiciones para usar los servicios de Graphos AI Studio."
+    },
+    "title": "Términos de Servicio",
+    "lastUpdated": "Última Actualización"
+  },
+  "footer": {
+    "description": "Graphos AI Studio te ayuda a escribir contenido auténtico con detección de IA, humanización y funciones de perfil de voz.",
+    "copyright": "Todos los derechos reservados."
+  }
+}

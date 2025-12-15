@@ -1,0 +1,68 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "features": "Funktionen",
+    "aiDetection": "KI-Erkennung",
+    "humanization": "Humanisierung",
+    "voiceProfile": "Stimmprofil",
+    "aiWorkspace": "KI-Arbeitsbereich",
+    "privacy": "Datenschutzrichtlinie",
+    "terms": "Nutzungsbedingungen",
+    "legal": "Rechtliches"
+  },
+  "cta": {
+    "getStarted": "Loslegen",
+    "tryFree": "Kostenlos Testen",
+    "learnMore": "Mehr Erfahren",
+    "signUp": "Registrieren"
+  },
+  "home": {
+    "meta": {
+      "title": "Graphos AI Studio - Authentisches KI-Schreiben",
+      "description": "Schreiben Sie authentische Inhalte mit KI-Erkennung, Humanisierung und Stimmprofil-Funktionen."
+    },
+    "hero": {
+      "title": "Schreiben Sie Authentische Inhalte mit KI",
+      "subtitle": "Erkennen Sie KI-generierten Text, humanisieren Sie Inhalte und erstellen Sie mit Ihrem einzigartigen Stimmprofil."
+    },
+    "features": { "title": "Leistungsstarke Funktionen" },
+    "cta": {
+      "title": "Bereit, Authentische Inhalte zu Schreiben?",
+      "description": "Schließen Sie sich Tausenden von Autoren an, die Graphos AI Studio nutzen, um authentische, menschliche Inhalte zu erstellen."
+    }
+  },
+  "aiDetection": {
+    "meta": { "title": "KI-Erkennung - Graphos AI Studio", "description": "Erkennen Sie KI-generierte Inhalte mit hoher Genauigkeit." },
+    "title": "KI-Erkennung",
+    "description": "Identifizieren Sie KI-generierte Inhalte mit Präzision und Vertrauen."
+  },
+  "humanization": {
+    "meta": { "title": "Inhalts-Humanisierung - Graphos AI Studio", "description": "Verwandeln Sie KI-generierten Text in natürliche, menschliche Inhalte." },
+    "title": "Inhalts-Humanisierung",
+    "description": "Verwandeln Sie KI-Text in natürliches, authentisches menschliches Schreiben."
+  },
+  "voiceProfile": {
+    "meta": { "title": "Stimmprofil - Graphos AI Studio", "description": "Erstellen Sie Ihr einzigartiges Schreib-Stimmprofil." },
+    "title": "Stimmprofil",
+    "description": "Erfassen Sie Ihren einzigartigen Schreibstil und erstellen Sie Inhalte, die authentisch nach Ihnen klingen."
+  },
+  "aiWorkspace": {
+    "meta": { "title": "KI-Arbeitsbereich - Graphos AI Studio", "description": "Chatten Sie mit KI unter Verwendung Ihres Stimmprofils." },
+    "title": "KI-Arbeitsbereich",
+    "description": "Chatten Sie mit KI in Ihrem einzigartigen Schreibstil."
+  },
+  "privacy": {
+    "meta": { "title": "Datenschutzrichtlinie - Graphos AI Studio", "description": "Erfahren Sie, wie wir Ihre Daten schützen." },
+    "title": "Datenschutzrichtlinie",
+    "lastUpdated": "Zuletzt Aktualisiert"
+  },
+  "terms": {
+    "meta": { "title": "Nutzungsbedingungen - Graphos AI Studio", "description": "Lesen Sie unsere Nutzungsbedingungen." },
+    "title": "Nutzungsbedingungen",
+    "lastUpdated": "Zuletzt Aktualisiert"
+  },
+  "footer": {
+    "description": "Graphos AI Studio hilft Ihnen, authentische Inhalte mit KI-Erkennung, Humanisierung und Stimmprofil-Funktionen zu schreiben.",
+    "copyright": "Alle Rechte vorbehalten."
+  }
+}

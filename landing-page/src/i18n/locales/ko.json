@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "home": "홈",
+    "features": "기능",
+    "aiDetection": "AI 감지",
+    "humanization": "휴머나이제이션",
+    "voiceProfile": "보이스 프로필",
+    "aiWorkspace": "AI 워크스페이스",
+    "privacy": "개인정보 보호정책",
+    "terms": "이용약관",
+    "legal": "법적 정보"
+  },
+  "cta": {
+    "getStarted": "시작하기",
+    "tryFree": "무료 체험",
+    "learnMore": "자세히 알아보기",
+    "signUp": "가입하기"
+  },
+  "home": {
+    "meta": {
+      "title": "Graphos AI Studio - 진정한 AI 글쓰기",
+      "description": "AI 감지, 휴머나이제이션, 보이스 프로필 기능으로 진정한 콘텐츠를 작성하세요. AI 텍스트를 자연스러운 인간적인 글로 변환합니다."
+    },
+    "hero": {
+      "title": "AI로 진정한 콘텐츠 작성",
+      "subtitle": "AI 생성 텍스트를 감지하고, 콘텐츠를 휴머나이즈하고, 고유한 보이스 프로필로 작성하세요."
+    },
+    "features": {
+      "title": "강력한 기능"
+    },
+    "cta": {
+      "title": "진정한 콘텐츠를 작성할 준비가 되셨나요?",
+      "description": "Graphos AI Studio를 사용하여 진정하고 인간적인 콘텐츠를 만드는 수천 명의 작가들과 함께하세요."
+    }
+  },
+  "aiDetection": {
+    "meta": {
+      "title": "AI 감지 - Graphos AI Studio",
+      "description": "높은 정확도로 AI 생성 콘텐츠를 감지합니다. ChatGPT, GPT-4 및 기타 AI 글쓰기를 식별합니다."
+    },
+    "title": "AI 감지",
+    "description": "정밀도와 신뢰도로 AI 생성 콘텐츠를 식별합니다."
+  },
+  "humanization": {
+    "meta": {
+      "title": "콘텐츠 휴머나이제이션 - Graphos AI Studio",
+      "description": "의미를 유지하면서 AI 생성 텍스트를 자연스러운 인간적인 콘텐츠로 변환합니다."
+    },
+    "title": "콘텐츠 휴머나이제이션",
+    "description": "AI 텍스트를 자연스럽고 진정한 인간적인 글로 변환합니다."
+  },
+  "voiceProfile": {
+    "meta": {
+      "title": "보이스 프로필 - Graphos AI Studio",
+      "description": "고유한 글쓰기 보이스 프로필을 만들고 당신처럼 들리는 콘텐츠를 생성하세요."
+    },
+    "title": "보이스 프로필",
+    "description": "고유한 글쓰기 스타일을 캡처하고 진정으로 당신처럼 들리는 콘텐츠를 만드세요."
+  },
+  "aiWorkspace": {
+    "meta": {
+      "title": "AI 워크스페이스 - Graphos AI Studio",
+      "description": "보이스 프로필을 사용하여 AI와 채팅하세요. 개인화된 글쓰기 지원을 받으세요."
+    },
+    "title": "AI 워크스페이스",
+    "description": "고유한 글쓰기 스타일로 AI와 채팅하세요."
+  },
+  "privacy": {
+    "meta": {
+      "title": "개인정보 보호정책 - Graphos AI Studio",
+      "description": "Graphos AI Studio가 개인 데이터를 어떻게 수집, 사용, 보호하는지 알아보세요."
+    },
+    "title": "개인정보 보호정책",
+    "lastUpdated": "최종 업데이트"
+  },
+  "terms": {
+    "meta": {
+      "title": "이용약관 - Graphos AI Studio",
+      "description": "Graphos AI Studio 서비스 이용약관을 읽어보세요."
+    },
+    "title": "이용약관",
+    "lastUpdated": "최종 업데이트"
+  },
+  "footer": {
+    "description": "Graphos AI Studio는 AI 감지, 휴머나이제이션, 보이스 프로필 기능으로 진정한 콘텐츠 작성을 도와줍니다.",
+    "copyright": "모든 권리 보유."
+  }
+}

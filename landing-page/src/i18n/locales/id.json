@@ -1,0 +1,12 @@
+{
+  "nav": { "home": "Beranda", "features": "Fitur", "aiDetection": "Deteksi AI", "humanization": "Humanisasi", "voiceProfile": "Profil Suara", "aiWorkspace": "Ruang Kerja AI", "privacy": "Kebijakan Privasi", "terms": "Ketentuan Layanan", "legal": "Hukum" },
+  "cta": { "getStarted": "Mulai", "tryFree": "Coba Gratis", "learnMore": "Pelajari Lebih Lanjut", "signUp": "Daftar" },
+  "home": { "meta": { "title": "Graphos AI Studio - Penulisan AI Autentik", "description": "Tulis konten autentik dengan deteksi AI, humanisasi, dan fitur profil suara." }, "hero": { "title": "Tulis Konten Autentik dengan AI", "subtitle": "Deteksi teks yang dihasilkan AI, humanisasi konten, dan buat dengan profil suara unik Anda." }, "features": { "title": "Fitur Canggih" }, "cta": { "title": "Siap Menulis Konten Autentik?", "description": "Bergabunglah dengan ribuan penulis yang menggunakan Graphos AI Studio untuk membuat konten autentik dan manusiawi." } },
+  "aiDetection": { "meta": { "title": "Deteksi AI - Graphos AI Studio", "description": "Deteksi konten yang dihasilkan AI dengan akurasi tinggi." }, "title": "Deteksi AI", "description": "Identifikasi konten yang dihasilkan AI dengan presisi dan kepercayaan." },
+  "humanization": { "meta": { "title": "Humanisasi Konten - Graphos AI Studio", "description": "Ubah teks AI menjadi konten alami dan manusiawi." }, "title": "Humanisasi Konten", "description": "Ubah teks AI menjadi tulisan manusia yang alami dan autentik." },
+  "voiceProfile": { "meta": { "title": "Profil Suara - Graphos AI Studio", "description": "Buat profil suara penulisan unik Anda." }, "title": "Profil Suara", "description": "Tangkap gaya penulisan unik Anda dan buat konten yang terdengar autentik seperti Anda." },
+  "aiWorkspace": { "meta": { "title": "Ruang Kerja AI - Graphos AI Studio", "description": "Ngobrol dengan AI menggunakan profil suara Anda." }, "title": "Ruang Kerja AI", "description": "Ngobrol dengan AI dalam gaya penulisan unik Anda." },
+  "privacy": { "meta": { "title": "Kebijakan Privasi - Graphos AI Studio", "description": "Pelajari bagaimana kami melindungi data Anda." }, "title": "Kebijakan Privasi", "lastUpdated": "Terakhir Diperbarui" },
+  "terms": { "meta": { "title": "Ketentuan Layanan - Graphos AI Studio", "description": "Baca ketentuan layanan kami." }, "title": "Ketentuan Layanan", "lastUpdated": "Terakhir Diperbarui" },
+  "footer": { "description": "Graphos AI Studio membantu Anda menulis konten autentik dengan deteksi AI, humanisasi, dan profil suara.", "copyright": "Hak cipta dilindungi." }
+}

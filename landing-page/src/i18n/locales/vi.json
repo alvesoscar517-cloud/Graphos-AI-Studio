@@ -1,0 +1,838 @@
+{
+  "common": {
+    "loading": "Đang tải..."
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "features": "Tính năng",
+    "aiDetection": "Phát hiện AI",
+    "aidetection": "Phát hiện AI",
+    "humanization": "Nhân hóa nội dung",
+    "voiceProfile": "Hồ sơ giọng văn",
+    "voiceprofile": "Hồ sơ giọng văn",
+    "aiWorkspace": "Không gian AI",
+    "workspace": "Workspace",
+    "privacy": "Chính sách bảo mật",
+    "terms": "Điều khoản sử dụng",
+    "legal": "Pháp lý"
+  },
+  "cta": {
+    "getStarted": "Bắt đầu ngay",
+    "getStartedFree": "Bắt đầu miễn phí",
+    "tryFree": "Dùng thử ngay",
+    "tryDemo": "Thử Demo",
+    "startFreeTrial": "Dùng thử miễn phí",
+    "learnMore": "Tìm hiểu thêm",
+    "signUp": "Đăng ký",
+    "seeItInAction": "Xem demo",
+    "badge": "Bắt đầu miễn phí ngay hôm nay",
+    "installExtension": "Cài đặt tiện ích",
+    "trustedBy": "Được tin dùng bởi người viết và nhà sáng tạo nội dung toàn cầu",
+    "trust": {
+      "free": "Gói miễn phí mãi mãi",
+      "noCard": "Không cần thẻ tín dụng",
+      "setup": "Thiết lập 2 phút"
+    },
+    "metrics": {
+      "users": "Người dùng hoạt động",
+      "texts": "Văn bản đã phân tích",
+      "languages": "Ngôn ngữ",
+      "rating": "Đánh giá người dùng"
+    }
+  },
+  "home": {
+    "meta": {
+      "title": "Graphos AI Studio - Phát hiện AI, Nhân hóa & Hồ sơ giọng văn",
+      "description": "Phát hiện nội dung AI, nhân hóa văn bản và tạo nội dung chân thực mang phong cách riêng của bạn. Trợ lý viết AI miễn phí với tiện ích Chrome."
+    },
+    "hero": {
+      "title": "Viết nội dung chân thực với AI",
+      "subtitle": "Phát hiện văn bản AI, nhân hóa nội dung và sáng tạo với giọng văn riêng của bạn."
+    },
+    "features": { "title": "Tính năng mạnh mẽ" },
+    "cta": {
+      "title": "Sẵn sàng viết nội dung chân thực?",
+      "description": "Tham gia cùng hàng nghìn người viết sử dụng Graphos AI Studio để tạo nội dung chân thực, tự nhiên."
+    }
+  },
+  "hero": {
+    "badgeText": "Trợ lý viết AI",
+    "title": "Viết chân thực",
+    "titleHighlight": "Với AI hiểu bạn",
+    "description": "Phát hiện nội dung AI, nhân hóa văn bản và tạo nội dung mang đậm phong cách riêng của bạn. Tất cả trong một nền tảng mạnh mẽ.",
+    "scroll": "Cuộn để khám phá",
+    "typing": {
+      "detect": "Phát hiện nội dung AI ngay lập tức",
+      "humanize": "Nhân hóa văn bản của bạn",
+      "voice": "Viết theo phong cách riêng",
+      "workspace": "Trò chuyện với AI theo cách của bạn"
+    }
+  },
+  "heroBadge": {
+    "detection": "Độ chính xác 98%",
+    "users": "50K+ Người dùng",
+    "fast": "Kết quả tức thì",
+    "languages": "15 Ngôn ngữ"
+  },
+  "heroTrust": {
+    "free": "Miễn phí để bắt đầu",
+    "noCard": "Không cần thẻ tín dụng",
+    "extension": "Bao gồm tiện ích Chrome"
+  },
+  "showcase": {
+    "badge": "Demo tương tác",
+    "title": "Trải nghiệm sản phẩm thực",
+    "subtitle": "Thử các tính năng ngay tại đây. Không cần đăng ký. Xem chính xác cách Graphos AI Studio hoạt động.",
+    "ctaText": "Sẵn sàng trải nghiệm toàn bộ sức mạnh?"
+  },
+  "howItWorks": {
+    "badge": "Quy trình đơn giản",
+    "title": "Cách hoạt động",
+    "subtitle": "Bắt đầu trong vài phút. Không cần thiết lập phức tạp.",
+    "step1": { "title": "Tạo hồ sơ giọng văn", "description": "Tải lên mẫu văn bản hoặc dán text. AI của chúng tôi phân tích phong cách, giọng điệu và từ vựng độc đáo của bạn." },
+    "step2": { "title": "Phát hiện nội dung AI", "description": "Dán bất kỳ văn bản nào để kiểm tra ngay xem nó có được viết bởi AI không. Nhận phân tích chi tiết với điểm tin cậy." },
+    "step3": { "title": "Nhân hóa nội dung", "description": "Biến văn bản AI thành nội dung tự nhiên, giống người viết phù hợp với phong cách viết của bạn." },
+    "step4": { "title": "Trò chuyện theo giọng văn", "description": "Sử dụng Không gian AI để tạo nội dung mang đậm phong cách của bạn. Hoàn hảo cho email, bài đăng và nhiều hơn nữa." }
+  },
+  "testimonials": {
+    "badge": "Đánh giá",
+    "title": "Được yêu thích bởi người viết toàn cầu",
+    "subtitle": "Xem người dùng nói gì về trải nghiệm của họ với Graphos AI Studio.",
+    "quotes": {
+      "1": "Graphos AI đã hoàn toàn thay đổi cách tôi viết nội dung. Tính năng hồ sơ giọng văn thật tuyệt vời - nó thực sự nghe như tôi!",
+      "2": "Là một giáo sư, tôi sử dụng phát hiện AI hàng ngày. Nó chính xác và giúp tôi duy trì tính trung thực học thuật trong các lớp học.",
+      "3": "Tính năng nhân hóa đã tiết kiệm cho tôi hàng giờ chỉnh sửa. Các bản nháp được AI hỗ trợ của tôi giờ đọc tự nhiên và chân thực.",
+      "4": "Cuối cùng cũng có một công cụ AI giúp tôi viết nhanh hơn mà không mất đi nét cá nhân. Không gian làm việc trực quan và mạnh mẽ.",
+      "5": "Ban đầu tôi hoài nghi, nhưng độ chính xác của phát hiện AI thật ấn tượng. Nó đã trở nên thiết yếu cho công việc biên tập của tôi.",
+      "6": "Tiện ích Chrome giúp sử dụng ở mọi nơi dễ dàng. Tôi có thể kiểm tra và nhân hóa nội dung mà không cần rời khỏi quy trình làm việc."
+    },
+    "roles": {
+      "contentCreator": "Nhà sáng tạo nội dung",
+      "professor": "Giáo sư đại học",
+      "marketingManager": "Quản lý Marketing",
+      "freelanceWriter": "Nhà văn tự do",
+      "editor": "Tổng biên tập",
+      "socialMediaManager": "Quản lý mạng xã hội"
+    }
+  },
+  "stats": {
+    "activeusers": "Người dùng hoạt động",
+    "textsanalyzed": "Văn bản đã phân tích",
+    "accuracyrate": "Tỷ lệ chính xác",
+    "userrating": "Đánh giá người dùng"
+  },
+  "pricing": {
+    "badge": "Bảng giá",
+    "title": "Trả theo nhu cầu",
+    "subtitle": "Mua credit khi cần. Không cần đăng ký. Credit không bao giờ hết hạn.",
+    "popular": "Phổ biến",
+    "bestValue": "Giá trị nhất",
+    "free": "Miễn phí",
+    "credits": "credits",
+    "creditsShort": "cr",
+    "bonus": "thưởng",
+    "perCredit": "credit",
+    "buyNow": "Mua ngay",
+    "startFree": "Bắt đầu miễn phí",
+    "freeCredits": "Bắt đầu với 100 credit miễn phí",
+    "noCardRequired": "Không cần thẻ tín dụng • Thử tất cả tính năng",
+    "firstPurchaseTitle": "Ưu đãi lần mua đầu",
+    "firstPurchaseDesc": "Nhận gấp đôi credit cho lần mua đầu tiên!",
+    "firstPurchase": "Lần mua đầu",
+    "limitedOffer": "Ưu đãi có hạn",
+    "whatCreditsFor": "Bạn có thể làm gì với Credit?",
+    "creditCostNote": "Credit ước tính mỗi lần sử dụng (thay đổi theo độ dài văn bản)",
+    "localCurrencyNote": "* Giá tiền địa phương có thể thay đổi theo tỷ giá hối đoái",
+    "poweredBy": "Thanh toán qua",
+    "creditCard": "Thẻ tín dụng",
+    "secureCheckout": "Thanh toán an toàn",
+    "note": "Thanh toán an toàn qua Lemon Squeezy • Chấp nhận thẻ tín dụng & PayPal",
+    "freeFeatures": {
+      "tryAllFeatures": "Thử tất cả tính năng",
+      "noCardRequired": "Không cần thẻ tín dụng",
+      "neverExpires": "Credit không hết hạn"
+    },
+    "uses": {
+      "aiDetection": "Phát hiện AI",
+      "humanization": "Nhân hóa",
+      "voiceProfiles": "Hồ sơ giọng văn",
+      "aiWorkspace": "Chat AI",
+      "rewriting": "Viết lại",
+      "styleAnalysis": "Phân tích phong cách"
+    },
+    "acceptedPayments": "Chấp nhận thanh toán",
+    "secureCheckout": "Thanh toán an toàn với mã hóa SSL 256-bit",
+    "benefits": {
+      "neverExpire": "Credit không hết hạn",
+      "noSubscription": "Không cần đăng ký",
+      "securePayment": "Thanh toán an toàn",
+      "instantCredits": "Nhận credit ngay"
+    }
+  }
+,
+  "demo": {
+    "liveDemo": "Demo trực tiếp",
+    "trySample": "Thử mẫu",
+    "aiText": "Văn bản AI",
+    "humanText": "Văn bản người",
+    "mixedText": "Hỗn hợp",
+    "enterText": "Nhập hoặc dán văn bản để phân tích... (tối thiểu 50 ký tự)",
+    "characters": "ký tự",
+    "analyzing": "Đang phân tích...",
+    "detect": "Phát hiện AI",
+    "aiDetection": "Phát hiện AI",
+    "contentAnalysis": "Phân tích nội dung",
+    "confidence": "Độ tin cậy",
+    "humanIndicators": "Dấu hiệu người viết",
+    "aiIndicators": "Dấu hiệu AI",
+    "enterTextToAnalyze": "Nhập văn bản để phân tích",
+    "minCharacters": "Yêu cầu tối thiểu 50 ký tự",
+    "verdictHuman": "Do người viết",
+    "verdictMostlyHuman": "Chủ yếu người viết",
+    "verdictMixed": "Nội dung hỗn hợp",
+    "verdictMostlyAI": "Chủ yếu AI",
+    "verdictAI": "Do AI tạo",
+    "voiceProfile": "Hồ sơ giọng văn",
+    "quickActions": "Hành động nhanh",
+    "startConversation": "Bắt đầu cuộc trò chuyện",
+    "workspaceDescription": "Trò chuyện với AI viết theo giọng văn riêng của bạn. Thử hành động nhanh hoặc nhập tin nhắn.",
+    "typeMessage": "Nhập tin nhắn...",
+    "viewExamples": "Xem ví dụ",
+    "tryYourOwn": "Thử của bạn",
+    "example": "Ví dụ",
+    "before": "Trước",
+    "after": "Sau",
+    "clickToTransform": "Nhấn chuyển đổi để xem phép màu",
+    "transforming": "Đang chuyển đổi...",
+    "humanize": "Nhân hóa nội dung",
+    "pasteAIText": "Dán văn bản AI",
+    "enterAIText": "Nhập văn bản AI tại đây...",
+    "transform": "Chuyển đổi",
+    "humanizedResult": "Kết quả nhân hóa",
+    "processing": "Đang xử lý...",
+    "resultWillAppear": "Văn bản nhân hóa sẽ xuất hiện ở đây",
+    "selectProfile": "Chọn hồ sơ",
+    "profileInfo": "Hồ sơ được tạo bằng cách phân tích mẫu văn bản của bạn",
+    "analyzingProfile": "Đang phân tích phong cách viết...",
+    "writingMetrics": "Chỉ số viết",
+    "formality": "Trang trọng",
+    "creativity": "Sáng tạo",
+    "directness": "Trực tiếp",
+    "empathy": "Đồng cảm",
+    "technicality": "Kỹ thuật",
+    "writingTraits": "Đặc điểm viết",
+    "signatureWords": "Từ đặc trưng",
+    "sentenceLength": "Độ dài câu",
+    "overallTone": "Giọng điệu chung",
+    "textTooShort": "Vui lòng nhập ít nhất 50 ký tự",
+    "textTooLong": "Văn bản phải dưới 2000 ký tự",
+    "rateLimited": "Bạn đã thử demo rồi. Đăng ký để truy cập không giới hạn!",
+    "tryFullVersion": "Dùng thử phiên bản đầy đủ",
+    "realApiCall": "API thực",
+    "signUpFree": "Đăng ký miễn phí",
+    "serverError": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "tryAgain": "Thử lại",
+    "chars": "ký tự",
+    "words": "từ",
+    "sentences": "câu",
+    "wordsAnalyzed": "Từ",
+    "sentencesAnalyzed": "Câu",
+    "redetect": "Phát hiện lại",
+    "aiProbability": "Xác suất AI",
+    "viewIndicators": "Xem chỉ số",
+    "humanizeThis": "Nhân hóa nội dung này",
+    "continueInApp": "Tiếp tục trong ứng dụng",
+    "unlimited": "Không giới hạn",
+    "readyToAnalyze": "Sẵn sàng phân tích",
+    "enterTextDesc": "Nhập hoặc dán văn bản, sau đó nhấn Phát hiện AI để phân tích",
+    "quickTip": "Mẹo: Thử các văn bản mẫu để xem cách các loại nội dung khác nhau được phát hiện",
+    "analyzingDesc": "Đang kiểm tra mẫu và chỉ số"
+  },
+  "analysis": {
+    "aiDetection": "Phát hiện AI",
+    "content": "Phân tích nội dung",
+    "confidence": "Độ tin cậy",
+    "humanIndicators": "Dấu hiệu người viết",
+    "aiIndicators": "Dấu hiệu AI",
+    "detect": "Phát hiện",
+    "detected": "Đã phát hiện"
+  },
+  "aiDetection": {
+    "meta": { "title": "Phát hiện AI - Graphos AI Studio", "description": "Phát hiện nội dung do AI tạo ra với độ chính xác cao. Nhận diện ChatGPT, GPT-4 và các AI viết khác." },
+    "title": "Phát hiện AI",
+    "description": "Nhận diện nội dung do AI tạo ra với độ chính xác và tin cậy cao."
+  },
+  "humanization": {
+    "meta": { "title": "Nhân hóa nội dung - Graphos AI Studio", "description": "Biến văn bản AI thành nội dung tự nhiên, giống người viết thật trong khi giữ nguyên ý nghĩa." },
+    "title": "Nhân hóa nội dung",
+    "description": "Biến văn bản AI thành nội dung tự nhiên, chân thực như người viết."
+  },
+  "voiceProfile": {
+    "meta": { "title": "Hồ sơ giọng văn - Graphos AI Studio", "description": "Tạo hồ sơ giọng văn độc đáo của bạn và tạo nội dung mang phong cách riêng." },
+    "title": "Hồ sơ giọng văn",
+    "description": "Nắm bắt phong cách viết độc đáo của bạn và tạo nội dung mang đậm dấu ấn cá nhân."
+  },
+  "aiWorkspace": {
+    "meta": { "title": "Không gian AI - Graphos AI Studio", "description": "Trò chuyện với AI theo phong cách viết của bạn. Nhận hỗ trợ viết cá nhân hóa." },
+    "title": "Không gian AI",
+    "description": "Trò chuyện với AI theo phong cách viết riêng của bạn."
+  },
+  "privacy": {
+    "meta": { "title": "Chính sách bảo mật - Graphos AI Studio", "description": "Tìm hiểu cách Graphos AI Studio thu thập, sử dụng và bảo vệ dữ liệu cá nhân của bạn." },
+    "title": "Chính sách bảo mật",
+    "lastUpdated": "Cập nhật lần cuối"
+  },
+  "terms": {
+    "meta": { "title": "Điều khoản sử dụng - Graphos AI Studio", "description": "Đọc các điều khoản và điều kiện sử dụng dịch vụ Graphos AI Studio." },
+    "title": "Điều khoản sử dụng",
+    "lastUpdated": "Cập nhật lần cuối"
+  },
+  "footer": {
+    "description": "Graphos AI Studio giúp bạn viết nội dung chân thực với tính năng phát hiện AI, nhân hóa nội dung và hồ sơ giọng văn.",
+    "copyright": "Bảo lưu mọi quyền.",
+    "newsletter": {
+      "title": "Cập nhật tin tức",
+      "placeholder": "Nhập email của bạn",
+      "subscribe": "Đăng ký",
+      "success": "Cảm ơn bạn đã đăng ký!",
+      "note": "Nhận mẹo, cập nhật và ưu đãi độc quyền. Không spam."
+    }
+  },
+  "faq": {
+    "badge": "Câu hỏi thường gặp",
+    "title": "Câu hỏi thường gặp",
+    "subtitle": "Mọi thứ bạn cần biết về Graphos AI Studio",
+    "stillHaveQuestions": "Vẫn còn câu hỏi?",
+    "contactSupport": "Liên hệ hỗ trợ",
+    "categories": {
+      "all": "Tất cả",
+      "general": "Chung",
+      "features": "Tính năng",
+      "pricing": "Giá cả",
+      "security": "Bảo mật"
+    },
+    "questions": {
+      "whatIs": "Graphos AI Studio là gì?",
+      "howDetection": "Độ chính xác của phát hiện AI là bao nhiêu?",
+      "humanization": "Nhân hóa hoạt động như thế nào?",
+      "voiceProfile": "Hồ sơ giọng văn là gì?",
+      "credits": "Credit hoạt động như thế nào?",
+      "freeTier": "Có gói miễn phí không?",
+      "languages": "Hỗ trợ những ngôn ngữ nào?",
+      "extension": "Tiện ích Chrome hoạt động như thế nào?",
+      "privacy": "Dữ liệu của tôi có an toàn không?",
+      "refund": "Chính sách hoàn tiền là gì?"
+    },
+    "answers": {
+      "whatIs": "Graphos AI Studio là trợ lý viết AI giúp bạn phát hiện nội dung AI, nhân hóa văn bản và tạo nội dung chân thực mang phong cách riêng của bạn. Bao gồm ứng dụng web và tiện ích Chrome để tích hợp liền mạch vào quy trình làm việc.",
+      "howDetection": "Phát hiện AI của chúng tôi đạt độ chính xác 98% bằng cách phân tích nhiều mẫu ngôn ngữ bao gồm từ vựng, ngữ nghĩa, cấu trúc và nội dung. Chúng tôi sử dụng phân tích đa lớp cho các trường hợp không chắc chắn để đảm bảo kết quả đáng tin cậy.",
+      "humanization": "Công cụ nhân hóa của chúng tôi viết lại văn bản AI để khớp với các mẫu viết tự nhiên của con người. Nó sử dụng hồ sơ giọng văn của bạn để duy trì phong cách độc đáo trong khi loại bỏ dấu vân tay AI như cấu trúc lặp lại, chuyển tiếp trang trọng và ngôn ngữ chung chung.",
+      "voiceProfile": "Hồ sơ giọng văn là dấu vân tay độc đáo của phong cách viết của bạn. Bằng cách phân tích các mẫu viết của bạn, chúng tôi nắm bắt giọng điệu, sở thích từ vựng, mẫu câu và đặc điểm chính. Điều này cho phép AI tạo nội dung nghe chân thực như bạn.",
+      "credits": "Credit là đơn vị tiền tệ trả theo nhu cầu của chúng tôi. Các tính năng khác nhau sử dụng số lượng khác nhau dựa trên độ dài và độ phức tạp của văn bản. Phát hiện AI sử dụng ~2-5 credit, Nhân hóa ~2-8 credit, Tạo hồ sơ giọng văn ~8-25 credit và Không gian AI ~1-3 credit mỗi tin nhắn. Credit không bao giờ hết hạn!",
+      "freeTier": "Có! Mỗi người dùng mới nhận được 100 credit miễn phí để thử tất cả tính năng. Không cần thẻ tín dụng. Thêm vào đó, lần mua đầu tiên của bạn nhận được gấp đôi credit!",
+      "languages": "Graphos AI hỗ trợ 15 ngôn ngữ bao gồm Tiếng Anh, Tiếng Việt, Tiếng Trung, Tiếng Nhật, Tiếng Hàn, Tiếng Thái, Tiếng Indonesia, Tiếng Mã Lai, Tiếng Ả Rập, Tiếng Pháp, Tiếng Đức, Tiếng Tây Ban Nha, Tiếng Bồ Đào Nha, Tiếng Ý và Tiếng Nga. Mỗi ngôn ngữ có các mẫu phát hiện và nhân hóa được tối ưu hóa.",
+      "extension": "Tiện ích Chrome của chúng tôi cho phép bạn sử dụng Graphos AI ở mọi nơi trên web. Chọn văn bản trên bất kỳ trang web nào để phát hiện nội dung AI, nhân hóa văn bản hoặc tạo nội dung theo giọng văn của bạn. Nó tích hợp liền mạch với Gmail, Google Docs, mạng xã hội và nhiều hơn nữa.",
+      "privacy": "Hoàn toàn. Chúng tôi sử dụng mã hóa cấp doanh nghiệp cho tất cả dữ liệu. Các mẫu viết và hồ sơ giọng văn của bạn được lưu trữ an toàn và không bao giờ được chia sẻ. Chúng tôi tuân thủ GDPR và các quy định bảo mật khác. Bạn có thể xóa dữ liệu của mình bất cứ lúc nào.",
+      "refund": "Chúng tôi cung cấp bảo đảm hoàn tiền 7 ngày cho tất cả các giao dịch mua credit. Nếu bạn không hài lòng, liên hệ đội ngũ hỗ trợ của chúng tôi để được hoàn tiền đầy đủ. Credit chưa sử dụng cũng có thể được hoàn lại trong vòng 30 ngày kể từ ngày mua."
+    }
+  },
+  "comparison": {
+    "badge": "Tại sao chọn chúng tôi",
+    "title": "Giải pháp viết AI hoàn chỉnh",
+    "subtitle": "Xem Graphos AI Studio so sánh với các công cụ viết AI khác như thế nào",
+    "feature": "Tính năng",
+    "others": "Công cụ khác",
+    "ctaText": "Tự mình trải nghiệm sự khác biệt",
+    "features": {
+      "aiDetection": "Phát hiện nội dung AI",
+      "humanization": "Nhân hóa nội dung",
+      "voiceProfile": "Hồ sơ giọng văn cá nhân",
+      "multiLanguage": "Hỗ trợ đa ngôn ngữ",
+      "chromeExtension": "Tiện ích Chrome",
+      "aiWorkspace": "Chat AI theo giọng văn",
+      "payAsYouGo": "Giá trả theo nhu cầu",
+      "creditsExpire": "Credit không hết hạn",
+      "freeTier": "Gói miễn phí",
+      "realtimeAnalysis": "Phân tích thời gian thực"
+    }
+  },
+  "trust": {
+    "items": {
+      "encryption": {
+        "title": "Mã hóa doanh nghiệp",
+        "desc": "Mã hóa AES-256 cho tất cả dữ liệu khi lưu trữ và truyền tải"
+      },
+      "privacy": {
+        "title": "Bảo mật trước tiên",
+        "desc": "Dữ liệu của bạn không bao giờ được chia sẻ hoặc sử dụng để huấn luyện mô hình AI"
+      },
+      "gdpr": {
+        "title": "Tuân thủ GDPR",
+        "desc": "Tuân thủ đầy đủ các quy định bảo vệ dữ liệu EU"
+      },
+      "uptime": {
+        "title": "Uptime 99.9%",
+        "desc": "Cơ sở hạ tầng đáng tin cậy được hỗ trợ bởi Google Cloud"
+      }
+    },
+    "guaranteesTitle": "Cam kết của chúng tôi",
+    "guarantees": {
+      "refund": {
+        "title": "Hoàn tiền 7 ngày",
+        "desc": "Không hài lòng? Nhận hoàn tiền đầy đủ trong 7 ngày"
+      },
+      "noExpiry": {
+        "title": "Credit không hết hạn",
+        "desc": "Sử dụng credit của bạn bất cứ khi nào bạn cần"
+      },
+      "support": {
+        "title": "Hỗ trợ ưu tiên",
+        "desc": "Nhận trợ giúp khi bạn cần qua email"
+      }
+    },
+    "securePayment": "Thanh toán an toàn",
+    "sslSecured": "Bảo mật SSL",
+    "pciCompliant": "Tuân thủ PCI"
+  },
+  "extension": {
+    "badge": "Tiện ích Chrome",
+    "title": "Sử dụng Graphos AI ở mọi nơi",
+    "subtitle": "Tiện ích Chrome của chúng tôi sẽ mang phát hiện AI và nhân hóa đến mọi trang web bạn truy cập.",
+    "comingSoon": "SẮP RA MẮT",
+    "comingSoonCta": "Sắp ra mắt",
+    "comingSoonNote": "Chúng tôi đang nỗ lực để mang đến cho bạn",
+    "preview": "Xem trước",
+    "willWorkOn": "Sẽ hoạt động trên",
+    "worksOn": "Hoạt động trên",
+    "features": {
+      "detect": {
+        "title": "Phát hiện AI tức thì",
+        "desc": "Chọn bất kỳ văn bản nào trên web và kiểm tra ngay xem nó có được AI tạo không."
+      },
+      "humanize": {
+        "title": "Nhân hóa một cú nhấp",
+        "desc": "Biến văn bản AI thành nội dung tự nhiên, giống người viết ngay tại nơi bạn cần."
+      },
+      "write": {
+        "title": "Viết theo giọng văn",
+        "desc": "Tạo nội dung khớp với phong cách viết độc đáo của bạn trực tiếp trong bất kỳ trường văn bản nào."
+      },
+      "workspace": {
+        "title": "AI Workspace",
+        "desc": "Chat với AI theo giọng văn độc đáo của bạn, ngay từ bất kỳ trang web nào."
+      }
+    },
+    "popup": {
+      "apply": "Áp dụng",
+      "more": "Thêm"
+    }
+  },
+  "useCases": {
+    "badge": "Trường hợp sử dụng",
+    "title": "Xây dựng cho mọi người viết",
+    "subtitle": "Xem các chuyên gia khác nhau sử dụng Graphos AI để nâng cao khả năng viết như thế nào",
+    "keyBenefits": "Lợi ích chính",
+    "startNow": "Bắt đầu sử dụng Graphos AI",
+    "contentCreators": {
+      "title": "Nhà sáng tạo nội dung",
+      "desc": "Blogger, YouTuber và quản lý mạng xã hội cần nội dung chân thực ở quy mô lớn.",
+      "benefits": {
+        "speed": "Tạo nội dung nhanh gấp 5 lần",
+        "voice": "Duy trì giọng văn độc đáo",
+        "scale": "Mở rộng mà không mất tính chân thực"
+      }
+    },
+    "students": {
+      "title": "Sinh viên & Học giả",
+      "desc": "Sinh viên và nhà nghiên cứu muốn đảm bảo công việc của họ là nguyên bản và chân thực.",
+      "benefits": {
+        "verify": "Xác minh công việc của bạn là nguyên bản",
+        "improve": "Cải thiện chất lượng viết",
+        "learn": "Học từ gợi ý AI"
+      }
+    },
+    "marketers": {
+      "title": "Đội ngũ Marketing",
+      "desc": "Chuyên gia marketing cần sản xuất nội dung thương hiệu chân thực một cách hiệu quả.",
+      "benefits": {
+        "brand": "Duy trì tính nhất quán giọng văn thương hiệu",
+        "campaigns": "Ra mắt chiến dịch nhanh hơn",
+        "authentic": "Tạo nội dung quảng cáo chân thực"
+      }
+    },
+    "educators": {
+      "title": "Nhà giáo dục",
+      "desc": "Giáo viên và giảng viên cần phát hiện bài nộp do AI tạo của sinh viên.",
+      "benefits": {
+        "detect": "Phát hiện bài nộp AI chính xác",
+        "integrity": "Duy trì tính trung thực học thuật",
+        "feedback": "Cung cấp phản hồi tốt hơn"
+      }
+    },
+    "businesses": {
+      "title": "Doanh nghiệp",
+      "desc": "Công ty cần giao tiếp chân thực với khách hàng và các bên liên quan.",
+      "benefits": {
+        "communication": "Giao tiếp khách hàng chân thực",
+        "documentation": "Tài liệu chuyên nghiệp",
+        "efficiency": "Cải thiện hiệu quả nhóm"
+      }
+    },
+    "freelancers": {
+      "title": "Nhà văn tự do",
+      "desc": "Nhà văn độc lập cần cung cấp nội dung chân thực cho khách hàng.",
+      "benefits": {
+        "quality": "Cung cấp công việc chất lượng cao hơn",
+        "clients": "Làm hài lòng nhiều khách hàng hơn",
+        "income": "Tăng thu nhập của bạn"
+      }
+    }
+  },
+  "features": {
+    "stats": {
+      "accuracy": "Độ chính xác 98%",
+      "natural": "Đầu ra tự nhiên",
+      "unique": "Phong cách riêng của bạn",
+      "chat": "Chat theo giọng văn"
+    },
+    "extension": {
+      "title": "Tiện ích Chrome có sẵn",
+      "description": "Sử dụng Graphos AI ở mọi nơi trên web",
+      "cta": "Cài đặt tiện ích"
+    },
+    "aiDetection": {
+      "badge": "Độ chính xác 98%",
+      "tryItNow": "Thử ngay - không cần đăng ký",
+      "whyChoose": "Tại sao chọn Phát hiện AI của chúng tôi?",
+      "stats": {
+        "models": "15+ Mô hình AI được phát hiện",
+        "speed": "<2 giây phân tích",
+        "privacy": "Không lưu văn bản"
+      },
+      "benefits": {
+        "accuracy": { "title": "Độ chính xác cao", "desc": "Thuật toán tiên tiến phát hiện nội dung AI với độ chính xác 98%+" },
+        "speed": { "title": "Phân tích nhanh", "desc": "Nhận kết quả trong vài giây, không phải vài phút" },
+        "reports": { "title": "Báo cáo chi tiết", "desc": "Hiểu chính xác phần nào có thể do AI tạo với điểm tin cậy" },
+        "privacy": { "title": "Bảo mật trước tiên", "desc": "Nội dung của bạn không bao giờ được lưu trữ hoặc chia sẻ" }
+      },
+      "useCasesTitle": "Trường hợp sử dụng",
+      "useCases": {
+        "education": { "title": "Giáo dục", "desc": "Giáo viên và giảng viên có thể xác minh bài nộp của sinh viên để đảm bảo tính trung thực học thuật" },
+        "business": { "title": "Doanh nghiệp", "desc": "Đảm bảo nội dung chân thực trong marketing, PR và truyền thông doanh nghiệp" },
+        "publishing": { "title": "Xuất bản", "desc": "Nhà xuất bản và biên tập viên có thể xác minh tính xác thực của nội dung trước khi xuất bản" },
+        "hiring": { "title": "Tuyển dụng", "desc": "Đội ngũ HR có thể kiểm tra thư xin việc và mẫu viết để đảm bảo tính xác thực" }
+      },
+      "howItWorks": {
+        "title": "Cách Phát hiện AI hoạt động",
+        "step1": { "title": "Dán văn bản", "desc": "Nhập hoặc dán nội dung bạn muốn phân tích (tối thiểu 50 ký tự)" },
+        "step2": { "title": "Phân tích AI", "desc": "AI đa lớp của chúng tôi phân tích mẫu, từ vựng và phong cách viết" },
+        "step3": { "title": "Nhận kết quả", "desc": "Nhận điểm xác suất AI, mức độ tin cậy và các chỉ số chi tiết" }
+      },
+      "sampleVerdict": "Nội dung hỗn hợp",
+      "sampleDesc": "Kết quả mẫu hiển thị xác suất AI với điểm tin cậy và các chỉ số chi tiết",
+      "comparisonTitle": "So sánh với đối thủ",
+      "comparison": {
+        "feature": "Tính năng",
+        "others": "Đối thủ",
+        "accuracy": "Độ chính xác phát hiện",
+        "speed": "Tốc độ phân tích",
+        "models": "Mô hình AI được phát hiện",
+        "confidence": "Điểm tin cậy",
+        "indicators": "Chỉ số Người/AI",
+        "privacy": "Không lưu trữ dữ liệu"
+      },
+      "faqTitle": "Câu hỏi thường gặp",
+      "faq": {
+        "q1": "Độ chính xác của phát hiện AI là bao nhiêu?",
+        "a1": "Phát hiện AI của chúng tôi đạt độ chính xác 98%+ trên hầu hết nội dung do AI tạo, bao gồm ChatGPT, GPT-4, Claude và các mô hình phổ biến khác. Chúng tôi liên tục cập nhật thuật toán để phát hiện các mẫu viết AI mới nhất.",
+        "q2": "Bạn có thể phát hiện những loại nội dung AI nào?",
+        "a2": "Chúng tôi có thể phát hiện nội dung từ ChatGPT, GPT-4, GPT-3.5, Claude, Gemini, Llama và hầu hết các công cụ viết AI phổ biến khác. Hệ thống của chúng tôi được cập nhật thường xuyên để nhận diện các mô hình AI mới.",
+        "q3": "Nội dung của tôi có được lưu trữ hoặc chia sẻ không?",
+        "a3": "Không. Chúng tôi ưu tiên quyền riêng tư của bạn. Văn bản của bạn được phân tích theo thời gian thực và không được lưu trữ trên máy chủ của chúng tôi. Chúng tôi không bao giờ chia sẻ nội dung của bạn với bên thứ ba.",
+        "q4": "Độ dài văn bản tối thiểu là bao nhiêu?",
+        "a4": "Để phát hiện chính xác, chúng tôi khuyến nghị ít nhất 50 ký tự. Văn bản dài hơn (200+ từ) cho kết quả đáng tin cậy hơn vì AI của chúng tôi có nhiều mẫu hơn để phân tích.",
+        "q5": "Phát hiện AI có thể bị đánh lừa không?",
+        "a5": "Mặc dù không có hệ thống phát hiện nào hoàn hảo 100%, phân tích đa lớp của chúng tôi khiến việc vượt qua rất khó khăn. Chúng tôi phân tích mẫu viết, từ vựng, cấu trúc câu và nhiều yếu tố khác đồng thời."
+      },
+      "ctaTitle": "Sẵn sàng phát hiện nội dung AI?",
+      "ctaDesc": "Tham gia cùng hàng nghìn chuyên gia tin tưởng Graphos AI để phát hiện nội dung chính xác. Bắt đầu miễn phí ngay.",
+      "chromeExtension": "Tiện ích Chrome",
+      "ctaBadge": "Bắt đầu phát hiện trong vài giây",
+      "trustIndicator1": "Không cần thẻ tín dụng",
+      "trustIndicator2": "Thiết lập trong 30 giây",
+      "trustIndicator3": "Hủy bất cứ lúc nào",
+      "stats": {
+        "models": "15+ Mô hình AI được phát hiện",
+        "speed": "<2 giây phân tích",
+        "privacy": "Không lưu trữ văn bản",
+        "languages": "15+ Ngôn ngữ"
+      },
+      "testimonials": {
+        "title": "Được tin dùng bởi chuyên gia",
+        "education": {
+          "quote": "Công cụ này đã tiết kiệm cho tôi vô số giờ kiểm tra bài của sinh viên. Độ chính xác ấn tượng và các chỉ số chi tiết giúp tôi hiểu chính xác cần tìm gì.",
+          "author": "TS. Trần Minh Anh",
+          "role": "Giảng viên Đại học"
+        },
+        "business": {
+          "quote": "Thiết yếu cho đội ngũ nội dung của chúng tôi. Chúng tôi sử dụng nó để xác minh tất cả nội dung trước khi xuất bản. Điểm tin cậy mang lại sự yên tâm.",
+          "author": "Nguyễn Văn Hùng",
+          "role": "Giám đốc Nội dung, Startup Công nghệ"
+        },
+        "freelance": {
+          "quote": "Là một biên tập viên tự do, tôi cần đảm bảo nội dung nhận được là chân thực. Công cụ này nhanh, chính xác và cách tiếp cận ưu tiên quyền riêng tư chính xác là những gì tôi cần.",
+          "author": "Lê Thị Mai",
+          "role": "Biên tập viên Tự do"
+        }
+      },
+      "pricing": {
+        "title": "Giá đơn giản, minh bạch",
+        "subtitle": "Bắt đầu miễn phí, nâng cấp khi cần",
+        "free": "Miễn phí",
+        "pro": "Pro",
+        "popular": "Phổ biến",
+        "freeFeature1": "5 lần phát hiện/ngày",
+        "freeFeature2": "Chỉ số cơ bản",
+        "freeFeature3": "Xử lý tiêu chuẩn",
+        "proFeature1": "Phát hiện không giới hạn",
+        "proFeature2": "Báo cáo bằng chứng đầy đủ",
+        "proFeature3": "Truy cập API",
+        "proFeature4": "Xử lý ưu tiên"
+      },
+      "comparison": {
+        "feature": "Tính năng",
+        "others": "Khác",
+        "accuracy": "Độ chính xác phát hiện",
+        "speed": "Tốc độ phân tích",
+        "models": "Mô hình AI được phát hiện",
+        "confidence": "Điểm tin cậy",
+        "indicators": "Chỉ số Người/AI",
+        "privacy": "Không lưu trữ dữ liệu",
+        "languages": "Hỗ trợ đa ngôn ngữ"
+      },
+      "faq": {
+        "q1": "Độ chính xác của phát hiện AI là bao nhiêu?",
+        "a1": "Phát hiện AI của chúng tôi đạt độ chính xác 98%+ trên hầu hết nội dung do AI tạo, bao gồm ChatGPT, GPT-4, Claude và các mô hình phổ biến khác. Chúng tôi liên tục cập nhật thuật toán để phát hiện các mẫu viết AI mới nhất.",
+        "q2": "Bạn có thể phát hiện những loại nội dung AI nào?",
+        "a2": "Chúng tôi có thể phát hiện nội dung từ ChatGPT, GPT-4, GPT-3.5, Claude, Gemini, Llama và hầu hết các công cụ viết AI phổ biến khác. Hệ thống được cập nhật thường xuyên để nhận dạng các mô hình AI mới.",
+        "q3": "Nội dung của tôi có được lưu trữ hoặc chia sẻ không?",
+        "a3": "Không. Chúng tôi ưu tiên quyền riêng tư của bạn. Văn bản được phân tích theo thời gian thực và không được lưu trữ trên máy chủ. Chúng tôi không bao giờ chia sẻ nội dung của bạn với bên thứ ba.",
+        "q4": "Độ dài văn bản tối thiểu là bao nhiêu?",
+        "a4": "Để phát hiện chính xác, chúng tôi khuyến nghị ít nhất 50 ký tự. Văn bản dài hơn (200+ từ) cho kết quả đáng tin cậy hơn vì AI có nhiều mẫu hơn để phân tích.",
+        "q5": "Phát hiện AI có thể bị đánh lừa không?",
+        "a5": "Mặc dù không có hệ thống phát hiện nào hoàn hảo 100%, phân tích đa lớp của chúng tôi khiến việc vượt qua rất khó khăn. Chúng tôi phân tích mẫu viết, từ vựng, cấu trúc câu và nhiều yếu tố khác đồng thời.",
+        "q6": "Bạn xử lý các ngôn ngữ khác nhau như thế nào?",
+        "a6": "Phát hiện AI của chúng tôi hỗ trợ 15+ ngôn ngữ bao gồm tiếng Anh, tiếng Việt, tiếng Tây Ban Nha, tiếng Pháp, tiếng Đức và nhiều hơn nữa. Hệ thống tự động phát hiện ngôn ngữ và áp dụng các mẫu phân tích phù hợp.",
+        "q7": "Sự khác biệt giữa miễn phí và premium là gì?",
+        "a7": "Người dùng miễn phí được giới hạn số lần phát hiện mỗi ngày với các chỉ số cơ bản. Người dùng premium được phát hiện không giới hạn, báo cáo bằng chứng chi tiết, truy cập API và xử lý ưu tiên."
+      },
+      "howItWorks": {
+        "title": "Cách phát hiện AI hoạt động",
+        "subtitle": "Phân tích đa lớp đảm bảo phát hiện chính xác chỉ trong vài giây",
+        "step1": { "title": "Dán văn bản", "desc": "Nhập hoặc dán nội dung bạn muốn phân tích (tối thiểu 50 ký tự)" },
+        "step2": { "title": "Phân tích đa lớp", "desc": "AI phân tích mẫu, từ vựng, cấu trúc câu và phong cách viết" },
+        "step3": { "title": "Nhận kết quả chi tiết", "desc": "Nhận điểm xác suất AI, mức độ tin cậy và các chỉ số người/AI" }
+      }
+    }
+,
+    "humanization": {
+      "badge": "AI thành Người trong vài giây",
+      "tryItNow": "Xem sự chuyển đổi trong thực tế",
+      "whyHumanize": "Tại sao nên nhân hóa nội dung?",
+      "benefits": {
+        "natural": { "title": "Dòng chảy tự nhiên", "desc": "Biến văn bản máy móc thành nội dung hội thoại, hấp dẫn và đọc tự nhiên" },
+        "meaning": { "title": "Giữ nguyên ý nghĩa", "desc": "Giữ nguyên thông điệp trong khi cải thiện khả năng đọc và tính xác thực" },
+        "styles": { "title": "Nhiều phong cách", "desc": "Chọn từ thông thường, chuyên nghiệp, học thuật hoặc khớp với hồ sơ giọng văn của bạn" },
+        "instant": { "title": "Kết quả tức thì", "desc": "Nhận nội dung nhân hóa trong vài giây với một cú nhấp" }
+      },
+      "useCasesTitle": "Hoàn hảo cho",
+      "useCases": {
+        "content": { "title": "Tạo nội dung", "desc": "Biến bản nháp AI thành bài blog, bài viết và nội dung marketing chân thực" },
+        "email": { "title": "Viết email", "desc": "Làm cho email được AI hỗ trợ nghe cá nhân và chân thực" },
+        "academic": { "title": "Viết học thuật", "desc": "Tinh chỉnh tóm tắt nghiên cứu do AI tạo để phù hợp với tiêu chuẩn học thuật" },
+        "social": { "title": "Mạng xã hội", "desc": "Tạo bài đăng hấp dẫn kết nối với khán giả của bạn" }
+      },
+      "examplesTitle": "Xem sự khác biệt",
+      "examples": {
+        "ex1": {
+          "before": "Việc triển khai các thực hành bền vững trong môi trường doanh nghiệp đã trở nên ngày càng quan trọng trong những năm gần đây.",
+          "after": "Bạn biết gì đang trong đầu tôi gần đây không? Cách các công ty cuối cùng cũng nghiêm túc về việc xanh hóa.",
+          "style": "Thông thường & Hội thoại"
+        },
+        "ex2": {
+          "before": "Nghiên cứu chỉ ra rằng tập thể dục thường xuyên đóng góp đáng kể vào việc cải thiện sức khỏe tâm thần.",
+          "after": "Đây là điều tôi đã học được: tập thể dục thực sự giúp giảm căng thẳng. Lo âu của tôi đã tốt hơn nhiều kể từ khi tôi bắt đầu vận động nhiều hơn.",
+          "style": "Cá nhân & Chân thực"
+        }
+      },
+      "comparisonTitle": "So sánh với đối thủ",
+      "comparison": {
+        "feature": "Tính năng",
+        "others": "Đối thủ",
+        "quality": "Chất lượng đầu ra",
+        "excellent": "Xuất sắc",
+        "good": "Tốt",
+        "voiceMatch": "Khớp hồ sơ giọng văn",
+        "styles": "Tùy chọn phong cách",
+        "meaning": "Bảo toàn ý nghĩa",
+        "speed": "Tốc độ xử lý",
+        "languages": "Ngôn ngữ"
+      },
+      "faqTitle": "Câu hỏi thường gặp",
+      "faq": {
+        "q1": "Nhân hóa nội dung hoạt động như thế nào?",
+        "a1": "AI của chúng tôi phân tích văn bản đầu vào và viết lại bằng các mẫu ngôn ngữ tự nhiên, cấu trúc câu đa dạng, đại từ nhân xưng và các yếu tố hội thoại đặc trưng của văn viết con người.",
+        "q2": "Ý nghĩa nội dung của tôi có thay đổi không?",
+        "a2": "Không. Nhân hóa của chúng tôi bảo toàn ý nghĩa cốt lõi và các điểm chính của nội dung trong khi chuyển đổi phong cách viết để nghe tự nhiên và chân thực hơn.",
+        "q3": "Tôi có thể tùy chỉnh phong cách viết không?",
+        "a3": "Có! Bạn có thể chọn từ nhiều phong cách (thông thường, chuyên nghiệp, học thuật) hoặc sử dụng Hồ sơ giọng văn để khớp với phong cách viết độc đáo của bạn.",
+        "q4": "Nội dung nhân hóa có vượt qua phát hiện AI không?",
+        "a4": "Nhân hóa của chúng tôi giảm đáng kể điểm phát hiện AI bằng cách đưa vào các mẫu viết tự nhiên. Tuy nhiên, chúng tôi khuyến nghị sử dụng một cách có đạo đức và minh bạch.",
+        "q5": "Có giới hạn từ không?",
+        "a5": "Người dùng miễn phí có thể nhân hóa tối đa 500 từ mỗi yêu cầu. Người dùng Pro có giới hạn cao hơn lên đến 5.000 từ mỗi yêu cầu."
+      },
+      "ctaTitle": "Sẵn sàng nhân hóa nội dung?",
+      "ctaDesc": "Biến văn bản AI thành nội dung tự nhiên, hấp dẫn."
+    }
+,
+    "voiceProfile": {
+      "badge": "DNA viết độc đáo của bạn",
+      "tryItNow": "Khám phá các hồ sơ giọng văn mẫu",
+      "whyCreate": "Tại sao tạo hồ sơ giọng văn?",
+      "benefits": {
+        "unique": { "title": "Bản sắc độc đáo", "desc": "Tạo nội dung nghe chân thực như bạn, mọi lúc" },
+        "analysis": { "title": "Phân tích sâu", "desc": "Hiểu các mẫu viết, từ vựng và sở thích phong cách của bạn" },
+        "consistent": { "title": "Giọng văn nhất quán", "desc": "Duy trì giọng điệu của bạn trên tất cả nội dung, từ email đến bài blog" },
+        "ai": { "title": "Tích hợp AI", "desc": "Sử dụng hồ sơ của bạn với Không gian AI để tạo nội dung cá nhân hóa" }
+      },
+      "useCasesTitle": "Hoàn hảo cho",
+      "useCases": {
+        "personal": { "title": "Xây dựng thương hiệu cá nhân", "desc": "Xây dựng thương hiệu cá nhân nhất quán trên tất cả nội dung của bạn" },
+        "business": { "title": "Giao tiếp doanh nghiệp", "desc": "Đảm bảo tất cả giao tiếp của nhóm khớp với giọng văn thương hiệu của bạn" },
+        "content": { "title": "Tạo nội dung", "desc": "Tạo bài blog, bài viết và nội dung nghe như bạn" },
+        "team": { "title": "Hợp tác nhóm", "desc": "Chia sẻ hồ sơ để duy trì giọng văn nhất quán trong nhóm" }
+      },
+      "howItWorksTitle": "Cách hồ sơ giọng văn hoạt động",
+      "howItWorks": {
+        "step1": { "title": "Tải lên mẫu", "desc": "Cung cấp 3-5 mẫu viết (email, bài đăng, bài viết) đại diện cho phong cách của bạn" },
+        "step2": { "title": "Phân tích AI", "desc": "AI của chúng tôi phân tích từ vựng, cấu trúc câu, giọng điệu và các mẫu độc đáo" },
+        "step3": { "title": "Hồ sơ được tạo", "desc": "Nhận hồ sơ chi tiết với các chỉ số, đặc điểm và đặc trưng chữ ký" },
+        "step4": { "title": "Sử dụng mọi nơi", "desc": "Áp dụng hồ sơ của bạn cho nhân hóa, Không gian AI và tạo nội dung" }
+      },
+      "whatYouGet": "Bạn nhận được gì",
+      "faqTitle": "Câu hỏi thường gặp",
+      "faq": {
+        "q1": "Tôi cần bao nhiêu mẫu viết?",
+        "a1": "Chúng tôi khuyến nghị 3-5 mẫu viết ít nhất 200 từ mỗi mẫu. Nhiều mẫu hơn dẫn đến hồ sơ chính xác hơn. Các mẫu nên đại diện cho phong cách viết điển hình của bạn.",
+        "q2": "Loại nội dung nào hoạt động tốt nhất?",
+        "a2": "Bất kỳ nội dung nào bạn đã viết đều hoạt động! Email, bài blog, bài đăng mạng xã hội, bài viết hoặc thậm chí tin nhắn chat. Điều quan trọng là nó đại diện cho cách bạn viết tự nhiên.",
+        "q3": "Tôi có thể có nhiều hồ sơ giọng văn không?",
+        "a3": "Có! Người dùng Pro có thể tạo nhiều hồ sơ cho các ngữ cảnh khác nhau - một cho giao tiếp chuyên nghiệp, một cho nội dung thông thường, v.v.",
+        "q4": "Độ chính xác của khớp giọng văn là bao nhiêu?",
+        "a4": "Khớp giọng văn của chúng tôi đạt độ tương đồng 90%+ với phong cách viết gốc của bạn. Bạn cung cấp càng nhiều mẫu, khớp càng chính xác.",
+        "q5": "Dữ liệu viết của tôi có an toàn không?",
+        "a5": "Hoàn toàn. Các mẫu viết của bạn được mã hóa và chỉ được sử dụng để tạo hồ sơ của bạn. Chúng tôi không bao giờ chia sẻ dữ liệu của bạn với bên thứ ba."
+      },
+      "ctaTitle": "Tạo hồ sơ giọng văn của bạn",
+      "ctaDesc": "Khám phá phong cách viết độc đáo của bạn ngay hôm nay."
+    }
+,
+    "aiWorkspace": {
+      "badge": "AI viết như bạn",
+      "tryItNow": "Thử giao diện chat",
+      "whyUse": "Tại sao sử dụng Không gian AI?",
+      "quickActionsTitle": "Hành động nhanh",
+      "actions": {
+        "email": { "label": "Viết Email", "desc": "Soạn email chuyên nghiệp theo giọng văn của bạn" },
+        "blog": { "label": "Bài Blog", "desc": "Tạo nội dung blog hấp dẫn" },
+        "proposal": { "label": "Đề xuất kinh doanh", "desc": "Soạn thảo đề xuất thuyết phục" },
+        "social": { "label": "Mạng xã hội", "desc": "Tạo bài đăng gây tiếng vang" },
+        "reply": { "label": "Trả lời nhanh", "desc": "Tạo phản hồi chu đáo" },
+        "rewrite": { "label": "Viết lại", "desc": "Cải thiện nội dung hiện có" }
+      },
+      "benefits": {
+        "natural": { "title": "Hội thoại tự nhiên", "desc": "Trò chuyện với AI hiểu phong cách và sở thích của bạn" },
+        "voice": { "title": "Giọng văn của bạn", "desc": "Tất cả đầu ra tự động khớp với hồ sơ viết độc đáo của bạn" },
+        "context": { "title": "Nhận biết ngữ cảnh", "desc": "AI nhớ sở thích và lịch sử hội thoại của bạn" },
+        "quick": { "title": "Hành động nhanh", "desc": "Mẫu một cú nhấp cho các tác vụ viết phổ biến" }
+      },
+      "useCasesTitle": "Hoàn hảo cho",
+      "useCases": {
+        "email": { "title": "Giao tiếp email", "desc": "Soạn thảo, trả lời và theo dõi email nghe như bạn viết" },
+        "content": { "title": "Tạo nội dung", "desc": "Tạo bài blog, bài viết và nội dung marketing theo giọng văn của bạn" },
+        "social": { "title": "Mạng xã hội", "desc": "Tạo bài đăng hấp dẫn cho LinkedIn, Twitter và nhiều hơn nữa" },
+        "business": { "title": "Viết kinh doanh", "desc": "Đề xuất, báo cáo và bài thuyết trình khớp với thương hiệu của bạn" }
+      },
+      "howItWorksTitle": "Cách Không gian AI hoạt động",
+      "chatExample": {
+        "user": "Giúp tôi viết email chuyên nghiệp từ chối lời mời họp",
+        "ai": "Chào bạn,\n\nCảm ơn bạn đã nghĩ đến tôi cho cuộc họp thứ Ba tuần tới! Tôi thực sự trân trọng lời mời.\n\nThật không may, tôi có xung đột vào ngày đó – lịch của tôi đầy kín với các cam kết liên tiếp mà tôi không thể di chuyển. Liệu có thể gặp nhau vào lúc khác không?\n\nHãy cho tôi biết thời gian nào phù hợp với bạn!\n\nThân,\n[Tên của bạn]"
+      },
+      "voiceApplied": "Hồ sơ giọng văn: Thông thường & Thân thiện đã áp dụng",
+      "comparisonTitle": "So sánh với đối thủ",
+      "comparison": {
+        "feature": "Tính năng",
+        "others": "Đối thủ",
+        "voiceMatch": "Tích hợp hồ sơ giọng văn",
+        "quickActions": "Mẫu hành động nhanh",
+        "context": "Bộ nhớ ngữ cảnh",
+        "limited": "Hạn chế",
+        "languages": "Ngôn ngữ",
+        "export": "Tùy chọn xuất",
+        "history": "Lịch sử hội thoại"
+      },
+      "faqTitle": "Câu hỏi thường gặp",
+      "faq": {
+        "q1": "Không gian AI sử dụng hồ sơ giọng văn của tôi như thế nào?",
+        "a1": "Khi bạn trò chuyện với Không gian AI, nó tự động áp dụng hồ sơ giọng văn của bạn cho tất cả nội dung được tạo. Điều này có nghĩa là mọi email, bài đăng hoặc bài viết sẽ nghe như bạn viết.",
+        "q2": "Tôi có thể sử dụng mà không có hồ sơ giọng văn không?",
+        "a2": "Có! Bạn có thể sử dụng Không gian AI mà không có hồ sơ giọng văn, và nó sẽ tạo nội dung với giọng điệu trung lập, chuyên nghiệp. Tuy nhiên, tạo hồ sơ giọng văn cải thiện đáng kể cá nhân hóa.",
+        "q3": "Tôi có thể tạo những loại nội dung nào?",
+        "a3": "Không gian AI có thể giúp với email, bài blog, nội dung mạng xã hội, đề xuất kinh doanh, mô tả sản phẩm, nội dung marketing và nhiều hơn nữa. Sử dụng hành động nhanh hoặc mô tả những gì bạn cần.",
+        "q4": "Lịch sử hội thoại của tôi có được lưu không?",
+        "a4": "Lịch sử hội thoại của bạn được lưu cục bộ và có thể truy cập qua các phiên. Bạn có thể xóa nó bất cứ lúc nào từ cài đặt. Chúng tôi ưu tiên quyền riêng tư của bạn.",
+        "q5": "Tôi có thể chỉnh sửa nội dung được tạo không?",
+        "a5": "Hoàn toàn! Tất cả nội dung được tạo đều có thể chỉnh sửa hoàn toàn. Bạn có thể tinh chỉnh, mở rộng hoặc yêu cầu AI tạo lại với các tham số khác nhau."
+      },
+      "ctaTitle": "Bắt đầu sử dụng Không gian AI",
+      "ctaDesc": "Trò chuyện với AI theo phong cách viết độc đáo của bạn."
+    }
+  },
+  "exitPopup": {
+    "title": "Khoan! Nhận 50 Credits Miễn Phí",
+    "subtitle": "Đăng ký nhận tin và nhận thêm 50 credits khi mua lần đầu!",
+    "emailPlaceholder": "Nhập email của bạn",
+    "cta": "Nhận Credits Ngay",
+    "success": "Tuyệt vời! Kiểm tra email để nhận mã bonus.",
+    "noSpam": "Không spam",
+    "unsubscribe": "Hủy đăng ký bất cứ lúc nào",
+    "noThanks": "Không, cảm ơn"
+  },
+
+  "socialProof": {
+    "trustedBy": "Được tin dùng bởi các nhà văn và đội ngũ tại",
+    "stats": {
+      "activeUsers": "Người dùng",
+      "textsProcessed": "Văn bản đã xử lý",
+      "accuracy": "Độ chính xác",
+      "languages": "Ngôn ngữ"
+    },
+    "userTypes": {
+      "contentCreators": "Nhà sáng tạo nội dung",
+      "students": "Sinh viên",
+      "marketers": "Marketer",
+      "educators": "Giáo viên",
+      "developers": "Lập trình viên"
+    }
+  },
+  "chat": {
+    "title": "Cần Hỗ Trợ?",
+    "subtitle": "Chúng tôi sẵn sàng giúp đỡ bạn",
+    "responseTime": "Thường phản hồi trong 2 giờ",
+    "actions": {
+      "emailSupport": "Gửi Email Hỗ Trợ",
+      "faq": "Xem Câu Hỏi Thường Gặp",
+      "docs": "Tài Liệu Hướng Dẫn"
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "features": "機能",
+    "aiDetection": "AI検出",
+    "humanization": "ヒューマナイゼーション",
+    "voiceProfile": "ボイスプロファイル",
+    "aiWorkspace": "AIワークスペース",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約",
+    "legal": "法的情報"
+  },
+  "cta": {
+    "getStarted": "始める",
+    "tryFree": "無料で試す",
+    "learnMore": "詳細を見る",
+    "signUp": "サインアップ"
+  },
+  "home": {
+    "meta": {
+      "title": "Graphos AI Studio - 本物のAIライティング",
+      "description": "AI検出、ヒューマナイゼーション、ボイスプロファイル機能で本物のコンテンツを作成。AIテキストを自然な人間らしい文章に変換。"
+    },
+    "hero": {
+      "title": "AIで本物のコンテンツを作成",
+      "subtitle": "AI生成テキストを検出し、コンテンツをヒューマナイズし、あなた独自のボイスプロファイルで作成。"
+    },
+    "features": {
+      "title": "強力な機能"
+    },
+    "cta": {
+      "title": "本物のコンテンツを書く準備はできましたか？",
+      "description": "Graphos AI Studioを使用して本物の人間らしいコンテンツを作成する何千人ものライターに参加しましょう。"
+    }
+  },
+  "aiDetection": {
+    "meta": {
+      "title": "AI検出 - Graphos AI Studio",
+      "description": "高精度でAI生成コンテンツを検出。ChatGPT、GPT-4、その他のAIライティングを識別。"
+    },
+    "title": "AI検出",
+    "description": "精度と信頼性でAI生成コンテンツを識別。"
+  },
+  "humanization": {
+    "meta": {
+      "title": "コンテンツヒューマナイゼーション - Graphos AI Studio",
+      "description": "意味を保ちながらAI生成テキストを自然な人間らしいコンテンツに変換。"
+    },
+    "title": "コンテンツヒューマナイゼーション",
+    "description": "AIテキストを自然で本物の人間らしい文章に変換。"
+  },
+  "voiceProfile": {
+    "meta": {
+      "title": "ボイスプロファイル - Graphos AI Studio",
+      "description": "あなた独自のライティングボイスプロファイルを作成し、あなたらしいコンテンツを生成。"
+    },
+    "title": "ボイスプロファイル",
+    "description": "あなた独自のライティングスタイルをキャプチャし、本物のあなたらしいコンテンツを作成。"
+  },
+  "aiWorkspace": {
+    "meta": {
+      "title": "AIワークスペース - Graphos AI Studio",
+      "description": "ボイスプロファイルを使用してAIとチャット。パーソナライズされたライティングアシスタンスを取得。"
+    },
+    "title": "AIワークスペース",
+    "description": "あなた独自のライティングスタイルでAIとチャット。"
+  },
+  "privacy": {
+    "meta": {
+      "title": "プライバシーポリシー - Graphos AI Studio",
+      "description": "Graphos AI Studioがあなたの個人データをどのように収集、使用、保護するかを学ぶ。"
+    },
+    "title": "プライバシーポリシー",
+    "lastUpdated": "最終更新日"
+  },
+  "terms": {
+    "meta": {
+      "title": "利用規約 - Graphos AI Studio",
+      "description": "Graphos AI Studioサービスの利用規約をお読みください。"
+    },
+    "title": "利用規約",
+    "lastUpdated": "最終更新日"
+  },
+  "footer": {
+    "description": "Graphos AI StudioはAI検出、ヒューマナイゼーション、ボイスプロファイル機能で本物のコンテンツ作成をサポートします。",
+    "copyright": "全著作権所有。"
+  }
+}

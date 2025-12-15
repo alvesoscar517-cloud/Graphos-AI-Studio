@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "home": "首页",
+    "features": "功能",
+    "aiDetection": "AI检测",
+    "humanization": "人性化",
+    "voiceProfile": "声音档案",
+    "aiWorkspace": "AI工作区",
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "legal": "法律信息"
+  },
+  "cta": {
+    "getStarted": "开始使用",
+    "tryFree": "免费试用",
+    "learnMore": "了解更多",
+    "signUp": "注册"
+  },
+  "home": {
+    "meta": {
+      "title": "Graphos AI Studio - 真实的AI写作",
+      "description": "使用AI检测、人性化和声音档案功能撰写真实内容。将AI文本转换为自然的人类写作。"
+    },
+    "hero": {
+      "title": "用AI撰写真实内容",
+      "subtitle": "检测AI生成的文本，人性化内容，并使用您独特的声音档案进行创作。"
+    },
+    "features": {
+      "title": "强大功能"
+    },
+    "cta": {
+      "title": "准备好撰写真实内容了吗？",
+      "description": "加入数千名使用Graphos AI Studio创建真实、自然内容的作家行列。"
+    }
+  },
+  "aiDetection": {
+    "meta": {
+      "title": "AI检测 - Graphos AI Studio",
+      "description": "高精度检测AI生成的内容。识别ChatGPT、GPT-4和其他AI写作。"
+    },
+    "title": "AI检测",
+    "description": "精准可靠地识别AI生成的内容。"
+  },
+  "humanization": {
+    "meta": {
+      "title": "内容人性化 - Graphos AI Studio",
+      "description": "在保留含义的同时将AI生成的文本转换为自然的人类内容。"
+    },
+    "title": "内容人性化",
+    "description": "将AI文本转换为自然、真实的人类写作。"
+  },
+  "voiceProfile": {
+    "meta": {
+      "title": "声音档案 - Graphos AI Studio",
+      "description": "创建您独特的写作声音档案，生成听起来像您的内容。"
+    },
+    "title": "声音档案",
+    "description": "捕捉您独特的写作风格，创建真正属于您的内容。"
+  },
+  "aiWorkspace": {
+    "meta": {
+      "title": "AI工作区 - Graphos AI Studio",
+      "description": "使用您的声音档案与AI聊天。获得个性化的写作帮助。"
+    },
+    "title": "AI工作区",
+    "description": "用您独特的写作风格与AI聊天。"
+  },
+  "privacy": {
+    "meta": {
+      "title": "隐私政策 - Graphos AI Studio",
+      "description": "了解Graphos AI Studio如何收集、使用和保护您的个人数据。"
+    },
+    "title": "隐私政策",
+    "lastUpdated": "最后更新"
+  },
+  "terms": {
+    "meta": {
+      "title": "服务条款 - Graphos AI Studio",
+      "description": "阅读Graphos AI Studio服务的使用条款和条件。"
+    },
+    "title": "服务条款",
+    "lastUpdated": "最后更新"
+  },
+  "footer": {
+    "description": "Graphos AI Studio通过AI检测、人性化和声音档案功能帮助您撰写真实内容。",
+    "copyright": "版权所有。"
+  }
+}

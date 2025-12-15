@@ -1,0 +1,12 @@
+{
+  "nav": { "home": "الرئيسية", "features": "الميزات", "aiDetection": "كشف الذكاء الاصطناعي", "humanization": "الأنسنة", "voiceProfile": "ملف الصوت", "aiWorkspace": "مساحة عمل الذكاء الاصطناعي", "privacy": "سياسة الخصوصية", "terms": "شروط الخدمة", "legal": "قانوني" },
+  "cta": { "getStarted": "ابدأ الآن", "tryFree": "جرب مجاناً", "learnMore": "اعرف المزيد", "signUp": "سجل" },
+  "home": { "meta": { "title": "Graphos AI Studio - كتابة ذكاء اصطناعي أصيلة", "description": "اكتب محتوى أصيل مع كشف الذكاء الاصطناعي والأنسنة وميزات ملف الصوت." }, "hero": { "title": "اكتب محتوى أصيل مع الذكاء الاصطناعي", "subtitle": "اكتشف النص المولد بالذكاء الاصطناعي، أنسن المحتوى، وأنشئ بملف صوتك الفريد." }, "features": { "title": "ميزات قوية" }, "cta": { "title": "هل أنت مستعد لكتابة محتوى أصيل؟", "description": "انضم إلى آلاف الكتاب الذين يستخدمون Graphos AI Studio لإنشاء محتوى أصيل وإنساني." } },
+  "aiDetection": { "meta": { "title": "كشف الذكاء الاصطناعي - Graphos AI Studio", "description": "اكتشف المحتوى المولد بالذكاء الاصطناعي بدقة عالية." }, "title": "كشف الذكاء الاصطناعي", "description": "حدد المحتوى المولد بالذكاء الاصطناعي بدقة وثقة." },
+  "humanization": { "meta": { "title": "أنسنة المحتوى - Graphos AI Studio", "description": "حول نص الذكاء الاصطناعي إلى محتوى طبيعي وبشري." }, "title": "أنسنة المحتوى", "description": "حول نص الذكاء الاصطناعي إلى كتابة بشرية طبيعية وأصيلة." },
+  "voiceProfile": { "meta": { "title": "ملف الصوت - Graphos AI Studio", "description": "أنشئ ملف صوت الكتابة الفريد الخاص بك." }, "title": "ملف الصوت", "description": "التقط أسلوب كتابتك الفريد وأنشئ محتوى يبدو أصيلاً مثلك." },
+  "aiWorkspace": { "meta": { "title": "مساحة عمل الذكاء الاصطناعي - Graphos AI Studio", "description": "تحدث مع الذكاء الاصطناعي باستخدام ملف صوتك." }, "title": "مساحة عمل الذكاء الاصطناعي", "description": "تحدث مع الذكاء الاصطناعي بأسلوب كتابتك الفريد." },
+  "privacy": { "meta": { "title": "سياسة الخصوصية - Graphos AI Studio", "description": "تعرف على كيفية حماية بياناتك." }, "title": "سياسة الخصوصية", "lastUpdated": "آخر تحديث" },
+  "terms": { "meta": { "title": "شروط الخدمة - Graphos AI Studio", "description": "اقرأ شروط الخدمة الخاصة بنا." }, "title": "شروط الخدمة", "lastUpdated": "آخر تحديث" },
+  "footer": { "description": "Graphos AI Studio يساعدك على كتابة محتوى أصيل مع كشف الذكاء الاصطناعي والأنسنة وملفات الصوت.", "copyright": "جميع الحقوق محفوظة." }
+}
