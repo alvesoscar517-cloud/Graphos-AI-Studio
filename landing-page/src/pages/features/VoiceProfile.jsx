@@ -1,6 +1,11 @@
+/**
+ * VoiceProfile - Landing page for Voice Profile feature
+ * Design: DNA/Fingerprint theme - "Your Unique Writing DNA"
+ * Enhanced: Dec 2025 - Breakthrough design with DNA helix visualization
+ */
 import { useTranslation } from 'react-i18next'
-import { motion } from 'framer-motion'
-import { useState, lazy, Suspense } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useState, lazy, Suspense, useEffect, useRef } from 'react'
 import SEOHead from '@components/seo/SEOHead'
 import StructuredData from '@components/seo/StructuredData'
 import Breadcrumb from '@components/common/Breadcrumb'
@@ -9,16 +14,534 @@ import Icon from '@components/common/Icon'
 // Lazy load the live demo
 const LiveVoiceProfileDemo = lazy(() => import('@components/demos/LiveVoiceProfileDemo'))
 
+// ============================================================================
+// HERO BACKGROUND - DNA/Fingerprint Theme
+// ============================================================================
+
+const DNAHelixBackground = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden -z-10">
+      {/* Base gradient - Purple/Indigo tones for uniqueness */}
+      <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/70 via-violet-50/30 to-white dark:from-slate-950 dark:via-indigo-950/30 dark:to-slate-900" />
+      
+      {/* SVG DNA Helix Visualization */}
+      <svg 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[900px] opacity-100"
+        viewBox="0 0 1100 900"
+        fill="none"
+      >
+        <defs>
+          {/* DNA strand gradients */}
+          <linearGradient id="dnaStrand1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="rgba(99, 102, 241, 0.4)" />
+            <stop offset="50%" stopColor="rgba(139, 92, 246, 0.5)" />
+            <stop offset="100%" stopColor="rgba(99, 102, 241, 0.4)" />
+          </linearGradient>
+          <linearGradient id="dnaStrand2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="rgba(167, 139, 250, 0.3)" />
+            <stop offset="50%" stopColor="rgba(196, 181, 253, 0.4)" />
+            <stop offset="100%" stopColor="rgba(167, 139, 250, 0.3)" />
+          </linearGradient>
+          
+          {/* Center glow */}
+          <radialGradient id="centerDNAGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="rgba(139, 92, 246, 0.2)" />
+            <stop offset="50%" stopColor="rgba(99, 102, 241, 0.1)" />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
+          
+          {/* Fingerprint pattern */}
+          <pattern id="fingerprintPattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+            <circle cx="30" cy="30" r="25" fill="none" stroke="rgba(139, 92, 246, 0.08)" strokeWidth="1" />
+            <circle cx="30" cy="30" r="18" fill="none" stroke="rgba(139, 92, 246, 0.06)" strokeWidth="1" />
+            <circle cx="30" cy="30" r="11" fill="none" stroke="rgba(139, 92, 246, 0.04)" strokeWidth="1" />
+          </pattern>
+        </defs>
+        
+        {/* Fingerprint background pattern - subtle */}
+        <rect x="0" y="0" width="1100" height="900" fill="url(#fingerprintPattern)" opacity="0.5" />
+        
+        {/* DNA Double Helix - Left side */}
+        <g transform="translate(200, 100)">
+          {/* First strand */}
+          <path 
+            d="M0 0 Q50 50 0 100 Q-50 150 0 200 Q50 250 0 300 Q-50 350 0 400 Q50 450 0 500 Q-50 550 0 600 Q50 650 0 700" 
+            stroke="url(#dnaStrand1)" 
+            strokeWidth="3" 
+            fill="none"
+            strokeLinecap="round"
+          />
+          {/* Second strand (offset) */}
+          <path 
+            d="M0 0 Q-50 50 0 100 Q50 150 0 200 Q-50 250 0 300 Q50 350 0 400 Q-50 450 0 500 Q50 550 0 600 Q-50 650 0 700" 
+            stroke="url(#dnaStrand2)" 
+            strokeWidth="3" 
+            fill="none"
+            strokeLinecap="round"
+          />
+          {/* Connecting bars (base pairs) */}
+          {[50, 150, 250, 350, 450, 550, 650].map((y, i) => (
+            <line 
+              key={i}
+              x1={i % 2 === 0 ? -35 : 35} 
+              y1={y} 
+              x2={i % 2 === 0 ? 35 : -35} 
+              y2={y} 
+              stroke="rgba(139, 92, 246, 0.25)" 
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          ))}
+          {/* Data points on helix */}
+          {[
+            [-30, 50], [30, 150], [-30, 250], [30, 350], [-30, 450], [30, 550], [-30, 650]
+          ].map(([x, y], i) => (
+            <g key={`point-${i}`}>
+              <circle cx={x} cy={y} r="6" fill="rgba(139, 92, 246, 0.4)" />
+              <circle cx={x} cy={y} r="3" fill="rgba(139, 92, 246, 0.8)" />
+            </g>
+          ))}
+        </g>
+        
+        {/* DNA Double Helix - Right side (mirrored, smaller) */}
+        <g transform="translate(900, 150) scale(0.7)">
+          <path 
+            d="M0 0 Q40 40 0 80 Q-40 120 0 160 Q40 200 0 240 Q-40 280 0 320 Q40 360 0 400 Q-40 440 0 480 Q40 520 0 560" 
+            stroke="url(#dnaStrand1)" 
+            strokeWidth="2.5" 
+            fill="none"
+            strokeLinecap="round"
+            opacity="0.6"
+          />
+          <path 
+            d="M0 0 Q-40 40 0 80 Q40 120 0 160 Q-40 200 0 240 Q40 280 0 320 Q-40 360 0 400 Q40 440 0 480 Q-40 520 0 560" 
+            stroke="url(#dnaStrand2)" 
+            strokeWidth="2.5" 
+            fill="none"
+            strokeLinecap="round"
+            opacity="0.6"
+          />
+        </g>
+        
+        {/* Center focal area - Profile visualization hint */}
+        <ellipse cx="550" cy="450" rx="200" ry="250" fill="url(#centerDNAGlow)" />
+        
+        {/* Floating data particles */}
+        {[
+          [450, 300, 4], [650, 350, 3], [500, 500, 5], [600, 550, 3],
+          [480, 400, 4], [620, 420, 3], [530, 480, 4], [570, 380, 3],
+          [400, 450, 3], [700, 480, 4]
+        ].map(([x, y, r], i) => (
+          <g key={`particle-${i}`}>
+            <circle cx={x} cy={y} r={r + 4} fill="rgba(139, 92, 246, 0.1)" />
+            <circle cx={x} cy={y} r={r} fill="rgba(139, 92, 246, 0.5)" />
+          </g>
+        ))}
+        
+        {/* Connecting lines between particles - neural network style */}
+        <g stroke="rgba(139, 92, 246, 0.1)" strokeWidth="1">
+          <line x1="450" y1="300" x2="500" y2="500" />
+          <line x1="650" y1="350" x2="600" y2="550" />
+          <line x1="480" y1="400" x2="620" y2="420" />
+          <line x1="530" y1="480" x2="570" y2="380" />
+          <line x1="500" y1="500" x2="620" y2="420" />
+        </g>
+        
+        {/* Fingerprint center icon hint */}
+        <g transform="translate(550, 450)">
+          <circle cx="0" cy="0" r="60" fill="none" stroke="rgba(139, 92, 246, 0.15)" strokeWidth="1.5" />
+          <circle cx="0" cy="0" r="45" fill="none" stroke="rgba(139, 92, 246, 0.12)" strokeWidth="1.5" />
+          <circle cx="0" cy="0" r="30" fill="none" stroke="rgba(139, 92, 246, 0.1)" strokeWidth="1.5" />
+          <circle cx="0" cy="0" r="15" fill="none" stroke="rgba(139, 92, 246, 0.08)" strokeWidth="1.5" />
+        </g>
+      </svg>
+      
+      {/* Ambient glow - purple */}
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+        }}
+      />
+      
+      {/* Secondary glow - left */}
+      <div 
+        className="absolute top-1/3 left-1/5 w-[300px] h-[400px] pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle at center, rgba(99, 102, 241, 0.08) 0%, transparent 70%)',
+          filter: 'blur(50px)',
+        }}
+      />
+      
+      {/* Edge fade */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white dark:to-slate-900" />
+      
+      {/* Radial fade for edges */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse 85% 75% at 50% 50%, transparent 0%, var(--color-bg-primary) 100%)',
+        }}
+      />
+    </div>
+  )
+}
+
+// ============================================================================
+// ANIMATED COUNTER HOOK
+// ============================================================================
+
+const useAnimatedCounter = (end, duration = 2000, startOnView = true) => {
+  const [count, setCount] = useState(0)
+  const [hasStarted, setHasStarted] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!startOnView) {
+      setHasStarted(true)
+    }
+  }, [startOnView])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasStarted) {
+          setHasStarted(true)
+        }
+      },
+      { threshold: 0.5 }
+    )
+
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+
+    return () => observer.disconnect()
+  }, [hasStarted])
+
+  useEffect(() => {
+    if (!hasStarted) return
+
+    let startTime
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime
+      const progress = Math.min((currentTime - startTime) / duration, 1)
+      
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4)
+      setCount(Math.floor(easeOutQuart * end))
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+
+    requestAnimationFrame(animate)
+  }, [end, duration, hasStarted])
+
+  return { count, ref }
+}
+
+// ============================================================================
+// STAT CARD COMPONENT
+// ============================================================================
+
+const StatCard = ({ value, label, suffix = '' }) => {
+  const numericValue = parseInt(value.replace(/[^0-9]/g, '')) || 0
+  const { count, ref } = useAnimatedCounter(numericValue, 1500)
+  
+  const displayValue = value.includes('+') 
+    ? `${count}+` 
+    : value.includes('%') 
+    ? `${count}%`
+    : `${count}${suffix}`
+
+  return (
+    <motion.div
+      ref={ref}
+      className="relative group"
+      whileHover={{ scale: 1.05, y: -2 }}
+      transition={{ type: 'spring', stiffness: 300 }}
+    >
+      <div className="relative px-6 py-4 bg-white/60 dark:bg-white/5 backdrop-blur-sm rounded-2xl border border-white/50 dark:border-white/10 shadow-lg shadow-black/5">
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl" />
+        
+        <div className="text-center">
+          <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
+            {displayValue}
+          </div>
+          <div className="text-sm text-text-muted mt-1 font-medium">{label}</div>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// ============================================================================
+// DNA STRAND ANIMATION COMPONENT
+// ============================================================================
+
+const DNAStrandIcon = ({ className = '' }) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className}>
+    <path 
+      d="M4 4C4 4 8 8 12 8C16 8 20 4 20 4" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round"
+    />
+    <path 
+      d="M4 12C4 12 8 16 12 16C16 16 20 12 20 12" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round"
+    />
+    <path 
+      d="M4 20C4 20 8 24 12 24C16 24 20 20 20 20" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round"
+      opacity="0.5"
+    />
+    <circle cx="8" cy="6" r="1.5" fill="currentColor" />
+    <circle cx="16" cy="6" r="1.5" fill="currentColor" />
+    <circle cx="8" cy="14" r="1.5" fill="currentColor" />
+    <circle cx="16" cy="14" r="1.5" fill="currentColor" />
+  </svg>
+)
+
+
+
+// ============================================================================
+// INTERACTIVE PROFILE BUILDER PREVIEW
+// ============================================================================
+
+const ProfileBuilderPreview = ({ t }) => {
+  const [activeStep, setActiveStep] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+  
+  const steps = [
+    {
+      icon: 'file-text',
+      title: t('features.voiceProfile.preview.step1', 'Add Writing Samples'),
+      desc: t('features.voiceProfile.preview.step1Desc', 'Paste emails, posts, or any text you\'ve written'),
+      visual: 'samples'
+    },
+    {
+      icon: 'cpu',
+      title: t('features.voiceProfile.preview.step2', 'AI Analyzes Patterns'),
+      desc: t('features.voiceProfile.preview.step2Desc', 'Deep learning extracts your unique style'),
+      visual: 'analyzing'
+    },
+    {
+      icon: 'fingerprint',
+      title: t('features.voiceProfile.preview.step3', 'Profile Generated'),
+      desc: t('features.voiceProfile.preview.step3Desc', 'Your writing DNA is captured'),
+      visual: 'profile'
+    }
+  ]
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true)
+      setTimeout(() => {
+        setActiveStep((prev) => (prev + 1) % steps.length)
+        setIsAnimating(false)
+      }, 300)
+    }, 4000)
+    
+    return () => clearInterval(interval)
+  }, [steps.length])
+  
+  return (
+    <div className="relative bg-gradient-to-br from-indigo-50 via-violet-50/50 to-white dark:from-slate-800 dark:via-indigo-900/20 dark:to-slate-900 rounded-3xl border border-indigo-200/50 dark:border-indigo-500/20 overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-violet-200/40 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-indigo-200/40 to-transparent rounded-full blur-2xl pointer-events-none" />
+      
+      <div className="relative p-8 md:p-10">
+        {/* Steps indicator */}
+        <div className="flex items-center justify-center gap-3 mb-8">
+          {steps.map((step, index) => (
+            <button
+              key={index}
+              onClick={() => setActiveStep(index)}
+              className={`
+                flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300
+                ${activeStep === index 
+                  ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30' 
+                  : 'bg-white dark:bg-slate-700 text-text-secondary hover:bg-indigo-50 dark:hover:bg-slate-600'
+                }
+              `}
+            >
+              <Icon name={step.icon} size="sm" className={activeStep === index ? 'icon-white' : ''} />
+              <span className="text-sm font-medium hidden sm:inline">{step.title}</span>
+              <span className="text-sm font-medium sm:hidden">{index + 1}</span>
+            </button>
+          ))}
+        </div>
+        
+        {/* Visual area */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeStep}
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.98 }}
+            transition={{ duration: 0.4 }}
+            className="min-h-[300px] flex items-center justify-center"
+          >
+            {activeStep === 0 && (
+              <div className="w-full max-w-lg">
+                <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xl overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-400" />
+                      <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                      <div className="w-3 h-3 rounded-full bg-green-400" />
+                    </div>
+                    <span className="text-xs text-gray-500 ml-2">{t('features.voiceProfile.preview.sampleInput', 'Your Writing Sample')}</span>
+                  </div>
+                  <div className="p-5 space-y-3">
+                    {[
+                      { type: 'email', text: '"Hey team, just wanted to share some thoughts..."' },
+                      { type: 'blog', text: '"Here\'s the thing about productivity..."' },
+                      { type: 'social', text: '"Honestly, this changed everything for me..."' }
+                    ].map((sample, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.2 }}
+                        className="flex items-start gap-3 p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg border border-indigo-100 dark:border-indigo-500/20"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                          <Icon name={sample.type === 'email' ? 'mail' : sample.type === 'blog' ? 'file-text' : 'message-circle'} size="sm" className="icon-indigo" />
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 italic">{sample.text}</p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {activeStep === 1 && (
+              <div className="text-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                  className="w-32 h-32 mx-auto mb-6 relative"
+                >
+                  <div className="absolute inset-0 rounded-full border-4 border-indigo-200 dark:border-indigo-800" />
+                  <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-500 border-r-violet-500" />
+                  <div className="absolute inset-4 rounded-full border-4 border-transparent border-b-purple-500 border-l-indigo-400" style={{ animationDirection: 'reverse' }} />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Icon name="cpu" size="2xl" className="icon-indigo" />
+                  </div>
+                </motion.div>
+                <div className="space-y-2">
+                  {[
+                    t('features.voiceProfile.preview.analyzing1', 'Analyzing vocabulary patterns...'),
+                    t('features.voiceProfile.preview.analyzing2', 'Detecting sentence structures...'),
+                    t('features.voiceProfile.preview.analyzing3', 'Identifying tone markers...')
+                  ].map((text, i) => (
+                    <motion.p
+                      key={i}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: [0, 1, 0] }}
+                      transition={{ duration: 2, delay: i * 0.7, repeat: Infinity }}
+                      className="text-sm text-gray-500 dark:text-gray-400"
+                    >
+                      {text}
+                    </motion.p>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {activeStep === 2 && (
+              <div className="w-full max-w-md">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-xl p-6"
+                >
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                      <Icon name="fingerprint" size="2xl" className="icon-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-800 dark:text-white">{t('features.voiceProfile.preview.yourProfile', 'Your Voice Profile')}</h4>
+                      <p className="text-sm text-indigo-600 dark:text-indigo-400">{t('features.voiceProfile.preview.ready', 'Ready to use')}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: t('demo.formality', 'Formality'), value: 65 },
+                      { label: t('demo.creativity', 'Creativity'), value: 78 },
+                      { label: t('demo.empathy', 'Empathy'), value: 85 },
+                      { label: t('demo.directness', 'Directness'), value: 72 }
+                    ].map((metric, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 + i * 0.1 }}
+                        className="p-3 bg-gray-50 dark:bg-slate-700 rounded-xl"
+                      >
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{metric.label}</div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-2 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${metric.value}%` }}
+                              transition={{ duration: 0.8, delay: 0.5 + i * 0.1 }}
+                              className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
+                            />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{metric.value}%</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="mt-4 flex flex-wrap gap-2"
+                  >
+                    {['Conversational', 'Empathetic', 'Clear'].map((trait, i) => (
+                      <span key={i} className="px-3 py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-medium rounded-full">
+                        {trait}
+                      </span>
+                    ))}
+                  </motion.div>
+                </motion.div>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+        
+        {/* Step description */}
+        <div className="text-center mt-6">
+          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{steps[activeStep].title}</h3>
+          <p className="text-gray-600 dark:text-gray-400">{steps[activeStep].desc}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
 function VoiceProfile() {
   const { t } = useTranslation()
   const [openFaq, setOpenFaq] = useState(null)
-
-  const profileMetrics = [
-    { label: t('demo.formality', 'Formality'), value: 65, color: 'from-primary to-blue-400' },
-    { label: t('demo.creativity', 'Creativity'), value: 82, color: 'from-primary to-blue-400' },
-    { label: t('demo.directness', 'Directness'), value: 72, color: 'from-primary to-blue-400' },
-    { label: t('demo.empathy', 'Empathy'), value: 78, color: 'from-primary to-blue-400' },
-  ]
 
   const benefits = [
     { icon: 'fingerprint', title: t('features.voiceProfile.benefits.unique.title', 'Unique Identity'), description: t('features.voiceProfile.benefits.unique.desc', 'Create content that sounds authentically like you, every time') },
@@ -28,17 +551,51 @@ function VoiceProfile() {
   ]
 
   const useCases = [
-    { icon: 'user', title: t('features.voiceProfile.useCases.personal.title', 'Personal Branding'), description: t('features.voiceProfile.useCases.personal.desc', 'Build a consistent personal brand across all your content') },
-    { icon: 'briefcase', title: t('features.voiceProfile.useCases.business.title', 'Business Communication'), description: t('features.voiceProfile.useCases.business.desc', 'Ensure all team communications match your brand voice') },
-    { icon: 'edit-3', title: t('features.voiceProfile.useCases.content.title', 'Content Creation'), description: t('features.voiceProfile.useCases.content.desc', 'Generate blog posts, articles, and copy that sound like you') },
-    { icon: 'users', title: t('features.voiceProfile.useCases.team.title', 'Team Collaboration'), description: t('features.voiceProfile.useCases.team.desc', 'Share profiles to maintain consistent voice across your team') },
+    { 
+      icon: 'user', 
+      title: t('features.voiceProfile.useCases.personal.title', 'Personal Branding'), 
+      description: t('features.voiceProfile.useCases.personal.desc', 'Build a consistent personal brand across all your content'),
+      quote: t('features.voiceProfile.useCases.personal.quote', '"My LinkedIn posts finally sound like me, not a robot."'),
+      stat: '10K+',
+      statLabel: t('features.voiceProfile.useCases.personal.statLabel', 'creators'),
+      color: 'indigo',
+      featured: true
+    },
+    { 
+      icon: 'briefcase', 
+      title: t('features.voiceProfile.useCases.business.title', 'Business Communication'), 
+      description: t('features.voiceProfile.useCases.business.desc', 'Ensure all team communications match your brand voice'),
+      quote: t('features.voiceProfile.useCases.business.quote', '"Our brand voice is now consistent across 50+ team members."'),
+      stat: '500+',
+      statLabel: t('features.voiceProfile.useCases.business.statLabel', 'companies'),
+      color: 'violet'
+    },
+    { 
+      icon: 'edit-3', 
+      title: t('features.voiceProfile.useCases.content.title', 'Content Creation'), 
+      description: t('features.voiceProfile.useCases.content.desc', 'Generate blog posts, articles, and copy that sound like you'),
+      quote: t('features.voiceProfile.useCases.content.quote', '"I write 3x faster and it still sounds authentically me."'),
+      stat: '1M+',
+      statLabel: t('features.voiceProfile.useCases.content.statLabel', 'articles'),
+      color: 'purple',
+      featured: true
+    },
+    { 
+      icon: 'users', 
+      title: t('features.voiceProfile.useCases.team.title', 'Team Collaboration'), 
+      description: t('features.voiceProfile.useCases.team.desc', 'Share profiles to maintain consistent voice across your team'),
+      quote: t('features.voiceProfile.useCases.team.quote', '"Onboarding new writers is now seamless with shared profiles."'),
+      stat: '50K+',
+      statLabel: t('features.voiceProfile.useCases.team.statLabel', 'teams'),
+      color: 'blue'
+    },
   ]
 
   const howItWorks = [
-    { step: 1, title: t('features.voiceProfile.howItWorks.step1.title', 'Upload Samples'), desc: t('features.voiceProfile.howItWorks.step1.desc', 'Provide 3-5 writing samples (emails, posts, articles) that represent your style') },
-    { step: 2, title: t('features.voiceProfile.howItWorks.step2.title', 'AI Analysis'), desc: t('features.voiceProfile.howItWorks.step2.desc', 'Our AI analyzes vocabulary, sentence structure, tone, and unique patterns') },
-    { step: 3, title: t('features.voiceProfile.howItWorks.step3.title', 'Profile Created'), desc: t('features.voiceProfile.howItWorks.step3.desc', 'Get a detailed profile with metrics, traits, and signature characteristics') },
-    { step: 4, title: t('features.voiceProfile.howItWorks.step4.title', 'Use Everywhere'), desc: t('features.voiceProfile.howItWorks.step4.desc', 'Apply your profile to humanization, AI Workspace, and content generation') },
+    { step: 1, title: t('features.voiceProfile.howItWorks.step1.title', 'Upload Samples'), desc: t('features.voiceProfile.howItWorks.step1.desc', 'Provide 3-5 writing samples (emails, posts, articles) that represent your style'), icon: 'upload' },
+    { step: 2, title: t('features.voiceProfile.howItWorks.step2.title', 'AI Analysis'), desc: t('features.voiceProfile.howItWorks.step2.desc', 'Our AI analyzes vocabulary, sentence structure, tone, and unique patterns'), icon: 'cpu' },
+    { step: 3, title: t('features.voiceProfile.howItWorks.step3.title', 'Profile Created'), desc: t('features.voiceProfile.howItWorks.step3.desc', 'Get a detailed profile with metrics, traits, and signature characteristics'), icon: 'fingerprint' },
+    { step: 4, title: t('features.voiceProfile.howItWorks.step4.title', 'Use Everywhere'), desc: t('features.voiceProfile.howItWorks.step4.desc', 'Apply your profile to humanization, AI Workspace, and content generation'), icon: 'zap' },
   ]
 
   const faqs = [
@@ -54,7 +611,7 @@ function VoiceProfile() {
       <SEOHead
         title={t('voiceProfile.meta.title')}
         description={t('voiceProfile.meta.description')}
-        keywords={['voice profile', 'writing style', 'personal AI', 'writing analysis', 'brand voice', 'content personalization']}
+        keywords={['voice profile', 'writing style', 'personal AI', 'writing analysis', 'brand voice', 'content personalization', 'writing DNA']}
       />
       <StructuredData
         type="SoftwareApplication"
@@ -81,213 +638,1189 @@ function VoiceProfile() {
           }))
         }}
       />
-      <div className="pt-16">
-        <div className="max-w-content-lg mx-auto px-4 py-8">
-          <Breadcrumb items={[{ label: t('nav.home'), href: '/' }, { label: t('nav.features'), href: '#' }, { label: t('nav.voiceProfile') }]} />
-
-          {/* Hero */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8 mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full text-primary text-sm font-medium mb-4">
-              <Icon name="fingerprint" size="sm" />
-              {t('features.voiceProfile.badge', 'Your Unique Writing DNA')}
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-4">{t('voiceProfile.title')}</h1>
-            <p className="text-xl text-text-secondary max-w-2xl">{t('voiceProfile.description')}</p>
+      
+      <div className="relative">
+        {/* ================================================================== */}
+        {/* HERO SECTION - DNA/Fingerprint Theme */}
+        {/* ================================================================== */}
+        <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-8 pb-16">
+          <DNAHelixBackground />
+          
+          {/* Breadcrumb */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="absolute top-6 left-4 sm:left-6 lg:left-8 z-20"
+          >
+            <Breadcrumb
+              items={[
+                { label: t('nav.home'), href: '/' },
+                { label: t('nav.features'), href: '#' },
+                { label: t('nav.voiceProfile') },
+              ]}
+            />
           </motion.div>
-
-          {/* Live Demo */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-16">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="px-2 py-1 bg-success/10 text-success text-xs font-medium rounded-full flex items-center gap-1">
-                <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
-                {t('demo.liveDemo', 'Live Demo')}
+          
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6 text-center relative z-10">
+            {/* Animated Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.5, type: 'spring' }}
+              className="mb-8"
+            >
+              <motion.span 
+                className="relative inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500/10 via-violet-500/15 to-purple-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-semibold rounded-full border border-indigo-200/50 dark:border-indigo-500/30 shadow-lg shadow-indigo-500/10"
+                animate={{
+                  boxShadow: [
+                    '0 0 20px rgba(99, 102, 241, 0.1)',
+                    '0 0 30px rgba(139, 92, 246, 0.2)',
+                    '0 0 20px rgba(99, 102, 241, 0.1)',
+                  ],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              >
+                <Icon name="fingerprint" size="sm" className="icon-indigo" />
+                {t('features.voiceProfile.badge', 'Your Unique Writing DNA')}
+                <motion.span 
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="w-2 h-2 bg-indigo-500 rounded-full"
+                />
+              </motion.span>
+            </motion.div>
+            
+            {/* Main Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary mb-6 leading-[1.1] tracking-tight"
+            >
+              {t('voiceProfile.title', 'Voice Profile')}
+            </motion.h1>
+            
+            {/* Subtitle with gradient */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8"
+            >
+              <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
+                {t('features.voiceProfile.heroHighlight', 'Capture Your Authentic Voice')}
               </span>
-              <span className="text-sm text-text-muted">{t('features.voiceProfile.tryItNow', 'Explore sample voice profiles')}</span>
-            </div>
-            <Suspense fallback={
-              <div className="h-96 bg-bg-secondary rounded-2xl border border-gray-200 flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-              </div>
-            }>
-              <LiveVoiceProfileDemo />
-            </Suspense>
-          </motion.div>
+            </motion.p>
+            
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg md:text-xl text-text-secondary mb-10 leading-relaxed max-w-2xl mx-auto"
+            >
+              {t('voiceProfile.description', 'Capture your unique writing style and create content that sounds authentically you. Your writing DNA, decoded by AI.')}
+            </motion.p>
 
-          {/* How It Works */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mb-16">
-            <h2 className="text-2xl font-bold text-text-primary mb-8">{t('features.voiceProfile.howItWorksTitle', 'How Voice Profile Works')}</h2>
-            <div className="grid md:grid-cols-4 gap-4">
+            {/* Stats Row */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-10 max-w-2xl mx-auto"
+            >
+              <StatCard value="90%+" label={t('features.voiceProfile.stats.accuracy', 'Voice Match')} />
+              <StatCard value="5" label={t('features.voiceProfile.stats.metrics', 'Style Metrics')} suffix="+" />
+              <StatCard value="3" label={t('features.voiceProfile.stats.samples', 'Min Samples')} />
+              <StatCard value="<30s" label={t('features.voiceProfile.stats.speed', 'Analysis')} />
+            </motion.div>
+
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
+            >
+              <motion.a
+                href="https://app.graphosai.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-semibold text-base overflow-hidden shadow-xl shadow-indigo-500/30"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative">{t('features.voiceProfile.cta.create', 'Create Your Profile')}</span>
+                <Icon name="arrow-right" size="sm" className="icon-white relative group-hover:translate-x-1 transition-transform" />
+              </motion.a>
+              <motion.a
+                href="#demo"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/80 dark:bg-white/10 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-text-primary rounded-xl font-semibold text-base hover:bg-white dark:hover:bg-white/20 transition-all shadow-lg"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Icon name="play-circle" size="sm" />
+                {t('cta.tryDemo', 'Try Demo')}
+              </motion.a>
+            </motion.div>
+            
+            {/* Trust indicators */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="flex flex-wrap items-center justify-center gap-4 text-sm"
+            >
+              {[
+                { icon: 'shield', text: t('features.voiceProfile.trust.secure', 'Data encrypted') },
+                { icon: 'zap', text: t('features.voiceProfile.trust.fast', 'Instant analysis') },
+                { icon: 'lock', text: t('features.voiceProfile.trust.private', 'Never shared') },
+              ].map((item, i) => (
+                <motion.div 
+                  key={i}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 bg-bg-primary"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 + i * 0.1 }}
+                >
+                  <Icon name={item.icon} size="sm" color="gray-medium" />
+                  <span>{item.text}</span>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Scroll Indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            className="absolute bottom-6 left-1/2 -translate-x-1/2"
+          >
+            <motion.a
+              href="#demo"
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="flex flex-col items-center gap-2 text-text-muted hover:text-indigo-600 transition-all cursor-pointer"
+            >
+              <span className="text-xs font-medium">{t('hero.scroll', 'Scroll to explore')}</span>
+              <div className="w-6 h-10 rounded-full border border-gray-300 dark:border-gray-600 flex items-start justify-center p-1.5">
+                <motion.div 
+                  animate={{ y: [0, 12, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className="w-1.5 h-1.5 bg-current rounded-full"
+                />
+              </div>
+            </motion.a>
+          </motion.div>
+        </section>
+
+
+        {/* ================================================================== */}
+        {/* INTERACTIVE DEMO SECTION */}
+        {/* ================================================================== */}
+        <section className="py-20 lg:py-28 relative">
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
+            <motion.div
+              id="demo"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="scroll-mt-24"
+            >
+              {/* Section Header */}
+              <div className="text-center mb-10">
+                <motion.span 
+                  initial={{ opacity: 0, scale: 0.9 }} 
+                  whileInView={{ opacity: 1, scale: 1 }} 
+                  viewport={{ once: true }} 
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white text-success text-sm font-semibold rounded-full mb-4 border border-gray-200 shadow-sm"
+                >
+                  <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
+                  {t('demo.liveDemo', 'Live Demo')}
+                </motion.span>
+                <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                  {t('features.voiceProfile.demo.title', 'Explore Voice Profiles')}
+                </h2>
+                <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+                  {t('features.voiceProfile.demo.subtitle', 'See how different writing styles are captured and visualized')}
+                </p>
+              </div>
+              
+              <Suspense fallback={
+                <div className="h-[600px] bg-bg-secondary rounded-2xl border border-gray-200 flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 border-3 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                    <span className="text-sm text-text-muted">{t('common.loading', 'Loading...')}</span>
+                  </div>
+                </div>
+              }>
+                <LiveVoiceProfileDemo />
+              </Suspense>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ================================================================== */}
+        {/* PROFILE BUILDER PREVIEW SECTION */}
+        {/* ================================================================== */}
+        <section className="py-20 lg:py-28 bg-bg-secondary relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/4 left-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-violet-500/5 rounded-full blur-3xl" />
+          </div>
+          
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6 relative">
+            <div className="text-center mb-10">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-indigo-600 text-sm font-semibold rounded-full mb-4 border border-gray-200 shadow-sm"
+              >
+                <Icon name="wand-sparkles" size="sm" className="icon-indigo" />
+                {t('features.voiceProfile.builderBadge', 'Profile Builder')}
+              </motion.span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+                {t('features.voiceProfile.builderTitle', 'See How It Works')}
+              </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto">
+                {t('features.voiceProfile.builderDesc', 'Watch your writing transform into a unique voice profile in three simple steps')}
+              </p>
+            </div>
+            
+            <ProfileBuilderPreview t={t} />
+          </div>
+        </section>
+
+        {/* ================================================================== */}
+        {/* HOW IT WORKS SECTION */}
+        {/* ================================================================== */}
+        <section className="py-20 lg:py-28 relative">
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
+            <div className="text-center mb-12">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-indigo-500/20"
+              >
+                <Icon name="git-branch" size="sm" className="icon-white" />
+                {t('features.voiceProfile.processBadge', 'Simple Process')}
+              </motion.span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+                {t('features.voiceProfile.howItWorksTitle', 'How Voice Profile Works')}
+              </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto">
+                {t('features.voiceProfile.howItWorksDesc', 'Create your unique writing DNA in four simple steps')}
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {howItWorks.map((item, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.25 + index * 0.1 }}
-                  className="relative p-5 bg-bg-secondary rounded-xl border border-gray-200"
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="relative group"
                 >
-                  <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mb-4">
-                    {item.step}
+                  <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300">
+                    {/* Step number */}
+                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-violet-500 text-white rounded-xl flex items-center justify-center font-bold text-lg mb-4 shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
+                      {item.step}
+                    </div>
+                    
+                    {/* Icon */}
+                    <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg flex items-center justify-center mb-3">
+                      <Icon name={item.icon} size="md" className="icon-indigo" />
+                    </div>
+                    
+                    <h3 className="font-semibold text-text-primary mb-2">{item.title}</h3>
+                    <p className="text-sm text-text-secondary">{item.desc}</p>
                   </div>
-                  <h3 className="font-semibold text-text-primary mb-2">{item.title}</h3>
-                  <p className="text-sm text-text-secondary">{item.desc}</p>
+                  
+                  {/* Connector arrow */}
                   {index < howItWorks.length - 1 && (
-                    <div className="hidden md:block absolute top-1/2 -right-2 transform -translate-y-1/2">
-                      <Icon name="chevron-right" size="md" className="text-text-muted" />
+                    <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10">
+                      <Icon name="chevron-right" size="md" className="text-indigo-300" />
                     </div>
                   )}
                 </motion.div>
               ))}
             </div>
-          </motion.div>
+          </div>
+        </section>
 
-          {/* Profile Visualization Preview */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-16">
-            <h2 className="text-2xl font-bold text-text-primary mb-8">{t('features.voiceProfile.whatYouGet', 'What You Get')}</h2>
-            <div className="bg-bg-secondary rounded-2xl border border-gray-200 p-6">
-              <div className="grid md:grid-cols-2 gap-8">
-                {/* Metrics */}
-                <div>
-                  <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-                    <Icon name="bar-chart-2" size="md" />
-                    {t('demo.writingMetrics', 'Writing Metrics')}
-                  </h3>
-                  <div className="space-y-4">
-                    {profileMetrics.map((metric, index) => (
-                      <div key={index} className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-text-secondary">{metric.label}</span>
-                          <span className="font-medium text-text-primary">{metric.value}%</span>
+        {/* ================================================================== */}
+        {/* BENEFITS SECTION */}
+        {/* ================================================================== */}
+        <section className="py-20 lg:py-28 bg-bg-secondary">
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+                {t('features.voiceProfile.whyCreate', 'Why Create a Voice Profile?')}
+              </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto">
+                {t('features.voiceProfile.whyCreateDesc', 'Unlock the power of personalized AI writing')}
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {benefits.map((benefit, index) => (
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl transition-all duration-300 group"
+                >
+                  <div className="w-14 h-14 bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-500/20 dark:to-violet-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Icon name={benefit.icon} size="xl" className="icon-indigo" />
+                  </div>
+                  <h3 className="font-semibold text-lg text-text-primary mb-2">{benefit.title}</h3>
+                  <p className="text-text-secondary">{benefit.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================================================================== */}
+        {/* USE CASES SECTION */}
+        {/* ================================================================== */}
+        <section className="py-20 lg:py-28">
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
+            <div className="text-center mb-12">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-indigo-500/20"
+              >
+                <Icon name="target" size="sm" className="icon-white" />
+                {t('features.voiceProfile.useCasesBadge', 'Use Cases')}
+              </motion.span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+                {t('features.voiceProfile.useCasesTitle', 'Perfect For')}
+              </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto">
+                {t('features.voiceProfile.useCasesDesc', 'Join thousands of professionals who use Voice Profile to maintain their authentic voice')}
+              </p>
+            </div>
+            
+            {/* Bento Grid Layout - 4 columns */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {useCases.map((useCase, index) => {
+                const colorClasses = {
+                  indigo: {
+                    bg: 'from-indigo-50 to-indigo-100/50 dark:from-indigo-950/50 dark:to-indigo-900/30',
+                    border: 'border-indigo-200/50 dark:border-indigo-500/30 hover:border-indigo-300 dark:hover:border-indigo-500/50',
+                    icon: 'from-indigo-500 to-indigo-600',
+                    iconShadow: 'shadow-indigo-500/30',
+                    stat: 'text-indigo-600 dark:text-indigo-400',
+                    quote: 'border-indigo-200 dark:border-indigo-500/30'
+                  },
+                  violet: {
+                    bg: 'from-violet-50 to-violet-100/50 dark:from-violet-950/50 dark:to-violet-900/30',
+                    border: 'border-violet-200/50 dark:border-violet-500/30 hover:border-violet-300 dark:hover:border-violet-500/50',
+                    icon: 'from-violet-500 to-violet-600',
+                    iconShadow: 'shadow-violet-500/30',
+                    stat: 'text-violet-600 dark:text-violet-400',
+                    quote: 'border-violet-200 dark:border-violet-500/30'
+                  },
+                  purple: {
+                    bg: 'from-purple-50 to-purple-100/50 dark:from-purple-950/50 dark:to-purple-900/30',
+                    border: 'border-purple-200/50 dark:border-purple-500/30 hover:border-purple-300 dark:hover:border-purple-500/50',
+                    icon: 'from-purple-500 to-purple-600',
+                    iconShadow: 'shadow-purple-500/30',
+                    stat: 'text-purple-600 dark:text-purple-400',
+                    quote: 'border-purple-200 dark:border-purple-500/30'
+                  },
+                  blue: {
+                    bg: 'from-blue-50 to-blue-100/50 dark:from-blue-950/50 dark:to-blue-900/30',
+                    border: 'border-blue-200/50 dark:border-blue-500/30 hover:border-blue-300 dark:hover:border-blue-500/50',
+                    icon: 'from-blue-500 to-blue-600',
+                    iconShadow: 'shadow-blue-500/30',
+                    stat: 'text-blue-600 dark:text-blue-400',
+                    quote: 'border-blue-200 dark:border-blue-500/30'
+                  }
+                }
+                const colors = colorClasses[useCase.color] || colorClasses.indigo
+                
+                return (
+                  <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ y: -5, scale: 1.02 }}
+                    className={`
+                      group relative p-5 rounded-2xl border bg-gradient-to-br overflow-hidden transition-all duration-300
+                      ${colors.bg} ${colors.border}
+                      hover:shadow-xl hover:shadow-black/5
+                    `}
+                  >
+                    {/* Background decoration */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/30 dark:bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    <div className="relative">
+                      {/* Header with icon and stat */}
+                      <div className="flex items-start justify-between mb-3">
+                        <motion.div 
+                          className={`w-12 h-12 bg-gradient-to-br ${colors.icon} rounded-xl flex items-center justify-center shadow-lg ${colors.iconShadow}`}
+                          whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+                          transition={{ duration: 0.5 }}
+                        >
+                          <Icon name={useCase.icon} size="lg" className="icon-white" />
+                        </motion.div>
+                        
+                        {/* Stat badge */}
+                        <div className="text-right">
+                          <div className={`text-xl font-bold ${colors.stat}`}>{useCase.stat}</div>
+                          <div className="text-xs text-text-muted">{useCase.statLabel}</div>
                         </div>
-                        <div className="h-2.5 bg-bg-primary rounded-full overflow-hidden">
+                      </div>
+                      
+                      {/* Title & Description */}
+                      <h3 className="font-bold text-base text-text-primary mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        {useCase.title}
+                      </h3>
+                      <p className="text-text-secondary text-sm mb-3 leading-relaxed line-clamp-2">
+                        {useCase.description}
+                      </p>
+                      
+                      {/* Quote */}
+                      <div className={`p-2.5 bg-white/60 dark:bg-slate-800/60 rounded-lg border ${colors.quote}`}>
+                        <p className="text-xs text-text-secondary italic line-clamp-2">
+                          {useCase.quote}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+            
+            {/* Bottom CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-12 text-center"
+            >
+              <p className="text-text-muted mb-4">
+                {t('features.voiceProfile.useCases.cta', 'Ready to find your voice?')}
+              </p>
+              <a 
+                href="https://app.graphosai.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-xl font-semibold shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:scale-105"
+              >
+                {t('features.voiceProfile.useCases.ctaButton', 'Create Your Profile')}
+                <Icon name="arrow-right" size="sm" className="icon-white" />
+              </a>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ================================================================== */}
+        {/* QUALITY SCORE SECTION */}
+        {/* ================================================================== */}
+        <section className="py-20 lg:py-28 bg-bg-secondary relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl" />
+          </div>
+          
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6 relative">
+            <div className="text-center mb-12">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-emerald-500/20"
+              >
+                <Icon name="award" size="sm" className="icon-white" />
+                {t('features.voiceProfile.qualityBadge', 'Quality Assurance')}
+              </motion.span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+                {t('features.voiceProfile.qualityTitle', 'Profile Quality Score')}
+              </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto">
+                {t('features.voiceProfile.qualityDesc', 'Our AI evaluates your writing samples to ensure the best possible voice profile accuracy')}
+              </p>
+            </div>
+            
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              {/* Quality Score Visual */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-8 shadow-xl">
+                  {/* Score Circle */}
+                  <div className="flex items-center justify-center mb-8">
+                    <div className="relative w-48 h-48">
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="85" fill="none" stroke="currentColor" strokeWidth="10" className="text-gray-100 dark:text-slate-700" />
+                        <motion.circle 
+                          cx="100" cy="100" r="85" fill="none" stroke="url(#scoreGradient)" strokeWidth="10" strokeLinecap="round"
+                          initial={{ strokeDasharray: '0 534' }}
+                          whileInView={{ strokeDasharray: '454 534' }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 1.5, ease: 'easeOut' }}
+                        />
+                        <defs>
+                          <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#10b981" />
+                            <stop offset="100%" stopColor="#6366f1" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <motion.span 
+                          className="text-5xl font-bold bg-gradient-to-r from-emerald-500 to-indigo-500 bg-clip-text text-transparent"
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.5 }}
+                        >
+                          85
+                        </motion.span>
+                        <span className="text-sm text-text-muted">{t('features.voiceProfile.quality.outOf', 'out of 100')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Rating Badge */}
+                  <div className="text-center mb-6">
+                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-full font-semibold">
+                      <Icon name="star" size="sm" className="icon-emerald" />
+                      {t('features.voiceProfile.quality.excellent', 'Excellent Profile')}
+                    </span>
+                  </div>
+                  
+                  {/* Score Breakdown */}
+                  <div className="space-y-3">
+                    {[
+                      { label: t('features.voiceProfile.quality.diversity', 'Sample Diversity'), value: 90, color: 'emerald' },
+                      { label: t('features.voiceProfile.quality.length', 'Content Length'), value: 85, color: 'indigo' },
+                      { label: t('features.voiceProfile.quality.consistency', 'Style Consistency'), value: 80, color: 'violet' }
+                    ].map((item, i) => (
+                      <div key={i} className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-text-secondary">{item.label}</span>
+                          <span className="font-medium text-text-primary">{item.value}%</span>
+                        </div>
+                        <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${metric.value}%` }}
-                            transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                            className={`h-full bg-gradient-to-r ${metric.color} rounded-full`}
+                            whileInView={{ width: `${item.value}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, delay: 0.3 + i * 0.1 }}
+                            className={`h-full rounded-full ${
+                              item.color === 'emerald' ? 'bg-emerald-500' :
+                              item.color === 'indigo' ? 'bg-indigo-500' : 'bg-violet-500'
+                            }`}
                           />
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
+              </motion.div>
+              
+              {/* Quality Ratings Explanation */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="space-y-4"
+              >
+                <h3 className="text-xl font-bold text-text-primary mb-6">
+                  {t('features.voiceProfile.quality.ratingsTitle', 'Quality Ratings')}
+                </h3>
                 
-                {/* Traits & Words */}
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-                      <Icon name="tag" size="md" />
-                      {t('demo.writingTraits', 'Writing Traits')}
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {['Conversational', 'Empathetic', 'Clear', 'Engaging'].map((trait, i) => (
-                        <motion.span
-                          key={trait}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.8 + i * 0.1 }}
-                          className="px-3 py-1.5 bg-primary/10 text-primary text-sm rounded-full"
-                        >
-                          {trait}
-                        </motion.span>
-                      ))}
+                {[
+                  { rating: 'Excellent', range: '80-100', color: 'emerald', icon: 'trophy', iconClass: 'icon-emerald', desc: t('features.voiceProfile.quality.excellentDesc', 'Highly accurate voice matching with rich style data') },
+                  { rating: 'Good', range: '60-79', color: 'blue', icon: 'thumbs-up', iconClass: 'icon-blue', desc: t('features.voiceProfile.quality.goodDesc', 'Reliable profile with good style representation') },
+                  { rating: 'Fair', range: '40-59', color: 'amber', icon: 'alert-circle', iconClass: 'icon-amber', desc: t('features.voiceProfile.quality.fairDesc', 'Basic profile, consider adding more samples') },
+                  { rating: 'Needs Work', range: '0-39', color: 'red', icon: 'alert-triangle', iconClass: 'icon-red', desc: t('features.voiceProfile.quality.needsWorkDesc', 'Add more diverse samples for better accuracy') }
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700"
+                  >
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      item.color === 'emerald' ? 'bg-emerald-100 dark:bg-emerald-500/20' :
+                      item.color === 'blue' ? 'bg-blue-100 dark:bg-blue-500/20' :
+                      item.color === 'amber' ? 'bg-amber-100 dark:bg-amber-500/20' :
+                      'bg-red-100 dark:bg-red-500/20'
+                    }`}>
+                      <Icon name={item.icon} size="md" className={item.iconClass} />
                     </div>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-                      <Icon name="book-open" size="md" />
-                      {t('demo.signatureWords', 'Signature Words')}
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {['"honestly"', '"I think"', '"let me explain"', '"here\'s the thing"'].map((word, i) => (
-                        <motion.span
-                          key={word}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 1 + i * 0.1 }}
-                          className="px-3 py-1.5 bg-bg-primary text-text-secondary text-sm rounded-full border border-gray-200"
-                        >
-                          {word}
-                        </motion.span>
-                      ))}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold text-text-primary">{item.rating}</span>
+                        <span className="text-xs text-text-muted px-2 py-0.5 bg-gray-100 dark:bg-slate-700 rounded">{item.range}</span>
+                      </div>
+                      <p className="text-sm text-text-secondary">{item.desc}</p>
                     </div>
-                  </div>
+                  </motion.div>
+                ))}
+                
+                {/* Tips */}
+                <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl border border-indigo-100 dark:border-indigo-500/20">
+                  <h4 className="font-semibold text-indigo-700 dark:text-indigo-400 mb-2 flex items-center gap-2">
+                    <Icon name="lightbulb" size="sm" className="icon-indigo" />
+                    {t('features.voiceProfile.quality.tipsTitle', 'Tips for Better Score')}
+                  </h4>
+                  <ul className="text-sm text-indigo-600 dark:text-indigo-300 space-y-1">
+                    <li>• {t('features.voiceProfile.quality.tip1', 'Add 5+ writing samples for best results')}</li>
+                    <li>• {t('features.voiceProfile.quality.tip2', 'Include different content types (emails, posts, articles)')}</li>
+                    <li>• {t('features.voiceProfile.quality.tip3', 'Use samples with at least 200 words each')}</li>
+                  </ul>
                 </div>
-              </div>
+              </motion.div>
             </div>
-          </motion.div>
+          </div>
+        </section>
 
-          {/* Benefits */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-16">
-            <h2 className="text-2xl font-bold text-text-primary mb-8">{t('features.voiceProfile.whyCreate', 'Why Create a Voice Profile?')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {benefits.map((benefit, index) => (
-                <motion.div 
+        {/* ================================================================== */}
+        {/* DETAILED METRICS SHOWCASE SECTION */}
+        {/* ================================================================== */}
+        <section className="py-20 lg:py-28">
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
+            <div className="text-center mb-12">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-violet-500/20"
+              >
+                <Icon name="sliders" size="sm" className="icon-white" />
+                {t('features.voiceProfile.metricsBadge', 'Deep Analysis')}
+              </motion.span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+                {t('features.voiceProfile.metricsTitle', 'What We Analyze')}
+              </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto">
+                {t('features.voiceProfile.metricsDesc', 'Our AI captures every nuance of your writing style through comprehensive analysis')}
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: 'type',
+                  title: t('features.voiceProfile.metrics.sentenceStarters', 'Sentence Starters'),
+                  desc: t('features.voiceProfile.metrics.sentenceStartersDesc', 'How you typically begin sentences - subject-first, adverbs, questions'),
+                  examples: ['"I think..."', '"However..."', '"The key is..."'],
+                  color: 'indigo'
+                },
+                {
+                  icon: 'link',
+                  title: t('features.voiceProfile.metrics.transitions', 'Transition Preferences'),
+                  desc: t('features.voiceProfile.metrics.transitionsDesc', 'Your preferred connecting words and phrases'),
+                  examples: ['"but"', '"therefore"', '"on the other hand"'],
+                  color: 'violet'
+                },
+                {
+                  icon: 'edit-2',
+                  title: t('features.voiceProfile.metrics.punctuation', 'Punctuation Style'),
+                  desc: t('features.voiceProfile.metrics.punctuationDesc', 'Your unique punctuation patterns and preferences'),
+                  examples: ['Em-dashes', 'Semicolons', 'Exclamation marks'],
+                  color: 'purple'
+                },
+                {
+                  icon: 'book-open',
+                  title: t('features.voiceProfile.metrics.vocabulary', 'Vocabulary Patterns'),
+                  desc: t('features.voiceProfile.metrics.vocabularyDesc', 'Common phrases, preferred words, and expressions'),
+                  examples: ['"honestly"', '"let me explain"', '"here\'s the thing"'],
+                  color: 'blue'
+                },
+                {
+                  icon: 'align-left',
+                  title: t('features.voiceProfile.metrics.sentenceLength', 'Sentence Structure'),
+                  desc: t('features.voiceProfile.metrics.sentenceLengthDesc', 'Typical length, complexity, and rhythm of your sentences'),
+                  examples: ['Short & punchy', 'Medium flow', 'Complex & detailed'],
+                  color: 'cyan'
+                },
+                {
+                  icon: 'heart',
+                  title: t('features.voiceProfile.metrics.tone', 'Emotional Markers'),
+                  desc: t('features.voiceProfile.metrics.toneDesc', 'How you express opinions, feelings, and emphasis'),
+                  examples: ['"I feel..."', '"In my opinion..."', '"Absolutely!"'],
+                  color: 'pink'
+                }
+              ].map((metric, index) => (
+                <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.35 + index * 0.1 }}
-                  className="p-6 bg-bg-secondary rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300"
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl transition-all duration-300"
                 >
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-3">
-                    <Icon name={benefit.icon} size="lg" />
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${
+                    metric.color === 'indigo' ? 'bg-indigo-100 dark:bg-indigo-500/20' :
+                    metric.color === 'violet' ? 'bg-violet-100 dark:bg-violet-500/20' :
+                    metric.color === 'purple' ? 'bg-purple-100 dark:bg-purple-500/20' :
+                    metric.color === 'blue' ? 'bg-blue-100 dark:bg-blue-500/20' :
+                    metric.color === 'cyan' ? 'bg-cyan-100 dark:bg-cyan-500/20' :
+                    'bg-pink-100 dark:bg-pink-500/20'
+                  }`}>
+                    <Icon name={metric.icon} size="lg" className={`icon-${metric.color}`} />
                   </div>
-                  <h3 className="font-semibold text-text-primary mb-2">{benefit.title}</h3>
-                  <p className="text-text-secondary text-sm">{benefit.description}</p>
+                  
+                  <h3 className="font-semibold text-lg text-text-primary mb-2">{metric.title}</h3>
+                  <p className="text-text-secondary text-sm mb-4">{metric.desc}</p>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {metric.examples.map((example, i) => (
+                      <span key={i} className="px-2 py-1 bg-gray-100 dark:bg-slate-700 text-text-secondary text-xs rounded-md">
+                        {example}
+                      </span>
+                    ))}
+                  </div>
                 </motion.div>
               ))}
             </div>
-          </motion.div>
+          </div>
+        </section>
 
-          {/* Use Cases */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mb-16">
-            <h2 className="text-2xl font-bold text-text-primary mb-8">{t('features.voiceProfile.useCasesTitle', 'Perfect For')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {useCases.map((useCase, index) => (
-                <div key={index} className="flex gap-4 p-5 bg-bg-secondary rounded-xl border border-gray-200">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary to-blue-400 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Icon name={useCase.icon} size="md" className="icon-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-text-primary mb-1">{useCase.title}</h3>
-                    <p className="text-text-secondary text-sm">{useCase.description}</p>
-                  </div>
-                </div>
-              ))}
+        {/* ================================================================== */}
+        {/* INTEGRATION SECTION */}
+        {/* ================================================================== */}
+        <section className="py-20 lg:py-28 bg-bg-secondary">
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
+            <div className="text-center mb-12">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-indigo-500/20"
+              >
+                <Icon name="puzzle" size="sm" className="icon-white" />
+                {t('features.voiceProfile.integrationBadge', 'Seamless Integration')}
+              </motion.span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+                {t('features.voiceProfile.integrationTitle', 'Use Your Voice Everywhere')}
+              </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto">
+                {t('features.voiceProfile.integrationDesc', 'Your Voice Profile integrates seamlessly with all Graphos AI features')}
+              </p>
             </div>
-          </motion.div>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Humanization Integration */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="relative bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-800 dark:to-amber-900/20 rounded-2xl border border-amber-200/50 dark:border-amber-500/20 p-8 overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/30 rounded-full blur-2xl pointer-events-none" />
+                
+                <div className="relative">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                      <Icon name="wand-sparkles" size="xl" className="icon-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-text-primary">{t('features.voiceProfile.integration.humanize', 'Humanization')}</h3>
+                      <p className="text-sm text-amber-600 dark:text-amber-400">{t('features.voiceProfile.integration.humanizeTag', 'Rewrite in your voice')}</p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-text-secondary mb-6">
+                    {t('features.voiceProfile.integration.humanizeDesc', 'Transform AI-generated content to match your unique writing style. The humanizer uses your Voice Profile to ensure every rewrite sounds authentically like you.')}
+                  </p>
+                  
+                  <div className="bg-white dark:bg-slate-700 rounded-xl p-4 border border-amber-200 dark:border-amber-500/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Icon name="arrow-right" size="sm" className="icon-amber" />
+                      <span className="text-sm font-medium text-text-primary">{t('features.voiceProfile.integration.example', 'Example')}</span>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <p className="text-gray-500 line-through">"The implementation of sustainable practices is important."</p>
+                      <p className="text-gray-800 dark:text-gray-200">"Here's the thing - going green isn't just a trend, it's essential."</p>
+                    </div>
+                  </div>
+                  
+                  <a href="/features/humanization" className="inline-flex items-center gap-2 mt-6 text-amber-600 dark:text-amber-400 font-medium hover:gap-3 transition-all">
+                    {t('features.voiceProfile.integration.learnMore', 'Learn more')}
+                    <Icon name="arrow-right" size="sm" />
+                  </a>
+                </div>
+              </motion.div>
+              
+              {/* AI Workspace Integration */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="relative bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-blue-900/20 rounded-2xl border border-blue-200/50 dark:border-blue-500/20 p-8 overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/30 rounded-full blur-2xl pointer-events-none" />
+                
+                <div className="relative">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                      <Icon name="message-square" size="xl" className="icon-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-text-primary">{t('features.voiceProfile.integration.workspace', 'AI Workspace')}</h3>
+                      <p className="text-sm text-blue-600 dark:text-blue-400">{t('features.voiceProfile.integration.workspaceTag', 'Chat with your voice')}</p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-text-secondary mb-6">
+                    {t('features.voiceProfile.integration.workspaceDesc', 'Generate content that sounds like you from the start. Select your Voice Profile in AI Workspace and every response will match your writing style.')}
+                  </p>
+                  
+                  <div className="bg-white dark:bg-slate-700 rounded-xl p-4 border border-blue-200 dark:border-blue-500/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center">
+                        <Icon name="user" size="xs" className="icon-indigo" />
+                      </div>
+                      <span className="text-sm font-medium text-text-primary">{t('features.voiceProfile.integration.prompt', 'Write a product description')}</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Gemini" size="xs" className="icon-white" />
+                      </div>
+                      <p className="text-sm text-gray-800 dark:text-gray-200 italic">"Okay, here's the thing about this product - it's honestly a game-changer..."</p>
+                    </div>
+                  </div>
+                  
+                  <a href="/features/ai-workspace" className="inline-flex items-center gap-2 mt-6 text-blue-600 dark:text-blue-400 font-medium hover:gap-3 transition-all">
+                    {t('features.voiceProfile.integration.learnMore', 'Learn more')}
+                    <Icon name="arrow-right" size="sm" />
+                  </a>
+                </div>
+              </motion.div>
+            </div>
+            
+            {/* Multi-language Support */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-8 p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700"
+            >
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 flex-shrink-0">
+                  <Icon name="globe" size="2xl" className="icon-white" />
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-xl font-bold text-text-primary mb-2">
+                    {t('features.voiceProfile.multiLang.title', '15+ Languages Supported')}
+                  </h3>
+                  <p className="text-text-secondary">
+                    {t('features.voiceProfile.multiLang.desc', 'Create Voice Profiles in English, Vietnamese, Chinese, Japanese, Korean, Spanish, French, German, and many more. Your writing style is captured accurately regardless of language.')}
+                  </p>
+                </div>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {['EN', 'VI', 'ZH', 'JA', 'KO', 'ES', 'FR', 'DE'].map((lang, i) => (
+                    <span key={i} className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-text-secondary">
+                      {lang}
+                    </span>
+                  ))}
+                  <span className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                    +7
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
 
-          {/* FAQ */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="mb-16">
-            <h2 className="text-2xl font-bold text-text-primary mb-8">{t('features.voiceProfile.faqTitle', 'Frequently Asked Questions')}</h2>
+        {/* ================================================================== */}
+        {/* FAQ SECTION - Matching AI Detection style */}
+        {/* ================================================================== */}
+        <section className="py-20 lg:py-28 pb-32 lg:pb-40 relative overflow-hidden bg-bg-secondary">
+          {/* Background decoration */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/4 right-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-violet-500/5 rounded-full blur-3xl" />
+          </div>
+
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 relative">
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-bg-primary text-indigo-600 dark:text-indigo-400 text-sm font-semibold rounded-full mb-4 border border-gray-200 dark:border-gray-700 shadow-sm"
+              >
+                <Icon name="help-circle" size="sm" className="icon-indigo" />
+                {t('features.voiceProfile.faqBadge', 'FAQ')}
+              </motion.span>
+              <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                {t('features.voiceProfile.faqTitle', 'Frequently Asked Questions')}
+              </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto text-lg">
+                {t('features.voiceProfile.faqSubtitle', 'Everything you need to know about Voice Profile')}
+              </p>
+            </div>
+
+            {/* FAQ List */}
             <div className="space-y-3">
               {faqs.map((faq, index) => (
-                <div key={index} className="bg-bg-secondary rounded-xl border border-gray-200 overflow-hidden">
+                <motion.div 
+                  key={index} 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                  className={`group rounded-2xl border transition-all overflow-hidden ${
+                    openFaq === index 
+                      ? 'bg-bg-primary border-indigo-200 dark:border-indigo-500/30 shadow-md' 
+                      : 'bg-bg-primary border-gray-200 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-500/30 hover:shadow-sm'
+                  }`}
+                >
                   <button
                     onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                    className="w-full flex items-center justify-between p-4 text-left hover:bg-bg-hover transition-colors"
+                    className="w-full flex items-center justify-between p-5 text-left"
                   >
-                    <span className="font-medium text-text-primary pr-4">{faq.q}</span>
-                    <Icon name={openFaq === index ? 'chevron-up' : 'chevron-down'} size="md" className="text-text-muted flex-shrink-0" />
-                  </button>
-                  {openFaq === index && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="px-4 pb-4">
-                      <p className="text-text-secondary text-sm leading-relaxed">{faq.a}</p>
+                    <div className="flex items-center gap-4 pr-4">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                        openFaq === index ? 'bg-indigo-500 text-white' : 'bg-bg-secondary text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20'
+                      }`}>
+                        <span className="text-sm font-bold">{String(index + 1).padStart(2, '0')}</span>
+                      </div>
+                      <span className={`text-base font-semibold transition-colors ${
+                        openFaq === index ? 'text-indigo-600 dark:text-indigo-400' : 'text-text-primary group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                      }`}>
+                        {faq.q}
+                      </span>
+                    </div>
+                    <motion.div
+                      animate={{ rotate: openFaq === index ? 180 : 0 }}
+                      transition={{ duration: 0.2, ease: 'easeInOut' }}
+                      className="flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                    >
+                      <Icon name="chevron-down" size="sm" className={openFaq === index ? 'text-indigo-600 dark:text-indigo-400' : 'text-text-muted'} />
                     </motion.div>
-                  )}
-                </div>
+                  </button>
+                  
+                  <AnimatePresence>
+                    {openFaq === index && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-5 pb-5 pl-[4.5rem]">
+                          <p className="text-text-secondary leading-relaxed">{faq.a}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
               ))}
             </div>
-          </motion.div>
 
-          {/* CTA */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="text-center py-12 bg-gradient-to-br from-primary/10 to-bg-secondary rounded-2xl">
-            <h2 className="text-2xl font-bold text-text-primary mb-4">{t('features.voiceProfile.ctaTitle', 'Create Your Voice Profile')}</h2>
-            <p className="text-text-secondary mb-6">{t('features.voiceProfile.ctaDesc', 'Discover your unique writing style today.')}</p>
-            <a href="https://app.graphosai.com" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-hover transition-colors">
-              {t('cta.getStartedFree')}
-            </a>
-          </motion.div>
-        </div>
+            {/* Contact CTA Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-12 p-8 bg-bg-primary rounded-2xl border border-gray-200 dark:border-gray-700 text-center"
+            >
+              <div className="w-16 h-16 mx-auto mb-4 bg-indigo-100 dark:bg-indigo-500/20 rounded-xl flex items-center justify-center">
+                <Icon name="message-circle" size="xl" className="icon-indigo" />
+              </div>
+              <h3 className="text-xl font-bold text-text-primary mb-2">
+                {t('faq.stillHaveQuestions', "Still have questions?")}
+              </h3>
+              <p className="text-text-secondary mb-6 max-w-md mx-auto">
+                {t('faq.contactDescription', "Can't find what you're looking for? Our support team is here to help.")}
+              </p>
+              <motion.a
+                href="mailto:support@graphosai.com"
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-500 text-white rounded-xl font-semibold hover:bg-indigo-600 transition-all shadow-sm hover:shadow-md"
+              >
+                <Icon name="mail" size="sm" className="icon-white" />
+                {t('faq.contactSupport', 'Contact Support')}
+              </motion.a>
+            </motion.div>
+          </div>
+
+          {/* Final CTA - Inside same section */}
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6 mt-20">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative rounded-[2rem] overflow-hidden"
+            >
+              {/* Solid Background - Indigo/Violet gradient */}
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600" />
+            
+              {/* Wave SVG at bottom */}
+              <div className="absolute bottom-0 left-0 right-0">
+                <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+                  <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="rgba(255,255,255,0.1)"/>
+                  <path d="M0 120L60 115C120 110 240 100 360 95C480 90 600 90 720 92C840 94 960 98 1080 100C1200 102 1320 102 1380 102L1440 102V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="rgba(255,255,255,0.15)"/>
+                </svg>
+              </div>
+              
+              {/* Wave SVG at top */}
+              <div className="absolute top-0 left-0 right-0 rotate-180">
+                <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+                  <path d="M0 80L48 74.7C96 69 192 59 288 53.3C384 48 480 48 576 53.3C672 59 768 69 864 69.3C960 69 1056 59 1152 53.3C1248 48 1344 48 1392 48L1440 48V80H1392C1344 80 1248 80 1152 80C1056 80 960 80 864 80C768 80 672 80 576 80C480 80 384 80 288 80C192 80 96 80 48 80H0Z" fill="rgba(255,255,255,0.08)"/>
+                </svg>
+              </div>
+
+              <div className="relative p-10 md:p-14 lg:p-20 text-center">
+                {/* Badge */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full mb-8 border border-white/[0.15]"
+                >
+                  <motion.span 
+                    animate={{ scale: [1, 1.3, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-2.5 h-2.5 bg-white rounded-full"
+                  />
+                  <span className="text-white/90 text-sm font-semibold">
+                    {t('features.voiceProfile.ctaBadge', 'Capture your unique voice')}
+                  </span>
+                  <Icon name="fingerprint" size="sm" className="icon-white opacity-80" />
+                </motion.div>
+
+                {/* Headline */}
+                <motion.h2
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight"
+                >
+                  {t('features.voiceProfile.ctaTitle', 'Ready to Create Your Voice Profile?')}
+                </motion.h2>
+
+                {/* Description */}
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed"
+                >
+                  {t('features.voiceProfile.ctaDesc', 'Join thousands of writers who use Voice Profile to maintain their authentic voice. Start free today.')}
+                </motion.p>
+
+                {/* CTA Buttons */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                  className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
+                >
+                  <motion.a
+                    href="https://app.graphosai.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-indigo-600 rounded-xl font-bold text-lg shadow-sm hover:shadow-lg transition-all"
+                  >
+                    <span>{t('cta.getStartedFree', 'Get Started Free')}</span>
+                    <Icon name="arrow-right" size="md" className="icon-indigo group-hover:translate-x-0.5 transition-transform" />
+                  </motion.a>
+                  <motion.a
+                    href="https://chrome.google.com/webstore"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-bold text-lg border border-white/[0.15] hover:bg-white/15 hover:border-white/[0.25] transition-all"
+                  >
+                    <Icon name="chrome" size="md" className="icon-white" />
+                    {t('cta.installExtension', 'Chrome Extension')}
+                  </motion.a>
+                </motion.div>
+
+                {/* Trust indicators */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 }}
+                  className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-white/70"
+                >
+                  {[
+                    { icon: 'gift', text: t('features.voiceProfile.trustIndicator1', 'No credit card required') },
+                    { icon: 'clock', text: t('features.voiceProfile.trustIndicator2', 'Setup in 30 seconds') },
+                    { icon: 'infinity', text: t('features.voiceProfile.trustIndicator3', 'Credits never expire') }
+                  ].map((item, i) => (
+                    <motion.div 
+                      key={i}
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.6 + i * 0.1 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Icon name={item.icon} size="sm" className="icon-white opacity-80" />
+                      <span>{item.text}</span>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Wave divider to Footer */}
+          <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+            <svg 
+              viewBox="0 0 1440 80" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-full h-auto block"
+              preserveAspectRatio="none"
+            >
+              <path 
+                d="M0 40C240 70 480 10 720 40C960 70 1200 10 1440 40V80H0V40Z" 
+                className="fill-slate-100 dark:fill-slate-800"
+              />
+              <path 
+                d="M0 50C240 75 480 25 720 50C960 75 1200 25 1440 50V80H0V50Z" 
+                className="fill-slate-200 dark:fill-slate-900"
+              />
+            </svg>
+          </div>
+        </section>
       </div>
     </>
   )

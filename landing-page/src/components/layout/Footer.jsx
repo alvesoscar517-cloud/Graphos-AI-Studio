@@ -41,13 +41,13 @@ function Footer() {
 
   return (
     <footer className="relative bg-gradient-to-b from-slate-200 to-slate-100 overflow-hidden">
-      {/* Decorative gradient orbs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-primary/8 rounded-full blur-3xl" />
-        <div className="absolute -bottom-10 right-1/4 w-56 h-56 bg-blue-400/8 rounded-full blur-3xl" />
-      </div>
+        {/* Decorative gradient orbs */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-primary/8 rounded-full blur-3xl" />
+          <div className="absolute -bottom-10 right-1/4 w-56 h-56 bg-blue-400/8 rounded-full blur-3xl" />
+        </div>
 
-      <div className="relative max-w-content-lg mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <div className="relative max-w-content-lg mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-6">
           {/* Brand Column */}
           <div className="col-span-2">

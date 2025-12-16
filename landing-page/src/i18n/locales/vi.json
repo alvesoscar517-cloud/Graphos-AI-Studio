@@ -12,6 +12,10 @@
     "voiceprofile": "Hồ sơ giọng văn",
     "aiWorkspace": "Không gian AI",
     "workspace": "Workspace",
+    "deviations": "Độ lệch phong cách",
+    "deviationsDesc": "Tìm sự không nhất quán phong cách",
+    "compatibilityScore": "Điểm tương thích",
+    "compatibilityScoreDesc": "Kiểm tra độ khớp phong cách viết",
     "privacy": "Chính sách bảo mật",
     "terms": "Điều khoản sử dụng",
     "legal": "Pháp lý"
@@ -246,7 +250,34 @@
     "readyToAnalyze": "Sẵn sàng phân tích",
     "enterTextDesc": "Nhập hoặc dán văn bản, sau đó nhấn Phát hiện AI để phân tích",
     "quickTip": "Mẹo: Thử các văn bản mẫu để xem cách các loại nội dung khác nhau được phát hiện",
-    "analyzingDesc": "Đang kiểm tra mẫu và chỉ số"
+    "analyzingDesc": "Đang kiểm tra mẫu và chỉ số",
+    "reset": "Đặt lại",
+    "deviations": {
+      "title": "Độ lệch phong cách",
+      "subtitle": "Tìm câu lệch khỏi phong cách của bạn",
+      "analyzing": "Đang phân tích câu để tìm độ lệch...",
+      "compatibility": "Tương thích",
+      "severe": "Nghiêm trọng",
+      "moderate": "Trung bình",
+      "mild": "Nhẹ",
+      "suggestion": "Câu này khác với phong cách viết thông thường của bạn. Hãy xem xét chỉnh sửa để khớp với giọng văn.",
+      "rewrite": "Viết lại với AI →",
+      "findBtn": "Tìm độ lệch"
+    },
+    "compatibility": {
+      "title": "Điểm tương thích",
+      "subtitle": "Phân tích mức độ văn bản khớp với phong cách viết của bạn",
+      "analyzing": "Đang phân tích phong cách viết...",
+      "veryCompatible": "Rất tương thích",
+      "goodMatch": "Khớp tốt",
+      "averageMatch": "Trung bình",
+      "lowMatch": "Khớp thấp",
+      "notCompatible": "Không tương thích",
+      "vector": "Vector",
+      "statistical": "Thống kê",
+      "deviations": "Độ lệch",
+      "analyzeBtn": "Tính điểm"
+    }
   },
   "analysis": {
     "aiDetection": "Phát hiện AI",
@@ -276,6 +307,12 @@
     "meta": { "title": "Không gian AI - Graphos AI Studio", "description": "Trò chuyện với AI theo phong cách viết của bạn. Nhận hỗ trợ viết cá nhân hóa." },
     "title": "Không gian AI",
     "description": "Trò chuyện với AI theo phong cách viết riêng của bạn."
+  },
+  "deviations": {
+    "meta": { "title": "Độ lệch phong cách - Tìm sự không nhất quán | Graphos AI", "description": "Xác định câu lệch khỏi phong cách viết của bạn. Nhận mức độ nghiêm trọng, gợi ý và sửa sự không nhất quán để duy trì giọng văn độc đáo." }
+  },
+  "compatibility": {
+    "meta": { "title": "Điểm tương thích - Kiểm tra độ khớp phong cách | Graphos AI", "description": "Phân tích mức độ văn bản khớp với phong cách viết độc đáo của bạn. Nhận điểm tương thích chi tiết, phân tích độ lệch và gợi ý cải thiện." }
   },
   "privacy": {
     "meta": { "title": "Chính sách bảo mật - Graphos AI Studio", "description": "Tìm hiểu cách Graphos AI Studio thu thập, sử dụng và bảo vệ dữ liệu cá nhân của bạn." },
@@ -796,6 +833,133 @@
       },
       "ctaTitle": "Bắt đầu sử dụng Không gian AI",
       "ctaDesc": "Trò chuyện với AI theo phong cách viết độc đáo của bạn."
+    },
+    "deviations": {
+      "badge": "Phát hiện phong cách",
+      "title": "Độ lệch phong cách",
+      "heroHighlight": "Tìm sự không nhất quán",
+      "description": "Xác định chính xác câu nào lệch khỏi phong cách viết của bạn. Nhận mức độ nghiêm trọng và gợi ý để duy trì sự nhất quán.",
+      "stats": {
+        "levels": "Mức độ nghiêm trọng",
+        "accuracy": "Độ chính xác",
+        "speed": "Mỗi câu"
+      },
+      "severity": {
+        "badge": "Mức độ nghiêm trọng",
+        "title": "Hiểu về mức độ lệch",
+        "subtitle": "Chúng tôi phân loại độ lệch thành ba mức để giúp bạn ưu tiên cải thiện",
+        "mild": "Nhẹ",
+        "mildDesc": "Khác biệt phong cách nhỏ, khó nhận thấy",
+        "mildExample": "Lựa chọn từ hoặc độ dài câu hơi khác",
+        "moderate": "Trung bình",
+        "moderateDesc": "Khác biệt phong cách đáng chú ý có thể ảnh hưởng đến sự nhất quán",
+        "moderateExample": "Giọng điệu hoặc mức độ trang trọng khác nhau",
+        "severe": "Nghiêm trọng",
+        "severeDesc": "Sự không khớp phong cách đáng kể, rõ ràng khác với giọng văn của bạn",
+        "severeExample": "Phong cách viết hoặc từ vựng hoàn toàn khác"
+      },
+      "howItWorks": {
+        "badge": "Cách hoạt động",
+        "title": "Phát hiện độ lệch thông minh",
+        "subtitle": "AI của chúng tôi phân tích từng câu so với Hồ sơ giọng văn để tìm sự không nhất quán",
+        "step1": { "title": "Chọn hồ sơ", "desc": "Chọn Hồ sơ giọng văn để so sánh" },
+        "step2": { "title": "Nhập văn bản", "desc": "Dán hoặc viết văn bản bạn muốn phân tích" },
+        "step3": { "title": "Phân tích AI", "desc": "Mỗi câu được so sánh bằng độ tương đồng vector" },
+        "step4": { "title": "Xem kết quả", "desc": "Xem các độ lệch được đánh dấu với mức độ nghiêm trọng" }
+      },
+      "useCases": {
+        "badge": "Trường hợp sử dụng",
+        "title": "Hoàn hảo cho mọi người viết",
+        "subtitle": "Tìm và sửa sự không nhất quán phong cách trong mọi loại nội dung",
+        "spotlight": "Trường hợp nổi bật",
+        "example": "Ví dụ",
+        "content": {
+          "title": "Đánh giá nội dung",
+          "desc": "Tìm câu không khớp với giọng thương hiệu trước khi xuất bản",
+          "b1": "Kiểm soát chất lượng",
+          "b2": "Nhất quán thương hiệu",
+          "b3": "Tiết kiệm thời gian",
+          "example": "Tìm thấy 3 độ lệch nghiêm trọng ở đoạn 2 - giọng trang trọng không khớp với phong cách trò chuyện của bạn."
+        },
+        "team": {
+          "title": "Viết nhóm",
+          "desc": "Đảm bảo tất cả thành viên viết nhất quán với hướng dẫn thương hiệu",
+          "b1": "Giọng văn thống nhất",
+          "b2": "Công cụ đào tạo",
+          "b3": "Onboarding",
+          "example": "Người viết mới có 5 độ lệch trung bình - chia sẻ Hồ sơ giọng văn để giúp họ khớp với phong cách nhóm."
+        },
+        "ai": {
+          "title": "Kiểm tra nội dung AI",
+          "desc": "Xác định phần nào của nội dung AI cần nhân hóa",
+          "b1": "Tính xác thực",
+          "b2": "Cá nhân hóa",
+          "b3": "Tin cậy",
+          "example": "Đầu ra ChatGPT có 8 độ lệch - sử dụng AI Rewrite cho những cái nghiêm trọng trước."
+        },
+        "learning": {
+          "title": "Học phong cách",
+          "desc": "Hiểu khía cạnh nào trong văn bản của bạn thay đổi nhiều nhất",
+          "b1": "Tự nhận thức",
+          "b2": "Cải thiện",
+          "b3": "Phát triển",
+          "example": "Phần kết luận của bạn có xu hướng lệch nhiều hơn phần mở đầu - tập trung duy trì giọng điệu ở cuối."
+        }
+      },
+      "benefits": {
+        "badge": "Lợi ích",
+        "title": "Tại sao sử dụng phát hiện độ lệch?",
+        "subtitle": "Xác định và sửa sự không nhất quán phong cách trước khi ảnh hưởng đến nội dung",
+        "levels": {
+          "title": "Mức độ nghiêm trọng",
+          "desc": "Phân loại độ lệch thành nhẹ, trung bình hoặc nghiêm trọng để ưu tiên sửa",
+          "stat": "Mức độ"
+        },
+        "speed": {
+          "title": "Phát hiện nhanh",
+          "desc": "Phân tích mỗi câu trong dưới 2 giây với phát hiện AI",
+          "stat": "Mỗi câu"
+        },
+        "accuracy": {
+          "title": "Độ chính xác cao",
+          "desc": "Ngưỡng động dựa trên Hồ sơ giọng văn để phát hiện chính xác",
+          "stat": "Độ chính xác"
+        },
+        "improve": {
+          "title": "Thông tin hành động",
+          "desc": "Nhận gợi ý để sửa độ lệch và cải thiện sự nhất quán phong cách",
+          "stat": "Cải thiện"
+        }
+      },
+      "demo": {
+        "badge": "Demo tương tác",
+        "title": "Xem độ lệch hoạt động",
+        "subtitle": "Thử phát hiện độ lệch với văn bản mẫu và xem cách nó xác định sự không nhất quán phong cách"
+      },
+      "faq": {
+        "badge": "FAQ",
+        "title": "Câu hỏi thường gặp",
+        "desc": "Mọi thứ bạn cần biết về phát hiện độ lệch",
+        "q1": "Độ lệch là gì?",
+        "a1": "Độ lệch là các câu trong văn bản không khớp với phong cách viết độc đáo được ghi trong Hồ sơ giọng văn. AI của chúng tôi so sánh từng câu với hồ sơ và xác định những câu khác biệt đáng kể về giọng điệu, từ vựng hoặc cấu trúc.",
+        "q2": "Mức độ nghiêm trọng được xác định như thế nào?",
+        "a2": "Chúng tôi sử dụng ngưỡng động dựa trên Hồ sơ giọng văn. Độ lệch nhẹ (0.4-0.5 tương đồng) khó nhận thấy. Độ lệch trung bình (0.3-0.4) là khác biệt đáng chú ý. Độ lệch nghiêm trọng (<0.3) là sự không khớp phong cách đáng kể.",
+        "q3": "Điều này khác với Điểm tương thích như thế nào?",
+        "a3": "Điểm tương thích cho bạn phần trăm tổng thể về mức độ văn bản khớp với phong cách. Độ lệch đi sâu hơn bằng cách xác định chính xác câu nào lệch và mức độ nghiêm trọng, để bạn biết chính xác cần sửa gì.",
+        "q4": "Tôi có thể tự động sửa độ lệch không?",
+        "a4": "Có! Sau khi xác định độ lệch, bạn có thể nhấp vào bất kỳ câu được đánh dấu để xem gợi ý. Bạn cũng có thể sử dụng tính năng AI Rewrite để tự động chuyển đổi câu lệch để khớp với Hồ sơ giọng văn.",
+        "q5": "Phát hiện độ lệch tốn bao nhiêu credits?",
+        "a5": "Phát hiện độ lệch được bao gồm trong chi phí phân tích văn bản: 2 credits cơ bản cộng 0.002 credits mỗi từ. Phân tích 500 từ điển hình tốn khoảng 3 credits và bao gồm cả Điểm tương thích và phát hiện độ lệch.",
+        "q6": "Nếu không có độ lệch thì sao?",
+        "a6": "Tin tốt! Nếu không tìm thấy độ lệch, nghĩa là văn bản của bạn khớp tốt với Hồ sơ giọng văn. Bạn sẽ thấy thông báo thành công xác nhận văn bản nhất quán với phong cách viết của bạn."
+      },
+      "ctaBadge": "Bắt đầu phát hiện ngay",
+      "cta": {
+        "title": "Sẵn sàng tìm sự không nhất quán phong cách?",
+        "subtitle": "Bắt đầu phân tích nội dung để tìm độ lệch phong cách ngay hôm nay. Không cần thẻ tín dụng.",
+        "instant": "100 credits miễn phí",
+        "privacy": "Bảo mật ưu tiên"
+      }
     }
   },
   "exitPopup": {

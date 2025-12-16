@@ -34,6 +34,30 @@ function Navigation({ mobile = false }) {
       description: t('nav.voiceProfileDesc', 'Create your unique voice')
     },
     { 
+      label: t('nav.rewrite', 'AI Rewrite'), 
+      href: '/features/rewrite',
+      icon: 'edit-3',
+      description: t('nav.rewriteDesc', 'Transform text in your voice')
+    },
+    { 
+      label: t('nav.compatibilityScore', 'Compatibility Score'), 
+      href: '/features/compatibility-score',
+      icon: 'target',
+      description: t('nav.compatibilityScoreDesc', 'Check your writing style match')
+    },
+    { 
+      label: t('nav.deviations', 'Deviations'), 
+      href: '/features/deviations',
+      icon: 'alert-triangle',
+      description: t('nav.deviationsDesc', 'Find style inconsistencies')
+    },
+    { 
+      label: t('nav.statistics', 'Statistics'), 
+      href: '/features/statistics',
+      icon: 'bar-chart-2',
+      description: t('nav.statisticsDesc', 'Analyze your writing metrics')
+    },
+    { 
       label: t('nav.aiWorkspace'), 
       href: '/features/ai-workspace',
       icon: 'layout-grid',

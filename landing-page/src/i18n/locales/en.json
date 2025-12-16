@@ -12,6 +12,11 @@
     "voiceprofile": "Voice Profile",
     "aiWorkspace": "AI Workspace",
     "workspace": "Workspace",
+    "rewrite": "AI Rewrite",
+    "deviations": "Deviations",
+    "deviationsDesc": "Find style inconsistencies",
+    "compatibilityScore": "Compatibility Score",
+    "compatibilityScoreDesc": "Check your writing style match",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "legal": "Legal"
@@ -246,7 +251,34 @@
     "readyToAnalyze": "Ready to analyze",
     "enterTextDesc": "Enter or paste text, then click Detect AI to analyze",
     "quickTip": "Tip: Try the sample texts to see how different content types are detected",
-    "analyzingDesc": "Checking patterns and indicators"
+    "analyzingDesc": "Checking patterns and indicators",
+    "reset": "Reset",
+    "deviations": {
+      "title": "Deviations",
+      "subtitle": "Find sentences that deviate from your style",
+      "analyzing": "Analyzing sentences for deviations...",
+      "compatibility": "Compatibility",
+      "severe": "Severe",
+      "moderate": "Moderate",
+      "mild": "Mild",
+      "suggestion": "This sentence differs from your typical writing style. Consider revising to match your voice.",
+      "rewrite": "Rewrite with AI →",
+      "findBtn": "Find Deviations"
+    },
+    "compatibility": {
+      "title": "Compatibility Score",
+      "subtitle": "Analyze how well text matches your writing style",
+      "analyzing": "Analyzing writing style...",
+      "veryCompatible": "Very Compatible",
+      "goodMatch": "Good Match",
+      "averageMatch": "Average Match",
+      "lowMatch": "Low Match",
+      "notCompatible": "Not Compatible",
+      "vector": "Vector",
+      "statistical": "Statistical",
+      "deviations": "Deviations",
+      "analyzeBtn": "Calculate Score"
+    }
   },
   "analysis": {
     "aiDetection": "AI Detection",
@@ -276,6 +308,12 @@
     "meta": { "title": "AI Workspace - Graphos AI Studio", "description": "Chat with AI using your voice profile. Get personalized writing assistance." },
     "title": "AI Workspace",
     "description": "Chat with AI in your unique writing style."
+  },
+  "deviations": {
+    "meta": { "title": "Deviations - Find Style Inconsistencies | Graphos AI", "description": "Identify sentences that deviate from your writing style. Get severity levels, suggestions, and fix inconsistencies to maintain your unique voice." }
+  },
+  "compatibility": {
+    "meta": { "title": "Compatibility Score - Check Your Writing Style Match | Graphos AI", "description": "Analyze how well your text matches your unique writing style. Get detailed compatibility scores, deviation analysis, and improvement suggestions." }
   },
   "privacy": {
     "meta": { "title": "Privacy Policy - Graphos AI Studio", "description": "Learn how Graphos AI Studio collects, uses, and protects your personal data." },
@@ -796,6 +834,133 @@
       },
       "ctaTitle": "Start Using AI Workspace",
       "ctaDesc": "Chat with AI in your unique writing style."
+    },
+    "deviations": {
+      "badge": "Style Detection",
+      "title": "Deviations",
+      "heroHighlight": "Find Style Inconsistencies",
+      "description": "Identify exactly which sentences deviate from your writing style. Get severity levels and suggestions to maintain consistency.",
+      "stats": {
+        "levels": "Severity Levels",
+        "accuracy": "Detection Accuracy",
+        "speed": "Per Sentence"
+      },
+      "severity": {
+        "badge": "Severity Levels",
+        "title": "Understanding Deviation Severity",
+        "subtitle": "We classify deviations into three levels to help you prioritize improvements",
+        "mild": "Mild",
+        "mildDesc": "Small style differences that are barely noticeable",
+        "mildExample": "Slightly different word choice or sentence length",
+        "moderate": "Moderate",
+        "moderateDesc": "Noticeable style differences that may affect consistency",
+        "moderateExample": "Different tone or formality level",
+        "severe": "Severe",
+        "severeDesc": "Significant style mismatch that clearly differs from your voice",
+        "severeExample": "Completely different writing style or vocabulary"
+      },
+      "howItWorks": {
+        "badge": "How It Works",
+        "title": "Intelligent Deviation Detection",
+        "subtitle": "Our AI analyzes each sentence against your Voice Profile to find inconsistencies",
+        "step1": { "title": "Select Profile", "desc": "Choose the Voice Profile to compare against" },
+        "step2": { "title": "Input Text", "desc": "Paste or write the text you want to analyze" },
+        "step3": { "title": "AI Analysis", "desc": "Each sentence is compared using vector similarity" },
+        "step4": { "title": "View Results", "desc": "See deviations highlighted with severity levels" }
+      },
+      "useCases": {
+        "badge": "Use Cases",
+        "title": "Perfect For Every Writer",
+        "subtitle": "Find and fix style inconsistencies in any type of content",
+        "spotlight": "Featured Use Case",
+        "example": "Example",
+        "content": {
+          "title": "Content Review",
+          "desc": "Find sentences that don't match your brand voice before publishing",
+          "b1": "Quality control",
+          "b2": "Brand consistency",
+          "b3": "Time savings",
+          "example": "Found 3 severe deviations in paragraph 2 - the formal tone doesn't match your conversational style."
+        },
+        "team": {
+          "title": "Team Writing",
+          "desc": "Ensure all team members write consistently with your brand guidelines",
+          "b1": "Unified voice",
+          "b2": "Training tool",
+          "b3": "Onboarding",
+          "example": "New writer has 5 moderate deviations - share the Voice Profile to help them match the team style."
+        },
+        "ai": {
+          "title": "AI Content Check",
+          "desc": "Identify which parts of AI-generated content need humanization",
+          "b1": "Authenticity",
+          "b2": "Personalization",
+          "b3": "Trust",
+          "example": "ChatGPT output has 8 deviations - use AI Rewrite on the severe ones first."
+        },
+        "learning": {
+          "title": "Style Learning",
+          "desc": "Understand which aspects of your writing vary the most",
+          "b1": "Self-awareness",
+          "b2": "Improvement",
+          "b3": "Growth",
+          "example": "Your conclusions tend to deviate more than introductions - focus on maintaining tone at the end."
+        }
+      },
+      "benefits": {
+        "badge": "Benefits",
+        "title": "Why Use Deviation Detection?",
+        "subtitle": "Identify and fix style inconsistencies before they affect your content",
+        "levels": {
+          "title": "Severity Levels",
+          "desc": "Classify deviations as mild, moderate, or severe to prioritize fixes",
+          "stat": "Severity Levels"
+        },
+        "speed": {
+          "title": "Fast Detection",
+          "desc": "Analyze each sentence in under 2 seconds with AI-powered detection",
+          "stat": "Per Sentence"
+        },
+        "accuracy": {
+          "title": "High Accuracy",
+          "desc": "Dynamic thresholds based on your Voice Profile for precise detection",
+          "stat": "Accuracy"
+        },
+        "improve": {
+          "title": "Actionable Insights",
+          "desc": "Get suggestions to fix deviations and improve style consistency",
+          "stat": "Improvement"
+        }
+      },
+      "demo": {
+        "badge": "Interactive Demo",
+        "title": "See Deviations in Action",
+        "subtitle": "Try our deviation detection with sample texts and see how it identifies style inconsistencies"
+      },
+      "faq": {
+        "badge": "FAQ",
+        "title": "Frequently Asked Questions",
+        "desc": "Everything you need to know about Deviation Detection",
+        "q1": "What are Deviations?",
+        "a1": "Deviations are sentences in your text that don't match your unique writing style captured in your Voice Profile. Our AI compares each sentence against your profile and identifies those that differ significantly in tone, vocabulary, or structure.",
+        "q2": "How are severity levels determined?",
+        "a2": "We use dynamic thresholds based on your Voice Profile. Mild deviations (0.4-0.5 similarity) are barely noticeable. Moderate deviations (0.3-0.4) are noticeable differences. Severe deviations (<0.3) are significant style mismatches that clearly differ from your voice.",
+        "q3": "How is this different from Compatibility Score?",
+        "a3": "Compatibility Score gives you an overall percentage of how well your text matches your style. Deviations goes deeper by identifying exactly which sentences deviate and how severely, so you know exactly what to fix.",
+        "q4": "Can I fix deviations automatically?",
+        "a4": "Yes! After identifying deviations, you can click on any highlighted sentence to see suggestions. You can also use our AI Rewrite feature to automatically transform deviant sentences to match your Voice Profile.",
+        "q5": "How many credits does deviation detection cost?",
+        "a5": "Deviation detection is included in the text analysis cost: 2 base credits plus 0.002 credits per word. A typical 500-word analysis costs about 3 credits and includes both Compatibility Score and Deviation detection.",
+        "q6": "What if I have no deviations?",
+        "a6": "Great news! If no deviations are found, it means your text matches your Voice Profile well. You'll see a success message confirming your text is consistent with your writing style."
+      },
+      "ctaBadge": "Start detecting in seconds",
+      "cta": {
+        "title": "Ready to Find Style Inconsistencies?",
+        "subtitle": "Start analyzing your content for style deviations today. No credit card required.",
+        "instant": "100 free credits",
+        "privacy": "Privacy first"
+      }
     }
   },
   "exitPopup": {

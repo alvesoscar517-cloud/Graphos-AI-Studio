@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
 import Layout from '@components/layout/Layout'
 import { PageLoader } from '@components/common/LoadingSpinner'
-import ScrollToTop from '@components/common/ScrollToTop'
 
 // Lazy load pages for code splitting
 // Using webpackChunkName for better debugging
@@ -19,6 +18,18 @@ const VoiceProfile = lazy(() =>
 const AIWorkspace = lazy(() =>
   import(/* webpackChunkName: "ai-workspace" */ '@pages/features/AIWorkspace')
 )
+const Rewrite = lazy(() =>
+  import(/* webpackChunkName: "rewrite" */ '@pages/features/Rewrite')
+)
+const CompatibilityScore = lazy(() =>
+  import(/* webpackChunkName: "compatibility-score" */ '@pages/features/CompatibilityScore')
+)
+const Deviations = lazy(() =>
+  import(/* webpackChunkName: "deviations" */ '@pages/features/Deviations')
+)
+const Statistics = lazy(() =>
+  import(/* webpackChunkName: "statistics" */ '@pages/features/Statistics')
+)
 const PrivacyPolicy = lazy(() =>
   import(/* webpackChunkName: "privacy" */ '@pages/PrivacyPolicy')
 )
@@ -29,7 +40,6 @@ const Terms = lazy(() =>
 function App() {
   return (
     <Layout>
-      <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Default routes */}
@@ -38,6 +48,10 @@ function App() {
           <Route path="/features/humanization" element={<Humanization />} />
           <Route path="/features/voice-profile" element={<VoiceProfile />} />
           <Route path="/features/ai-workspace" element={<AIWorkspace />} />
+          <Route path="/features/rewrite" element={<Rewrite />} />
+          <Route path="/features/compatibility-score" element={<CompatibilityScore />} />
+          <Route path="/features/deviations" element={<Deviations />} />
+          <Route path="/features/statistics" element={<Statistics />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />
 
@@ -48,6 +62,10 @@ function App() {
             <Route path="features/humanization" element={<Humanization />} />
             <Route path="features/voice-profile" element={<VoiceProfile />} />
             <Route path="features/ai-workspace" element={<AIWorkspace />} />
+            <Route path="features/rewrite" element={<Rewrite />} />
+            <Route path="features/compatibility-score" element={<CompatibilityScore />} />
+            <Route path="features/deviations" element={<Deviations />} />
+            <Route path="features/statistics" element={<Statistics />} />
             <Route path="privacy" element={<PrivacyPolicy />} />
             <Route path="terms" element={<Terms />} />
           </Route>

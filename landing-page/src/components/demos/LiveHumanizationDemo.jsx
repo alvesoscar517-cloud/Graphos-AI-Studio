@@ -91,9 +91,9 @@ const LiveHumanizationDemo = () => {
   return (
     <AppFrame
       title="Graphos AI Studio - Content Humanization"
-      className="max-w-5xl mx-auto"
+      className="max-w-6xl mx-auto"
     >
-      <div className="min-h-[520px] p-5 lg:p-6 flex flex-col">
+      <div className="min-h-[600px] p-6 lg:p-8 flex flex-col">
         {/* Header with Sample Buttons */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
@@ -162,7 +162,7 @@ const LiveHumanizationDemo = () => {
 
         {/* Editor Area */}
         <div className="flex-1 relative">
-          <div className="w-full h-full min-h-[320px] p-5 bg-gray-50 rounded-xl text-gray-700 text-sm leading-relaxed overflow-hidden relative">
+          <div className="w-full h-full min-h-[400px] p-5 bg-gray-50 rounded-2xl text-gray-700 text-base leading-relaxed overflow-hidden relative">
             {/* Original/Streamed text */}
             <div
               className={`transition-opacity duration-300 ${showShimmer ? 'opacity-0' : 'opacity-100'}`}

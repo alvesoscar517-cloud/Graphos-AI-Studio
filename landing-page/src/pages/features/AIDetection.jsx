@@ -1,13 +1,197 @@
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
-import { useState, lazy, Suspense } from 'react'
+import { useState, lazy, Suspense, useEffect, useRef } from 'react'
 import SEOHead from '@components/seo/SEOHead'
 import StructuredData from '@components/seo/StructuredData'
 import Breadcrumb from '@components/common/Breadcrumb'
 import Icon from '@components/common/Icon'
 
-// Lazy load the real demo for better performance
-const RealAIDetectionDemo = lazy(() => import('@components/demos/RealAIDetectionDemo'))
+// Lazy load components for better performance
+const LiveAIDetectionDemo = lazy(() => import('@components/demos/LiveAIDetectionDemo'))
+const PricingSection = lazy(() => import('@components/sections/PricingSection'))
+
+// Hero Background - Static Radar/Scanner design (no animation)
+const HeroBackground = () => (
+  <div className="absolute inset-0 overflow-hidden -z-10">
+    {/* Base gradient */}
+    <div className="absolute inset-0 bg-gradient-to-b from-blue-50/80 via-white to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-900" />
+    
+    {/* SVG Radar Background - Static */}
+    <svg 
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] opacity-100"
+      viewBox="0 0 800 800"
+      fill="none"
+    >
+      {/* Concentric circles - darker/bolder */}
+      <circle cx="400" cy="400" r="80" stroke="rgba(59, 130, 246, 0.25)" strokeWidth="1.5" fill="none" />
+      <circle cx="400" cy="400" r="140" stroke="rgba(59, 130, 246, 0.22)" strokeWidth="1.5" fill="none" />
+      <circle cx="400" cy="400" r="200" stroke="rgba(59, 130, 246, 0.18)" strokeWidth="1.5" fill="none" />
+      <circle cx="400" cy="400" r="260" stroke="rgba(59, 130, 246, 0.15)" strokeWidth="1" fill="none" />
+      <circle cx="400" cy="400" r="320" stroke="rgba(59, 130, 246, 0.12)" strokeWidth="1" fill="none" />
+      <circle cx="400" cy="400" r="380" stroke="rgba(59, 130, 246, 0.08)" strokeWidth="1" fill="none" />
+      
+      {/* Cross lines - bolder */}
+      <line x1="400" y1="20" x2="400" y2="780" stroke="rgba(59, 130, 246, 0.12)" strokeWidth="1" />
+      <line x1="20" y1="400" x2="780" y2="400" stroke="rgba(59, 130, 246, 0.12)" strokeWidth="1" />
+      
+      {/* Diagonal lines - bolder */}
+      <line x1="117" y1="117" x2="683" y2="683" stroke="rgba(59, 130, 246, 0.08)" strokeWidth="1" />
+      <line x1="683" y1="117" x2="117" y2="683" stroke="rgba(59, 130, 246, 0.08)" strokeWidth="1" />
+      
+      {/* Scanner sweep area - static gradient */}
+      <defs>
+        <linearGradient id="scannerGradient" x1="400" y1="400" x2="750" y2="50" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="rgba(59, 130, 246, 0.25)" />
+          <stop offset="100%" stopColor="rgba(59, 130, 246, 0)" />
+        </linearGradient>
+        <radialGradient id="centerGlow" cx="400" cy="400" r="150" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="rgba(59, 130, 246, 0.2)" />
+          <stop offset="100%" stopColor="rgba(59, 130, 246, 0)" />
+        </radialGradient>
+      </defs>
+      
+      {/* Scanner sweep - pie slice shape */}
+      <path 
+        d="M400,400 L400,0 A400,400 0 0,1 683,117 Z" 
+        fill="url(#scannerGradient)"
+        opacity="0.6"
+      />
+      
+      {/* Scanner line */}
+      <line 
+        x1="400" y1="400" x2="683" y2="117" 
+        stroke="rgba(59, 130, 246, 0.5)" 
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      
+      {/* Center glow */}
+      <circle cx="400" cy="400" r="150" fill="url(#centerGlow)" />
+      
+      {/* Center dot */}
+      <circle cx="400" cy="400" r="6" fill="rgba(59, 130, 246, 0.7)" />
+      <circle cx="400" cy="400" r="3" fill="rgba(59, 130, 246, 1)" />
+      
+      {/* Detection points on radar */}
+      <circle cx="480" cy="320" r="4" fill="rgba(34, 197, 94, 0.8)" />
+      <circle cx="480" cy="320" r="8" fill="rgba(34, 197, 94, 0.3)" />
+      
+      <circle cx="350" cy="280" r="3" fill="rgba(59, 130, 246, 0.6)" />
+      <circle cx="350" cy="280" r="6" fill="rgba(59, 130, 246, 0.2)" />
+      
+      <circle cx="520" cy="380" r="3" fill="rgba(139, 92, 246, 0.6)" />
+      <circle cx="520" cy="380" r="6" fill="rgba(139, 92, 246, 0.2)" />
+    </svg>
+    
+    {/* Additional ambient glow */}
+    <div 
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none"
+      style={{
+        background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.12) 0%, transparent 70%)',
+        filter: 'blur(50px)',
+      }}
+    />
+    
+    {/* Edge fade */}
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white dark:to-slate-900" />
+    
+    {/* Radial fade for edges */}
+    <div 
+      className="absolute inset-0"
+      style={{
+        background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 0%, var(--color-bg-primary) 100%)',
+      }}
+    />
+  </div>
+)
+
+// Animated Counter Hook
+const useAnimatedCounter = (end, duration = 2000, startOnView = true) => {
+  const [count, setCount] = useState(0)
+  const [hasStarted, setHasStarted] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!startOnView) {
+      setHasStarted(true)
+    }
+  }, [startOnView])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasStarted) {
+          setHasStarted(true)
+        }
+      },
+      { threshold: 0.5 }
+    )
+
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+
+    return () => observer.disconnect()
+  }, [hasStarted])
+
+  useEffect(() => {
+    if (!hasStarted) return
+
+    let startTime
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime
+      const progress = Math.min((currentTime - startTime) / duration, 1)
+      
+      // Easing function for smooth animation
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4)
+      setCount(Math.floor(easeOutQuart * end))
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+
+    requestAnimationFrame(animate)
+  }, [end, duration, hasStarted])
+
+  return { count, ref }
+}
+
+// Enhanced Stat Card Component
+const StatCard = ({ value, label, icon, suffix = '', prefix = '' }) => {
+  const numericValue = parseInt(value.replace(/[^0-9]/g, '')) || 0
+  const { count, ref } = useAnimatedCounter(numericValue, 1500)
+  
+  // Determine display value
+  const displayValue = value.includes('+') 
+    ? `${prefix}${count}+` 
+    : value.includes('%') 
+    ? `${count}%`
+    : value.includes('<')
+    ? `<${count}s`
+    : `${prefix}${count}${suffix}`
+
+  return (
+    <motion.div
+      ref={ref}
+      className="relative group"
+      whileHover={{ scale: 1.05, y: -2 }}
+      transition={{ type: 'spring', stiffness: 300 }}
+    >
+      <div className="relative px-6 py-4 bg-white/60 dark:bg-white/5 backdrop-blur-sm rounded-2xl border border-white/50 dark:border-white/10 shadow-lg shadow-black/5">
+        {/* Glow effect on hover */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/20 to-violet-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl" />
+        
+        <div className="text-center">
+          <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-blue-600 to-violet-600 bg-clip-text text-transparent">
+            {displayValue}
+          </div>
+          <div className="text-sm text-text-muted mt-1 font-medium">{label}</div>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
 
 function AIDetection() {
   const { t } = useTranslation()
@@ -52,19 +236,19 @@ function AIDetection() {
       quote: t('features.aiDetection.testimonials.education.quote', 'This tool has saved me countless hours checking student papers. The accuracy is impressive and the detailed indicators help me understand exactly what to look for.'),
       author: t('features.aiDetection.testimonials.education.author', 'Dr. Sarah Chen'),
       role: t('features.aiDetection.testimonials.education.role', 'University Professor'),
-      avatar: '👩‍🏫'
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face'
     },
     {
       quote: t('features.aiDetection.testimonials.business.quote', 'Essential for our content team. We use it to verify all incoming content before publication. The confidence scores give us peace of mind.'),
       author: t('features.aiDetection.testimonials.business.author', 'Michael Torres'),
       role: t('features.aiDetection.testimonials.business.role', 'Content Director, Tech Startup'),
-      avatar: '👨‍💼'
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
     },
     {
       quote: t('features.aiDetection.testimonials.freelance.quote', 'As a freelance editor, I need to ensure the content I receive is authentic. This tool is fast, accurate, and the privacy-first approach is exactly what I need.'),
       author: t('features.aiDetection.testimonials.freelance.author', 'Emma Williams'),
       role: t('features.aiDetection.testimonials.freelance.role', 'Freelance Editor'),
-      avatar: '✍️'
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face'
     }
   ]
 
@@ -130,96 +314,215 @@ function AIDetection() {
         }}
       />
 
-      <div className="pt-16">
-        <div className="max-w-content-lg mx-auto px-4 py-8">
-          <Breadcrumb
-            items={[
-              { label: t('nav.home'), href: '/' },
-              { label: t('nav.features'), href: '#' },
-              { label: t('nav.aiDetection') },
-            ]}
-          />
-
-          {/* Hero Section with Gradient Background */}
+      <div className="relative">
+        {/* Hero Section - Centered Professional Layout */}
+        <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-8 pb-16">
+          <HeroBackground />
+          
+          {/* Breadcrumb - Left aligned, outside main content */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-8 mb-12 relative"
+            transition={{ duration: 0.4 }}
+            className="absolute top-6 left-4 sm:left-6 lg:left-8 z-20"
           >
-            {/* Background Gradient */}
-            <div className="absolute -inset-4 bg-gradient-to-br from-primary/5 via-transparent to-purple-500/5 rounded-3xl -z-10" />
-            
-            {/* Trust Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full text-primary text-sm font-medium mb-4">
-              <Icon name="shield-check" size="sm" />
-              {t('features.aiDetection.badge', '98% Accuracy Rate')}
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-4">
-              {t('aiDetection.title')}
-            </h1>
-            <p className="text-xl text-text-secondary max-w-2xl mb-6">
-              {t('aiDetection.description')}
-            </p>
+            <Breadcrumb
+              items={[
+                { label: t('nav.home'), href: '/' },
+                { label: t('nav.features'), href: '#' },
+                { label: t('nav.aiDetection') },
+              ]}
+            />
+          </motion.div>
+          
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6 text-center relative z-10">
 
-            {/* Trust Statistics */}
-            <div className="flex flex-wrap items-center gap-4 md:gap-6 mb-6">
-              <div className="flex items-center gap-2 text-sm text-text-secondary">
-                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Icon name="cpu" size="sm" className="text-primary" />
-                </div>
-                <span>{t('features.aiDetection.stats.models', '15+ AI Models Detected')}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-text-secondary">
-                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Icon name="zap" size="sm" className="text-primary" />
-                </div>
-                <span>{t('features.aiDetection.stats.speed', '<2s Analysis Time')}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-text-secondary">
-                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Icon name="globe" size="sm" className="text-primary" />
-                </div>
-                <span>{t('features.aiDetection.stats.languages', '15+ Languages')}</span>
-              </div>
-            </div>
+            {/* Animated Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.5, type: 'spring' }}
+              className="mb-8"
+            >
+              <motion.span 
+                className="relative inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary/10 via-primary/15 to-violet-500/10 text-primary text-sm font-semibold rounded-full border border-primary/20 shadow-lg shadow-primary/10"
+                animate={{
+                  boxShadow: [
+                    '0 0 20px rgba(59, 130, 246, 0.1)',
+                    '0 0 30px rgba(59, 130, 246, 0.2)',
+                    '0 0 20px rgba(59, 130, 246, 0.1)',
+                  ],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              >
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+                </span>
+                {t('features.aiDetection.badge', '98% Accuracy Rate')}
+              </motion.span>
+            </motion.div>
+            
+            {/* Main Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary mb-6 leading-[1.1] tracking-tight"
+            >
+              {t('aiDetection.title', 'AI Detection')}
+            </motion.h1>
+            
+            {/* Subtitle with gradient */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8"
+            >
+              <span className="bg-gradient-to-r from-primary via-blue-500 to-violet-500 bg-clip-text text-transparent">
+                {t('features.aiDetection.heroHighlight', 'Precision & Confidence')}
+              </span>
+            </motion.p>
+            
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg md:text-xl text-text-secondary mb-10 leading-relaxed max-w-2xl mx-auto"
+            >
+              {t('aiDetection.description', 'Identify AI-generated content with precision and confidence. Trusted by educators, publishers, and businesses worldwide.')}
+            </motion.p>
 
-            {/* Primary CTAs */}
-            <div className="flex flex-wrap gap-3">
-              <a
+            {/* Enhanced Stats Row */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-10 max-w-2xl mx-auto"
+            >
+              <StatCard value="15+" label={t('features.aiDetection.stats.modelsShort', 'AI Models')} />
+              <StatCard value="<2s" label={t('features.aiDetection.stats.speedShort', 'Analysis')} />
+              <StatCard value="15+" label={t('features.aiDetection.stats.languagesShort', 'Languages')} />
+              <StatCard value="98%" label={t('features.aiDetection.stats.accuracy', 'Accuracy')} />
+            </motion.div>
+
+            {/* Enhanced CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
+            >
+              <motion.a
                 href="https://app.graphosai.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/25"
+                className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-blue-600 text-white rounded-xl font-semibold text-base overflow-hidden shadow-xl shadow-primary/30"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                {t('cta.getStartedFree', 'Get Started Free')}
-                <Icon name="arrow-right" size="sm" />
-              </a>
-              <a
+                {/* Shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative">{t('cta.getStartedFree', 'Get Started Free')}</span>
+                <Icon name="arrow-right" size="sm" className="icon-white relative group-hover:translate-x-1 transition-transform" />
+              </motion.a>
+              <motion.a
                 href="#demo"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-bg-secondary border border-gray-200 text-text-primary rounded-xl font-semibold hover:bg-bg-hover transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/80 dark:bg-white/10 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-text-primary rounded-xl font-semibold text-base hover:bg-white dark:hover:bg-white/20 transition-all shadow-lg"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <Icon name="play-circle" size="sm" />
                 {t('cta.tryDemo', 'Try Demo')}
-              </a>
-            </div>
-          </motion.div>
+              </motion.a>
+            </motion.div>
+            
+            {/* Enhanced Trust indicators */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="flex flex-wrap items-center justify-center gap-4 text-sm"
+            >
+              {[
+                { icon: 'credit-card', text: t('features.aiDetection.trust.noCard', 'No credit card required') },
+                { icon: 'zap', text: t('features.aiDetection.trust.instant', 'Instant results') },
+                { icon: 'shield', text: t('features.aiDetection.trust.privacy', 'Privacy first') },
+              ].map((item, i) => (
+                <motion.div 
+                  key={i}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 bg-bg-primary"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 + i * 0.1 }}
+                >
+                  <Icon name={item.icon} size="sm" color="gray-medium" />
+                  <span>{item.text}</span>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
 
-          {/* Live Demo Section */}
+          {/* Scroll Indicator */}
           <motion.div
-            id="demo"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mb-16 scroll-mt-24"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            className="absolute bottom-6 left-1/2 -translate-x-1/2"
           >
-            <div className="flex flex-wrap items-center gap-3 mb-4">
-              <span className="px-3 py-1.5 bg-success/10 text-success text-xs font-semibold rounded-full flex items-center gap-1.5">
+            <motion.a
+              href="#demo"
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="flex flex-col items-center gap-2 text-text-muted hover:text-primary transition-all cursor-pointer"
+            >
+              <span className="text-xs font-medium">{t('hero.scroll', 'Scroll to explore')}</span>
+              <div className="w-6 h-10 rounded-full border border-gray-300 dark:border-gray-600 flex items-start justify-center p-1.5">
+                <motion.div 
+                  animate={{ y: [0, 12, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className="w-1.5 h-1.5 bg-current rounded-full"
+                />
+              </div>
+            </motion.a>
+          </motion.div>
+        </section>
+
+        {/* Live Demo Section */}
+        <section className="py-20 lg:py-28 relative">
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
+            <motion.div
+              id="demo"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="scroll-mt-24"
+            >
+            {/* Section Header */}
+            <div className="text-center mb-10">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-success text-sm font-semibold rounded-full mb-4 border border-gray-200 shadow-sm"
+              >
                 <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
                 {t('demo.liveDemo', 'Live Demo')}
-              </span>
-              <span className="text-sm text-text-muted">{t('features.aiDetection.tryItNow', 'Try it now - no sign up required')}</span>
+              </motion.span>
+              <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                {t('features.aiDetection.demo.title', 'Try AI Detection Now')}
+              </h2>
+              <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+                {t('features.aiDetection.demo.subtitle', 'Experience our AI detection technology firsthand. No sign-up required.')}
+              </p>
             </div>
+            
             <Suspense fallback={
               <div className="h-[520px] bg-bg-secondary rounded-2xl border border-gray-200 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-3">
@@ -228,19 +531,31 @@ function AIDetection() {
                 </div>
               </div>
             }>
-              <RealAIDetectionDemo />
+              <LiveAIDetectionDemo />
             </Suspense>
-          </motion.div>
+            </motion.div>
+          </div>
+        </section>
 
-          {/* How It Works Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="mb-16"
-          >
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-3">
+        {/* How It Works Section - Enhanced */}
+        <section className="py-20 lg:py-28 relative overflow-hidden bg-bg-secondary">
+          {/* Background decoration */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/4 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl" />
+          </div>
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6 relative">
+            <div className="text-center mb-10">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-primary text-sm font-semibold rounded-full mb-4 border border-gray-200 shadow-sm"
+              >
+                <Icon name="shield-check" size="sm" className="icon-primary" />
+                {t('features.aiDetection.badge', '98% Accuracy Rate')}
+              </motion.span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
                 {t('features.aiDetection.howItWorks.title', 'How AI Detection Works')}
               </h2>
               <p className="text-text-secondary max-w-2xl mx-auto">
@@ -248,399 +563,1098 @@ function AIDetection() {
               </p>
             </div>
             
-            <div className="bg-gradient-to-br from-bg-secondary to-white rounded-2xl border border-gray-200 p-6 md:p-8">
-              <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-                {howItWorksSteps.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 + index * 0.1 }}
-                    className="text-center relative"
-                  >
-                    {/* Connector line */}
-                    {index < howItWorksSteps.length - 1 && (
-                      <div className="hidden md:block absolute top-8 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-primary/30 to-primary/10" />
-                    )}
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+              {/* Left: Steps with Timeline */}
+              <div className="relative">
+                {/* Vertical Timeline Line */}
+                <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-gradient-to-b from-blue-500 via-violet-500 to-emerald-500 rounded-full hidden md:block" />
+                
+                <div className="space-y-6">
+                  {howItWorksSteps.map((item, index) => {
+                    const colors = [
+                      { 
+                        gradient: 'from-blue-500 to-blue-600', 
+                        bg: 'bg-blue-500/10', 
+                        border: 'border-blue-500/20',
+                        filter: 'invert(42%) sepia(93%) saturate(1352%) hue-rotate(200deg) brightness(100%) contrast(97%)'
+                      },
+                      { 
+                        gradient: 'from-violet-500 to-purple-600', 
+                        bg: 'bg-violet-500/10', 
+                        border: 'border-violet-500/20',
+                        filter: 'invert(40%) sepia(96%) saturate(1847%) hue-rotate(238deg) brightness(100%) contrast(94%)'
+                      },
+                      { 
+                        gradient: 'from-emerald-500 to-teal-600', 
+                        bg: 'bg-emerald-500/10', 
+                        border: 'border-emerald-500/20',
+                        filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(95%) contrast(90%)'
+                      }
+                    ]
+                    const color = colors[index] || colors[0]
                     
-                    <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center relative">
-                      <Icon name={item.icon} size="xl" className="text-primary" />
-                      <span className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                        {item.step}
-                      </span>
-                    </div>
-                    <h3 className="font-semibold text-text-primary mb-2">{item.title}</h3>
-                    <p className="text-sm text-text-secondary">{item.desc}</p>
-                  </motion.div>
-                ))}
-              </div>
-              
-              {/* Result Preview */}
-              <div className="mt-8 p-4 md:p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
-                <div className="flex flex-col md:flex-row items-center gap-6">
-                  {/* Score Circle */}
-                  <div className="relative w-24 h-24 flex-shrink-0">
-                    <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                      <defs>
-                        <linearGradient id="aiDetectionGradientPreview" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#93c5fd" />
-                          <stop offset="50%" stopColor="#3b82f6" />
-                          <stop offset="100%" stopColor="#2563eb" />
-                        </linearGradient>
-                      </defs>
-                      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--color-border-light)" strokeWidth="8" />
-                      <circle cx="50" cy="50" r="42" fill="none" stroke="url(#aiDetectionGradientPreview)" strokeWidth="8" strokeLinecap="round" strokeDasharray="263.89" strokeDashoffset="66" />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-text-primary">75%</span>
-                    </div>
-                  </div>
-                  <div className="flex-1 text-center md:text-left">
-                    <div className="inline-flex items-center gap-2 py-2 px-3 bg-yellow-50 border border-yellow-200 rounded-lg text-xs font-semibold text-yellow-700 mb-2">
-                      <Icon name="alert-circle" size="sm" />
-                      <span>{t('features.aiDetection.sampleVerdict', 'Mixed content')}</span>
-                    </div>
-                    <p className="text-sm text-text-secondary">{t('features.aiDetection.sampleDesc', 'Sample result showing AI probability with confidence score and detailed human/AI indicators')}</p>
-                  </div>
+                    return (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: index * 0.15 }}
+                        className="relative flex gap-4 md:gap-5"
+                      >
+                        {/* Step Number Circle */}
+                        <div className="relative z-10 flex-shrink-0">
+                          <motion.div
+                            whileHover={{ scale: 1.1 }}
+                            className={`w-12 h-12 rounded-xl bg-gradient-to-br ${color.gradient} flex items-center justify-center shadow-lg`}
+                          >
+                            <span className="text-white font-bold text-lg">{item.step}</span>
+                          </motion.div>
+                        </div>
+
+                        {/* Step Content Card */}
+                        <motion.div
+                          whileHover={{ y: -2 }}
+                          className={`flex-1 bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900 rounded-xl p-4 md:p-5 border ${color.border} hover:shadow-lg transition-all duration-300`}
+                        >
+                          <div className={`w-10 h-10 rounded-lg ${color.bg} flex items-center justify-center mb-3`}>
+                            <Icon name={item.icon} size="md" style={{ filter: color.filter }} />
+                          </div>
+                          <h3 className="text-base md:text-lg font-bold text-text-primary mb-2">
+                            {item.title}
+                          </h3>
+                          <p className="text-sm text-text-secondary leading-relaxed">
+                            {item.desc}
+                          </p>
+                        </motion.div>
+                      </motion.div>
+                    )
+                  })}
                 </div>
               </div>
-            </div>
-          </motion.div>
 
-          {/* Benefits Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mb-16"
-          >
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-3">
-                {t('features.aiDetection.whyChoose', 'Why Choose Our AI Detection?')}
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              {benefits.map((benefit, index) => (
-                <motion.div 
-                  key={index} 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + index * 0.1 }}
-                  className="group p-6 bg-bg-secondary rounded-xl border border-gray-200 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
-                >
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Icon name={benefit.icon} size="lg" className="text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-text-primary mb-2">{benefit.title}</h3>
-                  <p className="text-text-secondary text-sm">{benefit.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Testimonials Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 }}
-            className="mb-16"
-          >
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-3">
-                {t('features.aiDetection.testimonials.title', 'Trusted by Professionals')}
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-              {testimonials.map((item, index) => (
+              {/* Right: Visual Demo */}
+              <div className="space-y-5">
+                {/* Analysis Layers Animation */}
                 <motion.div
-                  key={index}
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  className="p-6 bg-bg-secondary rounded-xl border border-gray-200"
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5"
                 >
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Icon key={i} name="star" size="sm" className="text-yellow-400 fill-yellow-400" />
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                      <Icon name="layers" size="sm" style={{ filter: 'invert(40%) sepia(96%) saturate(1847%) hue-rotate(238deg) brightness(100%) contrast(94%)' }} />
+                    </div>
+                    <h4 className="font-semibold text-text-primary text-sm">Multi-Layer Analysis</h4>
+                    <div className="ml-auto flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-xs text-emerald-500 font-medium">Processing</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      { label: 'Lexical Patterns', icon: 'type', active: true },
+                      { label: 'Semantic Analysis', icon: 'brain', active: false },
+                      { label: 'Structure Check', icon: 'layout', active: false },
+                      { label: 'Statistical Model', icon: 'activity', active: false }
+                    ].map((layer, idx) => (
+                      <motion.div
+                        key={layer.label}
+                        initial={{ opacity: 0.5 }}
+                        animate={{ opacity: idx === 0 ? 1 : 0.5 }}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all ${
+                          idx === 0
+                            ? 'bg-primary/10 border-primary/30'
+                            : 'bg-gray-50 dark:bg-slate-700/50 border-transparent'
+                        }`}
+                      >
+                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                          idx === 0 ? 'bg-primary/20' : 'bg-gray-200 dark:bg-gray-600'
+                        }`}>
+                          <Icon 
+                            name={layer.icon} 
+                            size="sm" 
+                            style={{ 
+                              filter: idx === 0 
+                                ? 'invert(42%) sepia(93%) saturate(1352%) hue-rotate(200deg) brightness(100%) contrast(97%)' 
+                                : 'brightness(0) saturate(100%) opacity(0.4)' 
+                            }} 
+                          />
+                        </div>
+                        <span className={`text-sm font-medium ${idx === 0 ? 'text-primary' : 'text-text-secondary'}`}>
+                          {layer.label}
+                        </span>
+                        {idx === 0 && (
+                          <div className="ml-auto w-2 h-2 rounded-full bg-primary animate-pulse" />
+                        )}
+                      </motion.div>
                     ))}
                   </div>
-                  <p className="text-text-secondary text-sm mb-4 italic">"{item.quote}"</p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-lg">
-                      {item.avatar}
+                </motion.div>
+
+                {/* Result Demo */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-lg"
+                >
+                  {/* Header */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                      <Icon name="shield-check" size="md" style={{ filter: 'invert(42%) sepia(93%) saturate(1352%) hue-rotate(200deg) brightness(100%) contrast(97%)' }} />
                     </div>
                     <div>
-                      <div className="font-semibold text-text-primary text-sm">{item.author}</div>
-                      <div className="text-text-muted text-xs">{item.role}</div>
+                      <h4 className="font-semibold text-text-primary text-sm">
+                        {t('demo.aiDetection', 'AI Detection')}
+                      </h4>
+                      <p className="text-xs text-text-tertiary">
+                        {t('features.aiDetection.sampleDesc', 'Sample result with confidence score')}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-5">
+                    {/* Circular Progress */}
+                    <div className="relative flex-shrink-0">
+                      <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#e5e7eb" strokeWidth="6" />
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="url(#progressGradientHIW)" strokeWidth="6" strokeLinecap="round" strokeDasharray="263.89" strokeDashoffset="66" />
+                        <defs>
+                          <linearGradient id="progressGradientHIW" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#93c5fd" />
+                            <stop offset="50%" stopColor="#60a5fa" />
+                            <stop offset="100%" stopColor="#3b82f6" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-2xl font-bold text-text-primary">75%</span>
+                        <span className="text-[10px] text-blue-400 uppercase tracking-wide font-medium">AI SCORE</span>
+                      </div>
+                    </div>
+
+                    {/* Result Details */}
+                    <div className="flex-1 min-w-0">
+                      {/* Verdict Badge */}
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50 dark:bg-orange-500/10 mb-4">
+                        <div className="w-2 h-2 rounded-full bg-orange-400" />
+                        <span className="text-xs font-semibold text-orange-500">
+                          {t('features.aiDetection.sampleVerdict', 'Mixed content')}
+                        </span>
+                      </div>
+
+                      {/* Indicators */}
+                      <div className="space-y-3">
+                        {/* Human Indicators */}
+                        <div className="flex items-center gap-3">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#d1fae5' }}>
+                            <Icon name="user" size="sm" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(95%) contrast(90%)' }} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="text-sm text-text-secondary">{t('demo.humanIndicators', 'Human Indicators')}</span>
+                              <span className="text-sm font-semibold text-green-500">4</span>
+                            </div>
+                            <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                              <div className="h-full w-[40%] rounded-full" style={{ backgroundColor: '#22c55e' }} />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* AI Indicators */}
+                        <div className="flex items-center gap-3">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#fce7f3' }}>
+                            <Icon name="bot" size="sm" style={{ filter: 'invert(56%) sepia(74%) saturate(1095%) hue-rotate(296deg) brightness(95%) contrast(96%)' }} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="text-sm text-text-secondary">{t('demo.aiIndicators', 'AI Indicators')}</span>
+                              <span className="text-sm font-semibold text-pink-500">6</span>
+                            </div>
+                            <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                              <div className="h-full w-[60%] rounded-full" style={{ backgroundColor: '#ec4899' }} />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Confidence */}
+                        <div className="flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+                          <Icon name="circle" size="xs" style={{ filter: 'brightness(0) saturate(100%) opacity(0.4)' }} />
+                          <span className="text-sm text-text-secondary">{t('demo.confidence', 'Confidence')}:</span>
+                          <span className="text-sm font-bold text-text-primary">High (92%)</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
-              ))}
+              </div>
             </div>
-          </motion.div>
+          </div>
+        </section>
 
-          {/* Use Cases Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mb-16"
-          >
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-3">
+        {/* Benefits Section - Why Choose Our AI Detection */}
+        <section className="py-20 lg:py-28 relative overflow-hidden">
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6 relative">
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/10 to-violet-500/10 text-primary text-sm font-semibold rounded-full mb-4 border border-primary/20 shadow-sm"
+              >
+                <Icon name="award" size="sm" className="icon-primary" />
+                {t('features.aiDetection.whyChooseBadge', 'Industry Leading')}
+              </motion.span>
+              <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                {t('features.aiDetection.whyChoose', 'Why Choose Our AI Detection?')}
+              </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto text-lg">
+                {t('features.aiDetection.whyChooseSubtitle', 'Trusted by thousands of professionals for accurate, fast, and private AI content detection')}
+              </p>
+            </div>
+
+            {/* Benefits Grid - Enhanced Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+              {benefits.map((benefit, index) => {
+                const cardStyles = [
+                  { 
+                    gradient: 'from-blue-500/10 via-blue-400/5 to-transparent',
+                    iconBg: 'from-blue-500 to-blue-600',
+                    borderHover: 'hover:border-blue-400/40',
+                    shadowHover: 'hover:shadow-blue-500/10',
+                    iconFilter: 'brightness(0) invert(1)'
+                  },
+                  { 
+                    gradient: 'from-amber-500/10 via-orange-400/5 to-transparent',
+                    iconBg: 'from-amber-500 to-orange-500',
+                    borderHover: 'hover:border-amber-400/40',
+                    shadowHover: 'hover:shadow-amber-500/10',
+                    iconFilter: 'brightness(0) invert(1)'
+                  },
+                  { 
+                    gradient: 'from-violet-500/10 via-purple-400/5 to-transparent',
+                    iconBg: 'from-violet-500 to-purple-600',
+                    borderHover: 'hover:border-violet-400/40',
+                    shadowHover: 'hover:shadow-violet-500/10',
+                    iconFilter: 'brightness(0) invert(1)'
+                  },
+                  { 
+                    gradient: 'from-emerald-500/10 via-teal-400/5 to-transparent',
+                    iconBg: 'from-emerald-500 to-teal-600',
+                    borderHover: 'hover:border-emerald-400/40',
+                    shadowHover: 'hover:shadow-emerald-500/10',
+                    iconFilter: 'brightness(0) invert(1)'
+                  }
+                ]
+                const style = cardStyles[index] || cardStyles[0]
+
+                return (
+                  <motion.div 
+                    key={index} 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1, duration: 0.5 }}
+                    whileHover={{ y: -4, scale: 1.01 }}
+                    className={`group relative p-6 md:p-7 bg-white dark:bg-slate-800/50 rounded-2xl border border-gray-200/80 dark:border-gray-700/50 ${style.borderHover} hover:shadow-xl ${style.shadowHover} transition-all duration-300 overflow-hidden`}
+                  >
+                    {/* Background Gradient Decoration */}
+                    <div className={`absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl ${style.gradient} rounded-full blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 -z-10`} />
+                    
+                    {/* Icon Container */}
+                    <div className="relative mb-5">
+                      <motion.div 
+                        whileHover={{ rotate: [0, -5, 5, 0], scale: 1.05 }}
+                        transition={{ duration: 0.4 }}
+                        className={`w-14 h-14 bg-gradient-to-br ${style.iconBg} rounded-xl flex items-center justify-center shadow-lg`}
+                      >
+                        <Icon name={benefit.icon} size="lg" style={{ filter: style.iconFilter }} />
+                      </motion.div>
+                      {/* Glow effect behind icon */}
+                      <div className={`absolute inset-0 w-14 h-14 bg-gradient-to-br ${style.iconBg} rounded-xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity`} />
+                    </div>
+
+                    {/* Content */}
+                    <h3 className="text-lg md:text-xl font-bold text-text-primary mb-2 group-hover:text-primary transition-colors">
+                      {benefit.title}
+                    </h3>
+                    <p className="text-text-secondary text-sm md:text-base leading-relaxed">
+                      {benefit.description}
+                    </p>
+
+                    {/* Decorative corner accent */}
+                    <div className="absolute bottom-0 right-0 w-20 h-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <svg viewBox="0 0 80 80" className="w-full h-full">
+                        <path d="M80 80 L80 60 Q80 80 60 80 Z" fill="currentColor" className="text-gray-100 dark:text-gray-700/50" />
+                      </svg>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+
+            {/* Bottom Stats Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="mt-10 p-6 bg-gradient-to-r from-primary/5 via-violet-500/5 to-primary/5 rounded-2xl border border-gray-200/50 dark:border-gray-700/30"
+            >
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                {[
+                  { value: '2M+', label: t('features.aiDetection.statsBar.scans', 'Scans Completed') },
+                  { value: '50K+', label: t('features.aiDetection.statsBar.users', 'Active Users') },
+                  { value: '99.9%', label: t('features.aiDetection.statsBar.uptime', 'Uptime') },
+                  { value: '4.9/5', label: t('features.aiDetection.statsBar.rating', 'User Rating') }
+                ].map((stat, idx) => (
+                  <div key={idx} className="text-center">
+                    <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-violet-600 bg-clip-text text-transparent">
+                      {stat.value}
+                    </div>
+                    <div className="text-sm text-text-muted mt-1">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Testimonials Section - Trusted by Professionals */}
+        <section className="py-20 lg:py-28 relative overflow-hidden bg-bg-secondary">
+          {/* Background decoration */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl" />
+          </div>
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6 relative">
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-600 dark:text-amber-400 text-sm font-semibold rounded-full mb-4 border border-amber-500/20 shadow-sm"
+              >
+                <Icon name="users" size="sm" style={{ filter: 'invert(65%) sepia(63%) saturate(588%) hue-rotate(360deg) brightness(101%) contrast(101%)' }} />
+                {t('features.aiDetection.testimonials.badge', 'Customer Stories')}
+              </motion.span>
+              <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                {t('features.aiDetection.testimonials.title', 'Trusted by Professionals')}
+              </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto text-lg">
+                {t('features.aiDetection.testimonials.subtitle', 'See what educators, businesses, and content creators say about our AI detection')}
+              </p>
+            </div>
+
+            {/* Testimonials Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {testimonials.map((item, index) => {
+                const cardColors = [
+                  { accent: 'from-blue-500 to-cyan-500', bg: 'from-blue-500/5 to-cyan-500/5', border: 'hover:border-blue-400/30' },
+                  { accent: 'from-violet-500 to-purple-500', bg: 'from-violet-500/5 to-purple-500/5', border: 'hover:border-violet-400/30' },
+                  { accent: 'from-emerald-500 to-teal-500', bg: 'from-emerald-500/5 to-teal-500/5', border: 'hover:border-emerald-400/30' }
+                ]
+                const colors = cardColors[index] || cardColors[0]
+
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.15, duration: 0.5 }}
+                    whileHover={{ y: -6 }}
+                    className={`group relative p-6 md:p-7 bg-white dark:bg-slate-800/50 rounded-2xl border border-gray-200/80 dark:border-gray-700/50 ${colors.border} hover:shadow-xl transition-all duration-300 overflow-hidden`}
+                  >
+                    {/* Background Gradient */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${colors.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                    
+                    {/* Quote Icon */}
+                    <div className="absolute top-4 right-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <svg className="w-12 h-12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                      </svg>
+                    </div>
+
+                    {/* Stars Rating - Filled Stars */}
+                    <div className="relative flex items-center gap-0.5 mb-5">
+                      {[...Array(5)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, scale: 0 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.3 + index * 0.1 + i * 0.05 }}
+                        >
+                          <svg className="w-5 h-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        </motion.div>
+                      ))}
+                      <span className="ml-2 text-xs font-semibold text-amber-500">5.0</span>
+                    </div>
+
+                    {/* Quote Text */}
+                    <p className="relative text-text-secondary text-sm md:text-base leading-relaxed mb-6">
+                      "{item.quote}"
+                    </p>
+
+                    {/* Author Info */}
+                    <div className="relative flex items-center gap-4 pt-5 border-t border-gray-100 dark:border-gray-700/50">
+                      {/* Avatar with gradient ring - Real Photo */}
+                      <div className="relative flex-shrink-0">
+                        <div className={`absolute -inset-1 bg-gradient-to-br ${colors.accent} rounded-full blur-sm opacity-60`} />
+                        <img 
+                          src={item.avatar} 
+                          alt={item.author}
+                          className="relative w-12 h-12 rounded-full object-cover ring-2 ring-white dark:ring-slate-800"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-text-primary truncate">{item.author}</div>
+                        <div className="text-text-muted text-sm truncate">{item.role}</div>
+                      </div>
+                      {/* Verified badge */}
+                      <div className="flex-shrink-0">
+                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center" title="Verified">
+                          <Icon name="check" size="xs" style={{ filter: 'brightness(0) invert(1)' }} />
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+
+            {/* Trust Logos / Social Proof */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+              className="mt-12 text-center"
+            >
+              <p className="text-sm text-text-muted mb-6">
+                {t('features.aiDetection.testimonials.trustedBy', 'Trusted by teams at leading organizations')}
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 opacity-50 grayscale hover:grayscale-0 hover:opacity-70 transition-all duration-500">
+                {['University', 'Enterprise', 'Media', 'Publishing'].map((org, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-text-muted">
+                    <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                      <Icon name={idx === 0 ? 'graduation-cap' : idx === 1 ? 'building' : idx === 2 ? 'tv' : 'book-open'} size="sm" />
+                    </div>
+                    <span className="text-sm font-medium">{org}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Use Cases Section - Enhanced */}
+        <section className="py-20 lg:py-28 relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/4 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 left-0 w-80 h-80 bg-teal-500/5 rounded-full blur-3xl" />
+          </div>
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6 relative">
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400 text-sm font-semibold rounded-full mb-4 border border-emerald-500/20 shadow-sm"
+              >
+                <Icon name="briefcase" size="sm" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(95%) contrast(90%)' }} />
+                {t('features.aiDetection.useCasesBadge', 'Real-World Applications')}
+              </motion.span>
+              <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
                 {t('features.aiDetection.useCasesTitle', 'Use Cases')}
               </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto text-lg">
+                {t('features.aiDetection.useCasesSubtitle', 'Discover how professionals across industries use our AI detection')}
+              </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              {useCases.map((useCase, index) => (
-                <motion.div 
-                  key={index}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  className="flex gap-4 p-5 bg-bg-secondary rounded-xl border border-gray-200 hover:border-primary/30 transition-colors"
-                >
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-blue-400 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
-                    <Icon name={useCase.icon} size="lg" className="text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-text-primary mb-1">{useCase.title}</h3>
-                    <p className="text-text-secondary text-sm">{useCase.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
 
-          {/* Comparison Table */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-            className="mb-16"
-          >
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-3">
+            {/* Use Cases Grid - Enhanced Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+              {useCases.map((useCase, index) => {
+                const cardStyles = [
+                  { 
+                    gradient: 'from-blue-500 to-indigo-600',
+                    bgGradient: 'from-blue-500/5 via-indigo-500/5 to-transparent',
+                    borderHover: 'hover:border-blue-400/40',
+                    stat: '10K+',
+                    statLabel: t('features.aiDetection.useCases.education.stat', 'Educators')
+                  },
+                  { 
+                    gradient: 'from-violet-500 to-purple-600',
+                    bgGradient: 'from-violet-500/5 via-purple-500/5 to-transparent',
+                    borderHover: 'hover:border-violet-400/40',
+                    stat: '500+',
+                    statLabel: t('features.aiDetection.useCases.business.stat', 'Companies')
+                  },
+                  { 
+                    gradient: 'from-amber-500 to-orange-600',
+                    bgGradient: 'from-amber-500/5 via-orange-500/5 to-transparent',
+                    borderHover: 'hover:border-amber-400/40',
+                    stat: '1M+',
+                    statLabel: t('features.aiDetection.useCases.publishing.stat', 'Articles Checked')
+                  },
+                  { 
+                    gradient: 'from-emerald-500 to-teal-600',
+                    bgGradient: 'from-emerald-500/5 via-teal-500/5 to-transparent',
+                    borderHover: 'hover:border-emerald-400/40',
+                    stat: '50K+',
+                    statLabel: t('features.aiDetection.useCases.hiring.stat', 'Applications Verified')
+                  }
+                ]
+                const style = cardStyles[index] || cardStyles[0]
+
+                return (
+                  <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1, duration: 0.5 }}
+                    whileHover={{ y: -4, scale: 1.01 }}
+                    className={`group relative p-6 md:p-7 bg-white dark:bg-slate-800/50 rounded-2xl border border-gray-200/80 dark:border-gray-700/50 ${style.borderHover} hover:shadow-xl transition-all duration-300 overflow-hidden`}
+                  >
+                    {/* Background Gradient */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${style.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                    
+                    {/* Decorative Pattern */}
+                    <div className="absolute top-0 right-0 w-32 h-32 opacity-5 group-hover:opacity-10 transition-opacity">
+                      <svg viewBox="0 0 100 100" className="w-full h-full">
+                        <pattern id={`pattern-${index}`} patternUnits="userSpaceOnUse" width="10" height="10">
+                          <circle cx="5" cy="5" r="1.5" fill="currentColor" />
+                        </pattern>
+                        <rect width="100" height="100" fill={`url(#pattern-${index})`} />
+                      </svg>
+                    </div>
+
+                    <div className="relative flex gap-5">
+                      {/* Icon Container */}
+                      <div className="flex-shrink-0">
+                        <motion.div 
+                          whileHover={{ rotate: [0, -5, 5, 0], scale: 1.05 }}
+                          transition={{ duration: 0.4 }}
+                          className={`w-14 h-14 bg-gradient-to-br ${style.gradient} rounded-xl flex items-center justify-center shadow-lg`}
+                        >
+                          <Icon name={useCase.icon} size="lg" style={{ filter: 'brightness(0) invert(1)' }} />
+                        </motion.div>
+                        {/* Glow effect */}
+                        <div className={`absolute top-6 left-6 w-14 h-14 bg-gradient-to-br ${style.gradient} rounded-xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity`} />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg md:text-xl font-bold text-text-primary mb-2 group-hover:text-primary transition-colors">
+                          {useCase.title}
+                        </h3>
+                        <p className="text-text-secondary text-sm md:text-base leading-relaxed mb-4">
+                          {useCase.description}
+                        </p>
+                        
+                        {/* Stats Badge */}
+                        <div className="flex items-center gap-3">
+                          <div className={`inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r ${style.bgGradient} rounded-full border border-gray-200/50 dark:border-gray-700/50`}>
+                            <span className={`text-sm font-bold bg-gradient-to-r ${style.gradient} bg-clip-text text-transparent`}>
+                              {style.stat}
+                            </span>
+                            <span className="text-xs text-text-muted">{style.statLabel}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Arrow indicator on hover */}
+                    <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                      <div className={`w-8 h-8 bg-gradient-to-br ${style.gradient} rounded-full flex items-center justify-center shadow-lg`}>
+                        <Icon name="arrow-right" size="sm" style={{ filter: 'brightness(0) invert(1)' }} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+
+            {/* Bottom CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+              className="mt-10 text-center"
+            >
+              <p className="text-text-secondary mb-4">
+                {t('features.aiDetection.useCasesCta', "Don't see your use case? We support many more industries.")}
+              </p>
+              <a
+                href="https://app.graphosai.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary/10 to-violet-500/10 text-primary font-semibold rounded-xl border border-primary/20 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300"
+              >
+                <Icon name="message-circle" size="sm" className="icon-primary" />
+                {t('features.aiDetection.contactUs', 'Contact Us for Custom Solutions')}
+                <Icon name="arrow-right" size="sm" className="icon-primary" />
+              </a>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Comparison Table - Enhanced */}
+        <section className="py-20 lg:py-28 relative overflow-hidden bg-bg-secondary">
+          {/* Background decoration */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-violet-500/5 rounded-full blur-3xl" />
+          </div>
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6 relative">
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/10 to-violet-500/10 text-primary text-sm font-semibold rounded-full mb-4 border border-primary/20 shadow-sm"
+              >
+                <Icon name="trophy" size="sm" className="icon-primary" />
+                {t('features.aiDetection.comparisonBadge', 'Why Choose Us')}
+              </motion.span>
+              <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
                 {t('features.aiDetection.comparisonTitle', 'How We Compare')}
               </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto text-lg mb-6">
+                {t('features.aiDetection.comparisonSubtitle', 'See why professionals choose Graphos AI over other detection tools')}
+              </p>
+              
+              {/* Win Counter Badge */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full border border-green-500/20"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                </svg>
+                <span className="text-sm font-bold">
+                  {t('features.aiDetection.comparisonWins', '7 key advantages over competitors')}
+                </span>
+              </motion.div>
             </div>
-            <div className="overflow-x-auto -mx-4 px-4">
-              <table className="w-full min-w-[500px] bg-bg-secondary rounded-xl border border-gray-200 overflow-hidden">
-                <thead>
-                  <tr className="bg-gradient-to-r from-primary/5 to-purple-500/5">
-                    <th className="text-left p-4 text-sm font-semibold text-text-primary">{t('features.aiDetection.comparison.feature', 'Feature')}</th>
-                    <th className="text-center p-4 text-sm font-semibold text-primary">
-                      <span className="inline-flex items-center gap-1">
-                        <Icon name="sparkles" size="sm" />
-                        Graphos AI
-                      </span>
-                    </th>
-                    <th className="text-center p-4 text-sm font-semibold text-text-muted">{t('features.aiDetection.comparison.others', 'Others')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonData.map((row, index) => (
-                    <tr key={index} className="border-t border-gray-200 hover:bg-bg-hover transition-colors">
-                      <td className="p-4 text-sm text-text-primary">{row.feature}</td>
-                      <td className="p-4 text-center text-sm font-semibold text-primary">{row.us}</td>
-                      <td className="p-4 text-center text-sm text-text-muted">{row.others}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
 
-          {/* Pricing Teaser */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="mb-16"
-          >
-            <div className="bg-gradient-to-br from-primary/5 via-bg-secondary to-purple-500/5 rounded-2xl border border-gray-200 p-6 md:p-8">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-3">
-                  {t('features.aiDetection.pricing.title', 'Simple, Transparent Pricing')}
-                </h2>
-                <p className="text-text-secondary">
-                  {t('features.aiDetection.pricing.subtitle', 'Start free, upgrade when you need more')}
-                </p>
+            {/* Comparison Table Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-white dark:bg-slate-800/50 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-xl"
+            >
+              {/* Table Header */}
+              <div className="grid grid-cols-3 bg-bg-secondary border-b border-gray-200 dark:border-gray-700">
+                <div className="p-4 md:p-5 text-sm font-semibold text-text-secondary flex items-center gap-2">
+                  <Icon name="list" size="sm" className="text-text-muted" />
+                  {t('features.aiDetection.comparison.feature', 'Feature')}
+                </div>
+                {/* Graphos column with highlight */}
+                <div className="p-4 md:p-5 text-center border-l border-gray-200 dark:border-gray-700 bg-gradient-to-b from-primary/10 to-primary/5">
+                  <div className="flex items-center justify-center gap-2">
+                    <img src="/logo.svg" alt="Graphos AI" className="w-7 h-7 rounded-lg shadow-sm" />
+                    <span className="font-bold text-primary text-lg">Graphos AI</span>
+                  </div>
+                  <span className="text-xs text-primary/70 mt-0.5 block">{t('features.aiDetection.comparison.ourSolution', 'Our Solution')}</span>
+                </div>
+                <div className="p-4 md:p-5 text-center border-l border-gray-200 dark:border-gray-700">
+                  <span className="text-text-secondary font-medium block">
+                    {t('features.aiDetection.comparison.others', 'Others')}
+                  </span>
+                  <span className="text-xs text-text-muted mt-0.5 block">{t('features.aiDetection.comparison.competitors', 'Competitors')}</span>
+                </div>
+              </div>
+
+              {/* Table Body */}
+              {comparisonData.map((row, index) => {
+                const isCheckmark = row.us === '✓'
+                const isOthersX = row.others === '✗'
+                
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.05 }}
+                    className={`grid grid-cols-3 group hover:bg-primary/5 transition-all duration-200 ${
+                      index !== comparisonData.length - 1 ? 'border-b border-gray-100 dark:border-gray-800' : ''
+                    }`}
+                  >
+                    {/* Feature Name */}
+                    <div className="py-4 px-4 md:px-5 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-bg-secondary flex items-center justify-center group-hover:bg-primary/10 transition-colors shrink-0">
+                        <Icon 
+                          name={index === 0 ? 'target' : index === 1 ? 'zap' : index === 2 ? 'cpu' : index === 3 ? 'bar-chart' : index === 4 ? 'users' : index === 5 ? 'shield' : 'globe'} 
+                          size="sm" 
+                          className="text-text-muted group-hover:text-primary transition-colors" 
+                        />
+                      </div>
+                      <span className="text-sm md:text-base font-medium text-text-primary group-hover:text-primary transition-colors">
+                        {row.feature}
+                      </span>
+                    </div>
+                    
+                    {/* Graphos Value */}
+                    <div className="py-4 px-4 md:px-5 flex items-center justify-center border-l border-gray-100 dark:border-gray-800 bg-gradient-to-b from-primary/[0.03] to-transparent">
+                      {isCheckmark ? (
+                        <motion.div 
+                          initial={{ scale: 0 }}
+                          whileInView={{ scale: 1 }}
+                          viewport={{ once: true }}
+                          className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-hover shadow-md shadow-primary/30 flex items-center justify-center"
+                        >
+                          <Icon name="check" size="sm" style={{ filter: 'brightness(0) invert(1)' }} />
+                        </motion.div>
+                      ) : (
+                        <span className="text-sm md:text-base font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full">
+                          {row.us}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Others Value */}
+                    <div className="py-4 px-4 md:px-5 flex items-center justify-center border-l border-gray-100 dark:border-gray-800">
+                      {isOthersX ? (
+                        <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                          <Icon name="x" size="sm" className="text-gray-400" />
+                        </div>
+                      ) : (
+                        <span className="text-sm md:text-base text-text-muted">
+                          {row.others}
+                        </span>
+                      )}
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+
+            {/* Bottom Social Proof */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-8 flex flex-col md:flex-row items-center justify-center gap-6"
+            >
+              <div className="inline-flex items-center gap-4 px-5 py-3 bg-bg-secondary/50 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="flex -space-x-2">
+                  <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&crop=face" alt="User" className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover" />
+                  <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt="User" className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover" />
+                  <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" alt="User" className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover" />
+                </div>
+                <span className="text-sm text-text-secondary">
+                  <span className="font-semibold text-text-primary">50K+</span> {t('features.aiDetection.comparison.usersCount', 'users trust us')}
+                </span>
               </div>
               
-              <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-                {/* Free Tier */}
-                <div className="p-6 bg-white rounded-xl border border-gray-200">
-                  <div className="text-sm font-semibold text-text-muted mb-2">{t('features.aiDetection.pricing.free', 'Free')}</div>
-                  <div className="text-3xl font-bold text-text-primary mb-4">$0</div>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-center gap-2 text-sm text-text-secondary">
-                      <Icon name="check" size="sm" className="text-green-500" />
-                      {t('features.aiDetection.pricing.freeFeature1', '5 detections/day')}
-                    </li>
-                    <li className="flex items-center gap-2 text-sm text-text-secondary">
-                      <Icon name="check" size="sm" className="text-green-500" />
-                      {t('features.aiDetection.pricing.freeFeature2', 'Basic indicators')}
-                    </li>
-                    <li className="flex items-center gap-2 text-sm text-text-secondary">
-                      <Icon name="check" size="sm" className="text-green-500" />
-                      {t('features.aiDetection.pricing.freeFeature3', 'Standard processing')}
-                    </li>
-                  </ul>
-                  <a
-                    href="https://app.graphosai.com/signup"
-                    className="block w-full py-2.5 text-center bg-bg-secondary border border-gray-200 text-text-primary rounded-xl font-medium hover:bg-bg-hover transition-colors"
-                  >
-                    {t('cta.getStarted', 'Get Started')}
-                  </a>
+              <div className="inline-flex items-center gap-2 px-5 py-3 bg-bg-secondary/50 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <svg key={i} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
                 </div>
-                
-                {/* Pro Tier */}
-                <div className="p-6 bg-gradient-to-br from-primary to-blue-600 rounded-xl text-white relative overflow-hidden">
-                  <div className="absolute top-3 right-3 px-2 py-1 bg-white/20 rounded-full text-xs font-semibold">
-                    {t('features.aiDetection.pricing.popular', 'Popular')}
-                  </div>
-                  <div className="text-sm font-semibold text-white/80 mb-2">{t('features.aiDetection.pricing.pro', 'Pro')}</div>
-                  <div className="text-3xl font-bold mb-4">$9<span className="text-lg font-normal text-white/70">/mo</span></div>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-center gap-2 text-sm">
-                      <Icon name="check" size="sm" className="text-white" />
-                      {t('features.aiDetection.pricing.proFeature1', 'Unlimited detections')}
-                    </li>
-                    <li className="flex items-center gap-2 text-sm">
-                      <Icon name="check" size="sm" className="text-white" />
-                      {t('features.aiDetection.pricing.proFeature2', 'Full evidence reports')}
-                    </li>
-                    <li className="flex items-center gap-2 text-sm">
-                      <Icon name="check" size="sm" className="text-white" />
-                      {t('features.aiDetection.pricing.proFeature3', 'API access')}
-                    </li>
-                    <li className="flex items-center gap-2 text-sm">
-                      <Icon name="check" size="sm" className="text-white" />
-                      {t('features.aiDetection.pricing.proFeature4', 'Priority processing')}
-                    </li>
-                  </ul>
-                  <a
-                    href="https://app.graphosai.com/signup?plan=pro"
-                    className="block w-full py-2.5 text-center bg-white text-primary rounded-xl font-semibold hover:bg-white/90 transition-colors"
-                  >
-                    {t('cta.startFreeTrial', 'Start Free Trial')}
-                  </a>
-                </div>
+                <span className="text-sm font-semibold text-text-primary">4.9/5</span>
+                <span className="text-sm text-text-muted">{t('features.aiDetection.comparison.rating', 'average rating')}</span>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
+        </section>
 
-          {/* FAQ Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55 }}
-            className="mb-16"
-          >
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-3">
+        {/* Pricing Section */}
+        <Suspense fallback={
+          <div className="h-[600px] flex items-center justify-center">
+            <div className="w-10 h-10 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+          </div>
+        }>
+          <PricingSection />
+        </Suspense>
+
+        {/* FAQ Section - Enhanced Design */}
+        <section className="py-20 lg:py-28 relative overflow-hidden bg-bg-secondary">
+          {/* Background decoration */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl" />
+          </div>
+
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 relative">
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-bg-primary text-primary text-sm font-semibold rounded-full mb-4 border border-gray-200 dark:border-gray-700 shadow-sm"
+              >
+                <Icon name="help-circle" size="sm" className="icon-primary" />
+                {t('features.aiDetection.faqBadge', 'FAQ')}
+              </motion.span>
+              <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
                 {t('features.aiDetection.faqTitle', 'Frequently Asked Questions')}
               </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto text-lg">
+                {t('features.aiDetection.faqSubtitle', 'Everything you need to know about our AI detection')}
+              </p>
             </div>
-            <div className="space-y-3 max-w-3xl mx-auto">
+
+            {/* FAQ List */}
+            <div className="space-y-3">
               {faqs.map((faq, index) => (
                 <motion.div 
                   key={index} 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.55 + index * 0.05 }}
-                  className="bg-bg-secondary rounded-xl border border-gray-200 overflow-hidden"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                  className={`group rounded-2xl border transition-all overflow-hidden ${
+                    openFaq === index 
+                      ? 'bg-bg-primary border-gray-200 dark:border-gray-700 shadow-md' 
+                      : 'bg-bg-primary border-gray-200 dark:border-gray-700 hover:border-gray-300 hover:shadow-sm'
+                  }`}
                 >
                   <button
                     onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                    className="w-full flex items-center justify-between p-4 text-left hover:bg-bg-hover transition-colors"
+                    className="w-full flex items-center justify-between p-5 text-left"
                   >
-                    <span className="font-medium text-text-primary pr-4">{faq.q}</span>
-                    <Icon 
-                      name={openFaq === index ? 'chevron-up' : 'chevron-down'} 
-                      size="md" 
-                      className="text-text-muted flex-shrink-0" 
-                    />
+                    <div className="flex items-center gap-4 pr-4">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                        openFaq === index ? 'bg-primary text-white' : 'bg-bg-secondary text-primary group-hover:bg-primary/10'
+                      }`}>
+                        <span className="text-sm font-bold">{String(index + 1).padStart(2, '0')}</span>
+                      </div>
+                      <span className={`text-base font-semibold transition-colors ${
+                        openFaq === index ? 'text-primary' : 'text-text-primary group-hover:text-primary'
+                      }`}>
+                        {faq.q}
+                      </span>
+                    </div>
+                    <motion.div
+                      animate={{ rotate: openFaq === index ? 180 : 0 }}
+                      transition={{ duration: 0.2, ease: 'easeInOut' }}
+                      className="flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                    >
+                      <Icon name="chevron-down" size="sm" className={openFaq === index ? 'text-primary' : 'text-text-muted'} />
+                    </motion.div>
                   </button>
+                  
                   {openFaq === index && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="px-4 pb-4"
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="overflow-hidden"
                     >
-                      <p className="text-text-secondary text-sm leading-relaxed">{faq.a}</p>
+                      <div className="px-5 pb-5 pl-[4.5rem]">
+                        <p className="text-text-secondary leading-relaxed">{faq.a}</p>
+                      </div>
                     </motion.div>
                   )}
                 </motion.div>
               ))}
             </div>
-          </motion.div>
 
-          {/* Final CTA Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="text-center py-12 md:py-16 bg-gradient-to-br from-primary/10 via-bg-secondary to-purple-500/10 rounded-2xl relative overflow-hidden"
-          >
-            {/* Background decoration */}
-            <div className="absolute inset-0 opacity-30">
-              <div className="absolute top-10 left-10 w-20 h-20 bg-primary/20 rounded-full blur-2xl" />
-              <div className="absolute bottom-10 right-10 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl" />
+            {/* Contact CTA Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-12 p-8 bg-bg-primary rounded-2xl border border-gray-200 dark:border-gray-700 text-center"
+            >
+              <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-xl flex items-center justify-center">
+                <Icon name="message-circle" size="xl" className="icon-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-text-primary mb-2">
+                {t('faq.stillHaveQuestions', "Still have questions?")}
+              </h3>
+              <p className="text-text-secondary mb-6 max-w-md mx-auto">
+                {t('faq.contactDescription', "Can't find what you're looking for? Our support team is here to help.")}
+              </p>
+              <motion.a
+                href="mailto:support@graphosai.com"
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-hover transition-all shadow-sm hover:shadow-md"
+              >
+                <Icon name="mail" size="sm" style={{ filter: 'brightness(0) invert(1)' }} />
+                {t('faq.contactSupport', 'Contact Support')}
+              </motion.a>
+            </motion.div>
+          </div>
+
+          {/* Final CTA - Inside same section */}
+          <div className="max-w-content-lg mx-auto px-4 sm:px-6 mt-20">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative rounded-[2rem] overflow-hidden"
+            >
+              {/* Solid Background */}
+              <div className="absolute inset-0 bg-primary" />
+            
+            {/* Wave SVG at bottom */}
+            <div className="absolute bottom-0 left-0 right-0">
+              <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+                <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="rgba(255,255,255,0.1)"/>
+                <path d="M0 120L60 115C120 110 240 100 360 95C480 90 600 90 720 92C840 94 960 98 1080 100C1200 102 1320 102 1380 102L1440 102V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="rgba(255,255,255,0.15)"/>
+              </svg>
             </div>
             
-            <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full text-primary text-sm font-medium mb-4">
-                <Icon name="sparkles" size="sm" />
-                {t('features.aiDetection.ctaBadge', 'Start detecting in seconds')}
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-4">
+            {/* Wave SVG at top */}
+            <div className="absolute top-0 left-0 right-0 rotate-180">
+              <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+                <path d="M0 80L48 74.7C96 69 192 59 288 53.3C384 48 480 48 576 53.3C672 59 768 69 864 69.3C960 69 1056 59 1152 53.3C1248 48 1344 48 1392 48L1440 48V80H1392C1344 80 1248 80 1152 80C1056 80 960 80 864 80C768 80 672 80 576 80C480 80 384 80 288 80C192 80 96 80 48 80H0Z" fill="rgba(255,255,255,0.08)"/>
+              </svg>
+            </div>
+
+            <div className="relative p-10 md:p-14 lg:p-20 text-center">
+              {/* Badge */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full mb-8 border border-white/[0.15]"
+              >
+                <motion.span 
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="w-2.5 h-2.5 bg-white rounded-full"
+                />
+                <span className="text-white/90 text-sm font-semibold">
+                  {t('features.aiDetection.ctaBadge', 'Start detecting in seconds')}
+                </span>
+                <Icon name="sparkles" size="sm" style={{ filter: 'brightness(0) invert(1)', opacity: 0.8 }} />
+              </motion.div>
+
+              {/* Headline */}
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight"
+              >
                 {t('features.aiDetection.ctaTitle', 'Ready to Detect AI Content?')}
-              </h2>
-              <p className="text-text-secondary mb-8 max-w-xl mx-auto">
+              </motion.h2>
+
+              {/* Description */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed"
+              >
                 {t('features.aiDetection.ctaDesc', 'Join thousands of professionals who trust Graphos AI for accurate content detection. Start free today.')}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
+              </motion.p>
+
+              {/* CTA Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
+              >
+                <motion.a
                   href="https://app.graphosai.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary text-white rounded-xl font-semibold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/25"
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary rounded-xl font-bold text-lg shadow-sm hover:shadow-lg transition-all"
                 >
-                  {t('cta.getStartedFree', 'Get Started Free')}
-                  <Icon name="arrow-right" size="sm" />
-                </a>
-                <a
-                  href="https://chromewebstore.google.com"
+                  <span>{t('cta.getStartedFree', 'Get Started Free')}</span>
+                  <Icon name="arrow-right" size="md" className="icon-primary group-hover:translate-x-0.5 transition-transform" />
+                </motion.a>
+                <motion.a
+                  href="https://chrome.google.com/webstore"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white border border-gray-200 text-text-primary rounded-xl font-semibold hover:bg-bg-hover transition-colors shadow-sm"
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-bold text-lg border border-white/[0.15] hover:bg-white/15 hover:border-white/[0.25] transition-all"
                 >
-                  <Icon name="chrome" size="md" />
-                  {t('features.aiDetection.chromeExtension', 'Chrome Extension')}
-                </a>
-              </div>
-              
+                  <Icon name="chrome" size="md" style={{ filter: 'brightness(0) invert(1)' }} />
+                  {t('cta.installExtension', 'Chrome Extension')}
+                </motion.a>
+              </motion.div>
+
               {/* Trust indicators */}
-              <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-text-muted">
-                <span className="flex items-center gap-1.5">
-                  <Icon name="check-circle" size="sm" className="text-green-500" />
-                  {t('features.aiDetection.trustIndicator1', 'No credit card required')}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Icon name="check-circle" size="sm" className="text-green-500" />
-                  {t('features.aiDetection.trustIndicator2', 'Setup in 30 seconds')}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Icon name="check-circle" size="sm" className="text-green-500" />
-                  {t('features.aiDetection.trustIndicator3', 'Cancel anytime')}
-                </span>
-              </div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+                className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-white/70"
+              >
+                {[
+                  { icon: 'gift', text: t('features.aiDetection.trustIndicator1', 'No credit card required') },
+                  { icon: 'clock', text: t('features.aiDetection.trustIndicator2', 'Setup in 30 seconds') },
+                  { icon: 'infinity', text: t('features.aiDetection.trustIndicator3', 'Credits never expire') }
+                ].map((item, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.6 + i * 0.1 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Icon name={item.icon} size="sm" style={{ filter: 'brightness(0) invert(1)', opacity: 0.8 }} />
+                    <span>{item.text}</span>
+                  </motion.div>
+                ))}
+              </motion.div>
             </div>
-          </motion.div>
-        </div>
+            </motion.div>
+          </div>
+
+          {/* Wave divider to Footer */}
+          <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+            <svg 
+              viewBox="0 0 1440 80" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-full h-auto block"
+              preserveAspectRatio="none"
+            >
+              <path 
+                d="M0 40C240 70 480 10 720 40C960 70 1200 10 1440 40V80H0V40Z" 
+                className="fill-slate-100"
+              />
+              <path 
+                d="M0 50C240 75 480 25 720 50C960 75 1200 25 1440 50V80H0V50Z" 
+                className="fill-slate-200"
+              />
+            </svg>
+          </div>
+        </section>
       </div>
     </>
   )

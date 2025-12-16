@@ -2,7 +2,7 @@
  * LiveWorkspaceDemo - Interactive AI Workspace demo
  * User can type anything, press Enter to see demo response
  */
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppFrame } from './DemoWrapper'
@@ -29,6 +29,17 @@ const LiveWorkspaceDemo = () => {
   const [isTyping, setIsTyping] = useState(false)
   const [streamedText, setStreamedText] = useState('')
   const textareaRef = useRef(null)
+  const chatContainerRef = useRef(null)
+
+  // Smooth scroll to bottom
+  const scrollToBottom = useCallback(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
+  }, [])
 
   const handleSend = async () => {
     const userMessage = inputValue.trim()
@@ -42,20 +53,33 @@ const LiveWorkspaceDemo = () => {
     // Add user message
     const userMsg = { id: Date.now(), role: 'user', content: userMessage }
     setMessages((prev) => [...prev, userMsg])
+    
+    // Scroll after user message
+    setTimeout(scrollToBottom, 100)
 
     // Wait a bit then start streaming AI response
-    await new Promise((r) => setTimeout(r, 800))
+    await new Promise((r) => setTimeout(r, 600))
 
-    // Stream the demo response
-    const words = DEMO_RESPONSE.split(' ')
-    const chunkSize = 4
+    // Stream the demo response character by character for smoother effect
     let currentText = ''
-
-    for (let i = 0; i < words.length; i += chunkSize) {
-      const chunk = words.slice(i, i + chunkSize).join(' ')
-      currentText += (i === 0 ? '' : ' ') + chunk
+    const chars = DEMO_RESPONSE.split('')
+    
+    for (let i = 0; i < chars.length; i++) {
+      currentText += chars[i]
       setStreamedText(currentText)
-      await new Promise((r) => setTimeout(r, 60))
+      
+      // Variable speed: faster for spaces, slower for punctuation
+      const char = chars[i]
+      let delay = 15 // base speed
+      if (char === ' ') delay = 8
+      else if (char === '\n') delay = 50
+      else if (['.', '!', '?'].includes(char)) delay = 80
+      else if ([',', ':'].includes(char)) delay = 40
+      
+      await new Promise((r) => setTimeout(r, delay))
+      
+      // Scroll periodically during streaming
+      if (i % 50 === 0) scrollToBottom()
     }
 
     // Finalize - add AI message
@@ -63,6 +87,7 @@ const LiveWorkspaceDemo = () => {
     setMessages((prev) => [...prev, aiMsg])
     setStreamedText('')
     setIsTyping(false)
+    scrollToBottom()
   }
 
   const handleKeyDown = (e) => {
@@ -84,11 +109,14 @@ const LiveWorkspaceDemo = () => {
   return (
     <AppFrame
       title="Graphos AI Studio - AI Workspace"
-      className="max-w-5xl mx-auto"
+      className="max-w-6xl mx-auto"
     >
-      <div className="flex flex-col min-h-[520px]">
-        {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto p-5 lg:p-6">
+      <div className="flex flex-col h-[600px]">
+        {/* Chat Area - Fixed height container */}
+        <div 
+          ref={chatContainerRef}
+          className="flex-1 overflow-y-auto p-6 lg:p-8 min-h-0"
+        >
           <AnimatePresence mode="wait">
             {messages.length === 0 && !streamedText ? (
               <motion.div
@@ -96,7 +124,7 @@ const LiveWorkspaceDemo = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="flex flex-col items-center justify-center h-full min-h-[380px] text-center"
+                className="flex flex-col items-center justify-center h-full text-center"
               >
                 <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
                   <Icon name="message-square" size="xl" className="text-gray-400" />
@@ -124,10 +152,11 @@ const LiveWorkspaceDemo = () => {
                     key={message.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
                     className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     {message.role === 'user' ? (
-                      <div className="max-w-[70%] py-3 px-4 bg-gray-100 rounded-2xl">
+                      <div className="max-w-[70%] py-3 px-4 bg-gray-100 border border-gray-200 rounded-2xl">
                         <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
                           {message.content}
                         </p>
@@ -163,16 +192,16 @@ const LiveWorkspaceDemo = () => {
 
                 {/* Streaming text */}
                 {streamedText && (
-                  <div className="w-full">
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="w-full"
+                  >
                     <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
                       {streamedText}
-                      <motion.span
-                        className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
-                        animate={{ opacity: [1, 0] }}
-                        transition={{ duration: 0.5, repeat: Infinity }}
-                      />
+                      <span className="inline-block w-0.5 h-4 bg-cyan-500 ml-0.5 align-middle animate-pulse" />
                     </p>
-                  </div>
+                  </motion.div>
                 )}
               </motion.div>
             )}
@@ -180,7 +209,7 @@ const LiveWorkspaceDemo = () => {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 lg:p-5">
+        <div className="p-5 lg:p-6">
           <div className="relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-sm">
             {/* Textarea */}
             <textarea

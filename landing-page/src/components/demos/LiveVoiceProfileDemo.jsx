@@ -93,11 +93,11 @@ const LiveVoiceProfileDemo = () => {
   return (
     <AppFrame
       title="Graphos AI Studio - Voice Profile"
-      className="max-w-5xl mx-auto"
+      className="max-w-6xl mx-auto"
     >
-      <div className="flex flex-col lg:flex-row min-h-[520px]">
+      <div className="flex flex-col lg:flex-row min-h-[600px]">
         {/* Profile Selector */}
-        <div className="w-full lg:w-64 p-5 lg:p-6 bg-gray-50/50">
+        <div className="w-full lg:w-72 p-6 lg:p-8 bg-gray-50/50">
           <h4 className="text-sm font-medium text-gray-800 mb-4">
             {t('demo.selectProfile', 'Select a Profile')}
           </h4>
@@ -145,7 +145,7 @@ const LiveVoiceProfileDemo = () => {
         </div>
 
         {/* Profile Details */}
-        <div className="flex-1 p-5 lg:p-6 bg-white">
+        <div className="flex-1 p-6 lg:p-8 bg-white">
           <AnimatePresence mode="wait">
             <motion.div
               key={`profile-${animationKey}`}
