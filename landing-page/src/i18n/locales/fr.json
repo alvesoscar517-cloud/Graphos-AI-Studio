@@ -1,68 +1,2629 @@
 {
-  "nav": {
-    "home": "Accueil",
-    "features": "Fonctionnalités",
-    "aiDetection": "Détection IA",
-    "humanization": "Humanisation",
-    "voiceProfile": "Profil Vocal",
-    "aiWorkspace": "Espace de Travail IA",
-    "privacy": "Politique de Confidentialité",
-    "terms": "Conditions d'Utilisation",
-    "legal": "Mentions Légales"
-  },
-  "cta": {
-    "getStarted": "Commencer",
-    "tryFree": "Essai Gratuit",
-    "learnMore": "En Savoir Plus",
-    "signUp": "S'inscrire"
-  },
-  "home": {
-    "meta": {
-      "title": "Graphos AI Studio - Écriture IA Authentique",
-      "description": "Écrivez du contenu authentique avec la détection IA, l'humanisation et les fonctionnalités de profil vocal."
-    },
-    "hero": {
-      "title": "Écrivez du Contenu Authentique avec l'IA",
-      "subtitle": "Détectez le texte généré par IA, humanisez le contenu et créez avec votre profil vocal unique."
-    },
-    "features": { "title": "Fonctionnalités Puissantes" },
-    "cta": {
-      "title": "Prêt à Écrire du Contenu Authentique ?",
-      "description": "Rejoignez des milliers d'écrivains qui utilisent Graphos AI Studio pour créer du contenu authentique et humain."
-    }
-  },
   "aiDetection": {
-    "meta": { "title": "Détection IA - Graphos AI Studio", "description": "Détectez le contenu généré par IA avec une haute précision." },
-    "title": "Détection IA",
-    "description": "Identifiez le contenu généré par IA avec précision et confiance."
-  },
-  "humanization": {
-    "meta": { "title": "Humanisation du Contenu - Graphos AI Studio", "description": "Transformez le texte généré par IA en contenu naturel et humain." },
-    "title": "Humanisation du Contenu",
-    "description": "Transformez le texte IA en écriture humaine naturelle et authentique."
-  },
-  "voiceProfile": {
-    "meta": { "title": "Profil Vocal - Graphos AI Studio", "description": "Créez votre profil vocal d'écriture unique." },
-    "title": "Profil Vocal",
-    "description": "Capturez votre style d'écriture unique et créez du contenu qui vous ressemble."
+    "description": "Identifiez le contenu généré par l'IA avec précision et confiance.",
+    "meta": {
+      "description": "Détectez le contenu généré par l'IA avec une grande précision. Identifiez ChatGPT, GPT-4 et d'autres outils de rédaction IA.",
+      "title": "Détection IA - Graphos AI Studio"
+    },
+    "title": "Détection IA"
   },
   "aiWorkspace": {
-    "meta": { "title": "Espace de Travail IA - Graphos AI Studio", "description": "Chattez avec l'IA en utilisant votre profil vocal." },
-    "title": "Espace de Travail IA",
-    "description": "Chattez avec l'IA dans votre style d'écriture unique."
+    "description": "Discutez avec l'IA dans votre style d'écriture unique.",
+    "meta": {
+      "description": "Discutez avec l'IA en utilisant votre profil vocal. Obtenez une assistance à la rédaction personnalisée.",
+      "title": "Espace de Travail IA - Graphos AI Studio"
+    },
+    "title": "Espace de Travail IA"
   },
-  "privacy": {
-    "meta": { "title": "Politique de Confidentialité - Graphos AI Studio", "description": "Découvrez comment nous protégeons vos données." },
-    "title": "Politique de Confidentialité",
-    "lastUpdated": "Dernière Mise à Jour"
+  "analysis": {
+    "aiDetection": "Détection IA",
+    "aiIndicators": "Indicateurs IA",
+    "confidence": "Confiance",
+    "content": "Analyse de Contenu",
+    "detect": "Détecter",
+    "detected": "Détecté",
+    "humanIndicators": "Indicateurs Humains"
   },
-  "terms": {
-    "meta": { "title": "Conditions d'Utilisation - Graphos AI Studio", "description": "Lisez nos conditions d'utilisation." },
-    "title": "Conditions d'Utilisation",
-    "lastUpdated": "Dernière Mise à Jour"
+  "brand": {
+    "aiStudio": "AI Studio",
+    "graphos": "Graphos",
+    "model": "Graphos Hyper",
+    "name": "Graphos AI Studio",
+    "shortName": "Graphos AI"
+  },
+  "chat": {
+    "actions": {
+      "docs": "Documentation",
+      "emailSupport": "Support par Email",
+      "faq": "Voir la FAQ"
+    },
+    "responseTime": "Répond généralement sous 2 heures",
+    "subtitle": "Nous sommes là pour vous aider",
+    "title": "Besoin d'aide ?"
+  },
+  "common": {
+    "detectionResults": "Résultats de Détection",
+    "failedToLoadImage": "Échec du chargement de l'image",
+    "imageLoadFailed": "Échec du chargement de l'image",
+    "loading": "Chargement...",
+    "onThisPage": "Sur cette page",
+    "step": "Étape",
+    "tableOfContents": "Table des Matières",
+    "viewDetails": "Voir les Détails",
+    "wordsAnalyzed": "Mots Analysés",
+    "reset": "Reset",
+    "clear": "Clear",
+    "analyze": "Analyze"
+  },
+  "comparison": {
+    "badge": "Pourquoi Nous Choisir",
+    "competitorNotes": {
+      "basicOnly": "Basique seulement",
+      "delayed": "Différé",
+      "generic": "Générique",
+      "languages23": "2-3 langues",
+      "limited": "Limité",
+      "monthlyOnly": "Mensuel seulement",
+      "monthlyReset": "Réinitialisation mensuelle",
+      "trialOnly": "Essai seulement"
+    },
+    "ctaText": "Vivez la différence par vous-même",
+    "feature": "Fonctionnalité",
+    "features": {
+      "aiDetection": "Détection de Contenu IA",
+      "aiRewrite": "Réécriture IA avec Votre Voix",
+      "aiWorkspace": "Chat IA avec Votre Voix",
+      "chromeExtension": "Extension Chrome",
+      "compatibilityScore": "Score de Compatibilité de Style",
+      "creditsExpire": "Les Crédits N'expirent Jamais",
+      "deviations": "Détection de Déviation de Style",
+      "freeTier": "Niveau Gratuit",
+      "humanization": "Humanisation de Contenu",
+      "multiLanguage": "Support Multilingue",
+      "payAsYouGo": "Tarification à l'Usage",
+      "realtimeAnalysis": "Analyse en Temps Réel",
+      "statistics": "Statistiques d'Écriture",
+      "voiceProfile": "Profil Vocal Personnel"
+    },
+    "graphosNotes": {
+      "accuracy98": "Précision de 98%",
+      "aiAnalyzed": "Analysé par IA",
+      "comprehensive": "Complet",
+      "detailedAnalysis": "Analyse détaillée",
+      "foreverYours": "À vous pour toujours",
+      "freeCredits100": "100 crédits",
+      "fullFeatures": "Fonctionnalités complètes",
+      "instant": "Instantané",
+      "languages15": "15 langues",
+      "noSubscription": "Sans abonnement",
+      "sentenceLevel": "Niveau phrase",
+      "voiceMatched": "Correspondance vocale"
+    },
+    "notes": {
+      "accuracy98": "Précision de 98%",
+      "aiAnalyzed": "Analysé par IA",
+      "basicOnly": "Basique seulement",
+      "comprehensive": "Complet",
+      "delayed": "Différé",
+      "detailedAnalysis": "Analyse détaillée",
+      "foreverYours": "À vous pour toujours",
+      "fullFeatures": "Fonctionnalités complètes",
+      "generic": "Générique",
+      "instant": "Instantané",
+      "languages15": "15 langues",
+      "languages23": "2-3 langues",
+      "limited": "Limité",
+      "monthlyOnly": "Mensuel seulement",
+      "monthlyReset": "Réinitialisation mensuelle",
+      "noSubscription": "Sans abonnement",
+      "sentenceLevel": "Niveau phrase",
+      "voiceMatched": "Correspondance vocale"
+    },
+    "others": "Autres Outils",
+    "competitors": "Concurrents",
+    "ourSolution": "Notre Solution",
+    "socialProof": {
+      "rating": "{{rating}}/5",
+      "writersCount": "{{count}}+ rédacteurs nous font confiance"
+    },
+    "subtitle": "Voyez comment Graphos AI Studio se compare aux autres outils d'écriture IA",
+    "title": "La Solution Complète d'Écriture IA",
+    "tooltips": {
+      "aiDetection": "Détectez le contenu généré par l'IA avec une précision de pointe",
+      "aiRewrite": "Transformez n'importe quel texte pour qu'il corresponde à votre style d'écriture unique",
+      "aiWorkspace": "Discutez avec une IA qui répond dans votre style d'écriture",
+      "chromeExtension": "Utilisez Graphos AI partout sur le web",
+      "compatibilityScore": "Vérifiez à quel point le texte correspond à votre style d'écriture",
+      "creditsExpire": "Vos crédits restent valides pour toujours",
+      "deviations": "Trouvez les phrases qui s'écartent de votre style d'écriture",
+      "freeTier": "Commencez avec des crédits gratuits, aucun paiement requis",
+      "humanization": "Transformez le texte IA pour qu'il corresponde à votre style d'écriture unique",
+      "multiLanguage": "Écrivez et humanisez du contenu dans plus de 15 langues",
+      "payAsYouGo": "Payez uniquement ce que vous utilisez, sans engagement mensuel",
+      "realtimeAnalysis": "Obtenez un retour instantané pendant que vous écrivez",
+      "statistics": "Analysez les métriques et modèles d'écriture",
+      "voiceProfile": "L'IA apprend et reproduit votre voix d'écriture unique"
+    },
+    "trustUs": "rédacteurs nous font confiance",
+    "winCount_one": "{{count}} avantage sur les concurrents",
+    "winCount_other": "{{count}} avantages sur les concurrents",
+    "writersCount": "{{count}}+ rédacteurs nous font confiance"
+  },
+  "compatibility": {
+    "meta": {
+      "description": "Analysez à quel point votre texte correspond à votre style d'écriture unique. Obtenez des scores de compatibilité détaillés, une analyse des déviations et des suggestions d'amélioration.",
+      "title": "Score de Compatibilité - Vérifiez la Correspondance de Votre Style | Graphos AI"
+    }
+  },
+  "compatibilityScore": {
+    "description": "Vérifiez la correspondance de votre style d'écriture avec une analyse détaillée.",
+    "meta": {
+      "description": "Analysez à quel point votre texte correspond à votre style d'écriture unique. Obtenez des scores de compatibilité détaillés, une analyse des déviations et des suggestions d'amélioration.",
+      "title": "Score de Compatibilité - Vérifiez la Correspondance de Votre Style | Graphos AI"
+    },
+    "title": "Score de Compatibilité"
+  },
+  "cta": {
+    "badge": "Commencez gratuitement aujourd'hui",
+    "getStarted": "Commencer",
+    "getStartedFree": "Commencer Gratuitement",
+    "installExtension": "Installer l'Extension",
+    "instant": "Accès instantané",
+    "learnMore": "En Savoir Plus",
+    "metrics": {
+      "languages": "Langues",
+      "rating": "Note Utilisateur",
+      "texts": "Textes Analysés",
+      "users": "Utilisateurs Actifs"
+    },
+    "noCard": "Pas de carte de crédit requise",
+    "privacy": "Confidentialité d'abord",
+    "seeItInAction": "Voir en Action",
+    "signUp": "S'inscrire",
+    "startFreeTrial": "Démarrer l'Essai Gratuit",
+    "trust": {
+      "free": "Plan gratuit à vie",
+      "noCard": "Pas de carte de crédit",
+      "setup": "Configuration en 2 minutes"
+    },
+    "trustedBy": "Approuvé par les écrivains et créateurs de contenu du monde entier",
+    "tryDemo": "Essayer la Démo",
+    "tryFree": "Essayer Gratuitement",
+    "watchDemo": "Voir la Démo"
+  },
+  "demo": {
+    "after": "Après",
+    "aiDetection": {
+      "result": "Résultat de Détection IA"
+    },
+    "aiIndicators": "Indicateurs IA",
+    "aiProbability": "Probabilité IA",
+    "aiText": "Texte IA",
+    "analyzing": "Analyse en cours...",
+    "analyzingDesc": "Vérification des modèles et indicateurs",
+    "analyzingProfile": "Analyse du style d'écriture...",
+    "before": "Avant",
+    "characters": "caractères",
+    "chars": "car.",
+    "clickDetect": "Sélectionnez un texte exemple, puis cliquez sur Détecter IA pour analyser",
+    "clickToTransform": "Cliquez sur transformer pour voir la magie",
+    "compatibility": {
+      "analyzeBtn": "Calculer le Score",
+      "analyzing": "Analyse du style d'écriture...",
+      "averageMatch": "Correspondance Moyenne",
+      "deviations": "Déviations",
+      "goodMatch": "Bonne Correspondance",
+      "lowMatch": "Faible Correspondance",
+      "notCompatible": "Non Compatible",
+      "statistical": "Statistique",
+      "subtitle": "Analysez la correspondance du texte avec votre style d'écriture",
+      "title": "Score de Compatibilité",
+      "vector": "Vecteur",
+      "veryCompatible": "Très Compatible",
+      "average": "Moyen"
+    },
+    "confidence": "Confiance",
+    "contentAnalysis": "Analyse de Contenu",
+    "contentHumanization": "Humanisation de Contenu",
+    "continueInApp": "Continuer dans l'App Complète",
+    "creativity": "Créativité",
+    "detect": "Détecter IA",
+    "deviations": {
+      "analyzing": "Analyse des phrases pour les déviations...",
+      "compatibility": "Compatibilité",
+      "deviant": "Déviant",
+      "findBtn": "Trouver les Déviations",
+      "majorStyleMismatch": "Inadéquation majeure de style",
+      "mild": "Léger",
+      "moderate": "Modéré",
+      "noticeableDifference": "Différence notable",
+      "rewrite": "Réécrire avec l'IA →",
+      "severe": "Sévère",
+      "smallVariation": "Petite variation",
+      "subtitle": "Trouvez les phrases qui s'écartent de votre style",
+      "suggestion": "Cette phrase diffère de votre style d'écriture typique. Envisagez de la réviser pour correspondre à votre voix.",
+      "tips": {
+        "focus": "Concentrez-vous d'abord sur les déviations sévères",
+        "hover": "Survolez les phrases surlignées pour les détails",
+        "rewrite": "Utilisez Réécriture IA pour corriger les problèmes"
+      },
+      "title": "Déviations"
+    },
+    "directness": "Franchise",
+    "empathy": "Empathie",
+    "enterAIText": "Entrez le texte généré par l'IA ici...",
+    "enterText": "Entrez ou collez votre texte ici pour analyser... (minimum 50 caractères)",
+    "enterTextDesc": "Entrez ou collez le texte, puis cliquez sur Détecter IA pour analyser",
+    "enterTextToAnalyze": "Entrez le texte à analyser",
+    "example": "Exemple",
+    "formality": "Formalité",
+    "humanIndicators": "Indicateurs Humains",
+    "humanText": "Texte Humain",
+    "humanize": "Humaniser le Contenu",
+    "humanizeContent": "Humaniser le Contenu",
+    "humanizeThis": "Rendre plus humain",
+    "humanized": "Humanisé",
+    "humanizedResult": "Résultat Humanisé",
+    "indicators": {
+      "ai": {
+        "consistentFormalTone": "Ton formel constant tout au long",
+        "formalSentenceStructures": "Structures de phrases formelles",
+        "lackOfPersonalExpressions": "Manque d'expressions personnelles",
+        "structuredParagraphFlow": "Flux de paragraphe structuré",
+        "technicalTerminology": "Terminologie technique détectée",
+        "technicalVocabulary": "Utilisation de vocabulaire technique"
+      },
+      "human": {
+        "emotionalExpressions": "Expressions émotionnelles présentes",
+        "informalExpressions": "Expressions informelles utilisées",
+        "informalLanguage": "Modèles de langage informel",
+        "personalAnecdotes": "Anecdotes personnelles présentes",
+        "personalPronouns": "Pronoms personnels détectés",
+        "variedSentenceStructure": "Structure de phrase variée"
+      }
+    },
+    "liveDemo": "Démo en Direct",
+    "minCharacters": "Minimum 50 caractères requis",
+    "mixedText": "Mixte",
+    "original": "Original - Généré par IA",
+    "overallTone": "Ton Global",
+    "pasteAIText": "Coller le texte généré par IA",
+    "processing": "Traitement...",
+    "profileInfo": "Les profils sont créés en analysant vos échantillons d'écriture",
+    "quickActions": "Actions Rapides",
+    "quickTip": "Conseil : Essayez les textes exemples pour voir comment différents types de contenu sont détectés",
+    "rateLimited": "Vous avez déjà essayé la démo. Inscrivez-vous pour un accès illimité !",
+    "readyToAnalyze": "Prêt à analyser",
+    "realApiCall": "API Réelle",
+    "redetect": "Redétecter",
+    "reset": "Réinitialiser",
+    "resultWillAppear": "Le texte humanisé apparaîtra ici",
+    "selectProfile": "Sélectionner un Profil",
+    "sentenceLength": "Longueur de Phrase",
+    "sentences": "phrases",
+    "sentencesAnalyzed": "Phrases",
+    "serverError": "Une erreur s'est produite. Veuillez réessayer.",
+    "sidebar": {
+      "analysis": "Analyse",
+      "confidence": "Confiance",
+      "humanization": "Humanisation",
+      "options": "Options",
+      "resultReliability": "Fiabilité du résultat",
+      "scoreGuide": "Guide des Scores",
+      "semanticMatching": "Correspondance sémantique",
+      "statistical": "Statistique",
+      "structureAnalysis": "Analyse de structure",
+      "vectorSimilarity": "Similitude Vectorielle",
+      "severityGuide": "Guide de Sévérité",
+      "tips": "Conseils",
+      "average": "Moyen"
+    },
+    "signUpFree": "Inscription Gratuite",
+    "signatureWords": "Mots Signatures",
+    "startConversation": "Démarrer une Conversation",
+    "statistics": {
+      "analyzeBtn": "Analyser le Texte",
+      "avgSentenceLength": "Phrase Moyenne",
+      "avgWordLength": "Longueur Moyenne Mot",
+      "benchmark": "Référence",
+      "benchmarkComparison": "Comparaison de référence",
+      "detailedMetrics": "Métriques Détaillées",
+      "metrics": {
+        "readability": {
+          "desc": "Score Flesch-Kincaid",
+          "label": "Lisibilité"
+        },
+        "sentenceLength": {
+          "desc": "Moyenne mots/phrase",
+          "label": "Longueur de Phrase"
+        },
+        "vocabulary": {
+          "desc": "Ratio mots uniques",
+          "label": "Vocabulaire"
+        },
+        "wordLength": {
+          "desc": "Moyenne caractères/mot",
+          "label": "Longueur de Mot"
+        }
+      },
+      "metricsGuide": "Guide des Métriques",
+      "punctuation": "Ponctuation",
+      "readability": "Lisibilité",
+      "readabilityLevels": {
+        "difficult": "Difficile",
+        "easy": "Facile",
+        "moderate": "Modéré",
+        "veryDifficult": "Très Difficile",
+        "veryEasy": "Très Facile"
+      },
+      "readabilityScale": "Échelle de Lisibilité",
+      "sentences": "Phrases",
+      "style": "style",
+      "subtitle": "Analysez les métriques et modèles d'écriture",
+      "title": "Statistiques de Texte",
+      "uniqueWordRatio": "Ratio de mots uniques",
+      "vocabulary": "Vocabulaire",
+      "words": "Mots"
+    },
+    "technicality": "Technicité",
+    "textTooLong": "Le texte doit faire moins de 2000 caractères",
+    "textTooShort": "Veuillez entrer au moins 50 caractères",
+    "transform": "Transformer",
+    "transformAIText": "Transformer le texte IA en écriture humaine",
+    "transformComplete": "Transformation terminée",
+    "transforming": "Transformation...",
+    "tryAgain": "Réessayer",
+    "tryFullVersion": "Try Full Version Free",
+    "trySample": "Essayer un exemple",
+    "tryYourOwn": "Essayez le Vôtre",
+    "typeMessage": "Tapez votre message...",
+    "unlimited": "Illimité",
+    "verdictAI": "Généré par IA",
+    "verdictHuman": "Écrit par un humain",
+    "verdictMixed": "Contenu mixte",
+    "verdictMostlyAI": "Majoritairement IA",
+    "verdictMostlyHuman": "Majoritairement humain",
+    "viewExamples": "Voir les Exemples",
+    "viewIndicators": "Voir les Indicateurs",
+    "voiceProfile": "Profil Vocal",
+    "words": "mots",
+    "wordsAnalyzed": "Mots",
+    "workspace": {
+      "modelName": "Graphos Hyper",
+      "askAnything": "Demandez n'importe quoi..."
+    },
+    "workspaceDescription": "Discutez avec une IA qui écrit avec votre voix unique. Essayez une action rapide ou tapez votre propre message.",
+    "workspaceDescriptionNew": "Tapez n'importe quoi et appuyez sur Entrée pour voir comment l'IA répond avec votre voix unique.",
+    "writingMetrics": "Métriques d'Écriture",
+    "writingTraits": "Traits d'Écriture",
+    "samples": {
+      "highMatch": "Haute Correspondance",
+      "mediumMatch": "Correspondance Moyenne",
+      "lowMatch": "Faible Correspondance",
+      "professional": "Professionnel",
+      "casual": "Décontracté",
+      "concise": "Concis",
+      "blogPost": "Article de Blog",
+      "academic": "Académique",
+      "fewDeviations": "Peu de Déviations",
+      "someDeviations": "Quelques Déviations",
+      "manyDeviations": "Nombreuses Déviations",
+      "formalText": "Texte Formel",
+      "technical": "Technique"
+    },
+    "options": {
+      "vocabulary": "Vocabulaire",
+      "keyFeatures": "Fonctionnalités Clés",
+      "sentenceStyle": "Style de Phrase",
+      "instructions": "Instructions",
+      "antiAI": "Anti-IA",
+      "iterative": "Itératif"
+    },
+    "tags": {
+      "new": "NOUVEAU",
+      "beta": "BÊTA"
+    },
+    "profile": {
+      "samples": "échantillons",
+      "tone": "ton"
+    },
+    "tryHumanization": "Try Humanization Demo",
+    "humanizationDesc": "See how AI-generated text transforms into natural, human-like writing.",
+    "originalAI": "Original (AI)",
+    "humanLike": "Human-like",
+    "aiGenerated": "AI-generated",
+    "exampleOf": "Example {{current}} of {{total}}",
+    "nextExample": "Next Example",
+    "humanizing": "Humanizing...",
+    "wantToHumanize": "Want to humanize your own content?",
+    "tryAIDetection": "Try AI Detection Demo",
+    "aiDetectionDesc": "Paste any text below to see a simulated AI detection analysis. This is a demo - for accurate results, use the full application.",
+    "pasteTextPlaceholder": "Paste your text here to analyze...",
+    "wantMoreAccurate": "Want more accurate results with detailed analysis?",
+    "traits": {
+      "conversational": "Conversational",
+      "empathetic": "Empathetic",
+      "clear": "Clear",
+      "engaging": "Engaging",
+      "playful": "Playful",
+      "creative": "Creative",
+      "informal": "Informal",
+      "storyteller": "Storyteller",
+      "analytical": "Analytical",
+      "precise": "Precise",
+      "structured": "Structured",
+      "evidenceBased": "Evidence-based"
+    },
+    "sentenceLengthMedium": "Medium (12-18 words)",
+    "sentenceLengthVaried": "Varied (8-25 words)",
+    "sentenceLengthLong": "Long (18-28 words)",
+    "voiceProfiles": {
+      "professional": "Professional Writer",
+      "casual": "Casual Blogger",
+      "academic": "Academic Style",
+      "personalBlog": "Personal Blog",
+      "creativeWriter": "Creative Writer"
+    },
+    "speed": {
+      "fast": "Fast",
+      "ultraFast": "Ultra Fast",
+      "quality": "Quality"
+    },
+    "tone": {
+      "conversational": "Conversational",
+      "formal": "Formal",
+      "expressive": "Expressive"
+    }
+  },
+  "deviations": {
+    "description": "Trouvez les incohérences de style dans votre écriture.",
+    "meta": {
+      "description": "Identifiez les phrases qui s'écartent de votre style d'écriture. Obtenez des niveaux de sévérité, des suggestions et corrigez les incohérences pour maintenir votre voix unique.",
+      "title": "Déviations - Trouvez les Incohérences de Style | Graphos AI"
+    },
+    "title": "Déviations"
+  },
+  "exitPopup": {
+    "cta": "Réclamer Mes Crédits Bonus",
+    "emailPlaceholder": "Entrez votre email",
+    "noSpam": "Pas de spam",
+    "noThanks": "Non merci, je paierai le prix fort",
+    "subtitle": "Abonnez-vous à notre newsletter et obtenez 50 crédits supplémentaires sur votre premier achat !",
+    "success": "Génial ! Vérifiez votre email pour le code bonus.",
+    "title": "Attendez ! Obtenez 50 Crédits Bonus",
+    "unsubscribe": "Se désabonner à tout moment"
+  },
+  "extension": {
+    "badge": "Extension Chrome",
+    "comingSoon": "BIENTÔT DISPONIBLE",
+    "comingSoonCta": "Bientôt Disponible",
+    "comingSoonNote": "Nous travaillons dur pour vous apporter ceci",
+    "features": {
+      "detect": {
+        "desc": "Sélectionnez n'importe quel texte sur le web et vérifiez instantanément s'il a été généré par l'IA.",
+        "title": "Détection IA Instantanée"
+      },
+      "humanize": {
+        "desc": "Transformez le texte IA en contenu naturel et humain, là où vous en avez besoin.",
+        "title": "Humanisation en Un Clic"
+      },
+      "workspace": {
+        "desc": "Discutez avec l'IA avec votre voix unique, directement depuis n'importe quelle page web.",
+        "title": "Espace de Travail IA"
+      },
+      "write": {
+        "desc": "Générez du contenu correspondant à votre style d'écriture unique directement dans n'importe quel champ de texte.",
+        "title": "Écrivez avec Votre Voix"
+      },
+      "writeInVoice": "Écrivez avec Votre Voix"
+    },
+    "popup": {
+      "apply": "Appliquer",
+      "more": "Plus"
+    },
+    "preview": "Aperçu",
+    "subtitle": "Notre extension Chrome apportera la détection et l'humanisation IA à chaque site web que vous visitez.",
+    "title": "Utilisez Graphos AI Partout",
+    "willWorkOn": "Fonctionnera parfaitement sur",
+    "worksOn": "Fonctionne sur",
+    "demo": {
+      "sampleText": "The implementation of artificial intelligence in modern systems represents a paradigm shift...",
+      "detect": {
+        "action": "Detecting AI content...",
+        "result": "87% AI Probability"
+      },
+      "humanize": {
+        "action": "Humanizing text...",
+        "result": "Text humanized!"
+      },
+      "write": {
+        "action": "Generating in your voice...",
+        "result": "Content ready!"
+      },
+      "workspace": {
+        "action": "Opening workspace...",
+        "result": "Ready to chat!"
+      }
+    }
+  },
+  "faq": {
+    "answers": {
+      "credits": "Les crédits sont notre monnaie de paiement à l'usage. Différentes fonctionnalités utilisent différentes quantités selon la longueur et la complexité du texte. La Détection IA utilise ~2-5 crédits, l'Humanisation ~2-8 crédits, la création de Profil Vocal ~8-25 crédits, et l'Espace de Travail IA ~1-3 crédits par message. Les crédits n'expirent jamais !",
+      "extension": "Notre extension Chrome vous permet d'utiliser Graphos AI partout sur le web. Sélectionnez du texte sur n'importe quel site web pour détecter le contenu IA, humaniser le texte ou générer du contenu avec votre voix. Elle s'intègre parfaitement avec Gmail, Google Docs, les réseaux sociaux, et plus encore.",
+      "freeTier": "Oui ! Chaque nouvel utilisateur reçoit 100 crédits gratuits pour essayer toutes les fonctionnalités. Aucune carte de crédit requise. De plus, votre premier achat bénéficie de 2x crédits bonus !",
+      "howDetection": "Notre détection IA atteint 98% de précision en analysant de multiples modèles linguistiques, y compris les modèles lexicaux, sémantiques, structurels et de contenu. Nous utilisons une analyse avancée multi-passes pour les cas incertains afin de garantir des résultats fiables.",
+      "humanization": "Notre moteur d'humanisation réécrit le texte généré par l'IA pour correspondre aux modèles d'écriture humaine naturels. Il utilise votre profil vocal pour maintenir votre style unique tout en supprimant les empreintes de l'IA comme les structures répétitives, les transitions formelles et le langage générique.",
+      "languages": "Graphos AI supporte 15 langues dont l'anglais, le vietnamien, le chinois, le japonais, le coréen, le thaï, l'indonésien, le malais, l'arabe, le français, l'allemand, l'espagnol, le portugais, l'italien et le russe. Chaque langue dispose de modèles de détection et d'humanisation optimisés.",
+      "privacy": "Absolument. Nous utilisons un chiffrement de niveau entreprise pour toutes les données. Vos échantillons d'écriture et profils vocaux sont stockés en toute sécurité et ne sont jamais partagés. Nous respectons le RGPD et d'autres réglementations de confidentialité. Vous pouvez supprimer vos données à tout moment.",
+      "refund": "Nous offrons une garantie de remboursement de 7 jours sur tous les achats de crédits. Si vous n'êtes pas satisfait, contactez notre équipe de support pour un remboursement complet. Les crédits non utilisés peuvent également être remboursés dans les 30 jours suivant l'achat.",
+      "voiceProfile": "Un Profil Vocal est une empreinte digitale unique de votre style d'écriture. En analysant vos échantillons d'écriture, nous capturons votre ton, vos préférences de vocabulaire, vos modèles de phrases et vos caractéristiques clés. Cela permet à l'IA de générer du contenu qui vous ressemble authentiquement.",
+      "whatIs": "Graphos AI Studio est un assistant d'écriture propulsé par l'IA qui vous aide à détecter le contenu généré par l'IA, humaniser votre écriture et créer du contenu authentique qui correspond à votre voix unique. Il inclut une application web et une extension Chrome pour une intégration fluide dans le flux de travail."
+    },
+    "badge": "FAQ",
+    "categories": {
+      "all": "Tout",
+      "features": "Fonctionnalités",
+      "general": "Général",
+      "pricing": "Tarification",
+      "security": "Sécurité"
+    },
+    "contactDescription": "Peut",
+    "contactSupport": "Contacter le Support",
+    "contactUs": "Contacter le Support",
+    "questions": {
+      "credits": "Comment fonctionnent les crédits ?",
+      "extension": "Comment fonctionne l'extension Chrome ?",
+      "freeTier": "Y a-t-il un plan gratuit ?",
+      "howDetection": "Quelle est la précision de la détection IA ?",
+      "humanization": "Comment fonctionne l'humanisation ?",
+      "languages": "Quelles langues sont supportées ?",
+      "privacy": "Mes données sont-elles sécurisées ?",
+      "refund": "Quelle est votre politique de remboursement ?",
+      "voiceProfile": "Qu'est-ce qu'un Profil Vocal ?",
+      "whatIs": "Qu'est-ce que Graphos AI Studio ?"
+    },
+    "stillHaveQuestions": "Encore des questions ?",
+    "subtitle": "Tout ce que vous devez savoir sur Graphos AI Studio",
+    "title": "Questions Fréquentes"
+  },
+  "features": {
+    "aiDetection": {
+      "badge": "Taux de Précision de 98%",
+      "benefits": {
+        "accuracy": {
+          "desc": "Des algorithmes avancés détectent le contenu généré par IA avec plus de 98% de précision",
+          "title": "Haute Précision"
+        },
+        "privacy": {
+          "desc": "Votre contenu n'est jamais stocké ni partagé",
+          "title": "Confidentialité d'Abord"
+        },
+        "reports": {
+          "desc": "Comprenez exactement quelles parties peuvent être générées par IA avec des scores de confiance",
+          "title": "Rapports Détaillés"
+        },
+        "speed": {
+          "desc": "Obtenez des résultats en secondes, pas en minutes",
+          "title": "Analyse Rapide"
+        }
+      },
+      "chromeExtension": "Extension Chrome",
+      "comparison": {
+        "accuracy": "Précision de Détection",
+        "competitors": "Concurrents",
+        "confidence": "Score de Confiance",
+        "feature": "Fonctionnalité",
+        "indicators": "Indicateurs Humains/IA",
+        "languages": "Support Multilingue",
+        "models": "Modèles IA Détectés",
+        "others": "Autres",
+        "ourSolution": "Notre Solution",
+        "privacy": "Pas de Stockage de Données",
+        "rating": "note moyenne",
+        "speed": "Vitesse d'Analyse",
+        "usersCount": "utilisateurs nous font confiance"
+      },
+      "comparisonBadge": "Pourquoi Nous Choisir",
+      "comparisonSubtitle": "Voyez pourquoi les professionnels choisissent Graphos AI par rapport aux autres outils de détection",
+      "comparisonTitle": "Comment Nous Comparer",
+      "comparisonWins": "7 avantages clés sur les concurrents",
+      "contactUs": "Contactez-nous pour des Solutions Personnalisées",
+      "contactUsShort": "Contactez-nous",
+      "ctaBadge": "Commencez à détecter en secondes",
+      "ctaDesc": "Rejoignez des milliers de professionnels qui font confiance à Graphos AI pour une détection de contenu précise. Commencez gratuitement aujourd'hui.",
+      "ctaTitle": "Prêt à Détecter du Contenu IA ?",
+      "demo": {
+        "subtitle": "Expérimentez notre technologie de détection IA par vous-même. Aucune inscription requise.",
+        "title": "Essayez la Détection IA Maintenant",
+        "highConfidence": "Élevée (92%)"
+      },
+      "faq": {
+        "a1": "Notre détection IA atteint une précision de plus de 98% sur la plupart des contenus générés par IA, y compris ChatGPT, GPT-4, Claude et d'autres modèles populaires. Nous mettons continuellement à jour nos algorithmes pour détecter les derniers modèles d'écriture IA.",
+        "a2": "Nous pouvons détecter du contenu provenant de ChatGPT, GPT-4, GPT-3.5, Claude, Gemini, Llama et la plupart des autres outils d'écriture IA populaires. Notre système est régulièrement mis à jour pour reconnaître les nouveaux modèles d'IA.",
+        "a3": "Non. Nous priorisons votre confidentialité. Votre texte est analysé en temps réel et n'est pas stocké sur nos serveurs. Nous ne partageons jamais votre contenu avec des tiers.",
+        "a4": "Pour une détection précise, nous recommandons au moins 50 caractères. Les textes plus longs (200+ mots) fournissent des résultats plus fiables car notre IA a plus de modèles à analyser.",
+        "a5": "Bien qu'aucun système de détection ne soit parfait à 100%, notre analyse multicouche rend le contournement très difficile. Nous analysons les modèles d'écriture, le vocabulaire, la structure des phrases et de nombreux autres facteurs simultanément.",
+        "a6": "Notre détection IA supporte plus de 15 langues, dont l'anglais, le vietnamien, l'espagnol, le français, l'allemand, et plus encore. Le système détecte automatiquement la langue et applique les modèles d'analyse appropriés.",
+        "a7": "Les utilisateurs gratuits obtiennent des détections limitées par jour avec des indicateurs basiques. Les utilisateurs Premium bénéficient de détections illimitées, de rapports de preuves complets, d'un accès API et d'un traitement prioritaire.",
+        "q1": "Quelle est la précision de la détection IA ?",
+        "q2": "Quels types de contenu IA pouvez-vous détecter ?",
+        "q3": "Mon contenu est-il stocké ou partagé ?",
+        "q4": "Quelle est la longueur de texte minimale requise ?",
+        "q5": "La détection IA peut-elle être trompée ?",
+        "q6": "Comment gérez-vous les différentes langues ?",
+        "q7": "Quelle est la différence entre gratuit et premium ?"
+      },
+      "faqBadge": "FAQ",
+      "faqSubtitle": "Tout ce que vous devez savoir sur notre détection IA",
+      "faqTitle": "Questions Fréquentes",
+      "heroHighlight": "Précision & Confiance",
+      "howItWorks": {
+        "step1": {
+          "desc": "Entrez ou collez le contenu que vous souhaitez analyser (minimum 50 caractères)",
+          "title": "Collez Votre Texte"
+        },
+        "step2": {
+          "desc": "Notre IA analyse les modèles, le vocabulaire, la structure des phrases et le style d'écriture",
+          "title": "Analyse Multicouche"
+        },
+        "step3": {
+          "desc": "Recevez un score de probabilité IA, un niveau de confiance et des indicateurs humains/IA",
+          "title": "Obtenez des Résultats Détaillés"
+        },
+        "subtitle": "Notre analyse multicouche garantit une détection précise en quelques secondes",
+        "title": "Comment Fonctionne la Détection IA"
+      },
+      "pricing": {
+        "free": "Gratuit",
+        "freeFeature1": "5 détections/jour",
+        "freeFeature2": "Indicateurs basiques",
+        "freeFeature3": "Traitement standard",
+        "popular": "Populaire",
+        "pro": "Pro",
+        "proFeature1": "Détections illimitées",
+        "proFeature2": "Rapports de preuves complets",
+        "proFeature3": "Accès API",
+        "proFeature4": "Traitement prioritaire",
+        "subtitle": "Commencez gratuitement, mettez à niveau quand vous avez besoin de plus",
+        "title": "Tarification Simple et Transparente"
+      },
+      "sampleDesc": "Exemple de résultat montrant la probabilité IA avec score de confiance et indicateurs détaillés",
+      "sampleVerdict": "Contenu mixte",
+      "stats": {
+        "accuracy": "Précision",
+        "languages": "15+ Langues",
+        "languagesShort": "Langues",
+        "models": "15+ Modèles IA Détectés",
+        "modelsShort": "Modèles IA",
+        "privacy": "Texte Non Stocké",
+        "speed": "<2s Temps d'Analyse",
+        "speedShort": "Analyse"
+      },
+      "statsBar": {
+        "rating": "Note Utilisateur",
+        "scans": "Analyses Terminées",
+        "uptime": "Temps de Disponibilité",
+        "users": "Utilisateurs Actifs"
+      },
+      "testimonials": {
+        "badge": "Histoires Clients",
+        "business": {
+          "author": "Michael Torres",
+          "quote": "Essentiel pour notre équipe de contenu. Nous l'utilisons pour vérifier tout le contenu entrant avant la publication. Les scores de confiance nous donnent la tranquillité d'esprit.",
+          "role": "Directeur de Contenu, Startup Tech"
+        },
+        "education": {
+          "author": "Dr. Sarah Chen",
+          "quote": "Cet outil m'a fait gagner d'innombrables heures à vérifier les copies des étudiants. La précision est impressionnante et les indicateurs détaillés m'aident à comprendre exactement quoi chercher.",
+          "role": "Professeur d'Université"
+        },
+        "freelance": {
+          "author": "Emma Williams",
+          "quote": "En tant qu'éditrice freelance, je dois m'assurer que le contenu que je reçois est authentique. Cet outil est rapide, précis, et l'approche axée sur la confidentialité est exactement ce dont j'ai besoin.",
+          "role": "Éditrice Freelance"
+        },
+        "subtitle": "Voyez ce que les éducateurs, les entreprises et les créateurs de contenu disent de notre détection IA",
+        "title": "Approuvé par les Professionnels",
+        "trustedBy": "Approuvé par les équipes des organisations leaders"
+      },
+      "trust": {
+        "instant": "Résultats instantanés",
+        "noCard": "Pas de carte de crédit requise",
+        "privacy": "Confidentialité d'abord"
+      },
+      "trustIndicator1": "Pas de carte de crédit requise",
+      "trustIndicator2": "Configuration en 30 secondes",
+      "trustIndicator3": "Annulez à tout moment",
+      "tryItNow": "Essayez-le maintenant - sans inscription",
+      "useCases": {
+        "business": {
+          "desc": "Assurez l'authenticité du contenu en marketing, RP et communications d'entreprise",
+          "stat": "Entreprises",
+          "title": "Affaires"
+        },
+        "education": {
+          "desc": "Les enseignants et professeurs peuvent vérifier les soumissions des étudiants pour l'intégrité académique",
+          "stat": "Éducateurs",
+          "title": "Éducation"
+        },
+        "hiring": {
+          "desc": "Les équipes RH peuvent vérifier l'authenticité des lettres de motivation et des échantillons d'écriture",
+          "stat": "Candidatures Vérifiées",
+          "title": "Recrutement"
+        },
+        "publishing": {
+          "desc": "Les éditeurs et publicateurs peuvent vérifier l'authenticité du contenu avant publication",
+          "stat": "Articles Vérifiés",
+          "title": "Édition"
+        }
+      },
+      "useCasesBadge": "Applications Réelles",
+      "useCasesCta": "Don",
+      "useCasesSubtitle": "Découvrez comment les professionnels de tous les secteurs utilisent notre détection IA",
+      "useCasesTitle": "Cas d'Usage",
+      "whyChoose": "Pourquoi Choisir Notre Détection IA ?",
+      "whyChooseBadge": "Leader de l'Industrie",
+      "whyChooseSubtitle": "Approuvé par des milliers de professionnels pour une détection de contenu IA précise, rapide et privée"
+    },
+    "aiWorkspace": {
+      "actions": {
+        "blog": {
+          "desc": "Créez du contenu de blog engageant",
+          "label": "Article de Blog"
+        },
+        "email": {
+          "desc": "Rédigez des emails professionnels avec votre voix",
+          "label": "Écrire un Email"
+        },
+        "proposal": {
+          "desc": "Rédigez des propositions convaincantes",
+          "label": "Proposition Commerciale"
+        },
+        "reply": {
+          "desc": "Générez des réponses réfléchies",
+          "label": "Réponse Rapide"
+        },
+        "rewrite": {
+          "desc": "Améliorez le contenu existant",
+          "label": "Réécrire"
+        },
+        "social": {
+          "desc": "Créez des posts qui résonnent",
+          "label": "Réseaux Sociaux"
+        }
+      },
+      "badge": "L'IA Qui Écrit Comme Vous",
+      "benefits": {
+        "context": {
+          "desc": "L'IA se souvient de vos préférences et de l'historique de conversation",
+          "title": "Conscient du Contexte"
+        },
+        "natural": {
+          "desc": "Discutez avec une IA qui comprend votre style et vos préférences",
+          "title": "Conversations Naturelles"
+        },
+        "quick": {
+          "desc": "Modèles en un clic pour les tâches d'écriture courantes",
+          "title": "Actions Rapides"
+        },
+        "voice": {
+          "desc": "Toutes les sorties correspondent automatiquement à votre profil d'écriture unique",
+          "title": "Votre Voix"
+        }
+      },
+      "benefitsBadge": "Avantages Clés",
+      "chatExample": {
+        "ai": "Salut,\n\nMerci beaucoup d'avoir pensé à moi pour la réunion de mardi prochain ! J'apprécie vraiment l'invitation.\n\nMalheureusement, j'ai un conflit ce jour-là – mon calendrier est rempli d'engagements consécutifs que je ne peux pas déplacer. Serait-il possible de se rattraper une autre fois ?\n\nFais-moi savoir ce qui te convient !\n\nBien à toi,\n[Votre nom]",
+        "user": "Aide-moi à écrire un email professionnel pour décliner une invitation à une réunion"
+      },
+      "comparison": {
+        "competitors": "Concurrents",
+        "context": "Mémoire de Contexte",
+        "export": "Options d'Export",
+        "feature": "Fonctionnalité",
+        "history": "Historique de Conversation",
+        "humanize": "Détection Anti-IA",
+        "languages": "Langues",
+        "limited": "Limité",
+        "multimodal": "Compréhension d'Image",
+        "others": "Autres",
+        "ourSolution": "Notre Solution",
+        "quickActions": "Modèles d'Action Rapide",
+        "voiceMatch": "Intégration de Profil Vocal"
+      },
+      "comparisonBadge": "Pourquoi Nous Choisir",
+      "comparisonDesc": "Voyez pourquoi Graphos AI Workspace se démarque de la concurrence",
+      "comparisonTitle": "Comment Nous Comparer",
+      "comparisonWins": "8 avantages clés sur les concurrents",
+      "ctaBadge": "Commencez à écrire avec votre voix",
+      "ctaDesc": "Discutez avec l'IA dans votre style d'écriture unique.",
+      "ctaTitle": "Commencer à Utiliser l'Espace de Travail IA",
+      "demo": {
+        "subtitle": "Expérimentez l'assistance à l'écriture par IA personnalisée. Aucune inscription requise.",
+        "title": "Essayez l'Espace de Travail IA Maintenant"
+      },
+      "faq": {
+        "a1": "Lorsque vous discutez avec l'Espace de Travail IA, il applique automatiquement votre profil vocal à tout le contenu généré. Cela signifie que chaque email, post ou article sonnera comme si vous l'aviez écrit.",
+        "a2": "Oui ! Vous pouvez utiliser l'Espace de Travail IA sans profil vocal, et il générera du contenu dans un ton neutre et professionnel. Cependant, la création d'un profil vocal améliore considérablement la personnalisation.",
+        "a3": "L'Espace de Travail IA peut aider avec les emails, articles de blog, contenu de réseaux sociaux, propositions commerciales, descriptions de produits, textes marketing, et bien plus encore. Utilisez les actions rapides ou décrivez ce dont vous avez besoin.",
+        "a4": "Votre historique de conversation est sauvegardé localement et peut être consulté d'une session à l'autre. Vous pouvez l'effacer à tout moment depuis les paramètres. Nous priorisons votre confidentialité.",
+        "a5": "Absolument ! Tout le contenu généré est entièrement éditable. Vous pouvez affiner, développer ou demander à l'IA de régénérer avec différents paramètres.",
+        "a6": "L'Espace de Travail IA utilise des modèles Gemini avancés, y compris Gemini 2.5 Flash pour des réponses rapides et Gemini 2.5 Pro pour des tâches complexes. Vous pouvez changer de modèle selon vos besoins.",
+        "a7": "Les crédits sont calculés en fonction des jetons d'entrée et de sortie. Les conversations plus courtes coûtent moins cher. Vous pouvez voir le coût en crédits pour chaque message en temps réel.",
+        "q1": "Comment l'Espace de Travail IA utilise-t-il mon profil vocal ?",
+        "q2": "Puis-je l'utiliser sans profil vocal ?",
+        "q3": "Quels types de contenu puis-je créer ?",
+        "q4": "Mon historique de conversation est-il sauvegardé ?",
+        "q5": "Puis-je éditer le contenu généré ?",
+        "q6": "Quels modèles d'IA sont disponibles ?",
+        "q7": "Combien de crédits cela coûte-t-il ?"
+      },
+      "faqBadge": "FAQ",
+      "faqDesc": "Tout ce que vous devez savoir sur l'Espace de Travail IA",
+      "faqTitle": "Questions Fréquentes",
+      "howItWorks": {
+        "step1": {
+          "desc": "Tapez votre demande ou utilisez un modèle d'action rapide",
+          "title": "Démarrer une Conversation"
+        },
+        "step2": {
+          "desc": "Notre IA crée du contenu adapté à votre profil vocal",
+          "title": "L'IA Génère une Réponse"
+        },
+        "step3": {
+          "desc": "Éditez, régénérez ou demandez des ajustements",
+          "title": "Revoir & Affiner"
+        }
+      },
+      "howItWorksBadge": "Processus Simple",
+      "howItWorksDesc": "Obtenez des réponses IA personnalisées en trois étapes simples",
+      "howItWorksTitle": "Comment Fonctionne l'Espace de Travail IA",
+      "moreActions": "+ 20 modèles supplémentaires disponibles dans l'app",
+      "quickActionsBadge": "Modèles en Un Clic",
+      "quickActionsDesc": "Commencez à écrire instantanément avec des modèles préconçus pour les tâches courantes",
+      "quickActionsTitle": "Actions Rapides",
+      "stats": {
+        "faster": "Plus Rapide",
+        "languages": "Langues",
+        "templates": "Modèles",
+        "voiceMatch": "Correspondance Vocale"
+      },
+      "testimonials": {
+        "entrepreneur": {
+          "author": "Emma Williams",
+          "quote": "En tant que locutrice non native de l'anglais, l'Espace de Travail IA m'aide à communiquer professionnellement tout en gardant ma voix authentique. Ça change tout !",
+          "role": "Entrepreneure"
+        },
+        "marketer": {
+          "author": "Michael Torres",
+          "quote": "Les actions rapides me font gagner des heures chaque semaine. Je peux rédiger des posts sociaux, des emails et des intros de blog en quelques minutes au lieu d'heures.",
+          "role": "Responsable Marketing"
+        },
+        "writer": {
+          "author": "Sarah Chen",
+          "quote": "L'Espace de Travail IA a complètement transformé ma façon d'écrire. La fonctionnalité de profil vocal signifie que chaque email sonne exactement comme moi, même quand l'IA aide à le rédiger.",
+          "role": "Rédactrice de Contenu"
+        }
+      },
+      "testimonialsBadge": "Ce Que Disent Les Utilisateurs",
+      "testimonialsTitle": "Aimé par les Écrivains Partout",
+      "trust": {
+        "instant": "Accès instantané",
+        "noCard": "Pas de carte de crédit requise",
+        "privacy": "Confidentialité d'abord"
+      },
+      "tryItNow": "Essayez l'interface de chat",
+      "typing": {
+        "blog": "Créez des articles de blog instantanément",
+        "business": "Rédigez des propositions commerciales",
+        "email": "Écrivez des emails avec votre voix",
+        "social": "Créez du contenu pour les réseaux sociaux"
+      },
+      "useCases": {
+        "business": {
+          "desc": "Propositions, rapports et présentations qui correspondent à votre marque",
+          "example": "",
+          "stat": "Productivité",
+          "title": "Rédaction Commerciale"
+        },
+        "content": {
+          "desc": "Générez des articles de blog, des articles et du texte marketing avec votre voix",
+          "example": "",
+          "stat": "Qualité du contenu",
+          "title": "Création de Contenu"
+        },
+        "email": {
+          "desc": "Rédigez, répondez et suivez des emails qui sonnent comme si vous les aviez écrits",
+          "example": "",
+          "stat": "Temps gagné",
+          "title": "Communication par Email"
+        },
+        "social": {
+          "desc": "Créez des posts engageants pour LinkedIn, Twitter, et plus encore",
+          "example": "",
+          "stat": "Engagement",
+          "title": "Réseaux Sociaux"
+        },
+        "spotlight": "En Vedette"
+      },
+      "useCasesBadge": "Cas d'Usage",
+      "useCasesDesc": "Voyez comment l'Espace de Travail IA transforme votre flux de travail",
+      "useCasesTitle": "Parfait Pour",
+      "voiceApplied": "Profil Vocal : Décontracté & Amical appliqué",
+      "whyUse": "Pourquoi Utiliser l'Espace de Travail IA ?",
+      "whyUseDesc": "Expérimentez le futur de l'assistance à l'écriture par IA personnalisée"
+    },
+    "compatibility": {
+      "badge": "Analyse de Style",
+      "benefits": {
+        "accuracy": {
+          "desc": "Analyse multicouche combinant similitude vectorielle et comparaison statistique",
+          "stat": "Couches d'Analyse",
+          "title": "Analyse Précise"
+        },
+        "badge": "Avantages",
+        "detailed": {
+          "desc": "Voyez exactement quelles phrases s'écartent de votre style avec des niveaux de sévérité",
+          "stat": "Niveaux de Sévérité",
+          "title": "Répartition Détaillée"
+        },
+        "improve": {
+          "desc": "Obtenez des suggestions pour améliorer le texte et mieux correspondre à votre voix",
+          "stat": "Augmentation du Score",
+          "title": "Informations Actionnables"
+        },
+        "speed": {
+          "desc": "Obtenez des scores de compatibilité détaillés en secondes, pas en minutes",
+          "stat": "Traitement",
+          "title": "Résultats Rapides"
+        },
+        "subtitle": "Maintenez une voix cohérente sur tout votre contenu",
+        "title": "Pourquoi Utiliser le Score de Compatibilité ?"
+      },
+      "cta": {
+        "instant": "100 crédits gratuits",
+        "privacy": "Confidentialité d'abord",
+        "subtitle": "Commencez à analyser votre contenu par rapport à votre Profil Vocal dès aujourd'hui. Pas de carte de crédit requise.",
+        "title": "Prêt à Vérifier Votre Correspondance de Style ?"
+      },
+      "ctaBadge": "Commencez à analyser en secondes",
+      "demo": {
+        "subtitle": "Voyez comment notre analyse fonctionne avec des textes exemples. Aucune inscription requise.",
+        "title": "Essayez le Score de Compatibilité Maintenant"
+      },
+      "description": "Analysez à quel point votre texte correspond à votre style d'écriture unique. Obtenez des scores détaillés, identifiez les déviations et améliorez la cohérence.",
+      "faq": {
+        "a1": "Le Score de Compatibilité mesure à quel point un texte correspond à votre style d'écriture unique capturé dans votre Profil Vocal. Il combine la similitude vectorielle (correspondance sémantique) et l'analyse statistique (structure, vocabulaire, modèles de phrases) pour vous donner un score complet de 0 à 100%.",
+        "a2": "Notre analyse multicouche atteint une grande précision en combinant les embeddings d'IA avec une comparaison statistique. Plus il y a d'échantillons dans votre Profil Vocal, plus les résultats sont précis. Nous fournissons également un score de confiance pour que vous sachiez à quel point chaque analyse est fiable.",
+        "a3": "Le Score Vectoriel mesure la similitude sémantique - à quel point le sens et le style de votre texte sont proches de votre profil. Le Score Statistique analyse les modèles structurels comme la longueur des phrases, la richesse du vocabulaire et l'utilisation de la ponctuation. Ensemble, ils donnent une image complète de la correspondance de style.",
+        "a4": "Lors de l'analyse du texte, nous identifions les phrases qui s'écartent de votre style et les classons comme Légères (petites différences), Modérées (différences notables) ou Sévères (inadéquation de style significative). Cela vous aide à vous concentrer sur les domaines les plus importants à améliorer.",
+        "a5": "Oui ! Après avoir vu votre Score de Compatibilité, vous pouvez utiliser notre fonctionnalité de Réécriture IA pour transformer automatiquement le texte afin qu'il corresponde mieux à votre Profil Vocal. La version réécrite obtient généralement un score de 20 à 40% plus élevé.",
+        "a6": "L'analyse de texte coûte 2 crédits de base plus un petit montant par mot (0,002 crédits/mot). Une analyse typique de 500 mots coûte environ 3 crédits. Les utilisateurs Premium obtiennent plus de crédits et un traitement prioritaire.",
+        "badge": "FAQ",
+        "desc": "Tout ce que vous devez savoir sur le Score de Compatibilité",
+        "q1": "Qu'est-ce que le Score de Compatibilité ?",
+        "q2": "Quelle est la précision de l'analyse ?",
+        "q3": "Que signifient les scores Vectoriel et Statistique ?",
+        "q4": "Que sont les sévérités de déviation ?",
+        "q5": "Puis-je améliorer un texte à faible score ?",
+        "q6": "Combien de crédits coûte l'analyse ?",
+        "title": "Questions Fréquentes"
+      },
+      "heroHighlight": "Connaissez Votre Correspondance de Style",
+      "howItWorks": {
+        "badge": "Comment Ça Marche",
+        "step1": {
+          "desc": "Choisissez le Profil Vocal que vous souhaitez comparer",
+          "title": "Sélectionner un Profil"
+        },
+        "step2": {
+          "desc": "Collez ou écrivez le texte que vous souhaitez analyser",
+          "title": "Saisir le Texte"
+        },
+        "step3": {
+          "desc": "Notre IA compare la similitude vectorielle et les modèles statistiques",
+          "title": "Analyse IA"
+        },
+        "step4": {
+          "desc": "Voir le score, les déviations et les suggestions d'amélioration",
+          "title": "Obtenir les Résultats"
+        },
+        "subtitle": "Notre IA combine plusieurs méthodes d'analyse pour une correspondance de style précise",
+        "title": "Analyse Multicouche"
+      },
+      "interpretation": {
+        "badge": "Guide des Scores",
+        "subtitle": "Voyez ce que signifient les différents scores de compatibilité pour votre écriture",
+        "title": "Comprendre Votre Score"
+      },
+      "scores": {
+        "average": "Moyen",
+        "averageDesc": "Quelques différences de style détectées",
+        "goodMatch": "Bonne Correspondance",
+        "goodMatchDesc": "Le texte correspond principalement à votre style",
+        "lowMatch": "Faible Correspondance",
+        "lowMatchDesc": "Différences de style significatives",
+        "notCompatible": "Non Compatible",
+        "notCompatibleDesc": "Le texte ne correspond pas",
+        "veryCompatible": "Très Compatible",
+        "veryCompatibleDesc": "Le texte correspond excellemment à votre style"
+      },
+      "stats": {
+        "accuracy": "Précision",
+        "layers": "Couches d'Analyse",
+        "severities": "Niveaux de Sévérité",
+        "speed": "Temps d'Analyse"
+      },
+      "title": "Score de Compatibilité",
+      "trust": {
+        "instant": "Résultats instantanés",
+        "multiLayer": "Analyse multicouche",
+        "privacy": "Confidentialité d'abord"
+      },
+      "useCases": {
+        "ai": {
+          "b1": "Authenticité",
+          "b2": "Personnalisation",
+          "b3": "Confiance",
+          "desc": "Vérifiez que le contenu généré par l'IA sonne comme vous avant de l'utiliser",
+          "example": "",
+          "title": "Vérification de Contenu IA"
+        },
+        "badge": "Cas d'Usage",
+        "content": {
+          "b1": "Cohérence de la marque",
+          "b2": "Contrôle qualité",
+          "b3": "Gain de temps",
+          "desc": "Vérifiez si le contenu externalisé ou généré par l'IA correspond à la voix de votre marque avant la publication",
+          "example": "",
+          "title": "Revue de Contenu"
+        },
+        "example": "Exemple",
+        "learning": {
+          "b1": "Conscience de soi",
+          "b2": "Amélioration",
+          "b3": "Croissance",
+          "desc": "Comprenez vos modèles d'écriture et améliorez la cohérence au fil du temps",
+          "example": "",
+          "title": "Apprentissage de Style"
+        },
+        "spotlight": "Cas d'Usage en Vedette",
+        "subtitle": "Assurez-vous que votre contenu correspond toujours à votre voix unique",
+        "team": {
+          "b1": "Voix unifiée",
+          "b2": "Outil de formation",
+          "b3": "Intégration",
+          "desc": "Assurez-vous que tous les membres de l'équipe écrivent avec une voix cohérente qui correspond à vos directives de marque",
+          "example": "",
+          "title": "Alignement d'Équipe"
+        },
+        "title": "Parfait Pour Chaque Scénario"
+      }
+    },
+    "deviations": {
+      "badge": "Détection de Style",
+      "benefits": {
+        "accuracy": {
+          "desc": "Seuils dynamiques basés sur votre Profil Vocal pour une détection précise",
+          "stat": "Précision",
+          "title": "Haute Précision"
+        },
+        "badge": "Avantages",
+        "improve": {
+          "desc": "Obtenez des suggestions pour corriger les déviations et améliorer la cohérence du style",
+          "stat": "Amélioration",
+          "title": "Informations Actionnables"
+        },
+        "levels": {
+          "desc": "Classifiez les déviations comme légères, modérées ou sévères pour prioriser les corrections",
+          "stat": "Niveaux de Sévérité",
+          "title": "Niveaux de Sévérité"
+        },
+        "speed": {
+          "desc": "Analysez chaque phrase en moins de 2 secondes avec une détection propulsée par l'IA",
+          "stat": "Par Phrase",
+          "title": "Détection Rapide"
+        },
+        "subtitle": "Identifiez et corrigez les incohérences de style avant qu'elles n'affectent votre contenu",
+        "title": "Pourquoi Utiliser la Détection de Déviations ?"
+      },
+      "cta": {
+        "instant": "100 crédits gratuits",
+        "privacy": "Confidentialité d'abord",
+        "subtitle": "Commencez à analyser votre contenu pour les déviations de style dès aujourd'hui. Pas de carte de crédit requise.",
+        "title": "Prêt à Trouver les Incohérences de Style ?"
+      },
+      "ctaBadge": "Commencez à détecter en secondes",
+      "demo": {
+        "badge": "Démo Interactive",
+        "subtitle": "Essayez notre détection de déviations avec des textes exemples et voyez comment elle identifie les incohérences de style",
+        "title": "Voir les Déviations en Action"
+      },
+      "description": "Identifiez exactement quelles phrases s'écartent de votre style d'écriture. Obtenez des niveaux de sévérité et des suggestions pour maintenir la cohérence.",
+      "faq": {
+        "a1": "Les déviations sont des phrases dans votre texte qui ne correspondent pas à votre style d'écriture unique capturé dans votre Profil Vocal. Notre IA compare chaque phrase à votre profil et identifie celles qui diffèrent significativement en ton, vocabulaire ou structure.",
+        "a2": "Nous utilisons des seuils dynamiques basés sur votre Profil Vocal. Les déviations légères (0,4-0,5 similitude) sont à peine perceptibles. Les déviations modérées (0,3-0,4) sont des différences notables. Les déviations sévères (<0,3) sont des inadéquations de style significatives qui diffèrent clairement de votre voix.",
+        "a3": "Le Score de Compatibilité vous donne un pourcentage global de la correspondance de votre texte avec votre style. Les Déviations vont plus loin en identifiant exactement quelles phrases s'écartent et avec quelle sévérité, pour que vous sachiez exactement quoi corriger.",
+        "a4": "Oui ! Après avoir identifié les déviations, vous pouvez cliquer sur n'importe quelle phrase surlignée pour voir des suggestions. Vous pouvez également utiliser notre fonctionnalité de Réécriture IA pour transformer automatiquement les phrases déviantes afin qu'elles correspondent à votre Profil Vocal.",
+        "a5": "La détection de déviations est incluse dans le coût de l'analyse de texte : 2 crédits de base plus 0,002 crédits par mot. Une analyse typique de 500 mots coûte environ 3 crédits et inclut à la fois le Score de Compatibilité et la détection de Déviations.",
+        "a6": "Excellente nouvelle ! Si aucune déviation n'est trouvée, cela signifie que votre texte correspond bien à votre Profil Vocal. Vous verrez un message de succès confirmant que votre texte est cohérent avec votre style d'écriture.",
+        "badge": "FAQ",
+        "desc": "Tout ce que vous devez savoir sur la Détection de Déviations",
+        "q1": "Que sont les Déviations ?",
+        "q2": "Comment les niveaux de sévérité sont-ils déterminés ?",
+        "q3": "En quoi est-ce différent du Score de Compatibilité ?",
+        "q4": "Puis-je corriger les déviations automatiquement ?",
+        "q5": "Combien de crédits coûte la détection de déviations ?",
+        "q6": "Et si je n'ai aucune déviation ?",
+        "title": "Questions Fréquentes"
+      },
+      "heroHighlight": "Trouver les Incohérences de Style",
+      "howItWorks": {
+        "badge": "Comment Ça Marche",
+        "step1": {
+          "desc": "Choisissez le Profil Vocal à comparer",
+          "title": "Sélectionner un Profil"
+        },
+        "step2": {
+          "desc": "Collez ou écrivez le texte que vous souhaitez analyser",
+          "title": "Saisir le Texte"
+        },
+        "step3": {
+          "desc": "Chaque phrase est comparée en utilisant la similitude vectorielle",
+          "title": "Analyse IA"
+        },
+        "step4": {
+          "desc": "Voir les déviations surlignées avec les niveaux de sévérité",
+          "title": "Voir les Résultats"
+        },
+        "subtitle": "Notre IA analyse chaque phrase par rapport à votre Profil Vocal pour trouver les incohérences",
+        "title": "Détection Intelligente de Déviations"
+      },
+      "severity": {
+        "badge": "Niveaux de Sévérité",
+        "mild": "Léger",
+        "mildDesc": "Petites différences de style à peine perceptibles",
+        "mildExample": "Choix de mot ou longueur de phrase légèrement différents",
+        "moderate": "Modéré",
+        "moderateDesc": "Différences de style notables pouvant affecter la cohérence",
+        "moderateExample": "Ton ou niveau de formalité différent",
+        "severe": "Sévère",
+        "severeDesc": "Inadéquation de style significative qui diffère clairement de votre voix",
+        "severeExample": "Style d'écriture ou vocabulaire complètement différent",
+        "subtitle": "Nous classifions les déviations en trois niveaux pour vous aider à prioriser les améliorations",
+        "title": "Comprendre la Sévérité des Déviations"
+      },
+      "stats": {
+        "accuracy": "Précision de Détection",
+        "levels": "Niveaux de Sévérité",
+        "speed": "Par Phrase"
+      },
+      "title": "Déviations",
+      "trust": {
+        "instant": "Résultats instantanés",
+        "noCard": "Pas de carte de crédit requise",
+        "privacy": "Confidentialité d'abord"
+      },
+      "useCases": {
+        "ai": {
+          "b1": "Authenticité",
+          "b2": "Personnalisation",
+          "b3": "Confiance",
+          "desc": "Identifiez quelles parties du contenu généré par l'IA nécessitent une humanisation",
+          "example": "La sortie ChatGPT a 8 déviations - utilisez Réécriture IA sur les sévères en premier.",
+          "title": "Vérification de Contenu IA"
+        },
+        "badge": "Cas d'Usage",
+        "content": {
+          "b1": "Contrôle qualité",
+          "b2": "Cohérence de la marque",
+          "b3": "Gain de temps",
+          "desc": "Trouvez les phrases qui ne correspondent pas à la voix de votre marque avant la publication",
+          "example": "3 déviations sévères trouvées dans le paragraphe 2 - le ton formel ne correspond pas à votre style conversationnel.",
+          "title": "Revue de Contenu"
+        },
+        "example": "Exemple",
+        "learning": {
+          "b1": "Conscience de soi",
+          "b2": "Amélioration",
+          "b3": "Croissance",
+          "desc": "Comprenez quels aspects de votre écriture varient le plus",
+          "example": "Vos conclusions tendent à dévier plus que les introductions - concentrez-vous sur le maintien du ton à la fin.",
+          "title": "Apprentissage de Style"
+        },
+        "spotlight": "Cas d'Usage en Vedette",
+        "subtitle": "Trouvez et corrigez les incohérences de style dans tout type de contenu",
+        "team": {
+          "b1": "Voix unifiée",
+          "b2": "Outil de formation",
+          "b3": "Intégration",
+          "desc": "Assurez-vous que tous les membres de l'équipe écrivent de manière cohérente avec vos directives de marque",
+          "example": "Le nouveau rédacteur a 5 déviations modérées - partagez le Profil Vocal pour l'aider à correspondre au style de l'équipe.",
+          "title": "Écriture d'Équipe"
+        },
+        "title": "Parfait Pour Chaque Écrivain"
+      }
+    },
+    "extension": {
+      "cta": "Installer l'Extension",
+      "description": "Utilisez Graphos AI partout sur le web",
+      "title": "Extension Chrome Disponible"
+    },
+    "humanization": {
+      "accuracy": "précision",
+      "aiContent": "Contenu IA Brut",
+      "analyzing": "Analyse des modèles...",
+      "badge": "De l'IA à l'Humain en Secondes",
+      "benefits": {
+        "instant": {
+          "desc": "Obtenez du contenu humanisé en quelques secondes en un clic",
+          "title": "Résultats Instantanés"
+        },
+        "meaning": {
+          "desc": "Gardez votre message intact tout en améliorant la lisibilité et l'authenticité",
+          "title": "Préserver le Sens"
+        },
+        "natural": {
+          "desc": "Transformez un texte robotique en contenu conversationnel et engageant qui se lit naturellement",
+          "title": "Flux Naturel"
+        },
+        "styles": {
+          "desc": "Choisissez entre décontracté, professionnel, académique, ou correspondez à votre profil vocal",
+          "title": "Styles Multiples"
+        }
+      },
+      "benefitsBadge": "La Différence",
+      "clickTransform": "Cliquez ",
+      "comparison": {
+        "competitors": "Concurrents",
+        "excellent": "Excellent",
+        "feature": "Fonctionnalité",
+        "good": "Bon",
+        "languages": "Langues",
+        "meaning": "Préservation du Sens",
+        "others": "Autres",
+        "ourSolution": "Notre Solution",
+        "quality": "Qualité de Sortie",
+        "rating": "note moyenne",
+        "speed": "Vitesse de Traitement",
+        "styles": "Options de Style",
+        "usersCount": "utilisateurs nous font confiance",
+        "voiceMatch": "Correspondance de Profil Vocal"
+      },
+      "comparisonBadge": "Pourquoi Nous Choisir",
+      "comparisonDesc": "Voyez pourquoi Graphos AI est leader dans l'humanisation de contenu",
+      "comparisonTitle": "Comment Nous Comparer",
+      "comparisonWins": "6 avantages clés sur les concurrents",
+      "ctaBadge": "Commencez à humaniser en secondes",
+      "ctaDesc": "Transformez le texte IA en écriture naturelle et engageante.",
+      "ctaTitle": "Prêt à Humaniser Votre Contenu ?",
+      "demo": {
+        "subtitle": "Regardez le texte IA se transformer en écriture naturelle et humaine en temps réel.",
+        "title": "Voir la Transformation"
+      },
+      "examples": {
+        "ex1": {
+          "after": "Vous savez ce qui me trotte dans la tête dernièrement ? Comment les entreprises prennent enfin le virage vert au sérieux.",
+          "before": "La mise en œuvre de pratiques durables dans les environnements d'entreprise est devenue de plus en plus importante ces dernières années.",
+          "style": "Décontracté & Conversationnel"
+        },
+        "ex2": {
+          "after": "Voici une chose que j'ai apprise : faire du sport aide vraiment avec le stress. Mon anxiété s'est tellement améliorée depuis que j'ai commencé à bouger plus.",
+          "before": "La recherche indique que l'exercice physique régulier contribue significativement à l'amélioration de la santé mentale.",
+          "style": "Personnel & Authentique"
+        }
+      },
+      "examplesTitle": "Voir la Différence",
+      "faq": {
+        "a1": "Notre IA analyse le texte d'entrée et le réécrit en utilisant des modèles de langage naturel, des structures de phrases variées, des pronoms personnels et des éléments conversationnels caractéristiques de l'écriture humaine.",
+        "a2": "Non. Notre humanisation préserve le sens central et les points clés de votre contenu tout en transformant le style d'écriture pour sonner plus naturel et authentique.",
+        "a3": "Oui ! Vous pouvez choisir parmi plusieurs styles (décontracté, professionnel, académique) ou utiliser votre Profil Vocal pour correspondre à votre style d'écriture unique.",
+        "a4": "Notre humanisation réduit considérablement les scores de détection IA en introduisant des modèles d'écriture naturels. Cependant, nous recommandons de l'utiliser de manière éthique et transparente.",
+        "a5": "Les utilisateurs gratuits peuvent humaniser jusqu'à 500 mots par demande. Les utilisateurs Pro ont des limites plus élevées jusqu'à 5 000 mots par demande.",
+        "q1": "Comment fonctionne l'humanisation de contenu ?",
+        "q2": "Le sens de mon contenu changera-t-il ?",
+        "q3": "Puis-je personnaliser le style d'écriture ?",
+        "q4": "Le contenu humanisé passera-t-il la détection IA ?",
+        "q5": "Y a-t-il une limite de mots ?"
+      },
+      "faqBadge": "FAQ",
+      "faqDesc": "Tout ce que vous devez savoir sur l'humanisation de contenu",
+      "faqTitle": "Questions Fréquentes",
+      "heroHighlight": "Naturel & Authentique",
+      "howItWorks": {
+        "badge": "Processus Simple",
+        "step1": {
+          "desc": "Entrez ou collez le contenu généré par l'IA que vous souhaitez humaniser",
+          "title": "Collez Votre Texte"
+        },
+        "step2": {
+          "desc": "Sélectionnez parmi décontracté, professionnel, académique, ou utilisez votre Profil Vocal",
+          "title": "Choisissez Votre Style"
+        },
+        "step3": {
+          "desc": "Recevez du contenu naturel et authentique qui sonne comme si une vraie personne l'avait écrit",
+          "title": "Obtenez du Contenu Humanisé"
+        },
+        "subtitle": "Transformez votre contenu IA en trois étapes simples",
+        "title": "Comment Fonctionne l'Humanisation"
+      },
+      "humanContent": "Contenu Humain Naturel",
+      "humanized": "Humanisé",
+      "moreEngaging": "plus engageant",
+      "problems": {
+        "detectable": {
+          "desc": "Les outils de détection IA signalent le contenu immédiatement",
+          "title": "Facilement Détectable"
+        },
+        "engagement": {
+          "desc": "Les lecteurs se déconnectent du contenu impersonnel",
+          "title": "Faible Engagement"
+        },
+        "generic": {
+          "desc": "Manque de personnalité et de style d'écriture unique",
+          "title": "Voix Générique"
+        },
+        "robotic": {
+          "desc": "Le texte sonne mécanique et peu naturel pour les lecteurs",
+          "title": "Robotique & Rigide"
+        }
+      },
+      "processing": "traitement",
+      "reset": "Réinitialiser",
+      "stats": {
+        "languages": "Langues",
+        "meaning": "Sens Préservé",
+        "speed": "Traitement",
+        "styles": "Styles d'Écriture"
+      },
+      "styles": "styles",
+      "testimonials": {
+        "academic": {
+          "author": "Dr. Emma Williams",
+          "quote": "Parfait pour affiner les résumés de recherche assistés par l'IA. L'option de style académique maintient le professionnalisme tout en ajoutant un flux naturel.",
+          "role": "Professeur de Recherche"
+        },
+        "badge": "Histoires d'Utilisateurs",
+        "content": {
+          "author": "Sarah Chen",
+          "quote": "Cet outil a transformé ma façon de créer du contenu. Mes articles de blog sonnent maintenant véritablement humains et engagent beaucoup mieux les lecteurs.",
+          "role": "Créatrice de Contenu"
+        },
+        "marketing": {
+          "author": "Michael Torres",
+          "quote": "Nos emails marketing semblent maintenant personnels et authentiques. Les taux d'ouverture ont augmenté de 40% depuis que nous avons commencé à utiliser Graphos.",
+          "role": "Directeur Marketing"
+        },
+        "subtitle": "Voyez ce que nos utilisateurs disent de l'humanisation de contenu",
+        "title": "Aimé par les Créateurs de Contenu"
+      },
+      "transform": "Transformer",
+      "transformations": "Transformations Réelles",
+      "transformationsDesc": "Voyez comment le texte généré par l'IA se transforme en écriture naturelle et humaine",
+      "transforming": "Transformation...",
+      "trust": {
+        "instant": "Résultats instantanés",
+        "preserve": "Préserve le sens",
+        "voice": "Correspond à votre voix"
+      },
+      "tryItNow": "Voir la transformation en action",
+      "tryNow": "Essayez l'Humanisation Maintenant",
+      "tryYourContent": "Essayez Avec Votre Contenu",
+      "tryYourself": "Essayez vous-même",
+      "useCases": {
+        "academic": {
+          "desc": "Affinez les résumés de recherche générés par l'IA pour correspondre aux normes académiques",
+          "example": "",
+          "stat": "Score de lisibilité",
+          "title": "Écriture Académique"
+        },
+        "content": {
+          "desc": "Transformez les brouillons IA en articles de blog, articles et textes marketing authentiques",
+          "example": "",
+          "stat": "Engagement blog",
+          "title": "Création de Contenu"
+        },
+        "email": {
+          "desc": "Rendez les emails assistés par l'IA personnels et authentiques",
+          "example": "",
+          "stat": "Augmentation taux ouverture",
+          "title": "Rédaction d'Email"
+        },
+        "preview": "Aperçu de Transformation",
+        "social": {
+          "desc": "Créez des posts sociaux engageants qui connectent avec votre audience",
+          "example": "",
+          "stat": "Boost d'engagement",
+          "title": "Réseaux Sociaux"
+        },
+        "spotlight": "En Vedette"
+      },
+      "useCasesBadge": "Cas d'Usage",
+      "useCasesDesc": "Cliquez sur n'importe quel cas d'usage pour voir comment l'humanisation transforme votre contenu",
+      "useCasesTitle": "Parfait Pour",
+      "watchTransform": "Regarder la transformation",
+      "whyHumanize": "Pourquoi Humaniser Votre Contenu ?",
+      "whyHumanizeDesc": "Transformez le texte IA robotique en contenu engageant et authentique",
+      "with": "Avec Humanisation",
+      "without": "Sans Humanisation"
+    },
+    "labels": {
+      "aiGenerated": "Généré par IA",
+      "aiRewrite": "Réécriture IA",
+      "aiScore": "SCORE IA",
+      "aiWorkspace": "Espace de Travail IA",
+      "humanizationPreview": "Aperçu Humanisation",
+      "voiceProfile": "Profil Vocal"
+    },
+    "placeholder": {
+      "voiceProfile": "PROFIL VOCAL",
+      "yourText": "VOTRE TEXTE"
+    },
+    "rewrite": {
+      "badge": "Transformation Propulsée par la Voix",
+      "benefits": {
+        "languages": {
+          "desc": "Support pour 15+ langues avec qualité native",
+          "title": "Multilingue"
+        },
+        "speed": {
+          "desc": "Transformez votre texte en secondes, pas en minutes",
+          "title": "Éclair Rapide"
+        },
+        "undetectable": {
+          "desc": "Contourne la détection IA tout en gardant le contenu naturel",
+          "title": "Indétectable"
+        },
+        "voice": {
+          "desc": "Maintient votre style d'écriture unique et votre personnalité",
+          "title": "Votre Voix"
+        }
+      },
+      "benefitsBadge": "Pourquoi Nous Choisir",
+      "benefitsDesc": "Tout ce dont vous avez besoin pour transformer votre écriture",
+      "benefitsTitle": "Fonctionnalités Puissantes",
+      "cta": {
+        "desc": "Commencez à réécrire votre contenu avec votre voix unique dès aujourd'hui. Pas de carte de crédit requise.",
+        "title": "Prêt à Transformer Votre Écriture ?",
+        "trust2": "100 crédits gratuits",
+        "trust3": "Confidentialité d'abord"
+      },
+      "ctaBadge": "Commencez à transformer en secondes",
+      "demo": {
+        "originalLabel": "Texte Original",
+        "rewriteBtn": "Réécrire",
+        "rewritten": "Réécrit",
+        "sectionDesc": "Expérimentez la puissance de la transformation de texte pilotée par l'IA. Aucune inscription requise.",
+        "sectionTitle": "Essayez Réécriture IA Maintenant",
+        "subtitle": "Transformez le texte pour correspondre à votre style d'écriture",
+        "tip1": "Essayez différents exemples pour voir diverses transformations",
+        "tip2": "Basculez les options pour personnaliser la sortie",
+        "title": "Réécriture IA",
+        "transformComplete": "Transformation terminée"
+      },
+      "faq": {
+        "a1": "Réécriture IA utilise votre Profil Vocal pour comprendre votre style d'écriture unique. Il transforme ensuite n'importe quel texte pour correspondre à votre vocabulaire, ton et modèles de phrases tout en préservant le sens original.",
+        "a2": "Bien que vous puissiez utiliser la réécriture de base sans profil, avoir un Profil Vocal améliore considérablement les résultats. Cela permet à l'IA de correspondre à votre style d'écriture spécifique plutôt que d'utiliser des transformations génériques.",
+        "a3": "Oui ! Notre Réécriture IA est conçue pour produire un texte naturel et humain. Lorsqu'il est combiné avec votre Profil Vocal, le résultat obtient généralement des scores très bas sur les outils de détection IA.",
+        "a4": "Nous supportons plus de 15 langues, dont l'anglais, le vietnamien, l'espagnol, le français, l'allemand, et plus encore. L'IA détecte automatiquement la langue d'entrée et maintient la qualité dans la sortie.",
+        "a5": "La réécriture coûte environ 1,5 crédits de base + 0,0008 crédits par mot. Le coût exact dépend de la longueur du texte et du modèle d'IA sélectionné.",
+        "a6": "Oui ! Vous pouvez réécrire des documents jusqu'à 50 000 caractères. Pour les documents plus longs, nous recommandons d'utiliser notre AI Studio qui fournit une expérience d'éditeur complète.",
+        "q1": "Comment fonctionne Réécriture IA ?",
+        "q2": "Ai-je besoin d'un Profil Vocal pour utiliser Réécriture ?",
+        "q3": "Le texte réécrit passera-t-il la détection IA ?",
+        "q4": "Quelles langues sont supportées ?",
+        "q5": "Combien de crédits coûte la réécriture ?",
+        "q6": "Puis-je réécrire de longs documents ?"
+      },
+      "faqBadge": "FAQ",
+      "faqDesc": "Tout ce que vous devez savoir sur Réécriture IA",
+      "faqTitle": "Questions Fréquentes",
+      "heroDesc": "Transformez n'importe quel texte pour qu'il corresponde à votre style d'écriture unique. Propulsé par votre Profil Vocal pour des résultats authentiques et indétectables.",
+      "heroHighlight": "Transformez Vos Mots",
+      "howItWorks": {
+        "step1": {
+          "desc": "Entrez le texte que vous souhaitez transformer",
+          "title": "Collez Votre Texte"
+        },
+        "step2": {
+          "desc": "Choisissez votre Profil Vocal pour des résultats personnalisés",
+          "title": "Sélectionnez Votre Profil"
+        },
+        "step3": {
+          "desc": "Recevez du contenu réécrit qui vous ressemble",
+          "title": "Obtenez le Texte Transformé"
+        }
+      },
+      "howItWorksBadge": "Processus Simple",
+      "howItWorksDesc": "Transformez votre texte en trois étapes simples",
+      "howItWorksTitle": "Comment Fonctionne Réécriture IA",
+      "integration": {
+        "badge": "Intégration Puissante",
+        "cta1": "Créer Profil Vocal",
+        "cta2": "Essayer la Démo",
+        "desc": "Réécriture IA utilise votre Profil Vocal pour transformer le texte en votre style d'écriture unique. Plus vous l'utilisez, mieux il comprend votre voix.",
+        "feature1": "Correspond à votre vocabulaire et ton",
+        "feature2": "Apprend de vos modèles d'écriture",
+        "feature3": "Voix cohérente sur tout le contenu",
+        "feature4": "Contourne la détection IA naturellement",
+        "result": "Résultat : Sonne exactement comme vous !",
+        "title": "Propulsé par Votre Profil Vocal"
+      },
+      "showcase": {
+        "badge": "Voyez La Magie",
+        "cta": "Essayez Vous-Même",
+        "formal": {
+          "after": "Vous savez quoi",
+          "before": "La mise en œuvre de pratiques durables dans les environnements d'entreprise est devenue de plus en plus importante ces dernières années.",
+          "metric": "Engagement",
+          "style": "Formel → Conversationnel"
+        },
+        "generic": {
+          "after": "Merci beaucoup pour votre commande ! J'ai emballé celui-ci personnellement—j'espère qu'il vous apportera autant de joie qu'il m'en a apporté à le créer.",
+          "before": "Merci pour votre achat. Nous espérons que vous apprécierez le produit.",
+          "metric": "Connexion",
+          "style": "Générique → Personnel"
+        },
+        "passive": {
+          "after": "L'équipe a terminé le rapport et l'a soumis au gestionnaire pour examen.",
+          "before": "Le rapport a été terminé par l'équipe et il a été soumis au gestionnaire pour examen.",
+          "metric": "Clarté",
+          "style": "Passif → Actif"
+        },
+        "subtitle": "Regardez comment Réécriture IA transforme votre texte tout en préservant votre message",
+        "title": "Transformations Réelles",
+        "wordy": {
+          "after": "Laissez",
+          "before": "Je vous écris pour vous informer que je souhaiterais demander une réunion à votre plus proche convenance pour discuter de la possibilité d'explorer des opportunités de collaboration potentielles.",
+          "metric": "Nombre de mots",
+          "style": "Verbeux → Concis"
+        }
+      },
+      "stats": {
+        "accuracy": "Correspondance de Style",
+        "languages": "Langues",
+        "speed": "Vitesse",
+        "users": "Utilisateurs Heureux"
+      },
+      "title": "Réécriture IA",
+      "trust": {
+        "instant": "Résultats instantanés",
+        "noCard": "Pas de carte de crédit requise",
+        "privacy": "Confidentialité d'abord"
+      },
+      "useCases": {
+        "academic": {
+          "desc": "Peaufinez les essais et papiers tout en maintenant le ton académique",
+          "example": "",
+          "stat": "Score de clarté",
+          "title": "Écriture Académique"
+        },
+        "content": {
+          "desc": "Réécrivez des articles de blog, des articles et du texte marketing avec votre voix",
+          "example": "",
+          "stat": "Temps de lecture",
+          "title": "Création de Contenu"
+        },
+        "email": {
+          "desc": "Transformez des emails formels en messages amicaux ou vice versa",
+          "example": "",
+          "stat": "Taux de réponse",
+          "title": "Rédaction d'Email"
+        },
+        "preview": "Aperçu de Transformation",
+        "social": {
+          "desc": "Créez des posts engageants qui sonnent authentiquement comme vous",
+          "example": "",
+          "stat": "Engagement",
+          "title": "Réseaux Sociaux"
+        },
+        "spotlight": "En Vedette"
+      },
+      "useCasesBadge": "Cas d'Usage",
+      "useCasesDesc": "Transformez n'importe quel type de contenu pour correspondre à votre voix et à votre objectif",
+      "useCasesTitle": "Parfait Pour Chaque Situation"
+    },
+    "statistics": {
+      "badge": "Analytique d'Écriture",
+      "benchmark": {
+        "badge": "Normes de l'Industrie",
+        "desc": {
+          "academic": "L'écriture académique nécessite précision et formalité. Des phrases plus longues et un vocabulaire plus riche sont attendus pour transmettre des idées complexes.",
+          "blog": "L'écriture de blog doit être conversationnelle et facile à lire. Visez des phrases plus courtes et un vocabulaire accessible pour engager les lecteurs.",
+          "casual": "L'écriture décontractée est détendue et amicale. Des phrases courtes, des mots simples et un ton conversationnel fonctionnent le mieux.",
+          "professional": "L'écriture professionnelle équilibre clarté et sophistication. Une longueur de phrase modérée et un vocabulaire précis transmettent la compétence."
+        },
+        "metrics": {
+          "punctuation": "Ponctuation",
+          "readability": "Lisibilité",
+          "sentenceLength": "Longueur de Phrase",
+          "vocabulary": "Vocabulaire",
+          "wordLength": "Longueur de Mot"
+        },
+        "styles": {
+          "academic": "Académique",
+          "blog": "Blog",
+          "casual": "Décontracté",
+          "professional": "Professionnel"
+        },
+        "subtitle": "Voyez comment votre écriture se compare aux normes de l'industrie pour différents types de contenu",
+        "table": {
+          "ideal": "Idéal",
+          "max": "Max",
+          "metric": "Métrique",
+          "min": "Min",
+          "range": "Plage"
+        },
+        "title": "Comparer Aux Références"
+      },
+      "benefits": {
+        "badge": "Avantages",
+        "languages": {
+          "desc": "Support pour 15+ langues avec analyse et références spécifiques à la langue",
+          "stat": "Langues",
+          "title": "Multilingue"
+        },
+        "metrics": {
+          "desc": "Obtenez 10+ métriques d'écriture incluant longueur de mot, structure de phrase, richesse de vocabulaire et scores de lisibilité",
+          "stat": "Métriques",
+          "title": "Métriques Complètes"
+        },
+        "speed": {
+          "desc": "Analysez n'importe quel texte en moins d'une seconde avec notre moteur de traitement optimisé",
+          "stat": "Analyse",
+          "title": "Analyse Instantanée"
+        },
+        "styles": {
+          "desc": "Comparez votre écriture aux normes de l'industrie pour le contenu de blog, académique, décontracté et professionnel",
+          "stat": "Types de Style",
+          "title": "Références de Style"
+        },
+        "subtitle": "Obtenez des informations qui vous aident à écrire mieux, plus vite",
+        "title": "Pourquoi Utiliser les Statistiques de Texte ?"
+      },
+      "cta": {
+        "instant": "100 crédits gratuits",
+        "privacy": "Confidentialité d'abord",
+        "subtitle": "Obtenez des informations instantanées sur votre style d'écriture avec des statistiques de texte complètes. Pas de carte de crédit requise.",
+        "title": "Prêt à Comprendre Votre Écriture ?"
+      },
+      "ctaBadge": "Analysez votre écriture maintenant",
+      "demo": {
+        "subtitle": "Expérimentez notre technologie d'analyse de texte par vous-même. Aucune inscription requise.",
+        "title": "Essayez les Statistiques de Texte Maintenant"
+      },
+      "description": "Analysez votre écriture avec des métriques complètes. Obtenez des scores de lisibilité, une analyse de vocabulaire, des modèles de phrases et des comparaisons de référence instantanément.",
+      "faq": {
+        "a1": "Nous analysons 10+ métriques incluant la longueur moyenne des mots, la longueur moyenne des phrases, la richesse du vocabulaire (ratio de mots uniques), le ratio de ponctuation, le score de lisibilité (Flesch-Kincaid), le total des mots/phrases/paragraphes, les débuts de phrase principaux et l'utilisation de mots de transition.",
+        "a2": "Nous utilisons la formule de lisibilité Flesch-Kincaid qui considère la longueur moyenne des phrases et les syllabes par mot. Les scores vont de 0 à 100, où des scores plus élevés indiquent une lecture plus facile. 60-70 est idéal pour le grand public, 30-50 pour le contenu académique.",
+        "a3": "Nous fournissons des références pour 4 styles d'écriture : Blog (conversationnel, facile à lire), Académique (formel, complexe), Décontracté (détendu, simple) et Professionnel (équilibré, clair). Chacun a des plages idéales différentes pour toutes les métriques.",
+        "a4": "Oui ! Nous supportons plus de 15 langues, dont l'anglais, le vietnamien, l'espagnol, le français, l'allemand, et plus encore. Le système détecte automatiquement la langue et applique les modèles d'analyse et références appropriés.",
+        "a5": "Utilisez la comparaison de référence pour voir où votre écriture diffère des plages idéales. Par exemple, si la longueur des phrases est trop élevée, essayez de couper les phrases longues. Si la richesse du vocabulaire est faible, utilisez des mots plus variés. Nos suggestions aident à guider les améliorations.",
+        "a6": "Oui ! Les statistiques de texte sont intégrées dans la Détection IA (pour analyser les modèles d'écriture), le Score de Compatibilité (pour comparer avec votre Profil Vocal) et les Déviations (pour identifier les incohérences de style). C'est une analyse fondamentale utilisée sur toute la plateforme.",
+        "badge": "FAQ",
+        "desc": "Tout ce que vous devez savoir sur les Statistiques de Texte",
+        "q1": "Quelles métriques sont incluses dans les statistiques de texte ?",
+        "q2": "Comment le score de lisibilité est-il calculé ?",
+        "q3": "Quels sont les types de style de référence ?",
+        "q4": "Cela supporte-t-il plusieurs langues ?",
+        "q5": "Comment puis-je améliorer mes statistiques ?",
+        "q6": "Les statistiques de texte font-elles partie d'autres fonctionnalités ?",
+        "title": "Questions Fréquentes"
+      },
+      "heroHighlight": "Comprenez Votre ADN d'Écriture",
+      "howItWorks": {
+        "badge": "Comment Ça Marche",
+        "step1": {
+          "desc": "Collez ou écrivez le texte que vous souhaitez analyser",
+          "title": "Saisir le Texte"
+        },
+        "step2": {
+          "desc": "Notre moteur analyse la structure, le vocabulaire et les modèles",
+          "title": "Traiter"
+        },
+        "step3": {
+          "desc": "Les métriques sont calculées et comparées aux références",
+          "title": "Calculer"
+        },
+        "step4": {
+          "desc": "Voir les statistiques détaillées avec des informations actionnables",
+          "title": "Résultats"
+        },
+        "subtitle": "Obtenez des statistiques d'écriture complètes en quelques secondes",
+        "title": "Analyse de Texte Instantanée"
+      },
+      "metrics": {
+        "badge": "Métriques Clés",
+        "benchmark": "Plage de Référence",
+        "ideal": "Idéal",
+        "punctuation": {
+          "desc": "Signes de ponctuation par mot. Affecte le rythme et la cadence de votre écriture.",
+          "title": "Ratio de Ponctuation",
+          "unit": "par mot"
+        },
+        "readability": {
+          "desc": "Score Flesch-Kincaid. Plus élevé = plus facile à lire. 60-70 est idéal pour le grand public.",
+          "title": "Score de Lisibilité",
+          "unit": "points"
+        },
+        "sentenceLength": {
+          "desc": "Indique la lisibilité et le flux. Phrases plus courtes = percutant, plus longues = idées complexes.",
+          "title": "Longueur Moyenne de Phrase",
+          "unit": "mots"
+        },
+        "subtitle": "Comprenez chaque aspect de votre écriture avec des métriques complètes",
+        "title": "Analyse d'Écriture Approfondie",
+        "vocabulary": {
+          "desc": "Mots uniques / mots totaux. Plus élevé = vocabulaire plus varié, plus bas = plus de répétition.",
+          "title": "Richesse de Vocabulaire",
+          "unit": "ratio"
+        },
+        "wordLength": {
+          "desc": "Mesure la complexité du vocabulaire. Mots plus courts = lecture plus facile, mots plus longs = plus sophistiqué.",
+          "title": "Longueur Moyenne de Mot",
+          "unit": "caractères"
+        }
+      },
+      "stats": {
+        "languages": "Langues",
+        "metrics": "Métriques",
+        "speed": "Analyse",
+        "styles": "Types de Style"
+      },
+      "title": "Statistiques de Texte",
+      "trust": {
+        "instant": "Résultats instantanés",
+        "noCard": "Pas de carte de crédit requise",
+        "privacy": "Confidentialité d'abord"
+      },
+      "useCases": {
+        "authors": {
+          "b1": "Cohérence de la voix",
+          "b2": "Analyse du rythme",
+          "b3": "Adéquation au genre",
+          "desc": "Analysez votre manuscrit pour assurer une voix cohérente et une complexité appropriée tout au long",
+          "example": "",
+          "title": "Auteurs"
+        },
+        "badge": "Cas d'Usage",
+        "educators": {
+          "b1": "Retour objectif",
+          "b2": "Suivi des progrès",
+          "b3": "Outil pédagogique",
+          "desc": "Aidez les étudiants à améliorer leur écriture en fournissant un retour objectif sur la structure et la complexité",
+          "example": "",
+          "title": "Éducateurs"
+        },
+        "example": "Exemple",
+        "professionals": {
+          "b1": "Communication claire",
+          "b2": "Ton professionnel",
+          "b3": "Adéquation au public",
+          "desc": "Assurez-vous que vos communications professionnelles sont claires, professionnelles et adaptées à votre public",
+          "example": "",
+          "title": "Professionnels"
+        },
+        "spotlight": "Cas d'Usage en Vedette",
+        "subtitle": "Les écrivains, éducateurs et professionnels utilisent nos statistiques pour améliorer leur art",
+        "title": "Qui Bénéficie des Statistiques ?",
+        "writers": {
+          "b1": "Meilleure lisibilité",
+          "b2": "Style cohérent",
+          "b3": "Optimisation SEO",
+          "desc": "Optimisez votre contenu pour la lisibilité et l'engagement en comprenant vos modèles d'écriture",
+          "example": "",
+          "title": "Rédacteurs de Contenu"
+        }
+      }
+    },
+    "stats": {
+      "accuracy": "Précision de 98%",
+      "analyze": "Métriques d'écriture",
+      "chat": "Chat avec votre voix",
+      "chatInYourVoice": "Chat avec votre voix",
+      "find": "Trouver les incohérences",
+      "match": "Correspondance de style",
+      "natural": "Sortie naturelle",
+      "transform": "Transformer le texte",
+      "unique": "Votre style unique",
+      "yourUniqueStyle": "Votre style unique"
+    },
+    "voiceProfile": {
+      "badge": "Votre ADN d'Écriture Unique",
+      "benefits": {
+        "ai": {
+          "desc": "Utilisez votre profil avec l'Espace de Travail IA pour la génération de contenu personnalisé",
+          "title": "Intégration IA"
+        },
+        "analysis": {
+          "desc": "Comprenez vos modèles d'écriture, vocabulaire et préférences de style",
+          "title": "Analyse Approfondie"
+        },
+        "consistent": {
+          "desc": "Maintenez votre ton sur tout le contenu, des emails aux articles de blog",
+          "title": "Voix Cohérente"
+        },
+        "unique": {
+          "desc": "Créez du contenu qui vous ressemble authentiquement, à chaque fois",
+          "title": "Identité Unique"
+        }
+      },
+      "builderBadge": "Constructeur de Profil",
+      "builderDesc": "Regardez votre écriture se transformer en un profil vocal unique en trois étapes simples",
+      "builderTitle": "Voir Comment Ça Marche",
+      "cta": {
+        "create": "Créez Votre Profil"
+      },
+      "ctaBadge": "Capturez votre voix unique",
+      "ctaDesc": "Découvrez votre style d'écriture unique dès aujourd'hui.",
+      "ctaTitle": "Créez Votre Profil Vocal",
+      "demo": {
+        "subtitle": "Voyez comment différents styles d'écriture sont capturés et visualisés",
+        "title": "Explorer les Profils Vocaux"
+      },
+      "faq": {
+        "a1": "Nous recommandons 3-5 échantillons d'écriture d'au moins 200 mots chacun. Plus d'échantillons conduisent à des profils plus précis. Les échantillons doivent représenter votre style d'écriture typique.",
+        "a2": "Tout contenu que vous avez écrit fonctionne ! Emails, articles de blog, publications sur les réseaux sociaux, articles, ou même messages de chat. La clé est que cela représente comment vous écrivez naturellement.",
+        "a3": "Oui ! Les utilisateurs Pro peuvent créer plusieurs profils pour différents contextes - un pour la communication professionnelle, un autre pour le contenu décontracté, etc.",
+        "a4": "Notre correspondance vocale atteint plus de 90% de similitude avec votre style d'écriture original. Plus vous fournissez d'échantillons, plus la correspondance devient précise.",
+        "a5": "Absolument. Vos échantillons d'écriture sont chiffrés et utilisés uniquement pour créer votre profil. Nous ne partageons jamais vos données avec des tiers.",
+        "q1": "Combien d'échantillons d'écriture ai-je besoin ?",
+        "q2": "Quels types de contenu fonctionnent le mieux ?",
+        "q3": "Puis-je avoir plusieurs profils vocaux ?",
+        "q4": "Quelle est la précision de la correspondance vocale ?",
+        "q5": "Mes données d'écriture sont-elles sécurisées ?"
+      },
+      "faqBadge": "FAQ",
+      "faqSubtitle": "Tout ce que vous devez savoir sur le Profil Vocal",
+      "faqTitle": "Questions Fréquentes",
+      "heroHighlight": "Capturez Votre Voix Authentique",
+      "howItWorks": {
+        "step1": {
+          "desc": "Fournissez 3-5 échantillons d'écriture (emails, posts, articles) qui représentent votre style",
+          "title": "Télécharger des Échantillons"
+        },
+        "step2": {
+          "desc": "Notre IA analyse le vocabulaire, la structure des phrases, le ton et les modèles uniques",
+          "title": "Analyse IA"
+        },
+        "step3": {
+          "desc": "Obtenez un profil détaillé avec des métriques, traits et caractéristiques signatures",
+          "title": "Profil Créé"
+        },
+        "step4": {
+          "desc": "Appliquez votre profil à l'humanisation, à l'Espace de Travail IA et à la génération de contenu",
+          "title": "Utilisez Partout"
+        }
+      },
+      "howItWorksDesc": "Créez votre ADN d'écriture unique en quatre étapes simples",
+      "howItWorksTitle": "Comment Fonctionne le Profil Vocal",
+      "examples": {
+        "before": "\"La mise en œuvre de pratiques durables est importante.\"",
+        "after": "\"Voilà le truc - passer au vert n'est pas juste une tendance, c'est essentiel.\"",
+        "aiResponse": "\"D'accord, voici le truc à propos de ce produit - c'est honnêtement révolutionnaire...\""
+      },
+      "integration": {
+        "example": "Exemple",
+        "humanize": "Humanisation",
+        "humanizeDesc": "Transformez le contenu généré par l'IA pour qu'il corresponde à votre style d'écriture unique. L'humaniseur utilise votre Profil Vocal pour s'assurer que chaque réécriture vous ressemble authentiquement.",
+        "humanizeTag": "Réécrire avec votre voix",
+        "learnMore": "En savoir plus",
+        "prompt": "Écrire une description de produit",
+        "workspace": "Espace de Travail IA",
+        "workspaceDesc": "Générez du contenu qui vous ressemble dès le départ. Sélectionnez votre Profil Vocal dans l'Espace de Travail IA et chaque réponse correspondra à votre style d'écriture.",
+        "workspaceTag": "Chat avec votre voix"
+      },
+      "integrationBadge": "Intégration Fluide",
+      "integrationDesc": "Votre Profil Vocal s'intègre parfaitement à toutes les fonctionnalités de Graphos AI",
+      "integrationTitle": "Utilisez Votre Voix Partout",
+      "metrics": {
+        "punctuation": "Style de Ponctuation",
+        "punctuationDesc": "Vos modèles et préférences de ponctuation uniques",
+        "sentenceLength": "Structure de Phrase",
+        "sentenceLengthDesc": "Longueur typique, complexité et rythme de vos phrases",
+        "sentenceStarters": "Débuts de Phrase",
+        "sentenceStartersDesc": "Comment vous commencez typiquement les phrases - sujet d'abord, adverbes, questions",
+        "tone": "Marqueurs Émotionnels",
+        "toneDesc": "Comment vous exprimez les opinions, sentiments et l'emphase",
+        "transitions": "Préférences de Transition",
+        "transitionsDesc": "Vos mots et phrases de connexion préférés",
+        "vocabulary": "Modèles de Vocabulaire",
+        "vocabularyDesc": "Phrases courantes, mots préférés et expressions"
+      },
+      "metricsBadge": "Analyse Approfondie",
+      "metricsDesc": "Notre IA capture chaque nuance de votre style d'écriture grâce à une analyse complète",
+      "metricsTitle": "Ce Que Nous Analysons",
+      "multiLang": {
+        "desc": "Créez des Profils Vocaux en anglais, vietnamien, chinois, japonais, coréen, espagnol, français, allemand et bien d'autres. Votre style d'écriture est capturé avec précision, quelle que soit la langue.",
+        "title": "15+ Langues Supportées"
+      },
+      "preview": {
+        "analyzing1": "Analyse des modèles de vocabulaire...",
+        "analyzing2": "Détection des structures de phrases...",
+        "analyzing3": "Identification des marqueurs de ton...",
+        "ready": "Prêt à l'emploi",
+        "sampleInput": "Votre Échantillon d'Écriture",
+        "step1": "Ajouter des Échantillons d'Écriture",
+        "step1Desc": "Collez des emails, posts ou tout texte que vous avez écrit",
+        "step2": "L'IA Analyse les Modèles",
+        "step2Desc": "L'apprentissage profond extrait votre style unique",
+        "step3": "Profil Généré",
+        "step3Desc": "Votre ADN d'écriture est capturé",
+        "yourProfile": "Votre Profil Vocal"
+      },
+      "processBadge": "Processus Simple",
+      "quality": {
+        "consistency": "Cohérence de Style",
+        "diversity": "Diversité des Échantillons",
+        "excellent": "Excellent Profil",
+        "excellentDesc": "Correspondance vocale très précise avec des données de style riches",
+        "fairDesc": "Profil basique, envisagez d'ajouter plus d'échantillons",
+        "goodDesc": "Profil fiable avec une bonne représentation du style",
+        "length": "Longueur du Contenu",
+        "needsWorkDesc": "Ajoutez des échantillons plus diversifiés pour une meilleure précision",
+        "outOf": "sur 100",
+        "ratingsTitle": "Notes de Qualité",
+        "tip1": "Ajoutez 5+ échantillons d'écriture pour de meilleurs résultats",
+        "tip2": "Incluez différents types de contenu (emails, posts, articles)",
+        "tip3": "Utilisez des échantillons d'au moins 200 mots chacun",
+        "tipsTitle": "Conseils pour un Meilleur Score"
+      },
+      "qualityBadge": "Assurance Qualité",
+      "qualityDesc": "Notre IA évalue vos échantillons d'écriture pour garantir la meilleure précision possible du profil vocal",
+      "qualityTitle": "Score de Qualité du Profil",
+      "stats": {
+        "accuracy": "Correspondance Vocale",
+        "metrics": "Métriques de Style",
+        "samples": "Échantillons Min",
+        "speed": "Analyse"
+      },
+      "trust": {
+        "fast": "Analyse instantanée",
+        "private": "Jamais partagé",
+        "secure": "Données chiffrées"
+      },
+      "trustIndicator1": "Pas de carte de crédit requise",
+      "trustIndicator2": "Configuration en 30 secondes",
+      "trustIndicator3": "Les crédits n'expirent jamais",
+      "tryItNow": "Explorer des exemples de profils vocaux",
+      "useCases": {
+        "business": {
+          "desc": "Assurez-vous que toutes les communications de l'équipe correspondent à la voix de votre marque",
+          "quote": "",
+          "statLabel": "entreprises",
+          "title": "Communication d'Entreprise"
+        },
+        "content": {
+          "desc": "Générez des articles de blog, des articles et du texte qui vous ressemblent",
+          "quote": "",
+          "statLabel": "articles",
+          "title": "Création de Contenu"
+        },
+        "cta": "Prêt à trouver votre voix ?",
+        "ctaButton": "Créez Votre Profil",
+        "personal": {
+          "desc": "Construisez une marque personnelle cohérente sur tout votre contenu",
+          "quote": "",
+          "statLabel": "créateurs",
+          "title": "Marque Personnelle"
+        },
+        "team": {
+          "desc": "Partagez des profils pour maintenir une voix cohérente au sein de votre équipe",
+          "quote": "",
+          "statLabel": "équipes",
+          "title": "Collaboration d'Équipe"
+        }
+      },
+      "useCasesBadge": "Cas d'Usage",
+      "useCasesDesc": "Rejoignez des milliers de professionnels qui utilisent le Profil Vocal pour maintenir leur voix authentique",
+      "useCasesTitle": "Parfait Pour",
+      "whatYouGet": "Ce Que Vous Obtenez",
+      "whyCreate": "Pourquoi Créer un Profil Vocal ?",
+      "whyCreateDesc": "Débloquez la puissance de l'écriture IA personnalisée"
+    }
+  },
+  "featuresPage": {
+    "badge": "8 Outils Puissants",
+    "cta": {
+      "description": "Rejoignez des milliers d'écrivains qui utilisent Graphos AI Studio pour créer du contenu authentique.",
+      "title": "Prêt à Commencer ?"
+    },
+    "description": "De la détection IA à l'humanisation de contenu, du profilage vocal à la réécriture intelligente — découvrez la boîte à outils complète pour une écriture authentique et humaine.",
+    "gridBadge": "Explorer les Fonctionnalités",
+    "gridSubtitle": "Cliquez sur n'importe quelle fonctionnalité pour en savoir plus et l'essayer",
+    "gridTitle": "Choisissez Votre Outil",
+    "meta": {
+      "description": "Explorez toutes les fonctionnalités de Graphos AI Studio : Détection IA, Humanisation, Profil Vocal, Espace de Travail IA, Réécriture, et plus encore.",
+      "title": "Fonctionnalités - Graphos AI Studio"
+    },
+    "stats": {
+      "extension": "Extension Chrome",
+      "features": "8 Fonctionnalités",
+      "languages": "15+ Langues"
+    },
+    "subtitle": "Tout Ce Dont Vous Avez Besoin pour Mieux Écrire",
+    "title": "Toutes les Fonctionnalités"
   },
   "footer": {
-    "description": "Graphos AI Studio vous aide à écrire du contenu authentique avec la détection IA, l'humanisation et les profils vocaux.",
-    "copyright": "Tous droits réservés."
+    "copyright": "Tous droits réservés.",
+    "description": "Graphos AI Studio vous aide à écrire du contenu authentique avec des fonctionnalités de détection IA, d'humanisation et de profil vocal.",
+    "newsletter": {
+      "note": "Recevez des conseils, des mises à jour et des offres exclusives. Pas de spam.",
+      "placeholder": "Entrez votre email",
+      "subscribe": "S'abonner",
+      "success": "Merci de vous être abonné !",
+      "title": "Restez Informé"
+    },
+    "trust": {
+      "gdpr": "Conforme au RGPD",
+      "privacy": "Confidentialité d'Abord",
+      "ssl": "Sécurisé SSL"
+    }
+  },
+  "hero": {
+    "badge": "Assistant d'Écriture IA",
+    "badgeText": "Assistant d'Écriture IA",
+    "description": "Détectez le contenu IA, humanisez votre écriture et créez du contenu qui vous ressemble authentiquement. Tout en une seule plateforme puissante.",
+    "scroll": "Faire défiler pour explorer",
+    "stats": {
+      "accuracy": "Précision",
+      "users": "Utilisateurs Actifs"
+    },
+    "title": "Écrivez avec Authenticité",
+    "titleHighlight": "Avec une IA Qui Vous Comprend",
+    "trust": {
+      "extension": "Extension Chrome",
+      "free": "Gratuit pour commencer",
+      "noCard": "Pas de carte de crédit"
+    },
+    "typing": {
+      "detect": "Détectez le contenu IA instantanément",
+      "humanize": "Humanisez votre écriture",
+      "voice": "Écrivez avec votre voix unique",
+      "workspace": "Discutez avec l'IA, à votre façon"
+    },
+    "videoNote": "Essayez la démo en direct ci-dessous à la place",
+    "videoPlaceholder": "Vidéo de démo bientôt disponible !"
+  },
+  "heroBadge": {
+    "detection": "Précision de 98%",
+    "fast": "Résultats Instantanés",
+    "languages": "15 Langues",
+    "users": "50K+ Utilisateurs"
+  },
+  "heroTrust": {
+    "extension": "Extension Chrome incluse",
+    "free": "Gratuit pour commencer",
+    "noCard": "Pas de carte de crédit requise"
+  },
+  "home": {
+    "cta": {
+      "description": "Rejoignez des milliers d'écrivains qui utilisent Graphos AI Studio pour créer du contenu authentique et humain.",
+      "title": "Prêt à Écrire du Contenu Authentique ?"
+    },
+    "features": {
+      "subtitle": "Tout ce dont vous avez besoin pour écrire du contenu authentique et humain avec l'assistance de l'IA.",
+      "title": "Fonctionnalités Puissantes"
+    },
+    "hero": {
+      "subtitle": "Détectez le texte généré par l'IA, humanisez le contenu et créez avec votre profil vocal unique.",
+      "title": "Écrivez du Contenu Authentique avec l'IA"
+    },
+    "meta": {
+      "description": "Détectez le contenu généré par l'IA, humanisez votre écriture et créez du contenu authentique qui vous ressemble. Assistant d'écriture IA gratuit avec extension Chrome.",
+      "title": "Graphos AI Studio - Détection IA, Humanisation & Profil Vocal"
+    }
+  },
+  "howItWorks": {
+    "badge": "Processus Simple",
+    "ctaText": "Prêt à commencer ?",
+    "step1": {
+      "description": "Téléchargez vos échantillons d'écriture ou collez du texte. Notre IA analyse votre style, ton et modèles de vocabulaire uniques.",
+      "title": "Créez Votre Profil Vocal"
+    },
+    "step2": {
+      "description": "Collez n'importe quel texte pour vérifier instantanément s'il a été écrit par une IA. Obtenez une analyse détaillée avec des scores de confiance.",
+      "title": "Détectez le Contenu IA"
+    },
+    "step3": {
+      "description": "Transformez le texte généré par l'IA en contenu naturel et humain qui correspond à votre style d'écriture.",
+      "title": "Humanisez Votre Contenu"
+    },
+    "step4": {
+      "description": "Utilisez l'Espace de Travail IA pour générer du contenu qui vous ressemble authentiquement. Parfait pour les emails, posts, et plus encore.",
+      "title": "Discutez avec Votre Voix"
+    },
+    "steps": {
+      "chatInVoice": "Discutez avec Votre Voix",
+      "createProfile": "Créez Votre Profil Vocal",
+      "detectAI": "Détectez le Contenu IA",
+      "humanize": "Humanisez Votre Contenu"
+    },
+    "subtitle": "Commencez en quelques minutes. Pas de configuration complexe requise.",
+    "title": "Comment Ça Marche"
+  },
+  "humanization": {
+    "description": "Transformez le texte IA en écriture humaine naturelle et authentique.",
+    "meta": {
+      "description": "Transformez le texte généré par l'IA en contenu naturel et humain tout en préservant le sens.",
+      "title": "Humanisation de Contenu - Graphos AI Studio"
+    },
+    "title": "Humanisation de Contenu"
+  },
+  "nav": {
+    "aiDetection": "Détection IA",
+    "aiDetectionDesc": "Détecter le contenu généré par IA",
+    "aiWorkspace": "Espace de Travail IA",
+    "aiWorkspaceDesc": "Espace de travail IA tout-en-un",
+    "aidetection": "Détection IA",
+    "chromeExtension": "Extension Chrome",
+    "compatibility": "Score de Compatibilité",
+    "compatibilityScore": "Score de Compatibilité",
+    "compatibilityScoreDesc": "Vérifiez votre correspondance de style d'écriture",
+    "cookies": "Politique de Cookies",
+    "deviations": "Déviations",
+    "deviationsDesc": "Trouver les incohérences de style",
+    "faq": "FAQ",
+    "features": "Fonctionnalités",
+    "home": "Accueil",
+    "humanization": "Humanisation",
+    "humanizationDesc": "Rendre le texte IA naturel",
+    "legal": "Légal",
+    "login": "Connexion",
+    "pricing": "Tarification",
+    "privacy": "Politique de Confidentialité",
+    "resources": "Ressources",
+    "rewrite": "Réécriture IA",
+    "rewriteDesc": "Transformer le texte avec votre voix",
+    "statistics": "Statistiques",
+    "statisticsDesc": "Analysez vos métriques d'écriture",
+    "support": "Support",
+    "terms": "Conditions d'Utilisation",
+    "viewAllFeatures": "Voir Toutes les Fonctionnalités",
+    "voiceProfile": "Profil Vocal",
+    "voiceProfileDesc": "Créez votre voix unique",
+    "voiceprofile": "Profil Vocal",
+    "workspace": "Espace de Travail"
+  },
+  "pricing": {
+    "acceptedPayments": "Nous acceptons",
+    "badge": "Tarification",
+    "benefits": {
+      "instantCredits": "Crédits instantanés",
+      "neverExpire": "Les crédits n'expirent jamais",
+      "noSubscription": "Pas d'abonnement",
+      "securePayment": "Paiement sécurisé"
+    },
+    "bestValue": "Meilleure Valeur",
+    "bonus": "bonus",
+    "buyNow": "Acheter Maintenant",
+    "creditCard": "Carte de Crédit",
+    "creditCostNote": "Crédits approximatifs par utilisation (varie selon la longueur du texte)",
+    "credits": "crédits",
+    "creditsShort": "cr",
+    "firstPurchase": "Premier achat",
+    "firstPurchaseDesc": "Obtenez 2x crédits sur votre premier achat !",
+    "firstPurchaseTitle": "Bonus de Premier Achat",
+    "free": "Gratuit",
+    "freeCredits": "Commencez avec 100 crédits gratuits",
+    "freeFeatures": {
+      "neverExpires": "Les crédits n'expirent jamais",
+      "noCardRequired": "Pas de carte de crédit requise",
+      "tryAllFeatures": "Essayez toutes les fonctionnalités"
+    },
+    "limitedOffer": "Offre à Durée Limitée",
+    "localCurrencyNote": "* Les estimations en devise locale peuvent varier selon les taux de change",
+    "noCardRequired": "Pas de carte de crédit requise • Essayez toutes les fonctionnalités",
+    "note": "Paiement sécurisé via Lemon Squeezy • Carte de Crédit & PayPal acceptés",
+    "perCredit": "crédit",
+    "popular": "Populaire",
+    "poweredBy": "Propulsé par",
+    "secureCheckout": "Paiement sécurisé avec chiffrement SSL 256-bits",
+    "startFree": "Commencer Gratuitement",
+    "subtitle": "Achetez des crédits quand vous en avez besoin. Pas d'abonnement requis. Les crédits n'expirent jamais.",
+    "title": "Paiement à l'Usage",
+    "uses": {
+      "aiDetection": "Détection IA",
+      "aiWorkspace": "Chat IA",
+      "humanization": "Humanisation",
+      "rewriting": "Réécrire avec votre style",
+      "styleAnalysis": "Analyser les modèles d'écriture",
+      "voiceProfiles": "Créer des profils vocaux d'écriture"
+    },
+    "usesDescriptions": {
+      "aiDetection": "Détecter le contenu généré par IA",
+      "aiWorkspace": "Assistant d'écriture propulsé par IA",
+      "humanization": "Rendre le texte plus humain",
+      "rewriting": "Réécrire avec votre style",
+      "styleAnalysis": "Analyser les modèles d'écriture",
+      "voiceProfiles": "Créer des profils vocaux d'écriture"
+    },
+    "whatCreditsFor": "Que Pouvez-Vous Faire Avec Les Crédits ?"
+  },
+  "privacy": {
+    "lastUpdated": "Dernière Mise à Jour",
+    "meta": {
+      "description": "Apprenez comment Graphos AI Studio collecte, utilise et protège vos données personnelles.",
+      "title": "Politique de Confidentialité - Graphos AI Studio"
+    },
+    "title": "Politique de Confidentialité"
+  },
+  "relatedFeatures": {
+    "badge": "Explorer Plus",
+    "subtitle": "Découvrez plus d'outils puissants pour améliorer votre écriture",
+    "title": "Fonctionnalités Connexes"
+  },
+  "rewrite": {
+    "description": "Transformez le texte avec votre voix grâce à la réécriture propulsée par l'IA.",
+    "meta": {
+      "description": "Transformez n'importe quel texte pour qu'il corresponde à votre style d'écriture unique. Réécriture propulsée par l'IA qui maintient votre voix et votre ton.",
+      "title": "Réécriture IA - Transformez le Texte avec Votre Voix | Graphos AI"
+    },
+    "title": "Réécriture IA"
+  },
+  "seo": {
+    "howToUse": "Comment Utiliser Graphos AI Studio",
+    "voiceProfileCreation": "Création de Profil Vocal"
+  },
+  "showcase": {
+    "badge": "Démo Interactive",
+    "ctaText": "Prêt à expérimenter toute la puissance ?",
+    "subtitle": "Essayez nos fonctionnalités ici même. Aucune inscription requise. Voyez exactement comment fonctionne Graphos AI Studio.",
+    "title": "Expérimentez le Produit Réel"
+  },
+  "socialProof": {
+    "benefits": {
+      "contentCreators": "Créez du contenu engageant",
+      "developers": "Écrivez une meilleure documentation",
+      "educators": "Améliorez le matériel pédagogique",
+      "marketers": "Rédigez des textes convaincants",
+      "students": "Améliorez l'écriture académique"
+    },
+    "perfectFor": "Parfait pour",
+    "stats": {
+      "accuracy": "Taux de Précision",
+      "activeUsers": "Utilisateurs Actifs",
+      "languages": "Langues",
+      "textsProcessed": "Textes Traités"
+    },
+    "trustedBy": "Approuvé par les écrivains et équipes chez",
+    "userTypeDescriptions": {
+      "contentCreators": "Créez du contenu engageant",
+      "developers": "Écrivez une meilleure documentation",
+      "educators": "Améliorez le matériel pédagogique",
+      "marketers": "Rédigez des textes convaincants",
+      "students": "Améliorez l'écriture académique"
+    },
+    "userTypes": {
+      "contentCreators": "Créateurs de Contenu",
+      "developers": "Développeurs",
+      "educators": "Éducateurs",
+      "marketers": "Marketeurs",
+      "students": "Étudiants"
+    }
+  },
+  "statistics": {
+    "description": "Analysez vos métriques et modèles d'écriture.",
+    "meta": {
+      "description": "Obtenez des statistiques d'écriture détaillées, y compris le nombre de mots, la longueur des phrases, la richesse du vocabulaire et les scores de lisibilité.",
+      "title": "Statistiques - Analysez Vos Métriques d'Écriture | Graphos AI"
+    },
+    "title": "Statistiques"
+  },
+  "stats": {
+    "accuracyrate": "Taux de Précision",
+    "activeusers": "Utilisateurs Actifs",
+    "textsanalyzed": "Textes Analysés",
+    "userrating": "Note Utilisateur"
+  },
+  "terms": {
+    "lastUpdated": "Dernière Mise à Jour",
+    "meta": {
+      "description": "Lisez les termes et conditions d'utilisation des services Graphos AI Studio.",
+      "title": "Conditions d'Utilisation - Graphos AI Studio"
+    },
+    "title": "Conditions d'Utilisation"
+  },
+  "testimonials": {
+    "badge": "Témoignages",
+    "quotes": {
+      "1": "Graphos AI a complètement changé ma façon d'écrire du contenu. La fonctionnalité de profil vocal est incroyable - elle sonne vraiment comme moi !",
+      "2": "En tant que professeur, j'utilise la détection IA quotidiennement. Elle est précise et m'aide à maintenir l'intégrité académique dans mes classes.",
+      "3": "La fonctionnalité d'humanisation m'a fait gagner des heures d'édition. Mes brouillons assistés par l'IA se lisent maintenant naturellement et authentiquement.",
+      "4": "Enfin, un outil d'IA qui m'aide à écrire plus vite sans perdre ma touche personnelle. L'espace de travail est intuitif et puissant.",
+      "5": "J'étais sceptique au début, mais la précision de la détection IA est impressionnante. C'est devenu essentiel pour mon travail éditorial.",
+      "6": "L'extension Chrome rend l'utilisation si facile partout. Je peux vérifier et humaniser le contenu sans quitter mon flux de travail."
+    },
+    "roles": {
+      "contentCreator": "Créateur de Contenu",
+      "customerSuccessLead": "Responsable Succès Client",
+      "editor": "Rédacteur en Chef",
+      "freelanceWriter": "Rédacteur Freelance",
+      "marketingManager": "Responsable Marketing",
+      "professor": "Professeur d'Université",
+      "socialMediaManager": "Responsable Réseaux Sociaux"
+    },
+    "subtitle": "Voyez ce que nos utilisateurs ont à dire sur leur expérience avec Graphos AI Studio.",
+    "title": "Aimé par les Écrivains du Monde Entier"
+  },
+  "trust": {
+    "guarantees": {
+      "noExpiry": {
+        "desc": "Utilisez vos crédits quand vous en avez besoin",
+        "title": "Les Crédits N'expirent Jamais"
+      },
+      "refund": {
+        "desc": "Pas satisfait ? Obtenez un remboursement complet sous 7 jours",
+        "title": "Remboursement sous 7 Jours"
+      },
+      "support": {
+        "desc": "Obtenez de l'aide quand vous en avez besoin par email",
+        "title": "Support Prioritaire"
+      }
+    },
+    "guaranteesTitle": "Nos Garanties",
+    "items": {
+      "encryption": {
+        "desc": "Chiffrement AES-256 pour toutes les données au repos et en transit",
+        "title": "Chiffrement d'Entreprise"
+      },
+      "gdpr": {
+        "desc": "Conformité totale avec les réglementations de protection des données de l'UE",
+        "title": "Conforme au RGPD"
+      },
+      "privacy": {
+        "desc": "Vos données ne sont jamais partagées ni utilisées pour entraîner des modèles d'IA",
+        "title": "Confidentialité d'Abord"
+      },
+      "uptime": {
+        "desc": "Infrastructure fiable propulsée par Google Cloud",
+        "title": "99,9% de Temps de Disponibilité"
+      }
+    },
+    "pciCompliant": "Conforme PCI",
+    "securePayment": "Paiement Sécurisé",
+    "sslSecured": "Sécurisé SSL"
+  },
+  "useCases": {
+    "badge": "Cas d'Usage",
+    "businesses": {
+      "benefits": {
+        "communication": "Communication client authentique",
+        "documentation": "Documentation professionnelle",
+        "efficiency": "Améliorer l'efficacité de l'équipe"
+      },
+      "desc": "Entreprises qui ont besoin d'une communication authentique avec les clients et les parties prenantes.",
+      "testimonial": {
+        "author": "Jennifer Park",
+        "quote": "Nos réponses au support client semblent plus personnelles maintenant.",
+        "role": "Responsable Succès Client"
+      },
+      "title": "Entreprises"
+    },
+    "contentCreators": {
+      "benefits": {
+        "scale": "Échelle sans perdre l'authenticité",
+        "speed": "Créez du contenu 5x plus vite",
+        "voice": "Maintenez votre voix unique"
+      },
+      "desc": "Blogueurs, YouTubers et gestionnaires de réseaux sociaux qui ont besoin de contenu authentique à grande échelle.",
+      "testimonial": {
+        "author": "Amanda Foster",
+        "quote": "Je peux maintenant produire deux fois plus de contenu tout en gardant ma touche personnelle.",
+        "role": "Créatrice de Contenu"
+      },
+      "title": "Créateurs de Contenu"
+    },
+    "educators": {
+      "benefits": {
+        "detect": "Détecter les soumissions IA avec précision",
+        "feedback": "Fournir un meilleur retour",
+        "integrity": "Maintenir l'intégrité académique"
+      },
+      "desc": "Enseignants et professeurs qui ont besoin de détecter les soumissions d'étudiants générées par l'IA.",
+      "testimonial": {
+        "author": "Dr. Robert Wilson",
+        "quote": "Outil essentiel pour maintenir les normes académiques à l'ère de l'IA.",
+        "role": "Professeur d'Université"
+      },
+      "title": "Éducateurs"
+    },
+    "freelancers": {
+      "benefits": {
+        "clients": "Satisfaire plus de clients",
+        "income": "Augmenter vos revenus",
+        "quality": "Livrer un travail de meilleure qualité"
+      },
+      "desc": "Rédacteurs indépendants qui doivent livrer du contenu authentique aux clients.",
+      "testimonial": {
+        "author": "Marcus Johnson",
+        "quote": "Mes clients adorent que mon contenu passe tous les détecteurs d'IA.",
+        "role": "Rédacteur Freelance"
+      },
+      "title": "Rédacteurs Freelance"
+    },
+    "keyBenefits": "Avantages Clés",
+    "marketers": {
+      "benefits": {
+        "authentic": "Créer des textes publicitaires authentiques",
+        "brand": "Maintenir la cohérence de la voix de la marque",
+        "campaigns": "Lancer des campagnes plus rapidement"
+      },
+      "desc": "Professionnels du marketing qui ont besoin de produire du contenu de marque authentique efficacement.",
+      "testimonial": {
+        "author": "Rachel Martinez",
+        "quote": "Nos taux d'ouverture d'emails se sont améliorés de 40% avec des textes plus humains.",
+        "role": "Responsable Marketing"
+      },
+      "title": "Équipes Marketing"
+    },
+    "startNow": "Commencer à utiliser Graphos AI",
+    "students": {
+      "benefits": {
+        "improve": "Améliorer la qualité d'écriture",
+        "learn": "Apprendre des suggestions de l'IA",
+        "verify": "Vérifier que votre travail est original"
+      },
+      "desc": "Étudiants et chercheurs qui veulent s'assurer que leur travail est original et authentique.",
+      "testimonial": {
+        "author": "Kevin Nguyen",
+        "quote": "Je l'utilise pour vérifier mes essais avant soumission. Tranquillité d'esprit !",
+        "role": "Étudiant Diplômé"
+      },
+      "title": "Étudiants & Académiques"
+    },
+    "subtitle": "Voyez comment différents professionnels utilisent Graphos AI pour améliorer leur écriture",
+    "title": "Conçu pour Tous Ceux Qui Écrivent"
+  },
+  "voiceProfile": {
+    "description": "Capturez votre style d'écriture unique et créez du contenu qui vous ressemble authentiquement.",
+    "meta": {
+      "description": "Créez votre profil vocal d'écriture unique et générez du contenu qui vous ressemble.",
+      "title": "Profil Vocal - Graphos AI Studio"
+    },
+    "title": "Profil Vocal"
+  },
+  "workspace": {
+    "askAnything": "Demandez n'importe quoi..."
+  },
+  "demoSamples": {
+    "aiDetection": {
+      "ai": {
+        "text": "L'implémentation de l'intelligence artificielle dans les systèmes de santé modernes représente un changement de paradigme dans le diagnostic médical et les soins aux patients. Les algorithmes d'apprentissage automatique ont démontré une précision remarquable dans l'analyse des données d'imagerie médicale, surpassant souvent les radiologues humains dans la détection de certaines conditions. De plus, le traitement du langage naturel permet l'extraction efficace d'informations pertinentes des dossiers de santé électroniques.",
+        "indicators": {
+          "predictablePatterns": "Modèles de phrases prévisibles"
+        }
+      },
+      "human": {
+        "text": "Je réfléchis à ce problème depuis des semaines maintenant, et honnêtement ? Ça me rend fou. Chaque fois que je pense avoir trouvé la solution, quelque chose de nouveau apparaît. Ma collègue Marie a suggéré d'essayer une approche différente - peut-être qu'on complique trop les choses. Elle a probablement raison. On fait souvent ça ici, surtout quand les deadlines approchent. Hier, je suis resté debout jusqu'à 2h du matin pour essayer de résoudre ça, alimenté par beaucoup trop de café.",
+        "indicators": {
+          "conversationalTone": "Ton conversationnel"
+        }
+      },
+      "mixed": {
+        "text": "L'intelligence artificielle a révolutionné la création de contenu grâce à des algorithmes sophistiqués et des réseaux neuronaux. Mais voilà le truc - je pense toujours qu'il y a quelque chose de spécial dans la créativité humaine que les machines ne peuvent pas tout à fait capturer. Bien sûr, l'IA peut générer une prose techniquement parfaite, mais peut-elle vous raconter cette fois où j'ai accidentellement envoyé un email embarrassant à toute mon équipe ? Je ne pense pas !",
+        "indicators": {
+          "rhetoricalQuestions": "Questions rhétoriques détectées",
+          "academicVocabulary": "Vocabulaire académique présent"
+        }
+      }
+    },
+    "humanization": {
+      "formal": {
+        "original": "La mise en œuvre de pratiques durables dans les environnements d'entreprise est devenue de plus en plus importante ces dernières années. Les organisations reconnaissent la nécessité d'adopter des stratégies respectueuses de l'environnement pour assurer la viabilité à long terme et la satisfaction des parties prenantes.",
+        "humanized": "Tu sais ce qui me trotte dans la tête ces derniers temps ? Comment les entreprises commencent enfin à prendre l'environnement au sérieux. Ce n'est plus juste pour faire bonne figure – elles réalisent qu'elles doivent vraiment se soucier de l'environnement si elles veulent durer. Et honnêtement ? Leurs clients et investisseurs le demandent aussi."
+      },
+      "academic": {
+        "original": "La recherche indique que l'exercice physique régulier contribue significativement à l'amélioration de la santé mentale. Des études ont démontré des corrélations entre des routines d'entraînement constantes et une réduction des symptômes d'anxiété et de dépression.",
+        "humanized": "Voici quelque chose que j'ai appris à mes dépens : faire du sport aide vraiment avec le stress et le moral. Avant, je pensais que c'était juste des paroles de sportifs, mais après avoir fait de l'exercice une habitude, je peux te dire – la science est vraie. Mon anxiété s'est beaucoup améliorée depuis que je bouge plus."
+      },
+      "technical": {
+        "original": "L'avancement de la technologie de l'intelligence artificielle présente à la fois des opportunités et des défis pour la main-d'œuvre moderne. L'automatisation des tâches routinières peut conduire à une efficacité accrue tout en exigeant des travailleurs qu'ils développent de nouvelles compétences.",
+        "humanized": "L'IA change tout dans notre façon de travailler, et je suis honnête – c'est un peu effrayant mais aussi excitant ? Bien sûr, les robots pourraient prendre en charge certaines tâches ennuyeuses (Dieu merci), mais ça veut aussi dire qu'on doit tous améliorer nos compétences. L'avenir appartient à ceux qui savent s'adapter, je pense."
+      }
+    },
+    "compatibility": {
+      "high": {
+        "text": "J'ai réfléchi à la façon dont nous abordons nos défis quotidiens. La clé est de se concentrer sur ce qui compte vraiment tout en restant assez flexible pour s'adapter. De petits pas constants mènent à des progrès remarquables avec le temps."
+      },
+      "medium": {
+        "text": "La mise en œuvre de pratiques durables dans les environnements d'entreprise est devenue de plus en plus importante. Les organisations doivent reconnaître la nécessité d'adopter des stratégies respectueuses de l'environnement pour rester compétitives sur le marché actuel."
+      },
+      "low": {
+        "text": "Conformément aux considérations susmentionnées, il est recommandé que le comité entreprenne un examen complet des protocoles existants. Les ramifications d'une telle entreprise seraient multiples et de grande portée."
+      }
+    },
+    "deviations": {
+      "few": {
+        "text": "J'ai réfléchi à la façon dont nous abordons nos défis quotidiens. La clé est de se concentrer sur ce qui compte vraiment. De petits pas constants mènent à des progrès remarquables avec le temps. Nous devrions embrasser le changement et nous adapter rapidement.",
+        "sentences": {
+          "0": "J'ai réfléchi à la façon dont nous abordons nos défis quotidiens.",
+          "1": "La clé est de se concentrer sur ce qui compte vraiment.",
+          "2": "De petits pas constants mènent à des progrès remarquables avec le temps.",
+          "3": "Nous devrions embrasser le changement et nous adapter rapidement."
+        }
+      },
+      "some": {
+        "text": "La mise en œuvre de pratiques durables est devenue de plus en plus importante. Les organisations doivent reconnaître la nécessité d'adopter des stratégies respectueuses de l'environnement. Cette approche apporte des avantages significatifs. Les entreprises devraient agir maintenant.",
+        "sentences": {
+          "0": "La mise en œuvre de pratiques durables est devenue de plus en plus importante.",
+          "1": "Les organisations doivent reconnaître la nécessité d'adopter des stratégies respectueuses de l'environnement.",
+          "2": "Cette approche apporte des avantages significatifs.",
+          "3": "Les entreprises devraient agir maintenant."
+        }
+      },
+      "many": {
+        "text": "Conformément aux considérations susmentionnées, il est recommandé que le comité entreprenne un examen complet. Les ramifications seraient multiples. De telles entreprises nécessitent une planification méticuleuse. Il faut procéder avec prudence.",
+        "sentences": {
+          "0": "Conformément aux considérations susmentionnées, il est recommandé que le comité entreprenne un examen complet.",
+          "1": "Les ramifications seraient multiples.",
+          "2": "De telles entreprises nécessitent une planification méticuleuse.",
+          "3": "Il faut procéder avec prudence."
+        }
+      }
+    },
+    "statistics": {
+      "blog": {
+        "text": "Écrire du bon contenu, ce n'est pas seulement avoir de bonnes idées. C'est les présenter d'une manière qui connecte avec vos lecteurs. Les phrases courtes aident. Elles créent du rythme. Les phrases plus longues, en revanche, vous permettent d'explorer des idées complexes et de créer de l'élan dans votre récit."
+      },
+      "academic": {
+        "text": "La mise en œuvre de pratiques de développement durable au sein des cadres organisationnels contemporains nécessite une compréhension globale des facteurs environnementaux, sociaux et de gouvernance. De plus, l'intégration de ces considérations multidimensionnelles dans les processus de prise de décision stratégique a démontré des corrélations significatives avec la résilience institutionnelle à long terme."
+      },
+      "casual": {
+        "text": "Salut ! Alors j'ai essayé ce nouveau café aujourd'hui. C'était plutôt bien, en fait. L'ambiance était cool et le barista super sympa. J'y retournerai certainement. Tu devrais y faire un tour !"
+      }
+    },
+    "rewrite": {
+      "professional": {
+        "original": "Je pense qu'on devrait peut-être envisager de regarder la possibilité d'implémenter de nouvelles fonctionnalités qui pourraient potentiellement aider à améliorer notre produit d'une certaine manière. Ce serait bien si on pouvait en discuter à un moment donné.",
+        "rewritten": "Je recommande d'implémenter de nouvelles fonctionnalités pour améliorer la valeur de notre produit. Planifions une réunion pour discuter des améliorations spécifiques et de leur impact attendu sur l'engagement des utilisateurs. J'ai identifié trois domaines clés à prioriser."
+      },
+      "casual": {
+        "original": "La mise en œuvre de pratiques durables dans les environnements d'entreprise est devenue de plus en plus importante ces dernières années. Les organisations reconnaissent la nécessité d'adopter des stratégies respectueuses de l'environnement.",
+        "rewritten": "Tu sais ce qui me trotte dans la tête ces derniers temps ? Comment les entreprises commencent enfin à prendre l'environnement au sérieux. Ce n'est plus juste pour faire bonne figure – elles réalisent qu'elles doivent vraiment se soucier de l'environnement si elles veulent durer."
+      },
+      "concise": {
+        "original": "Je vous écris pour vous informer que je souhaiterais demander une réunion à votre convenance la plus proche pour discuter de la possibilité d'explorer des opportunités de collaboration potentielles entre nos organisations respectives.",
+        "rewritten": "Planifions une réunion pour discuter des opportunités de collaboration. Quand êtes-vous disponible cette semaine ?"
+      }
+    },
+    "workspace": {
+      "response": "Salut,\n\nMerci beaucoup de m'avoir contacté ! J'apprécie vraiment que tu aies pris le temps.\n\nVoici mon avis : je pense que la clé est de garder les choses simples et authentiques. Ne réfléchis pas trop – sois toi-même et laisse ta personnalité briller.\n\nQuelques conseils rapides :\n• Commence par quelque chose de personnel ou de relatable\n• Garde tes phrases conversationnelles, pas robotiques\n• Termine par un appel à l'action clair ou une prochaine étape\n\nTu veux que je t'aide à peaufiner ça ? Je suis ravi d'ajuster le ton ou d'ajouter plus de détails !"
+    },
+    "voiceProfile": {
+      "sarah": {
+        "name": "Sarah Chen",
+        "style": "Professional & Warm",
+        "tone": "Warm & Approachable",
+        "vocab": {
+          "0": "honestly",
+          "1": "I think",
+          "2": "let me explain",
+          "3": "here's the thing"
+        }
+      },
+      "alex": {
+        "name": "Alex Rivera",
+        "style": "Casual & Creative",
+        "tone": "Fun & Energetic",
+        "vocab": {
+          "0": "basically",
+          "1": "you know",
+          "2": "kind of",
+          "3": "super"
+        }
+      },
+      "james": {
+        "name": "Dr. James Park",
+        "style": "Academic & Precise",
+        "tone": "Authoritative & Measured",
+        "vocab": {
+          "0": "furthermore",
+          "1": "consequently",
+          "2": "research indicates",
+          "3": "data suggests"
+        }
+      }
+    }
   }
 }

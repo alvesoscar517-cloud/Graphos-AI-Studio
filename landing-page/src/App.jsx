@@ -1,11 +1,12 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { Suspense, lazy } from 'react'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Suspense, lazy, useEffect } from 'react'
 import Layout from '@components/layout/Layout'
 import { PageLoader } from '@components/common/LoadingSpinner'
+import { requestIdleCallback } from '@utils/performance'
 
-// Lazy load pages for code splitting
-// Using webpackChunkName for better debugging
+// Lazy load pages for code splitting with prefetch support
 const Home = lazy(() => import(/* webpackChunkName: "home" */ '@pages/Home'))
+const Features = lazy(() => import(/* webpackChunkName: "features" */ '@pages/Features'))
 const AIDetection = lazy(() =>
   import(/* webpackChunkName: "ai-detection" */ '@pages/features/AIDetection')
 )
@@ -37,13 +38,33 @@ const Terms = lazy(() =>
   import(/* webpackChunkName: "terms" */ '@pages/Terms')
 )
 
+// Prefetch common routes in idle time
+const prefetchRoutes = () => {
+  requestIdleCallback(() => {
+    // Prefetch Features page (common navigation)
+    import('@pages/Features')
+  }, { timeout: 5000 })
+}
+
 function App() {
+  const location = useLocation()
+
+  // Prefetch routes after initial load
+  useEffect(() => {
+    // Only prefetch on home page after initial render
+    if (location.pathname === '/' || location.pathname.match(/^\/[a-z]{2}$/)) {
+      const timer = setTimeout(prefetchRoutes, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
   return (
     <Layout>
-      <Suspense fallback={<PageLoader />}>
+        <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Default routes */}
           <Route path="/" element={<Home />} />
+          <Route path="/features" element={<Features />} />
           <Route path="/features/ai-detection" element={<AIDetection />} />
           <Route path="/features/humanization" element={<Humanization />} />
           <Route path="/features/voice-profile" element={<VoiceProfile />} />
@@ -58,6 +79,7 @@ function App() {
           {/* Language-prefixed routes */}
           <Route path="/:lang">
             <Route index element={<Home />} />
+            <Route path="features" element={<Features />} />
             <Route path="features/ai-detection" element={<AIDetection />} />
             <Route path="features/humanization" element={<Humanization />} />
             <Route path="features/voice-profile" element={<VoiceProfile />} />

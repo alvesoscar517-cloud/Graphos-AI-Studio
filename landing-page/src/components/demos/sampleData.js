@@ -5,13 +5,106 @@
  * These are used for sample text selections to avoid API calls
  * and provide instant feedback to users.
  * 
+ * Now supports i18n - use getSampleTexts(t) to get localized samples.
+ * 
  * @module components/demos/sampleData
  */
 
 /**
- * Sample texts with pre-computed detection results
- * Each sample includes realistic text and matching detection results
+ * Get sample texts with pre-computed detection results (i18n supported)
+ * @param {Function} t - i18n translation function
+ * @returns {Object} Sample texts object with localized content
  */
+export const getSampleTexts = (t) => ({
+  ai: {
+    id: 'ai',
+    label: t('demo.aiText', 'AI Text'),
+    labelKey: 'demo.aiText',
+    text: t('demoSamples.aiDetection.ai.text', `The implementation of artificial intelligence in modern healthcare systems represents a paradigm shift in medical diagnostics and patient care. Machine learning algorithms have demonstrated remarkable accuracy in analyzing medical imaging data, often surpassing human radiologists in detecting certain conditions. Furthermore, natural language processing enables efficient extraction of relevant information from electronic health records, facilitating more informed clinical decision-making. The integration of these technologies promises to revolutionize patient outcomes while optimizing resource allocation across healthcare institutions.`),
+    result: {
+      success: true,
+      ai_probability: 87,
+      confidence: 92,
+      confidence_level: 'high',
+      verdict: t('demo.verdictAI', 'AI-generated'),
+      human_indicators: [],
+      ai_indicators: [
+        t('demo.indicators.ai.consistentFormalTone', 'Consistent formal tone throughout'),
+        t('demo.indicators.ai.technicalVocabulary', 'Technical vocabulary usage'),
+        t('demo.indicators.ai.structuredParagraphFlow', 'Structured paragraph flow'),
+        t('demo.indicators.ai.lackOfPersonalExpressions', 'Lack of personal expressions'),
+        t('demoSamples.aiDetection.ai.indicators.predictablePatterns', 'Predictable sentence patterns')
+      ],
+      text_statistics: {
+        totalWords: 89,
+        totalSentences: 4,
+        avgWordLength: 6.2,
+        avgSentenceLength: 22.3,
+        readabilityScore: 28
+      }
+    }
+  },
+  human: {
+    id: 'human',
+    label: t('demo.humanText', 'Human Text'),
+    labelKey: 'demo.humanText',
+    text: t('demoSamples.aiDetection.human.text', `I've been thinking about this problem for weeks now, and honestly? It's driving me crazy. Every time I think I've figured it out, something new pops up. My colleague Sarah suggested we try a different approach - maybe we're overcomplicating things. She's probably right. We tend to do that a lot around here, especially when deadlines are looming. Yesterday I stayed up until 2am trying to crack it, fueled by way too much coffee. Not my proudest moment, but hey, that's startup life for you.`),
+    result: {
+      success: true,
+      ai_probability: 18,
+      confidence: 88,
+      confidence_level: 'high',
+      verdict: t('demo.verdictHuman', 'Human-written'),
+      human_indicators: [
+        t('demo.indicators.human.personalPronouns', 'Personal pronouns detected'),
+        t('demo.indicators.human.informalLanguage', 'Informal language patterns'),
+        t('demo.indicators.human.emotionalExpressions', 'Emotional expressions present'),
+        t('demo.indicators.human.variedSentenceStructure', 'Varied sentence structure'),
+        t('demoSamples.aiDetection.human.indicators.conversationalTone', 'Conversational tone')
+      ],
+      ai_indicators: [],
+      text_statistics: {
+        totalWords: 98,
+        totalSentences: 8,
+        avgWordLength: 4.3,
+        avgSentenceLength: 12.3,
+        readabilityScore: 72
+      }
+    }
+  },
+  mixed: {
+    id: 'mixed',
+    label: t('demo.mixedText', 'Mixed'),
+    labelKey: 'demo.mixedText',
+    text: t('demoSamples.aiDetection.mixed.text', `Artificial intelligence has revolutionized content creation through sophisticated algorithms and neural networks. But here's the thing - I still think there's something special about human creativity that machines can't quite capture. Sure, AI can generate technically perfect prose, but can it tell you about that time I accidentally sent an embarrassing email to my entire team? I don't think so! The intersection of human intuition and machine precision creates opportunities for unprecedented innovation in creative fields.`),
+    result: {
+      success: true,
+      ai_probability: 52,
+      confidence: 75,
+      confidence_level: 'medium',
+      verdict: t('demo.verdictMixed', 'Mixed content'),
+      human_indicators: [
+        t('demo.indicators.human.personalAnecdotes', 'Personal anecdotes present'),
+        t('demo.indicators.human.informalExpressions', 'Informal expressions used'),
+        t('demoSamples.aiDetection.mixed.indicators.rhetoricalQuestions', 'Rhetorical questions detected')
+      ],
+      ai_indicators: [
+        t('demo.indicators.ai.technicalTerminology', 'Technical terminology detected'),
+        t('demo.indicators.ai.formalSentenceStructures', 'Formal sentence structures'),
+        t('demoSamples.aiDetection.mixed.indicators.academicVocabulary', 'Academic vocabulary present')
+      ],
+      text_statistics: {
+        totalWords: 91,
+        totalSentences: 6,
+        avgWordLength: 5.1,
+        avgSentenceLength: 15.2,
+        readabilityScore: 52
+      }
+    }
+  }
+});
+
+// Legacy export for backward compatibility (English only)
 export const SAMPLE_TEXTS = {
   ai: {
     id: 'ai',

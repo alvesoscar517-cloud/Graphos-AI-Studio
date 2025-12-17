@@ -2,12 +2,13 @@
  * ChromeExtensionSection - Premium Chrome Extension showcase
  * Enhanced: Dec 2025 - Coming Soon design with improved layout
  */
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import Icon from '@components/common/Icon'
 
-const EXTENSION_FEATURES = [
+// Get extension features with i18n support
+const getExtensionFeatures = (t) => [
   {
     id: 'detect',
     icon: 'shield-check',
@@ -15,7 +16,12 @@ const EXTENSION_FEATURES = [
     descKey: 'extension.features.detect.desc',
     defaultTitle: 'Instant AI Detection',
     defaultDesc: 'Select any text on the web and instantly check if it was AI-generated.',
-    demo: { action: 'Detecting AI content...', result: '87% AI Probability', icon: 'alert-triangle', color: 'text-amber-500' }
+    demo: { 
+      action: t('extension.demo.detect.action', 'Detecting AI content...'), 
+      result: t('extension.demo.detect.result', '87% AI Probability'), 
+      icon: 'alert-triangle', 
+      color: 'text-amber-500' 
+    }
   },
   {
     id: 'humanize',
@@ -24,7 +30,12 @@ const EXTENSION_FEATURES = [
     descKey: 'extension.features.humanize.desc',
     defaultTitle: 'One-Click Humanization',
     defaultDesc: 'Transform AI text into natural, human-sounding content instantly.',
-    demo: { action: 'Humanizing text...', result: 'Text humanized!', icon: 'check-circle', color: 'text-green-500' }
+    demo: { 
+      action: t('extension.demo.humanize.action', 'Humanizing text...'), 
+      result: t('extension.demo.humanize.result', 'Text humanized!'), 
+      icon: 'check-circle', 
+      color: 'text-green-500' 
+    }
   },
   {
     id: 'write',
@@ -33,7 +44,12 @@ const EXTENSION_FEATURES = [
     descKey: 'extension.features.write.desc',
     defaultTitle: 'Write in Your Voice',
     defaultDesc: 'Generate content that matches your unique writing style anywhere.',
-    demo: { action: 'Generating in your voice...', result: 'Content ready!', icon: 'sparkles', color: 'text-purple-500' }
+    demo: { 
+      action: t('extension.demo.write.action', 'Generating in your voice...'), 
+      result: t('extension.demo.write.result', 'Content ready!'), 
+      icon: 'sparkles', 
+      color: 'text-purple-500' 
+    }
   },
   {
     id: 'workspace',
@@ -42,7 +58,12 @@ const EXTENSION_FEATURES = [
     descKey: 'extension.features.workspace.desc',
     defaultTitle: 'AI Workspace',
     defaultDesc: 'Chat with AI in your unique voice, right from any webpage.',
-    demo: { action: 'Opening workspace...', result: 'Ready to chat!', icon: 'message-circle', color: 'text-blue-500' }
+    demo: { 
+      action: t('extension.demo.workspace.action', 'Opening workspace...'), 
+      result: t('extension.demo.workspace.result', 'Ready to chat!'), 
+      icon: 'message-circle', 
+      color: 'text-blue-500' 
+    }
   }
 ]
 
@@ -58,6 +79,9 @@ const SUPPORTED_SITES = [
 function ChromeExtensionSection() {
   const { t } = useTranslation()
   const [activeFeature, setActiveFeature] = useState('detect')
+  
+  // Get i18n extension features
+  const EXTENSION_FEATURES = useMemo(() => getExtensionFeatures(t), [t])
   const [isAnimating, setIsAnimating] = useState(false)
 
   const handleFeatureClick = (featureId) => {
@@ -70,45 +94,46 @@ function ChromeExtensionSection() {
   const currentFeature = EXTENSION_FEATURES.find(f => f.id === activeFeature)
 
   return (
-    <section className="pt-8 pb-20 lg:pt-10 lg:pb-28 bg-bg-secondary relative overflow-hidden">
+    <section className="pt-6 sm:pt-8 lg:pt-10 pb-12 sm:pb-16 lg:pb-20 xl:pb-28 bg-bg-secondary relative overflow-hidden">
       {/* Background - shared with FeaturesSection */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-48 sm:w-80 h-48 sm:h-80 bg-purple-500/5 rounded-full blur-3xl" />
+
       </div>
 
-      <div className="max-w-content-lg mx-auto px-4 relative">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-10 lg:mb-12"
         >
           <motion.span 
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-bg-primary text-primary text-sm font-semibold rounded-full mb-4 border border-gray-200 dark:border-gray-700 shadow-sm"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-bg-primary text-primary text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 border border-gray-200 dark:border-gray-700 shadow-sm"
           >
             <Icon name="chrome" size="sm" className="icon-primary" />
             {t('extension.badge', 'Chrome Extension')}
           </motion.span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-3 sm:mb-4">
             {t('extension.title', 'Use Graphos AI Anywhere')}
           </h2>
-          <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2 sm:px-0">
             {t('extension.subtitle', 'Our Chrome extension brings AI detection and humanization to every website you visit.')}
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 items-start">
           {/* Feature List */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-3 flex flex-col"
+            className="space-y-2 sm:space-y-3 flex flex-col"
           >
             {EXTENSION_FEATURES.map((feature, index) => (
               <motion.button
@@ -116,28 +141,28 @@ function ChromeExtensionSection() {
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.05 }}
                 whileHover={{ x: 2 }}
                 onClick={() => handleFeatureClick(feature.id)}
-                className={`w-full text-left p-5 rounded-2xl border transition-all ${
+                className={`w-full text-left p-3 sm:p-4 lg:p-5 rounded-xl sm:rounded-2xl border transition-all ${
                   activeFeature === feature.id
                     ? 'bg-bg-primary border-primary/25 shadow-md'
                     : 'bg-bg-primary border-gray-200 dark:border-gray-700 hover:border-gray-300 hover:shadow-sm'
                 }`}
               >
-                <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all border ${
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className={`w-10 sm:w-11 lg:w-12 h-10 sm:h-11 lg:h-12 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 transition-all border ${
                     activeFeature === feature.id 
                       ? 'bg-bg-primary border-gray-200 dark:border-gray-700 shadow-sm' 
                       : 'bg-bg-secondary border-transparent'
                   }`}>
                     <Icon name={feature.icon} size="md" className="icon-primary" />
                   </div>
-                  <div>
-                    <h4 className={`font-bold mb-1 transition-colors ${activeFeature === feature.id ? 'text-primary' : 'text-text-primary'}`}>
+                  <div className="min-w-0">
+                    <h4 className={`font-bold text-sm sm:text-base mb-0.5 sm:mb-1 transition-colors ${activeFeature === feature.id ? 'text-primary' : 'text-text-primary'}`}>
                       {t(feature.titleKey, feature.defaultTitle)}
                     </h4>
-                    <p className="text-sm text-text-secondary">
+                    <p className="text-xs sm:text-sm text-text-secondary line-clamp-2">
                       {t(feature.descKey, feature.defaultDesc)}
                     </p>
                   </div>
@@ -150,16 +175,16 @@ function ChromeExtensionSection() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="pt-4"
+              className="pt-3 sm:pt-4"
             >
               <motion.div
                 whileHover={{ scale: 1.02, y: -1 }}
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-white rounded-xl font-semibold shadow-sm cursor-default"
+                className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 bg-primary text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base shadow-sm cursor-default w-full sm:w-auto"
               >
                 <Icon name="clock" size="md" className="icon-white" />
                 {t('extension.comingSoonCta', 'Coming Soon')}
               </motion.div>
-              <p className="text-xs text-text-muted mt-3">
+              <p className="text-[10px] sm:text-xs text-text-muted mt-2 sm:mt-3 text-center sm:text-left">
                 * {t('extension.comingSoonNote', 'We\'re working hard to bring this to you')}
               </p>
             </motion.div>
@@ -211,7 +236,7 @@ function ChromeExtensionSection() {
                   className="p-4 bg-primary/5 border border-primary/20 rounded-lg mb-5"
                 >
                   <p className="text-base text-text-primary leading-relaxed">
-                    "The implementation of artificial intelligence in modern systems represents a paradigm shift..."
+                    "{t('extension.demo.sampleText', 'The implementation of artificial intelligence in modern systems represents a paradigm shift...')}"
                   </p>
                 </motion.div>
 
@@ -265,18 +290,18 @@ function ChromeExtensionSection() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-8 text-center"
+              className="mt-6 sm:mt-8 text-center"
             >
-              <p className="text-xs text-text-muted mb-4 font-medium">{t('extension.willWorkOn', 'Will work seamlessly on')}:</p>
-              <div className="flex flex-wrap justify-center gap-2">
+              <p className="text-[10px] sm:text-xs text-text-muted mb-3 sm:mb-4 font-medium">{t('extension.willWorkOn', 'Will work seamlessly on')}:</p>
+              <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
                 {SUPPORTED_SITES.map(site => (
                   <motion.div 
                     key={site.name}
                     whileHover={{ scale: 1.02, y: -1 }}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-bg-primary rounded-lg text-xs font-medium text-text-secondary border border-gray-200 dark:border-gray-700 hover:border-gray-300 hover:shadow-sm transition-all cursor-default"
+                    className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-bg-primary rounded-md sm:rounded-lg text-[10px] sm:text-xs font-medium text-text-secondary border border-gray-200 dark:border-gray-700 hover:border-gray-300 hover:shadow-sm transition-all cursor-default"
                   >
                     <Icon name={site.icon} size="xs" className={site.color} />
-                    {site.name}
+                    <span className="hidden xs:inline sm:inline">{site.name}</span>
                   </motion.div>
                 ))}
               </div>
@@ -289,3 +314,6 @@ function ChromeExtensionSection() {
 }
 
 export default ChromeExtensionSection
+
+
+

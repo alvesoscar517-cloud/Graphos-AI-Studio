@@ -1,15 +1,17 @@
 /**
- * VoiceProfile - Landing page for Voice Profile feature
+ * VoiceProfile - SEO-optimized Voice Profile feature page
  * Design: DNA/Fingerprint theme - "Your Unique Writing DNA"
- * Enhanced: Dec 2025 - Breakthrough design with DNA helix visualization
+ * Enhanced: Dec 2025 - Full SEO optimization
  */
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, lazy, Suspense, useEffect, useRef } from 'react'
-import SEOHead from '@components/seo/SEOHead'
-import StructuredData from '@components/seo/StructuredData'
+import PageSEO from '@components/seo/PageSEO'
 import Breadcrumb from '@components/common/Breadcrumb'
 import Icon from '@components/common/Icon'
+import RelatedFeatures from '@components/common/RelatedFeatures'
+import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
+import FAQAccordion from '@components/common/FAQAccordion'
 
 // Lazy load the live demo
 const LiveVoiceProfileDemo = lazy(() => import('@components/demos/LiveVoiceProfileDemo'))
@@ -24,9 +26,9 @@ const DNAHelixBackground = () => {
       {/* Base gradient - Purple/Indigo tones for uniqueness */}
       <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/70 via-violet-50/30 to-white dark:from-slate-950 dark:via-indigo-950/30 dark:to-slate-900" />
       
-      {/* SVG DNA Helix Visualization */}
+      {/* SVG DNA Helix Visualization - Responsive sizing */}
       <svg 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[900px] opacity-100"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] sm:w-[700px] md:w-[850px] lg:w-[1000px] xl:w-[1100px] h-[450px] sm:h-[570px] md:h-[700px] lg:h-[820px] xl:h-[900px] opacity-100"
         viewBox="0 0 1100 900"
         fill="none"
       >
@@ -156,18 +158,18 @@ const DNAHelixBackground = () => {
         </g>
       </svg>
       
-      {/* Ambient glow - purple */}
+      {/* Ambient glow - purple - Responsive */}
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[450px] md:w-[550px] lg:w-[650px] xl:w-[700px] h-[350px] sm:h-[450px] md:h-[550px] lg:h-[650px] xl:h-[700px] pointer-events-none"
         style={{
           background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%)',
           filter: 'blur(80px)',
         }}
       />
       
-      {/* Secondary glow - left */}
+      {/* Secondary glow - left - Responsive */}
       <div 
-        className="absolute top-1/3 left-1/5 w-[300px] h-[400px] pointer-events-none"
+        className="absolute top-1/3 left-1/5 w-[150px] sm:w-[200px] md:w-[250px] lg:w-[300px] h-[200px] sm:h-[270px] md:h-[340px] lg:h-[400px] pointer-events-none"
         style={{
           background: 'radial-gradient(circle at center, rgba(99, 102, 241, 0.08) 0%, transparent 70%)',
           filter: 'blur(50px)',
@@ -246,15 +248,18 @@ const useAnimatedCounter = (end, duration = 2000, startOnView = true) => {
 // STAT CARD COMPONENT
 // ============================================================================
 
-const StatCard = ({ value, label, suffix = '' }) => {
+const StatCard = ({ value, label, suffix = '', prefix = '' }) => {
   const numericValue = parseInt(value.replace(/[^0-9]/g, '')) || 0
   const { count, ref } = useAnimatedCounter(numericValue, 1500)
   
+  // Determine display value
   const displayValue = value.includes('+') 
-    ? `${count}+` 
+    ? `${prefix}${count}+` 
     : value.includes('%') 
     ? `${count}%`
-    : `${count}${suffix}`
+    : value.includes('<')
+    ? `<${count}s`
+    : `${prefix}${count}${suffix}`
 
   return (
     <motion.div
@@ -263,14 +268,15 @@ const StatCard = ({ value, label, suffix = '' }) => {
       whileHover={{ scale: 1.05, y: -2 }}
       transition={{ type: 'spring', stiffness: 300 }}
     >
-      <div className="relative px-6 py-4 bg-white/60 dark:bg-white/5 backdrop-blur-sm rounded-2xl border border-white/50 dark:border-white/10 shadow-lg shadow-black/5">
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl" />
+      <div className="relative px-3 py-2.5 sm:px-4 sm:py-3 md:px-6 md:py-4 bg-white/60 dark:bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/50 dark:border-white/10 shadow-lg shadow-black/5">
+        {/* Glow effect on hover */}
+        <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl" />
         
         <div className="text-center">
-          <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
+          <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
             {displayValue}
           </div>
-          <div className="text-sm text-text-muted mt-1 font-medium">{label}</div>
+          <div className="text-xs sm:text-sm text-text-muted mt-0.5 sm:mt-1 font-medium">{label}</div>
         </div>
       </div>
     </motion.div>
@@ -353,20 +359,20 @@ const ProfileBuilderPreview = ({ t }) => {
   }, [steps.length])
   
   return (
-    <div className="relative bg-gradient-to-br from-indigo-50 via-violet-50/50 to-white dark:from-slate-800 dark:via-indigo-900/20 dark:to-slate-900 rounded-3xl border border-indigo-200/50 dark:border-indigo-500/20 overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-violet-200/40 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-indigo-200/40 to-transparent rounded-full blur-2xl pointer-events-none" />
+    <div className="relative bg-gradient-to-br from-indigo-50 via-violet-50/50 to-white dark:from-slate-800 dark:via-indigo-900/20 dark:to-slate-900 rounded-2xl sm:rounded-3xl border border-indigo-200/50 dark:border-indigo-500/20 overflow-hidden">
+      {/* Background decoration - Responsive */}
+      <div className="absolute top-0 right-0 w-32 sm:w-48 md:w-64 h-32 sm:h-48 md:h-64 bg-gradient-to-bl from-violet-200/40 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-24 sm:w-36 md:w-48 h-24 sm:h-36 md:h-48 bg-gradient-to-tr from-indigo-200/40 to-transparent rounded-full blur-2xl pointer-events-none" />
       
-      <div className="relative p-8 md:p-10">
-        {/* Steps indicator */}
-        <div className="flex items-center justify-center gap-3 mb-8">
+      <div className="relative p-4 sm:p-6 md:p-8 lg:p-10">
+        {/* Steps indicator - Responsive */}
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-5 sm:mb-6 md:mb-8">
           {steps.map((step, index) => (
             <button
               key={index}
               onClick={() => setActiveStep(index)}
               className={`
-                flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300
+                flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-full transition-all duration-300
                 ${activeStep === index 
                   ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30' 
                   : 'bg-white dark:bg-slate-700 text-text-secondary hover:bg-indigo-50 dark:hover:bg-slate-600'
@@ -374,13 +380,13 @@ const ProfileBuilderPreview = ({ t }) => {
               `}
             >
               <Icon name={step.icon} size="sm" className={activeStep === index ? 'icon-white' : ''} />
-              <span className="text-sm font-medium hidden sm:inline">{step.title}</span>
-              <span className="text-sm font-medium sm:hidden">{index + 1}</span>
+              <span className="text-xs sm:text-sm font-medium hidden sm:inline">{step.title}</span>
+              <span className="text-xs sm:text-sm font-medium sm:hidden">{index + 1}</span>
             </button>
           ))}
         </div>
         
-        {/* Visual area */}
+        {/* Visual area - Responsive */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeStep}
@@ -388,20 +394,20 @@ const ProfileBuilderPreview = ({ t }) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.98 }}
             transition={{ duration: 0.4 }}
-            className="min-h-[300px] flex items-center justify-center"
+            className="min-h-[250px] sm:min-h-[280px] md:min-h-[300px] flex items-center justify-center"
           >
             {activeStep === 0 && (
-              <div className="w-full max-w-lg">
-                <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xl overflow-hidden">
-                  <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
-                    <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-400" />
-                      <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                      <div className="w-3 h-3 rounded-full bg-green-400" />
+              <div className="w-full max-w-md sm:max-w-lg">
+                <div className="bg-white dark:bg-slate-800 rounded-lg sm:rounded-xl border border-gray-200 dark:border-slate-700 shadow-xl overflow-hidden">
+                  <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
+                    <div className="flex gap-1 sm:gap-1.5">
+                      <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-400" />
+                      <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-yellow-400" />
+                      <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-400" />
                     </div>
-                    <span className="text-xs text-gray-500 ml-2">{t('features.voiceProfile.preview.sampleInput', 'Your Writing Sample')}</span>
+                    <span className="text-[10px] sm:text-xs text-gray-500 ml-1 sm:ml-2">{t('features.voiceProfile.preview.sampleInput', 'Your Writing Sample')}</span>
                   </div>
-                  <div className="p-5 space-y-3">
+                  <div className="p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-3">
                     {[
                       { type: 'email', text: '"Hey team, just wanted to share some thoughts..."' },
                       { type: 'blog', text: '"Here\'s the thing about productivity..."' },
@@ -412,12 +418,13 @@ const ProfileBuilderPreview = ({ t }) => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.2 }}
-                        className="flex items-start gap-3 p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg border border-indigo-100 dark:border-indigo-500/20"
+                        className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-md sm:rounded-lg border border-indigo-100 dark:border-indigo-500/20"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
-                          <Icon name={sample.type === 'email' ? 'mail' : sample.type === 'blog' ? 'file-text' : 'message-circle'} size="sm" className="icon-indigo" />
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-md sm:rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                          <Icon name={sample.type === 'email' ? 'mail' : sample.type === 'blog' ? 'file-text' : 'message-circle'} size="xs" className="icon-indigo sm:hidden" />
+                          <Icon name={sample.type === 'email' ? 'mail' : sample.type === 'blog' ? 'file-text' : 'message-circle'} size="sm" className="icon-indigo hidden sm:block" />
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 italic">{sample.text}</p>
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 italic">{sample.text}</p>
                       </motion.div>
                     ))}
                   </div>
@@ -430,16 +437,17 @@ const ProfileBuilderPreview = ({ t }) => {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                  className="w-32 h-32 mx-auto mb-6 relative"
+                  className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto mb-4 sm:mb-5 md:mb-6 relative"
                 >
-                  <div className="absolute inset-0 rounded-full border-4 border-indigo-200 dark:border-indigo-800" />
-                  <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-500 border-r-violet-500" />
-                  <div className="absolute inset-4 rounded-full border-4 border-transparent border-b-purple-500 border-l-indigo-400" style={{ animationDirection: 'reverse' }} />
+                  <div className="absolute inset-0 rounded-full border-3 sm:border-4 border-indigo-200 dark:border-indigo-800" />
+                  <div className="absolute inset-0 rounded-full border-3 sm:border-4 border-transparent border-t-indigo-500 border-r-violet-500" />
+                  <div className="absolute inset-3 sm:inset-4 rounded-full border-3 sm:border-4 border-transparent border-b-purple-500 border-l-indigo-400" style={{ animationDirection: 'reverse' }} />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Icon name="cpu" size="2xl" className="icon-indigo" />
+                    <Icon name="cpu" size="xl" className="icon-indigo sm:hidden" />
+                    <Icon name="cpu" size="2xl" className="icon-indigo hidden sm:block" />
                   </div>
                 </motion.div>
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   {[
                     t('features.voiceProfile.preview.analyzing1', 'Analyzing vocabulary patterns...'),
                     t('features.voiceProfile.preview.analyzing2', 'Detecting sentence structures...'),
@@ -450,7 +458,7 @@ const ProfileBuilderPreview = ({ t }) => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: [0, 1, 0] }}
                       transition={{ duration: 2, delay: i * 0.7, repeat: Infinity }}
-                      className="text-sm text-gray-500 dark:text-gray-400"
+                      className="text-xs sm:text-sm text-gray-500 dark:text-gray-400"
                     >
                       {text}
                     </motion.p>
@@ -460,23 +468,24 @@ const ProfileBuilderPreview = ({ t }) => {
             )}
             
             {activeStep === 2 && (
-              <div className="w-full max-w-md">
+              <div className="w-full max-w-sm sm:max-w-md">
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-xl p-6"
+                  className="bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700 shadow-xl p-4 sm:p-5 md:p-6"
                 >
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                      <Icon name="fingerprint" size="2xl" className="icon-white" />
+                  <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                      <Icon name="fingerprint" size="xl" className="icon-white sm:hidden" />
+                      <Icon name="fingerprint" size="2xl" className="icon-white hidden sm:block" />
                     </div>
                     <div>
-                      <h4 className="text-lg font-bold text-gray-800 dark:text-white">{t('features.voiceProfile.preview.yourProfile', 'Your Voice Profile')}</h4>
-                      <p className="text-sm text-indigo-600 dark:text-indigo-400">{t('features.voiceProfile.preview.ready', 'Ready to use')}</p>
+                      <h4 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">{t('features.voiceProfile.preview.yourProfile', 'Your Voice Profile')}</h4>
+                      <p className="text-xs sm:text-sm text-indigo-600 dark:text-indigo-400">{t('features.voiceProfile.preview.ready', 'Ready to use')}</p>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
                     {[
                       { label: t('demo.formality', 'Formality'), value: 65 },
                       { label: t('demo.creativity', 'Creativity'), value: 78 },
@@ -488,11 +497,11 @@ const ProfileBuilderPreview = ({ t }) => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 + i * 0.1 }}
-                        className="p-3 bg-gray-50 dark:bg-slate-700 rounded-xl"
+                        className="p-2 sm:p-3 bg-gray-50 dark:bg-slate-700 rounded-lg sm:rounded-xl"
                       >
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{metric.label}</div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-2 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                        <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">{metric.label}</div>
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <div className="flex-1 h-1.5 sm:h-2 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden">
                             <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${metric.value}%` }}
@@ -500,7 +509,7 @@ const ProfileBuilderPreview = ({ t }) => {
                               className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
                             />
                           </div>
-                          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{metric.value}%</span>
+                          <span className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">{metric.value}%</span>
                         </div>
                       </motion.div>
                     ))}
@@ -510,10 +519,10 @@ const ProfileBuilderPreview = ({ t }) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.8 }}
-                    className="mt-4 flex flex-wrap gap-2"
+                    className="mt-3 sm:mt-4 flex flex-wrap gap-1.5 sm:gap-2"
                   >
                     {['Conversational', 'Empathetic', 'Clear'].map((trait, i) => (
-                      <span key={i} className="px-3 py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-medium rounded-full">
+                      <span key={i} className="px-2 sm:px-3 py-0.5 sm:py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] sm:text-xs font-medium rounded-full">
                         {trait}
                       </span>
                     ))}
@@ -524,10 +533,10 @@ const ProfileBuilderPreview = ({ t }) => {
           </motion.div>
         </AnimatePresence>
         
-        {/* Step description */}
-        <div className="text-center mt-6">
-          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{steps[activeStep].title}</h3>
-          <p className="text-gray-600 dark:text-gray-400">{steps[activeStep].desc}</p>
+        {/* Step description - Responsive */}
+        <div className="text-center mt-4 sm:mt-5 md:mt-6">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 dark:text-white mb-1.5 sm:mb-2">{steps[activeStep].title}</h3>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{steps[activeStep].desc}</p>
         </div>
       </div>
     </div>
@@ -608,70 +617,47 @@ function VoiceProfile() {
 
   return (
     <>
-      <SEOHead
-        title={t('voiceProfile.meta.title')}
-        description={t('voiceProfile.meta.description')}
-        keywords={['voice profile', 'writing style', 'personal AI', 'writing analysis', 'brand voice', 'content personalization', 'writing DNA']}
+      <PageSEO 
+        pageKey="voice-profile" 
+        faqs={faqs} 
+        howToSteps={howItWorks}
       />
-      <StructuredData
-        type="SoftwareApplication"
-        data={{
-          name: 'Graphos Voice Profile',
-          description: t('voiceProfile.meta.description'),
-          url: 'https://graphosai.com/features/voice-profile',
-          applicationCategory: 'UtilitiesApplication',
-          operatingSystem: 'Web Browser',
-          offers: {
-            '@type': 'Offer',
-            price: '0',
-            priceCurrency: 'USD'
-          }
-        }}
-      />
-      <StructuredData
-        type="FAQPage"
-        data={{
-          mainEntity: faqs.map(faq => ({
-            '@type': 'Question',
-            name: faq.q,
-            acceptedAnswer: { '@type': 'Answer', text: faq.a }
-          }))
-        }}
-      />
-      
-      <div className="relative">
+      <main className="relative" itemScope itemType="https://schema.org/WebPage">
         {/* ================================================================== */}
-        {/* HERO SECTION - DNA/Fingerprint Theme */}
+        {/* HERO SECTION - DNA/Fingerprint Theme - Responsive */}
         {/* ================================================================== */}
-        <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-8 pb-16">
+        <section className="relative min-h-[85vh] sm:min-h-[88vh] lg:min-h-[92vh] flex items-center justify-center overflow-hidden pt-16 sm:pt-12 md:pt-8 pb-12 sm:pb-14 md:pb-16">
           <DNAHelixBackground />
           
-          {/* Breadcrumb */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="absolute top-6 left-4 sm:left-6 lg:left-8 z-20"
-          >
-            <Breadcrumb
-              items={[
-                { label: t('nav.home'), href: '/' },
-                { label: t('nav.features'), href: '#' },
-                { label: t('nav.voiceProfile') },
-              ]}
-            />
-          </motion.div>
+          {/* Breadcrumb - Inside container for alignment */}
+          <div className="absolute top-4 sm:top-5 md:top-6 left-0 right-0 z-20">
+            <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <Breadcrumb
+                  items={[
+                    { label: t('nav.home'), href: '/' },
+                    { label: t('nav.features'), href: '/features' },
+                    { label: t('nav.voiceProfile') },
+                  ]}
+                />
+              </motion.div>
+            </div>
+          </div>
           
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6 text-center relative z-10">
-            {/* Animated Badge */}
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 text-center relative z-10">
+            {/* Animated Badge - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.5, type: 'spring' }}
-              className="mb-8"
+              className="mb-5 sm:mb-6 md:mb-8"
             >
               <motion.span 
-                className="relative inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500/10 via-violet-500/15 to-purple-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-semibold rounded-full border border-indigo-200/50 dark:border-indigo-500/30 shadow-lg shadow-indigo-500/10"
+                className="relative inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-indigo-500/10 via-violet-500/15 to-purple-500/10 text-indigo-600 dark:text-indigo-400 text-xs sm:text-sm font-semibold rounded-full border border-indigo-200/50 dark:border-indigo-500/30 shadow-lg shadow-indigo-500/10"
                 animate={{
                   boxShadow: [
                     '0 0 20px rgba(99, 102, 241, 0.1)',
@@ -695,44 +681,44 @@ function VoiceProfile() {
               </motion.span>
             </motion.div>
             
-            {/* Main Headline */}
+            {/* Main Headline - Responsive Typography */}
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary mb-6 leading-[1.1] tracking-tight"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary mb-4 sm:mb-5 md:mb-6 leading-[1.1] tracking-tight"
             >
               {t('voiceProfile.title', 'Voice Profile')}
             </motion.h1>
             
-            {/* Subtitle with gradient */}
+            {/* Subtitle with gradient - Responsive */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8"
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-5 sm:mb-6 md:mb-8"
             >
               <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
                 {t('features.voiceProfile.heroHighlight', 'Capture Your Authentic Voice')}
               </span>
             </motion.p>
             
-            {/* Description */}
+            {/* Description - Responsive */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg md:text-xl text-text-secondary mb-10 leading-relaxed max-w-2xl mx-auto"
+              className="text-base sm:text-lg md:text-xl text-text-secondary mb-6 sm:mb-8 md:mb-10 leading-relaxed max-w-xl sm:max-w-2xl mx-auto px-2"
             >
               {t('voiceProfile.description', 'Capture your unique writing style and create content that sounds authentically you. Your writing DNA, decoded by AI.')}
             </motion.p>
 
-            {/* Stats Row */}
+            {/* Stats Row - Responsive Grid */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-10 max-w-2xl mx-auto"
+              className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 md:mb-10 max-w-xs sm:max-w-xl md:max-w-2xl mx-auto"
             >
               <StatCard value="90%+" label={t('features.voiceProfile.stats.accuracy', 'Voice Match')} />
               <StatCard value="5" label={t('features.voiceProfile.stats.metrics', 'Style Metrics')} suffix="+" />
@@ -740,18 +726,18 @@ function VoiceProfile() {
               <StatCard value="<30s" label={t('features.voiceProfile.stats.speed', 'Analysis')} />
             </motion.div>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8 md:mb-10 px-4 sm:px-0"
             >
               <motion.a
                 href="https://app.graphosai.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-semibold text-base overflow-hidden shadow-xl shadow-indigo-500/30"
+                className="group relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-semibold text-sm sm:text-base overflow-hidden shadow-xl shadow-indigo-500/30"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -761,7 +747,7 @@ function VoiceProfile() {
               </motion.a>
               <motion.a
                 href="#demo"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/80 dark:bg-white/10 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-text-primary rounded-xl font-semibold text-base hover:bg-white dark:hover:bg-white/20 transition-all shadow-lg"
+                className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-white/80 dark:bg-white/10 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-text-primary rounded-xl font-semibold text-sm sm:text-base hover:bg-white dark:hover:bg-white/20 transition-all shadow-lg"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -770,12 +756,12 @@ function VoiceProfile() {
               </motion.a>
             </motion.div>
             
-            {/* Trust indicators */}
+            {/* Trust indicators - Responsive */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="flex flex-wrap items-center justify-center gap-4 text-sm"
+              className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm px-2"
             >
               {[
                 { icon: 'shield', text: t('features.voiceProfile.trust.secure', 'Data encrypted') },
@@ -784,24 +770,24 @@ function VoiceProfile() {
               ].map((item, i) => (
                 <motion.div 
                   key={i}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 bg-bg-primary"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-full border border-gray-200 dark:border-gray-700 bg-bg-primary"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 + i * 0.1 }}
                 >
                   <Icon name={item.icon} size="sm" color="gray-medium" />
-                  <span>{item.text}</span>
+                  <span className="whitespace-nowrap">{item.text}</span>
                 </motion.div>
               ))}
             </motion.div>
           </div>
 
-          {/* Scroll Indicator */}
+          {/* Scroll Indicator - Hidden on mobile */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2"
+            className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 hidden sm:block"
           >
             <motion.a
               href="#demo"
@@ -823,43 +809,40 @@ function VoiceProfile() {
 
 
         {/* ================================================================== */}
-        {/* INTERACTIVE DEMO SECTION */}
+        {/* INTERACTIVE DEMO SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 relative">
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 relative">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
             <motion.div
               id="demo"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="scroll-mt-24"
+              className="scroll-mt-20 sm:scroll-mt-24"
             >
-              {/* Section Header */}
-              <div className="text-center mb-10">
+              {/* Section Header - Responsive */}
+              <div className="text-center mb-6 sm:mb-8 md:mb-10">
                 <motion.span 
                   initial={{ opacity: 0, scale: 0.9 }} 
                   whileInView={{ opacity: 1, scale: 1 }} 
                   viewport={{ once: true }} 
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white text-success text-sm font-semibold rounded-full mb-4 border border-gray-200 shadow-sm"
+                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-success text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 border border-gray-200 shadow-sm"
                 >
-                  <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-success rounded-full animate-pulse" />
                   {t('demo.liveDemo', 'Live Demo')}
                 </motion.span>
-                <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-3 sm:mb-4">
                   {t('features.voiceProfile.demo.title', 'Explore Voice Profiles')}
                 </h2>
-                <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+                <p className="text-base sm:text-lg text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                   {t('features.voiceProfile.demo.subtitle', 'See how different writing styles are captured and visualized')}
                 </p>
               </div>
               
               <Suspense fallback={
-                <div className="h-[600px] bg-bg-secondary rounded-2xl border border-gray-200 flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-10 h-10 border-3 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
-                    <span className="text-sm text-text-muted">{t('common.loading', 'Loading...')}</span>
-                  </div>
+                <div className="h-[400px] sm:h-[500px] md:h-[600px] bg-bg-secondary rounded-xl sm:rounded-2xl border border-gray-200 flex items-center justify-center">
+                  <ThreeDotsLoading size="lg" />
                 </div>
               }>
                 <LiveVoiceProfileDemo />
@@ -869,29 +852,36 @@ function VoiceProfile() {
         </section>
 
         {/* ================================================================== */}
-        {/* PROFILE BUILDER PREVIEW SECTION */}
+        {/* PROFILE BUILDER PREVIEW SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 bg-bg-secondary relative overflow-hidden">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 bg-bg-secondary relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-1/4 left-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-violet-500/5 rounded-full blur-3xl" />
+            <div className="absolute top-1/4 left-0 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-indigo-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 right-0 w-40 sm:w-56 md:w-72 lg:w-80 h-40 sm:h-56 md:h-72 lg:h-80 bg-violet-500/5 rounded-full blur-3xl" />
+            {/* SVG Background Pattern */}
+            <img 
+              src="/images/backgrounds/bg-wave-5.svg" 
+              alt="" 
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover opacity-100"
+            />
           </div>
           
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6 relative">
-            <div className="text-center mb-10">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 relative">
+            <div className="text-center mb-6 sm:mb-8 md:mb-10">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-indigo-600 text-sm font-semibold rounded-full mb-4 border border-gray-200 shadow-sm"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-indigo-600 text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 border border-gray-200 shadow-sm"
               >
                 <Icon name="wand-sparkles" size="sm" className="icon-indigo" />
                 {t('features.voiceProfile.builderBadge', 'Profile Builder')}
               </motion.span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
                 {t('features.voiceProfile.builderTitle', 'See How It Works')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.voiceProfile.builderDesc', 'Watch your writing transform into a unique voice profile in three simple steps')}
               </p>
             </div>
@@ -901,29 +891,29 @@ function VoiceProfile() {
         </section>
 
         {/* ================================================================== */}
-        {/* HOW IT WORKS SECTION */}
+        {/* HOW IT WORKS SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 relative">
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 relative">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-indigo-500/20"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 shadow-lg shadow-indigo-500/20"
               >
                 <Icon name="git-branch" size="sm" className="icon-white" />
                 {t('features.voiceProfile.processBadge', 'Simple Process')}
               </motion.span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
                 {t('features.voiceProfile.howItWorksTitle', 'How Voice Profile Works')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.voiceProfile.howItWorksDesc', 'Create your unique writing DNA in four simple steps')}
               </p>
             </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
               {howItWorks.map((item, index) => (
                 <motion.div
                   key={index}
@@ -933,19 +923,19 @@ function VoiceProfile() {
                   transition={{ delay: index * 0.1 }}
                   className="relative group"
                 >
-                  <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300">
+                  <div className="p-4 sm:p-5 md:p-6 bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300">
                     {/* Step number */}
-                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-violet-500 text-white rounded-xl flex items-center justify-center font-bold text-lg mb-4 shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
+                    <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-gradient-to-br from-indigo-500 to-violet-500 text-white rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-base sm:text-lg mb-3 sm:mb-4 shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
                       {item.step}
                     </div>
                     
                     {/* Icon */}
-                    <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg flex items-center justify-center mb-3">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg flex items-center justify-center mb-2 sm:mb-3">
                       <Icon name={item.icon} size="md" className="icon-indigo" />
                     </div>
                     
-                    <h3 className="font-semibold text-text-primary mb-2">{item.title}</h3>
-                    <p className="text-sm text-text-secondary">{item.desc}</p>
+                    <h3 className="font-semibold text-sm sm:text-base text-text-primary mb-1.5 sm:mb-2">{item.title}</h3>
+                    <p className="text-xs sm:text-sm text-text-secondary">{item.desc}</p>
                   </div>
                   
                   {/* Connector arrow */}
@@ -961,20 +951,20 @@ function VoiceProfile() {
         </section>
 
         {/* ================================================================== */}
-        {/* BENEFITS SECTION */}
+        {/* BENEFITS SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 bg-bg-secondary">
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 bg-bg-secondary">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
                 {t('features.voiceProfile.whyCreate', 'Why Create a Voice Profile?')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.voiceProfile.whyCreateDesc', 'Unlock the power of personalized AI writing')}
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
               {benefits.map((benefit, index) => (
                 <motion.div 
                   key={index}
@@ -982,13 +972,14 @@ function VoiceProfile() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl transition-all duration-300 group"
+                  className="p-4 sm:p-5 md:p-6 bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl transition-all duration-300 group"
                 >
-                  <div className="w-14 h-14 bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-500/20 dark:to-violet-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Icon name={benefit.icon} size="xl" className="icon-indigo" />
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-500/20 dark:to-violet-500/20 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform">
+                    <Icon name={benefit.icon} size="lg" className="icon-indigo sm:hidden" />
+                    <Icon name={benefit.icon} size="xl" className="icon-indigo hidden sm:block" />
                   </div>
-                  <h3 className="font-semibold text-lg text-text-primary mb-2">{benefit.title}</h3>
-                  <p className="text-text-secondary">{benefit.description}</p>
+                  <h3 className="font-semibold text-base sm:text-lg text-text-primary mb-1.5 sm:mb-2">{benefit.title}</h3>
+                  <p className="text-sm sm:text-base text-text-secondary">{benefit.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -996,30 +987,30 @@ function VoiceProfile() {
         </section>
 
         {/* ================================================================== */}
-        {/* USE CASES SECTION */}
+        {/* USE CASES SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28">
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-indigo-500/20"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 shadow-lg shadow-indigo-500/20"
               >
                 <Icon name="target" size="sm" className="icon-white" />
                 {t('features.voiceProfile.useCasesBadge', 'Use Cases')}
               </motion.span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
                 {t('features.voiceProfile.useCasesTitle', 'Perfect For')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.voiceProfile.useCasesDesc', 'Join thousands of professionals who use Voice Profile to maintain their authentic voice')}
               </p>
             </div>
             
-            {/* Bento Grid Layout - 4 columns */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* Bento Grid Layout - Responsive 4 columns */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
               {useCases.map((useCase, index) => {
                 const colorClasses = {
                   indigo: {
@@ -1066,43 +1057,44 @@ function VoiceProfile() {
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -5, scale: 1.02 }}
                     className={`
-                      group relative p-5 rounded-2xl border bg-gradient-to-br overflow-hidden transition-all duration-300
+                      group relative p-3 sm:p-4 md:p-5 rounded-xl sm:rounded-2xl border bg-gradient-to-br overflow-hidden transition-all duration-300
                       ${colors.bg} ${colors.border}
                       hover:shadow-xl hover:shadow-black/5
                     `}
                   >
                     {/* Background decoration */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/30 dark:bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute top-0 right-0 w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 bg-white/30 dark:bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     
                     <div className="relative">
-                      {/* Header with icon and stat */}
-                      <div className="flex items-start justify-between mb-3">
+                      {/* Header with icon and stat - Responsive */}
+                      <div className="flex items-start justify-between mb-2 sm:mb-3">
                         <motion.div 
-                          className={`w-12 h-12 bg-gradient-to-br ${colors.icon} rounded-xl flex items-center justify-center shadow-lg ${colors.iconShadow}`}
+                          className={`w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-gradient-to-br ${colors.icon} rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg ${colors.iconShadow}`}
                           whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
                           transition={{ duration: 0.5 }}
                         >
-                          <Icon name={useCase.icon} size="lg" className="icon-white" />
+                          <Icon name={useCase.icon} size="md" className="icon-white sm:hidden" />
+                          <Icon name={useCase.icon} size="lg" className="icon-white hidden sm:block" />
                         </motion.div>
                         
-                        {/* Stat badge */}
+                        {/* Stat badge - Responsive */}
                         <div className="text-right">
-                          <div className={`text-xl font-bold ${colors.stat}`}>{useCase.stat}</div>
-                          <div className="text-xs text-text-muted">{useCase.statLabel}</div>
+                          <div className={`text-lg sm:text-xl font-bold ${colors.stat}`}>{useCase.stat}</div>
+                          <div className="text-[10px] sm:text-xs text-text-muted">{useCase.statLabel}</div>
                         </div>
                       </div>
                       
-                      {/* Title & Description */}
-                      <h3 className="font-bold text-base text-text-primary mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      {/* Title & Description - Responsive */}
+                      <h3 className="font-bold text-sm sm:text-base text-text-primary mb-1 sm:mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         {useCase.title}
                       </h3>
-                      <p className="text-text-secondary text-sm mb-3 leading-relaxed line-clamp-2">
+                      <p className="text-text-secondary text-xs sm:text-sm mb-2 sm:mb-3 leading-relaxed line-clamp-2">
                         {useCase.description}
                       </p>
                       
-                      {/* Quote */}
-                      <div className={`p-2.5 bg-white/60 dark:bg-slate-800/60 rounded-lg border ${colors.quote}`}>
-                        <p className="text-xs text-text-secondary italic line-clamp-2">
+                      {/* Quote - Responsive */}
+                      <div className={`p-2 sm:p-2.5 bg-white/60 dark:bg-slate-800/60 rounded-md sm:rounded-lg border ${colors.quote}`}>
+                        <p className="text-[10px] sm:text-xs text-text-secondary italic line-clamp-2">
                           {useCase.quote}
                         </p>
                       </div>
@@ -1112,21 +1104,21 @@ function VoiceProfile() {
               })}
             </div>
             
-            {/* Bottom CTA */}
+            {/* Bottom CTA - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-12 text-center"
+              className="mt-8 sm:mt-10 md:mt-12 text-center"
             >
-              <p className="text-text-muted mb-4">
+              <p className="text-sm sm:text-base text-text-muted mb-3 sm:mb-4">
                 {t('features.voiceProfile.useCases.cta', 'Ready to find your voice?')}
               </p>
               <a 
                 href="https://app.graphosai.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-xl font-semibold shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:scale-105"
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:scale-105"
               >
                 {t('features.voiceProfile.useCases.ctaButton', 'Create Your Profile')}
                 <Icon name="arrow-right" size="sm" className="icon-white" />
@@ -1136,45 +1128,52 @@ function VoiceProfile() {
         </section>
 
         {/* ================================================================== */}
-        {/* QUALITY SCORE SECTION */}
+        {/* QUALITY SCORE SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 bg-bg-secondary relative overflow-hidden">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 bg-bg-secondary relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-emerald-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-40 sm:w-56 md:w-72 lg:w-80 h-40 sm:h-56 md:h-72 lg:h-80 bg-indigo-500/5 rounded-full blur-3xl" />
+            {/* SVG Background Pattern */}
+            <img 
+              src="/images/backgrounds/bg-wave-6.svg" 
+              alt="" 
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover opacity-100"
+            />
           </div>
           
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6 relative">
-            <div className="text-center mb-12">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 relative">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-emerald-500/20"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 shadow-lg shadow-emerald-500/20"
               >
                 <Icon name="award" size="sm" className="icon-white" />
                 {t('features.voiceProfile.qualityBadge', 'Quality Assurance')}
               </motion.span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
                 {t('features.voiceProfile.qualityTitle', 'Profile Quality Score')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.voiceProfile.qualityDesc', 'Our AI evaluates your writing samples to ensure the best possible voice profile accuracy')}
               </p>
             </div>
             
-            <div className="grid lg:grid-cols-2 gap-8 items-center">
-              {/* Quality Score Visual */}
+            <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 items-center">
+              {/* Quality Score Visual - Responsive */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 className="relative"
               >
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-8 shadow-xl">
-                  {/* Score Circle */}
-                  <div className="flex items-center justify-center mb-8">
-                    <div className="relative w-48 h-48">
+                <div className="bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700 p-4 sm:p-6 md:p-8 shadow-xl">
+                  {/* Score Circle - Responsive */}
+                  <div className="flex items-center justify-center mb-6 sm:mb-8">
+                    <div className="relative w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48">
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
                         <circle cx="100" cy="100" r="85" fill="none" stroke="currentColor" strokeWidth="10" className="text-gray-100 dark:text-slate-700" />
                         <motion.circle 
@@ -1193,7 +1192,7 @@ function VoiceProfile() {
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <motion.span 
-                          className="text-5xl font-bold bg-gradient-to-r from-emerald-500 to-indigo-500 bg-clip-text text-transparent"
+                          className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-indigo-500 bg-clip-text text-transparent"
                           initial={{ opacity: 0, scale: 0.5 }}
                           whileInView={{ opacity: 1, scale: 1 }}
                           viewport={{ once: true }}
@@ -1201,32 +1200,32 @@ function VoiceProfile() {
                         >
                           85
                         </motion.span>
-                        <span className="text-sm text-text-muted">{t('features.voiceProfile.quality.outOf', 'out of 100')}</span>
+                        <span className="text-xs sm:text-sm text-text-muted">{t('features.voiceProfile.quality.outOf', 'out of 100')}</span>
                       </div>
                     </div>
                   </div>
                   
-                  {/* Rating Badge */}
-                  <div className="text-center mb-6">
-                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-full font-semibold">
+                  {/* Rating Badge - Responsive */}
+                  <div className="text-center mb-4 sm:mb-6">
+                    <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-full font-semibold text-sm sm:text-base">
                       <Icon name="star" size="sm" className="icon-emerald" />
                       {t('features.voiceProfile.quality.excellent', 'Excellent Profile')}
                     </span>
                   </div>
                   
-                  {/* Score Breakdown */}
-                  <div className="space-y-3">
+                  {/* Score Breakdown - Responsive */}
+                  <div className="space-y-2 sm:space-y-3">
                     {[
                       { label: t('features.voiceProfile.quality.diversity', 'Sample Diversity'), value: 90, color: 'emerald' },
                       { label: t('features.voiceProfile.quality.length', 'Content Length'), value: 85, color: 'indigo' },
                       { label: t('features.voiceProfile.quality.consistency', 'Style Consistency'), value: 80, color: 'violet' }
                     ].map((item, i) => (
                       <div key={i} className="space-y-1">
-                        <div className="flex justify-between text-sm">
+                        <div className="flex justify-between text-xs sm:text-sm">
                           <span className="text-text-secondary">{item.label}</span>
                           <span className="font-medium text-text-primary">{item.value}%</span>
                         </div>
-                        <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div className="h-1.5 sm:h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             whileInView={{ width: `${item.value}%` }}
@@ -1244,14 +1243,14 @@ function VoiceProfile() {
                 </div>
               </motion.div>
               
-              {/* Quality Ratings Explanation */}
+              {/* Quality Ratings Explanation - Responsive */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="space-y-4"
+                className="space-y-3 sm:space-y-4"
               >
-                <h3 className="text-xl font-bold text-text-primary mb-6">
+                <h3 className="text-lg sm:text-xl font-bold text-text-primary mb-4 sm:mb-6">
                   {t('features.voiceProfile.quality.ratingsTitle', 'Quality Ratings')}
                 </h3>
                 
@@ -1267,33 +1266,34 @@ function VoiceProfile() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className="flex gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700"
+                    className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-slate-800 rounded-lg sm:rounded-xl border border-gray-200 dark:border-slate-700"
                   >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       item.color === 'emerald' ? 'bg-emerald-100 dark:bg-emerald-500/20' :
                       item.color === 'blue' ? 'bg-blue-100 dark:bg-blue-500/20' :
                       item.color === 'amber' ? 'bg-amber-100 dark:bg-amber-500/20' :
                       'bg-red-100 dark:bg-red-500/20'
                     }`}>
-                      <Icon name={item.icon} size="md" className={item.iconClass} />
+                      <Icon name={item.icon} size="sm" className={`${item.iconClass} sm:hidden`} />
+                      <Icon name={item.icon} size="md" className={`${item.iconClass} hidden sm:block`} />
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-text-primary">{item.rating}</span>
-                        <span className="text-xs text-text-muted px-2 py-0.5 bg-gray-100 dark:bg-slate-700 rounded">{item.range}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5 sm:mb-1">
+                        <span className="font-semibold text-sm sm:text-base text-text-primary">{item.rating}</span>
+                        <span className="text-[10px] sm:text-xs text-text-muted px-1.5 sm:px-2 py-0.5 bg-gray-100 dark:bg-slate-700 rounded">{item.range}</span>
                       </div>
-                      <p className="text-sm text-text-secondary">{item.desc}</p>
+                      <p className="text-xs sm:text-sm text-text-secondary">{item.desc}</p>
                     </div>
                   </motion.div>
                 ))}
                 
-                {/* Tips */}
-                <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl border border-indigo-100 dark:border-indigo-500/20">
-                  <h4 className="font-semibold text-indigo-700 dark:text-indigo-400 mb-2 flex items-center gap-2">
+                {/* Tips - Responsive */}
+                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg sm:rounded-xl border border-indigo-100 dark:border-indigo-500/20">
+                  <h4 className="font-semibold text-sm sm:text-base text-indigo-700 dark:text-indigo-400 mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2">
                     <Icon name="lightbulb" size="sm" className="icon-indigo" />
                     {t('features.voiceProfile.quality.tipsTitle', 'Tips for Better Score')}
                   </h4>
-                  <ul className="text-sm text-indigo-600 dark:text-indigo-300 space-y-1">
+                  <ul className="text-xs sm:text-sm text-indigo-600 dark:text-indigo-300 space-y-0.5 sm:space-y-1">
                     <li>• {t('features.voiceProfile.quality.tip1', 'Add 5+ writing samples for best results')}</li>
                     <li>• {t('features.voiceProfile.quality.tip2', 'Include different content types (emails, posts, articles)')}</li>
                     <li>• {t('features.voiceProfile.quality.tip3', 'Use samples with at least 200 words each')}</li>
@@ -1305,29 +1305,29 @@ function VoiceProfile() {
         </section>
 
         {/* ================================================================== */}
-        {/* DETAILED METRICS SHOWCASE SECTION */}
+        {/* DETAILED METRICS SHOWCASE SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28">
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-violet-500/20"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 shadow-lg shadow-violet-500/20"
               >
                 <Icon name="sliders" size="sm" className="icon-white" />
                 {t('features.voiceProfile.metricsBadge', 'Deep Analysis')}
               </motion.span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
                 {t('features.voiceProfile.metricsTitle', 'What We Analyze')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.voiceProfile.metricsDesc', 'Our AI captures every nuance of your writing style through comprehensive analysis')}
               </p>
             </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
               {[
                 {
                   icon: 'type',
@@ -1378,9 +1378,9 @@ function VoiceProfile() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="group p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl transition-all duration-300"
+                  className="group p-4 sm:p-5 md:p-6 bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl transition-all duration-300"
                 >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${
+                  <div className={`w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-4 transition-transform group-hover:scale-110 ${
                     metric.color === 'indigo' ? 'bg-indigo-100 dark:bg-indigo-500/20' :
                     metric.color === 'violet' ? 'bg-violet-100 dark:bg-violet-500/20' :
                     metric.color === 'purple' ? 'bg-purple-100 dark:bg-purple-500/20' :
@@ -1388,15 +1388,16 @@ function VoiceProfile() {
                     metric.color === 'cyan' ? 'bg-cyan-100 dark:bg-cyan-500/20' :
                     'bg-pink-100 dark:bg-pink-500/20'
                   }`}>
-                    <Icon name={metric.icon} size="lg" className={`icon-${metric.color}`} />
+                    <Icon name={metric.icon} size="md" className={`icon-${metric.color} sm:hidden`} />
+                    <Icon name={metric.icon} size="lg" className={`icon-${metric.color} hidden sm:block`} />
                   </div>
                   
-                  <h3 className="font-semibold text-lg text-text-primary mb-2">{metric.title}</h3>
-                  <p className="text-text-secondary text-sm mb-4">{metric.desc}</p>
+                  <h3 className="font-semibold text-base sm:text-lg text-text-primary mb-1.5 sm:mb-2">{metric.title}</h3>
+                  <p className="text-text-secondary text-xs sm:text-sm mb-3 sm:mb-4">{metric.desc}</p>
                   
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {metric.examples.map((example, i) => (
-                      <span key={i} className="px-2 py-1 bg-gray-100 dark:bg-slate-700 text-text-secondary text-xs rounded-md">
+                      <span key={i} className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 dark:bg-slate-700 text-text-secondary text-[10px] sm:text-xs rounded-md">
                         {example}
                       </span>
                     ))}
@@ -1408,111 +1409,124 @@ function VoiceProfile() {
         </section>
 
         {/* ================================================================== */}
-        {/* INTEGRATION SECTION */}
+        {/* INTEGRATION SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 bg-bg-secondary">
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 bg-bg-secondary relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/4 left-0 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-indigo-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 right-0 w-40 sm:w-56 md:w-72 lg:w-80 h-40 sm:h-56 md:h-72 lg:h-80 bg-violet-500/5 rounded-full blur-3xl" />
+            {/* SVG Background Pattern */}
+            <img 
+              src="/images/backgrounds/bg-wave-10.svg" 
+              alt="" 
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover opacity-100"
+            />
+          </div>
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 relative">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-indigo-500/20"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 shadow-lg shadow-indigo-500/20"
               >
                 <Icon name="puzzle" size="sm" className="icon-white" />
                 {t('features.voiceProfile.integrationBadge', 'Seamless Integration')}
               </motion.span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
                 {t('features.voiceProfile.integrationTitle', 'Use Your Voice Everywhere')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.voiceProfile.integrationDesc', 'Your Voice Profile integrates seamlessly with all Graphos AI features')}
               </p>
             </div>
             
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Humanization Integration */}
+            <div className="grid md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+              {/* Humanization Integration - Responsive */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="relative bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-800 dark:to-amber-900/20 rounded-2xl border border-amber-200/50 dark:border-amber-500/20 p-8 overflow-hidden"
+                className="relative bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-800 dark:to-amber-900/20 rounded-xl sm:rounded-2xl border border-amber-200/50 dark:border-amber-500/20 p-4 sm:p-6 md:p-8 overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/30 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute top-0 right-0 w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 bg-amber-200/30 rounded-full blur-2xl pointer-events-none" />
                 
                 <div className="relative">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
-                      <Icon name="wand-sparkles" size="xl" className="icon-white" />
+                  <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                      <Icon name="wand-sparkles" size="lg" className="icon-white sm:hidden" />
+                      <Icon name="wand-sparkles" size="xl" className="icon-white hidden sm:block" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-text-primary">{t('features.voiceProfile.integration.humanize', 'Humanization')}</h3>
-                      <p className="text-sm text-amber-600 dark:text-amber-400">{t('features.voiceProfile.integration.humanizeTag', 'Rewrite in your voice')}</p>
+                      <h3 className="text-lg sm:text-xl font-bold text-text-primary">{t('features.voiceProfile.integration.humanize', 'Humanization')}</h3>
+                      <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-400">{t('features.voiceProfile.integration.humanizeTag', 'Rewrite in your voice')}</p>
                     </div>
                   </div>
                   
-                  <p className="text-text-secondary mb-6">
+                  <p className="text-sm sm:text-base text-text-secondary mb-4 sm:mb-6">
                     {t('features.voiceProfile.integration.humanizeDesc', 'Transform AI-generated content to match your unique writing style. The humanizer uses your Voice Profile to ensure every rewrite sounds authentically like you.')}
                   </p>
                   
-                  <div className="bg-white dark:bg-slate-700 rounded-xl p-4 border border-amber-200 dark:border-amber-500/30">
-                    <div className="flex items-center gap-2 mb-3">
+                  <div className="bg-white dark:bg-slate-700 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-amber-200 dark:border-amber-500/30">
+                    <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
                       <Icon name="arrow-right" size="sm" className="icon-amber" />
-                      <span className="text-sm font-medium text-text-primary">{t('features.voiceProfile.integration.example', 'Example')}</span>
+                      <span className="text-xs sm:text-sm font-medium text-text-primary">{t('features.voiceProfile.integration.example', 'Example')}</span>
                     </div>
-                    <div className="space-y-2 text-sm">
-                      <p className="text-gray-500 line-through">"The implementation of sustainable practices is important."</p>
-                      <p className="text-gray-800 dark:text-gray-200">"Here's the thing - going green isn't just a trend, it's essential."</p>
+                    <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
+                      <p className="text-gray-500 line-through">{t('features.voiceProfile.examples.before', '"The implementation of sustainable practices is important."')}</p>
+                      <p className="text-gray-800 dark:text-gray-200">{t('features.voiceProfile.examples.after', '"Here\'s the thing - going green isn\'t just a trend, it\'s essential."')}</p>
                     </div>
                   </div>
                   
-                  <a href="/features/humanization" className="inline-flex items-center gap-2 mt-6 text-amber-600 dark:text-amber-400 font-medium hover:gap-3 transition-all">
+                  <a href="/features/humanization" className="inline-flex items-center gap-2 mt-4 sm:mt-6 text-sm sm:text-base text-amber-600 dark:text-amber-400 font-medium hover:gap-3 transition-all">
                     {t('features.voiceProfile.integration.learnMore', 'Learn more')}
                     <Icon name="arrow-right" size="sm" />
                   </a>
                 </div>
               </motion.div>
               
-              {/* AI Workspace Integration */}
+              {/* AI Workspace Integration - Responsive */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="relative bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-blue-900/20 rounded-2xl border border-blue-200/50 dark:border-blue-500/20 p-8 overflow-hidden"
+                className="relative bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-blue-900/20 rounded-xl sm:rounded-2xl border border-blue-200/50 dark:border-blue-500/20 p-4 sm:p-6 md:p-8 overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/30 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute top-0 right-0 w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 bg-blue-200/30 rounded-full blur-2xl pointer-events-none" />
                 
                 <div className="relative">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                      <Icon name="message-square" size="xl" className="icon-white" />
+                  <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                      <Icon name="message-square" size="lg" className="icon-white sm:hidden" />
+                      <Icon name="message-square" size="xl" className="icon-white hidden sm:block" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-text-primary">{t('features.voiceProfile.integration.workspace', 'AI Workspace')}</h3>
-                      <p className="text-sm text-blue-600 dark:text-blue-400">{t('features.voiceProfile.integration.workspaceTag', 'Chat with your voice')}</p>
+                      <h3 className="text-lg sm:text-xl font-bold text-text-primary">{t('features.voiceProfile.integration.workspace', 'AI Workspace')}</h3>
+                      <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400">{t('features.voiceProfile.integration.workspaceTag', 'Chat with your voice')}</p>
                     </div>
                   </div>
                   
-                  <p className="text-text-secondary mb-6">
+                  <p className="text-sm sm:text-base text-text-secondary mb-4 sm:mb-6">
                     {t('features.voiceProfile.integration.workspaceDesc', 'Generate content that sounds like you from the start. Select your Voice Profile in AI Workspace and every response will match your writing style.')}
                   </p>
                   
-                  <div className="bg-white dark:bg-slate-700 rounded-xl p-4 border border-blue-200 dark:border-blue-500/30">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center">
+                  <div className="bg-white dark:bg-slate-700 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-blue-200 dark:border-blue-500/30">
+                    <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center">
                         <Icon name="user" size="xs" className="icon-indigo" />
                       </div>
-                      <span className="text-sm font-medium text-text-primary">{t('features.voiceProfile.integration.prompt', 'Write a product description')}</span>
+                      <span className="text-xs sm:text-sm font-medium text-text-primary">{t('features.voiceProfile.integration.prompt', 'Write a product description')}</span>
                     </div>
-                    <div className="flex items-start gap-2">
-                      <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                    <div className="flex items-start gap-1.5 sm:gap-2">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
                         <Icon name="Gemini" size="xs" className="icon-white" />
                       </div>
-                      <p className="text-sm text-gray-800 dark:text-gray-200 italic">"Okay, here's the thing about this product - it's honestly a game-changer..."</p>
+                      <p className="text-xs sm:text-sm text-gray-800 dark:text-gray-200 italic">{t('features.voiceProfile.examples.aiResponse', '"Okay, here\'s the thing about this product - it\'s honestly a game-changer..."')}</p>
                     </div>
                   </div>
                   
-                  <a href="/features/ai-workspace" className="inline-flex items-center gap-2 mt-6 text-blue-600 dark:text-blue-400 font-medium hover:gap-3 transition-all">
+                  <a href="/features/ai-workspace" className="inline-flex items-center gap-2 mt-4 sm:mt-6 text-sm sm:text-base text-blue-600 dark:text-blue-400 font-medium hover:gap-3 transition-all">
                     {t('features.voiceProfile.integration.learnMore', 'Learn more')}
                     <Icon name="arrow-right" size="sm" />
                   </a>
@@ -1520,32 +1534,46 @@ function VoiceProfile() {
               </motion.div>
             </div>
             
-            {/* Multi-language Support */}
+            {/* Multi-language Support - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-8 p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700"
+              className="mt-6 sm:mt-8 p-4 sm:p-5 md:p-6 bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700"
             >
-              <div className="flex flex-col md:flex-row items-center gap-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 flex-shrink-0">
-                  <Icon name="globe" size="2xl" className="icon-white" />
+              <div className="flex flex-col md:flex-row items-center gap-4 sm:gap-6">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 flex-shrink-0">
+                  <Icon name="globe" size="xl" className="icon-white sm:hidden" />
+                  <Icon name="globe" size="2xl" className="icon-white hidden sm:block" />
                 </div>
                 <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-xl font-bold text-text-primary mb-2">
+                  <h3 className="text-lg sm:text-xl font-bold text-text-primary mb-1.5 sm:mb-2">
                     {t('features.voiceProfile.multiLang.title', '15+ Languages Supported')}
                   </h3>
-                  <p className="text-text-secondary">
+                  <p className="text-sm sm:text-base text-text-secondary">
                     {t('features.voiceProfile.multiLang.desc', 'Create Voice Profiles in English, Vietnamese, Chinese, Japanese, Korean, Spanish, French, German, and many more. Your writing style is captured accurately regardless of language.')}
                   </p>
                 </div>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {['EN', 'VI', 'ZH', 'JA', 'KO', 'ES', 'FR', 'DE'].map((lang, i) => (
-                    <span key={i} className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-text-secondary">
-                      {lang}
+                <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
+                  {[
+                    { flag: 'us', name: 'English' },
+                    { flag: 'vn', name: 'Vietnamese' },
+                    { flag: 'cn', name: 'Chinese' },
+                    { flag: 'jp', name: 'Japanese' },
+                    { flag: 'kr', name: 'Korean' },
+                    { flag: 'es', name: 'Spanish' },
+                    { flag: 'fr', name: 'French' },
+                    { flag: 'de', name: 'German' }
+                  ].map((lang, i) => (
+                    <span 
+                      key={i} 
+                      className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full overflow-hidden border-2 border-white dark:border-slate-600 shadow-sm inline-flex items-center justify-center bg-gray-100"
+                      title={lang.name}
+                    >
+                      <span className={`fi fi-${lang.flag} fis text-[2rem] sm:text-[2.25rem] md:text-[2.5rem]`} />
                     </span>
                   ))}
-                  <span className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                  <span className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 border-2 border-white dark:border-slate-600 shadow-sm">
                     +7
                   </span>
                 </div>
@@ -1555,115 +1583,65 @@ function VoiceProfile() {
         </section>
 
         {/* ================================================================== */}
-        {/* FAQ SECTION - Matching AI Detection style */}
+        {/* FAQ SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 pb-32 lg:pb-40 relative overflow-hidden bg-bg-secondary">
-          {/* Background decoration */}
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 pb-20 sm:pb-24 md:pb-32 lg:pb-40 relative overflow-hidden bg-bg-secondary">
+          {/* Background decoration - Responsive */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-1/4 right-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-violet-500/5 rounded-full blur-3xl" />
+            <div className="absolute top-1/4 right-0 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-indigo-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-40 sm:w-56 md:w-72 lg:w-80 h-40 sm:h-56 md:h-72 lg:h-80 bg-violet-500/5 rounded-full blur-3xl" />
           </div>
 
           <div className="max-w-3xl mx-auto px-4 sm:px-6 relative">
-            {/* Section Header */}
-            <div className="text-center mb-12">
+            {/* Section Header - Responsive */}
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-bg-primary text-indigo-600 dark:text-indigo-400 text-sm font-semibold rounded-full mb-4 border border-gray-200 dark:border-gray-700 shadow-sm"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-bg-primary text-indigo-600 dark:text-indigo-400 text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 border border-gray-200 dark:border-gray-700 shadow-sm"
               >
                 <Icon name="help-circle" size="sm" className="icon-indigo" />
                 {t('features.voiceProfile.faqBadge', 'FAQ')}
               </motion.span>
-              <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-3 sm:mb-4">
                 {t('features.voiceProfile.faqTitle', 'Frequently Asked Questions')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto text-lg">
+              <p className="text-sm sm:text-base md:text-lg text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.voiceProfile.faqSubtitle', 'Everything you need to know about Voice Profile')}
               </p>
             </div>
 
-            {/* FAQ List */}
-            <div className="space-y-3">
-              {faqs.map((faq, index) => (
-                <motion.div 
-                  key={index} 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                  className={`group rounded-2xl border transition-all overflow-hidden ${
-                    openFaq === index 
-                      ? 'bg-bg-primary border-indigo-200 dark:border-indigo-500/30 shadow-md' 
-                      : 'bg-bg-primary border-gray-200 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-500/30 hover:shadow-sm'
-                  }`}
-                >
-                  <button
-                    onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                    className="w-full flex items-center justify-between p-5 text-left"
-                  >
-                    <div className="flex items-center gap-4 pr-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                        openFaq === index ? 'bg-indigo-500 text-white' : 'bg-bg-secondary text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20'
-                      }`}>
-                        <span className="text-sm font-bold">{String(index + 1).padStart(2, '0')}</span>
-                      </div>
-                      <span className={`text-base font-semibold transition-colors ${
-                        openFaq === index ? 'text-indigo-600 dark:text-indigo-400' : 'text-text-primary group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
-                      }`}>
-                        {faq.q}
-                      </span>
-                    </div>
-                    <motion.div
-                      animate={{ rotate: openFaq === index ? 180 : 0 }}
-                      transition={{ duration: 0.2, ease: 'easeInOut' }}
-                      className="flex-shrink-0 w-8 h-8 flex items-center justify-center"
-                    >
-                      <Icon name="chevron-down" size="sm" className={openFaq === index ? 'text-indigo-600 dark:text-indigo-400' : 'text-text-muted'} />
-                    </motion.div>
-                  </button>
-                  
-                  <AnimatePresence>
-                    {openFaq === index && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-5 pb-5 pl-[4.5rem]">
-                          <p className="text-text-secondary leading-relaxed">{faq.a}</p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              ))}
-            </div>
+            {/* FAQ List - Using optimized CSS grid animation */}
+            <FAQAccordion 
+              faqs={faqs} 
+              openFaq={openFaq} 
+              setOpenFaq={setOpenFaq} 
+              accentColor="indigo"
+            />
 
-            {/* Contact CTA Card */}
+            {/* Contact CTA Card - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-12 p-8 bg-bg-primary rounded-2xl border border-gray-200 dark:border-gray-700 text-center"
+              className="mt-8 sm:mt-10 md:mt-12 p-5 sm:p-6 md:p-8 bg-bg-primary rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-700 text-center"
             >
-              <div className="w-16 h-16 mx-auto mb-4 bg-indigo-100 dark:bg-indigo-500/20 rounded-xl flex items-center justify-center">
-                <Icon name="message-circle" size="xl" className="icon-indigo" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-3 sm:mb-4 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg sm:rounded-xl flex items-center justify-center">
+                <Icon name="message-circle" size="lg" className="icon-indigo sm:hidden" />
+                <Icon name="message-circle" size="xl" className="icon-indigo hidden sm:block" />
               </div>
-              <h3 className="text-xl font-bold text-text-primary mb-2">
+              <h3 className="text-lg sm:text-xl font-bold text-text-primary mb-1.5 sm:mb-2">
                 {t('faq.stillHaveQuestions', "Still have questions?")}
               </h3>
-              <p className="text-text-secondary mb-6 max-w-md mx-auto">
+              <p className="text-sm sm:text-base text-text-secondary mb-4 sm:mb-6 max-w-md mx-auto">
                 {t('faq.contactDescription', "Can't find what you're looking for? Our support team is here to help.")}
               </p>
               <motion.a
-                href="mailto:support@graphosai.com"
+                href="mailto:Support@graphosai.com"
                 whileHover={{ scale: 1.02, y: -1 }}
                 whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-500 text-white rounded-xl font-semibold hover:bg-indigo-600 transition-all shadow-sm hover:shadow-md"
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-indigo-500 text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base hover:bg-indigo-600 transition-all shadow-sm hover:shadow-md"
               >
                 <Icon name="mail" size="sm" className="icon-white" />
                 {t('faq.contactSupport', 'Contact Support')}
@@ -1671,13 +1649,16 @@ function VoiceProfile() {
             </motion.div>
           </div>
 
-          {/* Final CTA - Inside same section */}
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6 mt-20">
+          {/* Related Features */}
+          <RelatedFeatures currentFeature="voiceProfile" />
+
+          {/* Final CTA - Responsive */}
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 mt-12 sm:mt-16 md:mt-20">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="relative rounded-[2rem] overflow-hidden"
+              className="relative rounded-2xl sm:rounded-3xl md:rounded-[2rem] overflow-hidden"
             >
               {/* Solid Background - Indigo/Violet gradient */}
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600" />
@@ -1697,55 +1678,55 @@ function VoiceProfile() {
                 </svg>
               </div>
 
-              <div className="relative p-10 md:p-14 lg:p-20 text-center">
-                {/* Badge */}
+              <div className="relative p-6 sm:p-8 md:p-10 lg:p-14 xl:p-20 text-center">
+                {/* Badge - Responsive */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.1 }}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full mb-8 border border-white/[0.15]"
+                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-white/10 backdrop-blur-sm rounded-full mb-5 sm:mb-6 md:mb-8 border border-white/[0.15]"
                 >
                   <motion.span 
                     animate={{ scale: [1, 1.3, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="w-2.5 h-2.5 bg-white rounded-full"
+                    className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full"
                   />
-                  <span className="text-white/90 text-sm font-semibold">
+                  <span className="text-white/90 text-xs sm:text-sm font-semibold">
                     {t('features.voiceProfile.ctaBadge', 'Capture your unique voice')}
                   </span>
                   <Icon name="fingerprint" size="sm" className="icon-white opacity-80" />
                 </motion.div>
 
-                {/* Headline */}
+                {/* Headline - Responsive */}
                 <motion.h2
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.2 }}
-                  className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight"
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-5 md:mb-6 leading-tight"
                 >
                   {t('features.voiceProfile.ctaTitle', 'Ready to Create Your Voice Profile?')}
                 </motion.h2>
 
-                {/* Description */}
+                {/* Description - Responsive */}
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.3 }}
-                  className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed"
+                  className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 mb-6 sm:mb-8 md:mb-10 max-w-xl sm:max-w-2xl mx-auto leading-relaxed px-2"
                 >
                   {t('features.voiceProfile.ctaDesc', 'Join thousands of writers who use Voice Profile to maintain their authentic voice. Start free today.')}
                 </motion.p>
 
-                {/* CTA Buttons */}
+                {/* CTA Buttons - Responsive */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.4 }}
-                  className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8 md:mb-10 px-4 sm:px-0"
                 >
                   <motion.a
                     href="https://app.graphosai.com"
@@ -1753,10 +1734,11 @@ function VoiceProfile() {
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.02, y: -1 }}
                     whileTap={{ scale: 0.98 }}
-                    className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-indigo-600 rounded-xl font-bold text-lg shadow-sm hover:shadow-lg transition-all"
+                    className="group inline-flex items-center justify-center gap-2 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-white text-indigo-600 rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg shadow-sm hover:shadow-lg transition-all"
                   >
                     <span>{t('cta.getStartedFree', 'Get Started Free')}</span>
-                    <Icon name="arrow-right" size="md" className="icon-indigo group-hover:translate-x-0.5 transition-transform" />
+                    <Icon name="arrow-right" size="sm" className="icon-indigo group-hover:translate-x-0.5 transition-transform sm:hidden" />
+                    <Icon name="arrow-right" size="md" className="icon-indigo group-hover:translate-x-0.5 transition-transform hidden sm:block" />
                   </motion.a>
                   <motion.a
                     href="https://chrome.google.com/webstore"
@@ -1764,20 +1746,21 @@ function VoiceProfile() {
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.02, y: -1 }}
                     whileTap={{ scale: 0.98 }}
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-bold text-lg border border-white/[0.15] hover:bg-white/15 hover:border-white/[0.25] transition-all"
+                    className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-white/10 backdrop-blur-sm text-white rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg border border-white/[0.15] hover:bg-white/15 hover:border-white/[0.25] transition-all"
                   >
-                    <Icon name="chrome" size="md" className="icon-white" />
+                    <Icon name="chrome" size="sm" className="icon-white sm:hidden" />
+                    <Icon name="chrome" size="md" className="icon-white hidden sm:block" />
                     {t('cta.installExtension', 'Chrome Extension')}
                   </motion.a>
                 </motion.div>
 
-                {/* Trust indicators */}
+                {/* Trust indicators - Responsive */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.5 }}
-                  className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-white/70"
+                  className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-2 sm:gap-y-3 text-xs sm:text-sm text-white/70"
                 >
                   {[
                     { icon: 'gift', text: t('features.voiceProfile.trustIndicator1', 'No credit card required') },
@@ -1790,10 +1773,10 @@ function VoiceProfile() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: 0.6 + i * 0.1 }}
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-1.5 sm:gap-2"
                     >
                       <Icon name={item.icon} size="sm" className="icon-white opacity-80" />
-                      <span>{item.text}</span>
+                      <span className="whitespace-nowrap">{item.text}</span>
                     </motion.div>
                   ))}
                 </motion.div>
@@ -1821,9 +1804,15 @@ function VoiceProfile() {
             </svg>
           </div>
         </section>
-      </div>
+      </main>
     </>
   )
 }
 
 export default VoiceProfile
+
+
+
+
+
+

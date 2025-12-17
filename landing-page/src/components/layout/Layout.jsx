@@ -1,9 +1,18 @@
+/**
+ * Layout - SEO-optimized layout wrapper
+ * Enhanced: Dec 2025 - Language detection, RTL support, semantic HTML
+ */
+import { useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Header from './Header'
 import Footer from './Footer'
+import ScrollToTop from '../common/ScrollToTop'
+import { getLanguageConfig, DEFAULT_LANGUAGE } from '@config/languages'
 
 // Tech grid background with glow
 const PageBackground = () => (
-  <div className="fixed inset-0 -z-50 overflow-hidden pointer-events-none">
+  <div className="fixed inset-0 -z-50 overflow-hidden pointer-events-none" aria-hidden="true">
     {/* Base background */}
     <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-white to-slate-50/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950" />
     
@@ -56,11 +65,58 @@ const PageBackground = () => (
 )
 
 function Layout({ children }) {
+  const { lang } = useParams()
+  const { i18n } = useTranslation()
+  
+  // Determine current language from URL or i18n
+  const currentLang = lang || i18n.language || DEFAULT_LANGUAGE
+  const langConfig = getLanguageConfig(currentLang)
+
+  // Sync language with URL and update document attributes
+  useEffect(() => {
+    // Update i18n language if URL has different language
+    if (lang && lang !== i18n.language) {
+      i18n.changeLanguage(lang)
+    }
+    
+    // Update document lang attribute for SEO
+    document.documentElement.lang = currentLang
+    
+    // Update text direction for RTL languages (Arabic)
+    document.documentElement.dir = langConfig?.dir || 'ltr'
+    
+    // Add language-specific class for styling
+    document.documentElement.classList.remove(...document.documentElement.classList)
+    document.documentElement.classList.add(`lang-${currentLang}`)
+    
+    if (langConfig?.dir === 'rtl') {
+      document.documentElement.classList.add('rtl')
+    }
+  }, [lang, currentLang, i18n, langConfig])
+
   return (
     <div className="min-h-screen flex flex-col bg-bg-primary relative">
+      {/* Skip to main content link for accessibility */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg"
+      >
+        Skip to main content
+      </a>
+      
+      <ScrollToTop />
       <PageBackground />
+      
       <Header />
-      <main className="flex-1 relative z-10">{children}</main>
+      
+      <main 
+        id="main-content" 
+        className="flex-1 relative z-10"
+        role="main"
+      >
+        {children}
+      </main>
+      
       <Footer />
     </div>
   )

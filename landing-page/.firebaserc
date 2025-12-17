@@ -1,5 +1,12 @@
 {
   "projects": {
-    "default": "graphos-ai-landing"
+    "default": "notes-sync-472107"
+  },
+  "targets": {
+    "notes-sync-472107": {
+      "hosting": {
+        "home": ["graphosai-home"]
+      }
+    }
   }
 }

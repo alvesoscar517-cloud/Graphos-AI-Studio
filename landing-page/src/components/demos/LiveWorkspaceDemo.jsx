@@ -7,9 +7,10 @@ import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppFrame } from './DemoWrapper'
 import Icon from '@components/common/Icon'
+import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
 
-// Demo AI response
-const DEMO_RESPONSE = `Hey there,
+// Demo AI response - fallback (i18n version used in component)
+const DEMO_RESPONSE_FALLBACK = `Hey there,
 
 Thanks so much for reaching out! I really appreciate you taking the time.
 
@@ -30,6 +31,9 @@ const LiveWorkspaceDemo = () => {
   const [streamedText, setStreamedText] = useState('')
   const textareaRef = useRef(null)
   const chatContainerRef = useRef(null)
+  
+  // Get localized demo response
+  const DEMO_RESPONSE = t('demoSamples.workspace.response', DEMO_RESPONSE_FALLBACK)
 
   // Smooth scroll to bottom
   const scrollToBottom = useCallback(() => {
@@ -62,19 +66,18 @@ const LiveWorkspaceDemo = () => {
 
     // Stream the demo response character by character for smoother effect
     let currentText = ''
-    const chars = DEMO_RESPONSE.split('')
     
-    for (let i = 0; i < chars.length; i++) {
-      currentText += chars[i]
+    for (let i = 0; i < DEMO_RESPONSE.length; i++) {
+      currentText += DEMO_RESPONSE[i]
       setStreamedText(currentText)
       
       // Variable speed: faster for spaces, slower for punctuation
-      const char = chars[i]
-      let delay = 15 // base speed
-      if (char === ' ') delay = 8
-      else if (char === '\n') delay = 50
-      else if (['.', '!', '?'].includes(char)) delay = 80
-      else if ([',', ':'].includes(char)) delay = 40
+      const char = DEMO_RESPONSE[i]
+      let delay = 12 // base speed
+      if (char === ' ') delay = 6
+      else if (char === '\n') delay = 40
+      else if (['.', '!', '?'].includes(char)) delay = 60
+      else if ([',', ':'].includes(char)) delay = 30
       
       await new Promise((r) => setTimeout(r, delay))
       
@@ -199,7 +202,11 @@ const LiveWorkspaceDemo = () => {
                   >
                     <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
                       {streamedText}
-                      <span className="inline-block w-0.5 h-4 bg-cyan-500 ml-0.5 align-middle animate-pulse" />
+                      <motion.span
+                        className="inline-block w-0.5 h-4 bg-cyan-500 ml-0.5 align-middle"
+                        animate={{ opacity: [1, 0] }}
+                        transition={{ duration: 0.5, repeat: Infinity }}
+                      />
                     </p>
                   </motion.div>
                 )}
@@ -278,7 +285,7 @@ const LiveWorkspaceDemo = () => {
                     className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
                   >
                     <Icon name="rotate-ccw" size="xs" className="text-gray-500" />
-                    Reset
+                    {t('demo.reset', 'Reset')}
                   </motion.button>
                 )}
                 <button
@@ -291,19 +298,7 @@ const LiveWorkspaceDemo = () => {
                   }`}
                 >
                   {isTyping ? (
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="animate-spin"
-                    >
-                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                    </svg>
+                    <ThreeDotsLoading size="sm" />
                   ) : (
                     <svg
                       width="16"

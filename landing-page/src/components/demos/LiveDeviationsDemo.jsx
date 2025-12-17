@@ -3,64 +3,65 @@
  * Shows how sentences are analyzed for style deviations
  * Design: Orange/Amber theme - representing alerts and warnings
  */
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppFrame } from './DemoWrapper'
 import Icon from '@components/common/Icon'
+import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
 
-// Sample texts with pre-calculated deviations
-const SAMPLES = [
+// Sample texts with pre-calculated deviations - i18n supported
+const getSamples = (t) => [
   {
     id: 'few',
-    label: 'Few Deviations',
-    text: `I've been thinking about how we approach our daily challenges. The key is to stay focused on what truly matters. Small consistent steps lead to remarkable progress over time. We should embrace change and adapt quickly.`,
+    label: t('demo.samples.fewDeviations', 'Few Deviations'),
+    text: t('demoSamples.deviations.few.text', `I've been thinking about how we approach our daily challenges. The key is to stay focused on what truly matters. Small consistent steps lead to remarkable progress over time. We should embrace change and adapt quickly.`),
     score: 88,
     avgSimilarity: 78,
     totalDeviant: 1,
     sentences: [
-      { text: "I've been thinking about how we approach our daily challenges.", isDeviant: false, severity: null, similarity: 0.92 },
-      { text: "The key is to stay focused on what truly matters.", isDeviant: false, severity: null, similarity: 0.89 },
-      { text: "Small consistent steps lead to remarkable progress over time.", isDeviant: true, severity: 'mild', similarity: 0.45 },
-      { text: "We should embrace change and adapt quickly.", isDeviant: false, severity: null, similarity: 0.87 }
+      { text: t('demoSamples.deviations.few.sentences.0', "I've been thinking about how we approach our daily challenges."), isDeviant: false, severity: null, similarity: 0.92 },
+      { text: t('demoSamples.deviations.few.sentences.1', "The key is to stay focused on what truly matters."), isDeviant: false, severity: null, similarity: 0.89 },
+      { text: t('demoSamples.deviations.few.sentences.2', "Small consistent steps lead to remarkable progress over time."), isDeviant: true, severity: 'mild', similarity: 0.45 },
+      { text: t('demoSamples.deviations.few.sentences.3', "We should embrace change and adapt quickly."), isDeviant: false, severity: null, similarity: 0.87 }
     ],
     summary: { mild: 1, moderate: 0, severe: 0 }
   },
   {
     id: 'some',
-    label: 'Some Deviations',
-    text: `The implementation of sustainable practices has become increasingly important. Organizations must recognize the necessity of adopting environmentally conscious strategies. This approach yields significant benefits. Companies should act now.`,
+    label: t('demo.samples.someDeviations', 'Some Deviations'),
+    text: t('demoSamples.deviations.some.text', `The implementation of sustainable practices has become increasingly important. Organizations must recognize the necessity of adopting environmentally conscious strategies. This approach yields significant benefits. Companies should act now.`),
     score: 65,
     avgSimilarity: 48,
     totalDeviant: 3,
     sentences: [
-      { text: "The implementation of sustainable practices has become increasingly important.", isDeviant: true, severity: 'moderate', similarity: 0.35 },
-      { text: "Organizations must recognize the necessity of adopting environmentally conscious strategies.", isDeviant: true, severity: 'severe', similarity: 0.22 },
-      { text: "This approach yields significant benefits.", isDeviant: true, severity: 'mild', similarity: 0.48 },
-      { text: "Companies should act now.", isDeviant: false, severity: null, similarity: 0.85 }
+      { text: t('demoSamples.deviations.some.sentences.0', "The implementation of sustainable practices has become increasingly important."), isDeviant: true, severity: 'moderate', similarity: 0.35 },
+      { text: t('demoSamples.deviations.some.sentences.1', "Organizations must recognize the necessity of adopting environmentally conscious strategies."), isDeviant: true, severity: 'severe', similarity: 0.22 },
+      { text: t('demoSamples.deviations.some.sentences.2', "This approach yields significant benefits."), isDeviant: true, severity: 'mild', similarity: 0.48 },
+      { text: t('demoSamples.deviations.some.sentences.3', "Companies should act now."), isDeviant: false, severity: null, similarity: 0.85 }
     ],
     summary: { mild: 1, moderate: 1, severe: 1 }
   },
   {
     id: 'many',
-    label: 'Many Deviations',
-    text: `Pursuant to the aforementioned considerations, it is hereby recommended that the committee undertake a comprehensive review. The ramifications would be manifold. Such endeavors require meticulous planning. One must proceed with caution.`,
+    label: t('demo.samples.manyDeviations', 'Many Deviations'),
+    text: t('demoSamples.deviations.many.text', `Pursuant to the aforementioned considerations, it is hereby recommended that the committee undertake a comprehensive review. The ramifications would be manifold. Such endeavors require meticulous planning. One must proceed with caution.`),
     score: 32,
     avgSimilarity: 27,
     totalDeviant: 4,
     sentences: [
-      { text: "Pursuant to the aforementioned considerations, it is hereby recommended that the committee undertake a comprehensive review.", isDeviant: true, severity: 'severe', similarity: 0.18 },
-      { text: "The ramifications would be manifold.", isDeviant: true, severity: 'severe', similarity: 0.21 },
-      { text: "Such endeavors require meticulous planning.", isDeviant: true, severity: 'moderate', similarity: 0.32 },
-      { text: "One must proceed with caution.", isDeviant: true, severity: 'moderate', similarity: 0.38 }
+      { text: t('demoSamples.deviations.many.sentences.0', "Pursuant to the aforementioned considerations, it is hereby recommended that the committee undertake a comprehensive review."), isDeviant: true, severity: 'severe', similarity: 0.18 },
+      { text: t('demoSamples.deviations.many.sentences.1', "The ramifications would be manifold."), isDeviant: true, severity: 'severe', similarity: 0.21 },
+      { text: t('demoSamples.deviations.many.sentences.2', "Such endeavors require meticulous planning."), isDeviant: true, severity: 'moderate', similarity: 0.32 },
+      { text: t('demoSamples.deviations.many.sentences.3', "One must proceed with caution."), isDeviant: true, severity: 'moderate', similarity: 0.38 }
     ],
     summary: { mild: 0, moderate: 2, severe: 2 }
   }
 ]
 
-// Mock Voice Profiles
-const VOICE_PROFILES = [
-  { id: 'personal', name: 'Personal Blog', samples: 12, tone: 'Conversational' },
+// Get i18n Voice Profiles
+const getVoiceProfiles = (t) => [
+  { id: 'personal', name: t('demo.voiceProfiles.personalBlog', 'Personal Blog'), samples: 12, tone: t('demo.tone.conversational', 'Conversational') },
 ]
 
 const LiveDeviationsDemo = () => {
@@ -73,6 +74,8 @@ const LiveDeviationsDemo = () => {
   const [selectedProfile] = useState('personal')
   const textAreaRef = useRef(null)
 
+  const SAMPLES = useMemo(() => getSamples(t), [t])
+  const VOICE_PROFILES = useMemo(() => getVoiceProfiles(t), [t])
   const currentSample = SAMPLES.find((s) => s.id === selectedSample)
   const currentProfile = VOICE_PROFILES.find((p) => p.id === selectedProfile)
 
@@ -249,28 +252,40 @@ const LiveDeviationsDemo = () => {
                 )}
               </AnimatePresence>
               
-              {/* Analysis overlay */}
+              {/* Shimmer skeleton overlay when analyzing */}
               <AnimatePresence>
                 {isAnalyzing && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-gray-50/90 dark:bg-slate-800/90 flex items-center justify-center"
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 p-5 flex flex-col gap-3 bg-gray-50 dark:bg-slate-800"
                   >
-                    <div className="text-center">
+                    {[95, 88, 92, 78, 85, 90, 72, 55].map((width, index) => (
                       <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                        className="w-16 h-16 mx-auto mb-4 relative"
+                        key={index}
+                        className="h-4 rounded-md bg-gray-200 dark:bg-slate-700 relative overflow-hidden"
+                        style={{ width: `${width}%` }}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
                       >
-                        <div className="absolute inset-0 rounded-full border-4 border-orange-200 dark:border-orange-800" />
-                        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-orange-500" />
+                        <motion.div
+                          className="absolute inset-0"
+                          style={{
+                            background: 'linear-gradient(90deg, transparent 0%, rgba(249,115,22,0.3) 50%, transparent 100%)'
+                          }}
+                          animate={{ x: ['-100%', '100%'] }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            ease: 'easeInOut',
+                            delay: index * 0.1
+                          }}
+                        />
                       </motion.div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('demo.deviations.analyzing', 'Analyzing...')}
-                      </p>
-                    </div>
+                    ))}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -416,22 +431,15 @@ const LiveDeviationsDemo = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleAnalyze}
                 disabled={isAnalyzing || showResult}
-                className="flex items-center justify-center gap-2 min-w-[160px] px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-sm font-medium hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-orange-500/20"
+                className="flex items-center justify-center gap-2 min-w-[160px] h-[42px] px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isAnalyzing ? (
-                  <span className="flex items-center gap-[3px]">
-                    {[0, 1, 2].map((i) => (
-                      <motion.span
-                        key={i}
-                        className="w-[6px] h-[6px] bg-white/60 rounded-full"
-                        animate={{ y: [0, -4, 0], opacity: [0.4, 1, 0.4] }}
-                        transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-                      />
-                    ))}
+                  <span className="flex items-center justify-center w-[120px]">
+                    <ThreeDotsLoading size="md" />
                   </span>
                 ) : (
                   <>
-                    <Icon name="alert-triangle" size="sm" className="icon-white" />
+                    <Icon name="alert-triangle" size="sm" className="icon-orange" />
                     <span>{t('demo.deviations.findBtn', 'Find Deviations')}</span>
                   </>
                 )}
@@ -460,20 +468,20 @@ const LiveDeviationsDemo = () => {
             <div className="flex items-center gap-1.5 mb-3">
               <Icon name="info" size="xs" color="gray-medium" />
               <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                Severity Guide
+                {t('demo.sidebar.severityGuide', 'Severity Guide')}
               </span>
             </div>
             <div className="space-y-2">
               {[
-                { severity: 'severe', label: 'Severe', desc: 'Major style mismatch', color: 'red' },
-                { severity: 'moderate', label: 'Moderate', desc: 'Noticeable difference', color: 'amber' },
-                { severity: 'mild', label: 'Mild', desc: 'Small variation', color: 'blue' },
+                { severity: 'severe', labelKey: 'demo.deviations.severe', descKey: 'demo.deviations.majorStyleMismatch', color: 'red' },
+                { severity: 'moderate', labelKey: 'demo.deviations.moderate', descKey: 'demo.deviations.noticeableDifference', color: 'amber' },
+                { severity: 'mild', labelKey: 'demo.deviations.mild', descKey: 'demo.deviations.smallVariation', color: 'blue' },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-2 p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
                   <Icon name={getSeverityIcon(item.severity)} size="xs" className={`icon-${item.color} mt-0.5 flex-shrink-0`} />
                   <div className="min-w-0">
-                    <div className={`text-[11px] font-medium text-${item.color}-600 dark:text-${item.color}-400`}>{item.label}</div>
-                    <div className="text-[9px] text-gray-500 dark:text-gray-400">{item.desc}</div>
+                    <div className={`text-[11px] font-medium text-${item.color}-600 dark:text-${item.color}-400`}>{t(item.labelKey)}</div>
+                    <div className="text-[9px] text-gray-500 dark:text-gray-400">{t(item.descKey)}</div>
                   </div>
                 </div>
               ))}
@@ -485,21 +493,21 @@ const LiveDeviationsDemo = () => {
             <div className="flex items-center gap-1.5 mb-3">
               <Icon name="lightbulb" size="xs" color="gray-medium" />
               <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                Tips
+                {t('demo.sidebar.tips', 'Tips')}
               </span>
             </div>
             <ul className="space-y-2 text-[10px] text-gray-500 dark:text-gray-400">
               <li className="flex items-start gap-1.5">
                 <Icon name="check" size="xs" className="icon-orange mt-0.5 flex-shrink-0" />
-                <span>Hover highlighted sentences for details</span>
+                <span>{t('demo.deviations.tips.hover')}</span>
               </li>
               <li className="flex items-start gap-1.5">
                 <Icon name="check" size="xs" className="icon-orange mt-0.5 flex-shrink-0" />
-                <span>Focus on severe deviations first</span>
+                <span>{t('demo.deviations.tips.focus')}</span>
               </li>
               <li className="flex items-start gap-1.5">
                 <Icon name="check" size="xs" className="icon-orange mt-0.5 flex-shrink-0" />
-                <span>Use AI Rewrite to fix issues</span>
+                <span>{t('demo.deviations.tips.rewrite')}</span>
               </li>
             </ul>
           </div>

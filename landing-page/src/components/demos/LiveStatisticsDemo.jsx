@@ -3,18 +3,19 @@
  * Shows comprehensive writing metrics and benchmark comparisons
  * Design: Indigo/Purple theme - representing data and analytics
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppFrame } from './DemoWrapper'
 import Icon from '@components/common/Icon'
+import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
 
-// Sample texts with pre-calculated statistics
-const SAMPLES = [
+// Sample texts with pre-calculated statistics - i18n supported
+const getSamples = (t) => [
   {
     id: 'blog',
-    label: 'Blog Post',
-    text: `Writing great content isn't just about having good ideas. It's about presenting them in a way that connects with your readers. Short sentences help. They create rhythm. Longer sentences, on the other hand, allow you to explore complex ideas and build momentum in your narrative.`,
+    label: t('demo.samples.blogPost', 'Blog Post'),
+    text: t('demoSamples.statistics.blog.text', `Writing great content isn't just about having good ideas. It's about presenting them in a way that connects with your readers. Short sentences help. They create rhythm. Longer sentences, on the other hand, allow you to explore complex ideas and build momentum in your narrative.`),
     stats: {
       totalWords: 48,
       totalSentences: 6,
@@ -32,8 +33,8 @@ const SAMPLES = [
   },
   {
     id: 'academic',
-    label: 'Academic',
-    text: `The implementation of sustainable development practices within contemporary organizational frameworks necessitates a comprehensive understanding of environmental, social, and governance factors. Furthermore, the integration of these multifaceted considerations into strategic decision-making processes has demonstrated significant correlations with long-term institutional resilience and stakeholder value creation.`,
+    label: t('demo.samples.academic', 'Academic'),
+    text: t('demoSamples.statistics.academic.text', `The implementation of sustainable development practices within contemporary organizational frameworks necessitates a comprehensive understanding of environmental, social, and governance factors. Furthermore, the integration of these multifaceted considerations into strategic decision-making processes has demonstrated significant correlations with long-term institutional resilience and stakeholder value creation.`),
     stats: {
       totalWords: 47,
       totalSentences: 2,
@@ -51,8 +52,8 @@ const SAMPLES = [
   },
   {
     id: 'casual',
-    label: 'Casual',
-    text: `Hey! So I tried that new coffee shop today. It was pretty good, actually. The vibes were chill and the barista was super friendly. Definitely going back. You should check it out sometime!`,
+    label: t('demo.samples.casual', 'Casual'),
+    text: t('demoSamples.statistics.casual.text', `Hey! So I tried that new coffee shop today. It was pretty good, actually. The vibes were chill and the barista was super friendly. Definitely going back. You should check it out sometime!`),
     stats: {
       totalWords: 35,
       totalSentences: 6,
@@ -99,6 +100,7 @@ const LiveStatisticsDemo = () => {
   const [showResult, setShowResult] = useState(false)
   const [animatedStats, setAnimatedStats] = useState({})
 
+  const SAMPLES = useMemo(() => getSamples(t), [t])
   const currentSample = SAMPLES.find((s) => s.id === selectedSample)
   const currentBenchmark = BENCHMARKS[currentSample?.styleMatch || 'blog']
 
@@ -227,30 +229,45 @@ const LiveStatisticsDemo = () => {
           {/* Text Display Area */}
           <div className="flex-1 relative">
             <div className="w-full h-full min-h-[200px] p-5 bg-gray-50 dark:bg-slate-800 rounded-2xl text-gray-700 dark:text-gray-300 text-base leading-relaxed overflow-hidden relative">
-              {currentSample?.text}
+              {/* Text content */}
+              <div className={`transition-opacity duration-300 ${isAnalyzing ? 'opacity-0' : 'opacity-100'}`}>
+                {currentSample?.text}
+              </div>
               
-              {/* Analysis overlay */}
+              {/* Shimmer skeleton overlay when analyzing */}
               <AnimatePresence>
                 {isAnalyzing && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-gray-50/90 dark:bg-slate-800/90 flex items-center justify-center"
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 p-5 flex flex-col gap-3"
                   >
-                    <div className="text-center">
+                    {[95, 88, 92, 78, 85, 55].map((width, index) => (
                       <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                        className="w-16 h-16 mx-auto mb-4 relative"
+                        key={index}
+                        className="h-4 rounded-md bg-gray-200 dark:bg-slate-700 relative overflow-hidden"
+                        style={{ width: `${width}%` }}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
                       >
-                        <div className="absolute inset-0 rounded-full border-4 border-indigo-200 dark:border-indigo-800" />
-                        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-500" />
+                        <motion.div
+                          className="absolute inset-0"
+                          style={{
+                            background: 'linear-gradient(90deg, transparent 0%, rgba(99,102,241,0.3) 50%, transparent 100%)'
+                          }}
+                          animate={{ x: ['-100%', '100%'] }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            ease: 'easeInOut',
+                            delay: index * 0.1
+                          }}
+                        />
                       </motion.div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('demo.statistics.analyzing', 'Calculating statistics...')}
-                      </p>
-                    </div>
+                    ))}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -474,22 +491,15 @@ const LiveStatisticsDemo = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleAnalyze}
                 disabled={isAnalyzing || showResult}
-                className="flex items-center justify-center gap-2 min-w-[160px] px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl text-sm font-medium hover:from-indigo-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-500/20"
+                className="flex items-center justify-center gap-2 min-w-[160px] h-[42px] px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isAnalyzing ? (
-                  <span className="flex items-center gap-[3px]">
-                    {[0, 1, 2].map((i) => (
-                      <motion.span
-                        key={i}
-                        className="w-[6px] h-[6px] bg-white/60 rounded-full"
-                        animate={{ y: [0, -4, 0], opacity: [0.4, 1, 0.4] }}
-                        transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-                      />
-                    ))}
+                  <span className="flex items-center justify-center w-[100px]">
+                    <ThreeDotsLoading size="md" />
                   </span>
                 ) : (
                   <>
-                    <Icon name="bar-chart-2" size="sm" className="icon-white" />
+                    <Icon name="bar-chart-2" size="sm" className="icon-indigo" />
                     {t('demo.statistics.analyzeBtn', 'Analyze Text')}
                   </>
                 )}
@@ -507,8 +517,8 @@ const LiveStatisticsDemo = () => {
                 <Icon name="edit-3" size="lg" className="icon-indigo" />
               </div>
               <div className="text-center">
-                <div className="text-xs font-medium text-gray-800 dark:text-gray-200 capitalize">{currentSample?.styleMatch} Style</div>
-                <div className="text-[10px] text-gray-500 dark:text-gray-400">Benchmark comparison</div>
+                <div className="text-xs font-medium text-gray-800 dark:text-gray-200 capitalize">{currentSample?.styleMatch} {t('demo.statistics.style', 'style')}</div>
+                <div className="text-[10px] text-gray-500 dark:text-gray-400">{t('demo.statistics.benchmarkComparison')}</div>
               </div>
             </div>
           </div>
@@ -517,22 +527,20 @@ const LiveStatisticsDemo = () => {
           <div className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
             <div className="flex items-center gap-1.5 mb-3">
               <Icon name="info" size="xs" color="gray-medium" />
-              <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                Metrics Guide
-              </span>
+              <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{t('demo.statistics.metricsGuide')}</span>
             </div>
             <div className="space-y-2">
               {[
-                { icon: 'type', label: 'Word Length', desc: 'Avg characters/word' },
-                { icon: 'align-left', label: 'Sentence Length', desc: 'Avg words/sentence' },
-                { icon: 'book-open', label: 'Readability', desc: 'Flesch-Kincaid score' },
-                { icon: 'book', label: 'Vocabulary', desc: 'Unique word ratio' },
+                { icon: 'type', labelKey: 'demo.statistics.metrics.wordLength.label', descKey: 'demo.statistics.metrics.wordLength.desc' },
+                { icon: 'align-left', labelKey: 'demo.statistics.metrics.sentenceLength.label', descKey: 'demo.statistics.metrics.sentenceLength.desc' },
+                { icon: 'book-open', labelKey: 'demo.statistics.metrics.readability.label', descKey: 'demo.statistics.metrics.readability.desc' },
+                { icon: 'book', labelKey: 'demo.statistics.metrics.vocabulary.label', descKey: 'demo.statistics.metrics.vocabulary.desc' },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-2 p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
                   <Icon name={item.icon} size="xs" className="icon-indigo mt-0.5" />
                   <div>
-                    <div className="text-[11px] font-medium text-gray-700 dark:text-gray-300">{item.label}</div>
-                    <div className="text-[9px] text-gray-500 dark:text-gray-400">{item.desc}</div>
+                    <div className="text-[11px] font-medium text-gray-700 dark:text-gray-300">{t(item.labelKey)}</div>
+                    <div className="text-[9px] text-gray-500 dark:text-gray-400">{t(item.descKey)}</div>
                   </div>
                 </div>
               ))}
@@ -543,21 +551,19 @@ const LiveStatisticsDemo = () => {
           <div className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
             <div className="flex items-center gap-1.5 mb-3">
               <Icon name="bar-chart" size="xs" color="gray-medium" />
-              <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                Readability Scale
-              </span>
+              <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{t('demo.statistics.readabilityScale')}</span>
             </div>
             <div className="space-y-1.5">
               {[
-                { range: '80-100', label: 'Very Easy', color: 'emerald' },
-                { range: '60-79', label: 'Easy', color: 'teal' },
-                { range: '40-59', label: 'Moderate', color: 'amber' },
-                { range: '20-39', label: 'Difficult', color: 'orange' },
-                { range: '0-19', label: 'Very Difficult', color: 'red' },
+                { range: '80-100', labelKey: 'demo.statistics.readabilityLevels.veryEasy', color: 'emerald' },
+                { range: '60-79', labelKey: 'demo.statistics.readabilityLevels.easy', color: 'teal' },
+                { range: '40-59', labelKey: 'demo.statistics.readabilityLevels.moderate', color: 'amber' },
+                { range: '20-39', labelKey: 'demo.statistics.readabilityLevels.difficult', color: 'orange' },
+                { range: '0-19', labelKey: 'demo.statistics.readabilityLevels.veryDifficult', color: 'red' },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between text-[10px]">
                   <span className={`text-${item.color}-600 dark:text-${item.color}-400 font-medium`}>{item.range}</span>
-                  <span className="text-gray-500 dark:text-gray-400">{item.label}</span>
+                  <span className="text-gray-500 dark:text-gray-400">{t(item.labelKey)}</span>
                 </div>
               ))}
             </div>

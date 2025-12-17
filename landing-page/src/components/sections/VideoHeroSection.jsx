@@ -47,7 +47,7 @@ const VideoHeroSection = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative max-w-content-lg mx-auto px-4 z-10">
+      <div className="relative w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left: Text Content */}
           <motion.div
@@ -153,10 +153,10 @@ const VideoHeroSection = () => {
                       <div className="mt-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
                         <div className="flex items-center gap-2 mb-2">
                           <Icon name="shield-check" size="sm" />
-                          <span className="text-xs font-medium text-primary">AI Detection Result</span>
+                          <span className="text-xs font-medium text-primary">{t('demo.aiDetection.result', 'AI Detection Result')}</span>
                         </div>
                         <div className="text-2xl font-bold text-text-primary">23%</div>
-                        <div className="text-xs text-text-secondary">Human-written content</div>
+                        <div className="text-xs text-text-secondary">{t('demo.verdictHuman', 'Human-written content')}</div>
                       </div>
                     </div>
                   </div>
@@ -263,3 +263,6 @@ const VideoHeroSection = () => {
 }
 
 export default VideoHeroSection
+
+
+

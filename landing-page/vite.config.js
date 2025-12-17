@@ -4,7 +4,12 @@ import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      // Enable Fast Refresh for better DX
+      fastRefresh: true
+    })
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
@@ -23,33 +28,80 @@ export default defineConfig({
     minify: 'terser',
     target: 'es2020',
     cssCodeSplit: true,
+    cssMinify: 'lightningcss',
     chunkSizeWarningLimit: 500,
+    // Enable module preload polyfill
+    modulePreload: {
+      polyfill: true
+    },
     terserOptions: {
       compress: {
         drop_console: true,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info'],
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+        passes: 2, // Multiple compression passes
+        ecma: 2020,
+        unsafe_arrows: true,
+        unsafe_methods: true,
       },
       mangle: {
         safari10: true,
+        properties: false, // Don't mangle properties for safety
+      },
+      format: {
+        comments: false, // Remove all comments
+        ecma: 2020,
       },
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          i18n: ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
-          animation: ['framer-motion', 'vanta', 'three'],
+        // Improved chunk splitting for better caching
+        manualChunks: (id) => {
+          // Core React - smallest, most cached
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'react-core'
+          }
+          // Router - separate for route-based caching
+          if (id.includes('react-router')) {
+            return 'router'
+          }
+          // i18n - loaded early but separate
+          if (id.includes('i18next') || id.includes('react-i18next')) {
+            return 'i18n'
+          }
+          // Heavy animation libraries - lazy loaded
+          if (id.includes('framer-motion')) {
+            return 'animation-framer'
+          }
+          // 3D/WebGL - very heavy, separate chunk
+          if (id.includes('three') || id.includes('vanta')) {
+            return 'animation-3d'
+          }
+          // Particles - separate for lazy loading
+          if (id.includes('tsparticles')) {
+            return 'particles'
+          }
+          // Lottie animations
+          if (id.includes('lottie')) {
+            return 'lottie'
+          }
+          // Other vendor chunks
+          if (id.includes('node_modules')) {
+            return 'vendor'
+          }
         },
         // Asset file naming for better caching
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name.split('.')
           const ext = info[info.length - 1]
-          if (/png|jpe?g|svg|gif|tiff|bmp|ico|webp/i.test(ext)) {
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico|webp|avif/i.test(ext)) {
             return `assets/images/[name]-[hash][extname]`
           }
           if (/woff2?|ttf|eot/i.test(ext)) {
             return `assets/fonts/[name]-[hash][extname]`
+          }
+          if (/css/i.test(ext)) {
+            return `assets/css/[name]-[hash][extname]`
           }
           return `assets/[name]-[hash][extname]`
         },
@@ -65,8 +117,24 @@ export default defineConfig({
   preview: {
     port: 3001,
   },
-  // Optimize dependencies
+  // Optimize dependencies - pre-bundle for faster dev
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'i18next', 'react-i18next'],
+    include: [
+      'react', 
+      'react-dom', 
+      'react-router-dom', 
+      'i18next', 
+      'react-i18next',
+      'framer-motion',
+      'clsx',
+      'tailwind-merge'
+    ],
+    // Exclude heavy libs from pre-bundling
+    exclude: ['three', 'vanta']
   },
+  // Enable esbuild for faster transforms
+  esbuild: {
+    legalComments: 'none',
+    treeShaking: true,
+  }
 })

@@ -2,18 +2,18 @@
  * LiveVoiceProfileDemo - Interactive Voice Profile visualization demo
  * Shows writing style analysis with animated metrics
  */
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppFrame } from './DemoWrapper'
 import Icon from '@components/common/Icon'
 
-// Sample profiles
-const SAMPLE_PROFILES = [
+// Get i18n sample profiles
+const getSampleProfiles = (t) => [
   {
-    name: 'Sarah Chen',
+    name: t('demoSamples.voiceProfile.sarah.name', 'Sarah Chen'),
     avatar: 'SC',
-    style: 'Professional & Warm',
+    style: t('demoSamples.voiceProfile.sarah.style', 'Professional & Warm'),
     metrics: {
       formality: 65,
       creativity: 78,
@@ -21,15 +21,25 @@ const SAMPLE_PROFILES = [
       empathy: 85,
       technicality: 45
     },
-    traits: ['Conversational', 'Empathetic', 'Clear', 'Engaging'],
-    vocabulary: ['honestly', 'I think', 'let me explain', "here's the thing"],
-    sentenceLength: 'Medium (12-18 words)',
-    tone: 'Warm & Approachable'
+    traits: [
+      t('demo.traits.conversational', 'Conversational'),
+      t('demo.traits.empathetic', 'Empathetic'),
+      t('demo.traits.clear', 'Clear'),
+      t('demo.traits.engaging', 'Engaging')
+    ],
+    vocabulary: [
+      t('demoSamples.voiceProfile.sarah.vocab.0', 'honestly'),
+      t('demoSamples.voiceProfile.sarah.vocab.1', 'I think'),
+      t('demoSamples.voiceProfile.sarah.vocab.2', 'let me explain'),
+      t('demoSamples.voiceProfile.sarah.vocab.3', "here's the thing")
+    ],
+    sentenceLength: t('demo.sentenceLengthMedium', 'Medium (12-18 words)'),
+    tone: t('demoSamples.voiceProfile.sarah.tone', 'Warm & Approachable')
   },
   {
-    name: 'Alex Rivera',
+    name: t('demoSamples.voiceProfile.alex.name', 'Alex Rivera'),
     avatar: 'AR',
-    style: 'Casual & Creative',
+    style: t('demoSamples.voiceProfile.alex.style', 'Casual & Creative'),
     metrics: {
       formality: 35,
       creativity: 92,
@@ -37,15 +47,25 @@ const SAMPLE_PROFILES = [
       empathy: 70,
       technicality: 40
     },
-    traits: ['Playful', 'Creative', 'Informal', 'Storyteller'],
-    vocabulary: ['basically', 'you know', 'kind of', 'super'],
-    sentenceLength: 'Varied (8-25 words)',
-    tone: 'Fun & Energetic'
+    traits: [
+      t('demo.traits.playful', 'Playful'),
+      t('demo.traits.creative', 'Creative'),
+      t('demo.traits.informal', 'Informal'),
+      t('demo.traits.storyteller', 'Storyteller')
+    ],
+    vocabulary: [
+      t('demoSamples.voiceProfile.alex.vocab.0', 'basically'),
+      t('demoSamples.voiceProfile.alex.vocab.1', 'you know'),
+      t('demoSamples.voiceProfile.alex.vocab.2', 'kind of'),
+      t('demoSamples.voiceProfile.alex.vocab.3', 'super')
+    ],
+    sentenceLength: t('demo.sentenceLengthVaried', 'Varied (8-25 words)'),
+    tone: t('demoSamples.voiceProfile.alex.tone', 'Fun & Energetic')
   },
   {
-    name: 'Dr. James Park',
+    name: t('demoSamples.voiceProfile.james.name', 'Dr. James Park'),
     avatar: 'JP',
-    style: 'Academic & Precise',
+    style: t('demoSamples.voiceProfile.james.style', 'Academic & Precise'),
     metrics: {
       formality: 88,
       creativity: 55,
@@ -53,10 +73,20 @@ const SAMPLE_PROFILES = [
       empathy: 50,
       technicality: 90
     },
-    traits: ['Analytical', 'Precise', 'Structured', 'Evidence-based'],
-    vocabulary: ['furthermore', 'consequently', 'research indicates', 'data suggests'],
-    sentenceLength: 'Long (18-28 words)',
-    tone: 'Authoritative & Measured'
+    traits: [
+      t('demo.traits.analytical', 'Analytical'),
+      t('demo.traits.precise', 'Precise'),
+      t('demo.traits.structured', 'Structured'),
+      t('demo.traits.evidenceBased', 'Evidence-based')
+    ],
+    vocabulary: [
+      t('demoSamples.voiceProfile.james.vocab.0', 'furthermore'),
+      t('demoSamples.voiceProfile.james.vocab.1', 'consequently'),
+      t('demoSamples.voiceProfile.james.vocab.2', 'research indicates'),
+      t('demoSamples.voiceProfile.james.vocab.3', 'data suggests')
+    ],
+    sentenceLength: t('demo.sentenceLengthLong', 'Long (18-28 words)'),
+    tone: t('demoSamples.voiceProfile.james.tone', 'Authoritative & Measured')
   }
 ]
 
@@ -82,6 +112,8 @@ const LiveVoiceProfileDemo = () => {
   const [selectedProfile, setSelectedProfile] = useState(0)
   const [animationKey, setAnimationKey] = useState(0)
 
+  // Get i18n sample profiles
+  const SAMPLE_PROFILES = useMemo(() => getSampleProfiles(t), [t])
   const profile = SAMPLE_PROFILES[selectedProfile]
 
   const handleProfileChange = (index) => {

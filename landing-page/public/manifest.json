@@ -1,0 +1,101 @@
+{
+  "name": "Graphos AI Studio",
+  "short_name": "Graphos AI",
+  "description": "AI Detection, Humanization & Voice Profile Platform - Detect AI content, humanize your writing, and create authentic content.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0071E3",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["productivity", "utilities", "education"],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/ai-detection.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "AI Detection Feature"
+    },
+    {
+      "src": "/screenshots/humanization.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Content Humanization"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "AI Detection",
+      "short_name": "Detect",
+      "description": "Detect AI-generated content",
+      "url": "/features/ai-detection",
+      "icons": [{ "src": "/icons/detect-icon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Humanization",
+      "short_name": "Humanize",
+      "description": "Humanize AI text",
+      "url": "/features/humanization",
+      "icons": [{ "src": "/icons/humanize-icon.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://app.graphosai.com"
+    }
+  ],
+  "prefer_related_applications": false
+}

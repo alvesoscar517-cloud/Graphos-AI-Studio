@@ -1,88 +1,2629 @@
 {
-  "nav": {
-    "home": "ホーム",
-    "features": "機能",
-    "aiDetection": "AI検出",
-    "humanization": "ヒューマナイゼーション",
-    "voiceProfile": "ボイスプロファイル",
-    "aiWorkspace": "AIワークスペース",
-    "privacy": "プライバシーポリシー",
-    "terms": "利用規約",
-    "legal": "法的情報"
-  },
-  "cta": {
-    "getStarted": "始める",
-    "tryFree": "無料で試す",
-    "learnMore": "詳細を見る",
-    "signUp": "サインアップ"
-  },
-  "home": {
-    "meta": {
-      "title": "Graphos AI Studio - 本物のAIライティング",
-      "description": "AI検出、ヒューマナイゼーション、ボイスプロファイル機能で本物のコンテンツを作成。AIテキストを自然な人間らしい文章に変換。"
-    },
-    "hero": {
-      "title": "AIで本物のコンテンツを作成",
-      "subtitle": "AI生成テキストを検出し、コンテンツをヒューマナイズし、あなた独自のボイスプロファイルで作成。"
-    },
-    "features": {
-      "title": "強力な機能"
-    },
-    "cta": {
-      "title": "本物のコンテンツを書く準備はできましたか？",
-      "description": "Graphos AI Studioを使用して本物の人間らしいコンテンツを作成する何千人ものライターに参加しましょう。"
-    }
-  },
   "aiDetection": {
+    "description": "AIが生成したコンテンツを高い精度と確信度で特定します。",
     "meta": {
-      "title": "AI検出 - Graphos AI Studio",
-      "description": "高精度でAI生成コンテンツを検出。ChatGPT、GPT-4、その他のAIライティングを識別。"
+      "description": "高い精度でAI生成コンテンツを検出します。ChatGPT、GPT-4、その他のAIライティングを特定します。",
+      "title": "AI検出 - Graphos AI Studio"
     },
-    "title": "AI検出",
-    "description": "精度と信頼性でAI生成コンテンツを識別。"
-  },
-  "humanization": {
-    "meta": {
-      "title": "コンテンツヒューマナイゼーション - Graphos AI Studio",
-      "description": "意味を保ちながらAI生成テキストを自然な人間らしいコンテンツに変換。"
-    },
-    "title": "コンテンツヒューマナイゼーション",
-    "description": "AIテキストを自然で本物の人間らしい文章に変換。"
-  },
-  "voiceProfile": {
-    "meta": {
-      "title": "ボイスプロファイル - Graphos AI Studio",
-      "description": "あなた独自のライティングボイスプロファイルを作成し、あなたらしいコンテンツを生成。"
-    },
-    "title": "ボイスプロファイル",
-    "description": "あなた独自のライティングスタイルをキャプチャし、本物のあなたらしいコンテンツを作成。"
+    "title": "AI検出"
   },
   "aiWorkspace": {
+    "description": "あなた独自の文体でAIとチャットできます。",
     "meta": {
-      "title": "AIワークスペース - Graphos AI Studio",
-      "description": "ボイスプロファイルを使用してAIとチャット。パーソナライズされたライティングアシスタンスを取得。"
+      "description": "あなたのボイスプロファイルを使用してAIとチャット。パーソナライズされたライティング支援を受けられます。",
+      "title": "AIワークスペース - Graphos AI Studio"
     },
-    "title": "AIワークスペース",
-    "description": "あなた独自のライティングスタイルでAIとチャット。"
+    "title": "AIワークスペース"
   },
-  "privacy": {
-    "meta": {
-      "title": "プライバシーポリシー - Graphos AI Studio",
-      "description": "Graphos AI Studioがあなたの個人データをどのように収集、使用、保護するかを学ぶ。"
-    },
-    "title": "プライバシーポリシー",
-    "lastUpdated": "最終更新日"
+  "analysis": {
+    "aiDetection": "AI検出",
+    "aiIndicators": "AI指標",
+    "confidence": "確信度",
+    "content": "コンテンツ分析",
+    "detect": "検出",
+    "detected": "検出済み",
+    "humanIndicators": "人間らしさの指標"
   },
-  "terms": {
-    "meta": {
-      "title": "利用規約 - Graphos AI Studio",
-      "description": "Graphos AI Studioサービスの利用規約をお読みください。"
+  "brand": {
+    "aiStudio": "AI Studio",
+    "graphos": "Graphos",
+    "model": "Graphos Hyper",
+    "name": "Graphos AI Studio",
+    "shortName": "Graphos AI"
+  },
+  "chat": {
+    "actions": {
+      "docs": "ドキュメント",
+      "emailSupport": "メールサポート",
+      "faq": "FAQを見る"
     },
-    "title": "利用規約",
-    "lastUpdated": "最終更新日"
+    "responseTime": "通常2時間以内に応答します",
+    "subtitle": "お手伝いします",
+    "title": "ヘルプが必要ですか？"
+  },
+  "common": {
+    "detectionResults": "検出結果",
+    "failedToLoadImage": "画像の読み込みに失敗しました",
+    "imageLoadFailed": "画像の読み込みに失敗しました",
+    "loading": "読み込み中...",
+    "onThisPage": "このページ内",
+    "step": "ステップ",
+    "tableOfContents": "目次",
+    "viewDetails": "詳細を見る",
+    "wordsAnalyzed": "分析された単語数",
+    "reset": "リセット",
+    "clear": "クリア",
+    "analyze": "分析"
+  },
+  "comparison": {
+    "badge": "選ばれる理由",
+    "competitorNotes": {
+      "basicOnly": "基本機能のみ",
+      "delayed": "遅延あり",
+      "generic": "一般的",
+      "languages23": "2-3言語",
+      "limited": "限定的",
+      "monthlyOnly": "月額のみ",
+      "monthlyReset": "毎月リセット",
+      "trialOnly": "トライアルのみ"
+    },
+    "ctaText": "違いを体験してください",
+    "feature": "機能",
+    "features": {
+      "aiDetection": "AIコンテンツ検出",
+      "aiRewrite": "あなたの声でAIリライト",
+      "aiWorkspace": "あなたの声でAIチャット",
+      "chromeExtension": "Chrome拡張機能",
+      "compatibilityScore": "文体適合スコア",
+      "creditsExpire": "クレジット有効期限なし",
+      "deviations": "文体逸脱検出",
+      "freeTier": "無料プラン",
+      "humanization": "コンテンツの人間化",
+      "multiLanguage": "多言語サポート",
+      "payAsYouGo": "従量課金制",
+      "realtimeAnalysis": "リアルタイム分析",
+      "statistics": "ライティング統計",
+      "voiceProfile": "個人ボイスプロファイル"
+    },
+    "graphosNotes": {
+      "accuracy98": "精度98%",
+      "aiAnalyzed": "AI分析済み",
+      "comprehensive": "包括的",
+      "detailedAnalysis": "詳細な分析",
+      "foreverYours": "永久に保持",
+      "freeCredits100": "100クレジット",
+      "fullFeatures": "全機能",
+      "instant": "即時",
+      "languages15": "15言語",
+      "noSubscription": "サブスクリプションなし",
+      "sentenceLevel": "文単位",
+      "voiceMatched": "ボイスマッチ"
+    },
+    "notes": {
+      "accuracy98": "精度98%",
+      "aiAnalyzed": "AI分析済み",
+      "basicOnly": "基本機能のみ",
+      "comprehensive": "包括的",
+      "delayed": "遅延あり",
+      "detailedAnalysis": "詳細な分析",
+      "foreverYours": "永久に保持",
+      "fullFeatures": "全機能",
+      "generic": "一般的",
+      "instant": "即時",
+      "languages15": "15言語",
+      "languages23": "2-3言語",
+      "limited": "限定的",
+      "monthlyOnly": "月額のみ",
+      "monthlyReset": "毎月リセット",
+      "noSubscription": "サブスクリプションなし",
+      "sentenceLevel": "文単位",
+      "voiceMatched": "ボイスマッチ"
+    },
+    "others": "他のツール",
+    "competitors": "競合他社",
+    "ourSolution": "当社のソリューション",
+    "socialProof": {
+      "rating": "{{rating}}/5",
+      "writersCount": "{{count}}+ 人のライターが信頼"
+    },
+    "subtitle": "Graphos AI Studioと他のAIライティングツールの比較をご覧ください",
+    "title": "完全なAIライティングソリューション",
+    "tooltips": {
+      "aiDetection": "業界トップクラスの精度でAI生成コンテンツを検出",
+      "aiRewrite": "あらゆるテキストを独自の文体に変換",
+      "aiWorkspace": "あなたの文体で応答するAIとチャット",
+      "chromeExtension": "Web上のどこでもGraphos AIを使用",
+      "compatibilityScore": "テキストがあなたの文体にどれだけ一致しているか確認",
+      "creditsExpire": "クレジットは永久に有効です",
+      "deviations": "文体から逸脱している文を検出",
+      "freeTier": "無料クレジットで開始、支払いは不要",
+      "humanization": "AIテキストを独自の文体に変換",
+      "multiLanguage": "15以上の言語でコンテンツを作成・人間化",
+      "payAsYouGo": "使った分だけ支払い、月額契約なし",
+      "realtimeAnalysis": "執筆中に即座にフィードバックを取得",
+      "statistics": "ライティング指標とパターンを分析",
+      "voiceProfile": "AIがあなた独自の文体を学習・再現"
+    },
+    "trustUs": "人のライターが信頼",
+    "winCount_one": "競合他社より{{count}}つの利点",
+    "winCount_other": "競合他社より{{count}}つの利点",
+    "writersCount": "{{count}}+ 人のライターが信頼"
+  },
+  "compatibility": {
+    "meta": {
+      "description": "テキストがあなたの独自の文体にどれだけ一致しているかを分析します。詳細な適合スコア、逸脱分析、改善提案を取得できます。",
+      "title": "適合スコア - 文体の一致を確認 | Graphos AI"
+    }
+  },
+  "compatibilityScore": {
+    "description": "詳細な分析で文体の一致度を確認します。",
+    "meta": {
+      "description": "テキストがあなたの独自の文体にどれだけ一致しているかを分析します。詳細な適合スコア、逸脱分析、改善提案を取得できます。",
+      "title": "適合スコア - 文体の一致を確認 | Graphos AI"
+    },
+    "title": "適合スコア"
+  },
+  "cta": {
+    "badge": "今すぐ無料で始める",
+    "getStarted": "始める",
+    "getStartedFree": "無料で始める",
+    "installExtension": "拡張機能をインストール",
+    "instant": "即時アクセス",
+    "learnMore": "詳細を見る",
+    "metrics": {
+      "languages": "言語",
+      "rating": "ユーザー評価",
+      "texts": "分析されたテキスト",
+      "users": "アクティブユーザー"
+    },
+    "noCard": "クレジットカード不要",
+    "privacy": "プライバシー第一",
+    "seeItInAction": "動作を見る",
+    "signUp": "登録する",
+    "startFreeTrial": "無料トライアルを開始",
+    "trust": {
+      "free": "永久無料プラン",
+      "noCard": "クレジットカード不要",
+      "setup": "2分でセットアップ"
+    },
+    "trustedBy": "世界中のライターやコンテンツクリエイターに信頼されています",
+    "tryDemo": "デモを試す",
+    "tryFree": "今すぐ無料で試す",
+    "watchDemo": "デモを見る"
+  },
+  "demo": {
+    "after": "変換後",
+    "aiDetection": {
+      "result": "AI検出結果"
+    },
+    "aiIndicators": "AI指標",
+    "aiProbability": "AI確率",
+    "aiText": "AIテキスト",
+    "analyzing": "分析中...",
+    "analyzingDesc": "パターンと指標を確認中",
+    "analyzingProfile": "文体を分析中...",
+    "before": "変換前",
+    "characters": "文字",
+    "chars": "文字",
+    "clickDetect": "サンプルテキストを選択し、「AIを検出」をクリックして分析",
+    "clickToTransform": "変換をクリックして魔法を見る",
+    "compatibility": {
+      "analyzeBtn": "スコアを計算",
+      "analyzing": "文体を分析中...",
+      "averageMatch": "平均的一致",
+      "deviations": "逸脱",
+      "goodMatch": "良好な一致",
+      "lowMatch": "低い一致",
+      "notCompatible": "不適合",
+      "statistical": "統計的",
+      "subtitle": "テキストが文体にどれだけ一致するか分析",
+      "title": "適合スコア",
+      "vector": "ベクトル",
+      "veryCompatible": "非常に適合",
+      "average": "平均"
+    },
+    "confidence": "確信度",
+    "contentAnalysis": "コンテンツ分析",
+    "contentHumanization": "コンテンツの人間化",
+    "continueInApp": "完全版アプリで続ける",
+    "creativity": "創造性",
+    "detect": "AIを検出",
+    "deviations": {
+      "analyzing": "文の逸脱を分析中...",
+      "compatibility": "適合性",
+      "deviant": "逸脱",
+      "findBtn": "逸脱を見つける",
+      "majorStyleMismatch": "大きなスタイルの不一致",
+      "mild": "軽度",
+      "moderate": "中度",
+      "noticeableDifference": "顕著な違い",
+      "rewrite": "AIでリライト →",
+      "severe": "重度",
+      "smallVariation": "小さな変動",
+      "subtitle": "スタイルから逸脱した文を見つける",
+      "suggestion": "この文はあなたの典型的な文体と異なります。あなたの声に合うように修正を検討してください。",
+      "tips": {
+        "focus": "重度の逸脱を優先してください",
+        "hover": "ハイライトされた文にカーソルを合わせると詳細が表示されます",
+        "rewrite": "AIリライトを使って問題を修正"
+      },
+      "title": "逸脱"
+    },
+    "directness": "直接性",
+    "empathy": "共感性",
+    "enterAIText": "AI生成テキストをここに入力...",
+    "enterText": "分析するテキストを入力または貼り付け...（最低50文字）",
+    "enterTextDesc": "テキストを入力または貼り付け、「AIを検出」をクリックして分析",
+    "enterTextToAnalyze": "分析するテキストを入力",
+    "example": "例",
+    "formality": "形式性",
+    "humanIndicators": "人間らしさの指標",
+    "humanText": "人間のテキスト",
+    "humanize": "コンテンツを人間化",
+    "humanizeContent": "コンテンツを人間化",
+    "humanizeThis": "より人間らしくする",
+    "humanized": "人間化済み",
+    "humanizedResult": "人間化された結果",
+    "indicators": {
+      "ai": {
+        "consistentFormalTone": "一貫して形式的なトーン",
+        "formalSentenceStructures": "形式的な文構造",
+        "lackOfPersonalExpressions": "個人的な表現の欠如",
+        "structuredParagraphFlow": "構造化された段落の流れ",
+        "technicalTerminology": "専門用語の検出",
+        "technicalVocabulary": "専門的な語彙の使用"
+      },
+      "human": {
+        "emotionalExpressions": "感情表現が存在",
+        "informalExpressions": "非公式な表現の使用",
+        "informalLanguage": "砕けた言語パターン",
+        "personalAnecdotes": "個人的な逸話が存在",
+        "personalPronouns": "人称代名詞の検出",
+        "variedSentenceStructure": "多様な文構造"
+      }
+    },
+    "liveDemo": "ライブデモ",
+    "minCharacters": "最低50文字必要です",
+    "mixedText": "混合",
+    "original": "オリジナル - AI生成",
+    "overallTone": "全体的なトーン",
+    "pasteAIText": "AI生成テキストを貼り付け",
+    "processing": "処理中...",
+    "profileInfo": "プロファイルはあなたのライティングサンプルを分析して作成されます",
+    "quickActions": "クイックアクション",
+    "quickTip": "ヒント：サンプルテキストを試して、異なるコンテンツタイプがどのように検出されるか確認してください",
+    "rateLimited": "デモの試行回数制限に達しました。無制限アクセスのために登録してください！",
+    "readyToAnalyze": "分析準備完了",
+    "realApiCall": "リアルAPI",
+    "redetect": "再検出",
+    "reset": "リセット",
+    "resultWillAppear": "人間化されたテキストがここに表示されます",
+    "selectProfile": "プロファイルを選択",
+    "sentenceLength": "文の長さ",
+    "sentences": "文",
+    "sentencesAnalyzed": "文",
+    "serverError": "問題が発生しました。もう一度お試しください。",
+    "sidebar": {
+      "analysis": "分析",
+      "confidence": "確信度",
+      "humanization": "人間化",
+      "options": "オプション",
+      "resultReliability": "結果の信頼性",
+      "scoreGuide": "スコアガイド",
+      "semanticMatching": "意味的マッチング",
+      "statistical": "統計的",
+      "structureAnalysis": "構造分析",
+      "vectorSimilarity": "ベクトル類似度",
+      "severityGuide": "重症度ガイド",
+      "tips": "ヒント",
+      "average": "平均"
+    },
+    "signUpFree": "無料登録",
+    "signatureWords": "特徴的な単語",
+    "startConversation": "会話を始める",
+    "statistics": {
+      "analyzeBtn": "テキストを分析",
+      "avgSentenceLength": "平均文長",
+      "avgWordLength": "平均単語長",
+      "benchmark": "ベンチマーク",
+      "benchmarkComparison": "ベンチマーク比較",
+      "detailedMetrics": "詳細指標",
+      "metrics": {
+        "readability": {
+          "desc": "Flesch-Kincaidスコア",
+          "label": "読みやすさ"
+        },
+        "sentenceLength": {
+          "desc": "平均単語数/文",
+          "label": "文の長さ"
+        },
+        "vocabulary": {
+          "desc": "ユニーク単語率",
+          "label": "語彙"
+        },
+        "wordLength": {
+          "desc": "平均文字数/単語",
+          "label": "単語の長さ"
+        }
+      },
+      "metricsGuide": "指標ガイド",
+      "punctuation": "句読点",
+      "readability": "読みやすさ",
+      "readabilityLevels": {
+        "difficult": "難しい",
+        "easy": "易しい",
+        "moderate": "普通",
+        "veryDifficult": "非常に難しい",
+        "veryEasy": "非常に易しい"
+      },
+      "readabilityScale": "読みやすさの尺度",
+      "sentences": "文",
+      "style": "スタイル",
+      "subtitle": "ライティング指標とパターンを分析",
+      "title": "テキスト統計",
+      "uniqueWordRatio": "ユニーク単語率",
+      "vocabulary": "語彙",
+      "words": "単語"
+    },
+    "technicality": "専門性",
+    "textTooLong": "テキストは2000文字以下である必要があります",
+    "textTooShort": "少なくとも50文字入力してください",
+    "transform": "変換",
+    "transformAIText": "AIテキストを人間らしい文章に変換",
+    "transformComplete": "変換完了",
+    "transforming": "変換中...",
+    "tryAgain": "再試行",
+    "tryFullVersion": "無料で試す",
+    "trySample": "サンプルを試す",
+    "tryYourOwn": "自分のテキストを試す",
+    "typeMessage": "メッセージを入力...",
+    "unlimited": "無制限",
+    "verdictAI": "AI生成",
+    "verdictHuman": "人間による執筆",
+    "verdictMixed": "混合コンテンツ",
+    "verdictMostlyAI": "ほぼAI",
+    "verdictMostlyHuman": "ほぼ人間",
+    "viewExamples": "例を見る",
+    "viewIndicators": "指標を見る",
+    "voiceProfile": "ボイスプロファイル",
+    "words": "単語",
+    "wordsAnalyzed": "単語",
+    "workspace": {
+      "modelName": "Graphos Hyper",
+      "askAnything": "何でも聞いてください..."
+    },
+    "workspaceDescription": "あなた独自の文体で書くAIとチャット。クイックアクションを試すか、独自のメッセージを入力してください。",
+    "workspaceDescriptionNew": "入力してEnterキーを押すと、AIが独自の文体で応答します。",
+    "writingMetrics": "ライティング指標",
+    "writingTraits": "ライティング特性",
+    "samples": {
+      "highMatch": "高い一致",
+      "mediumMatch": "中程度の一致",
+      "lowMatch": "低い一致",
+      "professional": "プロフェッショナル",
+      "casual": "カジュアル",
+      "concise": "簡潔",
+      "blogPost": "ブログ記事",
+      "academic": "アカデミック",
+      "fewDeviations": "少ない逸脱",
+      "someDeviations": "いくつかの逸脱",
+      "manyDeviations": "多くの逸脱",
+      "formalText": "フォーマルなテキスト",
+      "technical": "技術的"
+    },
+    "options": {
+      "vocabulary": "語彙",
+      "keyFeatures": "主な機能",
+      "sentenceStyle": "文のスタイル",
+      "instructions": "指示",
+      "antiAI": "アンチAI",
+      "iterative": "反復的"
+    },
+    "tags": {
+      "new": "NEW",
+      "beta": "BETA"
+    },
+    "profile": {
+      "samples": "サンプル",
+      "tone": "トーン"
+    },
+    "tryHumanization": "人間化デモを試す",
+    "humanizationDesc": "AI生成テキストが自然な人間らしい文章に変換される様子をご覧ください。",
+    "originalAI": "オリジナル (AI)",
+    "humanLike": "人間らしい",
+    "aiGenerated": "AI生成",
+    "exampleOf": "例 {{current}} / {{total}}",
+    "nextExample": "次の例",
+    "humanizing": "人間化中...",
+    "wantToHumanize": "あなたのコンテンツを人間化しますか？",
+    "tryAIDetection": "AI検出デモを試す",
+    "aiDetectionDesc": "テキストを貼り付けてAI検出分析のシミュレーションをご覧ください。これはデモです - 正確な結果を得るには、フルアプリケーションをご利用ください。",
+    "pasteTextPlaceholder": "分析するテキストをここに貼り付け...",
+    "wantMoreAccurate": "より正確で詳細な分析結果が必要ですか？",
+    "traits": {
+      "conversational": "会話的",
+      "empathetic": "共感的",
+      "clear": "明確",
+      "engaging": "魅力的",
+      "playful": "遊び心",
+      "creative": "創造的",
+      "informal": "カジュアル",
+      "storyteller": "ストーリーテラー",
+      "analytical": "分析的",
+      "precise": "正確",
+      "structured": "構造化",
+      "evidenceBased": "エビデンスベース"
+    },
+    "sentenceLengthMedium": "中程度 (12-18語)",
+    "sentenceLengthVaried": "多様 (8-25語)",
+    "sentenceLengthLong": "長文 (18-28語)",
+    "voiceProfiles": {
+      "professional": "プロフェッショナルライター",
+      "casual": "カジュアルブロガー",
+      "academic": "アカデミックスタイル",
+      "personalBlog": "個人ブログ",
+      "creativeWriter": "クリエイティブライター"
+    },
+    "speed": {
+      "fast": "高速",
+      "ultraFast": "超高速",
+      "quality": "高品質"
+    },
+    "tone": {
+      "conversational": "会話的",
+      "formal": "フォーマル",
+      "expressive": "表現力豊か"
+    }
+  },
+  "deviations": {
+    "description": "文章内のスタイルの不一致を見つけます。",
+    "meta": {
+      "description": "文体から逸脱した文を特定します。逸脱レベルや提案を取得し、不一致を修正して独自の声を維持します。",
+      "title": "逸脱 - スタイルの不一致を見つける | Graphos AI"
+    },
+    "title": "逸脱"
+  },
+  "exitPopup": {
+    "cta": "ボーナスクレジットを受け取る",
+    "emailPlaceholder": "メールアドレスを入力",
+    "noSpam": "スパムなし",
+    "noThanks": "いいえ、定価で支払います",
+    "subtitle": "ニュースレターに登録して、初回購入時に50クレジットの追加ボーナスをゲット！",
+    "success": "素晴らしい！メールでボーナスコードを確認してください。",
+    "title": "待ってください！50ボーナスクレジットをゲット",
+    "unsubscribe": "いつでも登録解除可能"
+  },
+  "extension": {
+    "badge": "Chrome拡張機能",
+    "comingSoon": "近日公開",
+    "comingSoonCta": "近日公開",
+    "comingSoonNote": "お届けできるよう鋭意開発中です",
+    "features": {
+      "detect": {
+        "desc": "Web上のテキストを選択して、AI生成かどうかを即座にチェック。",
+        "title": "即時AI検出"
+      },
+      "humanize": {
+        "desc": "AIテキストを自然で人間らしいコンテンツに、必要な場所で即座に変換。",
+        "title": "ワンクリック人間化"
+      },
+      "workspace": {
+        "desc": "どのWebページからでも、独自の文体でAIとチャット。",
+        "title": "AIワークスペース"
+      },
+      "write": {
+        "desc": "テキストフィールドで直接、独自の文体に合ったコンテンツを生成。",
+        "title": "あなたの声で書く"
+      },
+      "writeInVoice": "あなたの声で書く"
+    },
+    "popup": {
+      "apply": "適用",
+      "more": "もっと見る"
+    },
+    "preview": "プレビュー",
+    "subtitle": "Chrome拡張機能が、訪れるすべてのウェブサイトにAI検出と人間化をもたらします。",
+    "title": "Graphos AIをどこでも使用",
+    "willWorkOn": "シームレスに動作：",
+    "worksOn": "動作環境",
+    "demo": {
+      "sampleText": "現代システムにおける人工知能の実装は、パラダイムシフトを表しています...",
+      "detect": {
+        "action": "AIコンテンツを検出中...",
+        "result": "87% AI確率"
+      },
+      "humanize": {
+        "action": "テキストを人間化中...",
+        "result": "人間化完了！"
+      },
+      "write": {
+        "action": "あなたの声で生成中...",
+        "result": "コンテンツ準備完了！"
+      },
+      "workspace": {
+        "action": "ワークスペースを開いています...",
+        "result": "チャット準備完了！"
+      }
+    }
+  },
+  "faq": {
+    "answers": {
+      "credits": "クレジットは当社の従量制通貨です。機能によって、テキストの長さや複雑さに応じて異なる量が消費されます。AI検出は約2-5クレジット、人間化は約2-8クレジット、ボイスプロファイル作成は約8-25クレジット、AIワークスペースはメッセージあたり約1-3クレジットを使用します。クレジットに有効期限はありません！",
+      "extension": "Chrome拡張機能を使用すると、Web上のどこでもGraphos AIを利用できます。任意のウェブサイトでテキストを選択して、AIコンテンツの検出、テキストの人間化、または自分の声でのコンテンツ生成を行えます。Gmail、Googleドキュメント、ソーシャルメディアなどとシームレスに統合されます。",
+      "freeTier": "はい！新規ユーザーは全員、すべての機能を試せる100無料クレジットを受け取れます。クレジットカードは不要です。さらに、初回購入時には2倍のボーナスクレジットが付与されます！",
+      "howDetection": "当社のAI検出は、語彙、意味、構造、コンテンツパターンなど複数の言語パターンを分析することで98%の精度を達成しています。不確実なケースには高度なマルチパス分析を使用し、信頼性の高い結果を保証します。",
+      "humanization": "当社の人間化エンジンは、AI生成テキストを自然な人間のライティングパターンに書き換えます。ボイスプロファイルを使用して独自のスタイルを維持しながら、反復的な構造、形式的な移行、一般的な表現などのAI特有の痕跡を除去します。",
+      "languages": "Graphos AIは、英語、ベトナム語、中国語、日本語、韓国語、タイ語、インドネシア語、マレー語、アラビア語、フランス語、ドイツ語、スペイン語、ポルトガル語、イタリア語、ロシア語を含む15言語をサポートしています。各言語には最適化された検出および人間化パターンがあります。",
+      "privacy": "もちろんです。すべてのデータにエンタープライズグレードの暗号化を使用しています。あなたのライティングサンプルやボイスプロファイルは安全に保存され、共有されることはありません。GDPRおよびその他のプライバシー規制に準拠しています。データはいつでも削除できます。",
+      "refund": "すべてのクレジット購入に対して7日間の返金保証を提供しています。ご満足いただけない場合は、サポートチームにご連絡いただければ全額返金いたします。未使用のクレジットも購入から30日以内であれば返金可能です。",
+      "voiceProfile": "ボイスプロファイルは、あなたの文体の独自の指紋のようなものです。ライティングサンプルを分析することで、トーン、語彙の好み、文のパターン、主要な特徴をキャプチャします。これにより、AIが本当にあなたが書いたかのようなコンテンツを生成できるようになります。",
+      "whatIs": "Graphos AI Studioは、AI生成コンテンツの検出、文章の人間化、独自の文体に合ったコンテンツ作成を支援するAI搭載ライティングアシスタントです。WebアプリとChrome拡張機能が含まれており、ワークフローにシームレスに統合できます。"
+    },
+    "badge": "FAQ",
+    "categories": {
+      "all": "すべて",
+      "features": "機能",
+      "general": "一般",
+      "pricing": "価格",
+      "security": "セキュリティ"
+    },
+    "contactDescription": "可能",
+    "contactSupport": "サポートに連絡",
+    "contactUs": "サポートに連絡",
+    "questions": {
+      "credits": "クレジットの仕組みは？",
+      "extension": "Chrome拡張機能の使い方は？",
+      "freeTier": "無料プランはありますか？",
+      "howDetection": "AI検出の精度は？",
+      "humanization": "人間化はどのように機能しますか？",
+      "languages": "対応言語は？",
+      "privacy": "データは安全ですか？",
+      "refund": "返金ポリシーは？",
+      "voiceProfile": "ボイスプロファイルとは何ですか？",
+      "whatIs": "Graphos AI Studioとは？"
+    },
+    "stillHaveQuestions": "まだ質問がありますか？",
+    "subtitle": "Graphos AI Studioについて知っておくべきことすべて",
+    "title": "よくある質問"
+  },
+  "features": {
+    "aiDetection": {
+      "badge": "精度98%",
+      "benefits": {
+        "accuracy": {
+          "desc": "高度なアルゴリズムがAI生成コンテンツを98%以上の精度で検出",
+          "title": "高精度"
+        },
+        "privacy": {
+          "desc": "コンテンツが保存または共有されることはありません",
+          "title": "プライバシー第一"
+        },
+        "reports": {
+          "desc": "どの部分がAI生成である可能性があるかを確信度スコアと共に正確に理解",
+          "title": "詳細レポート"
+        },
+        "speed": {
+          "desc": "数分ではなく数秒で結果を取得",
+          "title": "高速分析"
+        }
+      },
+      "chromeExtension": "Chrome拡張機能",
+      "comparison": {
+        "accuracy": "検出精度",
+        "competitors": "競合他社",
+        "confidence": "確信度スコア",
+        "feature": "機能",
+        "indicators": "人間/AI指標",
+        "languages": "多言語サポート",
+        "models": "検出対象AIモデル",
+        "others": "その他",
+        "ourSolution": "当社のソリューション",
+        "privacy": "データ保存なし",
+        "rating": "平均評価",
+        "speed": "分析速度",
+        "usersCount": "信頼するユーザー数"
+      },
+      "comparisonBadge": "選ばれる理由",
+      "comparisonSubtitle": "専門家が他の検出ツールではなくGraphos AIを選ぶ理由をご覧ください",
+      "comparisonTitle": "比較",
+      "comparisonWins": "競合他社に対する7つの主な利点",
+      "contactUs": "カスタムソリューションについてお問い合わせ",
+      "contactUsShort": "お問い合わせ",
+      "ctaBadge": "数秒で検出を開始",
+      "ctaDesc": "正確なコンテンツ検出のためにGraphos AIを信頼する何千もの専門家に加わりましょう。今すぐ無料で開始。",
+      "ctaTitle": "AIコンテンツを検出する準備はできましたか？",
+      "demo": {
+        "subtitle": "当社のAI検出技術を直接体験してください。登録は不要です。",
+        "title": "今すぐAI検出を試す",
+        "highConfidence": "高 (92%)"
+      },
+      "faq": {
+        "a1": "当社のAI検出は、ChatGPT、GPT-4、Claude、その他の一般的なモデルを含むほとんどのAI生成コンテンツに対して98%以上の精度を達成しています。最新のAIライティングパターンを検出するためにアルゴリズムを継続的に更新しています。",
+        "a2": "ChatGPT、GPT-4、GPT-3.5、Claude、Gemini、Llama、およびその他ほとんどの一般的なAIライティングツールからのコンテンツを検出できます。システムは新しいAIモデルを認識するために定期的に更新されます。",
+        "a3": "いいえ。私たちはあなたのプライバシーを優先します。テキストはリアルタイムで分析され、サーバーには保存されません。コンテンツを第三者と共有することはありません。",
+        "a4": "正確な検出のために、少なくとも50文字をお勧めします。より長いテキスト（200語以上）は、AIが分析するパターンが増えるため、より信頼性の高い結果を提供します。",
+        "a5": "100%完璧な検出システムはありませんが、当社の多層分析により回避することは非常に困難です。ライティングパターン、語彙、文構造、その他多くの要素を同時に分析します。",
+        "a6": "当社のAI検出は、英語、ベトナム語、スペイン語、フランス語、ドイツ語などを含む15以上の言語をサポートしています。システムは自動的に言語を検出し、適切な分析パターンを適用します。",
+        "a7": "無料ユーザーは、基本的な指標付きで1日あたりの検出回数に制限があります。プレミアムユーザーは、無制限の検出、詳細な証拠レポート、APIアクセス、優先処理を利用できます。",
+        "q1": "AI検出の精度は？",
+        "q2": "どのような種類のAIコンテンツを検出できますか？",
+        "q3": "コンテンツは保存または共有されますか？",
+        "q4": "必要な最小テキスト長は？",
+        "q5": "AI検出を騙すことはできますか？",
+        "q6": "異なる言語をどのように扱いますか？",
+        "q7": "無料版とプレミアム版の違いは？"
+      },
+      "faqBadge": "FAQ",
+      "faqSubtitle": "当社のAI検出について知っておくべきことすべて",
+      "faqTitle": "よくある質問",
+      "heroHighlight": "精度と信頼",
+      "howItWorks": {
+        "step1": {
+          "desc": "分析したいコンテンツを入力または貼り付けます（最低50文字）",
+          "title": "テキストを貼り付け"
+        },
+        "step2": {
+          "desc": "AIがパターン、語彙、文構造、文体を分析します",
+          "title": "多層分析"
+        },
+        "step3": {
+          "desc": "AI確率スコア、確信度レベル、人間/AI指標を受け取ります",
+          "title": "詳細結果を取得"
+        },
+        "subtitle": "当社の多層分析により、わずか数秒で正確な検出を保証します",
+        "title": "AI検出の仕組み"
+      },
+      "pricing": {
+        "free": "無料",
+        "freeFeature1": "1日5回検出",
+        "freeFeature2": "基本指標",
+        "freeFeature3": "標準処理",
+        "popular": "人気",
+        "pro": "Pro",
+        "proFeature1": "無制限検出",
+        "proFeature2": "完全な証拠レポート",
+        "proFeature3": "APIアクセス",
+        "proFeature4": "優先処理",
+        "subtitle": "無料で開始、必要に応じてアップグレード",
+        "title": "シンプルで透明性のある価格設定"
+      },
+      "sampleDesc": "確信度スコアと詳細な指標を含むAI確率を示すサンプル結果",
+      "sampleVerdict": "混合コンテンツ",
+      "stats": {
+        "accuracy": "精度",
+        "languages": "15+ 言語",
+        "languagesShort": "言語",
+        "models": "15+ AIモデル検出",
+        "modelsShort": "AIモデル",
+        "privacy": "テキスト保存なし",
+        "speed": "<2秒 分析時間",
+        "speedShort": "分析"
+      },
+      "statsBar": {
+        "rating": "ユーザー評価",
+        "scans": "完了したスキャン",
+        "uptime": "稼働時間",
+        "users": "アクティブユーザー"
+      },
+      "testimonials": {
+        "badge": "お客様の声",
+        "business": {
+          "author": "Michael Torres",
+          "quote": "コンテンツチームにとって不可欠です。公開前にすべての受信コンテンツを検証するために使用しています。確信度スコアは安心感を与えてくれます。",
+          "role": "コンテンツディレクター, テックスタートアップ"
+        },
+        "education": {
+          "author": "Dr. Sarah Chen",
+          "quote": "このツールのおかげで、学生のレポートを確認する時間を大幅に節約できました。精度は印象的で、詳細な指標は何を見るべきかを正確に理解するのに役立ちます。",
+          "role": "大学教授"
+        },
+        "freelance": {
+          "author": "Emma Williams",
+          "quote": "フリーランスの編集者として、受け取るコンテンツが本物であることを確認する必要があります。このツールは高速で正確、そしてプライバシー優先のアプローチはまさに私が必要としているものです。",
+          "role": "フリーランス編集者"
+        },
+        "subtitle": "教育者、企業、コンテンツクリエイターが当社のAI検出について何を語っているかご覧ください",
+        "title": "専門家に信頼されています",
+        "trustedBy": "主要組織のチームに信頼されています"
+      },
+      "trust": {
+        "instant": "即時結果",
+        "noCard": "クレジットカード不要",
+        "privacy": "プライバシー第一"
+      },
+      "trustIndicator1": "クレジットカード不要",
+      "trustIndicator2": "30秒でセットアップ",
+      "trustIndicator3": "いつでもキャンセル可能",
+      "tryItNow": "今すぐ試す - 登録不要",
+      "useCases": {
+        "business": {
+          "desc": "マーケティング、PR、企業コミュニケーションにおける真正なコンテンツを保証",
+          "stat": "企業",
+          "title": "ビジネス"
+        },
+        "education": {
+          "desc": "教師や教授は、学問的誠実さのために学生の提出物を検証できます",
+          "stat": "教育者",
+          "title": "教育"
+        },
+        "hiring": {
+          "desc": "人事チームはカバーレターやライティングサンプルの真正性を確認できます",
+          "stat": "検証済み応募",
+          "title": "採用"
+        },
+        "publishing": {
+          "desc": "出版社や編集者は、出版前にコンテンツの真正性を検証できます",
+          "stat": "チェック済み記事",
+          "title": "出版"
+        }
+      },
+      "useCasesBadge": "実際のアプリケーション",
+      "useCasesCta": "しない",
+      "useCasesSubtitle": "業界を超えた専門家が当社のAI検出をどのように使用しているかを発見してください",
+      "useCasesTitle": "ユースケース",
+      "whyChoose": "なぜ当社のAI検出を選ぶのか？",
+      "whyChooseBadge": "業界トップクラス",
+      "whyChooseSubtitle": "正確、高速、プライベートなAIコンテンツ検出で何千もの専門家に信頼されています"
+    },
+    "aiWorkspace": {
+      "actions": {
+        "blog": {
+          "desc": "魅力的なブログコンテンツを作成",
+          "label": "ブログ記事"
+        },
+        "email": {
+          "desc": "あなたの声でプロフェッショナルなメールを作成",
+          "label": "メールを書く"
+        },
+        "proposal": {
+          "desc": "説得力のある提案書を作成",
+          "label": "ビジネス提案書"
+        },
+        "reply": {
+          "desc": "思慮深い返信を生成",
+          "label": "クイック返信"
+        },
+        "rewrite": {
+          "desc": "既存のコンテンツを改善",
+          "label": "リライト"
+        },
+        "social": {
+          "desc": "共感を呼ぶ投稿を作成",
+          "label": "ソーシャルメディア"
+        }
+      },
+      "badge": "あなたのように書くAI",
+      "benefits": {
+        "context": {
+          "desc": "AIはあなたの好みや会話履歴を記憶します",
+          "title": "文脈認識"
+        },
+        "natural": {
+          "desc": "あなたのスタイルや好みを理解するAIとチャット",
+          "title": "自然な会話"
+        },
+        "quick": {
+          "desc": "一般的な執筆タスク用のワンクリックテンプレート",
+          "title": "クイックアクション"
+        },
+        "voice": {
+          "desc": "すべての出力は自動的に独自の文体プロファイルに一致します",
+          "title": "あなたの声"
+        }
+      },
+      "benefitsBadge": "主な利点",
+      "chatExample": {
+        "ai": "こんにちは、\n\n来週火曜日のミーティングにお声がけいただき、本当にありがとうございます！ご招待いただけて嬉しいです。\n\n残念ながら、その日は予定が詰まっておりまして、どうしても動かせない約束が続いています。別の機会にお会いすることは可能でしょうか？\n\nご都合の良い時間を教えていただければ幸いです！\n\nよろしくお願いします。\n[あなたの名前]",
+        "user": "ミーティングの招待を断るプロフェッショナルなメールを書くのを手伝って"
+      },
+      "comparison": {
+        "competitors": "競合他社",
+        "context": "文脈メモリ",
+        "export": "エクスポートオプション",
+        "feature": "機能",
+        "history": "会話履歴",
+        "humanize": "アンチAI検出",
+        "languages": "言語",
+        "limited": "限定的",
+        "multimodal": "画像理解",
+        "others": "その他",
+        "ourSolution": "当社のソリューション",
+        "quickActions": "クイックアクションテンプレート",
+        "voiceMatch": "ボイスプロファイル統合"
+      },
+      "comparisonBadge": "選ばれる理由",
+      "comparisonDesc": "Graphos AI Workspaceが競合他社より優れている理由をご覧ください",
+      "comparisonTitle": "比較",
+      "comparisonWins": "競合他社に対する8つの主な利点",
+      "ctaBadge": "あなたの声で書き始める",
+      "ctaDesc": "独自の文体でAIとチャットしましょう。",
+      "ctaTitle": "AIワークスペースの使用を開始",
+      "demo": {
+        "subtitle": "パーソナライズされたAIライティング支援を体験してください。登録は不要です。",
+        "title": "今すぐAIワークスペースを試す"
+      },
+      "faq": {
+        "a1": "AIワークスペースとチャットすると、生成されるすべてのコンテンツに自動的にボイスプロファイルが適用されます。つまり、すべてのメール、投稿、記事は、あなたが書いたかのように聞こえます。",
+        "a2": "はい！ボイスプロファイルなしでもAIワークスペースを使用でき、中立的でプロフェッショナルなトーンでコンテンツを生成します。ただし、ボイスプロファイルを作成すると、パーソナライズが大幅に向上します。",
+        "a3": "AIワークスペースは、メール、ブログ記事、ソーシャルメディアコンテンツ、ビジネス提案書、製品説明、マーケティングコピーなどの作成を支援します。クイックアクションを使用するか、必要なものを説明してください。",
+        "a4": "会話履歴はローカルに保存され、セッション間でアクセスできます。設定からいつでも消去できます。プライバシーを優先しています。",
+        "a5": "もちろんです！生成されたコンテンツは完全に編集可能です。洗練させたり、拡張したり、異なるパラメータで再生成するようにAIに依頼したりできます。",
+        "a6": "AIワークスペースは、高速応答用のGemini 2.5 Flashや複雑なタスク用のGemini 2.5 Proを含む高度なGeminiモデルを使用しています。ニーズに応じてモデルを切り替えることができます。",
+        "a7": "クレジットは入出力トークンに基づいて計算されます。短い会話はコストが低くなります。各メッセージのクレジットコストをリアルタイムで確認できます。",
+        "q1": "AIワークスペースはボイスプロファイルをどのように使用しますか？",
+        "q2": "ボイスプロファイルなしで使用できますか？",
+        "q3": "どのような種類のコンテンツを作成できますか？",
+        "q4": "会話履歴は保存されますか？",
+        "q5": "生成されたコンテンツを編集できますか？",
+        "q6": "利用可能なAIモデルは？",
+        "q7": "コストは何クレジットですか？"
+      },
+      "faqBadge": "FAQ",
+      "faqDesc": "AIワークスペースについて知っておくべきことすべて",
+      "faqTitle": "よくある質問",
+      "howItWorks": {
+        "step1": {
+          "desc": "リクエストを入力するか、クイックアクションテンプレートを使用します",
+          "title": "会話を始める"
+        },
+        "step2": {
+          "desc": "AIがボイスプロファイルに合わせてコンテンツを作成します",
+          "title": "AIが応答を生成"
+        },
+        "step3": {
+          "desc": "編集、再生成、または調整を依頼します",
+          "title": "レビューと修正"
+        }
+      },
+      "howItWorksBadge": "シンプルなプロセス",
+      "howItWorksDesc": "3つの簡単なステップでパーソナライズされたAI応答を取得",
+      "howItWorksTitle": "AIワークスペースの仕組み",
+      "moreActions": "+ アプリで利用可能な20以上のテンプレート",
+      "quickActionsBadge": "ワンクリックテンプレート",
+      "quickActionsDesc": "一般的なタスク用の事前構築済みテンプレートで即座に書き始められます",
+      "quickActionsTitle": "クイックアクション",
+      "stats": {
+        "faster": "より速く",
+        "languages": "言語",
+        "templates": "テンプレート",
+        "voiceMatch": "ボイスマッチ"
+      },
+      "testimonials": {
+        "entrepreneur": {
+          "author": "Emma Williams",
+          "quote": "英語が母国語ではありませんが、AIワークスペースのおかげで、自分の本来の声を保ちながらプロフェッショナルにコミュニケーションできています。画期的です！",
+          "role": "起業家"
+        },
+        "marketer": {
+          "author": "Michael Torres",
+          "quote": "クイックアクションのおかげで毎週何時間も節約できています。ソーシャル投稿、メール、ブログの導入部を数時間ではなく数分で下書きできます。",
+          "role": "マーケティングマネージャー"
+        },
+        "writer": {
+          "author": "Sarah Chen",
+          "quote": "AIワークスペースは私の執筆方法を完全に変えました。ボイスプロファイル機能のおかげで、AIが下書きを手伝っても、すべてのメールが私らしく聞こえます。",
+          "role": "コンテンツライター"
+        }
+      },
+      "testimonialsBadge": "ユーザーの声",
+      "testimonialsTitle": "あらゆる場所のライターに愛されています",
+      "trust": {
+        "instant": "即時アクセス",
+        "noCard": "クレジットカード不要",
+        "privacy": "プライバシー第一"
+      },
+      "tryItNow": "チャットインターフェースを試す",
+      "typing": {
+        "blog": "ブログ記事を即座に作成",
+        "business": "ビジネス提案書を下書き",
+        "email": "あなたの声でメールを書く",
+        "social": "ソーシャルメディアコンテンツを作成"
+      },
+      "useCases": {
+        "business": {
+          "desc": "ブランドに合った提案書、レポート、プレゼンテーション",
+          "example": "",
+          "stat": "生産性",
+          "title": "ビジネスライティング"
+        },
+        "content": {
+          "desc": "あなたの声でブログ記事、記事、マーケティングコピーを生成",
+          "example": "",
+          "stat": "コンテンツ品質",
+          "title": "コンテンツ作成"
+        },
+        "email": {
+          "desc": "あなたが書いたように聞こえるメールの下書き、返信、フォローアップ",
+          "example": "",
+          "stat": "時間節約",
+          "title": "メールコミュニケーション"
+        },
+        "social": {
+          "desc": "LinkedIn、Twitterなどの魅力的な投稿を作成",
+          "example": "",
+          "stat": "エンゲージメント",
+          "title": "ソーシャルメディア"
+        },
+        "spotlight": "スポットライト"
+      },
+      "useCasesBadge": "ユースケース",
+      "useCasesDesc": "AIワークスペースがワークフローをどのように変えるかをご覧ください",
+      "useCasesTitle": "こんな用途に最適",
+      "voiceApplied": "ボイスプロファイル：カジュアル＆フレンドリー 適用済み",
+      "whyUse": "なぜAIワークスペースを使うのか？",
+      "whyUseDesc": "パーソナライズされたAIライティング支援の未来を体験してください"
+    },
+    "compatibility": {
+      "badge": "スタイル分析",
+      "benefits": {
+        "accuracy": {
+          "desc": "ベクトル類似度と統計的比較を組み合わせた多層分析",
+          "stat": "分析レイヤー",
+          "title": "精密な分析"
+        },
+        "badge": "利点",
+        "detailed": {
+          "desc": "どの文がスタイルから逸脱しているかを重症度レベルで正確に確認",
+          "stat": "重症度レベル",
+          "title": "詳細な内訳"
+        },
+        "improve": {
+          "desc": "テキストを改善し、あなたの声によりよく合わせるための提案を取得",
+          "stat": "スコアアップ",
+          "title": "実用的な洞察"
+        },
+        "speed": {
+          "desc": "詳細な適合スコアを数分ではなく数秒で取得",
+          "stat": "処理",
+          "title": "高速な結果"
+        },
+        "subtitle": "すべてのコンテンツで一貫した声を維持",
+        "title": "なぜ適合スコアを使うのか？"
+      },
+      "cta": {
+        "instant": "100無料クレジット",
+        "privacy": "プライバシー第一",
+        "subtitle": "今すぐボイスプロファイルに対してコンテンツの分析を開始しましょう。クレジットカードは不要です。",
+        "title": "スタイルマッチを確認する準備はできましたか？"
+      },
+      "ctaBadge": "数秒で分析を開始",
+      "demo": {
+        "subtitle": "サンプルテキストで分析がどのように機能するかをご覧ください。登録は不要です。",
+        "title": "今すぐ適合スコアを試す"
+      },
+      "description": "テキストがあなたの独自の文体にどれだけ一致しているかを分析します。詳細なスコア、逸脱の特定、一貫性の改善を行います。",
+      "faq": {
+        "a1": "適合スコアは、テキストがボイスプロファイルに保存された独自の文体とどれだけ一致しているかを測定します。ベクトル類似度（意味的マッチング）と統計分析（構造、語彙、文パターン）を組み合わせて、0〜100%の包括的なスコアを提供します。",
+        "a2": "当社の多層分析は、AI埋め込みと統計的比較を組み合わせることで高い精度を実現しています。ボイスプロファイル内のサンプルが多いほど、結果はより正確になります。各分析の信頼性を示す確信度スコアも提供します。",
+        "a3": "ベクトルスコアは意味的類似度、つまりテキストの意味とスタイルがプロファイルにどれだけ近いかを測定します。統計スコアは、文の長さ、語彙の豊かさ、句読点の使用などの構造パターンを分析します。これらを合わせて、スタイルマッチの完全な全体像を提供します。",
+        "a4": "テキストを分析する際、スタイルから逸脱した文を特定し、軽度（小さな違い）、中度（顕著な違い）、重度（重大な不一致）として分類します。これにより、改善すべき最も重要な領域に集中できます。",
+        "a5": "はい！適合スコアを確認した後、AIリライト機能を使用して、テキストをボイスプロファイルによりよく合うように自動的に変換できます。書き直されたバージョンは通常、スコアが20〜40%高くなります。",
+        "a6": "テキスト分析には、2基本クレジットに加えて、単語ごとに少額（0.002クレジット/語）がかかります。典型的な500語の分析には約3クレジットかかります。プレミアムユーザーはより多くのクレジットと優先処理を受けられます。",
+        "badge": "FAQ",
+        "desc": "適合スコアについて知っておくべきことすべて",
+        "q1": "適合スコアとは？",
+        "q2": "分析の精度は？",
+        "q3": "ベクトルスコアと統計スコアの意味は？",
+        "q4": "逸脱の重症度とは？",
+        "q5": "スコアの低いテキストを改善できますか？",
+        "q6": "分析には何クレジットかかりますか？",
+        "title": "よくある質問"
+      },
+      "heroHighlight": "スタイルの一致を知る",
+      "howItWorks": {
+        "badge": "仕組み",
+        "step1": {
+          "desc": "比較したいボイスプロファイルを選択",
+          "title": "プロファイル選択"
+        },
+        "step2": {
+          "desc": "分析したいテキストを貼り付けまたは入力",
+          "title": "テキスト入力"
+        },
+        "step3": {
+          "desc": "AIがベクトル類似度と統計パターンを比較",
+          "title": "AI分析"
+        },
+        "step4": {
+          "desc": "スコア、逸脱、改善提案を表示",
+          "title": "結果取得"
+        },
+        "subtitle": "AIが複数の分析手法を組み合わせて正確なスタイルマッチングを行います",
+        "title": "多層分析"
+      },
+      "interpretation": {
+        "badge": "スコアガイド",
+        "subtitle": "異なる適合スコアがあなたの文章にとって何を意味するかを確認",
+        "title": "スコアの理解"
+      },
+      "scores": {
+        "average": "平均",
+        "averageDesc": "いくつかのスタイルの違いが検出されました",
+        "goodMatch": "良好な一致",
+        "goodMatchDesc": "テキストは主にあなたのスタイルと一致しています",
+        "lowMatch": "低い一致",
+        "lowMatchDesc": "重大なスタイルの違いがあります",
+        "notCompatible": "不適合",
+        "notCompatibleDesc": "テキストは一致しません",
+        "veryCompatible": "非常に適合",
+        "veryCompatibleDesc": "テキストはあなたのスタイルと見事に一致しています"
+      },
+      "stats": {
+        "accuracy": "精度",
+        "layers": "分析レイヤー",
+        "severities": "重症度レベル",
+        "speed": "分析時間"
+      },
+      "title": "適合スコア",
+      "trust": {
+        "instant": "即時結果",
+        "multiLayer": "多層分析",
+        "privacy": "プライバシー第一"
+      },
+      "useCases": {
+        "ai": {
+          "b1": "真正性",
+          "b2": "パーソナライゼーション",
+          "b3": "信頼",
+          "desc": "使用前にAI生成コンテンツがあなたのように聞こえるか検証",
+          "example": "",
+          "title": "AIコンテンツチェック"
+        },
+        "badge": "ユースケース",
+        "content": {
+          "b1": "ブランドの一貫性",
+          "b2": "品質管理",
+          "b3": "時間節約",
+          "desc": "公開前に外注またはAI生成コンテンツがブランドの声と一致しているか確認",
+          "example": "",
+          "title": "コンテンツレビュー"
+        },
+        "example": "例",
+        "learning": {
+          "b1": "自己認識",
+          "b2": "改善",
+          "b3": "成長",
+          "desc": "自分のライティングパターンを理解し、経時的に一貫性を向上させる",
+          "example": "",
+          "title": "スタイル学習"
+        },
+        "spotlight": "注目のユースケース",
+        "subtitle": "コンテンツが常に独自の文体に一致するようにする",
+        "team": {
+          "b1": "統一された声",
+          "b2": "トレーニングツール",
+          "b3": "オンボーディング",
+          "desc": "チームメンバー全員がブランドガイドラインに一致する声で書くようにする",
+          "example": "",
+          "title": "チームの調整"
+        },
+        "title": "あらゆるシナリオに最適"
+      }
+    },
+    "deviations": {
+      "badge": "スタイル検出",
+      "benefits": {
+        "accuracy": {
+          "desc": "ボイスプロファイルに基づく動的しきい値で精密な検出",
+          "stat": "精度",
+          "title": "高精度"
+        },
+        "badge": "利点",
+        "improve": {
+          "desc": "逸脱を修正し、スタイルの一貫性を改善するための提案を取得",
+          "stat": "改善",
+          "title": "実用的な洞察"
+        },
+        "levels": {
+          "desc": "修正の優先順位をつけるために逸脱を軽度、中度、または重度に分類",
+          "stat": "重症度レベル",
+          "title": "重症度レベル"
+        },
+        "speed": {
+          "desc": "AI搭載の検出により、各文を2秒未満で分析",
+          "stat": "文あたり",
+          "title": "高速検出"
+        },
+        "subtitle": "コンテンツに影響を与える前にスタイルの不一致を特定して修正",
+        "title": "なぜ逸脱検出を使うのか？"
+      },
+      "cta": {
+        "instant": "100無料クレジット",
+        "privacy": "プライバシー第一",
+        "subtitle": "今すぐコンテンツのスタイル逸脱分析を開始しましょう。クレジットカードは不要です。",
+        "title": "スタイルの不一致を見つける準備はできましたか？"
+      },
+      "ctaBadge": "数秒で検出を開始",
+      "demo": {
+        "badge": "インタラクティブデモ",
+        "subtitle": "サンプルテキストで逸脱検出を試し、スタイルの不一致をどのように特定するかをご覧ください",
+        "title": "逸脱の動作を見る"
+      },
+      "description": "文体から逸脱している文を正確に特定します。一貫性を維持するための重症度レベルと提案を取得できます。",
+      "faq": {
+        "a1": "逸脱とは、ボイスプロファイルに保存された独自の文体と一致しないテキスト内の文のことです。AIが各文をプロファイルと比較し、トーン、語彙、または構造において著しく異なる文を特定します。",
+        "a2": "ボイスプロファイルに基づいた動的なしきい値を使用しています。軽度の逸脱（類似度0.4-0.5）はほとんど気づかない程度です。中度の逸脱（0.3-0.4）は顕著な違いです。重度の逸脱（<0.3）は、あなたの声とは明らかに異なる重大なスタイルの不一致です。",
+        "a3": "適合スコアは、テキストがスタイルとどれだけ一致しているかの全体的な割合を示します。逸脱機能はさらに踏み込んで、どの文がどの程度逸脱しているかを正確に特定するため、何を修正すべきかがわかります。",
+        "a4": "はい！逸脱を特定した後、ハイライトされた文をクリックすると提案が表示されます。また、AIリライト機能を使用して、逸脱した文をボイスプロファイルに一致するように自動的に変換することもできます。",
+        "a5": "逸脱検出はテキスト分析コストに含まれています：2基本クレジット + 単語あたり0.002クレジット。典型的な500語の分析には約3クレジットかかり、適合スコアと逸脱検出の両方が含まれます。",
+        "a6": "素晴らしいニュースです！逸脱が見つからない場合、テキストはボイスプロファイルとよく一致しています。テキストがあなたの文体と一致していることを確認する成功メッセージが表示されます。",
+        "badge": "FAQ",
+        "desc": "逸脱検出について知っておくべきことすべて",
+        "q1": "逸脱とは何ですか？",
+        "q2": "重症度レベルはどのように決定されますか？",
+        "q3": "これは適合スコアとどう違いますか？",
+        "q4": "逸脱を自動的に修正できますか？",
+        "q5": "逸脱検出には何クレジットかかりますか？",
+        "q6": "逸脱がない場合はどうなりますか？",
+        "title": "よくある質問"
+      },
+      "heroHighlight": "スタイルの不一致を見つける",
+      "howItWorks": {
+        "badge": "仕組み",
+        "step1": {
+          "desc": "比較対象のボイスプロファイルを選択",
+          "title": "プロファイル選択"
+        },
+        "step2": {
+          "desc": "分析したいテキストを貼り付けまたは入力",
+          "title": "テキスト入力"
+        },
+        "step3": {
+          "desc": "各文がベクトル類似度を使用して比較されます",
+          "title": "AI分析"
+        },
+        "step4": {
+          "desc": "逸脱が重症度レベルとともにハイライト表示されます",
+          "title": "結果を見る"
+        },
+        "subtitle": "AIが各文をボイスプロファイルと比較して不一致を見つけます",
+        "title": "インテリジェントな逸脱検出"
+      },
+      "severity": {
+        "badge": "重症度レベル",
+        "mild": "軽度",
+        "mildDesc": "ほとんど気づかない程度の小さなスタイルの違い",
+        "mildExample": "わずかに異なる言葉選びや文の長さ",
+        "moderate": "中度",
+        "moderateDesc": "一貫性に影響を与える可能性のある顕著なスタイルの違い",
+        "moderateExample": "異なるトーンや形式レベル",
+        "severe": "重度",
+        "severeDesc": "あなたの声とは明らかに異なる重大なスタイルの不一致",
+        "severeExample": "全く異なる文体や語彙",
+        "subtitle": "改善の優先順位をつけるために逸脱を3つのレベルに分類します",
+        "title": "逸脱の重症度を理解する"
+      },
+      "stats": {
+        "accuracy": "検出精度",
+        "levels": "重症度レベル",
+        "speed": "文あたり"
+      },
+      "title": "逸脱",
+      "trust": {
+        "instant": "即時結果",
+        "noCard": "クレジットカード不要",
+        "privacy": "プライバシー第一"
+      },
+      "useCases": {
+        "ai": {
+          "b1": "真正性",
+          "b2": "パーソナライゼーション",
+          "b3": "信頼",
+          "desc": "AI生成コンテンツのどの部分を人間化する必要があるかを特定",
+          "example": "ChatGPTの出力に8つの逸脱があります - 重度のものから先にAIリライトを使用してください。",
+          "title": "AIコンテンツチェック"
+        },
+        "badge": "ユースケース",
+        "content": {
+          "b1": "品質管理",
+          "b2": "ブランドの一貫性",
+          "b3": "時間節約",
+          "desc": "公開前にブランドの声と一致しない文を見つける",
+          "example": "第2段落に3つの重度の逸脱が見つかりました - 形式的なトーンがあなたの会話的なスタイルと一致しません。",
+          "title": "コンテンツレビュー"
+        },
+        "example": "例",
+        "learning": {
+          "b1": "自己認識",
+          "b2": "改善",
+          "b3": "成長",
+          "desc": "ライティングのどの側面が最も変化するかを理解する",
+          "example": "あなたの結論は導入部よりも逸脱する傾向があります - 最後にトーンを維持することに集中してください。",
+          "title": "スタイル学習"
+        },
+        "spotlight": "注目のユースケース",
+        "subtitle": "あらゆる種類のコンテンツでスタイルの不一致を見つけて修正",
+        "team": {
+          "b1": "統一された声",
+          "b2": "トレーニングツール",
+          "b3": "オンボーディング",
+          "desc": "チームメンバー全員がブランドガイドラインと一貫して書くようにする",
+          "example": "新しいライターには5つの中程度の逸脱があります - チームスタイルに合わせるためにボイスプロファイルを共有してください。",
+          "title": "チームライティング"
+        },
+        "title": "すべてのライターに最適"
+      }
+    },
+    "extension": {
+      "cta": "拡張機能をインストール",
+      "description": "Web上のどこでもGraphos AIを使用",
+      "title": "Chrome拡張機能が利用可能"
+    },
+    "humanization": {
+      "accuracy": "精度",
+      "aiContent": "生のAIコンテンツ",
+      "analyzing": "パターンを分析中...",
+      "badge": "数秒でAIから人間に",
+      "benefits": {
+        "instant": {
+          "desc": "ワンクリックで数秒以内に人間化されたコンテンツを取得",
+          "title": "即時結果"
+        },
+        "meaning": {
+          "desc": "メッセージをそのままに、読みやすさと真正性を向上",
+          "title": "意味を保持"
+        },
+        "natural": {
+          "desc": "機械的なテキストを、自然に読める会話的で魅力的なコンテンツに変換",
+          "title": "自然な流れ"
+        },
+        "styles": {
+          "desc": "カジュアル、プロフェッショナル、アカデミック、またはボイスプロファイルに合わせて選択",
+          "title": "複数のスタイル"
+        }
+      },
+      "benefitsBadge": "違い",
+      "clickTransform": "クリックして",
+      "comparison": {
+        "competitors": "競合他社",
+        "excellent": "優秀",
+        "feature": "機能",
+        "good": "良い",
+        "languages": "言語",
+        "meaning": "意味の保存",
+        "others": "その他",
+        "ourSolution": "当社のソリューション",
+        "quality": "出力品質",
+        "rating": "平均評価",
+        "speed": "処理速度",
+        "styles": "スタイルオプション",
+        "usersCount": "信頼するユーザー数",
+        "voiceMatch": "ボイスプロファイルマッチ"
+      },
+      "comparisonBadge": "選ばれる理由",
+      "comparisonDesc": "コンテンツの人間化においてGraphos AIがリードしている理由をご覧ください",
+      "comparisonTitle": "比較",
+      "comparisonWins": "競合他社に対する6つの主な利点",
+      "ctaBadge": "数秒で人間化を開始",
+      "ctaDesc": "AIテキストを自然で魅力的なライティングに変換します。",
+      "ctaTitle": "コンテンツを人間化する準備はできましたか？",
+      "demo": {
+        "subtitle": "AIテキストがリアルタイムで自然な人間らしい文章に変わるのをご覧ください。",
+        "title": "変換を見る"
+      },
+      "examples": {
+        "ex1": {
+          "after": "最近ずっと考えていたことがあるんだけど、企業がついに環境対策に本気になり始めたってこと。",
+          "before": "企業環境における持続可能な実践の実施は、近年ますます重要になっています。",
+          "style": "カジュアル＆会話的"
+        },
+        "ex2": {
+          "after": "学んだことがあります。運動は本当にストレス解消に役立ちます。もっと体を動かすようになってから、不安がずっと良くなりました。",
+          "before": "研究によると、定期的な身体運動は精神的健康の改善に大きく貢献します。",
+          "style": "個人的＆真正"
+        }
+      },
+      "examplesTitle": "違いを見る",
+      "faq": {
+        "a1": "AIが入力テキストを分析し、自然な言語パターン、多様な文構造、人称代名詞、および人間のライティングに特徴的な会話要素を使用して書き換えます。",
+        "a2": "いいえ。当社の人間化は、コンテンツの核心的な意味とキーポイントを保持しながら、より自然で本物らしく聞こえるように文体を変換します。",
+        "a3": "はい！複数のスタイル（カジュアル、プロフェッショナル、アカデミック）から選択するか、ボイスプロファイルを使用して独自の文体に合わせることができます。",
+        "a4": "当社の人間化は、自然なライティングパターンを導入することでAI検出スコアを大幅に低下させます。ただし、倫理的かつ透明性を持って使用することをお勧めします。",
+        "a5": "無料ユーザーはリクエストごとに最大500語まで人間化できます。Proユーザーはリクエストごとに最大5,000語までの上限があります。",
+        "q1": "コンテンツの人間化はどのように機能しますか？",
+        "q2": "コンテンツの意味は変わりますか？",
+        "q3": "文体をカスタマイズできますか？",
+        "q4": "人間化されたコンテンツはAI検出を通過しますか？",
+        "q5": "単語数制限はありますか？"
+      },
+      "faqBadge": "FAQ",
+      "faqDesc": "コンテンツの人間化について知っておくべきことすべて",
+      "faqTitle": "よくある質問",
+      "heroHighlight": "自然で本物",
+      "howItWorks": {
+        "badge": "シンプルなプロセス",
+        "step1": {
+          "desc": "人間化したいAI生成コンテンツを入力または貼り付け",
+          "title": "テキストを貼り付け"
+        },
+        "step2": {
+          "desc": "カジュアル、プロフェッショナル、アカデミック、またはボイスプロファイルから選択",
+          "title": "スタイルを選択"
+        },
+        "step3": {
+          "desc": "実在の人物が書いたような自然で本物のコンテンツを受け取る",
+          "title": "人間化されたコンテンツを取得"
+        },
+        "subtitle": "3つの簡単なステップでAIコンテンツを変換",
+        "title": "人間化の仕組み"
+      },
+      "humanContent": "自然な人間のコンテンツ",
+      "humanized": "人間化済み",
+      "moreEngaging": "より魅力的に",
+      "problems": {
+        "detectable": {
+          "desc": "AI検出ツールがコンテンツに即座にフラグを立てる",
+          "title": "簡単に検出される"
+        },
+        "engagement": {
+          "desc": "読者は非人間的なコンテンツから離脱する",
+          "title": "低いエンゲージメント"
+        },
+        "generic": {
+          "desc": "個性や独自の文体が欠けている",
+          "title": "一般的な声"
+        },
+        "robotic": {
+          "desc": "テキストが読者にとって機械的で不自然に聞こえる",
+          "title": "機械的で堅苦しい"
+        }
+      },
+      "processing": "処理中",
+      "reset": "リセット",
+      "stats": {
+        "languages": "言語",
+        "meaning": "意味保持",
+        "speed": "処理",
+        "styles": "ライティングスタイル"
+      },
+      "styles": "スタイル",
+      "testimonials": {
+        "academic": {
+          "author": "Dr. Emma Williams",
+          "quote": "AI支援による研究要約の洗練に最適です。アカデミックスタイルオプションは、専門性を維持しながら自然な流れを追加します。",
+          "role": "研究教授"
+        },
+        "badge": "ユーザーストーリー",
+        "content": {
+          "author": "Sarah Chen",
+          "quote": "このツールは私のコンテンツ作成方法を変えました。私のブログ記事は今や本当に人間らしく聞こえ、読者をより引きつけています。",
+          "role": "コンテンツクリエイター"
+        },
+        "marketing": {
+          "author": "Michael Torres",
+          "quote": "当社のマーケティングメールは個人的で本物らしく感じられるようになりました。Graphosを使い始めてから開封率が40%増加しました。",
+          "role": "マーケティングディレクター"
+        },
+        "subtitle": "コンテンツの人間化についてユーザーが語っていること",
+        "title": "コンテンツクリエイターに愛されています"
+      },
+      "transform": "変換",
+      "transformations": "実際の変換",
+      "transformationsDesc": "AI生成テキストが自然な人間らしい文章に変わる様子をご覧ください",
+      "transforming": "変換中...",
+      "trust": {
+        "instant": "即時結果",
+        "preserve": "意味を保持",
+        "voice": "あなたの声にマッチ"
+      },
+      "tryItNow": "変換を実際に見てみる",
+      "tryNow": "今すぐ人間化を試す",
+      "tryYourContent": "あなたのコンテンツで試す",
+      "tryYourself": "自分で試す",
+      "useCases": {
+        "academic": {
+          "desc": "AI生成の研究要約を学術基準に合わせて洗練",
+          "example": "",
+          "stat": "読みやすさスコア",
+          "title": "アカデミックライティング"
+        },
+        "content": {
+          "desc": "AIの下書きを本物のブログ記事、記事、マーケティングコピーに変換",
+          "example": "",
+          "stat": "ブログエンゲージメント",
+          "title": "コンテンツ作成"
+        },
+        "email": {
+          "desc": "AI支援メールを個人的で誠実なものにする",
+          "example": "",
+          "stat": "開封率増加",
+          "title": "メールライティング"
+        },
+        "preview": "変換プレビュー",
+        "social": {
+          "desc": "視聴者とつながる魅力的なソーシャル投稿を作成",
+          "example": "",
+          "stat": "エンゲージメント向上",
+          "title": "ソーシャルメディア"
+        },
+        "spotlight": "スポットライト"
+      },
+      "useCasesBadge": "ユースケース",
+      "useCasesDesc": "ユースケースをクリックして、人間化がコンテンツをどのように変えるかをご覧ください",
+      "useCasesTitle": "こんな用途に最適",
+      "watchTransform": "変換を見る",
+      "whyHumanize": "なぜコンテンツを人間化するのか？",
+      "whyHumanizeDesc": "機械的なAIテキストを魅力的で本物のコンテンツに変換",
+      "with": "人間化あり",
+      "without": "人間化なし"
+    },
+    "labels": {
+      "aiGenerated": "AI生成",
+      "aiRewrite": "AIリライト",
+      "aiScore": "AIスコア",
+      "aiWorkspace": "AIワークスペース",
+      "humanizationPreview": "人間化プレビュー",
+      "voiceProfile": "ボイスプロファイル"
+    },
+    "placeholder": {
+      "voiceProfile": "ボイスプロファイル",
+      "yourText": "あなたのテキスト"
+    },
+    "rewrite": {
+      "badge": "ボイスパワー変換",
+      "benefits": {
+        "languages": {
+          "desc": "ネイティブ品質で15以上の言語をサポート",
+          "title": "多言語"
+        },
+        "speed": {
+          "desc": "数分ではなく数秒でテキストを変換",
+          "title": "超高速"
+        },
+        "undetectable": {
+          "desc": "コンテンツを自然に保ちながらAI検出を回避",
+          "title": "検出不能"
+        },
+        "voice": {
+          "desc": "独自の文体と個性を維持",
+          "title": "あなたの声"
+        }
+      },
+      "benefitsBadge": "選ばれる理由",
+      "benefitsDesc": "ライティングを変えるために必要なすべて",
+      "benefitsTitle": "強力な機能",
+      "cta": {
+        "desc": "今すぐ独自の文体でコンテンツのリライトを始めましょう。クレジットカードは不要です。",
+        "title": "ライティングを変える準備はできましたか？",
+        "trust2": "100無料クレジット",
+        "trust3": "プライバシー第一"
+      },
+      "ctaBadge": "数秒で変換を開始",
+      "demo": {
+        "originalLabel": "元のテキスト",
+        "rewriteBtn": "リライト",
+        "rewritten": "リライト済み",
+        "sectionDesc": "AI駆動のテキスト変換の力を体験してください。登録は不要です。",
+        "sectionTitle": "今すぐAIリライトを試す",
+        "subtitle": "テキストを文体に合わせて変換",
+        "tip1": "さまざまなサンプルを試して、多様な変換を確認してください",
+        "tip2": "オプションを切り替えて出力をカスタマイズ",
+        "title": "AIリライト",
+        "transformComplete": "変換完了"
+      },
+      "faq": {
+        "a1": "AIリライトはボイスプロファイルを使用して、独自の文体を理解します。その後、元の意味を保持しながら、語彙、トーン、文パターンに合わせてテキストを変換します。",
+        "a2": "プロファイルなしでも基本的なリライトを使用できますが、ボイスプロファイルがあると結果が大幅に向上します。一般的な変換を使用するのではなく、特定の文体に合わせることができます。",
+        "a3": "はい！当社のAIリライトは、自然で人間らしいテキストを作成するように設計されています。ボイスプロファイルと組み合わせると、出力は通常、AI検出ツールで非常に低いスコアになります。",
+        "a4": "英語、ベトナム語、スペイン語、フランス語、ドイツ語など、15以上の言語をサポートしています。AIは入力言語を自動的に検出し、出力の品質を維持します。",
+        "a5": "リライトには、約1.5基本クレジット + 単語あたり0.0008クレジットがかかります。正確なコストは、テキストの長さと選択したAIモデルによって異なります。",
+        "a6": "はい！最大50,000文字のドキュメントをリライトできます。より長いドキュメントには、完全なエディタ体験を提供するAI Studioの使用をお勧めします。",
+        "q1": "AIリライトはどのように機能しますか？",
+        "q2": "リライトを使用するにはボイスプロファイルが必要ですか？",
+        "q3": "リライトされたテキストはAI検出を通過しますか？",
+        "q4": "どの言語がサポートされていますか？",
+        "q5": "リライトには何クレジットかかりますか？",
+        "q6": "長いドキュメントをリライトできますか？"
+      },
+      "faqBadge": "FAQ",
+      "faqDesc": "AIリライトについて知っておくべきことすべて",
+      "faqTitle": "よくある質問",
+      "heroDesc": "あらゆるテキストを独自の文体に変換します。ボイスプロファイルによって、本物で検出不可能な結果が得られます。",
+      "heroHighlight": "言葉を変える",
+      "howItWorks": {
+        "step1": {
+          "desc": "変換したいテキストを入力",
+          "title": "テキストを貼り付け"
+        },
+        "step2": {
+          "desc": "パーソナライズされた結果のためにボイスプロファイルを選択",
+          "title": "プロファイルを選択"
+        },
+        "step3": {
+          "desc": "あなたのように聞こえるリライトされたコンテンツを受け取る",
+          "title": "変換されたテキストを取得"
+        }
+      },
+      "howItWorksBadge": "シンプルなプロセス",
+      "howItWorksDesc": "3つの簡単なステップでテキストを変換",
+      "howItWorksTitle": "AIリライトの仕組み",
+      "integration": {
+        "badge": "強力な統合",
+        "cta1": "ボイスプロファイルを作成",
+        "cta2": "デモを試す",
+        "desc": "AIリライトはボイスプロファイルを使用して、テキストを独自の文体に変換します。使えば使うほど、あなたの声をよりよく理解します。",
+        "feature1": "語彙とトーンに一致",
+        "feature2": "ライティングパターンから学習",
+        "feature3": "すべてのコンテンツで一貫した声",
+        "feature4": "AI検出を自然に回避",
+        "result": "結果：まさにあなたの声！",
+        "title": "ボイスプロファイルによる強化"
+      },
+      "showcase": {
+        "badge": "魔法を見る",
+        "cta": "自分で試す",
+        "formal": {
+          "after": "あのね",
+          "before": "企業環境における持続可能な実践の実施は、近年ますます重要になっています。",
+          "metric": "エンゲージメント",
+          "style": "フォーマル → 会話的"
+        },
+        "generic": {
+          "after": "ご注文本当にありがとうございます！私が個人的に梱包しました。私が作った時と同じくらいの喜びがあなたにも届きますように。",
+          "before": "ご購入ありがとうございます。製品をお楽しみいただけることを願っています。",
+          "metric": "つながり",
+          "style": "一般的 → 個人的"
+        },
+        "passive": {
+          "after": "チームはレポートを完成させ、マネージャーに提出してレビューを仰ぎました。",
+          "before": "レポートはチームによって完成され、レビューのためにマネージャーに提出されました。",
+          "metric": "明瞭さ",
+          "style": "受動態 → 能動態"
+        },
+        "subtitle": "メッセージを保持しながらAIリライトがテキストを変換する様子をご覧ください",
+        "title": "実際の変換",
+        "wordy": {
+          "after": "しましょう",
+          "before": "潜在的な協力の機会を探る可能性について話し合うために、ご都合の良い最も早い時期に会議を要請したく、お知らせするために手紙を書いています。",
+          "metric": "単語数",
+          "style": "冗長 → 簡潔"
+        }
+      },
+      "stats": {
+        "accuracy": "スタイルマッチ",
+        "languages": "言語",
+        "speed": "速度",
+        "users": "満足したユーザー"
+      },
+      "title": "AIリライト",
+      "trust": {
+        "instant": "即時結果",
+        "noCard": "クレジットカード不要",
+        "privacy": "プライバシー第一"
+      },
+      "useCases": {
+        "academic": {
+          "desc": "アカデミックなトーンを維持しながらエッセイや論文を磨く",
+          "example": "",
+          "stat": "明瞭性スコア",
+          "title": "アカデミックライティング"
+        },
+        "content": {
+          "desc": "ブログ記事、記事、マーケティングコピーをあなたの声でリライト",
+          "example": "",
+          "stat": "読了時間",
+          "title": "コンテンツ作成"
+        },
+        "email": {
+          "desc": "フォーマルなメールをフレンドリーなメッセージに、またはその逆に変換",
+          "example": "",
+          "stat": "返信率",
+          "title": "メールライティング"
+        },
+        "preview": "変換プレビュー",
+        "social": {
+          "desc": "本当にあなたらしい魅力的な投稿を作成",
+          "example": "",
+          "stat": "エンゲージメント",
+          "title": "ソーシャルメディア"
+        },
+        "spotlight": "スポットライト"
+      },
+      "useCasesBadge": "ユースケース",
+      "useCasesDesc": "あらゆるタイプのコンテンツをあなたの声と目的に合わせて変換",
+      "useCasesTitle": "あらゆる状況に最適"
+    },
+    "statistics": {
+      "badge": "ライティング分析",
+      "benchmark": {
+        "badge": "業界基準",
+        "desc": {
+          "academic": "アカデミックライティングには正確さと形式性が必要です。複雑なアイデアを伝えるために、より長い文と豊富な語彙が期待されます。",
+          "blog": "ブログライティングは会話的で読みやすいものであるべきです。読者を引きつけるために、短い文と親しみやすい語彙を目指しましょう。",
+          "casual": "カジュアルライティングはリラックスしていてフレンドリーです。短い文、単純な言葉、会話的なトーンが最適です。",
+          "professional": "プロフェッショナルライティングは明瞭さと洗練さのバランスをとります。適度な文の長さと正確な語彙が能力を伝えます。"
+        },
+        "metrics": {
+          "punctuation": "句読点",
+          "readability": "読みやすさ",
+          "sentenceLength": "文の長さ",
+          "vocabulary": "語彙",
+          "wordLength": "単語の長さ"
+        },
+        "styles": {
+          "academic": "アカデミック",
+          "blog": "ブログ",
+          "casual": "カジュアル",
+          "professional": "プロフェッショナル"
+        },
+        "subtitle": "あなたの文章がさまざまなコンテンツタイプの業界基準と比べてどうなっているかを確認",
+        "table": {
+          "ideal": "理想",
+          "max": "最大",
+          "metric": "指標",
+          "min": "最小",
+          "range": "範囲"
+        },
+        "title": "ベンチマークと比較"
+      },
+      "benefits": {
+        "badge": "利点",
+        "languages": {
+          "desc": "言語固有の分析とベンチマークを備えた15以上の言語のサポート",
+          "stat": "言語",
+          "title": "多言語"
+        },
+        "metrics": {
+          "desc": "単語の長さ、文構造、語彙の豊かさ、読みやすさスコアを含む10以上のライティング指標を取得",
+          "stat": "指標",
+          "title": "包括的な指標"
+        },
+        "speed": {
+          "desc": "最適化された処理エンジンにより、1秒未満であらゆるテキストを分析",
+          "stat": "分析",
+          "title": "即時分析"
+        },
+        "styles": {
+          "desc": "ブログ、アカデミック、カジュアル、プロフェッショナルコンテンツの業界基準と文章を比較",
+          "stat": "スタイルタイプ",
+          "title": "スタイルベンチマーク"
+        },
+        "subtitle": "より良く、より速く書くのに役立つ洞察を得る",
+        "title": "なぜテキスト統計を使うのか？"
+      },
+      "cta": {
+        "instant": "100無料クレジット",
+        "privacy": "プライバシー第一",
+        "subtitle": "包括的なテキスト統計で、あなたの文体に関する即時の洞察を得ましょう。クレジットカードは不要です。",
+        "title": "自分の文章を理解する準備はできましたか？"
+      },
+      "ctaBadge": "今すぐ文章を分析",
+      "demo": {
+        "subtitle": "当社のテキスト分析技術を直接体験してください。登録は不要です。",
+        "title": "今すぐテキスト統計を試す"
+      },
+      "description": "包括的な指標で文章を分析します。読みやすさスコア、語彙分析、文パターン、ベンチマーク比較を即座に取得できます。",
+      "faq": {
+        "a1": "平均単語長、平均文長、語彙の豊かさ（ユニーク単語率）、句読点率、読みやすさスコア（Flesch-Kincaid）、総単語数/文数/段落数、トップの文頭、移行語の使用など、10以上の指標を分析します。",
+        "a2": "平均文長と単語あたりの音節数を考慮するFlesch-Kincaid読みやすさの公式を使用しています。スコアは0〜100の範囲で、スコアが高いほど読みやすくなります。一般向けには60〜70、アカデミックコンテンツには30〜50が理想的です。",
+        "a3": "4つのライティングスタイル（ブログ（会話的、読みやすい）、アカデミック（フォーマル、複雑）、カジュアル（リラックス、単純）、プロフェッショナル（バランス、明瞭））のベンチマークを提供しています。それぞれにすべての指標に対する異なる理想的な範囲があります。",
+        "a4": "はい！英語、ベトナム語、スペイン語、フランス語、ドイツ語など、15以上の言語をサポートしています。システムは自動的に言語を検出し、適切な分析パターンとベンチマークを適用します。",
+        "a5": "ベンチマーク比較を使用して、あなたの文章が理想的な範囲と異なる場所を確認してください。たとえば、文の長さが高すぎる場合は、長い文を分割してみてください。語彙の豊かさが低い場合は、より多様な単語を使用してください。当社の提案が改善を導きます。",
+        "a6": "はい！テキスト統計は、AI検出（ライティングパターンの分析）、適合スコア（ボイスプロファイルとの比較）、および逸脱（スタイルの不一致の特定）に統合されています。これはプラットフォーム全体で使用される基礎的な分析です。",
+        "badge": "FAQ",
+        "desc": "テキスト統計について知っておくべきことすべて",
+        "q1": "テキスト統計にはどのような指標が含まれていますか？",
+        "q2": "読みやすさスコアはどのように計算されますか？",
+        "q3": "ベンチマークスタイルタイプとは何ですか？",
+        "q4": "多言語をサポートしていますか？",
+        "q5": "どうすれば統計を改善できますか？",
+        "q6": "テキスト統計は他の機能の一部ですか？",
+        "title": "よくある質問"
+      },
+      "heroHighlight": "ライティングDNAを理解する",
+      "howItWorks": {
+        "badge": "仕組み",
+        "step1": {
+          "desc": "分析したいテキストを貼り付けまたは入力",
+          "title": "テキスト入力"
+        },
+        "step2": {
+          "desc": "エンジンが構造、語彙、パターンを分析",
+          "title": "処理"
+        },
+        "step3": {
+          "desc": "指標が計算され、ベンチマークと比較されます",
+          "title": "計算"
+        },
+        "step4": {
+          "desc": "実用的な洞察を含む詳細な統計を表示",
+          "title": "結果"
+        },
+        "subtitle": "数秒で包括的なライティング統計を取得",
+        "title": "即時テキスト分析"
+      },
+      "metrics": {
+        "badge": "主要指標",
+        "benchmark": "ベンチマーク範囲",
+        "ideal": "理想",
+        "punctuation": {
+          "desc": "単語あたりの句読点。文章のリズムとペースに影響します。",
+          "title": "句読点率",
+          "unit": "単語あたり"
+        },
+        "readability": {
+          "desc": "Flesch-Kincaidスコア。高いほど読みやすい。60〜70が一般向けに理想的。",
+          "title": "読みやすさスコア",
+          "unit": "ポイント"
+        },
+        "sentenceLength": {
+          "desc": "読みやすさと流れを示します。短い文＝パンチが効いている、長い文＝複雑なアイデア。",
+          "title": "平均文長",
+          "unit": "単語"
+        },
+        "subtitle": "包括的な指標であらゆる側面から文章を理解する",
+        "title": "深いライティング分析",
+        "vocabulary": {
+          "desc": "ユニーク単語 / 総単語。高い＝語彙が多様、低い＝繰り返しが多い。",
+          "title": "語彙の豊かさ",
+          "unit": "比率"
+        },
+        "wordLength": {
+          "desc": "語彙の複雑さを測定。短い単語＝読みやすい、長い単語＝より洗練。",
+          "title": "平均単語長",
+          "unit": "文字"
+        }
+      },
+      "stats": {
+        "languages": "言語",
+        "metrics": "指標",
+        "speed": "分析",
+        "styles": "スタイルタイプ"
+      },
+      "title": "テキスト統計",
+      "trust": {
+        "instant": "即時結果",
+        "noCard": "クレジットカード不要",
+        "privacy": "プライバシー第一"
+      },
+      "useCases": {
+        "authors": {
+          "b1": "声の一貫性",
+          "b2": "ペース分析",
+          "b3": "ジャンル適合",
+          "desc": "原稿を分析し、全体を通して一貫した声と適切な複雑さを確保",
+          "example": "",
+          "title": "著者"
+        },
+        "badge": "ユースケース",
+        "educators": {
+          "b1": "客観的なフィードバック",
+          "b2": "進捗追跡",
+          "b3": "教育ツール",
+          "desc": "構造と複雑さに関する客観的なフィードバックを提供し、学生のライティング改善を支援",
+          "example": "",
+          "title": "教育者"
+        },
+        "example": "例",
+        "professionals": {
+          "b1": "明確なコミュニケーション",
+          "b2": "プロフェッショナルトーン",
+          "b3": "オーディエンス適合",
+          "desc": "ビジネスコミュニケーションが明確でプロフェッショナル、かつオーディエンスに適切であることを保証",
+          "example": "",
+          "title": "専門家"
+        },
+        "spotlight": "注目のユースケース",
+        "subtitle": "ライター、教育者、専門家が統計を使用してスキルを向上させています",
+        "title": "統計から誰が恩恵を受けるか？",
+        "writers": {
+          "b1": "より良い読みやすさ",
+          "b2": "一貫したスタイル",
+          "b3": "SEO最適化",
+          "desc": "ライティングパターンを理解することで、読みやすさとエンゲージメントのためにコンテンツを最適化",
+          "example": "",
+          "title": "コンテンツライター"
+        }
+      }
+    },
+    "stats": {
+      "accuracy": "精度98%",
+      "analyze": "ライティング指標",
+      "chat": "あなたの声でチャット",
+      "chatInYourVoice": "あなたの声でチャット",
+      "find": "不一致を見つける",
+      "match": "スタイルマッチング",
+      "natural": "自然な出力",
+      "transform": "テキストを変換",
+      "unique": "独自のスタイル",
+      "yourUniqueStyle": "独自のスタイル"
+    },
+    "voiceProfile": {
+      "badge": "あなた独自のライティングDNA",
+      "benefits": {
+        "ai": {
+          "desc": "AIワークスペースでプロファイルを使用して、パーソナライズされたコンテンツを生成",
+          "title": "AI統合"
+        },
+        "analysis": {
+          "desc": "ライティングパターン、語彙、スタイルの好みを理解",
+          "title": "深い分析"
+        },
+        "consistent": {
+          "desc": "メールからブログ記事まで、すべてのコンテンツでトーンを維持",
+          "title": "一貫した声"
+        },
+        "unique": {
+          "desc": "毎回、本物のあなたのように聞こえるコンテンツを作成",
+          "title": "独自のアイデンティティ"
+        }
+      },
+      "builderBadge": "プロファイルビルダー",
+      "builderDesc": "3つの簡単なステップであなたの文章が独自のボイスプロファイルに変わるのをご覧ください",
+      "builderTitle": "仕組みを見る",
+      "cta": {
+        "create": "プロファイルを作成"
+      },
+      "ctaBadge": "独自の声をキャプチャ",
+      "ctaDesc": "独自の文体スタイルを今すぐ発見しましょう。",
+      "ctaTitle": "ボイスプロファイルを作成",
+      "demo": {
+        "subtitle": "さまざまな文体がどのようにキャプチャされ、視覚化されるかをご覧ください",
+        "title": "ボイスプロファイルを探る"
+      },
+      "faq": {
+        "a1": "それぞれ少なくとも200語の3〜5つのライティングサンプルをお勧めします。サンプルが多いほど、プロファイルはより正確になります。サンプルはあなたの典型的な文体を表すものであるべきです。",
+        "a2": "あなたが書いたコンテンツなら何でも使えます！メール、ブログ記事、ソーシャルメディアの投稿、記事、さらにはチャットメッセージまで。重要なのは、それがあなたの自然な書き方を表していることです。",
+        "a3": "はい！Proユーザーは、プロフェッショナルなコミュニケーション用、カジュアルなコンテンツ用など、さまざまなコンテキスト用に複数のプロファイルを作成できます。",
+        "a4": "当社のボイスマッチングは、元の文体に対して90%以上の類似性を達成しています。提供するサンプルが多いほど、マッチングはより正確になります。",
+        "a5": "もちろんです。ライティングサンプルは暗号化され、プロファイルの作成のみに使用されます。データを第三者と共有することはありません。",
+        "q1": "ライティングサンプルはいくつ必要ですか？",
+        "q2": "どのようなコンテンツが最適ですか？",
+        "q3": "複数のボイスプロファイルを持てますか？",
+        "q4": "ボイスマッチングはどれくらい正確ですか？",
+        "q5": "ライティングデータは安全ですか？"
+      },
+      "faqBadge": "FAQ",
+      "faqSubtitle": "ボイスプロファイルについて知っておくべきことすべて",
+      "faqTitle": "よくある質問",
+      "heroHighlight": "本物の声をキャプチャ",
+      "howItWorks": {
+        "step1": {
+          "desc": "スタイルを表す3〜5つのライティングサンプル（メール、投稿、記事）を提供",
+          "title": "サンプルをアップロード"
+        },
+        "step2": {
+          "desc": "AIが語彙、文構造、トーン、独自のパターンを分析",
+          "title": "AI分析"
+        },
+        "step3": {
+          "desc": "指標、特性、特徴的な署名を含む詳細なプロファイルを取得",
+          "title": "プロファイル作成"
+        },
+        "step4": {
+          "desc": "人間化、AIワークスペース、コンテンツ生成にプロファイルを適用",
+          "title": "どこでも使用"
+        }
+      },
+      "howItWorksDesc": "4つの簡単なステップで独自のライティングDNAを作成",
+      "howItWorksTitle": "ボイスプロファイルの仕組み",
+      "examples": {
+        "before": "\"持続可能な実践の実施は重要です。\"",
+        "after": "\"つまりこういうこと。環境への配慮は単なるトレンドじゃなくて、必要不可欠なんです。\"",
+        "aiResponse": "\"さて、この製品についてですが、正直言って画期的です...\""
+      },
+      "integration": {
+        "example": "例",
+        "humanize": "人間化",
+        "humanizeDesc": "AI生成コンテンツを独自の文体に変換。ヒューマナイザーはボイスプロファイルを使用して、すべてのリライトが本物のあなたのように聞こえるようにします。",
+        "humanizeTag": "あなたの声でリライト",
+        "learnMore": "詳細",
+        "prompt": "製品説明を書く",
+        "workspace": "AIワークスペース",
+        "workspaceDesc": "最初からあなたのように聞こえるコンテンツを生成。AIワークスペースでボイスプロファイルを選択すると、すべての応答が文体に一致します。",
+        "workspaceTag": "あなたの声でチャット"
+      },
+      "integrationBadge": "シームレスな統合",
+      "integrationDesc": "ボイスプロファイルはすべてのGraphos AI機能とシームレスに統合されます",
+      "integrationTitle": "どこでもあなたの声を使用",
+      "metrics": {
+        "punctuation": "句読点スタイル",
+        "punctuationDesc": "独自の句読点パターンと好み",
+        "sentenceLength": "文構造",
+        "sentenceLengthDesc": "文の典型的な長さ、複雑さ、リズム",
+        "sentenceStarters": "文の書き出し",
+        "sentenceStartersDesc": "文をどのように始めるか - 主語先行、副詞、質問",
+        "tone": "感情マーカー",
+        "toneDesc": "意見、感情、強調をどのように表現するか",
+        "transitions": "移行の好み",
+        "transitionsDesc": "好みの接続語とフレーズ",
+        "vocabulary": "語彙パターン",
+        "vocabularyDesc": "一般的なフレーズ、好みの単語、表現"
+      },
+      "metricsBadge": "深い分析",
+      "metricsDesc": "AIは包括的な分析を通じて文体のあらゆるニュアンスをキャプチャします",
+      "metricsTitle": "分析内容",
+      "multiLang": {
+        "desc": "英語、ベトナム語、中国語、日本語、韓国語、スペイン語、フランス語、ドイツ語などでボイスプロファイルを作成します。言語に関係なく文体は正確にキャプチャされます。",
+        "title": "15+ 言語対応"
+      },
+      "preview": {
+        "analyzing1": "語彙パターンを分析中...",
+        "analyzing2": "文構造を検出中...",
+        "analyzing3": "トーンマーカーを特定中...",
+        "ready": "使用準備完了",
+        "sampleInput": "ライティングサンプル",
+        "step1": "サンプルを追加",
+        "step1Desc": "メール、投稿、または書いたテキストを貼り付け",
+        "step2": "AIがパターンを分析",
+        "step2Desc": "ディープラーニングが独自のスタイルを抽出",
+        "step3": "プロファイル生成",
+        "step3Desc": "ライティングDNAがキャプチャされました",
+        "yourProfile": "あなたのボイスプロファイル"
+      },
+      "processBadge": "シンプルなプロセス",
+      "quality": {
+        "consistency": "スタイルの一貫性",
+        "diversity": "サンプルの多様性",
+        "excellent": "優秀なプロファイル",
+        "excellentDesc": "豊富なスタイルデータによる高精度のボイスマッチング",
+        "fairDesc": "基本的なプロファイル、サンプルの追加を検討してください",
+        "goodDesc": "良好なスタイル表現を備えた信頼できるプロファイル",
+        "length": "コンテンツの長さ",
+        "needsWorkDesc": "精度向上のためにより多様なサンプルを追加してください",
+        "outOf": "/ 100",
+        "ratingsTitle": "品質評価",
+        "tip1": "最良の結果を得るために5つ以上のサンプルを追加",
+        "tip2": "異なるコンテンツタイプ（メール、投稿、記事）を含める",
+        "tip3": "それぞれ少なくとも200語のサンプルを使用",
+        "tipsTitle": "スコア向上のヒント"
+      },
+      "qualityBadge": "品質保証",
+      "qualityDesc": "AIがライティングサンプルを評価し、最高のボイスプロファイル精度を保証します",
+      "qualityTitle": "プロファイル品質スコア",
+      "stats": {
+        "accuracy": "ボイスマッチ",
+        "metrics": "スタイル指標",
+        "samples": "最小サンプル",
+        "speed": "分析"
+      },
+      "trust": {
+        "fast": "即時分析",
+        "private": "共有されません",
+        "secure": "データ暗号化"
+      },
+      "trustIndicator1": "クレジットカード不要",
+      "trustIndicator2": "30秒でセットアップ",
+      "trustIndicator3": "クレジット有効期限なし",
+      "tryItNow": "サンプルボイスプロファイルを見る",
+      "useCases": {
+        "business": {
+          "desc": "すべてのチームコミュニケーションがブランドの声と一致することを保証",
+          "quote": "",
+          "statLabel": "企業",
+          "title": "ビジネスコミュニケーション"
+        },
+        "content": {
+          "desc": "あなたのように聞こえるブログ記事、記事、コピーを生成",
+          "quote": "",
+          "statLabel": "記事",
+          "title": "コンテンツ作成"
+        },
+        "cta": "自分の声を見つける準備はできましたか？",
+        "ctaButton": "プロファイルを作成",
+        "personal": {
+          "desc": "すべてのコンテンツで一貫したパーソナルブランドを構築",
+          "quote": "",
+          "statLabel": "クリエイター",
+          "title": "パーソナルブランディング"
+        },
+        "team": {
+          "desc": "プロファイルを共有してチーム全体で一貫した声を維持",
+          "quote": "",
+          "statLabel": "チーム",
+          "title": "チームコラボレーション"
+        }
+      },
+      "useCasesBadge": "ユースケース",
+      "useCasesDesc": "ボイスプロファイルを使用して本物の声を維持する何千もの専門家に加わりましょう",
+      "useCasesTitle": "こんな用途に最適",
+      "whatYouGet": "得られるもの",
+      "whyCreate": "なぜボイスプロファイルを作成するのか？",
+      "whyCreateDesc": "パーソナライズされたAIライティングの力を解き放つ"
+    }
+  },
+  "featuresPage": {
+    "badge": "8つの強力なツール",
+    "cta": {
+      "description": "Graphos AI Studioを使用して本物のコンテンツを作成する何千人ものライターに加わりましょう。",
+      "title": "始める準備はできましたか？"
+    },
+    "description": "AI検出からコンテンツの人間化、ボイスプロファイリング、スマートリライトまで — 本物で人間らしいライティングのための完全なツールキットを発見してください。",
+    "gridBadge": "機能を探る",
+    "gridSubtitle": "機能をクリックして詳細を確認し、試してみてください",
+    "gridTitle": "ツールを選択",
+    "meta": {
+      "description": "Graphos AI Studioの全機能を探る：AI検出、人間化、ボイスプロファイル、AIワークスペース、リライトなど。",
+      "title": "機能 - Graphos AI Studio"
+    },
+    "stats": {
+      "extension": "Chrome拡張機能",
+      "features": "8つの機能",
+      "languages": "15+ 言語"
+    },
+    "subtitle": "より良く書くために必要なすべて",
+    "title": "すべての機能"
   },
   "footer": {
-    "description": "Graphos AI StudioはAI検出、ヒューマナイゼーション、ボイスプロファイル機能で本物のコンテンツ作成をサポートします。",
-    "copyright": "全著作権所有。"
+    "copyright": "All rights reserved.",
+    "description": "Graphos AI Studioは、AI検出、人間化、ボイスプロファイル機能を使用して、本物のコンテンツを書くのに役立ちます。",
+    "newsletter": {
+      "note": "ヒント、アップデート、限定オファーを入手。スパムなし。",
+      "placeholder": "メールアドレスを入力",
+      "subscribe": "登録",
+      "success": "登録ありがとうございます！",
+      "title": "最新情報を入手"
+    },
+    "trust": {
+      "gdpr": "GDPR準拠",
+      "privacy": "プライバシー第一",
+      "ssl": "SSL保護"
+    }
+  },
+  "hero": {
+    "badge": "AIライティングアシスタント",
+    "badgeText": "AIライティングアシスタント",
+    "description": "AIコンテンツを検出し、文章を人間化し、本当にあなたのように聞こえるコンテンツを作成します。すべてを1つの強力なプラットフォームで。",
+    "scroll": "スクロールして探索",
+    "stats": {
+      "accuracy": "精度",
+      "users": "アクティブユーザー"
+    },
+    "title": "本物らしく書く",
+    "titleHighlight": "あなたを理解するAIと共に",
+    "trust": {
+      "extension": "Chrome拡張機能",
+      "free": "無料で開始",
+      "noCard": "カード不要"
+    },
+    "typing": {
+      "detect": "AIコンテンツを即座に検出",
+      "humanize": "文章を人間化",
+      "voice": "独自の文体で書く",
+      "workspace": "あなたの方法でAIとチャット"
+    },
+    "videoNote": "下のライブデモをお試しください",
+    "videoPlaceholder": "デモ動画近日公開！"
+  },
+  "heroBadge": {
+    "detection": "精度98%",
+    "fast": "即時結果",
+    "languages": "15言語",
+    "users": "50K+ ユーザー"
+  },
+  "heroTrust": {
+    "extension": "Chrome拡張機能付属",
+    "free": "無料で開始",
+    "noCard": "クレジットカード不要"
+  },
+  "home": {
+    "cta": {
+      "description": "Graphos AI Studioを使用して本物で人間らしいコンテンツを作成する何千人ものライターに加わりましょう。",
+      "title": "本物のコンテンツを書く準備はできましたか？"
+    },
+    "features": {
+      "subtitle": "AI支援により、本物で人間らしいコンテンツを書くために必要なすべて。",
+      "title": "強力な機能"
+    },
+    "hero": {
+      "subtitle": "AI生成テキストを検出し、コンテンツを人間化し、独自のボイスプロファイルで作成します。",
+      "title": "AIで本物のコンテンツを書く"
+    },
+    "meta": {
+      "description": "AI生成コンテンツを検出し、文章を人間化し、あなたのように聞こえる本物のコンテンツを作成します。Chrome拡張機能付きの無料AIライティングアシスタント。",
+      "title": "Graphos AI Studio - AI検出、人間化、ボイスプロファイル"
+    }
+  },
+  "howItWorks": {
+    "badge": "シンプルなプロセス",
+    "ctaText": "始める準備はできましたか？",
+    "step1": {
+      "description": "ライティングサンプルをアップロードするかテキストを貼り付けます。AIが独自のスタイル、トーン、語彙パターンを分析します。",
+      "title": "ボイスプロファイルを作成"
+    },
+    "step2": {
+      "description": "テキストを貼り付けて、AIによって書かれたものかどうかを即座にチェック。確信度スコア付きの詳細な分析を取得。",
+      "title": "AIコンテンツを検出"
+    },
+    "step3": {
+      "description": "AI生成テキストを、文体に合った自然で人間らしいコンテンツに変換。",
+      "title": "コンテンツを人間化"
+    },
+    "step4": {
+      "description": "AIワークスペースを使用して、本当にあなたのように聞こえるコンテンツを生成。メールや投稿などに最適です。",
+      "title": "あなたの声でチャット"
+    },
+    "steps": {
+      "chatInVoice": "あなたの声でチャット",
+      "createProfile": "ボイスプロファイルを作成",
+      "detectAI": "AIコンテンツを検出",
+      "humanize": "コンテンツを人間化"
+    },
+    "subtitle": "数分で開始。複雑なセットアップは不要です。",
+    "title": "仕組み"
+  },
+  "humanization": {
+    "description": "AIテキストを自然で本物の人間によるライティングに変換します。",
+    "meta": {
+      "description": "意味を保持しながら、AI生成テキストを自然で人間らしいコンテンツに変換します。",
+      "title": "コンテンツの人間化 - Graphos AI Studio"
+    },
+    "title": "コンテンツの人間化"
+  },
+  "nav": {
+    "aiDetection": "AI検出",
+    "aiDetectionDesc": "AI生成コンテンツを検出",
+    "aiWorkspace": "AIワークスペース",
+    "aiWorkspaceDesc": "オールインワンAIワークスペース",
+    "aidetection": "AI検出",
+    "chromeExtension": "Chrome拡張機能",
+    "compatibility": "適合スコア",
+    "compatibilityScore": "適合スコア",
+    "compatibilityScoreDesc": "文体の一致を確認",
+    "cookies": "Cookieポリシー",
+    "deviations": "逸脱",
+    "deviationsDesc": "スタイルの不一致を見つける",
+    "faq": "FAQ",
+    "features": "機能",
+    "home": "ホーム",
+    "humanization": "人間化",
+    "humanizationDesc": "AIテキストを自然にする",
+    "legal": "法的事項",
+    "login": "ログイン",
+    "pricing": "価格",
+    "privacy": "プライバシーポリシー",
+    "resources": "リソース",
+    "rewrite": "AIリライト",
+    "rewriteDesc": "あなたの声でテキストを変換",
+    "statistics": "統計",
+    "statisticsDesc": "ライティング指標を分析",
+    "support": "サポート",
+    "terms": "利用規約",
+    "viewAllFeatures": "全機能を見る",
+    "voiceProfile": "ボイスプロファイル",
+    "voiceProfileDesc": "独自の文体を作成",
+    "voiceprofile": "ボイスプロファイル",
+    "workspace": "ワークスペース"
+  },
+  "pricing": {
+    "acceptedPayments": "お支払い方法",
+    "badge": "価格",
+    "benefits": {
+      "instantCredits": "即時クレジット",
+      "neverExpire": "クレジット期限なし",
+      "noSubscription": "サブスクリプションなし",
+      "securePayment": "安全な支払い"
+    },
+    "bestValue": "ベストバリュー",
+    "bonus": "ボーナス",
+    "buyNow": "今すぐ購入",
+    "creditCard": "クレジットカード",
+    "creditCostNote": "使用ごとの概算クレジット（テキスト長により異なります）",
+    "credits": "クレジット",
+    "creditsShort": "cr",
+    "firstPurchase": "初回購入",
+    "firstPurchaseDesc": "初回購入で2倍のクレジットをゲット！",
+    "firstPurchaseTitle": "初回購入ボーナス",
+    "free": "無料",
+    "freeCredits": "100無料クレジットで開始",
+    "freeFeatures": {
+      "neverExpires": "クレジット期限なし",
+      "noCardRequired": "クレジットカード不要",
+      "tryAllFeatures": "全機能を試す"
+    },
+    "limitedOffer": "期間限定オファー",
+    "localCurrencyNote": "* 現地通貨の概算は為替レートにより異なる場合があります",
+    "noCardRequired": "クレジットカード不要 • 全機能を試す",
+    "note": "Lemon Squeezyによる安全な支払い • クレジットカード & PayPal対応",
+    "perCredit": "クレジット",
+    "popular": "人気",
+    "poweredBy": "Powered by",
+    "secureCheckout": "256ビットSSL暗号化による安全な決済",
+    "startFree": "無料で開始",
+    "subtitle": "必要な時にクレジットを購入。サブスクリプション不要。クレジットに有効期限はありません。",
+    "title": "従量課金制",
+    "uses": {
+      "aiDetection": "AI検出",
+      "aiWorkspace": "AIチャット",
+      "humanization": "人間化",
+      "rewriting": "あなたのスタイルでリライト",
+      "styleAnalysis": "ライティングパターン分析",
+      "voiceProfiles": "ライティングボイスプロファイル作成"
+    },
+    "usesDescriptions": {
+      "aiDetection": "AI生成コンテンツを検出",
+      "aiWorkspace": "AI搭載ライティングアシスタント",
+      "humanization": "テキストをより人間らしく",
+      "rewriting": "あなたのスタイルでリライト",
+      "styleAnalysis": "ライティングパターン分析",
+      "voiceProfiles": "ライティングボイスプロファイル作成"
+    },
+    "whatCreditsFor": "クレジットで何ができますか？"
+  },
+  "privacy": {
+    "lastUpdated": "最終更新日",
+    "meta": {
+      "description": "Graphos AI Studioが個人データをどのように収集、使用、保護するかをご覧ください。",
+      "title": "プライバシーポリシー - Graphos AI Studio"
+    },
+    "title": "プライバシーポリシー"
+  },
+  "relatedFeatures": {
+    "badge": "もっと探す",
+    "subtitle": "ライティングを強化するより強力なツールを発見",
+    "title": "関連機能"
+  },
+  "rewrite": {
+    "description": "AIリライトにより、あなたの声でテキストを変換します。",
+    "meta": {
+      "description": "あらゆるテキストを独自の文体に変換します。あなたの声とトーンを維持するAIリライト。",
+      "title": "AIリライト - テキストをあなたの声に変換 | Graphos AI"
+    },
+    "title": "AIリライト"
+  },
+  "seo": {
+    "howToUse": "Graphos AI Studioの使い方",
+    "voiceProfileCreation": "ボイスプロファイル作成"
+  },
+  "showcase": {
+    "badge": "インタラクティブデモ",
+    "ctaText": "フルパワーを体験する準備はできましたか？",
+    "subtitle": "ここで機能を試してみてください。登録は不要です。Graphos AI Studioがどのように機能するか正確に確認してください。",
+    "title": "実際の製品を体験"
+  },
+  "socialProof": {
+    "benefits": {
+      "contentCreators": "魅力的なコンテンツを作成",
+      "developers": "より良いドキュメントを作成",
+      "educators": "教材を強化",
+      "marketers": "説得力のあるコピーを作成",
+      "students": "アカデミックライティングを改善"
+    },
+    "perfectFor": "こんな方に最適",
+    "stats": {
+      "accuracy": "精度",
+      "activeUsers": "アクティブユーザー",
+      "languages": "言語",
+      "textsProcessed": "処理済みテキスト"
+    },
+    "trustedBy": "以下のライターやチームに信頼されています",
+    "userTypeDescriptions": {
+      "contentCreators": "魅力的なコンテンツを作成",
+      "developers": "より良いドキュメントを作成",
+      "educators": "教材を強化",
+      "marketers": "説得力のあるコピーを作成",
+      "students": "アカデミックライティングを改善"
+    },
+    "userTypes": {
+      "contentCreators": "コンテンツクリエイター",
+      "developers": "開発者",
+      "educators": "教育者",
+      "marketers": "マーケター",
+      "students": "学生"
+    }
+  },
+  "statistics": {
+    "description": "ライティング指標とパターンを分析します。",
+    "meta": {
+      "description": "単語数、文の長さ、語彙の豊かさ、読みやすさスコアを含む詳細なライティング統計を取得します。",
+      "title": "統計 - ライティング指標を分析 | Graphos AI"
+    },
+    "title": "統計"
+  },
+  "stats": {
+    "accuracyrate": "精度",
+    "activeusers": "アクティブユーザー",
+    "textsanalyzed": "分析済みテキスト",
+    "userrating": "ユーザー評価"
+  },
+  "terms": {
+    "lastUpdated": "最終更新日",
+    "meta": {
+      "description": "Graphos AI Studioサービスの利用規約をお読みください。",
+      "title": "利用規約 - Graphos AI Studio"
+    },
+    "title": "利用規約"
+  },
+  "testimonials": {
+    "badge": "お客様の声",
+    "quotes": {
+      "1": "Graphos AIは私のコンテンツ作成方法を完全に変えました。ボイスプロファイル機能は信じられないほどです - 本当に私のように聞こえます！",
+      "2": "教授として、毎日AI検出を使用しています。正確で、クラスでの学問的誠実さを維持するのに役立っています。",
+      "3": "人間化機能のおかげで、編集に何時間も費やす必要がなくなりました。AI支援の下書きが自然で本物らしく読めるようになりました。",
+      "4": "ついに、個人的なタッチを失うことなく速く書くのに役立つAIツールに出会えました。ワークスペースは直感的で強力です。",
+      "5": "最初は懐疑的でしたが、AI検出の精度は印象的です。編集作業に不可欠なものになりました。",
+      "6": "Chrome拡張機能のおかげでどこでも簡単に使用できます。ワークフローを離れることなくコンテンツをチェックし、人間化できます。"
+    },
+    "roles": {
+      "contentCreator": "コンテンツクリエイター",
+      "customerSuccessLead": "カスタマーサクセスリード",
+      "editor": "編集長",
+      "freelanceWriter": "フリーランスライター",
+      "marketingManager": "マーケティングマネージャー",
+      "professor": "大学教授",
+      "socialMediaManager": "ソーシャルメディアマネージャー"
+    },
+    "subtitle": "Graphos AI Studioでの体験についてユーザーが何を語っているかをご覧ください。",
+    "title": "世界中のライターに愛されています"
+  },
+  "trust": {
+    "guarantees": {
+      "noExpiry": {
+        "desc": "必要な時にいつでもクレジットを使用",
+        "title": "クレジット期限なし"
+      },
+      "refund": {
+        "desc": "満足できませんか？7日以内に全額返金を受けられます",
+        "title": "7日間返金保証"
+      },
+      "support": {
+        "desc": "必要な時にメールでサポートを受けられます",
+        "title": "優先サポート"
+      }
+    },
+    "guaranteesTitle": "当社の保証",
+    "items": {
+      "encryption": {
+        "desc": "保存時および転送時の全データにAES-256暗号化を使用",
+        "title": "エンタープライズ暗号化"
+      },
+      "gdpr": {
+        "desc": "EUデータ保護規制に完全準拠",
+        "title": "GDPR準拠"
+      },
+      "privacy": {
+        "desc": "データが共有されたりAIモデルのトレーニングに使用されたりすることはありません",
+        "title": "プライバシー第一"
+      },
+      "uptime": {
+        "desc": "Google Cloudを利用した信頼性の高いインフラストラクチャ",
+        "title": "99.9% 稼働時間"
+      }
+    },
+    "pciCompliant": "PCI準拠",
+    "securePayment": "安全な支払い",
+    "sslSecured": "SSL保護"
+  },
+  "useCases": {
+    "badge": "ユースケース",
+    "businesses": {
+      "benefits": {
+        "communication": "本物の顧客コミュニケーション",
+        "documentation": "プロフェッショナルなドキュメント",
+        "efficiency": "チーム効率の向上"
+      },
+      "desc": "顧客や関係者との真摯なコミュニケーションが必要な企業。",
+      "testimonial": {
+        "author": "Jennifer Park",
+        "quote": "カスタマーサポートの対応がより個人的に感じられるようになりました。",
+        "role": "カスタマーサクセスリード"
+      },
+      "title": "ビジネス"
+    },
+    "contentCreators": {
+      "benefits": {
+        "scale": "真正性を失わずにスケール",
+        "speed": "コンテンツを5倍速く作成",
+        "voice": "独自の声を維持"
+      },
+      "desc": "大規模に本物のコンテンツを必要とするブロガー、YouTuber、ソーシャルメディアマネージャー。",
+      "testimonial": {
+        "author": "Amanda Foster",
+        "quote": "個人的なタッチを保ちながら、2倍のコンテンツを作成できるようになりました。",
+        "role": "コンテンツクリエイター"
+      },
+      "title": "コンテンツクリエイター"
+    },
+    "educators": {
+      "benefits": {
+        "detect": "AI提出物を正確に検出",
+        "feedback": "より良いフィードバックを提供",
+        "integrity": "学問的誠実さを維持"
+      },
+      "desc": "AI生成された学生の提出物を検出する必要がある教師や教授。",
+      "testimonial": {
+        "author": "Dr. Robert Wilson",
+        "quote": "AI時代の学術基準を維持するための不可欠なツールです。",
+        "role": "大学教授"
+      },
+      "title": "教育者"
+    },
+    "freelancers": {
+      "benefits": {
+        "clients": "より多くのクライアントを満足させる",
+        "income": "収入を増やす",
+        "quality": "より高品質な仕事を提供"
+      },
+      "desc": "クライアントに本物のコンテンツを提供する必要がある独立したライター。",
+      "testimonial": {
+        "author": "Marcus Johnson",
+        "quote": "クライアントは、私のコンテンツがすべてのAI検出器を通過することを気に入っています。",
+        "role": "フリーランスライター"
+      },
+      "title": "フリーランスライター"
+    },
+    "keyBenefits": "主な利点",
+    "marketers": {
+      "benefits": {
+        "authentic": "本物の広告コピーを作成",
+        "brand": "ブランドの声の一貫性を維持",
+        "campaigns": "キャンペーンをより速く開始"
+      },
+      "desc": "本物のブランドコンテンツを効率的に制作する必要があるマーケティング専門家。",
+      "testimonial": {
+        "author": "Rachel Martinez",
+        "quote": "より人間らしいコピーのおかげで、メールの開封率が40%向上しました。",
+        "role": "マーケティングマネージャー"
+      },
+      "title": "マーケティングチーム"
+    },
+    "startNow": "Graphos AIの使用を開始",
+    "students": {
+      "benefits": {
+        "improve": "ライティング品質を向上",
+        "learn": "AIの提案から学ぶ",
+        "verify": "作品がオリジナルであることを確認"
+      },
+      "desc": "自分の作品がオリジナルで本物であることを確認したい学生や研究者。",
+      "testimonial": {
+        "author": "Kevin Nguyen",
+        "quote": "提出前にエッセイをチェックするのに使っています。安心です！",
+        "role": "大学院生"
+      },
+      "title": "学生＆研究者"
+    },
+    "subtitle": "さまざまな専門家がライティングを強化するためにGraphos AIをどのように使用しているかをご覧ください",
+    "title": "書くすべての人のために"
+  },
+  "voiceProfile": {
+    "description": "独自の文体をキャプチャし、本当にあなたのように聞こえるコンテンツを作成します。",
+    "meta": {
+      "description": "独自のライティングボイスプロファイルを作成し、あなたのように聞こえるコンテンツを生成します。",
+      "title": "ボイスプロファイル - Graphos AI Studio"
+    },
+    "title": "ボイスプロファイル"
+  },
+  "workspace": {
+    "askAnything": "何でも聞いてください..."
+  },
+  "demoSamples": {
+    "aiDetection": {
+      "ai": {
+        "text": "現代の医療システムにおける人工知能の導入は、医療診断と患者ケアにおけるパラダイムシフトを表しています。機械学習アルゴリズムは、医療画像データの分析において驚くべき精度を示し、特定の疾患の検出において人間の放射線科医を上回ることも多くあります。さらに、自然言語処理により、電子カルテから関連情報を効率的に抽出し、より情報に基づいた臨床判断を促進することが可能になります。",
+        "indicators": {
+          "predictablePatterns": "予測可能な文章パターン"
+        }
+      },
+      "human": {
+        "text": "この問題についてもう何週間も考えているんだけど、正直？もう頭がおかしくなりそう。解決したと思うたびに、また新しい問題が出てくるんだよね。同僚の田中さんが別のアプローチを試してみたらって提案してくれた。たぶん私たち、複雑に考えすぎてるのかも。彼女の言う通りかもしれない。うちではよくあることなんだ、特に締め切りが迫ってる時は。昨日は夜中の2時まで起きて解決しようとしてた、コーヒー飲みすぎて。自慢できることじゃないけど、まあスタートアップってそういうものだよね。",
+        "indicators": {
+          "conversationalTone": "会話調のトーン"
+        }
+      },
+      "mixed": {
+        "text": "人工知能は、洗練されたアルゴリズムとニューラルネットワークを通じてコンテンツ制作に革命をもたらしました。でもね、正直に言うと、機械には完全に捉えられない人間の創造性には何か特別なものがあると今でも思うんだ。確かにAIは技術的に完璧な文章を生成できるけど、私がチーム全員に恥ずかしいメールを誤送信した時のことを話せる？無理だと思う！人間の直感と機械の精度の交差点が、クリエイティブ分野で前例のないイノベーションの機会を生み出しています。",
+        "indicators": {
+          "rhetoricalQuestions": "修辞的疑問文を検出",
+          "academicVocabulary": "学術的語彙が存在"
+        }
+      }
+    },
+    "humanization": {
+      "formal": {
+        "original": "近年、企業環境における持続可能な実践の導入がますます重要になっています。組織は、長期的な存続可能性とステークホルダーの満足を確保するために、環境に配慮した戦略を採用する必要性を認識しています。",
+        "humanized": "最近よく考えるんだけど、企業がやっと環境問題に本気で取り組み始めたよね。もう見栄えのためだけじゃなくて、長く続けたいなら本当に環境のことを考えないといけないって気づいたんだと思う。正直？顧客や投資家もそれを求めてるしね。"
+      },
+      "academic": {
+        "original": "研究によると、定期的な運動はメンタルヘルスの改善に大きく貢献することが示されています。研究では、一貫した運動習慣と不安やうつ症状の軽減との間に相関関係があることが実証されています。",
+        "humanized": "これは身をもって学んだことなんだけど、運動って本当にストレスや落ち込みに効くんだよね。前はジム好きの人の話だと思ってたけど、運動を習慣にしてから言えるのは、科学は本当だってこと。運動を始めてから、私の不安はかなり良くなったよ。"
+      },
+      "technical": {
+        "original": "人工知能技術の進歩は、現代の労働力に機会と課題の両方をもたらしています。日常業務の自動化は効率の向上につながる可能性がある一方で、労働者に新しいスキルセットの開発を求めることにもなります。",
+        "humanized": "AIは私たちの働き方のすべてを変えていて、正直に言うと、ちょっと怖いけどワクワクもする？確かにロボットが退屈な仕事を引き継ぐかもしれない（ありがたいことに）、でもそれは私たち全員がスキルアップする必要があるってことでもある。適応できる人が未来を手にすると思うな。"
+      }
+    },
+    "compatibility": {
+      "high": {
+        "text": "日々の課題にどう取り組むかについて考えてきました。大切なのは、本当に重要なことに集中しながら、適応できる柔軟性を保つこと。小さくても一貫した歩みが、時間とともに素晴らしい進歩につながります。"
+      },
+      "medium": {
+        "text": "企業環境における持続可能な実践の導入がますます重要になっています。組織は、今日の市場で競争力を維持するために、環境に配慮した戦略を採用する必要性を認識しなければなりません。"
+      },
+      "low": {
+        "text": "前述の考慮事項に基づき、委員会が既存のプロトコルの包括的な見直しを行うことをここに勧告いたします。そのような取り組みの影響は多岐にわたり、広範囲に及ぶものとなるでしょう。"
+      }
+    },
+    "deviations": {
+      "few": {
+        "text": "日々の課題にどう取り組むかについて考えてきました。大切なのは、本当に重要なことに集中すること。小さくても一貫した歩みが、時間とともに素晴らしい進歩につながります。変化を受け入れ、素早く適応すべきです。",
+        "sentences": {
+          "0": "日々の課題にどう取り組むかについて考えてきました。",
+          "1": "大切なのは、本当に重要なことに集中すること。",
+          "2": "小さくても一貫した歩みが、時間とともに素晴らしい進歩につながります。",
+          "3": "変化を受け入れ、素早く適応すべきです。"
+        }
+      },
+      "some": {
+        "text": "持続可能な実践の導入がますます重要になっています。組織は環境に配慮した戦略を採用する必要性を認識しなければなりません。このアプローチは大きな利益をもたらします。企業は今すぐ行動すべきです。",
+        "sentences": {
+          "0": "持続可能な実践の導入がますます重要になっています。",
+          "1": "組織は環境に配慮した戦略を採用する必要性を認識しなければなりません。",
+          "2": "このアプローチは大きな利益をもたらします。",
+          "3": "企業は今すぐ行動すべきです。"
+        }
+      },
+      "many": {
+        "text": "前述の考慮事項に基づき、委員会が包括的な見直しを行うことをここに勧告いたします。その影響は多岐にわたるでしょう。そのような取り組みには綿密な計画が必要です。慎重に進めなければなりません。",
+        "sentences": {
+          "0": "前述の考慮事項に基づき、委員会が包括的な見直しを行うことをここに勧告いたします。",
+          "1": "その影響は多岐にわたるでしょう。",
+          "2": "そのような取り組みには綿密な計画が必要です。",
+          "3": "慎重に進めなければなりません。"
+        }
+      }
+    },
+    "statistics": {
+      "blog": {
+        "text": "良いコンテンツを書くことは、良いアイデアを持つことだけではありません。読者とつながる方法で提示することです。短い文は役立ちます。リズムを生み出します。一方、長い文は複雑なアイデアを探求し、物語に勢いをつけることができます。"
+      },
+      "academic": {
+        "text": "現代の組織フレームワーク内での持続可能な開発実践の実施には、環境、社会、ガバナンス要因の包括的な理解が必要です。さらに、これらの多面的な考慮事項を戦略的意思決定プロセスに統合することは、長期的な組織のレジリエンスとステークホルダー価値創造との間に有意な相関関係があることが示されています。"
+      },
+      "casual": {
+        "text": "ねえ！今日あの新しいカフェ行ってみたんだ。結構良かったよ、実は。雰囲気もリラックスできて、バリスタもすごくフレンドリーだった。絶対また行く。今度一緒に行こうよ！"
+      }
+    },
+    "rewrite": {
+      "professional": {
+        "original": "私たちは、製品を何らかの形で改善するのに役立つ可能性のある新機能を実装する可能性を検討することを考えるべきかもしれないと思います。いつかこれについて話し合えたらいいですね。",
+        "rewritten": "製品価値を高めるために新機能の実装を提案します。具体的な改善点とユーザーエンゲージメントへの期待される影響について話し合うミーティングを設定しましょう。優先すべき3つの重要な領域を特定しました。"
+      },
+      "casual": {
+        "original": "近年、企業環境における持続可能な実践の導入がますます重要になっています。組織は、環境に配慮した戦略を採用する必要性を認識しています。",
+        "rewritten": "最近よく考えるんだけど、企業がやっと環境問題に本気で取り組み始めたよね。もう見栄えのためだけじゃなくて、長く続けたいなら本当に環境のことを考えないといけないって気づいたんだと思う。"
+      },
+      "concise": {
+        "original": "私たちの組織間の潜在的な協力機会を探る可能性について話し合うために、ご都合の良い最も早い時期にミーティングをお願いしたいことをお知らせするためにこの手紙を書いています。",
+        "rewritten": "協力の機会について話し合うミーティングを設定しましょう。今週いつがご都合よろしいですか？"
+      }
+    },
+    "workspace": {
+      "response": "こんにちは、\n\nご連絡いただきありがとうございます！お時間を取っていただき、本当に感謝しています。\n\n私の考えはこうです：大切なのはシンプルで本物であること。考えすぎないで、自分らしく、あなたの個性を輝かせてください。\n\nいくつかのヒント：\n• 個人的で共感できる内容から始める\n• 文章は会話のように自然に、ロボットっぽくならないように\n• 明確な行動喚起や次のステップで締めくくる\n\nもっと磨きをかけるお手伝いをしましょうか？トーンを調整したり、詳細を追加したりするのは喜んでやりますよ！"
+    },
+    "voiceProfile": {
+      "sarah": {
+        "name": "田中さくら",
+        "style": "プロフェッショナル & 温かい",
+        "tone": "温かく親しみやすい",
+        "vocab": {
+          "0": "正直に言うと",
+          "1": "私は思います",
+          "2": "説明させてください",
+          "3": "ポイントは"
+        }
+      },
+      "alex": {
+        "name": "山田太郎",
+        "style": "カジュアル & クリエイティブ",
+        "tone": "楽しく元気",
+        "vocab": {
+          "0": "基本的に",
+          "1": "知ってる？",
+          "2": "みたいな",
+          "3": "超"
+        }
+      },
+      "james": {
+        "name": "佐藤博士",
+        "style": "学術的 & 正確",
+        "tone": "権威的 & 落ち着いた",
+        "vocab": {
+          "0": "さらに",
+          "1": "したがって",
+          "2": "研究によると",
+          "3": "データが示す"
+        }
+      }
+    }
   }
 }

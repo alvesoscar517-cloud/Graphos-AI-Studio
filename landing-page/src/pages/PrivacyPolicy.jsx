@@ -1,6 +1,10 @@
+/**
+ * PrivacyPolicy - SEO-optimized Privacy Policy page
+ * Enhanced: Dec 2025 - Full SEO optimization
+ */
 import { useTranslation } from 'react-i18next'
 import { useState, useEffect } from 'react'
-import SEOHead from '@components/seo/SEOHead'
+import PageSEO from '@components/seo/PageSEO'
 
 const sections = [
   { id: 'introduction', title: 'Introduction' },
@@ -55,6 +59,22 @@ function PrivacyPolicy() {
   const { t } = useTranslation()
   const [activeSection, setActiveSection] = useState('introduction')
 
+  // Handle hash navigation on page load
+  useEffect(() => {
+    const hash = window.location.hash.slice(1)
+    if (hash) {
+      setTimeout(() => {
+        const element = document.getElementById(hash)
+        if (element) {
+          const offset = 100
+          const top = element.getBoundingClientRect().top + window.scrollY - offset
+          window.scrollTo({ top, behavior: 'smooth' })
+          setActiveSection(hash)
+        }
+      }, 100)
+    }
+  }, [])
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
@@ -86,16 +106,12 @@ function PrivacyPolicy() {
 
   return (
     <>
-      <SEOHead
-        title={t('privacy.meta.title')}
-        description={t('privacy.meta.description')}
-        keywords={['privacy policy', 'data protection', 'user privacy', 'GDPR', 'AI writing tool privacy']}
-      />
+      <PageSEO pageKey="privacy" />
       
       <div className="min-h-screen bg-bg-primary relative">
         {/* Header */}
         <header className="bg-bg-primary border-b border-gray-100 dark:border-gray-800">
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 pt-4 pb-6">
             <div className="flex items-center gap-2 text-sm text-text-muted mb-3">
               <span>Legal</span>
               <span>/</span>
@@ -111,7 +127,7 @@ function PrivacyPolicy() {
         </header>
 
         {/* Content */}
-        <div className="max-w-content-lg mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-8">
           <div className="flex gap-12">
             {/* Main Content */}
             <article className="flex-1 min-w-0">
@@ -781,3 +797,6 @@ function PrivacyPolicy() {
 }
 
 export default PrivacyPolicy
+
+
+

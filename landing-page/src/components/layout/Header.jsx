@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navigation from './Navigation'
 import Icon from '../common/Icon'
+import LanguageSelector from '../common/LanguageSelector'
 
 function Header() {
   const { t } = useTranslation()
@@ -30,8 +31,8 @@ function Header() {
 
   return (
     <header className="relative z-50">
-      <div className="max-w-content-lg mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+        <div className="flex items-center justify-between h-14 lg:h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
             <motion.div
@@ -48,6 +49,7 @@ function Header() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-4">
             <Navigation />
+            <LanguageSelector />
             <motion.a
               href="https://app.graphosai.com"
               target="_blank"
@@ -93,10 +95,13 @@ function Header() {
               transition={{ duration: 0.2 }}
               className="md:hidden absolute top-full left-0 right-0 bg-bg-primary border-b border-gray-200 dark:border-gray-700 shadow-md z-50"
             >
-              <div className="max-w-content-lg mx-auto px-4 py-4">
+              <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-4">
                 <Navigation mobile />
                 
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+                  <div className="flex justify-center">
+                    <LanguageSelector />
+                  </div>
                   <motion.a
                     href="https://app.graphosai.com"
                     target="_blank"

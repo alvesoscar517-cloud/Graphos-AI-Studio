@@ -1,88 +1,2629 @@
 {
-  "nav": {
-    "home": "首页",
-    "features": "功能",
-    "aiDetection": "AI检测",
-    "humanization": "人性化",
-    "voiceProfile": "声音档案",
-    "aiWorkspace": "AI工作区",
-    "privacy": "隐私政策",
-    "terms": "服务条款",
-    "legal": "法律信息"
-  },
-  "cta": {
-    "getStarted": "开始使用",
-    "tryFree": "免费试用",
-    "learnMore": "了解更多",
-    "signUp": "注册"
-  },
-  "home": {
-    "meta": {
-      "title": "Graphos AI Studio - 真实的AI写作",
-      "description": "使用AI检测、人性化和声音档案功能撰写真实内容。将AI文本转换为自然的人类写作。"
-    },
-    "hero": {
-      "title": "用AI撰写真实内容",
-      "subtitle": "检测AI生成的文本，人性化内容，并使用您独特的声音档案进行创作。"
-    },
-    "features": {
-      "title": "强大功能"
-    },
-    "cta": {
-      "title": "准备好撰写真实内容了吗？",
-      "description": "加入数千名使用Graphos AI Studio创建真实、自然内容的作家行列。"
-    }
-  },
   "aiDetection": {
+    "description": "精确且自信地识别AI生成的内容。",
     "meta": {
-      "title": "AI检测 - Graphos AI Studio",
-      "description": "高精度检测AI生成的内容。识别ChatGPT、GPT-4和其他AI写作。"
+      "description": "高精度检测AI生成内容。识别ChatGPT、GPT-4及其他AI写作。",
+      "title": "AI检测 - Graphos AI Studio"
     },
-    "title": "AI检测",
-    "description": "精准可靠地识别AI生成的内容。"
-  },
-  "humanization": {
-    "meta": {
-      "title": "内容人性化 - Graphos AI Studio",
-      "description": "在保留含义的同时将AI生成的文本转换为自然的人类内容。"
-    },
-    "title": "内容人性化",
-    "description": "将AI文本转换为自然、真实的人类写作。"
-  },
-  "voiceProfile": {
-    "meta": {
-      "title": "声音档案 - Graphos AI Studio",
-      "description": "创建您独特的写作声音档案，生成听起来像您的内容。"
-    },
-    "title": "声音档案",
-    "description": "捕捉您独特的写作风格，创建真正属于您的内容。"
+    "title": "AI检测"
   },
   "aiWorkspace": {
+    "description": "以你独特的写作风格与AI对话。",
     "meta": {
-      "title": "AI工作区 - Graphos AI Studio",
-      "description": "使用您的声音档案与AI聊天。获得个性化的写作帮助。"
+      "description": "使用你的声音档案与AI聊天。获取个性化的写作辅助。",
+      "title": "AI工作区 - Graphos AI Studio"
     },
-    "title": "AI工作区",
-    "description": "用您独特的写作风格与AI聊天。"
+    "title": "AI工作区"
   },
-  "privacy": {
-    "meta": {
-      "title": "隐私政策 - Graphos AI Studio",
-      "description": "了解Graphos AI Studio如何收集、使用和保护您的个人数据。"
-    },
-    "title": "隐私政策",
-    "lastUpdated": "最后更新"
+  "analysis": {
+    "aiDetection": "AI检测",
+    "aiIndicators": "AI指标",
+    "confidence": "置信度",
+    "content": "内容分析",
+    "detect": "检测",
+    "detected": "已检测",
+    "humanIndicators": "人类指标"
   },
-  "terms": {
-    "meta": {
-      "title": "服务条款 - Graphos AI Studio",
-      "description": "阅读Graphos AI Studio服务的使用条款和条件。"
+  "brand": {
+    "aiStudio": "AI Studio",
+    "graphos": "Graphos",
+    "model": "Graphos Hyper",
+    "name": "Graphos AI Studio",
+    "shortName": "Graphos AI"
+  },
+  "chat": {
+    "actions": {
+      "docs": "文档",
+      "emailSupport": "邮件支持",
+      "faq": "查看常见问题"
     },
-    "title": "服务条款",
-    "lastUpdated": "最后更新"
+    "responseTime": "通常在2小时内回复",
+    "subtitle": "我们随时为您提供帮助",
+    "title": "需要帮助？"
+  },
+  "common": {
+    "detectionResults": "检测结果",
+    "failedToLoadImage": "加载图片失败",
+    "imageLoadFailed": "加载图片失败",
+    "loading": "加载中...",
+    "onThisPage": "本页内容",
+    "step": "步骤",
+    "tableOfContents": "目录",
+    "viewDetails": "查看详情",
+    "wordsAnalyzed": "分析字数",
+    "reset": "重置",
+    "clear": "清除",
+    "analyze": "分析"
+  },
+  "comparison": {
+    "badge": "为何选择我们",
+    "competitorNotes": {
+      "basicOnly": "仅限基础",
+      "delayed": "有延迟",
+      "generic": "通用的",
+      "languages23": "2-3种语言",
+      "limited": "受限",
+      "monthlyOnly": "仅限包月",
+      "monthlyReset": "每月重置",
+      "trialOnly": "仅限试用"
+    },
+    "ctaText": "亲身体验差异",
+    "feature": "功能",
+    "features": {
+      "aiDetection": "AI内容检测",
+      "aiRewrite": "按你的声音AI重写",
+      "aiWorkspace": "按你的声音AI聊天",
+      "chromeExtension": "Chrome扩展",
+      "compatibilityScore": "风格兼容性评分",
+      "creditsExpire": "积分永不过期",
+      "deviations": "风格偏差检测",
+      "freeTier": "免费层级",
+      "humanization": "内容人性化",
+      "multiLanguage": "多语言支持",
+      "payAsYouGo": "按需付费定价",
+      "realtimeAnalysis": "实时分析",
+      "statistics": "写作统计",
+      "voiceProfile": "个人声音档案"
+    },
+    "graphosNotes": {
+      "accuracy98": "98% 准确率",
+      "aiAnalyzed": "AI分析",
+      "comprehensive": "全面的",
+      "detailedAnalysis": "详细分析",
+      "foreverYours": "永久有效",
+      "freeCredits100": "100 积分",
+      "fullFeatures": "全功能",
+      "instant": "即时",
+      "languages15": "15种语言",
+      "noSubscription": "无订阅",
+      "sentenceLevel": "句子级",
+      "voiceMatched": "声音匹配"
+    },
+    "notes": {
+      "accuracy98": "98% 准确率",
+      "aiAnalyzed": "AI分析",
+      "basicOnly": "仅限基础",
+      "comprehensive": "全面的",
+      "delayed": "有延迟",
+      "detailedAnalysis": "详细分析",
+      "foreverYours": "永久有效",
+      "fullFeatures": "全功能",
+      "generic": "通用的",
+      "instant": "即时",
+      "languages15": "15种语言",
+      "languages23": "2-3种语言",
+      "limited": "受限",
+      "monthlyOnly": "仅限包月",
+      "monthlyReset": "每月重置",
+      "noSubscription": "无订阅",
+      "sentenceLevel": "句子级",
+      "voiceMatched": "声音匹配"
+    },
+    "others": "其他工具",
+    "competitors": "竞争对手",
+    "ourSolution": "我们的方案",
+    "socialProof": {
+      "rating": "{{rating}}/5",
+      "writersCount": "{{count}}+ 写作者信赖我们"
+    },
+    "subtitle": "看看 Graphos AI Studio 与其他AI写作工具的对比",
+    "title": "完整的AI写作解决方案",
+    "tooltips": {
+      "aiDetection": "以行业领先的准确率检测AI生成内容",
+      "aiRewrite": "将任何文本转换为匹配你独特的写作风格",
+      "aiWorkspace": "与能够以你的写作风格回应的AI聊天",
+      "chromeExtension": "在网页任何地方使用 Graphos AI",
+      "compatibilityScore": "检查文本与你的写作风格的匹配程度",
+      "creditsExpire": "你的积分永久有效",
+      "deviations": "找出偏离你写作风格的句子",
+      "freeTier": "从免费积分开始，无需付款",
+      "humanization": "转换AI文本以匹配你独特的写作风格",
+      "multiLanguage": "用15+种语言写作和人性化内容",
+      "payAsYouGo": "只为使用的部分付费，无月度承诺",
+      "realtimeAnalysis": "写作时获得即时反馈",
+      "statistics": "分析写作指标和模式",
+      "voiceProfile": "AI学习并复制你独特的写作声音"
+    },
+    "trustUs": "写作者信赖我们",
+    "winCount_one": "相比竞品有 {{count}} 个优势",
+    "winCount_other": "相比竞品有 {{count}} 个优势",
+    "writersCount": "{{count}}+ 写作者信赖我们"
+  },
+  "compatibility": {
+    "meta": {
+      "description": "分析文本与你独特写作风格的匹配程度。获取详细的兼容性评分、偏差分析和改进建议。",
+      "title": "兼容性评分 - 检查你的写作风格匹配度 | Graphos AI"
+    }
+  },
+  "compatibilityScore": {
+    "description": "通过详细分析检查你的写作风格匹配度。",
+    "meta": {
+      "description": "分析文本与你独特写作风格的匹配程度。获取详细的兼容性评分、偏差分析和改进建议。",
+      "title": "兼容性评分 - 检查你的写作风格匹配度 | Graphos AI"
+    },
+    "title": "兼容性评分"
+  },
+  "cta": {
+    "badge": "今天免费开始",
+    "getStarted": "开始使用",
+    "getStartedFree": "免费开始",
+    "installExtension": "安装扩展",
+    "instant": "即时访问",
+    "learnMore": "了解更多",
+    "metrics": {
+      "languages": "语言",
+      "rating": "用户评分",
+      "texts": "已分析文本",
+      "users": "活跃用户"
+    },
+    "noCard": "无需信用卡",
+    "privacy": "隐私至上",
+    "seeItInAction": "观看演示",
+    "signUp": "注册",
+    "startFreeTrial": "开始免费试用",
+    "trust": {
+      "free": "永久免费计划",
+      "noCard": "无信用卡",
+      "setup": "2分钟设置"
+    },
+    "trustedBy": "深受全球写作者和内容创作者信赖",
+    "tryDemo": "试用演示",
+    "tryFree": "立即免费试用",
+    "watchDemo": "观看演示"
+  },
+  "demo": {
+    "after": "之后",
+    "aiDetection": {
+      "result": "AI检测结果"
+    },
+    "aiIndicators": "AI指标",
+    "aiProbability": "AI概率",
+    "aiText": "AI文本",
+    "analyzing": "分析中...",
+    "analyzingDesc": "正在检查模式和指标",
+    "analyzingProfile": "正在分析写作风格...",
+    "before": "之前",
+    "characters": "字符",
+    "chars": "字符",
+    "clickDetect": "选择示例文本，然后点击“检测AI”进行分析",
+    "clickToTransform": "点击转换查看神奇效果",
+    "compatibility": {
+      "analyzeBtn": "计算评分",
+      "analyzing": "正在分析写作风格...",
+      "averageMatch": "一般匹配",
+      "deviations": "偏差",
+      "goodMatch": "良好匹配",
+      "lowMatch": "低匹配",
+      "notCompatible": "不兼容",
+      "statistical": "统计学",
+      "subtitle": "分析文本与你写作风格的匹配程度",
+      "title": "兼容性评分",
+      "vector": "向量",
+      "veryCompatible": "非常兼容",
+      "average": "平均"
+    },
+    "confidence": "置信度",
+    "contentAnalysis": "内容分析",
+    "contentHumanization": "内容人性化",
+    "continueInApp": "在完整应用中继续",
+    "creativity": "创造力",
+    "detect": "检测AI",
+    "deviations": {
+      "analyzing": "正在分析句子偏差...",
+      "compatibility": "兼容性",
+      "deviant": "偏离",
+      "findBtn": "查找偏差",
+      "majorStyleMismatch": "严重风格不匹配",
+      "mild": "轻微",
+      "moderate": "中度",
+      "noticeableDifference": "明显差异",
+      "rewrite": "用AI重写 →",
+      "severe": "严重",
+      "smallVariation": "微小变动",
+      "subtitle": "找出偏离你风格的句子",
+      "suggestion": "这句话与你的典型写作风格不同。建议修改以匹配你的声音。",
+      "tips": {
+        "focus": "首先关注严重偏差",
+        "hover": "悬停高亮句子查看详情",
+        "rewrite": "使用AI重写修复问题"
+      },
+      "title": "偏差"
+    },
+    "directness": "直接性",
+    "empathy": "同理心",
+    "enterAIText": "在此输入AI生成的文本...",
+    "enterText": "在此输入或粘贴你的文本进行分析...（最少50个字符）",
+    "enterTextDesc": "输入或粘贴文本，然后点击“检测AI”进行分析",
+    "enterTextToAnalyze": "输入文本进行分析",
+    "example": "示例",
+    "formality": "正式度",
+    "humanIndicators": "人类指标",
+    "humanText": "人类文本",
+    "humanize": "人性化内容",
+    "humanizeContent": "人性化内容",
+    "humanizeThis": "使其更像人类",
+    "humanized": "已人性化",
+    "humanizedResult": "人性化结果",
+    "indicators": {
+      "ai": {
+        "consistentFormalTone": "通篇一致的正式语气",
+        "formalSentenceStructures": "正式的句子结构",
+        "lackOfPersonalExpressions": "缺乏个人表达",
+        "structuredParagraphFlow": "结构化的段落流",
+        "technicalTerminology": "检测到技术术语",
+        "technicalVocabulary": "技术词汇使用"
+      },
+      "human": {
+        "emotionalExpressions": "存在情感表达",
+        "informalExpressions": "使用了非正式表达",
+        "informalLanguage": "非正式语言模式",
+        "personalAnecdotes": "存在个人轶事",
+        "personalPronouns": "检测到人称代词",
+        "variedSentenceStructure": "多样的句子结构"
+      }
+    },
+    "liveDemo": "实时演示",
+    "minCharacters": "最少需要50个字符",
+    "mixedText": "混合",
+    "original": "原文 - AI生成",
+    "overallTone": "整体语气",
+    "pasteAIText": "粘贴AI生成的文本",
+    "processing": "处理中...",
+    "profileInfo": "档案通过分析你的写作样本创建",
+    "quickActions": "快速操作",
+    "quickTip": "提示：尝试示例文本，看看不同类型的内容是如何被检测的",
+    "rateLimited": "你已用完演示次数。注册以获得无限访问权限！",
+    "readyToAnalyze": "准备分析",
+    "realApiCall": "真实API",
+    "redetect": "重新检测",
+    "reset": "重置",
+    "resultWillAppear": "人性化文本将显示在这里",
+    "selectProfile": "选择档案",
+    "sentenceLength": "句子长度",
+    "sentences": "句子",
+    "sentencesAnalyzed": "句子",
+    "serverError": "出错了。请重试。",
+    "sidebar": {
+      "analysis": "分析",
+      "confidence": "置信度",
+      "humanization": "人性化",
+      "options": "选项",
+      "resultReliability": "结果可靠性",
+      "scoreGuide": "评分指南",
+      "semanticMatching": "语义匹配",
+      "statistical": "统计学",
+      "structureAnalysis": "结构分析",
+      "vectorSimilarity": "向量相似度",
+      "severityGuide": "严重程度指南",
+      "tips": "提示",
+      "average": "平均"
+    },
+    "signUpFree": "免费注册",
+    "signatureWords": "标志性词汇",
+    "startConversation": "开始对话",
+    "statistics": {
+      "analyzeBtn": "分析文本",
+      "avgSentenceLength": "平均句长",
+      "avgWordLength": "平均词长",
+      "benchmark": "基准",
+      "benchmarkComparison": "基准比较",
+      "detailedMetrics": "详细指标",
+      "metrics": {
+        "readability": {
+          "desc": "Flesch-Kincaid 分数",
+          "label": "可读性"
+        },
+        "sentenceLength": {
+          "desc": "平均每句单词数",
+          "label": "句子长度"
+        },
+        "vocabulary": {
+          "desc": "唯一词比率",
+          "label": "词汇量"
+        },
+        "wordLength": {
+          "desc": "平均每词字符数",
+          "label": "单词长度"
+        }
+      },
+      "metricsGuide": "指标指南",
+      "punctuation": "标点符号",
+      "readability": "可读性",
+      "readabilityLevels": {
+        "difficult": "困难",
+        "easy": "容易",
+        "moderate": "中等",
+        "veryDifficult": "非常困难",
+        "veryEasy": "非常容易"
+      },
+      "readabilityScale": "可读性量表",
+      "sentences": "句子",
+      "style": "风格",
+      "subtitle": "分析写作指标和模式",
+      "title": "文本统计",
+      "uniqueWordRatio": "唯一词比率",
+      "vocabulary": "词汇",
+      "words": "单词"
+    },
+    "technicality": "技术性",
+    "textTooLong": "文本必须少于2000个字符",
+    "textTooShort": "请输入至少50个字符",
+    "transform": "转换",
+    "transformAIText": "将AI文本转换为类人写作",
+    "transformComplete": "转换完成",
+    "transforming": "转换中...",
+    "tryAgain": "重试",
+    "tryFullVersion": "免费试用完整版",
+    "trySample": "试用示例",
+    "tryYourOwn": "试用你自己的",
+    "typeMessage": "输入你的消息...",
+    "unlimited": "无限",
+    "verdictAI": "AI生成",
+    "verdictHuman": "人类写作",
+    "verdictMixed": "混合内容",
+    "verdictMostlyAI": "大部分为AI",
+    "verdictMostlyHuman": "大部分为人类",
+    "viewExamples": "查看示例",
+    "viewIndicators": "查看指标",
+    "voiceProfile": "声音档案",
+    "words": "单词",
+    "wordsAnalyzed": "单词",
+    "workspace": {
+      "modelName": "Graphos Hyper",
+      "askAnything": "随便问..."
+    },
+    "workspaceDescription": "与能够以你独特声音写作的AI聊天。尝试快速操作或输入你自己的消息。",
+    "workspaceDescriptionNew": "输入任何内容并按回车，看看AI如何以你独特的声音回应。",
+    "writingMetrics": "写作指标",
+    "writingTraits": "写作特征",
+    "samples": {
+      "highMatch": "高匹配",
+      "mediumMatch": "中等匹配",
+      "lowMatch": "低匹配",
+      "professional": "专业",
+      "casual": "随意",
+      "concise": "简洁",
+      "blogPost": "博客文章",
+      "academic": "学术",
+      "fewDeviations": "极少偏差",
+      "someDeviations": "部分偏差",
+      "manyDeviations": "大量偏差",
+      "formalText": "正式文本",
+      "technical": "技术性"
+    },
+    "options": {
+      "vocabulary": "词汇",
+      "keyFeatures": "关键特性",
+      "sentenceStyle": "句子风格",
+      "instructions": "指令",
+      "antiAI": "反AI",
+      "iterative": "迭代"
+    },
+    "tags": {
+      "new": "新",
+      "beta": "公测"
+    },
+    "profile": {
+      "samples": "样本",
+      "tone": "语气"
+    },
+    "tryHumanization": "试用人性化演示",
+    "humanizationDesc": "看看AI生成的文本如何转变为自然的人类写作。",
+    "originalAI": "原文 (AI)",
+    "humanLike": "人性化",
+    "aiGenerated": "AI生成",
+    "exampleOf": "示例 {{current}} / {{total}}",
+    "nextExample": "下一个示例",
+    "humanizing": "正在人性化...",
+    "wantToHumanize": "想要人性化您的内容？",
+    "tryAIDetection": "试用AI检测演示",
+    "aiDetectionDesc": "粘贴任何文本以查看模拟的AI检测分析。这是演示 - 要获得准确结果，请使用完整应用程序。",
+    "pasteTextPlaceholder": "在此粘贴文本进行分析...",
+    "wantMoreAccurate": "想要更准确的详细分析结果？",
+    "traits": {
+      "conversational": "对话式",
+      "empathetic": "有同理心",
+      "clear": "清晰",
+      "engaging": "引人入胜",
+      "playful": "活泼",
+      "creative": "创意",
+      "informal": "非正式",
+      "storyteller": "讲故事者",
+      "analytical": "分析型",
+      "precise": "精确",
+      "structured": "结构化",
+      "evidenceBased": "基于证据"
+    },
+    "sentenceLengthMedium": "中等 (12-18词)",
+    "sentenceLengthVaried": "多样 (8-25词)",
+    "sentenceLengthLong": "长句 (18-28词)",
+    "voiceProfiles": {
+      "professional": "专业作家",
+      "casual": "休闲博主",
+      "academic": "学术风格",
+      "personalBlog": "个人博客",
+      "creativeWriter": "创意作家"
+    },
+    "speed": {
+      "fast": "快速",
+      "ultraFast": "超快",
+      "quality": "高质量"
+    },
+    "tone": {
+      "conversational": "对话式",
+      "formal": "正式",
+      "expressive": "表达性"
+    }
+  },
+  "deviations": {
+    "description": "找出你写作中的风格不一致之处。",
+    "meta": {
+      "description": "识别偏离你写作风格的句子。获取严重程度分级、建议并修复不一致之处，以保持你独特的声音。",
+      "title": "偏差 - 找出风格不一致 | Graphos AI"
+    },
+    "title": "偏差"
+  },
+  "exitPopup": {
+    "cta": "领取我的奖励积分",
+    "emailPlaceholder": "输入你的邮箱",
+    "noSpam": "无垃圾邮件",
+    "noThanks": "不用了，我愿意全额支付",
+    "subtitle": "订阅我们的通讯，首次购买即可额外获得50积分！",
+    "success": "太棒了！请查收邮件获取奖励代码。",
+    "title": "等一下！领取50奖励积分",
+    "unsubscribe": "随时取消订阅"
+  },
+  "extension": {
+    "badge": "Chrome扩展",
+    "comingSoon": "即将推出",
+    "comingSoonCta": "即将推出",
+    "comingSoonNote": "我们正在努力为您开发此功能",
+    "features": {
+      "detect": {
+        "desc": "在网页上选择任何文本，即刻检查其是否由AI生成。",
+        "title": "即时AI检测"
+      },
+      "humanize": {
+        "desc": "在任何你需要的地方，将AI文本转换为自然、人性化的内容。",
+        "title": "一键人性化"
+      },
+      "workspace": {
+        "desc": "在任何网页上，以你独特的声音与AI聊天。",
+        "title": "AI工作区"
+      },
+      "write": {
+        "desc": "在任何文本字段中直接生成符合你独特写作风格的内容。",
+        "title": "用你的声音写作"
+      },
+      "writeInVoice": "用你的声音写作"
+    },
+    "popup": {
+      "apply": "应用",
+      "more": "更多"
+    },
+    "preview": "预览",
+    "subtitle": "我们的Chrome扩展将为您访问的每个网站带来AI检测和人性化功能。",
+    "title": "在任何地方使用 Graphos AI",
+    "willWorkOn": "将无缝运行于",
+    "worksOn": "运行于",
+    "demo": {
+      "sampleText": "人工智能在现代系统中的实施代表着一个范式转变...",
+      "detect": {
+        "action": "正在检测AI内容...",
+        "result": "87% AI概率"
+      },
+      "humanize": {
+        "action": "正在人性化文本...",
+        "result": "已人性化！"
+      },
+      "write": {
+        "action": "正在用您的风格生成...",
+        "result": "内容已准备好！"
+      },
+      "workspace": {
+        "action": "正在打开工作区...",
+        "result": "准备聊天！"
+      }
+    }
+  },
+  "faq": {
+    "answers": {
+      "credits": "积分是我们“按需付费”的货币。不同功能根据文本长度和复杂性消耗不同数量的积分。AI检测消耗约2-5积分，人性化约2-8积分，声音档案创建约8-25积分，AI工作区每条消息约1-3积分。积分永不过期！",
+      "extension": "我们的Chrome扩展允许你在网络上的任何地方使用 Graphos AI。在任何网站上选择文本即可检测AI内容、人性化文本或用你的声音生成内容。它与Gmail、Google Docs、社交媒体等无缝集成。",
+      "freeTier": "是的！每个新用户均可获得100个免费积分来试用所有功能。无需信用卡。此外，你的首次购买将获得2倍奖励积分！",
+      "howDetection": "我们的AI检测通过分析多种语言模式（包括词汇、语义、结构和内容模式）实现98%的准确率。对于不确定的情况，我们使用高级多通道分析以确保结果可靠。",
+      "humanization": "我们的人性化引擎将AI生成的文本重写为符合人类自然写作模式的内容。它使用你的声音档案来保持你独特的风格，同时消除AI指纹，如重复结构、正式过渡和通用语言。",
+      "languages": "Graphos AI 支持15种语言，包括英语、越南语、中文、日语、韩语、泰语、印尼语、马来语、阿拉伯语、法语、德语、西班牙语、葡萄牙语、意大利语和俄语。每种语言都有优化的检测和人性化模式。",
+      "privacy": "绝对安全。我们对所有数据使用企业级加密。你的写作样本和声音档案被安全存储且从不共享。我们遵守GDPR和其他隐私法规。你可以随时删除你的数据。",
+      "refund": "我们为所有积分购买提供7天退款保证。如果你不满意，请联系我们的支持团队进行全额退款。未使用的积分也可以在购买后30天内退款。",
+      "voiceProfile": "声音档案是你写作风格的独特指纹。通过分析你的写作样本，我们捕捉你的语气、词汇偏好、句子模式和关键特征。这使得AI能够生成听起来真实像你的内容。",
+      "whatIs": "Graphos AI Studio 是一个AI驱动的写作助手，帮助你检测AI生成的内容，人性化你的写作，并创建符合你独特声音的真实内容。它包括一个Web应用程序和Chrome扩展，可无缝集成到工作流程中。"
+    },
+    "badge": "常见问题",
+    "categories": {
+      "all": "全部",
+      "features": "功能",
+      "general": "常规",
+      "pricing": "定价",
+      "security": "安全"
+    },
+    "contactDescription": "可以",
+    "contactSupport": "联系支持",
+    "contactUs": "联系支持",
+    "questions": {
+      "credits": "积分如何运作？",
+      "extension": "Chrome扩展如何工作？",
+      "freeTier": "有免费计划吗？",
+      "howDetection": "AI检测有多准确？",
+      "humanization": "人性化如何工作？",
+      "languages": "支持哪些语言？",
+      "privacy": "我的数据安全吗？",
+      "refund": "你们的退款政策是什么？",
+      "voiceProfile": "什么是声音档案？",
+      "whatIs": "Graphos AI Studio 是什么？"
+    },
+    "stillHaveQuestions": "还有问题？",
+    "subtitle": "关于 Graphos AI Studio 你需要知道的一切",
+    "title": "常见问题"
+  },
+  "features": {
+    "aiDetection": {
+      "badge": "98% 准确率",
+      "benefits": {
+        "accuracy": {
+          "desc": "先进算法以98%+的精度检测AI生成内容",
+          "title": "高精度"
+        },
+        "privacy": {
+          "desc": "你的内容从未被存储或共享",
+          "title": "隐私至上"
+        },
+        "reports": {
+          "desc": "通过置信度分数确切了解哪些部分可能是AI生成的",
+          "title": "详细报告"
+        },
+        "speed": {
+          "desc": "秒级出结果，无需等待",
+          "title": "快速分析"
+        }
+      },
+      "chromeExtension": "Chrome扩展",
+      "comparison": {
+        "accuracy": "检测准确率",
+        "competitors": "竞争对手",
+        "confidence": "置信度分数",
+        "feature": "功能",
+        "indicators": "人类/AI指标",
+        "languages": "多语言支持",
+        "models": "检测到的AI模型",
+        "others": "其他",
+        "ourSolution": "我们的方案",
+        "privacy": "无数据存储",
+        "rating": "平均评分",
+        "speed": "分析速度",
+        "usersCount": "用户信赖我们"
+      },
+      "comparisonBadge": "为何选择我们",
+      "comparisonSubtitle": "看看为什么专业人士选择 Graphos AI 而不是其他检测工具",
+      "comparisonTitle": "我们的优势",
+      "comparisonWins": "相比竞品的7个关键优势",
+      "contactUs": "联系我们获取定制方案",
+      "contactUsShort": "联系我们",
+      "ctaBadge": "秒级开始检测",
+      "ctaDesc": "加入成千上万信赖 Graphos AI 进行精准内容检测的专业人士。今天免费开始。",
+      "ctaTitle": "准备好检测AI内容了吗？",
+      "demo": {
+        "subtitle": "亲身体验我们的AI检测技术。无需注册。",
+        "title": "立即试用AI检测",
+        "highConfidence": "高 (92%)"
+      },
+      "faq": {
+        "a1": "我们的AI检测对大多数AI生成内容（包括ChatGPT、GPT-4、Claude和其他流行模型）的准确率达到98%以上。我们不断更新算法以检测最新的AI写作模式。",
+        "a2": "我们可以检测来自ChatGPT、GPT-4、GPT-3.5、Claude、Gemini、Llama和大多数其他流行AI写作工具的内容。我们的系统定期更新以识别新的AI模型。",
+        "a3": "不。我们优先考虑你的隐私。你的文本是实时分析的，不会存储在我们的服务器上。我们从不与第三方分享你的内容。",
+        "a4": "为了准确检测，我们建议至少50个字符。较长的文本（200+字）提供更可靠的结果，因为我们的AI有更多的模式可供分析。",
+        "a5": "虽然没有检测系统是100%完美的，但我们的多层分析使其很难被绕过。我们同时分析写作模式、词汇、句子结构和许多其他因素。",
+        "a6": "我们的AI检测支持15+种语言，包括英语、越南语、西班牙语、法语、德语等。系统自动检测语言并应用适当的分析模式。",
+        "a7": "免费用户每天获得有限的检测次数和基本指标。高级用户享受无限检测、详细证据报告、API访问和优先处理。",
+        "q1": "AI检测有多准确？",
+        "q2": "你们能检测哪些类型的AI内容？",
+        "q3": "我的内容会被存储或共享吗？",
+        "q4": "要求的最小文本长度是多少？",
+        "q5": "AI检测能被愚弄吗？",
+        "q6": "你们如何处理不同语言？",
+        "q7": "免费版和高级版有什么区别？"
+      },
+      "faqBadge": "常见问题",
+      "faqSubtitle": "关于我们的AI检测你需要知道的一切",
+      "faqTitle": "常见问题",
+      "heroHighlight": "精确与自信",
+      "howItWorks": {
+        "step1": {
+          "desc": "输入或粘贴你想分析的内容（最少50个字符）",
+          "title": "粘贴你的文本"
+        },
+        "step2": {
+          "desc": "我们的AI分析模式、词汇、句子结构和写作风格",
+          "title": "多层分析"
+        },
+        "step3": {
+          "desc": "接收AI概率分数、置信度水平和人类/AI指标",
+          "title": "获取详细结果"
+        },
+        "subtitle": "我们的多层分析确保在几秒钟内实现精确检测",
+        "title": "AI检测如何工作"
+      },
+      "pricing": {
+        "free": "免费",
+        "freeFeature1": "5次检测/天",
+        "freeFeature2": "基本指标",
+        "freeFeature3": "标准处理",
+        "popular": "热门",
+        "pro": "专业版",
+        "proFeature1": "无限检测",
+        "proFeature2": "完整证据报告",
+        "proFeature3": "API访问",
+        "proFeature4": "优先处理",
+        "subtitle": "免费开始，按需升级",
+        "title": "简单、透明的定价"
+      },
+      "sampleDesc": "显示AI概率及置信度分数和详细指标的示例结果",
+      "sampleVerdict": "混合内容",
+      "stats": {
+        "accuracy": "准确率",
+        "languages": "15+ 种语言",
+        "languagesShort": "语言",
+        "models": "检测到15+ AI模型",
+        "modelsShort": "AI模型",
+        "privacy": "不存储文本",
+        "speed": "<2秒 分析时间",
+        "speedShort": "分析"
+      },
+      "statsBar": {
+        "rating": "用户评分",
+        "scans": "已完成扫描",
+        "uptime": "正常运行时间",
+        "users": "活跃用户"
+      },
+      "testimonials": {
+        "badge": "客户故事",
+        "business": {
+          "author": "Michael Torres",
+          "quote": "对我们的内容团队至关重要。我们用它在发布前验证所有传入的内容。置信度分数让我们安心。",
+          "role": "内容总监，科技初创公司"
+        },
+        "education": {
+          "author": "Dr. Sarah Chen",
+          "quote": "这个工具为我检查学生论文节省了无数小时。准确性令人印象深刻，详细的指标帮助我确切了解要寻找什么。",
+          "role": "大学教授"
+        },
+        "freelance": {
+          "author": "Emma Williams",
+          "quote": "作为自由编辑，我需要确保我收到的内容是真实的。这个工具快速、准确，隐私优先的方法正是我所需要的。",
+          "role": "自由编辑"
+        },
+        "subtitle": "看看教育工作者、企业和内容创作者如何评价我们的AI检测",
+        "title": "受专业人士信赖",
+        "trustedBy": "受领先组织团队信赖"
+      },
+      "trust": {
+        "instant": "即时结果",
+        "noCard": "无需信用卡",
+        "privacy": "隐私至上"
+      },
+      "trustIndicator1": "无需信用卡",
+      "trustIndicator2": "30秒设置",
+      "trustIndicator3": "随时取消",
+      "tryItNow": "立即试用 - 无需注册",
+      "useCases": {
+        "business": {
+          "desc": "确保营销、公关和企业传播中的内容真实性",
+          "stat": "公司",
+          "title": "商业"
+        },
+        "education": {
+          "desc": "教师和教授可以验证学生提交的内容以确保学术诚信",
+          "stat": "教育工作者",
+          "title": "教育"
+        },
+        "hiring": {
+          "desc": "人力资源团队可以检查求职信和写作样本的真实性",
+          "stat": "已验证申请",
+          "title": "招聘"
+        },
+        "publishing": {
+          "desc": "出版商和编辑可以在发布前验证内容的真实性",
+          "stat": "已检查文章",
+          "title": "出版"
+        }
+      },
+      "useCasesBadge": "实际应用",
+      "useCasesCta": "Don",
+      "useCasesSubtitle": "发现各行各业的专业人士如何使用我们的AI检测",
+      "useCasesTitle": "使用案例",
+      "whyChoose": "为何选择我们的AI检测？",
+      "whyChooseBadge": "行业领先",
+      "whyChooseSubtitle": "因精确、快速和私密的AI内容检测而受到成千上万专业人士的信赖"
+    },
+    "aiWorkspace": {
+      "actions": {
+        "blog": {
+          "desc": "创建引人入胜的博客内容",
+          "label": "博客文章"
+        },
+        "email": {
+          "desc": "用你的声音撰写专业邮件",
+          "label": "写邮件"
+        },
+        "proposal": {
+          "desc": "起草令人信服的提案",
+          "label": "商业提案"
+        },
+        "reply": {
+          "desc": "生成深思熟虑的回复",
+          "label": "快速回复"
+        },
+        "rewrite": {
+          "desc": "改进现有内容",
+          "label": "重写"
+        },
+        "social": {
+          "desc": "制作引起共鸣的帖子",
+          "label": "社交媒体"
+        }
+      },
+      "badge": "像你一样写作的AI",
+      "benefits": {
+        "context": {
+          "desc": "AI记住你的偏好和对话历史",
+          "title": "上下文感知"
+        },
+        "natural": {
+          "desc": "与理解你风格和偏好的AI聊天",
+          "title": "自然对话"
+        },
+        "quick": {
+          "desc": "常用写作任务的一键模板",
+          "title": "快速操作"
+        },
+        "voice": {
+          "desc": "所有输出自动匹配你独特的写作档案",
+          "title": "你的声音"
+        }
+      },
+      "benefitsBadge": "主要优势",
+      "chatExample": {
+        "ai": "嘿，\n\n非常感谢你想到邀请我参加下周二的会议！真的很感激这个邀请。\n\n不幸的是，那天我有冲突——我的日历排满了背靠背的承诺，无法调整。我们能不能换个时间聚聚？\n\n告诉我什么时间对你方便！\n\n祝好，\n[你的名字]",
+        "user": "帮我写一封婉拒会议邀请的专业邮件"
+      },
+      "comparison": {
+        "competitors": "竞争对手",
+        "context": "上下文记忆",
+        "export": "导出选项",
+        "feature": "功能",
+        "history": "对话历史",
+        "humanize": "反AI检测",
+        "languages": "语言",
+        "limited": "受限",
+        "multimodal": "图像理解",
+        "others": "其他",
+        "ourSolution": "我们的方案",
+        "quickActions": "快速操作模板",
+        "voiceMatch": "声音档案集成"
+      },
+      "comparisonBadge": "为何选择我们",
+      "comparisonDesc": "看看 Graphos AI 工作区如何在竞争中脱颖而出",
+      "comparisonTitle": "我们的优势",
+      "comparisonWins": "相比竞品的8个关键优势",
+      "ctaBadge": "开始用你的声音写作",
+      "ctaDesc": "以你独特的写作风格与AI聊天。",
+      "ctaTitle": "开始使用AI工作区",
+      "demo": {
+        "subtitle": "体验个性化的AI写作辅助。无需注册。",
+        "title": "立即试用AI工作区"
+      },
+      "faq": {
+        "a1": "当你与AI工作区聊天时，它会自动将你的声音档案应用于所有生成的内容。这意味着每封邮件、帖子或文章听起来都像是你写的。",
+        "a2": "是的！你可以在没有声音档案的情况下使用AI工作区，它将以中立、专业的语气生成内容。然而，创建声音档案会显著提高个性化程度。",
+        "a3": "AI工作区可以帮助处理邮件、博客文章、社交媒体内容、商业提案、产品描述、营销文案等。使用快速操作或描述你需要什么。",
+        "a4": "你的对话历史保存在本地，可以跨会话访问。你可以随时在设置中清除它。我们优先考虑你的隐私。",
+        "a5": "当然！所有生成的内容都是完全可编辑的。你可以改进、扩展或要求AI使用不同的参数重新生成。",
+        "a6": "AI工作区使用高级Gemini模型，包括用于快速响应的Gemini 2.5 Flash和用于复杂任务的Gemini 2.5 Pro。你可以根据需要切换模型。",
+        "a7": "积分根据输入和输出token计算。较短的对话成本较低。你可以实时查看每条消息的积分成本。",
+        "q1": "AI工作区如何使用我的声音档案？",
+        "q2": "我可以在没有声音档案的情况下使用它吗？",
+        "q3": "我可以创建什么类型的内容？",
+        "q4": "我的对话历史会保存吗？",
+        "q5": "我可以编辑生成的内容吗？",
+        "q6": "有哪些AI模型可用？",
+        "q7": "它花费多少积分？"
+      },
+      "faqBadge": "常见问题",
+      "faqDesc": "关于AI工作区你需要知道的一切",
+      "faqTitle": "常见问题",
+      "howItWorks": {
+        "step1": {
+          "desc": "输入你的请求或使用快速操作模板",
+          "title": "开始对话"
+        },
+        "step2": {
+          "desc": "我们的AI创建为你声音档案量身定制的内容",
+          "title": "AI生成回复"
+        },
+        "step3": {
+          "desc": "编辑、重新生成或要求调整",
+          "title": "审查与改进"
+        }
+      },
+      "howItWorksBadge": "简单流程",
+      "howItWorksDesc": "简单三步获取个性化AI回复",
+      "howItWorksTitle": "AI工作区如何工作",
+      "moreActions": "+ 应用内还有20多个模板",
+      "quickActionsBadge": "一键模板",
+      "quickActionsDesc": "使用针对常见任务的预建模板即刻开始写作",
+      "quickActionsTitle": "快速操作",
+      "stats": {
+        "faster": "更快",
+        "languages": "语言",
+        "templates": "模板",
+        "voiceMatch": "声音匹配"
+      },
+      "testimonials": {
+        "entrepreneur": {
+          "author": "Emma Williams",
+          "quote": "作为非英语母语者，AI工作区帮助我专业地交流，同时保持我真实的声音。改变游戏规则！",
+          "role": "企业家"
+        },
+        "marketer": {
+          "author": "Michael Torres",
+          "quote": "快速操作每周为我节省数小时。我可以在几分钟内草拟社交帖子、邮件和博客介绍，而不是几小时。",
+          "role": "营销经理"
+        },
+        "writer": {
+          "author": "Sarah Chen",
+          "quote": "AI工作区完全改变了我的写作方式。声音档案功能意味着每封邮件听起来完全像我，即使是AI帮助起草的。",
+          "role": "内容写作者"
+        }
+      },
+      "testimonialsBadge": "用户评价",
+      "testimonialsTitle": "深受各地写作者喜爱",
+      "trust": {
+        "instant": "即时访问",
+        "noCard": "无需信用卡",
+        "privacy": "隐私至上"
+      },
+      "tryItNow": "试用聊天界面",
+      "typing": {
+        "blog": "即刻创建博客文章",
+        "business": "起草商业提案",
+        "email": "用你的声音写邮件",
+        "social": "制作社交媒体内容"
+      },
+      "useCases": {
+        "business": {
+          "desc": "符合你品牌的提案、报告和演示",
+          "example": "",
+          "stat": "生产力",
+          "title": "商业写作"
+        },
+        "content": {
+          "desc": "用你的声音生成博客文章、文章和营销文案",
+          "example": "",
+          "stat": "内容质量",
+          "title": "内容创作"
+        },
+        "email": {
+          "desc": "起草、回复和跟进邮件，听起来就像你亲手写的",
+          "example": "",
+          "stat": "节省时间",
+          "title": "邮件沟通"
+        },
+        "social": {
+          "desc": "为LinkedIn、Twitter等创建引人入胜的帖子",
+          "example": "",
+          "stat": "参与度",
+          "title": "社交媒体"
+        },
+        "spotlight": "焦点"
+      },
+      "useCasesBadge": "使用案例",
+      "useCasesDesc": "看看AI工作区如何改变你的工作流程",
+      "useCasesTitle": "完美适用于",
+      "voiceApplied": "声音档案：休闲且友好 已应用",
+      "whyUse": "为何使用AI工作区？",
+      "whyUseDesc": "体验个性化AI写作辅助的未来"
+    },
+    "compatibility": {
+      "badge": "风格分析",
+      "benefits": {
+        "accuracy": {
+          "desc": "结合向量相似度和统计比较的多层分析",
+          "stat": "分析层",
+          "title": "精确分析"
+        },
+        "badge": "优势",
+        "detailed": {
+          "desc": "通过严重程度级别确切查看哪些句子偏离了你的风格",
+          "stat": "严重程度",
+          "title": "详细分解"
+        },
+        "improve": {
+          "desc": "获取建议以改进文本并更好地匹配你的声音",
+          "stat": "分数提升",
+          "title": "可操作的见解"
+        },
+        "speed": {
+          "desc": "几秒钟内获得详细的兼容性评分，无需等待",
+          "stat": "处理",
+          "title": "快速结果"
+        },
+        "subtitle": "在你所有的内容中保持一致的声音",
+        "title": "为何使用兼容性评分？"
+      },
+      "cta": {
+        "instant": "100个免费积分",
+        "privacy": "隐私至上",
+        "subtitle": "今天开始根据你的声音档案分析内容。无需信用卡。",
+        "title": "准备好检查你的风格匹配度了吗？"
+      },
+      "ctaBadge": "秒级开始分析",
+      "demo": {
+        "subtitle": "通过示例文本看看我们的分析是如何工作的。无需注册。",
+        "title": "立即试用兼容性评分"
+      },
+      "description": "分析你的文本与你独特写作风格的匹配程度。获取详细评分，识别偏差，并提高一致性。",
+      "faq": {
+        "a1": "兼容性评分衡量一段文本与你声音档案中捕获的独特写作风格的匹配程度。它结合了向量相似度（语义匹配）和统计分析（结构、词汇、句子模式），为你提供0-100%的综合评分。",
+        "a2": "我们的多层分析通过结合AI嵌入和统计比较实现高精度。你声音档案中的样本越多，结果就越准确。我们还提供置信度分数，以便你了解每次分析的可靠程度。",
+        "a3": "向量分数衡量语义相似度——你的文本在意义和风格上与你的档案有多接近。统计分数分析结构模式，如句子长度、词汇丰富度和标点符号使用。它们共同给出了风格匹配的完整画面。",
+        "a4": "在分析文本时，我们识别偏离你风格的句子，并将其分类为轻微（小差异）、中度（明显差异）或严重（重大风格不匹配）。这有助于你关注最重要的改进区域。",
+        "a5": "是的！看到你的兼容性评分后，你可以使用我们的AI重写功能自动转换文本，以更好地匹配你的声音档案。重写后的版本通常分数会提高20-40%。",
+        "a6": "文本分析花费2个基础积分加上每词少量积分（0.002积分/词）。典型的500字分析花费约3个积分。高级用户获得更多积分和优先处理。",
+        "badge": "常见问题",
+        "desc": "关于兼容性评分你需要知道的一切",
+        "q1": "什么是兼容性评分？",
+        "q2": "分析有多准确？",
+        "q3": "向量和统计分数意味着什么？",
+        "q4": "什么是偏差严重程度？",
+        "q5": "我可以改进低分文本吗？",
+        "q6": "分析花费多少积分？",
+        "title": "常见问题"
+      },
+      "heroHighlight": "了解你的风格匹配度",
+      "howItWorks": {
+        "badge": "工作原理",
+        "step1": {
+          "desc": "选择你要对比的声音档案",
+          "title": "选择档案"
+        },
+        "step2": {
+          "desc": "粘贴或写入你想分析的文本",
+          "title": "输入文本"
+        },
+        "step3": {
+          "desc": "我们的AI对比向量相似度和统计模式",
+          "title": "AI分析"
+        },
+        "step4": {
+          "desc": "查看评分、偏差和改进建议",
+          "title": "获取结果"
+        },
+        "subtitle": "我们的AI结合多种分析方法以实现精确的风格匹配",
+        "title": "多层分析"
+      },
+      "interpretation": {
+        "badge": "评分指南",
+        "subtitle": "了解不同的兼容性评分对你的写作意味着什么",
+        "title": "理解你的评分"
+      },
+      "scores": {
+        "average": "一般",
+        "averageDesc": "检测到一些风格差异",
+        "goodMatch": "良好匹配",
+        "goodMatchDesc": "文本主要匹配你的风格",
+        "lowMatch": "低匹配",
+        "lowMatchDesc": "显著的风格差异",
+        "notCompatible": "不兼容",
+        "notCompatibleDesc": "文本不匹配",
+        "veryCompatible": "非常兼容",
+        "veryCompatibleDesc": "文本极好地匹配你的风格"
+      },
+      "stats": {
+        "accuracy": "准确率",
+        "layers": "分析层",
+        "severities": "严重程度",
+        "speed": "分析时间"
+      },
+      "title": "兼容性评分",
+      "trust": {
+        "instant": "即时结果",
+        "multiLayer": "多层分析",
+        "privacy": "隐私至上"
+      },
+      "useCases": {
+        "ai": {
+          "b1": "真实性",
+          "b2": "个性化",
+          "b3": "信任",
+          "desc": "在使用前验证AI生成的内容听起来像你",
+          "example": "",
+          "title": "AI内容检查"
+        },
+        "badge": "使用案例",
+        "content": {
+          "b1": "品牌一致性",
+          "b2": "质量控制",
+          "b3": "节省时间",
+          "desc": "在发布前检查外包或AI生成的内容是否匹配你的品牌声音",
+          "example": "",
+          "title": "内容审查"
+        },
+        "example": "示例",
+        "learning": {
+          "b1": "自我意识",
+          "b2": "改进",
+          "b3": "成长",
+          "desc": "了解你的写作模式并随时间提高一致性",
+          "example": "",
+          "title": "风格学习"
+        },
+        "spotlight": "精选使用案例",
+        "subtitle": "确保你的内容始终匹配你独特的声音",
+        "team": {
+          "b1": "统一的声音",
+          "b2": "培训工具",
+          "b3": "入职",
+          "desc": "确保所有团队成员以符合品牌准则的一致声音写作",
+          "example": "",
+          "title": "团队对齐"
+        },
+        "title": "完美适用于各种场景"
+      }
+    },
+    "deviations": {
+      "badge": "风格检测",
+      "benefits": {
+        "accuracy": {
+          "desc": "基于你声音档案的动态阈值以实现精确检测",
+          "stat": "准确率",
+          "title": "高精度"
+        },
+        "badge": "优势",
+        "improve": {
+          "desc": "获取建议以修复偏差并提高风格一致性",
+          "stat": "改进",
+          "title": "可操作的见解"
+        },
+        "levels": {
+          "desc": "将偏差分类为轻微、中度或严重以优先修复",
+          "stat": "严重程度",
+          "title": "严重程度级别"
+        },
+        "speed": {
+          "desc": "利用AI驱动的检测在2秒内分析每个句子",
+          "stat": "每句",
+          "title": "快速检测"
+        },
+        "subtitle": "在影响内容之前识别并修复风格不一致",
+        "title": "为何使用偏差检测？"
+      },
+      "cta": {
+        "instant": "100个免费积分",
+        "privacy": "隐私至上",
+        "subtitle": "今天开始分析你的内容是否存在风格偏差。无需信用卡。",
+        "title": "准备好查找风格不一致了吗？"
+      },
+      "ctaBadge": "秒级开始检测",
+      "demo": {
+        "badge": "交互式演示",
+        "subtitle": "用示例文本尝试我们的偏差检测，看看它是如何识别风格不一致的",
+        "title": "查看偏差实效"
+      },
+      "description": "确切找出哪些句子偏离了你的写作风格。获取严重程度级别和保持一致性的建议。",
+      "faq": {
+        "a1": "偏差是你文本中不匹配声音档案中捕获的独特写作风格的句子。我们的AI将每句话与你的档案进行比较，并识别在语气、词汇或结构上有显著差异的句子。",
+        "a2": "我们使用基于你声音档案的动态阈值。轻微偏差（0.4-0.5相似度）几乎不明显。中度偏差（0.3-0.4）是明显差异。严重偏差（<0.3）是与你的声音明显不同的重大风格不匹配。",
+        "a3": "兼容性评分给你一个关于文本与风格匹配程度的整体百分比。偏差功能更进一步，确切识别哪些句子偏离及其严重程度，所以你知道确切需要修复什么。",
+        "a4": "是的！识别出偏差后，你可以点击任何高亮的句子查看建议。你也可以使用我们的AI重写功能自动转换偏离的句子以匹配你的声音档案。",
+        "a5": "偏差检测包含在文本分析成本中：2个基础积分加上每词0.002积分。典型的500字分析花费约3个积分，并包含兼容性评分和偏差检测。",
+        "a6": "好消息！如果没有发现偏差，意味着你的文本与你的声音档案匹配良好。你会看到一条成功消息，确认你的文本与你的写作风格一致。",
+        "badge": "常见问题",
+        "desc": "关于偏差检测你需要知道的一切",
+        "q1": "什么是偏差？",
+        "q2": "严重程度级别是如何确定的？",
+        "q3": "这与兼容性评分有何不同？",
+        "q4": "我可以自动修复偏差吗？",
+        "q5": "偏差检测花费多少积分？",
+        "q6": "如果没有偏差会怎样？",
+        "title": "常见问题"
+      },
+      "heroHighlight": "查找风格不一致",
+      "howItWorks": {
+        "badge": "工作原理",
+        "step1": {
+          "desc": "选择要对比的声音档案",
+          "title": "选择档案"
+        },
+        "step2": {
+          "desc": "粘贴或写入你想分析的文本",
+          "title": "输入文本"
+        },
+        "step3": {
+          "desc": "使用向量相似度比较每个句子",
+          "title": "AI分析"
+        },
+        "step4": {
+          "desc": "查看高亮的偏差及严重程度",
+          "title": "查看结果"
+        },
+        "subtitle": "我们的AI针对你的声音档案分析每个句子以查找不一致",
+        "title": "智能偏差检测"
+      },
+      "severity": {
+        "badge": "严重程度",
+        "mild": "轻微",
+        "mildDesc": "几乎不明显的风格小差异",
+        "mildExample": "稍微不同的用词或句长",
+        "moderate": "中度",
+        "moderateDesc": "可能影响一致性的明显风格差异",
+        "moderateExample": "不同的语气或正式程度",
+        "severe": "严重",
+        "severeDesc": "与你的声音明显不同的重大风格不匹配",
+        "severeExample": "完全不同的写作风格或词汇",
+        "subtitle": "我们将偏差分为三个级别以帮助你优先改进",
+        "title": "理解偏差严重程度"
+      },
+      "stats": {
+        "accuracy": "检测准确率",
+        "levels": "严重程度",
+        "speed": "每句"
+      },
+      "title": "偏差",
+      "trust": {
+        "instant": "即时结果",
+        "noCard": "无需信用卡",
+        "privacy": "隐私至上"
+      },
+      "useCases": {
+        "ai": {
+          "b1": "真实性",
+          "b2": "个性化",
+          "b3": "信任",
+          "desc": "识别AI生成内容的哪些部分需要人性化",
+          "example": "ChatGPT输出有8个偏差 - 首先对严重的偏差使用AI重写。",
+          "title": "AI内容检查"
+        },
+        "badge": "使用案例",
+        "content": {
+          "b1": "质量控制",
+          "b2": "品牌一致性",
+          "b3": "节省时间",
+          "desc": "在发布前找出不匹配品牌声音的句子",
+          "example": "在第2段发现3个严重偏差 - 正式语气不匹配你的对话风格。",
+          "title": "内容审查"
+        },
+        "example": "示例",
+        "learning": {
+          "b1": "自我意识",
+          "b2": "改进",
+          "b3": "成长",
+          "desc": "了解你写作的哪些方面变化最大",
+          "example": "你的结论往往比引言偏离更多 - 专注于在结尾保持语气。",
+          "title": "风格学习"
+        },
+        "spotlight": "精选使用案例",
+        "subtitle": "在任何类型的内容中查找并修复风格不一致",
+        "team": {
+          "b1": "统一的声音",
+          "b2": "培训工具",
+          "b3": "入职",
+          "desc": "确保所有团队成员与你的品牌准则一致地写作",
+          "example": "新写作者有5个中度偏差 - 分享声音档案以帮助他们匹配团队风格。",
+          "title": "团队写作"
+        },
+        "title": "完美适用于每位写作者"
+      }
+    },
+    "extension": {
+      "cta": "安装扩展",
+      "description": "在网页任何地方使用 Graphos AI",
+      "title": "Chrome扩展可用"
+    },
+    "humanization": {
+      "accuracy": "准确率",
+      "aiContent": "原始AI内容",
+      "analyzing": "分析模式中...",
+      "badge": "秒变真人",
+      "benefits": {
+        "instant": {
+          "desc": "一键在几秒钟内获得人性化内容",
+          "title": "即时结果"
+        },
+        "meaning": {
+          "desc": "保持你的信息完整，同时提高可读性和真实性",
+          "title": "保留原意"
+        },
+        "natural": {
+          "desc": "将机械文本转换为自然阅读的对话式、引人入胜的内容",
+          "title": "自然流畅"
+        },
+        "styles": {
+          "desc": "选择随意、专业、学术，或匹配你的声音档案",
+          "title": "多种风格"
+        }
+      },
+      "benefitsBadge": "差异所在",
+      "clickTransform": "点击 ",
+      "comparison": {
+        "competitors": "竞争对手",
+        "excellent": "优秀",
+        "feature": "功能",
+        "good": "良好",
+        "languages": "语言",
+        "meaning": "原意保留",
+        "others": "其他",
+        "ourSolution": "我们的方案",
+        "quality": "输出质量",
+        "rating": "平均评分",
+        "speed": "处理速度",
+        "styles": "风格选项",
+        "usersCount": "用户信赖我们",
+        "voiceMatch": "声音档案匹配"
+      },
+      "comparisonBadge": "为何选择我们",
+      "comparisonDesc": "看看 Graphos AI 为何在内容人性化方面领先",
+      "comparisonTitle": "我们的优势",
+      "comparisonWins": "相比竞品的6个关键优势",
+      "ctaBadge": "秒级开始人性化",
+      "ctaDesc": "将AI文本转换为自然、引人入胜的写作。",
+      "ctaTitle": "准备好人性化你的内容了吗？",
+      "demo": {
+        "subtitle": "观看AI文本实时转换为自然、类人的写作。",
+        "title": "观看转换"
+      },
+      "examples": {
+        "ex1": {
+          "after": "你知道我最近在想什么吗？公司终于开始认真对待绿色环保了。",
+          "before": "近年来，在企业环境中实施可持续实践变得越来越重要。",
+          "style": "随意 & 对话式"
+        },
+        "ex2": {
+          "after": "这是我学到的一点：锻炼真的有助于缓解压力。自从我开始多动动后，我的焦虑好多了。",
+          "before": "研究表明，定期体育锻炼对心理健康改善有显著贡献。",
+          "style": "个人 & 真实"
+        }
+      },
+      "examplesTitle": "查看差异",
+      "faq": {
+        "a1": "我们的AI分析输入文本，并使用自然语言模式、多样的句子结构、人称代词和人类写作特有的对话元素进行重写。",
+        "a2": "不。我们的人性化保留你内容的核心含义和关键点，同时转换写作风格以听起来更自然和真实。",
+        "a3": "是的！你可以选择多种风格（随意、专业、学术）或使用你的声音档案来匹配你独特的写作风格。",
+        "a4": "我们的人性化通过引入自然写作模式显著降低AI检测分数。但是，我们建议以道德和透明的方式使用它。",
+        "a5": "免费用户每次请求最多可人性化500字。专业用户有更高的限制，每次请求可达5,000字。",
+        "q1": "内容人性化如何工作？",
+        "q2": "我内容的含义会改变吗？",
+        "q3": "我可以自定义写作风格吗？",
+        "q4": "人性化内容能通过AI检测吗？",
+        "q5": "有字数限制吗？"
+      },
+      "faqBadge": "常见问题",
+      "faqDesc": "关于内容人性化你需要知道的一切",
+      "faqTitle": "常见问题",
+      "heroHighlight": "自然 & 真实",
+      "howItWorks": {
+        "badge": "简单流程",
+        "step1": {
+          "desc": "输入或粘贴你想人性化的AI生成内容",
+          "title": "粘贴你的文本"
+        },
+        "step2": {
+          "desc": "从随意、专业、学术中选择，或使用你的声音档案",
+          "title": "选择你的风格"
+        },
+        "step3": {
+          "desc": "接收听起来像是真人写的自然、真实的内容",
+          "title": "获取人性化内容"
+        },
+        "subtitle": "简单三步转换你的AI内容",
+        "title": "人性化如何工作"
+      },
+      "humanContent": "自然人类内容",
+      "humanized": "已人性化",
+      "moreEngaging": "更吸引人",
+      "problems": {
+        "detectable": {
+          "desc": "AI检测工具立即标记内容",
+          "title": "容易被检测"
+        },
+        "engagement": {
+          "desc": "读者与非个人化的内容脱节",
+          "title": "低参与度"
+        },
+        "generic": {
+          "desc": "缺乏个性和独特的写作风格",
+          "title": "通用的声音"
+        },
+        "robotic": {
+          "desc": "文本对读者来说听起来机械生硬且不自然",
+          "title": "机械生硬"
+        }
+      },
+      "processing": "处理中",
+      "reset": "重置",
+      "stats": {
+        "languages": "语言",
+        "meaning": "原意保留",
+        "speed": "处理",
+        "styles": "写作风格"
+      },
+      "styles": "风格",
+      "testimonials": {
+        "academic": {
+          "author": "Dr. Emma Williams",
+          "quote": "非常适合润色AI辅助的研究摘要。学术风格选项在保持专业性的同时增加了自然流畅感。",
+          "role": "研究教授"
+        },
+        "badge": "用户故事",
+        "content": {
+          "author": "Sarah Chen",
+          "quote": "这个工具改变了我创作内容的方式。我的博客文章现在听起来真正像人写的，并且更好地吸引了读者。",
+          "role": "内容创作者"
+        },
+        "marketing": {
+          "author": "Michael Torres",
+          "quote": "我们的营销邮件现在感觉个性化和真实。自从我们开始使用 Graphos 以来，打开率提高了40%。",
+          "role": "营销总监"
+        },
+        "subtitle": "看看我们的用户如何评价内容人性化",
+        "title": "深受内容创作者喜爱"
+      },
+      "transform": "转换",
+      "transformations": "真实转换",
+      "transformationsDesc": "看看AI生成的文本如何转换为自然、类人的写作",
+      "transforming": "转换中...",
+      "trust": {
+        "instant": "即时结果",
+        "preserve": "保留原意",
+        "voice": "匹配你的声音"
+      },
+      "tryItNow": "观看转换实效",
+      "tryNow": "立即试用人性化",
+      "tryYourContent": "用你的内容试用",
+      "tryYourself": "亲自试用",
+      "useCases": {
+        "academic": {
+          "desc": "润色AI生成的研究摘要以符合学术标准",
+          "example": "",
+          "stat": "可读性分数",
+          "title": "学术写作"
+        },
+        "content": {
+          "desc": "将AI草稿转换为真实的博客文章、文章和营销文案",
+          "example": "",
+          "stat": "博客参与度",
+          "title": "内容创作"
+        },
+        "email": {
+          "desc": "让AI辅助的邮件听起来个性化和真诚",
+          "example": "",
+          "stat": "打开率增加",
+          "title": "邮件写作"
+        },
+        "preview": "转换预览",
+        "social": {
+          "desc": "创建与受众建立联系的引人入胜的社交帖子",
+          "example": "",
+          "stat": "参与度提升",
+          "title": "社交媒体"
+        },
+        "spotlight": "焦点"
+      },
+      "useCasesBadge": "使用案例",
+      "useCasesDesc": "点击任何使用案例，看看人性化如何转换你的内容",
+      "useCasesTitle": "完美适用于",
+      "watchTransform": "观看转换",
+      "whyHumanize": "为何人性化你的内容？",
+      "whyHumanizeDesc": "将机械的AI文本转换为引人入胜、真实的内容",
+      "with": "有人性化",
+      "without": "无人性化"
+    },
+    "labels": {
+      "aiGenerated": "AI生成",
+      "aiRewrite": "AI重写",
+      "aiScore": "AI分数",
+      "aiWorkspace": "AI工作区",
+      "humanizationPreview": "人性化预览",
+      "voiceProfile": "声音档案"
+    },
+    "placeholder": {
+      "voiceProfile": "声音档案",
+      "yourText": "你的文本"
+    },
+    "rewrite": {
+      "badge": "声音驱动的转换",
+      "benefits": {
+        "languages": {
+          "desc": "支持15+种语言，具有原生质量",
+          "title": "多语言"
+        },
+        "speed": {
+          "desc": "几秒钟内转换你的文本，无需等待",
+          "title": "闪电般快速"
+        },
+        "undetectable": {
+          "desc": "绕过AI检测，同时保持内容自然",
+          "title": "不可检测"
+        },
+        "voice": {
+          "desc": "保持你独特的写作风格和个性",
+          "title": "你的声音"
+        }
+      },
+      "benefitsBadge": "为何选择我们",
+      "benefitsDesc": "转换你写作所需的一切",
+      "benefitsTitle": "强大功能",
+      "cta": {
+        "desc": "今天开始用你独特的声音重写内容。无需信用卡。",
+        "title": "准备好转换你的写作了吗？",
+        "trust2": "100个免费积分",
+        "trust3": "隐私至上"
+      },
+      "ctaBadge": "秒级开始转换",
+      "demo": {
+        "originalLabel": "原文",
+        "rewriteBtn": "重写",
+        "rewritten": "已重写",
+        "sectionDesc": "体验AI驱动的文本转换的力量。无需注册。",
+        "sectionTitle": "立即试用AI重写",
+        "subtitle": "转换文本以匹配你的写作风格",
+        "tip1": "尝试不同样本以查看各种转换",
+        "tip2": "切换选项以自定义输出",
+        "title": "AI重写",
+        "transformComplete": "转换完成"
+      },
+      "faq": {
+        "a1": "AI重写使用你的声音档案来理解你独特的写作风格。然后它转换任何文本以匹配你的词汇、语气和句子模式，同时保留原始含义。",
+        "a2": "虽然你可以在没有档案的情况下使用基本重写，但拥有声音档案会显著提高结果。它允许AI匹配你的特定写作风格，而不是使用通用转换。",
+        "a3": "是的！我们的AI重写旨在产生自然、类人的文本。当与你的声音档案结合时，输出通常在AI检测工具上得分很低。",
+        "a4": "我们支持15+种语言，包括英语、越南语、西班牙语、法语、德语等。AI自动检测输入语言并保持输出质量。",
+        "a5": "重写花费约1.5个基础积分 + 每词0.0008积分。确切成本取决于文本长度和选择的AI模型。",
+        "a6": "是的！你可以重写最多50,000个字符的文档。对于更长的文档，我们建议使用我们的AI Studio，它提供完整的编辑器体验。",
+        "q1": "AI重写如何工作？",
+        "q2": "我需要声音档案来使用重写吗？",
+        "q3": "重写的文本能通过AI检测吗？",
+        "q4": "支持哪些语言？",
+        "q5": "重写花费多少积分？",
+        "q6": "我可以重写长文档吗？"
+      },
+      "faqBadge": "常见问题",
+      "faqDesc": "关于AI重写你需要知道的一切",
+      "faqTitle": "常见问题",
+      "heroDesc": "将任何文本转换为匹配你独特的写作风格。由你的声音档案驱动，带来真实、不可检测的结果。",
+      "heroHighlight": "转换你的文字",
+      "howItWorks": {
+        "step1": {
+          "desc": "输入你想转换的文本",
+          "title": "粘贴你的文本"
+        },
+        "step2": {
+          "desc": "选择你的声音档案以获得个性化结果",
+          "title": "选择你的档案"
+        },
+        "step3": {
+          "desc": "接收听起来像你的重写内容",
+          "title": "获取转换后的文本"
+        }
+      },
+      "howItWorksBadge": "简单流程",
+      "howItWorksDesc": "简单三步转换你的文本",
+      "howItWorksTitle": "AI重写如何工作",
+      "integration": {
+        "badge": "强大集成",
+        "cta1": "创建声音档案",
+        "cta2": "试用演示",
+        "desc": "AI重写使用你的声音档案将文本转换为你独特的写作风格。你用得越多，它就越了解你的声音。",
+        "feature1": "匹配你的词汇和语气",
+        "feature2": "从你的写作模式中学习",
+        "feature3": "所有内容中一致的声音",
+        "feature4": "自然地绕过AI检测",
+        "result": "结果：听起来完全像你！",
+        "title": "由你的声音档案驱动"
+      },
+      "showcase": {
+        "badge": "见证奇迹",
+        "cta": "亲自试试",
+        "formal": {
+          "after": "你知道吗",
+          "before": "近年来，在企业环境中实施可持续实践变得越来越重要。",
+          "metric": "参与度",
+          "style": "正式 → 对话式"
+        },
+        "generic": {
+          "after": "非常感谢你的订单！这是我亲自打包的——希望它给你带来的快乐和我创作它时一样多。",
+          "before": "感谢您的购买。我们希望您喜欢该产品。",
+          "metric": "连接",
+          "style": "通用 → 个人"
+        },
+        "passive": {
+          "after": "团队完成了报告并提交给经理审查。",
+          "before": "报告由团队完成，并已提交给经理审查。",
+          "metric": "清晰度",
+          "style": "被动 → 主动"
+        },
+        "subtitle": "观看AI重写如何在保留信息的同时转换你的文本",
+        "title": "真实转换",
+        "wordy": {
+          "after": "让我们",
+          "before": "我写信通知您，我想请求在您最早方便的时候开会，讨论探索潜在合作机会的可能性。",
+          "metric": "字数",
+          "style": "冗长 → 简洁"
+        }
+      },
+      "stats": {
+        "accuracy": "风格匹配",
+        "languages": "语言",
+        "speed": "速度",
+        "users": "满意的用户"
+      },
+      "title": "AI重写",
+      "trust": {
+        "instant": "即时结果",
+        "noCard": "无需信用卡",
+        "privacy": "隐私至上"
+      },
+      "useCases": {
+        "academic": {
+          "desc": "润色论文和文章，同时保持学术语气",
+          "example": "",
+          "stat": "清晰度分数",
+          "title": "学术写作"
+        },
+        "content": {
+          "desc": "用你的声音重写博客文章、文章和营销文案",
+          "example": "",
+          "stat": "阅读时间",
+          "title": "内容创作"
+        },
+        "email": {
+          "desc": "将正式邮件转换为友好信息，反之亦然",
+          "example": "",
+          "stat": "回复率",
+          "title": "邮件写作"
+        },
+        "preview": "转换预览",
+        "social": {
+          "desc": "创建听起来真实的引人入胜的帖子",
+          "example": "",
+          "stat": "参与度",
+          "title": "社交媒体"
+        },
+        "spotlight": "焦点"
+      },
+      "useCasesBadge": "使用案例",
+      "useCasesDesc": "将任何类型的内容转换为匹配你的声音和目的",
+      "useCasesTitle": "完美适用于各种情况"
+    },
+    "statistics": {
+      "badge": "写作分析",
+      "benchmark": {
+        "badge": "行业标准",
+        "desc": {
+          "academic": "学术写作需要精确和正式。预期使用较长的句子和丰富的词汇来传达复杂的想法。",
+          "blog": "博客写作应该是对话式的且易于阅读。旨在用较短的句子和通俗的词汇来吸引读者。",
+          "casual": "休闲写作是轻松友好的。短句、简单的词汇和对话语气效果最好。",
+          "professional": "专业写作平衡清晰度与复杂性。适中的句子长度和精确的词汇传达能力。"
+        },
+        "metrics": {
+          "punctuation": "标点符号",
+          "readability": "可读性",
+          "sentenceLength": "句子长度",
+          "vocabulary": "词汇",
+          "wordLength": "单词长度"
+        },
+        "styles": {
+          "academic": "学术",
+          "blog": "博客",
+          "casual": "休闲",
+          "professional": "专业"
+        },
+        "subtitle": "看看你的写作与不同内容类型的行业标准相比如何",
+        "table": {
+          "ideal": "理想",
+          "max": "最大",
+          "metric": "指标",
+          "min": "最小",
+          "range": "范围"
+        },
+        "title": "与基准比较"
+      },
+      "benefits": {
+        "badge": "优势",
+        "languages": {
+          "desc": "支持15+种语言，具有特定语言的分析和基准",
+          "stat": "语言",
+          "title": "多语言"
+        },
+        "metrics": {
+          "desc": "获取10+种写作指标，包括单词长度、句子结构、词汇丰富度和可读性分数",
+          "stat": "指标",
+          "title": "综合指标"
+        },
+        "speed": {
+          "desc": "利用我们优化的处理引擎在不到一秒内分析任何文本",
+          "stat": "分析",
+          "title": "即时分析"
+        },
+        "styles": {
+          "desc": "将你的写作与博客、学术、休闲和专业内容的行业标准进行比较",
+          "stat": "风格类型",
+          "title": "风格基准"
+        },
+        "subtitle": "获取帮助你写得更好、更快的见解",
+        "title": "为何使用文本统计？"
+      },
+      "cta": {
+        "instant": "100个免费积分",
+        "privacy": "隐私至上",
+        "subtitle": "通过全面的文本统计即时了解你的写作风格。无需信用卡。",
+        "title": "准备好了解你的写作了吗？"
+      },
+      "ctaBadge": "立即分析你的写作",
+      "demo": {
+        "subtitle": "亲身体验我们的文本分析技术。无需注册。",
+        "title": "立即试用文本统计"
+      },
+      "description": "用综合指标分析你的写作。即刻获取可读性分数、词汇分析、句子模式和基准比较。",
+      "faq": {
+        "a1": "我们分析10+种指标，包括平均词长、平均句长、词汇丰富度（唯一词比率）、标点符号比率、可读性分数（Flesch-Kincaid）、总字数/句数/段落数、热门句子开头和过渡词使用。",
+        "a2": "我们使用考虑平均句长和每词音节数的Flesch-Kincaid可读性公式。分数范围为0-100，分数越高表示越容易阅读。60-70适合大众，30-50适合学术内容。",
+        "a3": "我们为4种写作风格提供基准：博客（对话式、易读）、学术（正式、复杂）、休闲（轻松、简单）和专业（平衡、清晰）。每种风格在所有指标上都有不同的理想范围。",
+        "a4": "是的！我们支持15+种语言，包括英语、越南语、西班牙语、法语、德语等。系统自动检测语言并应用适当的分析模式和基准。",
+        "a5": "使用基准比较查看你的写作在哪些方面偏离了理想范围。例如，如果句子长度太高，尝试拆分长句。如果词汇丰富度低，使用更多样的词汇。我们的建议有助于指导改进。",
+        "a6": "是的！文本统计已集成到AI检测（分析写作模式）、兼容性评分（与你的声音档案比较）和偏差（识别风格不一致）中。这是整个平台使用的基础分析。",
+        "badge": "常见问题",
+        "desc": "关于文本统计你需要知道的一切",
+        "q1": "文本统计包含哪些指标？",
+        "q2": "可读性分数是如何计算的？",
+        "q3": "什么是基准风格类型？",
+        "q4": "它支持多语言吗？",
+        "q5": "我如何改进我的统计数据？",
+        "q6": "文本统计是其他功能的一部分吗？",
+        "title": "常见问题"
+      },
+      "heroHighlight": "了解你的写作DNA",
+      "howItWorks": {
+        "badge": "工作原理",
+        "step1": {
+          "desc": "粘贴或写入你想分析的文本",
+          "title": "输入文本"
+        },
+        "step2": {
+          "desc": "我们的引擎分析结构、词汇和模式",
+          "title": "处理"
+        },
+        "step3": {
+          "desc": "计算指标并与基准进行比较",
+          "title": "计算"
+        },
+        "step4": {
+          "desc": "查看详细统计数据和可操作的见解",
+          "title": "结果"
+        },
+        "subtitle": "几秒钟内获取综合写作统计",
+        "title": "即时文本分析"
+      },
+      "metrics": {
+        "badge": "关键指标",
+        "benchmark": "基准范围",
+        "ideal": "理想",
+        "punctuation": {
+          "desc": "每词标点符号数。影响你写作的节奏和速度。",
+          "title": "标点符号比率",
+          "unit": "每词"
+        },
+        "readability": {
+          "desc": "Flesch-Kincaid 分数。越高 = 越易读。60-70 适合大众。",
+          "title": "可读性分数",
+          "unit": "分"
+        },
+        "sentenceLength": {
+          "desc": "指示可读性和流畅度。短句 = 有力，长句 = 复杂想法。",
+          "title": "平均句长",
+          "unit": "单词"
+        },
+        "subtitle": "用综合指标了解你写作的方方面面",
+        "title": "深度写作分析",
+        "vocabulary": {
+          "desc": "唯一词 / 总词数。越高 = 词汇越多样，越低 = 重复越多。",
+          "title": "词汇丰富度",
+          "unit": "比率"
+        },
+        "wordLength": {
+          "desc": "衡量词汇复杂性。短词 = 易读，长词 = 更精细。",
+          "title": "平均词长",
+          "unit": "字符"
+        }
+      },
+      "stats": {
+        "languages": "语言",
+        "metrics": "指标",
+        "speed": "分析",
+        "styles": "风格类型"
+      },
+      "title": "文本统计",
+      "trust": {
+        "instant": "即时结果",
+        "noCard": "无需信用卡",
+        "privacy": "隐私至上"
+      },
+      "useCases": {
+        "authors": {
+          "b1": "声音一致性",
+          "b2": "节奏分析",
+          "b3": "体裁契合",
+          "desc": "分析你的手稿以确保通篇声音一致且复杂性适当",
+          "example": "",
+          "title": "作者"
+        },
+        "badge": "使用案例",
+        "educators": {
+          "b1": "客观反馈",
+          "b2": "跟踪进度",
+          "b3": "教学工具",
+          "desc": "通过提供结构和复杂性方面的客观反馈帮助学生改进写作",
+          "example": "",
+          "title": "教育工作者"
+        },
+        "example": "示例",
+        "professionals": {
+          "b1": "清晰沟通",
+          "b2": "专业语气",
+          "b3": "受众契合",
+          "desc": "确保你的商业沟通清晰、专业且适合受众",
+          "example": "",
+          "title": "专业人士"
+        },
+        "spotlight": "精选使用案例",
+        "subtitle": "写作者、教育工作者和专业人士使用我们的统计数据来提高技艺",
+        "title": "谁从统计中受益？",
+        "writers": {
+          "b1": "更好的可读性",
+          "b2": "一致的风格",
+          "b3": "SEO优化",
+          "desc": "通过了解你的写作模式来优化内容的可读性和参与度",
+          "example": "",
+          "title": "内容写作者"
+        }
+      }
+    },
+    "stats": {
+      "accuracy": "98% 准确率",
+      "analyze": "写作指标",
+      "chat": "按你的声音聊天",
+      "chatInYourVoice": "按你的声音聊天",
+      "find": "查找不一致",
+      "match": "风格匹配",
+      "natural": "自然输出",
+      "transform": "转换文本",
+      "unique": "你独特的风格",
+      "yourUniqueStyle": "你独特的风格"
+    },
+    "voiceProfile": {
+      "badge": "你独特的写作DNA",
+      "benefits": {
+        "ai": {
+          "desc": "在AI工作区使用你的档案生成个性化内容",
+          "title": "AI集成"
+        },
+        "analysis": {
+          "desc": "了解你的写作模式、词汇和风格偏好",
+          "title": "深度分析"
+        },
+        "consistent": {
+          "desc": "从邮件到博客文章，在所有内容中保持你的语气",
+          "title": "一致的声音"
+        },
+        "unique": {
+          "desc": "每次都创建听起来真实像你的内容",
+          "title": "独特身份"
+        }
+      },
+      "builderBadge": "档案构建器",
+      "builderDesc": "观看你的写作在简单三步中转换为独特的声音档案",
+      "builderTitle": "查看工作原理",
+      "cta": {
+        "create": "创建你的档案"
+      },
+      "ctaBadge": "捕捉你独特的声音",
+      "ctaDesc": "今天发现你独特的写作风格。",
+      "ctaTitle": "创建你的声音档案",
+      "demo": {
+        "subtitle": "看看不同的写作风格是如何被捕捉和可视化的",
+        "title": "探索声音档案"
+      },
+      "faq": {
+        "a1": "我们建议提供3-5个写作样本，每个至少200字。样本越多，档案越准确。样本应代表你的典型写作风格。",
+        "a2": "你写过的任何内容都可以！邮件、博客文章、社交媒体帖子、文章，甚至聊天记录。关键是它代表了你自然的写作方式。",
+        "a3": "是的！专业用户可以为不同情境创建多个档案——一个用于专业沟通，另一个用于休闲内容等。",
+        "a4": "我们的声音匹配与你的原始写作风格相似度达到90%以上。你提供的样本越多，匹配就越准确。",
+        "a5": "绝对安全。你的写作样本被加密并仅用于创建你的档案。我们从不与第三方分享你的数据。",
+        "q1": "我需要多少写作样本？",
+        "q2": "什么类型的内容最好？",
+        "q3": "我可以有多个声音档案吗？",
+        "q4": "声音匹配有多准确？",
+        "q5": "我的写作数据安全吗？"
+      },
+      "faqBadge": "常见问题",
+      "faqSubtitle": "关于声音档案你需要知道的一切",
+      "faqTitle": "常见问题",
+      "heroHighlight": "捕捉你真实的声音",
+      "howItWorks": {
+        "step1": {
+          "desc": "提供3-5个代表你风格的写作样本（邮件、帖子、文章）",
+          "title": "上传样本"
+        },
+        "step2": {
+          "desc": "我们的AI分析词汇、句子结构、语气和独特模式",
+          "title": "AI分析"
+        },
+        "step3": {
+          "desc": "获取包含指标、特征和标志性特点的详细档案",
+          "title": "档案已创建"
+        },
+        "step4": {
+          "desc": "将你的档案应用于人性化、AI工作区和内容生成",
+          "title": "随处使用"
+        }
+      },
+      "howItWorksDesc": "简单四步创建你独特的写作DNA",
+      "howItWorksTitle": "声音档案如何工作",
+      "examples": {
+        "before": "\"实施可持续实践很重要。\"",
+        "after": "\"事情是这样的——绿色环保不只是趋势，它是必不可少的。\"",
+        "aiResponse": "\"好的，关于这个产品——说实话，它是颠覆性的...\""
+      },
+      "integration": {
+        "example": "示例",
+        "humanize": "人性化",
+        "humanizeDesc": "转换AI生成内容以匹配你独特的写作风格。人性化器使用你的声音档案确保每次重写都听起来真实像你。",
+        "humanizeTag": "按你的声音重写",
+        "learnMore": "了解更多",
+        "prompt": "写一个产品描述",
+        "workspace": "AI工作区",
+        "workspaceDesc": "从一开始就生成听起来像你的内容。在AI工作区选择你的声音档案，每个回复都会匹配你的写作风格。",
+        "workspaceTag": "用你的声音聊天"
+      },
+      "integrationBadge": "无缝集成",
+      "integrationDesc": "你的声音档案与所有 Graphos AI 功能无缝集成",
+      "integrationTitle": "随处使用你的声音",
+      "metrics": {
+        "punctuation": "标点符号风格",
+        "punctuationDesc": "你独特的标点符号模式和偏好",
+        "sentenceLength": "句子结构",
+        "sentenceLengthDesc": "你句子的典型长度、复杂性和节奏",
+        "sentenceStarters": "句子开头",
+        "sentenceStartersDesc": "你通常如何开始句子——主语优先、副词、疑问",
+        "tone": "情感标记",
+        "toneDesc": "你如何表达观点、感受和强调",
+        "transitions": "过渡偏好",
+        "transitionsDesc": "你偏好的连接词和短语",
+        "vocabulary": "词汇模式",
+        "vocabularyDesc": "常用短语、偏好词汇和表达"
+      },
+      "metricsBadge": "深度分析",
+      "metricsDesc": "我们的AI通过全面分析捕捉你写作风格的每一个细微差别",
+      "metricsTitle": "我们分析什么",
+      "multiLang": {
+        "desc": "用英语、越南语、中文、日语、韩语、西班牙语、法语、德语等创建声音档案。无论语言如何，都能准确捕捉你的写作风格。",
+        "title": "支持15+种语言"
+      },
+      "preview": {
+        "analyzing1": "正在分析词汇模式...",
+        "analyzing2": "正在检测句子结构...",
+        "analyzing3": "正在识别语气标记...",
+        "ready": "准备就绪",
+        "sampleInput": "你的写作样本",
+        "step1": "添加写作样本",
+        "step1Desc": "粘贴邮件、帖子或你写过的任何文本",
+        "step2": "AI分析模式",
+        "step2Desc": "深度学习提取你独特的风格",
+        "step3": "档案已生成",
+        "step3Desc": "你的写作DNA已被捕捉",
+        "yourProfile": "你的声音档案"
+      },
+      "processBadge": "简单流程",
+      "quality": {
+        "consistency": "风格一致性",
+        "diversity": "样本多样性",
+        "excellent": "优秀档案",
+        "excellentDesc": "具有丰富风格数据的高精度声音匹配",
+        "fairDesc": "基本档案，考虑添加更多样本",
+        "goodDesc": "具有良好风格表现的可靠档案",
+        "length": "内容长度",
+        "needsWorkDesc": "添加更多样化的样本以获得更好的准确性",
+        "outOf": "/ 100",
+        "ratingsTitle": "质量评级",
+        "tip1": "添加5+个写作样本以获得最佳结果",
+        "tip2": "包含不同类型的内容（邮件、帖子、文章）",
+        "tip3": "使用每个至少200字的样本",
+        "tipsTitle": "提高分数的提示"
+      },
+      "qualityBadge": "质量保证",
+      "qualityDesc": "我们的AI评估你的写作样本，以确保最佳的声音档案准确性",
+      "qualityTitle": "档案质量分数",
+      "stats": {
+        "accuracy": "声音匹配",
+        "metrics": "风格指标",
+        "samples": "最少样本",
+        "speed": "分析"
+      },
+      "trust": {
+        "fast": "即时分析",
+        "private": "从未分享",
+        "secure": "数据已加密"
+      },
+      "trustIndicator1": "无需信用卡",
+      "trustIndicator2": "30秒设置",
+      "trustIndicator3": "积分永不过期",
+      "tryItNow": "探索示例声音档案",
+      "useCases": {
+        "business": {
+          "desc": "确保所有团队沟通匹配你的品牌声音",
+          "quote": "",
+          "statLabel": "公司",
+          "title": "商业沟通"
+        },
+        "content": {
+          "desc": "生成听起来像你的博客文章、文章和文案",
+          "quote": "",
+          "statLabel": "文章",
+          "title": "内容创作"
+        },
+        "cta": "准备好找到你的声音了吗？",
+        "ctaButton": "创建你的档案",
+        "personal": {
+          "desc": "在你所有的内容中建立一致的个人品牌",
+          "quote": "",
+          "statLabel": "创作者",
+          "title": "个人品牌"
+        },
+        "team": {
+          "desc": "分享档案以在你的团队中保持一致的声音",
+          "quote": "",
+          "statLabel": "团队",
+          "title": "团队协作"
+        }
+      },
+      "useCasesBadge": "使用案例",
+      "useCasesDesc": "加入成千上万使用声音档案来保持真实声音的专业人士",
+      "useCasesTitle": "完美适用于",
+      "whatYouGet": "你将获得",
+      "whyCreate": "为何创建声音档案？",
+      "whyCreateDesc": "解锁个性化AI写作的力量"
+    }
+  },
+  "featuresPage": {
+    "badge": "8个强大工具",
+    "cta": {
+      "description": "加入成千上万使用 Graphos AI Studio 创作真实内容的写作者。",
+      "title": "准备好开始了吗？"
+    },
+    "description": "从AI检测到内容人性化，从声音档案到智能重写——探索真实、类人写作的完整工具包。",
+    "gridBadge": "探索功能",
+    "gridSubtitle": "点击任何功能以了解更多并试用",
+    "gridTitle": "选择你的工具",
+    "meta": {
+      "description": "探索 Graphos AI Studio 的所有功能：AI检测、人性化、声音档案、AI工作区、重写等。",
+      "title": "功能 - Graphos AI Studio"
+    },
+    "stats": {
+      "extension": "Chrome扩展",
+      "features": "8个功能",
+      "languages": "15+ 种语言"
+    },
+    "subtitle": "你写得更好所需的一切",
+    "title": "所有功能"
   },
   "footer": {
-    "description": "Graphos AI Studio通过AI检测、人性化和声音档案功能帮助您撰写真实内容。",
-    "copyright": "版权所有。"
+    "copyright": "保留所有权利。",
+    "description": "Graphos AI Studio 通过AI检测、人性化和声音档案功能帮助你撰写真实内容。",
+    "newsletter": {
+      "note": "获取提示、更新和独家优惠。无垃圾邮件。",
+      "placeholder": "输入你的邮箱",
+      "subscribe": "订阅",
+      "success": "感谢订阅！",
+      "title": "保持更新"
+    },
+    "trust": {
+      "gdpr": "GDPR 合规",
+      "privacy": "隐私至上",
+      "ssl": "SSL 安全"
+    }
+  },
+  "hero": {
+    "badge": "AI写作助手",
+    "badgeText": "AI写作助手",
+    "description": "检测AI内容，人性化你的写作，并创建听起来真实像你的内容。一切尽在一个强大的平台。",
+    "scroll": "滚动以探索",
+    "stats": {
+      "accuracy": "准确率",
+      "users": "活跃用户"
+    },
+    "title": "真实地写作",
+    "titleHighlight": "与懂你的AI一起",
+    "trust": {
+      "extension": "Chrome扩展",
+      "free": "免费开始",
+      "noCard": "无信用卡"
+    },
+    "typing": {
+      "detect": "即时检测AI内容",
+      "humanize": "人性化你的写作",
+      "voice": "用你独特的声音写作",
+      "workspace": "以你的方式与AI聊天"
+    },
+    "videoNote": "试试下面的实时演示",
+    "videoPlaceholder": "演示视频即将推出！"
+  },
+  "heroBadge": {
+    "detection": "98% 准确率",
+    "fast": "即时结果",
+    "languages": "15种语言",
+    "users": "50K+ 用户"
+  },
+  "heroTrust": {
+    "extension": "包含Chrome扩展",
+    "free": "免费开始",
+    "noCard": "无需信用卡"
+  },
+  "home": {
+    "cta": {
+      "description": "加入成千上万使用 Graphos AI Studio 创作真实、类人内容的写作者。",
+      "title": "准备好撰写真实内容了吗？"
+    },
+    "features": {
+      "subtitle": "在AI辅助下撰写真实、类人内容所需的一切。",
+      "title": "强大功能"
+    },
+    "hero": {
+      "subtitle": "检测AI生成的文本，人性化内容，并用你独特的声音档案创作。",
+      "title": "用AI撰写真实内容"
+    },
+    "meta": {
+      "description": "检测AI生成的内容，人性化你的写作，并创建听起来像你的真实内容。带有Chrome扩展的免费AI写作助手。",
+      "title": "Graphos AI Studio - AI检测、人性化 & 声音档案"
+    }
+  },
+  "howItWorks": {
+    "badge": "简单流程",
+    "ctaText": "准备好开始了吗？",
+    "step1": {
+      "description": "上传你的写作样本或粘贴文本。我们的AI分析你独特的风格、语气和词汇模式。",
+      "title": "创建你的声音档案"
+    },
+    "step2": {
+      "description": "粘贴任何文本以即时检查其是否由AI编写。获取带有置信度分数的详细分析。",
+      "title": "检测AI内容"
+    },
+    "step3": {
+      "description": "将AI生成的文本转换为匹配你写作风格的自然、人声内容。",
+      "title": "人性化你的内容"
+    },
+    "step4": {
+      "description": "使用AI工作区生成听起来真实像你的内容。非常适合邮件、帖子等。",
+      "title": "按你的声音聊天"
+    },
+    "steps": {
+      "chatInVoice": "按你的声音聊天",
+      "createProfile": "创建你的声音档案",
+      "detectAI": "检测AI内容",
+      "humanize": "人性化你的内容"
+    },
+    "subtitle": "几分钟内开始。无需复杂设置。",
+    "title": "工作原理"
+  },
+  "humanization": {
+    "description": "将AI文本转换为自然、真实的人类写作。",
+    "meta": {
+      "description": "将AI生成的文本转换为自然、类人的内容，同时保留含义。",
+      "title": "内容人性化 - Graphos AI Studio"
+    },
+    "title": "内容人性化"
+  },
+  "nav": {
+    "aiDetection": "AI检测",
+    "aiDetectionDesc": "检测AI生成内容",
+    "aiWorkspace": "AI工作区",
+    "aiWorkspaceDesc": "多合一AI工作区",
+    "aidetection": "AI检测",
+    "chromeExtension": "Chrome扩展",
+    "compatibility": "兼容性评分",
+    "compatibilityScore": "兼容性评分",
+    "compatibilityScoreDesc": "检查你的写作风格匹配度",
+    "cookies": "Cookie政策",
+    "deviations": "偏差",
+    "deviationsDesc": "查找风格不一致",
+    "faq": "常见问题",
+    "features": "功能",
+    "home": "主页",
+    "humanization": "人性化",
+    "humanizationDesc": "让AI文本听起来自然",
+    "legal": "法律",
+    "login": "登录",
+    "pricing": "定价",
+    "privacy": "隐私政策",
+    "resources": "资源",
+    "rewrite": "AI重写",
+    "rewriteDesc": "用你的声音转换文本",
+    "statistics": "统计",
+    "statisticsDesc": "分析你的写作指标",
+    "support": "支持",
+    "terms": "服务条款",
+    "viewAllFeatures": "查看所有功能",
+    "voiceProfile": "声音档案",
+    "voiceProfileDesc": "创建你独特的声音",
+    "voiceprofile": "声音档案",
+    "workspace": "工作区"
+  },
+  "pricing": {
+    "acceptedPayments": "我们接受",
+    "badge": "定价",
+    "benefits": {
+      "instantCredits": "即时积分",
+      "neverExpire": "积分永不过期",
+      "noSubscription": "无订阅",
+      "securePayment": "安全支付"
+    },
+    "bestValue": "最佳价值",
+    "bonus": "奖励",
+    "buyNow": "立即购买",
+    "creditCard": "信用卡",
+    "creditCostNote": "每次使用的近似积分（因文本长度而异）",
+    "credits": "积分",
+    "creditsShort": "积分",
+    "firstPurchase": "首次购买",
+    "firstPurchaseDesc": "首次购买获得2倍积分！",
+    "firstPurchaseTitle": "首购奖励",
+    "free": "免费",
+    "freeCredits": "从100免费积分开始",
+    "freeFeatures": {
+      "neverExpires": "积分永不过期",
+      "noCardRequired": "无需信用卡",
+      "tryAllFeatures": "试用所有功能"
+    },
+    "limitedOffer": "限时优惠",
+    "localCurrencyNote": "* 本地货币估算可能因汇率而异",
+    "noCardRequired": "无需信用卡 • 试用所有功能",
+    "note": "通过 Lemon Squeezy 安全支付 • 接受信用卡和PayPal",
+    "perCredit": "积分",
+    "popular": "热门",
+    "poweredBy": "提供支持：",
+    "secureCheckout": "256位SSL加密安全结账",
+    "startFree": "免费开始",
+    "subtitle": "在需要时购买积分。无需订阅。积分永不过期。",
+    "title": "按需付费",
+    "uses": {
+      "aiDetection": "AI检测",
+      "aiWorkspace": "AI聊天",
+      "humanization": "人性化",
+      "rewriting": "按你的风格重写",
+      "styleAnalysis": "分析写作模式",
+      "voiceProfiles": "创建写作声音档案"
+    },
+    "usesDescriptions": {
+      "aiDetection": "检测AI生成内容",
+      "aiWorkspace": "AI驱动的写作助手",
+      "humanization": "让文本更像人类",
+      "rewriting": "按你的风格重写",
+      "styleAnalysis": "分析写作模式",
+      "voiceProfiles": "创建写作声音档案"
+    },
+    "whatCreditsFor": "积分可以做什么？"
+  },
+  "privacy": {
+    "lastUpdated": "最后更新",
+    "meta": {
+      "description": "了解 Graphos AI Studio 如何收集、使用和保护你的个人数据。",
+      "title": "隐私政策 - Graphos AI Studio"
+    },
+    "title": "隐私政策"
+  },
+  "relatedFeatures": {
+    "badge": "探索更多",
+    "subtitle": "发现更多增强你写作的强大工具",
+    "title": "相关功能"
+  },
+  "rewrite": {
+    "description": "利用AI驱动的重写功能，用你的声音转换文本。",
+    "meta": {
+      "description": "将任何文本转换为匹配你独特的写作风格。保持你声音和语气的AI重写。",
+      "title": "AI重写 - 用你的声音转换文本 | Graphos AI"
+    },
+    "title": "AI重写"
+  },
+  "seo": {
+    "howToUse": "如何使用 Graphos AI Studio",
+    "voiceProfileCreation": "声音档案创建"
+  },
+  "showcase": {
+    "badge": "交互式演示",
+    "ctaText": "准备好体验全部威力了吗？",
+    "subtitle": "在此处试用我们的功能。无需注册。确切了解 Graphos AI Studio 如何工作。",
+    "title": "体验真实产品"
+  },
+  "socialProof": {
+    "benefits": {
+      "contentCreators": "创建引人入胜的内容",
+      "developers": "撰写更好的文档",
+      "educators": "增强教材",
+      "marketers": "制作令人信服的文案",
+      "students": "改进学术写作"
+    },
+    "perfectFor": "完美适用于",
+    "stats": {
+      "accuracy": "准确率",
+      "activeUsers": "活跃用户",
+      "languages": "语言",
+      "textsProcessed": "已处理文本"
+    },
+    "trustedBy": "被以下写作者和团队信赖",
+    "userTypeDescriptions": {
+      "contentCreators": "创建引人入胜的内容",
+      "developers": "撰写更好的文档",
+      "educators": "增强教材",
+      "marketers": "制作令人信服的文案",
+      "students": "改进学术写作"
+    },
+    "userTypes": {
+      "contentCreators": "内容创作者",
+      "developers": "开发者",
+      "educators": "教育工作者",
+      "marketers": "营销人员",
+      "students": "学生"
+    }
+  },
+  "statistics": {
+    "description": "分析你的写作指标和模式。",
+    "meta": {
+      "description": "获取详细的写作统计，包括字数、句长、词汇丰富度和可读性分数。",
+      "title": "统计 - 分析你的写作指标 | Graphos AI"
+    },
+    "title": "统计"
+  },
+  "stats": {
+    "accuracyrate": "准确率",
+    "activeusers": "活跃用户",
+    "textsanalyzed": "已分析文本",
+    "userrating": "用户评分"
+  },
+  "terms": {
+    "lastUpdated": "最后更新",
+    "meta": {
+      "description": "阅读 Graphos AI Studio 服务的使用条款和条件。",
+      "title": "服务条款 - Graphos AI Studio"
+    },
+    "title": "服务条款"
+  },
+  "testimonials": {
+    "badge": "客户评价",
+    "quotes": {
+      "1": "Graphos AI 完全改变了我创作内容的方式。声音档案功能简直难以置信——它听起来真的像我！",
+      "2": "作为教授，我每天使用AI检测。它很准确，帮助我在课堂上保持学术诚信。",
+      "3": "人性化功能为我节省了数小时的编辑时间。我的AI辅助草稿现在读起来自然且真实。",
+      "4": "终于有一个能帮助我写得更快而又不失个人风格的AI工具。工作区直观且强大。",
+      "5": "起初我很怀疑，但AI检测的准确性令人印象深刻。它已成为我编辑工作不可或缺的一部分。",
+      "6": "Chrome扩展让在任何地方使用变得如此简单。我可以在不离开工作流程的情况下检查和人性化内容。"
+    },
+    "roles": {
+      "contentCreator": "内容创作者",
+      "customerSuccessLead": "客户成功主管",
+      "editor": "主编",
+      "freelanceWriter": "自由撰稿人",
+      "marketingManager": "营销经理",
+      "professor": "大学教授",
+      "socialMediaManager": "社交媒体经理"
+    },
+    "subtitle": "看看我们的用户如何评价他们在 Graphos AI Studio 的体验。",
+    "title": "深受全球写作者喜爱"
+  },
+  "trust": {
+    "guarantees": {
+      "noExpiry": {
+        "desc": "随时随地使用你的积分",
+        "title": "积分永不过期"
+      },
+      "refund": {
+        "desc": "不满意？7天内全额退款",
+        "title": "7天退款保证"
+      },
+      "support": {
+        "desc": "需要时通过邮件获取帮助",
+        "title": "优先支持"
+      }
+    },
+    "guaranteesTitle": "我们的保证",
+    "items": {
+      "encryption": {
+        "desc": "对所有静止和传输中的数据使用AES-256加密",
+        "title": "企业级加密"
+      },
+      "gdpr": {
+        "desc": "完全遵守欧盟数据保护法规",
+        "title": "GDPR 合规"
+      },
+      "privacy": {
+        "desc": "你的数据从未被共享或用于训练AI模型",
+        "title": "隐私至上"
+      },
+      "uptime": {
+        "desc": "由Google Cloud支持的可靠基础设施",
+        "title": "99.9% 正常运行时间"
+      }
+    },
+    "pciCompliant": "PCI 合规",
+    "securePayment": "安全支付",
+    "sslSecured": "SSL 安全"
+  },
+  "useCases": {
+    "badge": "使用案例",
+    "businesses": {
+      "benefits": {
+        "communication": "真实的客户沟通",
+        "documentation": "专业文档",
+        "efficiency": "提高团队效率"
+      },
+      "desc": "需要与客户和利益相关者进行真实沟通的公司。",
+      "testimonial": {
+        "author": "Jennifer Park",
+        "quote": "我们的客户支持回复现在感觉更个性化了。",
+        "role": "客户成功主管"
+      },
+      "title": "企业"
+    },
+    "contentCreators": {
+      "benefits": {
+        "scale": "扩展而不失真实性",
+        "speed": "创作内容快5倍",
+        "voice": "保持你独特的声音"
+      },
+      "desc": "需要大规模真实内容的博主、YouTuber和社交媒体经理。",
+      "testimonial": {
+        "author": "Amanda Foster",
+        "quote": "我现在可以产出两倍的内容，同时保持我的个人风格。",
+        "role": "内容创作者"
+      },
+      "title": "内容创作者"
+    },
+    "educators": {
+      "benefits": {
+        "detect": "准确检测AI提交",
+        "feedback": "提供更好的反馈",
+        "integrity": "保持学术诚信"
+      },
+      "desc": "需要检测AI生成的学生作业的教师和教授。",
+      "testimonial": {
+        "author": "Dr. Robert Wilson",
+        "quote": "在AI时代保持学术标准的必备工具。",
+        "role": "大学教授"
+      },
+      "title": "教育工作者"
+    },
+    "freelancers": {
+      "benefits": {
+        "clients": "满足更多客户",
+        "income": "增加你的收入",
+        "quality": "交付更高质量的工作"
+      },
+      "desc": "需要向客户交付真实内容的独立写作者。",
+      "testimonial": {
+        "author": "Marcus Johnson",
+        "quote": "我的客户喜欢我的内容通过所有AI检测器。",
+        "role": "自由撰稿人"
+      },
+      "title": "自由撰稿人"
+    },
+    "keyBenefits": "主要优势",
+    "marketers": {
+      "benefits": {
+        "authentic": "创建真实的广告文案",
+        "brand": "保持品牌声音一致性",
+        "campaigns": "更快启动活动"
+      },
+      "desc": "需要高效制作真实品牌内容的营销专业人士。",
+      "testimonial": {
+        "author": "Rachel Martinez",
+        "quote": "有了更像人声的文案，我们的邮件打开率提高了40%。",
+        "role": "营销经理"
+      },
+      "title": "营销团队"
+    },
+    "startNow": "开始使用 Graphos AI",
+    "students": {
+      "benefits": {
+        "improve": "提高写作质量",
+        "learn": "从AI建议中学习",
+        "verify": "验证你的作品是原创的"
+      },
+      "desc": "想要确保作品原创且真实的学生和研究人员。",
+      "testimonial": {
+        "author": "Kevin Nguyen",
+        "quote": "我在提交前用它检查我的论文。很安心！",
+        "role": "研究生"
+      },
+      "title": "学生与学者"
+    },
+    "subtitle": "看看不同的专业人士如何使用 Graphos AI 来增强他们的写作",
+    "title": "专为每个写作者打造"
+  },
+  "voiceProfile": {
+    "description": "捕捉你独特的写作风格，并创建听起来真实像你的内容。",
+    "meta": {
+      "description": "创建你独特的写作声音档案，并生成听起来像你的内容。",
+      "title": "声音档案 - Graphos AI Studio"
+    },
+    "title": "声音档案"
+  },
+  "workspace": {
+    "askAnything": "随便问..."
+  },
+  "demoSamples": {
+    "aiDetection": {
+      "ai": {
+        "text": "人工智能在现代医疗系统中的应用代表着医学诊断和患者护理的范式转变。机器学习算法在分析医学影像数据方面展现出卓越的准确性，在检测某些疾病方面往往超越人类放射科医生。此外，自然语言处理技术能够高效地从电子病历中提取相关信息，促进更明智的临床决策。这些技术的整合有望在优化医疗机构资源配置的同时，彻底改善患者治疗效果。",
+        "indicators": {
+          "predictablePatterns": "可预测的句式模式"
+        }
+      },
+      "human": {
+        "text": "这个问题我已经想了好几周了，说实话？快把我逼疯了。每次觉得自己想通了，又会冒出新问题。我同事小李建议换个思路——也许我们把事情想复杂了。她说得可能对。我们这儿经常这样，特别是deadline快到的时候。昨天我熬到凌晨两点想解决这事，喝了太多咖啡。不是什么值得骄傲的时刻，但这就是创业生活嘛。",
+        "indicators": {
+          "conversationalTone": "对话式语气"
+        }
+      },
+      "mixed": {
+        "text": "人工智能通过复杂的算法和神经网络彻底改变了内容创作。但说实话——我仍然觉得人类创造力有些特别的东西是机器无法完全捕捉的。没错，AI可以生成技术上完美的文章，但它能告诉你那次我不小心把尴尬邮件发给整个团队的事吗？我觉得不行！人类直觉与机器精确度的交汇为创意领域带来了前所未有的创新机遇。",
+        "indicators": {
+          "rhetoricalQuestions": "检测到反问句",
+          "academicVocabulary": "存在学术词汇"
+        }
+      }
+    },
+    "humanization": {
+      "formal": {
+        "original": "近年来，在企业环境中实施可持续发展实践变得越来越重要。各组织正在认识到采用环保意识战略以确保长期生存能力和利益相关者满意度的必要性。",
+        "humanized": "你知道吗？最近我一直在想，企业终于开始认真对待环保了。这不再只是为了好看——他们意识到如果想长久发展，就真的需要关心环境。说实话？他们的客户和投资者也在推动这件事。"
+      },
+      "academic": {
+        "original": "研究表明，定期体育锻炼对改善心理健康有显著贡献。研究已证明，持续的锻炼习惯与焦虑和抑郁症状的减轻之间存在相关性。",
+        "humanized": "这是我从亲身经历中学到的：运动真的能帮助缓解压力和低落情绪。以前我觉得这只是健身达人的说法，但养成运动习惯后，我可以告诉你——科学是真的。自从我开始多运动，我的焦虑改善了很多。"
+      },
+      "technical": {
+        "original": "人工智能技术的进步为现代劳动力带来了机遇和挑战。日常任务的自动化可能会提高效率，同时也要求工人发展新的技能组合。",
+        "humanized": "AI正在改变我们工作的方方面面，说实话——有点吓人但也很令人兴奋？没错，机器人可能会接管一些无聊的工作（谢天谢地），但这也意味着我们都需要提升技能。我觉得未来属于那些能够适应的人。"
+      }
+    },
+    "compatibility": {
+      "high": {
+        "text": "我一直在思考我们如何应对日常挑战。关键是专注于真正重要的事情，同时保持足够的灵活性来适应变化。小而持续的步骤会随着时间带来显著的进步。"
+      },
+      "medium": {
+        "text": "在企业环境中实施可持续发展实践变得越来越重要。各组织必须认识到采用环保意识战略以在当今市场保持竞争力的必要性。"
+      },
+      "low": {
+        "text": "鉴于上述考虑因素，特此建议委员会对现有协议进行全面审查。此类努力的影响将是多方面且深远的。"
+      }
+    },
+    "deviations": {
+      "few": {
+        "text": "我一直在思考我们如何应对日常挑战。关键是专注于真正重要的事情。小而持续的步骤会随着时间带来显著的进步。我们应该拥抱变化并快速适应。",
+        "sentences": {
+          "0": "我一直在思考我们如何应对日常挑战。",
+          "1": "关键是专注于真正重要的事情。",
+          "2": "小而持续的步骤会随着时间带来显著的进步。",
+          "3": "我们应该拥抱变化并快速适应。"
+        }
+      },
+      "some": {
+        "text": "实施可持续发展实践变得越来越重要。各组织必须认识到采用环保意识战略的必要性。这种方法会带来显著的好处。企业应该立即行动。",
+        "sentences": {
+          "0": "实施可持续发展实践变得越来越重要。",
+          "1": "各组织必须认识到采用环保意识战略的必要性。",
+          "2": "这种方法会带来显著的好处。",
+          "3": "企业应该立即行动。"
+        }
+      },
+      "many": {
+        "text": "鉴于上述考虑因素，特此建议委员会进行全面审查。其影响将是多方面的。此类努力需要周密的规划。必须谨慎行事。",
+        "sentences": {
+          "0": "鉴于上述考虑因素，特此建议委员会进行全面审查。",
+          "1": "其影响将是多方面的。",
+          "2": "此类努力需要周密的规划。",
+          "3": "必须谨慎行事。"
+        }
+      }
+    },
+    "statistics": {
+      "blog": {
+        "text": "写出好内容不仅仅是有好想法。而是以一种能与读者产生共鸣的方式呈现它们。短句很有帮助。它们创造节奏感。而长句则让你能够探索复杂的想法，并在叙述中建立动力。"
+      },
+      "academic": {
+        "text": "在当代组织框架内实施可持续发展实践需要对环境、社会和治理因素有全面的理解。此外，将这些多方面的考虑因素整合到战略决策过程中，已显示出与长期机构韧性和利益相关者价值创造之间存在显著相关性。"
+      },
+      "casual": {
+        "text": "嘿！今天我去试了那家新开的咖啡店。其实还挺不错的。氛围很放松，咖啡师也超级友好。肯定会再去的。你有空也去看看！"
+      }
+    },
+    "rewrite": {
+      "professional": {
+        "original": "我觉得我们也许应该考虑看看实施一些新功能的可能性，这些功能可能在某些方面帮助改进我们的产品。如果我们能在某个时候讨论一下就好了。",
+        "rewritten": "我建议我们实施新功能来提升产品价值。让我们安排一次会议，讨论具体的改进措施及其对用户参与度的预期影响。我已经确定了三个需要优先考虑的关键领域。"
+      },
+      "casual": {
+        "original": "近年来，在企业环境中实施可持续发展实践变得越来越重要。各组织正在认识到采用环保意识战略的必要性。",
+        "rewritten": "你知道吗？最近我一直在想，企业终于开始认真对待环保了。这不再只是为了好看——他们意识到如果想长久发展，就真的需要关心环境。"
+      },
+      "concise": {
+        "original": "我写这封信是为了通知您，我想请求在您方便的最早时间安排一次会议，讨论探索我们各自组织之间潜在合作机会的可能性。",
+        "rewritten": "让我们安排一次会议讨论合作机会。这周什么时候方便？"
+      }
+    },
+    "workspace": {
+      "response": "你好，\n\n非常感谢你的联系！我很感激你抽出时间。\n\n这是我的看法：我觉得关键是保持简单和真实。不要想太多——做你自己，让你的个性闪耀。\n\n几个小建议：\n• 从个人化或容易产生共鸣的内容开始\n• 保持句子像对话一样自然，不要机械\n• 以明确的行动号召或下一步结束\n\n你想让我帮你进一步完善吗？我很乐意调整语气或添加更多细节！"
+    },
+    "voiceProfile": {
+      "sarah": {
+        "name": "陈晓",
+        "style": "专业 & 温暖",
+        "tone": "温暖 & 亲切",
+        "vocab": {
+          "0": "说实话",
+          "1": "我认为",
+          "2": "让我解释",
+          "3": "问题是"
+        }
+      },
+      "alex": {
+        "name": "李明",
+        "style": "休闲 & 创意",
+        "tone": "有趣 & 活力",
+        "vocab": {
+          "0": "基本上",
+          "1": "你知道",
+          "2": "有点像",
+          "3": "超级"
+        }
+      },
+      "james": {
+        "name": "王博士",
+        "style": "学术 & 精确",
+        "tone": "权威 & 稳重",
+        "vocab": {
+          "0": "此外",
+          "1": "因此",
+          "2": "研究表明",
+          "3": "数据显示"
+        }
+      }
+    }
   }
 }

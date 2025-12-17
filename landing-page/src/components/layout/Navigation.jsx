@@ -13,55 +13,95 @@ function Navigation({ mobile = false }) {
 
   const isActive = path => location.pathname === path
 
-  // Feature items with icons for modern look
+  // Feature items with icons and unique colors
   const featureItems = [
     { 
       label: t('nav.aiDetection'), 
       href: '/features/ai-detection',
       icon: 'shield-check',
-      description: t('nav.aiDetectionDesc', 'Detect AI-generated content')
+      description: t('nav.aiDetectionDesc', 'Detect AI-generated content'),
+      iconColor: 'icon-blue',
+      bgColor: 'bg-blue-50 dark:bg-blue-500/10',
+      iconBgColor: 'bg-blue-100 dark:bg-blue-500/20',
+      textColor: 'text-blue-600 dark:text-blue-400',
+      hoverTextColor: 'group-hover:text-blue-600 dark:group-hover:text-blue-400'
     },
     { 
       label: t('nav.humanization'), 
       href: '/features/humanization',
-      icon: 'sparkles',
-      description: t('nav.humanizationDesc', 'Make AI text sound natural')
+      icon: 'wand-sparkles',
+      description: t('nav.humanizationDesc', 'Make AI text sound natural'),
+      iconColor: 'icon-amber',
+      bgColor: 'bg-amber-50 dark:bg-amber-500/10',
+      iconBgColor: 'bg-amber-100 dark:bg-amber-500/20',
+      textColor: 'text-amber-600 dark:text-amber-400',
+      hoverTextColor: 'group-hover:text-amber-600 dark:group-hover:text-amber-400'
     },
     { 
       label: t('nav.voiceProfile'), 
       href: '/features/voice-profile',
-      icon: 'user-circle',
-      description: t('nav.voiceProfileDesc', 'Create your unique voice')
+      icon: 'mic',
+      description: t('nav.voiceProfileDesc', 'Create your unique voice'),
+      iconColor: 'icon-violet',
+      bgColor: 'bg-violet-50 dark:bg-violet-500/10',
+      iconBgColor: 'bg-violet-100 dark:bg-violet-500/20',
+      textColor: 'text-violet-600 dark:text-violet-400',
+      hoverTextColor: 'group-hover:text-violet-600 dark:group-hover:text-violet-400'
     },
     { 
       label: t('nav.rewrite', 'AI Rewrite'), 
       href: '/features/rewrite',
       icon: 'edit-3',
-      description: t('nav.rewriteDesc', 'Transform text in your voice')
+      description: t('nav.rewriteDesc', 'Transform text in your voice'),
+      iconColor: 'icon-emerald',
+      bgColor: 'bg-emerald-50 dark:bg-emerald-500/10',
+      iconBgColor: 'bg-emerald-100 dark:bg-emerald-500/20',
+      textColor: 'text-emerald-600 dark:text-emerald-400',
+      hoverTextColor: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
     },
     { 
       label: t('nav.compatibilityScore', 'Compatibility Score'), 
       href: '/features/compatibility-score',
       icon: 'target',
-      description: t('nav.compatibilityScoreDesc', 'Check your writing style match')
+      description: t('nav.compatibilityScoreDesc', 'Check your writing style match'),
+      iconColor: 'icon-teal',
+      bgColor: 'bg-teal-50 dark:bg-teal-500/10',
+      iconBgColor: 'bg-teal-100 dark:bg-teal-500/20',
+      textColor: 'text-teal-600 dark:text-teal-400',
+      hoverTextColor: 'group-hover:text-teal-600 dark:group-hover:text-teal-400'
     },
     { 
       label: t('nav.deviations', 'Deviations'), 
       href: '/features/deviations',
       icon: 'alert-triangle',
-      description: t('nav.deviationsDesc', 'Find style inconsistencies')
+      description: t('nav.deviationsDesc', 'Find style inconsistencies'),
+      iconColor: 'icon-orange',
+      bgColor: 'bg-orange-50 dark:bg-orange-500/10',
+      iconBgColor: 'bg-orange-100 dark:bg-orange-500/20',
+      textColor: 'text-orange-600 dark:text-orange-400',
+      hoverTextColor: 'group-hover:text-orange-600 dark:group-hover:text-orange-400'
     },
     { 
       label: t('nav.statistics', 'Statistics'), 
       href: '/features/statistics',
       icon: 'bar-chart-2',
-      description: t('nav.statisticsDesc', 'Analyze your writing metrics')
+      description: t('nav.statisticsDesc', 'Analyze your writing metrics'),
+      iconColor: 'icon-indigo',
+      bgColor: 'bg-indigo-50 dark:bg-indigo-500/10',
+      iconBgColor: 'bg-indigo-100 dark:bg-indigo-500/20',
+      textColor: 'text-indigo-600 dark:text-indigo-400',
+      hoverTextColor: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
     },
     { 
       label: t('nav.aiWorkspace'), 
       href: '/features/ai-workspace',
-      icon: 'layout-grid',
-      description: t('nav.aiWorkspaceDesc', 'All-in-one AI workspace')
+      icon: 'message-square',
+      description: t('nav.aiWorkspaceDesc', 'All-in-one AI workspace'),
+      iconColor: 'icon-cyan',
+      bgColor: 'bg-cyan-50 dark:bg-cyan-500/10',
+      iconBgColor: 'bg-cyan-100 dark:bg-cyan-500/20',
+      textColor: 'text-cyan-600 dark:text-cyan-400',
+      hoverTextColor: 'group-hover:text-cyan-600 dark:group-hover:text-cyan-400'
     },
   ]
 
@@ -165,23 +205,36 @@ function Navigation({ mobile = false }) {
                         <Link
                           key={childIndex}
                           to={child.href}
-                          className={`flex items-center gap-3 py-2.5 px-3 rounded-lg transition-all ${
+                          className={`flex items-center gap-3 py-2.5 px-3 rounded-lg transition-all group ${
                             isActive(child.href) 
-                              ? 'bg-primary/10 text-primary' 
-                              : 'text-text-secondary hover:bg-bg-hover/50 hover:text-text-primary'
+                              ? `${child.bgColor} ${child.textColor}` 
+                              : 'text-text-secondary hover:bg-bg-hover/50'
                           }`}
                         >
-                          <div className={`p-1.5 rounded-md ${
-                            isActive(child.href) ? 'bg-primary/20' : 'bg-bg-secondary'
+                          <div className={`p-1.5 rounded-md transition-colors ${
+                            isActive(child.href) ? child.iconBgColor : child.bgColor
                           }`}>
-                            <Icon name={child.icon} size="sm" color={isActive(child.href) ? 'primary' : 'gray-medium'} />
+                            <Icon name={child.icon} size="sm" className={child.iconColor} />
                           </div>
                           <div>
-                            <div className="text-sm font-medium">{child.label}</div>
+                            <div className={`text-sm font-medium transition-colors ${isActive(child.href) ? child.textColor : child.hoverTextColor}`}>{child.label}</div>
                             <div className="text-xs text-text-tertiary">{child.description}</div>
                           </div>
                         </Link>
                       ))}
+                      
+                      {/* View All Features Link - Mobile */}
+                      <Link
+                        to="/features"
+                        className={`flex items-center justify-center gap-2 py-2.5 px-3 mt-2 rounded-lg border border-dashed transition-all ${
+                          isActive('/features') 
+                            ? 'bg-violet-50 dark:bg-violet-500/10 border-violet-300 dark:border-violet-500/30 text-violet-600 dark:text-violet-400' 
+                            : 'border-gray-300 dark:border-gray-600 text-text-secondary hover:bg-bg-hover/50 hover:text-violet-600 dark:hover:text-violet-400'
+                        }`}
+                      >
+                        <Icon name="grid" size="sm" className="icon-violet" />
+                        <span className="text-sm font-medium">{t('nav.viewAllFeatures', 'View All Features')}</span>
+                      </Link>
                     </div>
                   </motion.div>
                 )}
@@ -252,25 +305,27 @@ function Navigation({ mobile = false }) {
                       <motion.div key={childIndex} variants={itemVariants}>
                         <Link
                           to={child.href}
-                          className={`flex items-center gap-3 p-3 rounded-lg transition-all group ${
+                          className={`flex items-center gap-3 p-2.5 rounded-lg transition-all group ${
                             isActive(child.href) 
-                              ? 'bg-gray-100 dark:bg-gray-800' 
-                              : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                              ? `${child.bgColor}` 
+                              : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
                           }`}
                         >
                           <div className={`p-2 rounded-lg transition-colors ${
                             isActive(child.href) 
-                              ? 'bg-gray-200 dark:bg-gray-700' 
-                              : 'bg-bg-secondary group-hover:bg-gray-200 dark:group-hover:bg-gray-700'
+                              ? child.iconBgColor 
+                              : child.bgColor
                           }`}>
                             <Icon 
                               name={child.icon} 
                               size="sm" 
-                              color="gray"
+                              className={child.iconColor}
                             />
                           </div>
                           <div className="flex-1">
-                            <div className="text-sm font-medium text-text-primary">
+                            <div className={`text-sm font-medium transition-colors ${
+                              isActive(child.href) ? child.textColor : `text-text-primary ${child.hoverTextColor}`
+                            }`}>
                               {child.label}
                             </div>
                             <div className="text-xs text-text-tertiary mt-0.5">
@@ -280,12 +335,29 @@ function Navigation({ mobile = false }) {
                           <Icon 
                             name="chevron-right" 
                             size="xs" 
-                            color="gray-medium"
-                            className="opacity-0 group-hover:opacity-60 transition-opacity" 
+                            className={`opacity-0 group-hover:opacity-60 transition-opacity ${child.iconColor}`}
                           />
                         </Link>
                       </motion.div>
                     ))}
+                    
+                    {/* View All Features Link */}
+                    <motion.div variants={itemVariants}>
+                      <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2">
+                        <Link
+                          to="/features"
+                          className={`flex items-center justify-center gap-2 p-2.5 rounded-lg transition-all group ${
+                            isActive('/features') 
+                              ? 'bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400' 
+                              : 'hover:bg-gray-50 dark:hover:bg-gray-800/50 text-text-secondary hover:text-violet-600 dark:hover:text-violet-400'
+                          }`}
+                        >
+                          <Icon name="grid" size="sm" className="icon-violet" />
+                          <span className="text-sm font-medium">{t('nav.viewAllFeatures', 'View All Features')}</span>
+                          <Icon name="arrow-right" size="xs" className="opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                        </Link>
+                      </div>
+                    </motion.div>
                   </div>
                 </motion.div>
               )}

@@ -1,11 +1,11 @@
 /**
  * FAQSection - Premium FAQ with animated accordion and category filters
- * Enhanced: Dec 2025 - Glassmorphism cards, smooth animations, better visual hierarchy
+ * Enhanced: Dec 2025 - Performance optimized, reduced motion support
  * Added: FAQ Schema structured data for SEO
  */
-import { useState, useMemo } from 'react'
+import { useState, useMemo, memo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Icon from '@components/common/Icon'
 import StructuredData from '@components/seo/StructuredData'
 
@@ -100,71 +100,71 @@ const CATEGORIES = [
   { key: 'security', labelKey: 'faq.categories.security', defaultLabel: 'Security', icon: 'shield-check' }
 ]
 
-const FAQItem = ({ item, isOpen, onToggle, t, index }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ delay: index * 0.05 }}
-    className={`group rounded-2xl border transition-all overflow-hidden ${
-      isOpen 
-        ? 'bg-bg-primary border-gray-200 dark:border-gray-700 shadow-md' 
-        : 'bg-bg-primary border-gray-200 dark:border-gray-700 hover:border-gray-300 hover:shadow-sm'
-    }`}
-  >
-    <button
-      onClick={onToggle}
-      className="w-full flex items-center justify-between p-5 text-left"
+const FAQItem = memo(({ item, isOpen, onToggle, t, index }) => {
+  return (
+    <div
+      className={`group rounded-xl sm:rounded-2xl border overflow-hidden transition-shadow duration-200 ${
+        isOpen 
+          ? 'bg-bg-primary border-gray-200 dark:border-gray-700 shadow-md' 
+          : 'bg-bg-primary border-gray-200 dark:border-gray-700 hover:border-gray-300 hover:shadow-sm'
+      }`}
     >
-      <div className="flex items-center gap-4 pr-4">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-          isOpen ? 'bg-primary text-white' : 'bg-bg-secondary text-primary group-hover:bg-primary/10'
-        }`}>
-          <span className="text-sm font-bold">{String(index + 1).padStart(2, '0')}</span>
-        </div>
-        <span className={`text-base font-semibold transition-colors ${
-          isOpen ? 'text-primary' : 'text-text-primary group-hover:text-primary'
-        }`}>
-          {t(item.questionKey, item.defaultQuestion)}
-        </span>
-      </div>
-      <motion.div
-        animate={{ rotate: isOpen ? 180 : 0 }}
-        transition={{ duration: 0.2, ease: 'easeInOut' }}
-        className="flex-shrink-0 w-8 h-8 flex items-center justify-center transition-all"
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center justify-between p-3 sm:p-4 lg:p-5 text-left"
+        aria-expanded={isOpen}
       >
-        <Icon name="chevron-down" size="sm" className={isOpen ? 'text-primary' : 'text-text-muted'} />
-      </motion.div>
-    </button>
-    
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-          className="overflow-hidden"
+        <div className="flex items-center gap-2.5 sm:gap-3 lg:gap-4 pr-2 sm:pr-4 min-w-0">
+          <div className={`w-8 sm:w-9 lg:w-10 h-8 sm:h-9 lg:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-colors duration-200 flex-shrink-0 ${
+            isOpen ? 'bg-primary text-white' : 'bg-bg-secondary text-primary group-hover:bg-primary/10'
+          }`}>
+            <span className="text-xs sm:text-sm font-bold">{String(index + 1).padStart(2, '0')}</span>
+          </div>
+          <span className={`text-sm sm:text-base font-semibold transition-colors duration-200 line-clamp-2 ${
+            isOpen ? 'text-primary' : 'text-text-primary group-hover:text-primary'
+          }`}>
+            {t(item.questionKey, item.defaultQuestion)}
+          </span>
+        </div>
+        <div
+          className={`flex-shrink-0 w-6 sm:w-7 lg:w-8 h-6 sm:h-7 lg:h-8 flex items-center justify-center transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : 'rotate-0'
+          }`}
         >
-          <div className="px-5 pb-5 pl-[4.5rem]">
-            <p className="text-text-secondary leading-relaxed">
+          <Icon name="chevron-down" size="sm" className={isOpen ? 'text-primary' : 'text-text-muted'} />
+        </div>
+      </button>
+      
+      {/* Optimized accordion content - using CSS grid for smooth height animation */}
+      <div 
+        className="grid transition-[grid-template-rows] duration-200 ease-out"
+        style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
+      >
+        <div className="overflow-hidden">
+          <div className="px-3 sm:px-4 lg:px-5 pb-3 sm:pb-4 lg:pb-5 pl-[2.75rem] sm:pl-[3.25rem] lg:pl-[4.5rem]">
+            <p className="text-xs sm:text-sm lg:text-base text-text-secondary leading-relaxed">
               {t(item.answerKey, item.defaultAnswer)}
             </p>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </motion.div>
-)
+        </div>
+      </div>
+    </div>
+  )
+})
 
-function FAQSection() {
+FAQItem.displayName = 'FAQItem'
+
+const FAQSection = memo(() => {
   const { t } = useTranslation()
   const [openId, setOpenId] = useState('what-is')
   const [activeCategory, setActiveCategory] = useState('all')
 
-  const filteredItems = activeCategory === 'all' 
-    ? FAQ_ITEMS 
-    : FAQ_ITEMS.filter(item => item.categoryKey === activeCategory)
+  const filteredItems = useMemo(() => 
+    activeCategory === 'all' 
+      ? FAQ_ITEMS 
+      : FAQ_ITEMS.filter(item => item.categoryKey === activeCategory),
+    [activeCategory]
+  )
 
   // Generate FAQ structured data for SEO
   const faqStructuredData = useMemo(() => ({
@@ -174,37 +174,43 @@ function FAQSection() {
     }))
   }), [t])
 
+  // Memoized toggle handler
+  const handleToggle = useCallback((id) => {
+    setOpenId(prev => prev === id ? null : id)
+  }, [])
+
   return (
     <>
       <StructuredData type="FAQPage" data={faqStructuredData} />
-    <section id="faq" className="py-20 lg:py-28 bg-bg-secondary/50 relative overflow-hidden">
+    <section id="faq" className="py-12 sm:py-16 lg:py-20 xl:py-28 bg-bg-secondary/50 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-64 sm:w-96 h-64 sm:h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 sm:w-80 h-48 sm:h-80 bg-purple-500/5 rounded-full blur-3xl" />
+
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 relative">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-10 lg:mb-12"
         >
           <motion.span 
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-bg-primary text-primary text-sm font-semibold rounded-full mb-4 border border-gray-200 dark:border-gray-700 shadow-sm"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-bg-primary text-primary text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 border border-gray-200 dark:border-gray-700 shadow-sm"
           >
             <Icon name="help-circle" size="sm" className="icon-primary" />
             {t('faq.badge', 'FAQ')}
           </motion.span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-3 sm:mb-4">
             {t('faq.title', 'Frequently Asked Questions')}
           </h2>
-          <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2 sm:px-0">
             {t('faq.subtitle', 'Everything you need to know about Graphos AI Studio')}
           </p>
         </motion.div>
@@ -214,70 +220,67 @@ function FAQSection() {
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-2 mb-10"
+          className="mb-6 sm:mb-8 lg:mb-10"
         >
-          {CATEGORIES.map((cat, index) => (
-            <motion.button
-              key={cat.key}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setActiveCategory(cat.key)}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all ${
-                activeCategory === cat.key
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'bg-bg-primary text-text-secondary hover:bg-bg-hover border border-gray-200 dark:border-gray-700'
-              }`}
-            >
-              <Icon name={cat.icon} size="sm" className={activeCategory === cat.key ? 'icon-white' : ''} />
-              {t(cat.labelKey, cat.defaultLabel)}
-            </motion.button>
-          ))}
+          <div className="flex flex-wrap justify-center gap-2 px-2 sm:px-0">
+            {CATEGORIES.map((cat, index) => (
+              <motion.button
+                key={cat.key}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.03 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setActiveCategory(cat.key)}
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-lg sm:rounded-xl transition-all ${
+                  activeCategory === cat.key
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-bg-primary text-text-secondary hover:bg-bg-hover border border-gray-200 dark:border-gray-700'
+                }`}
+              >
+                <Icon name={cat.icon} size="sm" className={activeCategory === cat.key ? 'icon-white' : ''} />
+                {t(cat.labelKey, cat.defaultLabel)}
+              </motion.button>
+            ))}
+          </div>
         </motion.div>
 
         {/* FAQ List */}
-        <motion.div
-          layout
-          className="space-y-3"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredItems.map((item, index) => (
-              <FAQItem
-                key={item.id}
-                item={item}
-                index={index}
-                isOpen={openId === item.id}
-                onToggle={() => setOpenId(openId === item.id ? null : item.id)}
-                t={t}
-              />
-            ))}
-          </AnimatePresence>
-        </motion.div>
+        <div className="space-y-3">
+          {filteredItems.map((item, index) => (
+            <FAQItem
+              key={item.id}
+              item={item}
+              index={index}
+              isOpen={openId === item.id}
+              onToggle={() => handleToggle(item.id)}
+              t={t}
+            />
+          ))}
+        </div>
 
         {/* Contact CTA Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 p-8 bg-bg-primary rounded-2xl border border-gray-200 dark:border-gray-700 text-center"
+          className="mt-8 sm:mt-10 lg:mt-12 p-5 sm:p-6 lg:p-8 bg-bg-primary rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-700 text-center"
         >
-          <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-xl flex items-center justify-center">
-            <Icon name="message-circle" size="xl" className="icon-primary" />
+          <div className="w-12 sm:w-14 lg:w-16 h-12 sm:h-14 lg:h-16 mx-auto mb-3 sm:mb-4 bg-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center">
+            <Icon name="message-circle" size="lg" className="icon-primary sm:!w-6 sm:!h-6 lg:!w-7 lg:!h-7" />
           </div>
-          <h3 className="text-xl font-bold text-text-primary mb-2">
+          <h3 className="text-lg sm:text-xl font-bold text-text-primary mb-1.5 sm:mb-2">
             {t('faq.stillHaveQuestions', "Still have questions?")}
           </h3>
-          <p className="text-text-secondary mb-6 max-w-md mx-auto">
+          <p className="text-sm sm:text-base text-text-secondary mb-4 sm:mb-5 lg:mb-6 max-w-sm sm:max-w-md mx-auto">
             {t('faq.contactDescription', "Can't find what you're looking for? Our support team is here to help.")}
           </p>
           <motion.a
-            href="mailto:support@graphosai.com"
+            href="mailto:Support@graphosai.com"
             whileHover={{ scale: 1.02, y: -1 }}
             whileTap={{ scale: 0.98 }}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-hover transition-all shadow-sm hover:shadow-md"
+            className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-primary text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base hover:bg-primary-hover transition-all shadow-sm hover:shadow-md w-full sm:w-auto"
           >
             <Icon name="mail" size="sm" className="icon-white" />
             {t('faq.contactSupport', 'Contact Support')}
@@ -287,6 +290,11 @@ function FAQSection() {
     </section>
     </>
   )
-}
+})
+
+FAQSection.displayName = 'FAQSection'
 
 export default FAQSection
+
+
+

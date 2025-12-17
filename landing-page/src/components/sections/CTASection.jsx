@@ -10,22 +10,23 @@ function CTASection() {
   const { t } = useTranslation()
 
   return (
-    <section className="pt-0 pb-20 lg:pb-28 bg-bg-secondary/50 relative overflow-hidden">
+    <section className="pt-0 pb-12 sm:pb-16 lg:pb-20 xl:pb-28 bg-bg-secondary/50 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div 
           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 10, repeat: Infinity }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-primary/5 rounded-full blur-3xl" 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] sm:w-[700px] lg:w-[900px] h-[500px] sm:h-[700px] lg:h-[900px] bg-primary/5 rounded-full blur-3xl" 
         />
+
       </div>
 
-      <div className="relative max-w-content-lg mx-auto px-4">
+      <div className="relative w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative rounded-[2rem] overflow-hidden"
+          className="relative rounded-2xl sm:rounded-3xl lg:rounded-[2rem] overflow-hidden"
         >
           {/* Solid Background */}
           <div className="absolute inset-0 bg-primary" />
@@ -45,24 +46,24 @@ function CTASection() {
             </svg>
           </div>
 
-          <div className="relative p-10 md:p-14 lg:p-20 text-center">
+          <div className="relative p-6 sm:p-8 md:p-10 lg:p-14 xl:p-20 text-center">
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full mb-8 border border-white/[0.15]"
+              className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 bg-white/10 backdrop-blur-sm rounded-full mb-5 sm:mb-6 lg:mb-8 border border-white/[0.15]"
             >
               <motion.span 
                 animate={{ scale: [1, 1.3, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="w-2.5 h-2.5 bg-white rounded-full"
+                className="w-2 sm:w-2.5 h-2 sm:h-2.5 bg-white rounded-full"
               />
-              <span className="text-white/90 text-sm font-semibold">
+              <span className="text-white/90 text-xs sm:text-sm font-semibold">
                 {t('cta.badge', 'Start for free today')}
               </span>
-              <Icon name="sparkles" size="sm" className="icon-white opacity-80" />
+              <Icon name="sparkles" size="sm" className="icon-white opacity-80 hidden sm:block" />
             </motion.div>
 
             {/* Headline */}
@@ -71,7 +72,7 @@ function CTASection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-5 lg:mb-6 leading-tight px-2 sm:px-0"
             >
               {t('home.cta.title', 'Ready to Write Authentic Content?')}
             </motion.h2>
@@ -82,7 +83,7 @@ function CTASection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed"
+              className="text-base sm:text-lg md:text-xl text-white/80 mb-6 sm:mb-8 lg:mb-10 max-w-xl sm:max-w-2xl mx-auto leading-relaxed px-2 sm:px-0"
             >
               {t('home.cta.description', 'Join thousands of writers who use Graphos AI Studio to create authentic, human-like content.')}
             </motion.p>
@@ -93,7 +94,7 @@ function CTASection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8 lg:mb-10 px-4 sm:px-0"
             >
               <motion.a
                 href="https://app.graphosai.com"
@@ -101,7 +102,7 @@ function CTASection() {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.02, y: -1 }}
                 whileTap={{ scale: 0.98 }}
-                className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary rounded-xl font-bold text-lg shadow-sm hover:shadow-lg transition-all"
+                className="group inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-white text-primary rounded-xl font-bold text-base sm:text-lg shadow-sm hover:shadow-lg transition-all w-full sm:w-auto"
               >
                 <span>{t('cta.getStartedFree', 'Get Started Free')}</span>
                 <Icon name="arrow-right" size="md" color="primary" className="group-hover:translate-x-0.5 transition-transform" />
@@ -112,7 +113,7 @@ function CTASection() {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.02, y: -1 }}
                 whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-bold text-lg border border-white/[0.15] hover:bg-white/15 hover:border-white/[0.25] transition-all"
+                className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-bold text-base sm:text-lg border border-white/[0.15] hover:bg-white/15 hover:border-white/[0.25] transition-all w-full sm:w-auto"
               >
                 <Icon name="chrome" size="md" className="icon-white" />
                 {t('cta.installExtension', 'Install Extension')}
@@ -125,7 +126,7 @@ function CTASection() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.5 }}
-              className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-white/70"
+              className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-2 sm:gap-y-3 text-xs sm:text-sm text-white/70"
             >
               {[
                 { icon: 'gift', text: t('cta.trust.free', 'Free forever plan') },
@@ -138,7 +139,7 @@ function CTASection() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.6 + i * 0.1 }}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1.5 sm:gap-2"
                 >
                   <Icon name={item.icon} size="sm" className="icon-white opacity-80" />
                   <span>{item.text}</span>
@@ -174,3 +175,6 @@ function CTASection() {
 }
 
 export default CTASection
+
+
+

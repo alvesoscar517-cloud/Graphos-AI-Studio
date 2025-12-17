@@ -1,6 +1,10 @@
+/**
+ * Terms - SEO-optimized Terms of Service page
+ * Enhanced: Dec 2025 - Full SEO optimization
+ */
 import { useTranslation } from 'react-i18next'
 import { useState, useEffect } from 'react'
-import SEOHead from '@components/seo/SEOHead'
+import PageSEO from '@components/seo/PageSEO'
 
 const sections = [
   { id: 'acceptance', title: 'Acceptance of Terms' },
@@ -85,16 +89,12 @@ function Terms() {
 
   return (
     <>
-      <SEOHead
-        title={t('terms.meta.title')}
-        description={t('terms.meta.description')}
-        keywords={['terms of service', 'user agreement', 'terms and conditions', 'AI writing tool terms']}
-      />
+      <PageSEO pageKey="terms" />
       
       <div className="min-h-screen bg-bg-primary relative">
         {/* Header */}
         <header className="bg-bg-primary border-b border-gray-100 dark:border-gray-800">
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 pt-4 pb-6">
             <div className="flex items-center gap-2 text-sm text-text-muted mb-3">
               <span>Legal</span>
               <span>/</span>
@@ -110,7 +110,7 @@ function Terms() {
         </header>
 
         {/* Content */}
-        <div className="max-w-content-lg mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-8">
           <div className="flex gap-12">
             {/* Main Content */}
             <article className="flex-1 min-w-0">
@@ -796,3 +796,6 @@ function Terms() {
 }
 
 export default Terms
+
+
+

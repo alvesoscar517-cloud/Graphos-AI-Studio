@@ -1,10 +1,16 @@
+/**
+ * Humanization - SEO-optimized Content Humanization feature page
+ * Enhanced: Dec 2025 - Full SEO optimization
+ */
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, lazy, Suspense, useEffect, useRef } from 'react'
-import SEOHead from '@components/seo/SEOHead'
-import StructuredData from '@components/seo/StructuredData'
+import PageSEO from '@components/seo/PageSEO'
 import Breadcrumb from '@components/common/Breadcrumb'
 import Icon from '@components/common/Icon'
+import RelatedFeatures from '@components/common/RelatedFeatures'
+import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
+import FAQAccordion from '@components/common/FAQAccordion'
 
 // Lazy load the live demo
 const LiveHumanizationDemo = lazy(() => import('@components/demos/LiveHumanizationDemo'))
@@ -19,9 +25,9 @@ const TransformationBackground = () => (
     {/* Base gradient - warm tones for humanization */}
     <div className="absolute inset-0 bg-gradient-to-b from-amber-100/80 via-orange-50/40 to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-900" />
     
-    {/* SVG Transformation Visual */}
+    {/* SVG Transformation Visual - Responsive sizing */}
     <svg 
-      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[800px] opacity-100"
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] sm:w-[650px] md:w-[800px] lg:w-[1000px] h-[400px] sm:h-[520px] md:h-[640px] lg:h-[800px] opacity-100"
       viewBox="0 0 1000 800"
       fill="none"
     >
@@ -221,18 +227,18 @@ const TransformationBackground = () => (
       </g>
     </svg>
     
-    {/* Ambient glow - warm */}
+    {/* Ambient glow - warm - Responsive */}
     <div 
-      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] pointer-events-none"
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[400px] md:w-[500px] lg:w-[600px] h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] pointer-events-none"
       style={{
         background: 'radial-gradient(circle at center, rgba(251, 191, 36, 0.08) 0%, transparent 70%)',
         filter: 'blur(60px)',
       }}
     />
     
-    {/* Secondary glow - right side */}
+    {/* Secondary glow - right side - Responsive */}
     <div 
-      className="absolute top-1/3 right-1/4 w-[300px] h-[300px] pointer-events-none"
+      className="absolute top-1/3 right-1/4 w-[150px] sm:w-[200px] md:w-[250px] lg:w-[300px] h-[150px] sm:h-[200px] md:h-[250px] lg:h-[300px] pointer-events-none"
       style={{
         background: 'radial-gradient(circle at center, rgba(251, 146, 60, 0.1) 0%, transparent 70%)',
         filter: 'blur(40px)',
@@ -345,34 +351,43 @@ const UseCasesMarqueeSection = ({ t, useCases }) => {
   const marqueeItems = [...extendedUseCases, ...extendedUseCases, ...extendedUseCases]
   
   return (
-    <section className="py-20 lg:py-28 overflow-hidden">
-      <div className="max-w-content-lg mx-auto px-4 sm:px-6">
-        {/* Header */}
-        <div className="text-center mb-12">
+    <section className="py-12 sm:py-16 md:py-20 lg:py-28 overflow-hidden relative">
+      {/* Background decoration */}
+      <div className="absolute inset-0 pointer-events-none">
+        <img 
+          src="/images/backgrounds/bg-wave-9.svg" 
+          alt="" 
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover opacity-100"
+        />
+      </div>
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 relative">
+        {/* Header - Responsive */}
+        <div className="text-center mb-8 sm:mb-10 md:mb-12">
           <motion.span 
             initial={{ opacity: 0, scale: 0.9 }} 
             whileInView={{ opacity: 1, scale: 1 }} 
             viewport={{ once: true }} 
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-amber-500/20"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 shadow-lg shadow-amber-500/20"
           >
             <Icon name="target" size="sm" className="icon-white" />
             {t('features.humanization.useCasesBadge', 'Use Cases')}
           </motion.span>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
             {t('features.humanization.useCasesTitle', 'Perfect For')}
           </h2>
-          <p className="text-text-secondary max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
             {t('features.humanization.useCasesDesc', 'Click any use case to see how humanization transforms your content')}
           </p>
         </div>
         
-        {/* Marquee Container */}
+        {/* Marquee Container - Responsive */}
         <div 
-          className="relative mb-10"
+          className="relative mb-6 sm:mb-8 md:mb-10"
         >
           {/* Marquee Track */}
           <motion.div 
-            className="flex gap-4"
+            className="flex gap-2 sm:gap-3 md:gap-4"
             animate={{ 
               x: [0, '-33.33%'] 
             }}
@@ -394,7 +409,7 @@ const UseCasesMarqueeSection = ({ t, useCases }) => {
                   whileHover={{ scale: 1.05, y: -4 }}
                   whileTap={{ scale: 0.98 }}
                   className={`
-                    relative flex items-center gap-3 px-5 py-3 rounded-2xl border-2 transition-all duration-300 flex-shrink-0
+                    relative flex items-center gap-2 sm:gap-3 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 rounded-xl sm:rounded-2xl border-2 transition-all duration-300 flex-shrink-0
                     ${isSelected 
                       ? 'bg-gradient-to-r from-amber-500 to-orange-500 border-transparent text-white shadow-xl shadow-amber-500/30' 
                       : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:border-amber-300 text-text-primary'
@@ -402,7 +417,7 @@ const UseCasesMarqueeSection = ({ t, useCases }) => {
                   `}
                 >
                   <div className={`
-                    w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all
+                    w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 transition-all
                     ${isSelected 
                       ? 'bg-white/20' 
                       : 'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-500/20 dark:to-orange-500/20'
@@ -414,7 +429,7 @@ const UseCasesMarqueeSection = ({ t, useCases }) => {
                       className={isSelected ? 'icon-white' : 'icon-amber'} 
                     />
                   </div>
-                  <span className="font-semibold whitespace-nowrap">{item.title}</span>
+                  <span className="text-sm sm:text-base font-semibold whitespace-nowrap">{item.title}</span>
                   
 
                 </motion.button>
@@ -423,7 +438,7 @@ const UseCasesMarqueeSection = ({ t, useCases }) => {
           </motion.div>
         </div>
         
-        {/* Spotlight Showcase */}
+        {/* Spotlight Showcase - Responsive */}
         <AnimatePresence mode="wait">
           <motion.div
             key={selectedCase}
@@ -433,87 +448,88 @@ const UseCasesMarqueeSection = ({ t, useCases }) => {
             transition={{ duration: 0.4, ease: 'easeOut' }}
             className="relative"
           >
-            <div className="relative bg-gradient-to-br from-amber-100/90 via-orange-100/60 to-amber-50/80 dark:from-slate-800 dark:via-slate-800/50 dark:to-slate-900 rounded-3xl border border-amber-300/60 dark:border-amber-500/20 overflow-hidden">
-              {/* Background decoration */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-amber-300/40 to-transparent rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-orange-300/40 to-transparent rounded-full blur-2xl pointer-events-none" />
+            <div className="relative bg-gradient-to-br from-amber-100/90 via-orange-100/60 to-amber-50/80 dark:from-slate-800 dark:via-slate-800/50 dark:to-slate-900 rounded-2xl sm:rounded-3xl border border-amber-300/60 dark:border-amber-500/20 overflow-hidden">
+              {/* Background decoration - Responsive */}
+              <div className="absolute top-0 right-0 w-32 sm:w-48 md:w-64 h-32 sm:h-48 md:h-64 bg-gradient-to-bl from-amber-300/40 to-transparent rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-24 sm:w-36 md:w-48 h-24 sm:h-36 md:h-48 bg-gradient-to-tr from-orange-300/40 to-transparent rounded-full blur-2xl pointer-events-none" />
               
-              <div className="relative p-8 md:p-10">
-                <div className="grid lg:grid-cols-2 gap-8 items-center">
+              <div className="relative p-4 sm:p-6 md:p-8 lg:p-10">
+                <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 items-center">
                   {/* Left: Info */}
                   <div>
-                    {/* Icon & Title */}
-                    <div className="flex items-center gap-4 mb-6">
+                    {/* Icon & Title - Responsive */}
+                    <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
                       <motion.div 
                         initial={{ rotate: -10, scale: 0.8 }}
                         animate={{ rotate: 0, scale: 1 }}
-                        className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-xl shadow-amber-500/30"
+                        className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl shadow-amber-500/30"
                       >
-                        <Icon name={extendedUseCases[selectedCase].icon} size="2xl" className="icon-white" />
+                        <Icon name={extendedUseCases[selectedCase].icon} size="xl" className="icon-white sm:hidden" />
+                        <Icon name={extendedUseCases[selectedCase].icon} size="2xl" className="icon-white hidden sm:block" />
                       </motion.div>
                       <div>
-                        <h3 className="text-2xl font-bold text-text-primary">
+                        <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-text-primary">
                           {extendedUseCases[selectedCase].title}
                         </h3>
-                        <p className="text-amber-600 dark:text-amber-400 font-medium">
+                        <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-400 font-medium">
                           {t('features.humanization.useCases.spotlight', 'Spotlight')}
                         </p>
                       </div>
                     </div>
                     
-                    {/* Description */}
-                    <p className="text-text-secondary text-lg leading-relaxed mb-6">
+                    {/* Description - Responsive */}
+                    <p className="text-sm sm:text-base md:text-lg text-text-secondary leading-relaxed mb-4 sm:mb-6">
                       {extendedUseCases[selectedCase].description}
                     </p>
                     
-                    {/* Stats badge */}
-                    <div className="inline-flex items-center gap-3 px-4 py-2 bg-white dark:bg-slate-700 rounded-xl border border-amber-200 dark:border-amber-500/30 shadow-sm">
+                    {/* Stats badge - Responsive */}
+                    <div className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 bg-white dark:bg-slate-700 rounded-lg sm:rounded-xl border border-amber-200 dark:border-amber-500/30 shadow-sm">
                       <Icon name="trending-up" size="sm" className="icon-amber" />
-                      <span className="text-sm text-text-secondary">{extendedUseCases[selectedCase].stats.label}:</span>
-                      <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+                      <span className="text-xs sm:text-sm text-text-secondary">{extendedUseCases[selectedCase].stats.label}:</span>
+                      <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
                         {extendedUseCases[selectedCase].stats.value}
                       </span>
                     </div>
                   </div>
                   
-                  {/* Right: Example transformation */}
+                  {/* Right: Example transformation - Responsive */}
                   <div className="relative">
-                    <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xl overflow-hidden">
-                      {/* Window header */}
-                      <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
-                        <div className="flex gap-1.5">
-                          <div className="w-3 h-3 rounded-full bg-red-400" />
-                          <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                          <div className="w-3 h-3 rounded-full bg-green-400" />
+                    <div className="bg-white dark:bg-slate-800 rounded-lg sm:rounded-xl border border-gray-200 dark:border-slate-700 shadow-xl overflow-hidden">
+                      {/* Window header - Responsive */}
+                      <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
+                        <div className="flex gap-1 sm:gap-1.5">
+                          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-400" />
+                          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-yellow-400" />
+                          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-400" />
                         </div>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                        <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 ml-1 sm:ml-2">
                           {t('features.humanization.useCases.preview', 'Transformation Preview')}
                         </span>
                       </div>
                       
-                      {/* Content */}
-                      <div className="p-5">
+                      {/* Content - Responsive */}
+                      <div className="p-3 sm:p-4 md:p-5">
                         {/* Before */}
-                        <div className="mb-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="w-5 h-5 rounded bg-gray-100 dark:bg-slate-600 flex items-center justify-center">
+                        <div className="mb-3 sm:mb-4">
+                          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                            <div className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-gray-100 dark:bg-slate-600 flex items-center justify-center">
                               <Icon name="cpu" size="xs" color="gray-medium" />
                             </div>
-                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">AI Generated</span>
+                            <span className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400">{t('features.labels.aiGenerated', 'AI Generated')}</span>
                           </div>
-                          <div className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600">
-                            <p className="text-sm text-gray-500 dark:text-gray-400 line-through opacity-70">
+                          <div className="p-2 sm:p-3 bg-gray-50 dark:bg-slate-700 rounded-md sm:rounded-lg border border-gray-200 dark:border-slate-600">
+                            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-through opacity-70">
                               {extendedUseCases[selectedCase].example.split('→')[0].replace(/"/g, '').trim()}
                             </p>
                           </div>
                         </div>
                         
-                        {/* Arrow */}
-                        <div className="flex justify-center my-3">
+                        {/* Arrow - Responsive */}
+                        <div className="flex justify-center my-2 sm:my-3">
                           <motion.div
                             animate={{ y: [0, 4, 0] }}
                             transition={{ duration: 1.5, repeat: Infinity }}
-                            className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg"
+                            className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg"
                           >
                             <Icon name="arrow-down" size="sm" className="icon-white" />
                           </motion.div>
@@ -521,14 +537,14 @@ const UseCasesMarqueeSection = ({ t, useCases }) => {
                         
                         {/* After */}
                         <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="w-5 h-5 rounded bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+                          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                            <div className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
                               <Icon name="sparkles" size="xs" className="icon-amber" />
                             </div>
-                            <span className="text-xs font-medium text-amber-600 dark:text-amber-400">Humanized</span>
+                            <span className="text-[10px] sm:text-xs font-medium text-amber-600 dark:text-amber-400">{t('demo.humanized', 'Humanized')}</span>
                           </div>
-                          <div className="p-3 bg-gradient-to-r from-amber-100/90 to-orange-100/80 dark:from-amber-500/15 dark:to-orange-500/15 rounded-lg border border-amber-300/70 dark:border-amber-500/30">
-                            <p className="text-sm text-gray-800 dark:text-gray-200">
+                          <div className="p-2 sm:p-3 bg-gradient-to-r from-amber-100/90 to-orange-100/80 dark:from-amber-500/15 dark:to-orange-500/15 rounded-md sm:rounded-lg border border-amber-300/70 dark:border-amber-500/30">
+                            <p className="text-xs sm:text-sm text-gray-800 dark:text-gray-200">
                               {extendedUseCases[selectedCase].example.split('→')[1]?.replace(/"/g, '').trim() || ''}
                             </p>
                           </div>
@@ -536,28 +552,28 @@ const UseCasesMarqueeSection = ({ t, useCases }) => {
                       </div>
                     </div>
                     
-                    {/* Floating badge */}
+                    {/* Floating badge - Responsive */}
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8, x: 20 }}
                       animate={{ opacity: 1, scale: 1, x: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="absolute -top-3 -right-3 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold rounded-full shadow-lg"
+                      className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] sm:text-xs font-bold rounded-full shadow-lg"
                     >
                       {extendedUseCases[selectedCase].stats.value}
                     </motion.div>
                   </div>
                 </div>
                 
-                {/* Navigation dots */}
-                <div className="flex justify-center gap-2 mt-8">
+                {/* Navigation dots - Responsive */}
+                <div className="flex justify-center gap-1.5 sm:gap-2 mt-4 sm:mt-6 md:mt-8">
                   {extendedUseCases.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedCase(index)}
                       className={`
-                        w-2.5 h-2.5 rounded-full transition-all duration-300
+                        w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300
                         ${selectedCase === index 
-                          ? 'w-8 bg-gradient-to-r from-amber-500 to-orange-500' 
+                          ? 'w-6 sm:w-8 bg-gradient-to-r from-amber-500 to-orange-500' 
                           : 'bg-gray-300 dark:bg-slate-600 hover:bg-amber-300'
                         }
                       `}
@@ -569,16 +585,16 @@ const UseCasesMarqueeSection = ({ t, useCases }) => {
           </motion.div>
         </AnimatePresence>
         
-        {/* CTA */}
+        {/* CTA - Responsive */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-10 text-center"
+          className="mt-6 sm:mt-8 md:mt-10 text-center"
         >
           <a 
             href="#demo" 
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/30 transition-all"
+            className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/30 transition-all"
           >
             <Icon name="wand-sparkles" size="sm" className="icon-white" />
             <span>{t('features.humanization.tryYourContent', 'Try With Your Content')}</span>
@@ -744,29 +760,29 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
   }
   
   return (
-    <section className="py-20 lg:py-28 overflow-hidden">
-      <div className="max-w-content-lg mx-auto px-4 sm:px-6">
-        {/* Header */}
-        <div className="text-center mb-12">
+    <section className="py-12 sm:py-16 md:py-20 lg:py-28 overflow-hidden">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+        {/* Header - Responsive */}
+        <div className="text-center mb-8 sm:mb-10 md:mb-12">
           <motion.span 
             initial={{ opacity: 0, scale: 0.9 }} 
             whileInView={{ opacity: 1, scale: 1 }} 
             viewport={{ once: true }} 
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-amber-500/20"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 shadow-lg shadow-amber-500/20"
           >
             <Icon name="wand-sparkles" size="sm" className="icon-white" />
             {t('features.humanization.examplesTitle', 'See the Difference')}
           </motion.span>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
             {t('features.humanization.transformations', 'Real Transformations')}
           </h2>
-          <p className="text-text-secondary max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
             {t('features.humanization.transformationsDesc', 'See how AI-generated text transforms into natural, human-like writing')}
           </p>
         </div>
         
-        {/* Style Selector Pills */}
-        <div className="flex flex-wrap justify-center gap-3 mb-10">
+        {/* Style Selector Pills - Responsive */}
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8 md:mb-10 px-2">
           {transformationExamples.map((example, index) => (
             <motion.button
               key={index}
@@ -774,7 +790,7 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className={`
-                flex items-center gap-2 px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-300
+                flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-full font-medium text-xs sm:text-sm transition-all duration-300
                 ${activeExample === index 
                   ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/25' 
                   : 'bg-white border border-gray-200 text-gray-600 hover:border-amber-300 hover:text-amber-600'
@@ -782,12 +798,12 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
               `}
             >
               <Icon name={example.icon} size="sm" className={activeExample === index ? 'icon-white' : ''} />
-              {example.style}
+              <span className="whitespace-nowrap">{example.style}</span>
             </motion.button>
           ))}
         </div>
         
-        {/* Main Transformation Card */}
+        {/* Main Transformation Card - Responsive */}
         <motion.div
           key={activeExample}
           initial={{ opacity: 0, y: 20 }}
@@ -795,27 +811,27 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
           transition={{ duration: 0.4 }}
           className="relative"
         >
-          <div className="relative bg-white rounded-xl border border-gray-200 shadow-xl overflow-hidden">
-            {/* Card Header - Toolbar */}
-            <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-amber-400 to-orange-500">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+          <div className="relative bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-xl overflow-hidden">
+            {/* Card Header - Toolbar - Responsive */}
+            <div className="flex items-center justify-between px-3 sm:px-4 md:px-6 py-3 sm:py-4 bg-gradient-to-r from-amber-400 to-orange-500">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center">
                   <Icon name={currentExample.icon} size="md" className="icon-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">{currentExample.style}</h3>
-                  <p className="text-xs text-white/70">{t('features.humanization.watchTransform', 'Watch the transformation')}</p>
+                  <h3 className="text-sm sm:text-base font-semibold text-white">{currentExample.style}</h3>
+                  <p className="text-[10px] sm:text-xs text-white/70 hidden sm:block">{t('features.humanization.watchTransform', 'Watch the transformation')}</p>
                 </div>
               </div>
               
-              {/* Transform Button */}
+              {/* Transform Button - Responsive */}
               <motion.button
                 onClick={showAfter ? handleReset : handleTransform}
                 disabled={isTransforming}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className={`
-                  flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all
+                  flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm transition-all
                   ${showAfter 
                     ? 'bg-white/20 text-white hover:bg-white/30' 
                     : 'bg-white text-amber-600 shadow-lg hover:bg-gray-50'
@@ -831,36 +847,37 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
                     >
                       <Icon name="loader" size="sm" className="icon-amber" />
                     </motion.div>
-                    {t('features.humanization.transforming', 'Transforming...')}
+                    <span className="hidden sm:inline">{t('features.humanization.transforming', 'Transforming...')}</span>
+                    <span className="sm:hidden">...</span>
                   </>
                 ) : showAfter ? (
                   <>
                     <Icon name="rotate-ccw" size="sm" className="icon-white" />
-                    {t('features.humanization.reset', 'Reset')}
+                    <span className="hidden sm:inline">{t('features.humanization.reset', 'Reset')}</span>
                   </>
                 ) : (
                   <>
                     <Icon name="wand-sparkles" size="sm" className="icon-amber" />
-                    {t('features.humanization.transform', 'Transform')}
+                    <span className="hidden sm:inline">{t('features.humanization.transform', 'Transform')}</span>
                   </>
                 )}
               </motion.button>
             </div>
             
-            {/* Content Area */}
-            <div className="grid lg:grid-cols-2 min-h-[300px]">
-              {/* Before Panel */}
-              <div className="relative p-6 lg:p-8 bg-white">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-6 h-6 rounded-md bg-slate-200 flex items-center justify-center">
+            {/* Content Area - Responsive */}
+            <div className="grid lg:grid-cols-2 min-h-[250px] sm:min-h-[280px] md:min-h-[300px]">
+              {/* Before Panel - Responsive */}
+              <div className="relative p-4 sm:p-5 md:p-6 lg:p-8 bg-white">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-slate-200 flex items-center justify-center">
                     <Icon name="cpu" size="xs" color="gray-medium" />
                   </div>
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">
                     {t('demo.before', 'Before')} - AI Generated
                   </span>
                 </div>
                 
-                <div className="text-base text-slate-600 leading-relaxed relative">
+                <div className="text-sm sm:text-base text-slate-600 leading-relaxed relative">
                   {/* Full text with inline highlights */}
                   <p className="relative z-10">
                     {currentExample.before.split(/(\s+)/).map((word, wordIdx) => {
@@ -898,16 +915,16 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
                     })}
                   </p>
                   
-                  {/* Floating transformation tooltips */}
+                  {/* Floating transformation tooltips - Responsive */}
                   <AnimatePresence>
                     {highlightedWords.length > 0 && !showAfter && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="mt-4 p-3 bg-gradient-to-r from-amber-200/90 to-orange-200/70 rounded-xl border border-amber-300/80"
+                        className="mt-3 sm:mt-4 p-2 sm:p-3 bg-gradient-to-r from-amber-200/90 to-orange-200/70 rounded-lg sm:rounded-xl border border-amber-300/80"
                       >
-                        <div className="flex items-center gap-2 text-sm">
+                        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
                           <Icon name="arrow-right" size="sm" className="icon-amber flex-shrink-0" />
                           <span className="text-amber-800">
                             <span className="line-through opacity-60">
@@ -926,21 +943,21 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
                 
               </div>
               
-              {/* After Panel */}
-              <div className="relative p-6 lg:p-8 bg-white overflow-hidden">
+              {/* After Panel - Responsive */}
+              <div className="relative p-4 sm:p-5 md:p-6 lg:p-8 bg-white overflow-hidden">
                 {/* Sparkle particles on completion */}
                 <SparkleParticles isActive={showAfter} />
                 
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4">
                   <motion.div 
-                    className="w-6 h-6 rounded-md bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center"
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center"
                     animate={showAfter ? { scale: [1, 1.2, 1] } : {}}
                     transition={{ duration: 0.5 }}
                   >
                     <Icon name="sparkles" size="xs" className="icon-white" />
                   </motion.div>
-                  <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">
-                    {t('demo.after', 'After')} - Humanized
+                  <span className="text-[10px] sm:text-xs font-bold text-amber-600 uppercase tracking-wider">
+                    {t('demo.after', 'After')} - {t('demo.humanized', 'Humanized')}
                   </span>
                 </div>
                 
@@ -951,7 +968,7 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
                       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.5, ease: 'easeOut' }}
-                      className="text-base text-gray-800 leading-relaxed relative z-10"
+                      className="text-sm sm:text-base text-gray-800 leading-relaxed relative z-10"
                     >
                       {/* Typewriter-like reveal */}
                       {currentExample.after.split(' ').map((word, idx) => (
@@ -971,13 +988,13 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="space-y-3"
+                      className="space-y-2 sm:space-y-3"
                     >
-                      {/* Animated skeleton lines */}
+                      {/* Animated skeleton lines - Responsive */}
                       {[85, 92, 78, 65].map((width, idx) => (
                         <motion.div 
                           key={idx}
-                          className="h-4 rounded-md bg-amber-100/50 relative overflow-hidden"
+                          className="h-3 sm:h-4 rounded-md bg-amber-100/50 relative overflow-hidden"
                           style={{ width: `${width}%` }}
                           animate={isTransforming ? { opacity: [0.5, 1, 0.5] } : {}}
                           transition={{ duration: 1.5, repeat: Infinity, delay: idx * 0.2 }}
@@ -991,7 +1008,7 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
                           )}
                         </motion.div>
                       ))}
-                      <p className="text-sm text-amber-500/70 mt-4 italic">
+                      <p className="text-xs sm:text-sm text-amber-500/70 mt-3 sm:mt-4 italic">
                         {isTransforming 
                           ? t('features.humanization.analyzing', 'Analyzing patterns...') 
                           : t('features.humanization.clickTransform', 'Click "Transform" to see the magic ✨')
@@ -1001,7 +1018,7 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
                   )}
                 </AnimatePresence>
                 
-                {/* Success indicator with animation */}
+                {/* Success indicator with animation - Responsive */}
                 <AnimatePresence>
                   {showAfter && (
                     <motion.div
@@ -1009,7 +1026,7 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
                       animate={{ opacity: 1, scale: 1, x: 0 }}
                       exit={{ opacity: 0, scale: 0.5 }}
                       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                      className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 text-xs font-medium rounded-full shadow-sm"
+                      className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-green-100 text-green-700 text-[10px] sm:text-xs font-medium rounded-full shadow-sm"
                     >
                       <motion.div
                         animate={{ rotate: [0, 360] }}
@@ -1027,16 +1044,16 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
           </div>
         </motion.div>
         
-        {/* CTA */}
+        {/* CTA - Responsive */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-10 text-center"
+          className="mt-6 sm:mt-8 md:mt-10 text-center"
         >
           <a 
             href="#demo" 
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-amber-300/80 text-amber-600 rounded-xl font-medium hover:bg-gradient-to-r hover:from-amber-100/80 hover:to-orange-100/60 hover:border-amber-400 transition-all shadow-sm"
+            className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white border border-amber-300/80 text-amber-600 rounded-lg sm:rounded-xl font-medium text-sm sm:text-base hover:bg-gradient-to-r hover:from-amber-100/80 hover:to-orange-100/60 hover:border-amber-400 transition-all shadow-sm"
           >
             <Icon name="play-circle" size="sm" className="icon-amber" />
             <span>{t('features.humanization.tryYourself', 'Try it yourself')}</span>
@@ -1070,15 +1087,15 @@ const StatCard = ({ value, label, icon }) => {
       whileHover={{ scale: 1.05, y: -2 }}
       transition={{ type: 'spring', stiffness: 300 }}
     >
-      <div className="relative px-5 py-3 bg-white/70 dark:bg-white/5 backdrop-blur-sm rounded-2xl border border-amber-200/50 dark:border-amber-500/20 shadow-lg shadow-amber-500/5">
+      <div className="relative px-3 py-2.5 sm:px-4 sm:py-3 md:px-5 md:py-3 bg-white/70 dark:bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-amber-200/50 dark:border-amber-500/20 shadow-lg shadow-amber-500/5">
         {/* Glow effect on hover */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl" />
+        <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl" />
         
         <div className="text-center">
-          <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 bg-clip-text text-transparent">
+          <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 bg-clip-text text-transparent">
             {displayValue}
           </div>
-          <div className="text-xs text-text-muted mt-0.5 font-medium">{label}</div>
+          <div className="text-[10px] sm:text-xs text-text-muted mt-0.5 sm:mt-1 font-medium">{label}</div>
         </div>
       </div>
     </motion.div>
@@ -1133,74 +1150,70 @@ function Humanization() {
     { feature: t('features.humanization.comparison.languages', 'Languages'), us: '15+', others: '3-5' },
   ]
 
+  const howItWorksSteps = [
+    {
+      step: 1,
+      title: t('features.humanization.howItWorks.step1.title', 'Paste Your Text'),
+      desc: t('features.humanization.howItWorks.step1.desc', 'Enter or paste the AI-generated content you want to humanize'),
+      icon: 'clipboard'
+    },
+    {
+      step: 2,
+      title: t('features.humanization.howItWorks.step2.title', 'Choose Your Style'),
+      desc: t('features.humanization.howItWorks.step2.desc', 'Select from casual, professional, academic, or use your Voice Profile'),
+      icon: 'sliders'
+    },
+    {
+      step: 3,
+      title: t('features.humanization.howItWorks.step3.title', 'Get Humanized Content'),
+      desc: t('features.humanization.howItWorks.step3.desc', 'Receive natural, authentic content that sounds like a real person wrote it'),
+      icon: 'sparkles'
+    }
+  ]
+
   return (
     <>
-      <SEOHead
-        title={t('humanization.meta.title')}
-        description={t('humanization.meta.description')}
-        keywords={['content humanization', 'humanize AI text', 'natural writing', 'AI to human', 'rewrite AI content', 'make AI text human']}
+      <PageSEO 
+        pageKey="humanization" 
+        faqs={faqs} 
+        howToSteps={howItWorksSteps}
       />
-      <StructuredData
-        type="SoftwareApplication"
-        data={{
-          name: 'Graphos Content Humanization',
-          description: t('humanization.meta.description'),
-          url: 'https://graphosai.com/features/humanization',
-          applicationCategory: 'UtilitiesApplication',
-          operatingSystem: 'Web Browser',
-          offers: {
-            '@type': 'Offer',
-            price: '0',
-            priceCurrency: 'USD'
-          }
-        }}
-      />
-      <StructuredData
-        type="FAQPage"
-        data={{
-          mainEntity: faqs.map(faq => ({
-            '@type': 'Question',
-            name: faq.q,
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: faq.a
-            }
-          }))
-        }}
-      />
-      <div className="relative">
+      <main className="relative" itemScope itemType="https://schema.org/WebPage">
         {/* ================================================================== */}
-        {/* HERO SECTION - Transformation Theme */}
+        {/* HERO SECTION - Transformation Theme - Responsive Centered Layout */}
         {/* ================================================================== */}
-        <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-8 pb-16">
+        <section className="relative min-h-[85vh] sm:min-h-[88vh] lg:min-h-[92vh] flex items-center justify-center overflow-hidden pt-16 sm:pt-12 md:pt-8 pb-12 sm:pb-14 md:pb-16">
           <TransformationBackground />
           
-          {/* Breadcrumb - Left aligned */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="absolute top-6 left-4 sm:left-6 lg:left-8 z-20"
-          >
-            <Breadcrumb
-              items={[
-                { label: t('nav.home'), href: '/' },
-                { label: t('nav.features'), href: '#' },
-                { label: t('nav.humanization') },
-              ]}
-            />
-          </motion.div>
+          {/* Breadcrumb - Inside container for alignment */}
+          <div className="absolute top-4 sm:top-5 md:top-6 left-0 right-0 z-20">
+            <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <Breadcrumb
+                  items={[
+                    { label: t('nav.home'), href: '/' },
+                    { label: t('nav.features'), href: '/features' },
+                    { label: t('nav.humanization') },
+                  ]}
+                />
+              </motion.div>
+            </div>
+          </div>
           
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6 text-center relative z-10">
-            {/* Animated Badge - Warm theme */}
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 text-center relative z-10">
+            {/* Animated Badge - Warm theme - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.5, type: 'spring' }}
-              className="mb-8"
+              className="mb-5 sm:mb-6 md:mb-8"
             >
               <motion.span 
-                className="relative inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-200/90 via-orange-200/80 to-amber-200/90 dark:from-amber-500/15 dark:via-orange-500/20 dark:to-amber-500/15 text-amber-800 dark:text-amber-400 text-sm font-semibold rounded-full border border-amber-300/80 dark:border-amber-500/30 shadow-lg shadow-amber-500/20"
+                className="relative inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-amber-200/90 via-orange-200/80 to-amber-200/90 dark:from-amber-500/15 dark:via-orange-500/20 dark:to-amber-500/15 text-amber-800 dark:text-amber-400 text-xs sm:text-sm font-semibold rounded-full border border-amber-300/80 dark:border-amber-500/30 shadow-lg shadow-amber-500/20"
                 animate={{
                   boxShadow: [
                     '0 0 20px rgba(251, 191, 36, 0.1)',
@@ -1215,7 +1228,7 @@ function Humanization() {
                 }}
               >
                 <motion.span 
-                  className="w-2 h-2 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
+                  className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
                   animate={{ scale: [1, 1.3, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
@@ -1224,44 +1237,44 @@ function Humanization() {
               </motion.span>
             </motion.div>
             
-            {/* Main Headline */}
+            {/* Main Headline - Responsive Typography */}
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary mb-6 leading-[1.1] tracking-tight"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary mb-4 sm:mb-5 md:mb-6 leading-[1.1] tracking-tight"
             >
               {t('humanization.title', 'Content Humanization')}
             </motion.h1>
             
-            {/* Subtitle with warm gradient */}
+            {/* Subtitle with warm gradient - Responsive */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8"
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-5 sm:mb-6 md:mb-8"
             >
               <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 bg-clip-text text-transparent">
                 {t('features.humanization.heroHighlight', 'Natural & Authentic')}
               </span>
             </motion.p>
             
-            {/* Description */}
+            {/* Description - Responsive */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg md:text-xl text-text-secondary mb-10 leading-relaxed max-w-2xl mx-auto"
+              className="text-base sm:text-lg md:text-xl text-text-secondary mb-6 sm:mb-8 md:mb-10 leading-relaxed max-w-xl sm:max-w-2xl mx-auto px-2"
             >
               {t('humanization.description', 'Transform AI text into natural, authentic human writing.')}
             </motion.p>
 
-            {/* Stats Row - Warm theme */}
+            {/* Stats Row - Warm theme - Responsive Grid */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-10 max-w-2xl mx-auto"
+              className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 md:mb-10 max-w-xs sm:max-w-xl md:max-w-2xl mx-auto"
             >
               <StatCard value="98%" label={t('features.humanization.stats.meaning', 'Meaning Preserved')} />
               <StatCard value="<3s" label={t('features.humanization.stats.speed', 'Processing')} />
@@ -1269,18 +1282,18 @@ function Humanization() {
               <StatCard value="5+" label={t('features.humanization.stats.styles', 'Writing Styles')} />
             </motion.div>
 
-            {/* CTA Buttons - Warm theme */}
+            {/* CTA Buttons - Warm theme - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8 md:mb-10 px-4 sm:px-0"
             >
               <motion.a
                 href="https://app.graphosai.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold text-base overflow-hidden shadow-xl shadow-amber-500/25"
+                className="group relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold text-sm sm:text-base overflow-hidden shadow-xl shadow-amber-500/25"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -1291,7 +1304,7 @@ function Humanization() {
               </motion.a>
               <motion.a
                 href="#demo"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/80 dark:bg-white/10 backdrop-blur-sm border border-amber-200 dark:border-amber-500/30 text-text-primary rounded-xl font-semibold text-base hover:bg-white dark:hover:bg-white/20 hover:border-amber-300 transition-all shadow-lg"
+                className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-white/80 dark:bg-white/10 backdrop-blur-sm border border-amber-200 dark:border-amber-500/30 text-text-primary rounded-xl font-semibold text-sm sm:text-base hover:bg-white dark:hover:bg-white/20 hover:border-amber-300 transition-all shadow-lg"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -1300,12 +1313,12 @@ function Humanization() {
               </motion.a>
             </motion.div>
             
-            {/* Trust indicators */}
+            {/* Trust indicators - Responsive */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="flex flex-wrap items-center justify-center gap-3 text-sm"
+              className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm px-2"
             >
               {[
                 { icon: 'shield-check', text: t('features.humanization.trust.preserve', 'Preserves meaning') },
@@ -1314,24 +1327,24 @@ function Humanization() {
               ].map((item, i) => (
                 <motion.div 
                   key={i}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-amber-200/60 dark:border-amber-500/20 bg-white/60 dark:bg-white/5"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-full border border-amber-200/60 dark:border-amber-500/20 bg-white/60 dark:bg-white/5"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 + i * 0.1 }}
                 >
                   <Icon name={item.icon} size="sm" className="icon-amber" />
-                  <span className="text-text-secondary">{item.text}</span>
+                  <span className="text-text-secondary whitespace-nowrap">{item.text}</span>
                 </motion.div>
               ))}
             </motion.div>
           </div>
 
-          {/* Scroll Indicator */}
+          {/* Scroll Indicator - Hidden on mobile */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2"
+            className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 hidden sm:block"
           >
             <motion.a
               href="#demo"
@@ -1352,42 +1365,39 @@ function Humanization() {
         </section>
 
         {/* ================================================================== */}
-        {/* LIVE DEMO SECTION */}
+        {/* LIVE DEMO SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 relative">
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 relative">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
             <motion.div
               id="demo"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="scroll-mt-24"
+              className="scroll-mt-20 sm:scroll-mt-24"
             >
-              {/* Section Header */}
-              <div className="text-center mb-10">
+              {/* Section Header - Responsive */}
+              <div className="text-center mb-6 sm:mb-8 md:mb-10">
                 <motion.span 
                   initial={{ opacity: 0, scale: 0.9 }} 
                   whileInView={{ opacity: 1, scale: 1 }} 
                   viewport={{ once: true }} 
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white text-success text-sm font-semibold rounded-full mb-4 border border-gray-200 shadow-sm"
+                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-success text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 border border-gray-200 shadow-sm"
                 >
-                  <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-success rounded-full animate-pulse" />
                   {t('demo.liveDemo', 'Live Demo')}
                 </motion.span>
-                <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-3 sm:mb-4">
                   {t('features.humanization.demo.title', 'See the Transformation')}
                 </h2>
-                <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+                <p className="text-base sm:text-lg text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                   {t('features.humanization.demo.subtitle', 'Watch AI text transform into natural, human-like writing in real-time.')}
                 </p>
               </div>
               
               <Suspense fallback={
-                <div className="h-[520px] bg-bg-secondary rounded-2xl border border-gray-200 flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-10 h-10 border-3 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-                    <span className="text-sm text-text-muted">{t('common.loading', 'Loading...')}</span>
-                  </div>
+                <div className="h-[400px] sm:h-[480px] md:h-[520px] bg-bg-secondary rounded-xl sm:rounded-2xl border border-gray-200 flex items-center justify-center">
+                  <ThreeDotsLoading size="lg" />
                 </div>
               }>
                 <LiveHumanizationDemo />
@@ -1397,41 +1407,48 @@ function Humanization() {
         </section>
 
         {/* ================================================================== */}
-        {/* HOW IT WORKS SECTION */}
+        {/* HOW IT WORKS SECTION - Responsive Enhanced */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 relative overflow-hidden bg-bg-secondary">
-          {/* Background decoration */}
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 relative overflow-hidden bg-bg-secondary">
+          {/* Background decoration - Responsive */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-1/4 left-0 w-96 h-96 bg-gradient-to-br from-amber-400/10 to-orange-400/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-gradient-to-tl from-orange-400/10 to-amber-400/5 rounded-full blur-3xl" />
+            <div className="absolute top-1/4 left-0 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-gradient-to-br from-amber-400/10 to-orange-400/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 right-0 w-40 sm:w-56 md:w-72 lg:w-80 h-40 sm:h-56 md:h-72 lg:h-80 bg-gradient-to-tl from-orange-400/10 to-amber-400/5 rounded-full blur-3xl" />
+            {/* SVG Background Pattern */}
+            <img 
+              src="/images/backgrounds/bg-wave-12.svg" 
+              alt="" 
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover opacity-100"
+            />
           </div>
           
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6 relative">
-            <div className="text-center mb-12">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 relative">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-amber-600 text-sm font-semibold rounded-full mb-4 border border-amber-200 shadow-sm"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-amber-600 text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 border border-amber-200 shadow-sm"
               >
                 <Icon name="wand-sparkles" size="sm" className="icon-amber" />
                 {t('features.humanization.howItWorks.badge', 'Simple Process')}
               </motion.span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
                 {t('features.humanization.howItWorks.title', 'How Humanization Works')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.humanization.howItWorks.subtitle', 'Transform your AI content in three simple steps')}
               </p>
             </div>
             
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+            <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
               {/* Left: Steps with Timeline */}
               <div className="relative">
-                {/* Vertical Timeline Line */}
-                <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-gradient-to-b from-amber-400 via-orange-500 to-amber-600 rounded-full hidden md:block" />
+                {/* Vertical Timeline Line - Hidden on mobile */}
+                <div className="absolute left-5 sm:left-6 top-8 bottom-8 w-0.5 bg-gradient-to-b from-amber-400 via-orange-500 to-amber-600 rounded-full hidden md:block" />
                 
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   {[
                     {
                       step: 1,
@@ -1458,24 +1475,24 @@ function Humanization() {
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.15 }}
-                      className="relative flex gap-5"
+                      className="relative flex gap-3 sm:gap-4 md:gap-5"
                     >
-                      {/* Step number circle */}
+                      {/* Step number circle - Responsive */}
                       <div className="relative z-10 flex-shrink-0">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
                           <Icon name={item.icon} size="md" className="icon-white" />
                         </div>
                       </div>
                       
                       {/* Content */}
-                      <div className="flex-1 pb-6">
+                      <div className="flex-1 pb-4 sm:pb-6">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">
+                          <span className="text-[10px] sm:text-xs font-bold text-amber-600 uppercase tracking-wider">
                             {t('common.step', 'Step')} {item.step}
                           </span>
                         </div>
-                        <h3 className="text-lg font-semibold text-text-primary mb-2">{item.title}</h3>
-                        <p className="text-text-secondary text-sm leading-relaxed">{item.desc}</p>
+                        <h3 className="text-base sm:text-lg font-semibold text-text-primary mb-1 sm:mb-2">{item.title}</h3>
+                        <p className="text-text-secondary text-xs sm:text-sm leading-relaxed">{item.desc}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -1497,7 +1514,7 @@ function Humanization() {
                       <div className="w-3 h-3 rounded-full bg-yellow-400" />
                       <div className="w-3 h-3 rounded-full bg-green-400" />
                     </div>
-                    <span className="text-xs text-gray-500 ml-2">Humanization Preview</span>
+                    <span className="text-xs text-gray-500 ml-2">{t('features.labels.humanizationPreview', 'Humanization Preview')}</span>
                   </div>
                   
                   {/* Content */}
@@ -1508,7 +1525,7 @@ function Humanization() {
                         <div className="w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center">
                           <Icon name="cpu" size="xs" color="gray-medium" />
                         </div>
-                        <span className="text-xs font-medium text-gray-500">AI Generated</span>
+                        <span className="text-xs font-medium text-gray-500">{t('features.labels.aiGenerated', 'AI Generated')}</span>
                       </div>
                       <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <p className="text-sm text-gray-600 line-through opacity-60">
@@ -1534,7 +1551,7 @@ function Humanization() {
                         <div className="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center">
                           <Icon name="user" size="xs" className="icon-amber" />
                         </div>
-                        <span className="text-xs font-medium text-amber-600">Humanized</span>
+                        <span className="text-xs font-medium text-amber-600">{t('demo.humanized', 'Humanized')}</span>
                       </div>
                       <div className="p-3 bg-gradient-to-r from-amber-100/90 to-orange-100/70 rounded-lg border border-amber-300/70">
                         <p className="text-sm text-gray-800">
@@ -1555,46 +1572,46 @@ function Humanization() {
         <RealTransformationsSection t={t} beforeAfterExamples={beforeAfterExamples} />
 
         {/* ================================================================== */}
-        {/* BENEFITS SECTION - Split Screen Comparison Design */}
+        {/* BENEFITS SECTION - Split Screen Comparison Design - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 bg-bg-secondary overflow-hidden">
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
-            {/* Header */}
-            <div className="text-center mb-16">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 bg-bg-secondary overflow-hidden">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+            {/* Header - Responsive */}
+            <div className="text-center mb-8 sm:mb-12 md:mb-16">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg shadow-amber-500/20"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 shadow-lg shadow-amber-500/20"
               >
                 <Icon name="git-compare" size="sm" className="icon-white" />
                 {t('features.humanization.benefitsBadge', 'The Difference')}
               </motion.span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
                 {t('features.humanization.whyHumanize', 'Why Humanize Your Content?')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.humanization.whyHumanizeDesc', 'Transform robotic AI text into engaging, authentic content')}
               </p>
             </div>
             
-            {/* Split Screen Comparison */}
+            {/* Split Screen Comparison - Responsive */}
             <div className="relative">
-              {/* Center divider line - Desktop */}
+              {/* Center divider line - Desktop only */}
               <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-amber-400 to-transparent z-10" />
               
-              {/* Center transformation icon */}
+              {/* Center transformation icon - Desktop only */}
               <motion.div 
                 initial={{ scale: 0, rotate: -180 }}
                 whileInView={{ scale: 1, rotate: 0 }}
                 viewport={{ once: true }}
                 transition={{ type: 'spring', duration: 0.8 }}
-                className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full items-center justify-center shadow-xl shadow-amber-500/30"
+                className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full items-center justify-center shadow-xl shadow-amber-500/30"
               >
                 <Icon name="arrow-right" size="lg" className="icon-white" />
               </motion.div>
               
-              <div className="grid lg:grid-cols-2 gap-6 lg:gap-0">
+              <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-0">
                 
                 {/* LEFT SIDE - Without Humanization (Problems) */}
                 <motion.div 
@@ -1602,21 +1619,21 @@ function Humanization() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6 }}
-                  className="relative lg:pr-12"
+                  className="relative lg:pr-8 xl:pr-12"
                 >
-                  {/* Side label */}
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 bg-slate-200 rounded-xl flex items-center justify-center">
+                  {/* Side label - Responsive */}
+                  <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-200 rounded-lg sm:rounded-xl flex items-center justify-center">
                       <Icon name="cpu" size="md" color="gray-medium" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-600">{t('features.humanization.without', 'Without Humanization')}</h3>
-                      <p className="text-xs text-slate-400">{t('features.humanization.aiContent', 'Raw AI Content')}</p>
+                      <h3 className="text-sm sm:text-base font-semibold text-slate-600">{t('features.humanization.without', 'Without Humanization')}</h3>
+                      <p className="text-[10px] sm:text-xs text-slate-400">{t('features.humanization.aiContent', 'Raw AI Content')}</p>
                     </div>
                   </div>
                   
-                  {/* Problem items */}
-                  <div className="space-y-4">
+                  {/* Problem items - Responsive */}
+                  <div className="space-y-3 sm:space-y-4">
                     {[
                       { icon: 'alert-circle', title: t('features.humanization.problems.robotic.title', 'Robotic & Stiff'), desc: t('features.humanization.problems.robotic.desc', 'Text sounds mechanical and unnatural to readers') },
                       { icon: 'eye-off', title: t('features.humanization.problems.detectable.title', 'Easily Detectable'), desc: t('features.humanization.problems.detectable.desc', 'AI detection tools flag content immediately') },
@@ -1629,51 +1646,51 @@ function Humanization() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 }}
-                        className="group flex gap-4 p-4 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all"
+                        className="group flex gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl border border-slate-200 hover:border-slate-300 transition-all"
                       >
-                        <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-slate-200 transition-colors">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-100 rounded-md sm:rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-slate-200 transition-colors">
                           <Icon name={item.icon} size="md" color="gray-medium" />
                         </div>
-                        <div>
-                          <h4 className="font-medium text-slate-700 mb-0.5">{item.title}</h4>
-                          <p className="text-sm text-slate-500">{item.desc}</p>
+                        <div className="min-w-0">
+                          <h4 className="text-sm sm:text-base font-medium text-slate-700 mb-0.5">{item.title}</h4>
+                          <p className="text-xs sm:text-sm text-slate-500">{item.desc}</p>
                         </div>
                       </motion.div>
                     ))}
                   </div>
                 </motion.div>
                 
-                {/* Mobile divider */}
-                <div className="lg:hidden flex items-center justify-center py-6">
+                {/* Mobile divider - Responsive */}
+                <div className="lg:hidden flex items-center justify-center py-4 sm:py-6">
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-300 to-transparent" />
-                  <div className="mx-4 w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                  <div className="mx-3 sm:mx-4 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                     <Icon name="arrow-down" size="md" className="icon-white lg:hidden" />
                     <Icon name="arrow-right" size="md" className="icon-white hidden lg:block" />
                   </div>
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-300 to-transparent" />
                 </div>
                 
-                {/* RIGHT SIDE - With Humanization (Solutions) */}
+                {/* RIGHT SIDE - With Humanization (Solutions) - Responsive */}
                 <motion.div 
                   initial={{ opacity: 0, x: 50 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6 }}
-                  className="relative lg:pl-12"
+                  className="relative lg:pl-8 xl:pl-12"
                 >
-                  {/* Side label */}
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-md">
+                  {/* Side label - Responsive */}
+                  <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md">
                       <Icon name="sparkles" size="md" className="icon-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-amber-600">{t('features.humanization.with', 'With Humanization')}</h3>
-                      <p className="text-xs text-amber-500">{t('features.humanization.humanContent', 'Natural Human Content')}</p>
+                      <h3 className="text-sm sm:text-base font-semibold text-amber-600">{t('features.humanization.with', 'With Humanization')}</h3>
+                      <p className="text-[10px] sm:text-xs text-amber-500">{t('features.humanization.humanContent', 'Natural Human Content')}</p>
                     </div>
                   </div>
                   
-                  {/* Solution items */}
-                  <div className="space-y-4">
+                  {/* Solution items - Responsive */}
+                  <div className="space-y-3 sm:space-y-4">
                     {[
                       { icon: 'sparkles', title: t('features.humanization.benefits.natural.title', 'Natural Flow'), desc: t('features.humanization.benefits.natural.desc', 'Transform robotic text into conversational, engaging content'), stat: '95%', statLabel: t('features.humanization.moreEngaging', 'more engaging') },
                       { icon: 'shield-check', title: t('features.humanization.benefits.meaning.title', 'Preserve Meaning'), desc: t('features.humanization.benefits.meaning.desc', 'Keep your message intact while improving readability'), stat: '98%', statLabel: t('features.humanization.accuracy', 'accuracy') },
@@ -1686,19 +1703,19 @@ function Humanization() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 }}
-                        className="group flex gap-4 p-4 bg-gradient-to-r from-amber-100/90 via-orange-100/70 to-amber-50/80 rounded-xl border border-amber-300/70 hover:border-amber-400 hover:shadow-md transition-all"
+                        className="group flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-r from-amber-100/90 via-orange-100/70 to-amber-50/80 rounded-lg sm:rounded-xl border border-amber-300/70 hover:border-amber-400 hover:shadow-md transition-all"
                       >
-                        <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-md sm:rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                           <Icon name={item.icon} size="md" className="icon-white" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <h4 className="font-medium text-gray-800 mb-0.5">{item.title}</h4>
-                            <span className="flex-shrink-0 px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
+                            <h4 className="text-sm sm:text-base font-medium text-gray-800 mb-0.5">{item.title}</h4>
+                            <span className="flex-shrink-0 px-1.5 sm:px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] sm:text-xs font-semibold rounded-full">
                               {item.stat}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600">{item.desc}</p>
+                          <p className="text-xs sm:text-sm text-gray-600">{item.desc}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -1708,16 +1725,16 @@ function Humanization() {
               </div>
             </div>
             
-            {/* Bottom CTA */}
+            {/* Bottom CTA - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-12 text-center"
+              className="mt-8 sm:mt-10 md:mt-12 text-center"
             >
               <a 
                 href="#demo" 
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/30 transition-all"
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/30 transition-all"
               >
                 <Icon name="wand-sparkles" size="sm" className="icon-white" />
                 <span>{t('features.humanization.tryNow', 'Try Humanization Now')}</span>
@@ -1732,30 +1749,31 @@ function Humanization() {
         <UseCasesMarqueeSection t={t} useCases={useCases} />
 
         {/* ================================================================== */}
-        {/* COMPARISON TABLE - Enhanced */}
+        {/* COMPARISON TABLE - Enhanced - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 relative overflow-hidden bg-bg-secondary">
-          {/* Background decoration */}
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 relative overflow-hidden bg-bg-secondary">
+          {/* Background decoration - Responsive */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-amber-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-40 sm:w-56 md:w-72 lg:w-80 h-40 sm:h-56 md:h-72 lg:h-80 bg-orange-500/5 rounded-full blur-3xl" />
+
           </div>
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6 relative">
-            {/* Section Header */}
-            <div className="text-center mb-12">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 relative">
+            {/* Section Header - Responsive */}
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-600 text-sm font-semibold rounded-full mb-4 border border-amber-500/20 shadow-sm"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-600 text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 border border-amber-500/20 shadow-sm"
               >
                 <Icon name="trophy" size="sm" className="icon-amber" />
                 {t('features.humanization.comparisonBadge', 'Why Choose Us')}
               </motion.span>
-              <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-3 sm:mb-4">
                 {t('features.humanization.comparisonTitle', 'How We Compare')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto text-lg mb-6">
+              <p className="text-sm sm:text-base md:text-lg text-text-secondary max-w-xl sm:max-w-2xl mx-auto mb-4 sm:mb-6 px-2">
                 {t('features.humanization.comparisonDesc', 'See why Graphos AI leads in content humanization')}
               </p>
               
@@ -1903,29 +1921,29 @@ function Humanization() {
         </section>
 
         {/* ================================================================== */}
-        {/* TESTIMONIALS SECTION */}
+        {/* TESTIMONIALS SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28">
-          <div className="max-w-content-lg mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-200/90 to-orange-200/80 text-amber-800 text-sm font-semibold rounded-full mb-4 border border-amber-300/80"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-200/90 to-orange-200/80 text-amber-800 text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 border border-amber-300/80"
               >
                 <Icon name="message-circle" size="sm" className="icon-amber" />
                 {t('features.humanization.testimonials.badge', 'User Stories')}
               </motion.span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3">
                 {t('features.humanization.testimonials.title', 'Loved by Content Creators')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.humanization.testimonials.subtitle', 'See what our users say about content humanization')}
               </p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
               {[
                 {
                   quote: t('features.humanization.testimonials.content.quote', 'This tool has transformed how I create content. My blog posts now sound genuinely human and engage readers much better.'),
@@ -1952,35 +1970,35 @@ function Humanization() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="group relative p-6 bg-white rounded-2xl border border-gray-200 hover:border-amber-300 hover:shadow-xl transition-all duration-300"
+                  className="group relative p-4 sm:p-5 md:p-6 bg-white rounded-xl sm:rounded-2xl border border-gray-200 hover:border-amber-300 hover:shadow-xl transition-all duration-300"
                 >
-                  {/* Quote icon */}
-                  <div className="absolute -top-3 -left-2 w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                  {/* Quote icon - Responsive */}
+                  <div className="absolute -top-2 -left-1 sm:-top-3 sm:-left-2 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                     <Icon name="quote" size="sm" className="icon-white" />
                   </div>
                   
-                  {/* Stars */}
-                  <div className="flex gap-1 mb-4">
+                  {/* Stars - Responsive */}
+                  <div className="flex gap-0.5 sm:gap-1 mb-3 sm:mb-4">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <svg key={star} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                      <svg key={star} className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     ))}
                   </div>
                   
-                  {/* Quote */}
-                  <p className="text-text-secondary text-sm leading-relaxed mb-6">"{testimonial.quote}"</p>
+                  {/* Quote - Responsive */}
+                  <p className="text-text-secondary text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">"{testimonial.quote}"</p>
                   
-                  {/* Author */}
-                  <div className="flex items-center gap-3">
+                  {/* Author - Responsive */}
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <img 
                       src={testimonial.avatar} 
                       alt={testimonial.author}
-                      className="w-10 h-10 rounded-full object-cover"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
                     />
                     <div>
-                      <p className="font-semibold text-text-primary text-sm">{testimonial.author}</p>
-                      <p className="text-xs text-text-muted">{testimonial.role}</p>
+                      <p className="font-semibold text-text-primary text-xs sm:text-sm">{testimonial.author}</p>
+                      <p className="text-[10px] sm:text-xs text-text-muted">{testimonial.role}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -1990,115 +2008,64 @@ function Humanization() {
         </section>
 
         {/* ================================================================== */}
-        {/* FAQ SECTION - Enhanced */}
+        {/* FAQ SECTION - Enhanced - Responsive */}
         {/* ================================================================== */}
-        <section className="py-20 lg:py-28 relative overflow-hidden bg-bg-secondary">
-          {/* Background decoration */}
+        <section className="py-12 sm:py-16 md:py-20 lg:py-28 relative overflow-hidden bg-bg-secondary">
+          {/* Background decoration - Responsive */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-amber-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-40 sm:w-56 md:w-72 lg:w-80 h-40 sm:h-56 md:h-72 lg:h-80 bg-orange-500/5 rounded-full blur-3xl" />
           </div>
 
           <div className="max-w-3xl mx-auto px-4 sm:px-6 relative">
-            {/* Section Header */}
-            <div className="text-center mb-12">
+            {/* Section Header - Responsive */}
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <motion.span 
                 initial={{ opacity: 0, scale: 0.9 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: true }} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-bg-primary text-amber-600 text-sm font-semibold rounded-full mb-4 border border-gray-200 dark:border-gray-700 shadow-sm"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-bg-primary text-amber-600 text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-4 border border-gray-200 dark:border-gray-700 shadow-sm"
               >
                 <Icon name="help-circle" size="sm" className="icon-amber" />
                 {t('features.humanization.faqBadge', 'FAQ')}
               </motion.span>
-              <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-3 sm:mb-4">
                 {t('features.humanization.faqTitle', 'Frequently Asked Questions')}
               </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto text-lg">
+              <p className="text-sm sm:text-base md:text-lg text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2">
                 {t('features.humanization.faqDesc', 'Everything you need to know about content humanization')}
               </p>
             </div>
 
-            {/* FAQ List */}
-            <div className="space-y-3">
-              {faqs.map((faq, index) => (
-                <motion.div 
-                  key={index} 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                  className={`group rounded-2xl border transition-all overflow-hidden ${
-                    openFaq === index 
-                      ? 'bg-bg-primary border-gray-200 dark:border-gray-700 shadow-md' 
-                      : 'bg-bg-primary border-gray-200 dark:border-gray-700 hover:border-gray-300 hover:shadow-sm'
-                  }`}
-                >
-                  <button
-                    onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                    className="w-full flex items-center justify-between p-5 text-left"
-                  >
-                    <div className="flex items-center gap-4 pr-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                        openFaq === index ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-white' : 'bg-bg-secondary text-amber-600 group-hover:bg-amber-500/10'
-                      }`}>
-                        <span className="text-sm font-bold">{String(index + 1).padStart(2, '0')}</span>
-                      </div>
-                      <span className={`text-base font-semibold transition-colors ${
-                        openFaq === index ? 'text-amber-600' : 'text-text-primary group-hover:text-amber-600'
-                      }`}>
-                        {faq.q}
-                      </span>
-                    </div>
-                    <motion.div
-                      animate={{ rotate: openFaq === index ? 180 : 0 }}
-                      transition={{ duration: 0.2, ease: 'easeInOut' }}
-                      className="flex-shrink-0 w-8 h-8 flex items-center justify-center"
-                    >
-                      <Icon name="chevron-down" size="sm" className={openFaq === index ? 'text-amber-600' : 'text-text-muted'} />
-                    </motion.div>
-                  </button>
-                  
-                  <AnimatePresence>
-                    {openFaq === index && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-5 pb-5 pl-[4.5rem]">
-                          <p className="text-text-secondary leading-relaxed">{faq.a}</p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              ))}
-            </div>
+            {/* FAQ List - Using optimized CSS grid animation */}
+            <FAQAccordion 
+              faqs={faqs} 
+              openFaq={openFaq} 
+              setOpenFaq={setOpenFaq} 
+              accentColor="amber"
+            />
 
-            {/* Contact CTA Card */}
+            {/* Contact CTA Card - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-12 p-8 bg-bg-primary rounded-2xl border border-gray-200 dark:border-gray-700 text-center"
+              className="mt-8 sm:mt-10 md:mt-12 p-5 sm:p-6 md:p-8 bg-bg-primary rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-700 text-center"
             >
-              <div className="w-16 h-16 mx-auto mb-4 bg-amber-500/10 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-3 sm:mb-4 bg-amber-500/10 rounded-lg sm:rounded-xl flex items-center justify-center">
                 <Icon name="message-circle" size="xl" className="icon-amber" />
               </div>
-              <h3 className="text-xl font-bold text-text-primary mb-2">
+              <h3 className="text-lg sm:text-xl font-bold text-text-primary mb-1.5 sm:mb-2">
                 {t('faq.stillHaveQuestions', "Still have questions?")}
               </h3>
-              <p className="text-text-secondary mb-6 max-w-md mx-auto">
+              <p className="text-xs sm:text-sm md:text-base text-text-secondary mb-4 sm:mb-6 max-w-md mx-auto px-2">
                 {t('faq.contactDescription', "Can't find what you're looking for? Our support team is here to help.")}
               </p>
               <motion.a
-                href="mailto:support@graphosai.com"
+                href="mailto:Support@graphosai.com"
                 whileHover={{ scale: 1.02, y: -1 }}
                 whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
               >
                 <Icon name="mail" size="sm" className="icon-white" />
                 {t('faq.contactSupport', 'Contact Support')}
@@ -2107,25 +2074,28 @@ function Humanization() {
           </div>
         </section>
 
+        {/* Related Features */}
+        <RelatedFeatures currentFeature="humanization" />
+
         {/* ================================================================== */}
-        {/* FINAL CTA SECTION */}
+        {/* FINAL CTA SECTION - Responsive */}
         {/* ================================================================== */}
-        <section className="pt-0 pb-20 lg:pb-28 bg-bg-secondary relative overflow-hidden">
-          {/* Background decoration */}
+        <section className="pt-0 pb-12 sm:pb-16 md:pb-20 lg:pb-28 bg-bg-secondary relative overflow-hidden">
+          {/* Background decoration - Responsive */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <motion.div 
               animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
               transition={{ duration: 10, repeat: Infinity }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-amber-500/5 rounded-full blur-3xl" 
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] md:w-[750px] lg:w-[900px] h-[400px] sm:h-[600px] md:h-[750px] lg:h-[900px] bg-amber-500/5 rounded-full blur-3xl" 
             />
           </div>
 
-          <div className="relative max-w-content-lg mx-auto px-4">
+          <div className="relative w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="relative rounded-[2rem] overflow-hidden"
+              className="relative rounded-2xl sm:rounded-3xl lg:rounded-[2rem] overflow-hidden"
             >
               {/* Solid Background */}
               <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600" />
@@ -2145,55 +2115,55 @@ function Humanization() {
                 </svg>
               </div>
 
-              <div className="relative p-10 md:p-14 lg:p-20 text-center">
-                {/* Badge */}
+              <div className="relative p-6 sm:p-8 md:p-10 lg:p-14 xl:p-20 text-center">
+                {/* Badge - Responsive */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.1 }}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full mb-8 border border-white/[0.15]"
+                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-white/10 backdrop-blur-sm rounded-full mb-5 sm:mb-6 md:mb-8 border border-white/[0.15]"
                 >
                   <motion.span 
                     animate={{ scale: [1, 1.3, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="w-2.5 h-2.5 bg-white rounded-full"
+                    className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full"
                   />
-                  <span className="text-white/90 text-sm font-semibold">
+                  <span className="text-white/90 text-xs sm:text-sm font-semibold">
                     {t('features.humanization.ctaBadge', 'Start humanizing in seconds')}
                   </span>
                   <Icon name="sparkles" size="sm" className="icon-white opacity-80" />
                 </motion.div>
 
-                {/* Headline */}
+                {/* Headline - Responsive */}
                 <motion.h2
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.2 }}
-                  className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight"
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-5 md:mb-6 leading-tight"
                 >
                   {t('features.humanization.ctaTitle', 'Ready to Humanize Your Content?')}
                 </motion.h2>
 
-                {/* Description */}
+                {/* Description - Responsive */}
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.3 }}
-                  className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed"
+                  className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 mb-6 sm:mb-8 md:mb-10 max-w-xl sm:max-w-2xl mx-auto leading-relaxed px-2"
                 >
                   {t('features.humanization.ctaDesc', 'Transform AI text into natural, engaging writing that sounds authentically human.')}
                 </motion.p>
 
-                {/* CTA Buttons */}
+                {/* CTA Buttons - Responsive */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.4 }}
-                  className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8 md:mb-10 px-4 sm:px-0"
                 >
                   <motion.a
                     href="https://app.graphosai.com"
@@ -2201,7 +2171,7 @@ function Humanization() {
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.02, y: -1 }}
                     whileTap={{ scale: 0.98 }}
-                    className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-amber-600 rounded-xl font-bold text-lg shadow-sm hover:shadow-lg transition-all"
+                    className="group inline-flex items-center justify-center gap-2 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-white text-amber-600 rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg shadow-sm hover:shadow-lg transition-all"
                   >
                     <span>{t('cta.getStartedFree', 'Get Started Free')}</span>
                     <Icon name="arrow-right" size="md" className="icon-amber group-hover:translate-x-0.5 transition-transform" />
@@ -2210,20 +2180,20 @@ function Humanization() {
                     href="#demo"
                     whileHover={{ scale: 1.02, y: -1 }}
                     whileTap={{ scale: 0.98 }}
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-bold text-lg border border-white/[0.15] hover:bg-white/15 hover:border-white/[0.25] transition-all"
+                    className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-white/10 backdrop-blur-sm text-white rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg border border-white/[0.15] hover:bg-white/15 hover:border-white/[0.25] transition-all"
                   >
                     <Icon name="play-circle" size="md" className="icon-white" />
                     {t('cta.tryDemo', 'Try Demo')}
                   </motion.a>
                 </motion.div>
 
-                {/* Trust indicators */}
+                {/* Trust indicators - Responsive */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.5 }}
-                  className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-white/70"
+                  className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-2 sm:gap-y-3 text-xs sm:text-sm text-white/70 px-2"
                 >
                   {[
                     { icon: 'check-circle', text: t('cta.noCard', 'No credit card required') },
@@ -2236,10 +2206,10 @@ function Humanization() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: 0.6 + i * 0.1 }}
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-1.5 sm:gap-2"
                     >
                       <Icon name={item.icon} size="sm" className="icon-white opacity-80" />
-                      <span>{item.text}</span>
+                      <span className="whitespace-nowrap">{item.text}</span>
                     </motion.div>
                   ))}
                 </motion.div>
@@ -2267,9 +2237,15 @@ function Humanization() {
             </svg>
           </div>
         </section>
-      </div>
+      </main>
     </>
   )
 }
 
 export default Humanization
+
+
+
+
+
+

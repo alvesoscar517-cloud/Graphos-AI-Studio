@@ -31,8 +31,11 @@ function LanguageSelector() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-bg-hover transition-colors"
       >
-        <span className={`fi fi-${currentLang.flag} w-5 h-4 rounded-sm`} />
-        <span className="text-sm text-text-primary">{currentLang.name}</span>
+        <div 
+          className={`fi fi-${currentLang.flag} !w-6 !h-6 rounded-full border border-gray-200 dark:border-gray-600 shadow-sm flex-shrink-0`}
+          style={{ backgroundSize: '150%', backgroundPosition: 'center' }}
+        />
+        <span className="text-sm text-text-primary hidden sm:inline">{currentLang.name}</span>
         <Icon 
           name="chevron-down" 
           size="sm" 
@@ -42,17 +45,24 @@ function LanguageSelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 bg-bg-primary border border-gray-200 rounded-lg shadow-popup py-1 min-w-[180px] max-h-[300px] overflow-y-auto z-popup">
+        <div className="absolute top-full right-0 mt-2 bg-bg-primary border border-gray-200 dark:border-gray-700 rounded-xl shadow-popup py-1.5 min-w-[200px] max-h-[320px] overflow-y-auto scrollbar-hidden z-popup">
           {SUPPORTED_LANGUAGES.map(lang => (
             <button
               key={lang.code}
               onClick={() => handleLanguageChange(lang.code)}
-              className={`w-full flex items-center gap-2.5 px-4 h-10 text-sm leading-none hover:bg-bg-hover ${
-                lang.code === i18n.language ? 'text-primary bg-primary-light' : 'text-text-primary'
+              className={`w-full flex items-center gap-3 mx-1.5 px-3 py-2.5 text-sm leading-none rounded-lg transition-colors ${
+                lang.code === i18n.language ? 'text-primary bg-primary-light' : 'text-text-primary hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
+              style={{ width: 'calc(100% - 12px)' }}
             >
-              <span className={`fi fi-${lang.flag} w-5 h-4 rounded-sm shrink-0`} />
+              <div 
+                className={`fi fi-${lang.flag} !w-6 !h-6 rounded-full border border-gray-200 dark:border-gray-600 shadow-sm flex-shrink-0`}
+                style={{ backgroundSize: '150%', backgroundPosition: 'center' }}
+              />
               <span className="truncate">{lang.name}</span>
+              {lang.code === i18n.language && (
+                <Icon name="check" size="sm" className="ml-auto text-primary" />
+              )}
             </button>
           ))}
         </div>

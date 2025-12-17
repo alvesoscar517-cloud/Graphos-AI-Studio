@@ -2,61 +2,25 @@
  * LiveAIDetectionDemo - Interactive AI Detection demo
  * Matches the real AIDetectionCard component from the main app
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppFrame } from './DemoWrapper'
 import Icon from '@components/common/Icon'
+import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
+import { getSampleTexts } from './sampleData'
 
-// Sample texts for demo - locked, user cannot edit
-const SAMPLE_TEXTS = {
-  ai: `The implementation of artificial intelligence in modern healthcare systems represents a paradigm shift in medical diagnostics and patient care. Machine learning algorithms have demonstrated remarkable accuracy in analyzing medical imaging data, often surpassing human radiologists in detecting certain conditions. Furthermore, natural language processing enables efficient extraction of relevant information from electronic health records, facilitating more informed clinical decision-making.`,
-  human: `I've been thinking about this problem for weeks now, and honestly? It's driving me crazy. Every time I think I've figured it out, something new pops up. My colleague Sarah suggested we try a different approach - maybe we're overcomplicating things. She's probably right. We tend to do that a lot around here, especially when deadlines are looming.`,
-  mixed: `Artificial intelligence has revolutionized content creation through sophisticated algorithms and neural networks. But here's the thing - I still think there's something special about human creativity that machines can't quite capture. Sure, AI can generate technically perfect prose, but can it tell you about that time I accidentally sent an email to the wrong person? I don't think so!`
-}
-
-// Mock detection results matching real app behavior
-const getMockResult = (type) => {
-  const results = {
-    ai: {
-      aiScore: 87,
-      confidence: 92,
-      verdict: 'AI-generated',
-      humanIndicators: [],
-      aiIndicators: [
-        'Consistent formal tone throughout',
-        'Technical vocabulary usage',
-        'Structured paragraph flow',
-        'Lack of personal expressions'
-      ]
-    },
-    human: {
-      aiScore: 18,
-      confidence: 88,
-      verdict: 'Human-written',
-      humanIndicators: [
-        'Personal pronouns detected',
-        'Informal language patterns',
-        'Emotional expressions present',
-        'Varied sentence structure'
-      ],
-      aiIndicators: []
-    },
-    mixed: {
-      aiScore: 52,
-      confidence: 75,
-      verdict: 'Mixed content',
-      humanIndicators: [
-        'Personal anecdotes present',
-        'Informal expressions used'
-      ],
-      aiIndicators: [
-        'Technical terminology detected',
-        'Formal sentence structures'
-      ]
-    }
+// Get mock result from sample data (i18n supported)
+const getMockResult = (sampleData) => {
+  if (!sampleData?.result) return null
+  const { result } = sampleData
+  return {
+    aiScore: result.ai_probability,
+    confidence: result.confidence,
+    verdict: result.verdict,
+    humanIndicators: result.human_indicators || [],
+    aiIndicators: result.ai_indicators || []
   }
-  return results[type]
 }
 
 const LiveAIDetectionDemo = () => {
@@ -66,7 +30,10 @@ const LiveAIDetectionDemo = () => {
   const [result, setResult] = useState(null)
   const [showResult, setShowResult] = useState(true)
 
-  const text = SAMPLE_TEXTS[selectedSample]
+  // Get i18n sample texts
+  const sampleTexts = useMemo(() => getSampleTexts(t), [t])
+  const currentSample = sampleTexts[selectedSample]
+  const text = currentSample?.text || ''
 
   // Reset result when sample changes
   useEffect(() => {
@@ -79,7 +46,7 @@ const LiveAIDetectionDemo = () => {
 
     await new Promise((resolve) => setTimeout(resolve, 1800))
 
-    const mockResult = getMockResult(selectedSample)
+    const mockResult = getMockResult(currentSample)
     setResult(mockResult)
     setIsAnalyzing(false)
   }
@@ -110,17 +77,13 @@ const LiveAIDetectionDemo = () => {
             <span className="text-sm text-gray-500 font-medium">
               {t('demo.trySample', 'Try sample')}:
             </span>
-            {[
-              { key: 'ai', label: t('demo.aiText', 'AI Text') },
-              { key: 'human', label: t('demo.humanText', 'Human Text') },
-              { key: 'mixed', label: t('demo.mixedText', 'Mixed') }
-            ].map(({ key, label }) => (
+            {Object.values(sampleTexts).map(({ id, label }) => (
               <motion.button
-                key={key}
+                key={id}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => setSelectedSample(key)}
+                onClick={() => setSelectedSample(id)}
                 className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${
-                  selectedSample === key
+                  selectedSample === id
                     ? 'bg-primary text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
@@ -162,7 +125,7 @@ const LiveAIDetectionDemo = () => {
                         <motion.div
                           className="absolute inset-0"
                           style={{
-                            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)'
+                            background: 'linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.3) 50%, transparent 100%)'
                           }}
                           animate={{ x: ['-100%', '100%'] }}
                           transition={{
@@ -195,32 +158,15 @@ const LiveAIDetectionDemo = () => {
               whileTap={{ scale: 0.98 }}
               onClick={handleAnalyze}
               disabled={isAnalyzing}
-              className="flex items-center justify-center gap-2 min-w-[140px] px-5 py-3 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary/20"
+              className="flex items-center justify-center gap-2 min-w-[140px] h-[46px] px-5 py-3 bg-white text-gray-700 border border-gray-300 rounded-xl text-sm font-semibold hover:bg-gray-50 hover:border-gray-400 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
             >
               {isAnalyzing ? (
-                <span className="flex items-center justify-center w-[60px] h-[20px]">
-                  <span className="flex items-center gap-[4px]">
-                    {[0, 1, 2].map((i) => (
-                      <motion.span
-                        key={i}
-                        className="w-[7px] h-[7px] bg-white/70 rounded-full"
-                        animate={{
-                          y: [0, -4, 0],
-                          opacity: [0.4, 1, 0.4]
-                        }}
-                        transition={{
-                          duration: 0.6,
-                          repeat: Infinity,
-                          delay: i * 0.15,
-                          ease: 'easeInOut'
-                        }}
-                      />
-                    ))}
-                  </span>
+                <span className="flex items-center justify-center w-[90px]">
+                  <ThreeDotsLoading size="md" />
                 </span>
               ) : (
                 <>
-                  <Icon name="shield-check" size="sm" className="icon-white" />
+                  <Icon name="shield-check" size="sm" className="icon-primary" />
                   <span>
                     {result
                       ? t('analysis.detected', 'Detected')
@@ -236,8 +182,8 @@ const LiveAIDetectionDemo = () => {
         <div className="lg:col-span-2 p-6 lg:p-8 bg-white">
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-              <Icon name="shield-check" size="xl" className="text-gray-500" />
+            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/20 rounded-xl flex items-center justify-center">
+              <Icon name="shield-check" size="xl" className="icon-primary" />
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-sm font-semibold text-gray-800 m-0 mb-1">
@@ -270,13 +216,7 @@ const LiveAIDetectionDemo = () => {
                 exit={{ opacity: 0 }}
                 className="flex flex-col items-center justify-center py-24"
               >
-                <div className="relative w-16 h-16 mb-4">
-                  <div className="absolute inset-0 border-[3px] border-gray-200 rounded-full" />
-                  <div className="absolute inset-0 border-[3px] border-primary border-t-transparent rounded-full animate-spin" />
-                </div>
-                <p className="text-base text-gray-600 font-medium">
-                  {t('demo.analyzing', 'Analyzing...')}
-                </p>
+                <ThreeDotsLoading size="lg" />
               </motion.div>
             ) : result && showResult ? (
               <motion.div

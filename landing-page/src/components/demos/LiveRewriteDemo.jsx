@@ -3,46 +3,47 @@
  * Based on LiveHumanizationDemo with customizations for Rewrite feature
  * Includes Voice Profile selector, Model selector, and Writing Preferences
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppFrame } from './DemoWrapper'
 import Icon from '@components/common/Icon'
+import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
 
-// Sample transformations - locked data for Rewrite
-const SAMPLES = [
+// Sample transformations - i18n supported for Rewrite
+const getSamples = (t) => [
   {
     id: 'professional',
-    label: 'Professional',
-    original: `I think we should maybe consider looking at the possibility of implementing some new features that could potentially help improve our product in some ways. It would be good if we could discuss this at some point.`,
-    rewritten: `I recommend we implement new features to enhance our product's value. Let's schedule a meeting to discuss the specific improvements and their expected impact on user engagement. I've identified three key areas we should prioritize.`
+    label: t('demo.samples.professional', 'Professional'),
+    original: t('demoSamples.rewrite.professional.original', `I think we should maybe consider looking at the possibility of implementing some new features that could potentially help improve our product in some ways. It would be good if we could discuss this at some point.`),
+    rewritten: t('demoSamples.rewrite.professional.rewritten', `I recommend we implement new features to enhance our product's value. Let's schedule a meeting to discuss the specific improvements and their expected impact on user engagement. I've identified three key areas we should prioritize.`)
   },
   {
     id: 'casual',
-    label: 'Casual',
-    original: `The implementation of sustainable practices in corporate environments has become increasingly important in recent years. Organizations are recognizing the necessity of adopting environmentally conscious strategies.`,
-    rewritten: `You know what's been on my mind lately? How companies are finally getting serious about going green. It's not just about looking good anymore – businesses are realizing they actually need to care about the environment if they want to stick around.`
+    label: t('demo.samples.casual', 'Casual'),
+    original: t('demoSamples.rewrite.casual.original', `The implementation of sustainable practices in corporate environments has become increasingly important in recent years. Organizations are recognizing the necessity of adopting environmentally conscious strategies.`),
+    rewritten: t('demoSamples.rewrite.casual.rewritten', `You know what's been on my mind lately? How companies are finally getting serious about going green. It's not just about looking good anymore – businesses are realizing they actually need to care about the environment if they want to stick around.`)
   },
   {
     id: 'concise',
-    label: 'Concise',
-    original: `I am writing to inform you that I would like to request a meeting at your earliest convenience to discuss the possibility of exploring potential collaboration opportunities between our respective organizations.`,
-    rewritten: `Let's schedule a meeting to discuss collaboration opportunities. When works best for you this week?`
+    label: t('demo.samples.concise', 'Concise'),
+    original: t('demoSamples.rewrite.concise.original', `I am writing to inform you that I would like to request a meeting at your earliest convenience to discuss the possibility of exploring potential collaboration opportunities between our respective organizations.`),
+    rewritten: t('demoSamples.rewrite.concise.rewritten', `Let's schedule a meeting to discuss collaboration opportunities. When works best for you this week?`)
   }
 ]
 
-// Mock Voice Profiles
-const VOICE_PROFILES = [
-  { id: 'professional', name: 'Professional Writer', samples: 8 },
-  { id: 'casual', name: 'Casual Blogger', samples: 5 },
-  { id: 'academic', name: 'Academic Style', samples: 6 },
+// Get i18n Voice Profiles
+const getVoiceProfiles = (t) => [
+  { id: 'professional', name: t('demo.voiceProfiles.professional', 'Professional Writer'), samples: 8 },
+  { id: 'casual', name: t('demo.voiceProfiles.casual', 'Casual Blogger'), samples: 5 },
+  { id: 'academic', name: t('demo.voiceProfiles.academic', 'Academic Style'), samples: 6 },
 ]
 
-// Mock AI Models
-const AI_MODELS = [
-  { id: 'hyper', name: 'Graphos Hyper', speed: 'Fast', icon: 'zap' },
-  { id: 'velocity', name: 'Graphos Velocity', speed: 'Ultra Fast', icon: 'rocket' },
-  { id: 'zenith', name: 'Graphos Zenith', speed: 'Quality', icon: 'star' },
+// Get i18n AI Models
+const getAIModels = (t) => [
+  { id: 'hyper', name: 'Graphos Hyper', speed: t('demo.speed.fast', 'Fast'), icon: 'zap' },
+  { id: 'velocity', name: 'Graphos Velocity', speed: t('demo.speed.ultraFast', 'Ultra Fast'), icon: 'rocket' },
+  { id: 'zenith', name: 'Graphos Zenith', speed: t('demo.speed.quality', 'Quality'), icon: 'star' },
 ]
 
 const LiveRewriteDemo = () => {
@@ -67,6 +68,11 @@ const LiveRewriteDemo = () => {
     useIterativeRefinement: false,
   })
 
+  // Get i18n data
+  const SAMPLES = useMemo(() => getSamples(t), [t])
+  const VOICE_PROFILES = useMemo(() => getVoiceProfiles(t), [t])
+  const AI_MODELS = useMemo(() => getAIModels(t), [t])
+  
   const currentSample = SAMPLES.find((s) => s.id === selectedSample)
   const currentProfile = VOICE_PROFILES.find((p) => p.id === selectedProfile)
   const currentModel = AI_MODELS.find((m) => m.id === selectedModel)
@@ -97,9 +103,16 @@ const LiveRewriteDemo = () => {
     for (let i = 0; i < text.length; i++) {
       currentText += text[i]
       setStreamedText(currentText)
-      await new Promise((resolve) =>
-        setTimeout(resolve, 8 + Math.random() * 12)
-      )
+      
+      // Variable speed: faster for spaces, slower for punctuation
+      const char = text[i]
+      let delay = 12 // base speed
+      if (char === ' ') delay = 6
+      else if (char === '\n') delay = 40
+      else if (['.', '!', '?'].includes(char)) delay = 60
+      else if ([',', ':'].includes(char)) delay = 30
+      
+      await new Promise((resolve) => setTimeout(resolve, delay))
     }
 
     setIsComplete(true)
@@ -308,32 +321,15 @@ const LiveRewriteDemo = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleRewrite}
                 disabled={isProcessing || isComplete}
-                className="flex items-center justify-center gap-2 min-w-[140px] px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl text-sm font-medium hover:from-emerald-600 hover:to-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-emerald-500/20"
+                className="flex items-center justify-center gap-2 min-w-[120px] h-[42px] px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isProcessing ? (
-                  <span className="flex items-center justify-center w-[50px] h-[16px]">
-                    <span className="flex items-center gap-[3px]">
-                      {[0, 1, 2].map((i) => (
-                        <motion.span
-                          key={i}
-                          className="w-[6px] h-[6px] bg-white/60 rounded-full"
-                          animate={{
-                            y: [0, -4, 0],
-                            opacity: [0.4, 1, 0.4]
-                          }}
-                          transition={{
-                            duration: 0.6,
-                            repeat: Infinity,
-                            delay: i * 0.15,
-                            ease: 'easeInOut'
-                          }}
-                        />
-                      ))}
-                    </span>
+                  <span className="flex items-center justify-center w-[70px]">
+                    <ThreeDotsLoading size="md" />
                   </span>
                 ) : (
                   <>
-                    <Icon name="edit-3" size="sm" className="icon-white" />
+                    <Icon name="edit-3" size="sm" className="icon-emerald" />
                     {t('features.rewrite.demo.rewriteBtn', 'Rewrite')}
                   </>
                 )}
@@ -375,16 +371,16 @@ const LiveRewriteDemo = () => {
             <div className="flex items-center gap-1.5 px-1 mb-2">
               <Icon name="sliders" size="xs" color="gray-medium" />
               <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                Options
+                {t('demo.sidebar.options', 'Options')}
               </span>
             </div>
             
             <div className="space-y-1.5">
               {[
-                { key: 'useVocabularyPreferences', icon: 'book-open', title: 'Vocabulary' },
-                { key: 'useKeyCharacteristics', icon: 'list', title: 'Key Features' },
-                { key: 'useSentencePatterns', icon: 'align-left', title: 'Sentence Style' },
-                { key: 'useRewriteInstructions', icon: 'file-text', title: 'Instructions' },
+                { key: 'useVocabularyPreferences', icon: 'book-open', titleKey: 'demo.options.vocabulary', title: 'Vocabulary' },
+                { key: 'useKeyCharacteristics', icon: 'list', titleKey: 'demo.options.keyFeatures', title: 'Key Features' },
+                { key: 'useSentencePatterns', icon: 'align-left', titleKey: 'demo.options.sentenceStyle', title: 'Sentence Style' },
+                { key: 'useRewriteInstructions', icon: 'file-text', titleKey: 'demo.options.instructions', title: 'Instructions' },
               ].map((item) => (
                 <div
                   key={item.key}
@@ -392,7 +388,7 @@ const LiveRewriteDemo = () => {
                 >
                   <div className="flex items-center gap-2">
                     <Icon name={item.icon} size="xs" color="gray-medium" />
-                    <span className="text-[11px] text-gray-700 dark:text-gray-300">{item.title}</span>
+                    <span className="text-[11px] text-gray-700 dark:text-gray-300">{t(item.titleKey, item.title)}</span>
                   </div>
                   <ToggleSwitch
                     checked={preferences[item.key]}
@@ -408,7 +404,7 @@ const LiveRewriteDemo = () => {
             <div className="flex items-center gap-1.5 px-1 mb-2">
               <Icon name="user-check" size="xs" color="gray-medium" />
               <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                Humanization
+                {t('demo.sidebar.humanization', 'Humanization')}
               </span>
             </div>
             
@@ -416,8 +412,8 @@ const LiveRewriteDemo = () => {
               <div className="flex items-center justify-between gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
                 <div className="flex items-center gap-2">
                   <Icon name="shield" size="xs" color="gray-medium" />
-                  <span className="text-[11px] text-gray-700 dark:text-gray-300">Anti-AI</span>
-                  <span className="text-[8px] font-medium py-px px-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded">NEW</span>
+                  <span className="text-[11px] text-gray-700 dark:text-gray-300">{t('demo.options.antiAI', 'Anti-AI')}</span>
+                  <span className="text-[8px] font-medium py-px px-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded">{t('demo.tags.new', 'NEW')}</span>
                 </div>
                 <ToggleSwitch
                   checked={preferences.useAntiAIDetection}
@@ -428,8 +424,8 @@ const LiveRewriteDemo = () => {
               <div className="flex items-center justify-between gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
                 <div className="flex items-center gap-2">
                   <Icon name="refresh-cw" size="xs" color="gray-medium" />
-                  <span className="text-[11px] text-gray-700 dark:text-gray-300">Iterative</span>
-                  <span className="text-[8px] font-medium py-px px-1 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded">BETA</span>
+                  <span className="text-[11px] text-gray-700 dark:text-gray-300">{t('demo.options.iterative', 'Iterative')}</span>
+                  <span className="text-[8px] font-medium py-px px-1 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded">{t('demo.tags.beta', 'BETA')}</span>
                 </div>
                 <ToggleSwitch
                   checked={preferences.useIterativeRefinement}

@@ -16,19 +16,23 @@ function Footer() {
       { to: '/features/ai-detection', label: t('nav.aiDetection', 'AI Detection') },
       { to: '/features/humanization', label: t('nav.humanization', 'Humanization') },
       { to: '/features/voice-profile', label: t('nav.voiceProfile', 'Voice Profile') },
+      { to: '/features/rewrite', label: t('nav.rewrite', 'AI Rewrite') },
+      { to: '/features/compatibility-score', label: t('nav.compatibilityScore', 'Compatibility Score') },
+      { to: '/features/deviations', label: t('nav.deviations', 'Deviations') },
+      { to: '/features/statistics', label: t('nav.statistics', 'Statistics') },
       { to: '/features/ai-workspace', label: t('nav.aiWorkspace', 'AI Workspace') },
       { href: 'https://chrome.google.com/webstore', label: t('nav.chromeExtension', 'Chrome Extension'), external: true }
     ],
     resources: [
       { href: '#faq', label: t('nav.faq', 'FAQ') },
       { href: '#pricing', label: t('nav.pricing', 'Pricing') },
-      { href: 'mailto:support@graphosai.com', label: t('nav.support', 'Support') },
+      { href: 'mailto:Support@graphosai.com', label: t('nav.support', 'Support') },
       { href: 'https://app.graphosai.com', label: t('nav.login', 'Login'), external: true }
     ],
     legal: [
       { to: '/privacy', label: t('nav.privacy', 'Privacy Policy') },
       { to: '/terms', label: t('nav.terms', 'Terms of Service') },
-      { href: '#', label: t('nav.cookies', 'Cookie Policy') }
+      { to: '/privacy#cookies', label: t('nav.cookies', 'Cookie Policy') }
     ]
   }
 
@@ -36,7 +40,13 @@ function Footer() {
     { href: 'https://twitter.com/graphosai', icon: 'twitter', label: 'Twitter' },
     { href: 'https://linkedin.com/company/graphosai', icon: 'linkedin', label: 'LinkedIn' },
     { href: 'https://github.com/graphosai', icon: 'github', label: 'GitHub' },
-    { href: 'mailto:hello@graphosai.com', icon: 'mail', label: 'Email' }
+    { href: 'mailto:Support@graphosai.com', icon: 'mail', label: 'Email' }
+  ]
+
+  const trustBadges = [
+    { icon: 'shield-check', label: t('footer.trust.ssl', 'SSL Secured') },
+    { icon: 'lock', label: t('footer.trust.gdpr', 'GDPR Compliant') },
+    { icon: 'check-circle', label: t('footer.trust.privacy', 'Privacy First') }
   ]
 
   return (
@@ -47,7 +57,7 @@ function Footer() {
           <div className="absolute -bottom-10 right-1/4 w-56 h-56 bg-blue-400/8 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative max-w-content-lg mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <div className="relative w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 pt-12 pb-8">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-6">
           {/* Brand Column */}
           <div className="col-span-2">
@@ -62,9 +72,21 @@ function Footer() {
                 Graphos AI
               </span>
             </Link>
-            <p className="text-text-secondary text-sm max-w-xs mb-5 leading-relaxed">
+            <p className="text-text-secondary text-sm max-w-xs mb-4 leading-relaxed">
               {t('footer.description', 'Graphos AI Studio helps you write authentic content with AI detection, humanization, and voice profile features.')}
             </p>
+            {/* Trust Badges */}
+            <div className="flex flex-wrap gap-2">
+              {trustBadges.map((badge) => (
+                <div 
+                  key={badge.label} 
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/60 border border-gray-200/80 rounded-full"
+                >
+                  <Icon name={badge.icon} size="xs" color="gray-medium" />
+                  <span className="text-xs text-text-muted font-medium">{badge.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Features */}
@@ -123,15 +145,9 @@ function Footer() {
             <ul className="space-y-2">
               {footerLinks.legal.map((link, i) => (
                 <li key={i}>
-                  {link.to ? (
-                    <Link to={link.to} className="text-text-secondary hover:text-primary text-sm transition-colors">
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className="text-text-secondary hover:text-primary text-sm transition-colors">
-                      {link.label}
-                    </a>
-                  )}
+                  <Link to={link.to} className="text-text-secondary hover:text-primary text-sm transition-colors">
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -139,7 +155,7 @@ function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-10 pt-6 border-t border-slate-300/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="mt-8 pt-6 border-t border-slate-300/50 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-text-muted text-sm">
             © {currentYear} Graphos AI Studio. {t('footer.copyright', 'All rights reserved.')}
           </p>

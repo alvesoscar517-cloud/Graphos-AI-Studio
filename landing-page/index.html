@@ -1,51 +1,263 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    
+    <!-- Favicon & App Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
     
     <!-- Primary Meta Tags -->
     <title>Graphos AI Studio - AI Detection, Humanization & Voice Profile</title>
     <meta name="title" content="Graphos AI Studio - AI Detection, Humanization & Voice Profile" />
-    <meta name="description" content="Detect AI-generated content with 98% accuracy, humanize your writing, and create authentic content in your unique voice. Free AI writing assistant with Chrome extension." />
-    <meta name="keywords" content="AI detection, AI content detector, humanize AI text, AI writing assistant, voice profile, content humanization, AI workspace, Chrome extension, GPT detector" />
+    <meta name="description" content="Detect AI-generated content with 98% accuracy, humanize your writing, and create authentic content that sounds like you. Free AI writing assistant with Chrome extension." />
+    <meta name="keywords" content="AI detection, AI content detector, humanize AI text, AI writing assistant, voice profile, content humanization, AI workspace, Chrome extension, GPT detector, ChatGPT detector, AI text detector, make AI text human, bypass AI detection" />
     <meta name="author" content="Graphos AI Studio" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow" />
     
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://graphosai.com/" />
+    
+    <!-- Hreflang Tags for Multi-language SEO -->
+    <link rel="alternate" hreflang="en" href="https://graphosai.com/" />
+    <link rel="alternate" hreflang="vi" href="https://graphosai.com/vi/" />
+    <link rel="alternate" hreflang="ja" href="https://graphosai.com/ja/" />
+    <link rel="alternate" hreflang="ko" href="https://graphosai.com/ko/" />
+    <link rel="alternate" hreflang="zh-CN" href="https://graphosai.com/zh-CN/" />
+    <link rel="alternate" hreflang="zh-TW" href="https://graphosai.com/zh-TW/" />
+    <link rel="alternate" hreflang="es" href="https://graphosai.com/es/" />
+    <link rel="alternate" hreflang="fr" href="https://graphosai.com/fr/" />
+    <link rel="alternate" hreflang="de" href="https://graphosai.com/de/" />
+    <link rel="alternate" hreflang="it" href="https://graphosai.com/it/" />
+    <link rel="alternate" hreflang="pt" href="https://graphosai.com/pt/" />
+    <link rel="alternate" hreflang="ru" href="https://graphosai.com/ru/" />
+    <link rel="alternate" hreflang="ar" href="https://graphosai.com/ar/" />
+    <link rel="alternate" hreflang="hi" href="https://graphosai.com/hi/" />
+    <link rel="alternate" hreflang="th" href="https://graphosai.com/th/" />
+    <link rel="alternate" hreflang="id" href="https://graphosai.com/id/" />
+    <link rel="alternate" hreflang="x-default" href="https://graphosai.com/" />
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://graphosai.com/" />
     <meta property="og:title" content="Graphos AI Studio - AI Detection, Humanization & Voice Profile" />
-    <meta property="og:description" content="Detect AI-generated content with 98% accuracy, humanize your writing, and create authentic content in your unique voice." />
+    <meta property="og:description" content="Detect AI-generated content with 98% accuracy, humanize your writing, and create authentic content that sounds like you." />
     <meta property="og:image" content="https://graphosai.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Graphos AI Studio - AI Writing Assistant" />
     <meta property="og:site_name" content="Graphos AI Studio" />
     <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="vi_VN" />
+    <meta property="og:locale:alternate" content="ja_JP" />
+    <meta property="og:locale:alternate" content="ko_KR" />
+    <meta property="og:locale:alternate" content="zh_CN" />
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://graphosai.com/" />
-    <meta property="twitter:title" content="Graphos AI Studio - AI Detection, Humanization & Voice Profile" />
-    <meta property="twitter:description" content="Detect AI-generated content with 98% accuracy, humanize your writing, and create authentic content in your unique voice." />
-    <meta property="twitter:image" content="https://graphosai.com/og-image.png" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@graphosai" />
     <meta name="twitter:creator" content="@graphosai" />
+    <meta name="twitter:url" content="https://graphosai.com/" />
+    <meta name="twitter:title" content="Graphos AI Studio - AI Detection, Humanization & Voice Profile" />
+    <meta name="twitter:description" content="Detect AI-generated content with 98% accuracy, humanize your writing, and create authentic content that sounds like you." />
+    <meta name="twitter:image" content="https://graphosai.com/og-image.png" />
+    <meta name="twitter:image:alt" content="Graphos AI Studio - AI Writing Assistant" />
 
-    <!-- Theme Color -->
+    <!-- Theme & App Meta -->
     <meta name="theme-color" content="#0071E3" />
     <meta name="msapplication-TileColor" content="#0071E3" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Graphos AI" />
+    <meta name="application-name" content="Graphos AI Studio" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Security -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     
     <!-- Preconnect to external domains for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://app.graphosai.com" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://images.unsplash.com" />
     
-    <!-- DNS Prefetch -->
+    <!-- DNS Prefetch for non-critical resources -->
     <link rel="dns-prefetch" href="https://www.youtube.com" />
     <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    
+    <!-- Preload critical assets for faster LCP -->
+    <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
+    <link rel="preload" href="/favicon.svg" as="image" type="image/svg+xml" />
+    
+    <!-- Critical JS chunks will be injected by Vite during build -->
+    
+    <!-- JSON-LD Structured Data - Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://graphosai.com/#organization",
+      "name": "Graphos AI Studio",
+      "url": "https://graphosai.com",
+      "logo": {
+        "@type": "ImageObject",
+        "@id": "https://graphosai.com/#logo",
+        "url": "https://graphosai.com/logo.png",
+        "width": 512,
+        "height": 512,
+        "caption": "Graphos AI Studio"
+      },
+      "description": "AI-powered writing assistant with detection, humanization, and voice profile features",
+      "email": "support@graphosai.com",
+      "sameAs": [
+        "https://twitter.com/graphosai",
+        "https://linkedin.com/company/graphosai"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "support@graphosai.com",
+        "contactType": "customer support",
+        "availableLanguage": ["English", "Vietnamese", "Japanese", "Korean", "Chinese", "Spanish", "French", "German"]
+      }
+    }
+    </script>
+    
+    <!-- JSON-LD Structured Data - WebSite with SearchAction -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://graphosai.com/#website",
+      "name": "Graphos AI Studio",
+      "url": "https://graphosai.com",
+      "description": "AI Detection, Humanization & Voice Profile Platform",
+      "publisher": {"@id": "https://graphosai.com/#organization"},
+      "inLanguage": "en",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://graphosai.com/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    
+    <!-- JSON-LD Structured Data - SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://graphosai.com/#software",
+      "name": "Graphos AI Studio",
+      "description": "AI-powered writing assistant that helps you detect AI content, humanize your writing, and create authentic content in your unique voice.",
+      "applicationCategory": "ProductivityApplication",
+      "operatingSystem": "Web, Chrome Extension",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "softwareVersion": "2.0",
+      "featureList": [
+        "AI Content Detection with 98% accuracy",
+        "Content Humanization",
+        "Voice Profile Creation",
+        "AI Workspace Chat",
+        "Chrome Extension",
+        "Multi-language Support (15+ languages)"
+      ],
+      "brand": {
+        "@type": "Brand",
+        "name": "Graphos AI",
+        "logo": "https://graphosai.com/logo.png"
+      },
+      "author": {"@id": "https://graphosai.com/#organization"},
+      "publisher": {"@id": "https://graphosai.com/#organization"},
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "1250",
+        "bestRating": "5",
+        "worstRating": "1",
+        "reviewCount": "890"
+      }
+    }
+    </script>
   </head>
   <body>
+    <!-- Noscript fallback for SEO -->
+    <noscript>
+      <div style="padding: 20px; text-align: center; font-family: system-ui, sans-serif;">
+        <h1>Graphos AI Studio</h1>
+        <p>AI Detection, Humanization & Voice Profile Platform</p>
+        <p>Please enable JavaScript to use this application.</p>
+        <p>
+          <a href="https://app.graphosai.com">Go to App</a> |
+          <a href="mailto:support@graphosai.com">Contact Support</a>
+        </p>
+      </div>
+    </noscript>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Performance: Report Web Vitals -->
+    <script>
+      // Minimal Web Vitals reporting
+      if ('PerformanceObserver' in window) {
+        // LCP Observer
+        try {
+          new PerformanceObserver((list) => {
+            const entries = list.getEntries();
+            const lastEntry = entries[entries.length - 1];
+            if (lastEntry && window.gtag) {
+              window.gtag('event', 'LCP', {
+                event_category: 'Web Vitals',
+                value: Math.round(lastEntry.startTime),
+                non_interaction: true
+              });
+            }
+          }).observe({ type: 'largest-contentful-paint', buffered: true });
+        } catch (e) {}
+        
+        // CLS Observer
+        try {
+          let clsValue = 0;
+          new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              if (!entry.hadRecentInput) {
+                clsValue += entry.value;
+              }
+            }
+          }).observe({ type: 'layout-shift', buffered: true });
+          
+          // Report CLS on page hide
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden' && window.gtag) {
+              window.gtag('event', 'CLS', {
+                event_category: 'Web Vitals',
+                value: Math.round(clsValue * 1000),
+                non_interaction: true
+              });
+            }
+          });
+        } catch (e) {}
+      }
+    </script>
   </body>
 </html>

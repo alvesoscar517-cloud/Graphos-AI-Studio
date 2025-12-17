@@ -3,18 +3,19 @@
  * Shows how text is analyzed against a Voice Profile for style matching
  * Design: Teal/Cyan theme - representing analysis and precision
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppFrame } from './DemoWrapper'
 import Icon from '@components/common/Icon'
+import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
 
-// Sample texts with pre-calculated compatibility scores
-const SAMPLES = [
+// Sample texts with pre-calculated compatibility scores - i18n supported
+const getSamples = (t) => [
   {
     id: 'high',
-    label: 'High Match',
-    text: `I've been thinking about how we approach our daily challenges. The key is to stay focused on what truly matters while remaining flexible enough to adapt. Small consistent steps lead to remarkable progress over time.`,
+    label: t('demo.samples.highMatch', 'High Match'),
+    text: t('demoSamples.compatibility.high.text', `I've been thinking about how we approach our daily challenges. The key is to stay focused on what truly matters while remaining flexible enough to adapt. Small consistent steps lead to remarkable progress over time.`),
     score: 92,
     vectorScore: 94,
     statisticalScore: 89,
@@ -23,8 +24,8 @@ const SAMPLES = [
   },
   {
     id: 'medium',
-    label: 'Medium Match',
-    text: `The implementation of sustainable practices in corporate environments has become increasingly important. Organizations must recognize the necessity of adopting environmentally conscious strategies to remain competitive in today's market.`,
+    label: t('demo.samples.mediumMatch', 'Medium Match'),
+    text: t('demoSamples.compatibility.medium.text', `The implementation of sustainable practices in corporate environments has become increasingly important. Organizations must recognize the necessity of adopting environmentally conscious strategies to remain competitive in today's market.`),
     score: 68,
     vectorScore: 72,
     statisticalScore: 63,
@@ -33,8 +34,8 @@ const SAMPLES = [
   },
   {
     id: 'low',
-    label: 'Low Match',
-    text: `Pursuant to the aforementioned considerations, it is hereby recommended that the committee undertake a comprehensive review of the existing protocols. The ramifications of such an endeavor would be manifold and far-reaching.`,
+    label: t('demo.samples.lowMatch', 'Low Match'),
+    text: t('demoSamples.compatibility.low.text', `Pursuant to the aforementioned considerations, it is hereby recommended that the committee undertake a comprehensive review of the existing protocols. The ramifications of such an endeavor would be manifold and far-reaching.`),
     score: 34,
     vectorScore: 38,
     statisticalScore: 29,
@@ -43,11 +44,11 @@ const SAMPLES = [
   }
 ]
 
-// Mock Voice Profiles
-const VOICE_PROFILES = [
-  { id: 'personal', name: 'Personal Blog', samples: 12, tone: 'Conversational' },
-  { id: 'professional', name: 'Professional', samples: 8, tone: 'Formal' },
-  { id: 'creative', name: 'Creative Writer', samples: 15, tone: 'Expressive' },
+// Get i18n Voice Profiles
+const getVoiceProfiles = (t) => [
+  { id: 'personal', name: t('demo.voiceProfiles.personalBlog', 'Personal Blog'), samples: 12, tone: t('demo.tone.conversational', 'Conversational') },
+  { id: 'professional', name: t('demo.voiceProfiles.professional', 'Professional'), samples: 8, tone: t('demo.tone.formal', 'Formal') },
+  { id: 'creative', name: t('demo.voiceProfiles.creativeWriter', 'Creative Writer'), samples: 15, tone: t('demo.tone.expressive', 'Expressive') },
 ]
 
 const LiveCompatibilityDemo = () => {
@@ -58,6 +59,8 @@ const LiveCompatibilityDemo = () => {
   const [animatedScore, setAnimatedScore] = useState(0)
   const [selectedProfile] = useState('personal')
 
+  const SAMPLES = useMemo(() => getSamples(t), [t])
+  const VOICE_PROFILES = useMemo(() => getVoiceProfiles(t), [t])
   const currentSample = SAMPLES.find((s) => s.id === selectedSample)
   const currentProfile = VOICE_PROFILES.find((p) => p.id === selectedProfile)
 
@@ -177,30 +180,45 @@ const LiveCompatibilityDemo = () => {
           {/* Text Display Area */}
           <div className="flex-1 relative">
             <div className="w-full h-full min-h-[300px] p-5 bg-gray-50 dark:bg-slate-800 rounded-2xl text-gray-700 dark:text-gray-300 text-base leading-relaxed overflow-hidden relative">
-              {currentSample?.text}
+              {/* Text content */}
+              <div className={`transition-opacity duration-300 ${isAnalyzing ? 'opacity-0' : 'opacity-100'}`}>
+                {currentSample?.text}
+              </div>
               
-              {/* Analysis overlay */}
+              {/* Shimmer skeleton overlay when analyzing */}
               <AnimatePresence>
                 {isAnalyzing && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-gray-50/90 dark:bg-slate-800/90 flex items-center justify-center"
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 p-5 flex flex-col gap-3"
                   >
-                    <div className="text-center">
+                    {[95, 88, 92, 78, 85, 90, 72, 55].map((width, index) => (
                       <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                        className="w-16 h-16 mx-auto mb-4 relative"
+                        key={index}
+                        className="h-4 rounded-md bg-gray-200 dark:bg-slate-700 relative overflow-hidden"
+                        style={{ width: `${width}%` }}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
                       >
-                        <div className="absolute inset-0 rounded-full border-4 border-teal-200 dark:border-teal-800" />
-                        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-teal-500" />
+                        <motion.div
+                          className="absolute inset-0"
+                          style={{
+                            background: 'linear-gradient(90deg, transparent 0%, rgba(20,184,166,0.3) 50%, transparent 100%)'
+                          }}
+                          animate={{ x: ['-100%', '100%'] }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            ease: 'easeInOut',
+                            delay: index * 0.1
+                          }}
+                        />
                       </motion.div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('demo.compatibility.analyzing', 'Analyzing writing style...')}
-                      </p>
-                    </div>
+                    ))}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -280,17 +298,17 @@ const LiveCompatibilityDemo = () => {
                     <div className="flex flex-wrap gap-1.5">
                       {currentSample?.deviations.severe > 0 && (
                         <span className="text-xs px-2 py-0.5 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-full">
-                          {currentSample.deviations.severe} severe
+                          {currentSample.deviations.severe} {t('demo.deviations.severe', 'severe').toLowerCase()}
                         </span>
                       )}
                       {currentSample?.deviations.moderate > 0 && (
                         <span className="text-xs px-2 py-0.5 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full">
-                          {currentSample.deviations.moderate} moderate
+                          {currentSample.deviations.moderate} {t('demo.deviations.moderate', 'moderate').toLowerCase()}
                         </span>
                       )}
                       {currentSample?.deviations.mild > 0 && (
                         <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full">
-                          {currentSample.deviations.mild} mild
+                          {currentSample.deviations.mild} {t('demo.deviations.mild', 'mild').toLowerCase()}
                         </span>
                       )}
                     </div>
@@ -328,22 +346,15 @@ const LiveCompatibilityDemo = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleAnalyze}
                 disabled={isAnalyzing || showResult}
-                className="flex items-center justify-center gap-2 min-w-[160px] px-5 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl text-sm font-medium hover:from-teal-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-teal-500/20"
+                className="flex items-center justify-center gap-2 min-w-[160px] h-[42px] px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isAnalyzing ? (
-                  <span className="flex items-center gap-[3px]">
-                    {[0, 1, 2].map((i) => (
-                      <motion.span
-                        key={i}
-                        className="w-[6px] h-[6px] bg-white/60 rounded-full"
-                        animate={{ y: [0, -4, 0], opacity: [0.4, 1, 0.4] }}
-                        transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-                      />
-                    ))}
+                  <span className="flex items-center justify-center w-[120px]">
+                    <ThreeDotsLoading size="md" />
                   </span>
                 ) : (
                   <>
-                    <Icon name="target" size="sm" className="icon-white" />
+                    <Icon name="target" size="sm" className="icon-teal" />
                     {t('demo.compatibility.analyzeBtn', 'Calculate Score')}
                   </>
                 )}
@@ -372,20 +383,20 @@ const LiveCompatibilityDemo = () => {
             <div className="flex items-center gap-1.5 mb-3">
               <Icon name="info" size="xs" color="gray-medium" />
               <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                Score Guide
+                {t('demo.sidebar.scoreGuide', 'Score Guide')}
               </span>
             </div>
             <div className="space-y-2">
               {[
-                { range: '90-100%', label: 'Very Compatible', color: 'emerald' },
-                { range: '75-89%', label: 'Good Match', color: 'teal' },
-                { range: '50-74%', label: 'Average', color: 'amber' },
-                { range: '25-49%', label: 'Low Match', color: 'orange' },
-                { range: '0-24%', label: 'Not Compatible', color: 'red' },
+                { range: '90-100%', labelKey: 'demo.compatibility.veryCompatible', label: 'Very Compatible', color: 'emerald' },
+                { range: '75-89%', labelKey: 'demo.compatibility.goodMatch', label: 'Good Match', color: 'teal' },
+                { range: '50-74%', labelKey: 'demo.compatibility.average', label: 'Average', color: 'amber' },
+                { range: '25-49%', labelKey: 'demo.compatibility.lowMatch', label: 'Low Match', color: 'orange' },
+                { range: '0-24%', labelKey: 'demo.compatibility.notCompatible', label: 'Not Compatible', color: 'red' },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between text-[10px]">
                   <span className={`text-${item.color}-600 dark:text-${item.color}-400 font-medium`}>{item.range}</span>
-                  <span className="text-gray-500 dark:text-gray-400">{item.label}</span>
+                  <span className="text-gray-500 dark:text-gray-400">{t(item.labelKey, item.label)}</span>
                 </div>
               ))}
             </div>
@@ -396,20 +407,20 @@ const LiveCompatibilityDemo = () => {
             <div className="flex items-center gap-1.5 mb-3">
               <Icon name="layers" size="xs" color="gray-medium" />
               <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                Analysis
+                {t('demo.sidebar.analysis', 'Analysis')}
               </span>
             </div>
             <div className="space-y-2">
               {[
-                { icon: 'cpu', label: 'Vector Similarity', desc: 'Semantic matching' },
-                { icon: 'bar-chart-2', label: 'Statistical', desc: 'Structure analysis' },
-                { icon: 'activity', label: 'Confidence', desc: 'Result reliability' },
+                { icon: 'cpu', labelKey: 'demo.sidebar.vectorSimilarity', label: 'Vector Similarity', descKey: 'demo.sidebar.semanticMatching', desc: 'Semantic matching' },
+                { icon: 'bar-chart-2', labelKey: 'demo.sidebar.statistical', label: 'Statistical', descKey: 'demo.sidebar.structureAnalysis', desc: 'Structure analysis' },
+                { icon: 'activity', labelKey: 'demo.sidebar.confidence', label: 'Confidence', descKey: 'demo.sidebar.resultReliability', desc: 'Result reliability' },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-2 p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
                   <Icon name={item.icon} size="xs" className="icon-teal mt-0.5" />
                   <div>
-                    <div className="text-[11px] font-medium text-gray-700 dark:text-gray-300">{item.label}</div>
-                    <div className="text-[9px] text-gray-500 dark:text-gray-400">{item.desc}</div>
+                    <div className="text-[11px] font-medium text-gray-700 dark:text-gray-300">{t(item.labelKey, item.label)}</div>
+                    <div className="text-[9px] text-gray-500 dark:text-gray-400">{t(item.descKey, item.desc)}</div>
                   </div>
                 </div>
               ))}

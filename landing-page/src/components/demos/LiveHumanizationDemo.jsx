@@ -2,31 +2,32 @@
  * LiveHumanizationDemo - Interactive Humanization demo
  * Single editor with shimmer effect and streaming text animation
  */
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppFrame } from './DemoWrapper'
 import Icon from '@components/common/Icon'
+import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
 
-// Sample transformations - locked data
-const SAMPLES = [
+// Sample transformations - i18n supported
+const getSamples = (t) => [
   {
     id: 'formal',
-    label: 'Formal Text',
-    original: `The implementation of sustainable practices in corporate environments has become increasingly important in recent years. Organizations are recognizing the necessity of adopting environmentally conscious strategies to ensure long-term viability and stakeholder satisfaction.`,
-    humanized: `You know what's been on my mind lately? How companies are finally getting serious about going green. It's not just about looking good anymore – businesses are realizing they actually need to care about the environment if they want to stick around. And honestly? Their customers and investors are pushing for it too.`
+    label: t('demo.samples.formalText', 'Formal Text'),
+    original: t('demoSamples.humanization.formal.original', `The implementation of sustainable practices in corporate environments has become increasingly important in recent years. Organizations are recognizing the necessity of adopting environmentally conscious strategies to ensure long-term viability and stakeholder satisfaction.`),
+    humanized: t('demoSamples.humanization.formal.humanized', `You know what's been on my mind lately? How companies are finally getting serious about going green. It's not just about looking good anymore – businesses are realizing they actually need to care about the environment if they want to stick around. And honestly? Their customers and investors are pushing for it too.`)
   },
   {
     id: 'academic',
-    label: 'Academic',
-    original: `Research indicates that regular physical exercise contributes significantly to mental health improvement. Studies have demonstrated correlations between consistent workout routines and reduced symptoms of anxiety and depression.`,
-    humanized: `Here's something I've learned the hard way: working out really does help with stress and feeling down. I used to think it was just gym-bro talk, but after making exercise a habit, I can tell you – the science is real. My anxiety has gotten so much better since I started moving more.`
+    label: t('demo.samples.academic', 'Academic'),
+    original: t('demoSamples.humanization.academic.original', `Research indicates that regular physical exercise contributes significantly to mental health improvement. Studies have demonstrated correlations between consistent workout routines and reduced symptoms of anxiety and depression.`),
+    humanized: t('demoSamples.humanization.academic.humanized', `Here's something I've learned the hard way: working out really does help with stress and feeling down. I used to think it was just gym-bro talk, but after making exercise a habit, I can tell you – the science is real. My anxiety has gotten so much better since I started moving more.`)
   },
   {
     id: 'technical',
-    label: 'Technical',
-    original: `The advancement of artificial intelligence technology presents both opportunities and challenges for the modern workforce. Automation of routine tasks may lead to increased efficiency while simultaneously requiring workers to develop new skill sets.`,
-    humanized: `AI is changing everything about how we work, and I'll be honest – it's a bit scary but also exciting? Sure, robots might take over some boring tasks (thank goodness), but it also means we all need to level up our skills. The future belongs to people who can adapt, I think.`
+    label: t('demo.samples.technical', 'Technical'),
+    original: t('demoSamples.humanization.technical.original', `The advancement of artificial intelligence technology presents both opportunities and challenges for the modern workforce. Automation of routine tasks may lead to increased efficiency while simultaneously requiring workers to develop new skill sets.`),
+    humanized: t('demoSamples.humanization.technical.humanized', `AI is changing everything about how we work, and I'll be honest – it's a bit scary but also exciting? Sure, robots might take over some boring tasks (thank goodness), but it also means we all need to level up our skills. The future belongs to people who can adapt, I think.`)
   }
 ]
 
@@ -39,6 +40,7 @@ const LiveHumanizationDemo = () => {
   const [isComplete, setIsComplete] = useState(false)
   const streamRef = useRef(null)
 
+  const SAMPLES = useMemo(() => getSamples(t), [t])
   const currentSample = SAMPLES.find((s) => s.id === selectedSample)
 
   // Reset when sample changes
@@ -60,18 +62,23 @@ const LiveHumanizationDemo = () => {
     await new Promise((resolve) => setTimeout(resolve, 1500))
     setShowShimmer(false)
 
-    // Streaming phase
+    // Streaming phase - character by character for smoother effect
     const text = currentSample.humanized
-    const words = text.split(' ')
     let currentText = ''
 
-    for (let i = 0; i < words.length; i++) {
-      currentText += (i === 0 ? '' : ' ') + words[i]
+    for (let i = 0; i < text.length; i++) {
+      currentText += text[i]
       setStreamedText(currentText)
-      // Variable delay for natural feel
-      await new Promise((resolve) =>
-        setTimeout(resolve, 30 + Math.random() * 40)
-      )
+      
+      // Variable speed: faster for spaces, slower for punctuation
+      const char = text[i]
+      let delay = 12 // base speed
+      if (char === ' ') delay = 6
+      else if (char === '\n') delay = 40
+      else if (['.', '!', '?'].includes(char)) delay = 60
+      else if ([',', ':'].includes(char)) delay = 30
+      
+      await new Promise((resolve) => setTimeout(resolve, delay))
     }
 
     setIsComplete(true)
@@ -97,14 +104,14 @@ const LiveHumanizationDemo = () => {
         {/* Header with Sample Buttons */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-              <Icon name="wand-sparkles" size="lg" className="text-gray-500" />
+            <div className="w-10 h-10 bg-violet-100 dark:bg-violet-500/20 rounded-xl flex items-center justify-center">
+              <Icon name="wand-sparkles" size="lg" className="icon-violet" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-800">
+              <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">
                 {t('demo.contentHumanization', 'Content Humanization')}
               </h3>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {t('demo.transformAIText', 'Transform AI text to human-like writing')}
               </p>
             </div>
@@ -122,8 +129,8 @@ const LiveHumanizationDemo = () => {
                 disabled={isProcessing}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all disabled:opacity-50 ${
                   selectedSample === id
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-violet-500 text-white'
+                    : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600'
                 }`}
               >
                 {label}
@@ -137,10 +144,10 @@ const LiveHumanizationDemo = () => {
           <span
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
               isComplete
-                ? 'bg-green-50 text-green-600'
+                ? 'bg-green-50 dark:bg-green-500/20 text-green-600 dark:text-green-400'
                 : isShowingOriginal
-                  ? 'bg-gray-100 text-gray-600'
-                  : 'bg-blue-50 text-blue-600'
+                  ? 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400'
+                  : 'bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400'
             }`}
           >
             <span
@@ -149,7 +156,7 @@ const LiveHumanizationDemo = () => {
                   ? 'bg-green-500'
                   : isShowingOriginal
                     ? 'bg-gray-400'
-                    : 'bg-blue-500 animate-pulse'
+                    : 'bg-violet-500 animate-pulse'
               }`}
             />
             {isComplete
@@ -171,7 +178,7 @@ const LiveHumanizationDemo = () => {
               {/* Typing cursor when streaming */}
               {isProcessing && !showShimmer && (
                 <motion.span
-                  className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
+                  className="inline-block w-0.5 h-4 bg-violet-500 ml-0.5 align-middle"
                   animate={{ opacity: [1, 0] }}
                   transition={{ duration: 0.5, repeat: Infinity }}
                 />
@@ -201,7 +208,7 @@ const LiveHumanizationDemo = () => {
                         className="absolute inset-0"
                         style={{
                           background:
-                            'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)'
+                            'linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.3) 50%, transparent 100%)'
                         }}
                         animate={{ x: ['-100%', '100%'] }}
                         transition={{
@@ -229,7 +236,7 @@ const LiveHumanizationDemo = () => {
               </span>
             ) : (
               <span>
-                <span className="font-semibold text-green-600">
+                <span className="font-semibold text-violet-600 dark:text-violet-400">
                   {currentSample.original.length}
                 </span>
                 <span className="text-gray-400"> {t('demo.characters', 'characters')}</span>
@@ -256,32 +263,15 @@ const LiveHumanizationDemo = () => {
               whileTap={{ scale: 0.98 }}
               onClick={handleHumanize}
               disabled={isProcessing || isComplete}
-              className="flex items-center justify-center gap-2 min-w-[160px] px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="flex items-center justify-center gap-2 min-w-[180px] h-[42px] px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isProcessing ? (
-                <span className="flex items-center justify-center w-[50px] h-[16px]">
-                  <span className="flex items-center gap-[3px]">
-                    {[0, 1, 2].map((i) => (
-                      <motion.span
-                        key={i}
-                        className="w-[6px] h-[6px] bg-white/60 rounded-full"
-                        animate={{
-                          y: [0, -4, 0],
-                          opacity: [0.4, 1, 0.4]
-                        }}
-                        transition={{
-                          duration: 0.6,
-                          repeat: Infinity,
-                          delay: i * 0.15,
-                          ease: 'easeInOut'
-                        }}
-                      />
-                    ))}
-                  </span>
+                <span className="flex items-center justify-center w-[140px]">
+                  <ThreeDotsLoading size="md" />
                 </span>
               ) : (
                 <>
-                  <Icon name="wand-sparkles" size="sm" color="white" />
+                  <Icon name="wand-sparkles" size="sm" className="icon-violet" />
                   {t('demo.humanizeContent', 'Humanize Content')}
                 </>
               )}

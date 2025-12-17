@@ -35,7 +35,7 @@ function TableOfContents({ sections }) {
 
   return (
     <nav className="sticky top-24 p-4 bg-bg-secondary rounded-xl border border-gray-200">
-      <h3 className="font-semibold text-text-primary mb-4">Table of Contents</h3>
+      <h3 className="font-semibold text-text-primary mb-4">{t('common.tableOfContents')}</h3>
       <ul className="space-y-2">
         {sections.map(section => (
           <li key={section.id}>
