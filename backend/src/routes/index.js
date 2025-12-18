@@ -31,6 +31,77 @@ const analysisController = require('../controllers/analysis.controller');
 const router = express.Router();
 
 // ============================================================================
+// MIDDLEWARE DECLARATIONS (must be before routes that use them)
+// ============================================================================
+
+// Import operation rate limiter
+const { operationRateLimiter } = require('../middleware/rateLimit');
+
+// Rate limiter for profile creation - max 3 requests per 60 seconds per user
+const profileCreationRateLimiter = operationRateLimiter('profile_creation', {
+  points: 3,      // Max 3 profile creations
+  duration: 60,   // Per 60 seconds
+  blockDuration: 120 // Block for 2 minutes if exceeded
+});
+
+// Rate limiter for AI detection - max 10 requests per 60 seconds per user
+const aiDetectionRateLimiter = operationRateLimiter('ai_detection', {
+  points: 10,     // Max 10 AI detections
+  duration: 60,   // Per 60 seconds
+  blockDuration: 60 // Block for 1 minute if exceeded
+});
+
+// Debug middleware for create_profile_complete
+const debugProfileCreate = (req, res, next) => {
+  const logger = require('../utils/logger');
+  logger.info('create_profile_complete request received', {
+    hasBody: !!req.body,
+    bodyKeys: req.body ? Object.keys(req.body) : [],
+    hasUserId: !!req.body?.user_id,
+    hasSamples: !!req.body?.samples,
+    samplesCount: req.body?.samples?.length || 0,
+    contentType: req.headers['content-type'],
+    authHeader: req.headers['authorization'] ? 'present' : 'missing'
+  });
+  next();
+};
+
+// Profile creation timeout (5 minutes) - for complete profile creation with many samples
+const profileCreationTimeout = (req, res, next) => {
+  req.setTimeout(300000);
+  res.setTimeout(300000);
+  next();
+};
+
+// Standard AI timeout (2 minutes) - for detection, analysis, suggestions
+const standardTimeout = (req, res, next) => {
+  req.setTimeout(120000);
+  res.setTimeout(120000);
+  next();
+};
+
+// Heavy AI timeout (3 minutes) - for rewrite, humanization check
+const heavyTimeout = (req, res, next) => {
+  req.setTimeout(180000);
+  res.setTimeout(180000);
+  next();
+};
+
+// Iterative timeout (5 minutes) - for iterative humanization (multiple passes)
+const iterativeTimeout = (req, res, next) => {
+  req.setTimeout(300000);
+  res.setTimeout(300000);
+  next();
+};
+
+// Streaming timeout (5 minutes) - for streaming operations
+const streamingTimeout = (req, res, next) => {
+  req.setTimeout(300000);
+  res.setTimeout(300000);
+  next();
+};
+
+// ============================================================================
 // PUBLIC ROUTES (No Auth Required)
 // ============================================================================
 
@@ -229,36 +300,6 @@ router.post('/create_profile',
   asyncHandler(profileController.createProfile)
 );
 
-// Rate limiter for profile creation - max 3 requests per 60 seconds per user
-const { operationRateLimiter } = require('../middleware/rateLimit');
-const profileCreationRateLimiter = operationRateLimiter('profile_creation', {
-  points: 3,      // Max 3 profile creations
-  duration: 60,   // Per 60 seconds
-  blockDuration: 120 // Block for 2 minutes if exceeded
-});
-
-// Debug middleware for create_profile_complete
-const debugProfileCreate = (req, res, next) => {
-  const logger = require('../utils/logger');
-  logger.info('create_profile_complete request received', {
-    hasBody: !!req.body,
-    bodyKeys: req.body ? Object.keys(req.body) : [],
-    hasUserId: !!req.body?.user_id,
-    hasSamples: !!req.body?.samples,
-    samplesCount: req.body?.samples?.length || 0,
-    contentType: req.headers['content-type'],
-    authHeader: req.headers['authorization'] ? 'present' : 'missing'
-  });
-  next();
-};
-
-// Profile creation timeout (5 minutes) - for complete profile creation with many samples
-const profileCreationTimeout = (req, res, next) => {
-  req.setTimeout(300000);
-  res.setTimeout(300000);
-  next();
-};
-
 router.post('/create_profile_complete', 
   deprecationWarning('/profiles/create'),
   profileCreationTimeout, // 5 minutes for profile creation
@@ -319,45 +360,6 @@ router.post('/delete_profile',
   optionalAuth, checkLocked, activityLoggerMiddleware,
   asyncHandler(profileController.deleteProfile)
 );
-
-// Rate limiter for AI detection - max 10 requests per 60 seconds per user
-const aiDetectionRateLimiter = operationRateLimiter('ai_detection', {
-  points: 10,     // Max 10 AI detections
-  duration: 60,   // Per 60 seconds
-  blockDuration: 60 // Block for 1 minute if exceeded
-});
-
-// ============================================================================
-// TIMEOUT CONFIGURATION FOR LEGACY ROUTES
-// ============================================================================
-
-// Standard AI timeout (2 minutes) - for detection, analysis, suggestions
-const standardTimeout = (req, res, next) => {
-  req.setTimeout(120000);
-  res.setTimeout(120000);
-  next();
-};
-
-// Heavy AI timeout (3 minutes) - for rewrite, humanization check
-const heavyTimeout = (req, res, next) => {
-  req.setTimeout(180000);
-  res.setTimeout(180000);
-  next();
-};
-
-// Iterative timeout (5 minutes) - for iterative humanization (multiple passes)
-const iterativeTimeout = (req, res, next) => {
-  req.setTimeout(300000);
-  res.setTimeout(300000);
-  next();
-};
-
-// Streaming timeout (5 minutes) - for streaming operations
-const streamingTimeout = (req, res, next) => {
-  req.setTimeout(300000);
-  res.setTimeout(300000);
-  next();
-};
 
 // === Analysis legacy endpoints ===
 router.post('/authenticate', 
