@@ -24,8 +24,7 @@ export function usePackages(userId) {
   return useQuery({
     queryKey: queryKeys.payment.packages(userId),
     queryFn: async () => {
-      const params = userId ? { user_id: userId } : {}
-      const { data } = await apiClient.get('/api/credits/packages', { params })
+      const { data } = await apiClient.get('/api/credits/packages', { params: { user_id: userId } })
       
       const result = {
         packages: DEFAULT_PACKAGES,
@@ -40,6 +39,7 @@ export function usePackages(userId) {
       result.isFirstPurchaseEligible = data.isFirstPurchaseEligible || false
       return result
     },
+    enabled: !!userId, // Only fetch when userId is available
     staleTime: 5 * 60 * 1000, // 5 minutes (shorter for first purchase check)
     placeholderData: { packages: DEFAULT_PACKAGES, isFirstPurchaseEligible: false },
   })
