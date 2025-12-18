@@ -368,110 +368,109 @@ const PORT = process.env.PORT || config.PORT || 8080;
 async function startServer() {
   try {
     console.log(`[STARTUP] Attempting to start server on port ${PORT}...`);
+    console.log(`[STARTUP] Memory usage: ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`);
     
     // Start server FIRST to respond to health checks immediately
-    const server = app.listen(PORT, '0.0.0.0', async () => {
-      // Setup terminus health checks with graceful shutdown
-      setupHealthCheck(server, {
-        redisClient: redisService.getClient?.(),
-        onShutdown: async () => {
-          // Stop workers first
-          await stopEmailWorker();
-          await stopAnalysisWorker();
-          // Close queue service
-          await queueService.closeAll();
-          // Flush activity logs
-          await activityLogService.flushBuffer();
-          // Close Redis
-          await redisService.close();
-        }
-      });
-      console.log(`[START] Server listening on port ${PORT}`);
-      
-      // Initialize Redis AFTER server is listening (optional, will fallback to memory cache)
-      const redisConnected = await redisService.initRedis().catch(() => false);
-      
-      // Start background workers if Redis is connected
-      let workersStarted = false;
-      if (redisConnected) {
-        try {
-          startEmailWorker();
-          startAnalysisWorker();
-          workersStarted = true;
-        } catch (workerError) {
-          console.warn('[WORKERS] Failed to start workers:', workerError.message);
-        }
+    // Use synchronous callback to ensure port is bound ASAP
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`[START] Server listening on port ${PORT} - READY FOR HEALTH CHECKS`);
+    });
+    
+    // Wait a tick to ensure server is bound
+    await new Promise(resolve => setImmediate(resolve));
+    
+    // Setup terminus health checks with graceful shutdown (sync, fast)
+    setupHealthCheck(server, {
+      redisClient: redisService.getClient?.(),
+      onShutdown: async () => {
+        await stopEmailWorker();
+        await stopAnalysisWorker();
+        await queueService.closeAll();
+        await activityLogService.flushBuffer();
+        await redisService.close();
       }
-      
-      // Initialize realtime events listener (Firestore -> SSE bridge)
+    });
+    
+    console.log(`[START] Health check endpoints ready`);
+    
+    // Now do async initialization in background (non-blocking)
+    setImmediate(async () => {
       try {
-        realtimeEventsService.initialize(realtimeController);
-        console.log('[STARTUP] [SUCCESS] Realtime events listener initialized');
-      } catch (realtimeError) {
-        console.warn('[STARTUP] [WARNING] Realtime events listener failed:', realtimeError.message);
-      }
-      
-      // Initialize environment config from Firestore (async, non-blocking)
-      try {
-        const envConfigHelper = require('./src/config/envConfigHelper');
-        await envConfigHelper.loadFromFirestore();
-        console.log('[STARTUP] [SUCCESS] Environment config loaded from Firestore');
-      } catch (envError) {
-        console.warn('[STARTUP] [WARNING] Environment config from Firestore failed, using process.env:', envError.message);
-      }
-      
-      // Check and deploy Firestore indexes (one-time, non-blocking)
-      try {
-        const { deployIndexes } = require('./scripts/deploy-indexes');
-        // Run in background, don't block server startup
-        deployIndexes().catch(err => {
-          console.warn('[STARTUP] [WARNING] Index deployment check failed:', err.message);
+        // Initialize Redis (optional, will fallback to memory cache)
+        const redisConnected = await redisService.initRedis().catch((err) => {
+          console.warn('[REDIS] Connection failed, using memory fallback:', err.message);
+          return false;
         });
-      } catch (indexError) {
-        // Script not found or error - not critical
-        console.log('[STARTUP] [INFO] Skipping index deployment check');
-      }
-      
-      console.log('');
-      console.log('========================================================');
-      console.log('   Graphos AI Studio - Backend Server v2.1');
-      console.log('========================================================');
-      console.log('');
-      console.log(`[START] Server running on port ${PORT}`);
-      console.log(`[ENV] Environment: ${config.NODE_ENV}`);
-      console.log(`[CONFIG] Project ID: ${config.PROJECT_ID}`);
-      console.log(`[CONFIG] Location: ${config.LOCATION}`);
-      console.log(`[MODEL] Gemini Model: ${config.GEMINI_MODEL}`);
-      console.log('');
-      console.log('[FEATURES]');
-      console.log(`   - Caching: ${config.FEATURES.ENABLE_CACHING ? 'ENABLED' : 'DISABLED'}`);
-      console.log(`   - Rate Limiting: ${config.FEATURES.ENABLE_RATE_LIMITING ? 'ENABLED' : 'DISABLED'}`);
-      console.log(`   - Analytics: ${config.FEATURES.ENABLE_ANALYTICS ? 'ENABLED' : 'DISABLED'}`);
-      console.log(`   - Redis Cache: ${redisConnected ? 'ENABLED (distributed)' : 'DISABLED (memory fallback)'}`);
-      console.log(`   - Background Workers: ${workersStarted ? 'ENABLED' : 'DISABLED (no Redis)'}`);
-      console.log('');
-      console.log('[SECURITY]');
-      console.log(`   - CORS: Configured`);
-      console.log(`   - Rate Limiting: ${config.FEATURES.ENABLE_RATE_LIMITING ? 'Active' : 'Disabled'}`);
-      console.log(`   - Request Timeout: 30s`);
-      console.log(`   - Correlation IDs: Enabled`);
-      console.log('');
-      
-      // Log config warnings if any
-      if (config.CONFIG_WARNINGS && config.CONFIG_WARNINGS.length > 0) {
-        console.log('[WARNINGS]');
-        config.CONFIG_WARNINGS.forEach(w => console.log(`   [WARNING]  ${w}`));
+        
+        // Start background workers if Redis is connected
+        let workersStarted = false;
+        if (redisConnected) {
+          try {
+            startEmailWorker();
+            startAnalysisWorker();
+            workersStarted = true;
+          } catch (workerError) {
+            console.warn('[WORKERS] Failed to start workers:', workerError.message);
+          }
+        }
+        
+        // Initialize realtime events listener (Firestore -> SSE bridge)
+        try {
+          realtimeEventsService.initialize(realtimeController);
+          console.log('[STARTUP] [SUCCESS] Realtime events listener initialized');
+        } catch (realtimeError) {
+          console.warn('[STARTUP] [WARNING] Realtime events listener failed:', realtimeError.message);
+        }
+        
+        // Initialize environment config from Firestore (async, non-blocking)
+        try {
+          const envConfigHelper = require('./src/config/envConfigHelper');
+          await envConfigHelper.loadFromFirestore();
+          console.log('[STARTUP] [SUCCESS] Environment config loaded from Firestore');
+        } catch (envError) {
+          console.warn('[STARTUP] [WARNING] Environment config from Firestore failed:', envError.message);
+        }
+        
+        // Check and deploy Firestore indexes (one-time, non-blocking)
+        try {
+          const { deployIndexes } = require('./scripts/deploy-indexes');
+          deployIndexes().catch(err => {
+            console.warn('[STARTUP] [WARNING] Index deployment check failed:', err.message);
+          });
+        } catch (indexError) {
+          console.log('[STARTUP] [INFO] Skipping index deployment check');
+        }
+        
         console.log('');
+        console.log('========================================================');
+        console.log('   Graphos AI Studio - Backend Server v2.1');
+        console.log('========================================================');
+        console.log('');
+        console.log(`[START] Server running on port ${PORT}`);
+        console.log(`[ENV] Environment: ${config.NODE_ENV}`);
+        console.log(`[CONFIG] Project ID: ${config.PROJECT_ID}`);
+        console.log(`[CONFIG] Location: ${config.LOCATION}`);
+        console.log(`[MODEL] Gemini Model: ${config.GEMINI_MODEL}`);
+        console.log('');
+        console.log('[FEATURES]');
+        console.log(`   - Caching: ${config.FEATURES.ENABLE_CACHING ? 'ENABLED' : 'DISABLED'}`);
+        console.log(`   - Rate Limiting: ${config.FEATURES.ENABLE_RATE_LIMITING ? 'ENABLED' : 'DISABLED'}`);
+        console.log(`   - Analytics: ${config.FEATURES.ENABLE_ANALYTICS ? 'ENABLED' : 'DISABLED'}`);
+        console.log(`   - Redis Cache: ${redisConnected ? 'ENABLED (distributed)' : 'DISABLED (memory fallback)'}`);
+        console.log(`   - Background Workers: ${workersStarted ? 'ENABLED' : 'DISABLED (no Redis)'}`);
+        console.log('');
+        console.log(`[READY] Server fully initialized at http://localhost:${PORT}`);
+        console.log('');
+        
+        logger.info('Server started successfully', { 
+          port: PORT, 
+          env: config.NODE_ENV,
+          redisConnected 
+        });
+      } catch (initError) {
+        console.error('[STARTUP] Background initialization error:', initError.message);
+        // Don't crash - server is already running and can handle requests
       }
-      
-      console.log(`[READY] Server ready at http://localhost:${PORT}`);
-      console.log('');
-      
-      logger.info('Server started successfully', { 
-        port: PORT, 
-        env: config.NODE_ENV,
-        redisConnected 
-      });
     });
     
     // Handle server errors

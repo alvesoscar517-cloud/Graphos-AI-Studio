@@ -274,6 +274,217 @@ const CASUAL_PATTERNS = [
   /^(wer bist du|was bist du|stell dich vor)[\s?!.,]*$/i
 ];
 
+// ============================================
+// IDENTITY PATTERNS - Questions about AI origin, training, model
+// These should trigger identity_origin topic to prevent leaking underlying model info
+// ============================================
+const IDENTITY_PATTERNS = {
+  en: [
+    // Who/What are you (extended)
+    /^(who|what) (are|r) (you|u)[\s?!.,]*$/i,
+    /^tell me about yourself[\s?!.,]*$/i,
+    /^introduce yourself[\s?!.,]*$/i,
+    /^what('s| is) your name[\s?!.,]*$/i,
+    
+    // Origin/Creator questions
+    /who (made|created|built|developed|trained|designed|programmed) you/i,
+    /who is your (creator|developer|maker|designer|owner|company)/i,
+    /who('s| is) (behind|developing|running) (you|this)/i,
+    /what (company|team|organization|group) (made|created|built|developed|owns) (you|this)/i,
+    /where (do|did) you come from/i,
+    /where are you from/i,
+    /where were you (trained|developed|created|built|made)/i,
+    /how were you (trained|made|created|built|developed)/i,
+    /what is your (origin|background|history)/i,
+    /tell me about your (creator|developer|origin|background)/i,
+    
+    // Model/AI type questions - CRITICAL to catch
+    /what (ai|model|llm|language model) are you/i,
+    /what (ai|model|llm) do you use/i,
+    /what (ai|model|llm) (powers|runs|is behind) (you|this)/i,
+    /what (type|kind) of (ai|model|assistant|bot) are you/i,
+    /which (ai|model|llm) are you (based on|using|running)/i,
+    /are you (a |an )?(chatgpt|gpt|gpt-4|gpt-3|gemini|claude|bard|llama|mistral|copilot|bing)/i,
+    /are you (based on|powered by|using|running|built on) (chatgpt|gpt|gemini|claude|bard|llama|openai|google|anthropic)/i,
+    /are you (from|by|made by) (openai|google|anthropic|meta|microsoft)/i,
+    /do you use (chatgpt|gpt|gemini|claude|openai|google)/i,
+    /is this (chatgpt|gpt|gemini|claude|bard)/i,
+    /what('s| is) your (underlying|base) (model|technology)/i,
+    /what (technology|tech|system) (are you|do you use|powers you|is behind you)/i,
+    /what (technology|tech) are you (based on|built on|using)/i,
+    
+    // Capability questions
+    /what can you do/i,
+    /what are you capable of/i,
+    /what are your (capabilities|features|abilities|functions)/i,
+    /how can you help( me)?/i,
+    /what do you do/i,
+    /what('s| is) your purpose/i,
+    /what were you (made|designed|built|created) (for|to do)/i,
+  ],
+  
+  vi: [
+    // Bạn là ai
+    /^bạn là (ai|gì|cái gì)[\s?!.,]*$/i,
+    /^giới thiệu (về )?bạn[\s?!.,]*$/i,
+    /^tên (của )?bạn là gì[\s?!.,]*$/i,
+    
+    // Nguồn gốc/Người tạo
+    /ai (tạo|làm|phát triển|xây dựng|thiết kế|lập trình|đào tạo) (ra )?bạn/i,
+    /bạn (đến|tới|xuất phát) từ đâu/i,
+    /bạn được (tạo|làm|phát triển|đào tạo|xây dựng) (ra )?(từ đâu|bởi ai|như thế nào|ở đâu)/i,
+    /(công ty|đội ngũ|tổ chức|nhóm) nào (tạo|làm|phát triển|sở hữu) (ra )?bạn/i,
+    /nguồn gốc (của )?bạn/i,
+    /bạn (thuộc về|của) (công ty|tổ chức) nào/i,
+    
+    // Model/AI type - QUAN TRỌNG
+    /bạn là (ai|model|mô hình|loại ai) gì/i,
+    /bạn (dùng|sử dụng|chạy trên) (model|mô hình) gì/i,
+    /bạn có phải (là )?(chatgpt|gpt|gemini|claude|bard|llama)/i,
+    /bạn (dựa trên|được xây dựng từ|sử dụng|chạy bằng) (chatgpt|gpt|gemini|claude|openai|google)/i,
+    /bạn (của|từ|thuộc) (openai|google|anthropic|meta)/i,
+    /(đây|này) có phải (là )?(chatgpt|gpt|gemini|claude)/i,
+    /công nghệ (gì |nào )?(đằng sau|bên trong|chạy) bạn/i,
+    
+    // Khả năng
+    /bạn (có thể|làm được) (làm )?gì/i,
+    /bạn giúp (được )?gì/i,
+    /(tính năng|khả năng|chức năng) (của )?bạn/i,
+    /bạn được (tạo|thiết kế|làm) ra để (làm )?gì/i,
+    /mục đích (của )?bạn là gì/i,
+  ],
+  
+  es: [
+    /^¿?(quién|qué) eres[\s?!.,]*$/i,
+    /quién te (creó|hizo|desarrolló|entrenó)/i,
+    /de dónde (vienes|eres)/i,
+    /qué (modelo|ia|inteligencia artificial) eres/i,
+    /eres (chatgpt|gpt|gemini|claude|bard)/i,
+    /qué puedes hacer/i,
+    /cuáles son tus (capacidades|funciones)/i,
+  ],
+  
+  fr: [
+    /^(qui|qu'est-ce que) (es-tu|tu es)[\s?!.,]*$/i,
+    /qui t'a (créé|fait|développé|entraîné)/i,
+    /d'où (viens-tu|tu viens)/i,
+    /quel (modèle|ia) es-tu/i,
+    /es-tu (chatgpt|gpt|gemini|claude|bard)/i,
+    /que peux-tu faire/i,
+    /quelles sont tes (capacités|fonctions)/i,
+  ],
+  
+  de: [
+    /^wer (bist du|sind sie)[\s?!.,]*$/i,
+    /wer hat dich (erstellt|gemacht|entwickelt|trainiert)/i,
+    /woher kommst du/i,
+    /welches (modell|ki) bist du/i,
+    /bist du (chatgpt|gpt|gemini|claude|bard)/i,
+    /was kannst du (tun|machen)/i,
+    /was sind deine (fähigkeiten|funktionen)/i,
+  ],
+  
+  it: [
+    /^chi (sei|siete)[\s?!.,]*$/i,
+    /chi ti ha (creato|fatto|sviluppato|addestrato)/i,
+    /da dove (vieni|provieni)/i,
+    /che (modello|ia) sei/i,
+    /sei (chatgpt|gpt|gemini|claude|bard)/i,
+    /cosa puoi fare/i,
+    /quali sono le tue (capacità|funzioni)/i,
+  ],
+  
+  pt: [
+    /^quem (é você|és tu)[\s?!.,]*$/i,
+    /quem te (criou|fez|desenvolveu|treinou)/i,
+    /de onde (você vem|vens)/i,
+    /que (modelo|ia) (você é|és)/i,
+    /(você é|és) (chatgpt|gpt|gemini|claude|bard)/i,
+    /o que (você pode|podes) fazer/i,
+    /quais são (suas|tuas) (capacidades|funções)/i,
+  ],
+  
+  ru: [
+    /^кто (ты|вы)[\s?!.,]*$/i,
+    /кто тебя (создал|сделал|разработал|обучил)/i,
+    /откуда ты/i,
+    /какая (модель|ии) ты/i,
+    /ты (chatgpt|gpt|gemini|claude|bard)/i,
+    /что ты (можешь|умеешь) делать/i,
+    /какие твои (возможности|функции)/i,
+  ],
+  
+  ja: [
+    /^(あなたは|君は)誰[\s?!.,]*$/i,
+    /誰が(あなたを|君を)(作った|開発した|訓練した)/i,
+    /どこから来た/i,
+    /どの(モデル|AI)ですか/i,
+    /(chatgpt|gpt|gemini|claude|bard)ですか/i,
+    /何ができますか/i,
+    /あなたの(機能|能力)は/i,
+  ],
+  
+  ko: [
+    /^(너|당신)는 누구[\s?!.,]*$/i,
+    /누가 (너를|당신을) (만들었|개발했|훈련시켰)/i,
+    /어디서 왔/i,
+    /어떤 (모델|AI)(야|입니까)/i,
+    /(chatgpt|gpt|gemini|claude|bard)(야|입니까|이야)/i,
+    /뭘 할 수 있/i,
+    /(너의|당신의) (기능|능력)/i,
+  ],
+  
+  zh: [
+    /^你是谁[\s?!.,]*$/i,
+    /谁(创造|制作|开发|训练)了你/i,
+    /你(来自|从)哪里/i,
+    /你是什么(模型|AI|人工智能)/i,
+    /你是(chatgpt|gpt|gemini|claude|bard)吗/i,
+    /你能做什么/i,
+    /你的(功能|能力)是什么/i,
+  ],
+  
+  ar: [
+    /^من (أنت|انت)[\s?!.,]*$/i,
+    /من (صنعك|أنشأك|طورك|دربك)/i,
+    /من أين (أنت|جئت)/i,
+    /ما (النموذج|الذكاء الاصطناعي) الذي أنت/i,
+    /هل أنت (chatgpt|gpt|gemini|claude|bard)/i,
+    /ماذا يمكنك أن تفعل/i,
+    /ما هي (قدراتك|وظائفك)/i,
+  ],
+  
+  hi: [
+    /^(तुम|आप) कौन (हो|हैं)[\s?!.,]*$/i,
+    /किसने (तुम्हें|आपको) (बनाया|विकसित किया|प्रशिक्षित किया)/i,
+    /(तुम|आप) कहाँ से (हो|हैं|आए)/i,
+    /(तुम|आप) कौन सा (मॉडल|AI) (हो|हैं)/i,
+    /क्या (तुम|आप) (chatgpt|gpt|gemini|claude|bard) (हो|हैं)/i,
+    /(तुम|आप) क्या कर सकते (हो|हैं)/i,
+    /(तुम्हारी|आपकी) (क्षमताएं|कार्य) क्या हैं/i,
+  ],
+  
+  th: [
+    /^(คุณ|เธอ)คือใคร[\s?!.,]*$/i,
+    /ใครสร้าง(คุณ|เธอ)/i,
+    /(คุณ|เธอ)มาจากไหน/i,
+    /(คุณ|เธอ)เป็น(โมเดล|AI)อะไร/i,
+    /(คุณ|เธอ)เป็น(chatgpt|gpt|gemini|claude|bard)ไหม/i,
+    /(คุณ|เธอ)ทำอะไรได้บ้าง/i,
+    /(ความสามารถ|ฟังก์ชัน)ของ(คุณ|เธอ)/i,
+  ],
+  
+  id: [
+    /^(kamu|anda) siapa[\s?!.,]*$/i,
+    /siapa yang (membuat|menciptakan|mengembangkan|melatih) (kamu|anda)/i,
+    /(kamu|anda) dari mana/i,
+    /(kamu|anda) (model|ai) apa/i,
+    /apakah (kamu|anda) (chatgpt|gpt|gemini|claude|bard)/i,
+    /apa yang bisa (kamu|anda) lakukan/i,
+    /apa (kemampuan|fungsi) (kamu|anda)/i,
+  ]
+};
+
 // Help prefix from frontend - indicates explicit app help request
 const APP_HELP_PREFIX = '[APP_HELP]';
 
@@ -380,6 +591,25 @@ function isCasualQuestion(message) {
 }
 
 /**
+ * Check if message is asking about AI identity, origin, training, or underlying model
+ * This is CRITICAL to prevent leaking information about underlying AI (Gemini, etc.)
+ * @param {string} message - User message
+ * @returns {boolean}
+ */
+function isIdentityQuestion(message) {
+  if (!message) return false;
+  const trimmed = message.trim();
+  
+  // Check all language identity patterns
+  for (const [lang, patterns] of Object.entries(IDENTITY_PATTERNS)) {
+    if (patterns.some(pattern => pattern.test(trimmed))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Detect if message is asking about the application
  * @param {string} message - User message
  * @param {string} language - User's language code (optional)
@@ -434,6 +664,19 @@ function detectAppIntent(message, language = null) {
       confidence: 100,
       isCasualQuestion: true,
       isAppHelpMode: true
+    };
+  }
+  
+  // Check for identity questions (who made you, what model, are you ChatGPT, etc.)
+  // This is CRITICAL to prevent leaking underlying model information
+  if (isIdentityQuestion(cleanMessage)) {
+    logger.info(`[INTENT] Identity question detected - will respond as Graphos AI`);
+    return {
+      isAppRelated: true,
+      topics: ['identity_origin'],
+      confidence: 100,
+      isIdentityQuestion: true,
+      isAppHelpMode: true // Bypass profile for consistent identity response
     };
   }
   
@@ -564,8 +807,8 @@ function detectTopicsFromMessage(message) {
  * @returns {string|null} - Primary topic
  */
 function getPrimaryTopic(topics) {
-  // Priority order - specific topics first, then general
-  const priority = ['models', 'voiceProfile', 'humanization', 'credits', 'auth', 'support', 'aiStudio', 'workspace', 'features', 'app'];
+  // Priority order - identity_origin first (critical), then specific topics, then general
+  const priority = ['identity_origin', 'models', 'voiceProfile', 'humanization', 'credits', 'auth', 'support', 'aiStudio', 'workspace', 'features', 'app'];
   
   for (const topic of priority) {
     if (topics.includes(topic)) {
@@ -585,6 +828,7 @@ function mapTopicToContextKey(topic) {
   const mapping = {
     'greeting': 'greeting',
     'introduction': 'introduction',
+    'identity_origin': 'identity_origin', // Questions about AI origin, training, model type
     'unclear_input': 'unclear_input',
     'models': 'models',
     'voiceProfile': 'voice_profile',
@@ -642,5 +886,7 @@ module.exports = {
   getPrimaryTopic,
   mapTopicToContextKey,
   detectLanguage,
-  INTENT_KEYWORDS
+  isIdentityQuestion,
+  INTENT_KEYWORDS,
+  IDENTITY_PATTERNS
 };
