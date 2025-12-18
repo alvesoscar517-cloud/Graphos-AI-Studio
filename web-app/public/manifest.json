@@ -1,37 +1,41 @@
 {
-  "name": "Graphos AI Studio",
+  "name": "Graphos AI Studio - AI Humanizer & Detection Bypass",
   "short_name": "Graphos AI",
-  "description": "AI-powered content analysis and writing assistant",
+  "description": "Best AI humanizer tool to transform AI-generated text into 100% human-like content. Bypass GPTZero, Originality AI, Turnitin and all AI detectors instantly.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#6366f1",
   "orientation": "portrait-primary",
   "scope": "/",
+  "id": "graphos-ai-studio",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["productivity", "utilities", "education", "business"],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-192x192.png",
@@ -43,7 +47,7 @@
       "src": "/icons/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-512x512.png",
@@ -52,7 +56,68 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["productivity", "utilities"],
-  "lang": "en",
-  "dir": "ltr"
+  "screenshots": [
+    {
+      "src": "/screenshots/humanization.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "AI Humanizer - Transform AI text to human-like content",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/ai-detection.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "AI Detection - Check if content is AI-generated",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/voice-profile.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Voice Profile - Create your unique writing style",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/ai-workspace.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "AI Workspace - Chat and collaborate with AI",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/rewrite.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "AI Rewrite - Improve and enhance your content",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Humanize Text",
+      "short_name": "Humanize",
+      "description": "Convert AI text to human-like content",
+      "url": "/?tool=humanizer",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "AI Detection",
+      "short_name": "Detect",
+      "description": "Check if content is AI-generated",
+      "url": "/?tool=detection",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://graphosai.com"
+    },
+    {
+      "platform": "chrome_web_store",
+      "url": "https://chrome.google.com/webstore/detail/graphos-ai"
+    }
+  ],
+  "prefer_related_applications": false
 }

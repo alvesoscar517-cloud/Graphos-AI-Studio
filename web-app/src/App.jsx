@@ -17,6 +17,7 @@ import LowCreditsToast from './components/LowCreditsToast'
 import UpgradePlanModal from './components/UpgradePlanModal'
 import UnsupportedScreenOverlay from './components/Common/UnsupportedScreenOverlay'
 import { ErrorBoundaryProvider } from './contexts/ErrorBoundaryContext'
+import { SEOHead } from './components/SEO'
 import modal from './utils/modal'
 import { initTooltips } from './utils/tooltips'
 import { initStorageCleanup } from './utils/storageCleanup'
@@ -127,6 +128,8 @@ function App() {
         <GlobalErrorHandler>
           <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AppProviders>
+              {/* SEO Component - Injects structured data and manages meta tags */}
+              <SEOHead />
               <AppContent />
               <ContextMenu />
               <ToastContainer />

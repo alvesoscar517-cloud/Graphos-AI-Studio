@@ -1,0 +1,24 @@
+# Robots.txt for Graphos AI Studio Web App
+# https://app.graphosai.com
+
+User-agent: *
+Allow: /
+
+# Disallow private/API paths
+Disallow: /api/
+Disallow: /auth/
+Disallow: /callback/
+Disallow: /_/
+Disallow: /__/
+
+# Allow important pages
+Allow: /profile-setup
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://app.graphosai.com/sitemap.xml
+
+# Host
+Host: https://app.graphosai.com

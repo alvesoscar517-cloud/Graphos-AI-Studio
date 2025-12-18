@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && npm run seo:generate",
     "preview": "vite preview",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs",
     "lint:fix": "eslint . --ext .js,.jsx,.cjs,.mjs --fix",
@@ -13,7 +13,8 @@
     "format:check": "prettier --check \"src/**/*.{js,jsx,json}\"",
     "test": "vitest --run",
     "test:watch": "vitest",
-    "test:coverage": "vitest --run --coverage"
+    "test:coverage": "vitest --run --coverage",
+    "seo:generate": "node scripts/generate-seo-html.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

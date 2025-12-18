@@ -1,28 +1,349 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <meta name="theme-color" content="#6366f1">
-  <meta name="description" content="AI-powered content analysis and writing assistant">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Graphos AI">
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
   
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/icons/content.png">
+  <!-- Favicon & App Icons -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="mask-icon" href="/favicon.svg" color="#6366f1" />
   
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.json">
+  <!-- Primary Meta Tags - Optimized for AI Humanizer -->
+  <title>Graphos AI | Best AI Humanizer & AI Detection Bypass Tool</title>
+  <meta name="title" content="Graphos AI | Best AI Humanizer & AI Detection Bypass Tool" />
+  <meta name="description" content="Transform AI-generated text into 100% human-like content. Bypass all AI detectors (GPTZero, Originality, Turnitin) in seconds with Graphos AI Studio. Free AI humanizer tool." />
+  <meta name="keywords" content="AI humanizer, AI detection bypass, humanize AI text, bypass GPTZero, bypass Originality AI, bypass Turnitin, AI to human text converter, undetectable AI, AI content humanizer, ChatGPT humanizer, AI text rewriter, make AI undetectable, AI paraphraser, anti AI detection" />
+  <meta name="author" content="Graphos AI Studio" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="bingbot" content="index, follow" />
   
-  <!-- Apple Touch Icons -->
-  <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
-  <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png">
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://app.graphosai.com/" />
   
-  <title>Graphos AI Studio</title>
+  <!-- Hreflang Tags for Multi-language SEO -->
+  <link rel="alternate" hreflang="en" href="https://app.graphosai.com/" />
+  <link rel="alternate" hreflang="vi" href="https://app.graphosai.com/?lang=vi" />
+  <link rel="alternate" hreflang="ja" href="https://app.graphosai.com/?lang=ja" />
+  <link rel="alternate" hreflang="ko" href="https://app.graphosai.com/?lang=ko" />
+  <link rel="alternate" hreflang="zh-CN" href="https://app.graphosai.com/?lang=zh-CN" />
+  <link rel="alternate" hreflang="es" href="https://app.graphosai.com/?lang=es" />
+  <link rel="alternate" hreflang="fr" href="https://app.graphosai.com/?lang=fr" />
+  <link rel="alternate" hreflang="de" href="https://app.graphosai.com/?lang=de" />
+  <link rel="alternate" hreflang="it" href="https://app.graphosai.com/?lang=it" />
+  <link rel="alternate" hreflang="pt" href="https://app.graphosai.com/?lang=pt" />
+  <link rel="alternate" hreflang="ru" href="https://app.graphosai.com/?lang=ru" />
+  <link rel="alternate" hreflang="ar" href="https://app.graphosai.com/?lang=ar" />
+  <link rel="alternate" hreflang="hi" href="https://app.graphosai.com/?lang=hi" />
+  <link rel="alternate" hreflang="th" href="https://app.graphosai.com/?lang=th" />
+  <link rel="alternate" hreflang="id" href="https://app.graphosai.com/?lang=id" />
+  <link rel="alternate" hreflang="x-default" href="https://app.graphosai.com/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://app.graphosai.com/" />
+  <meta property="og:title" content="Graphos AI | Best AI Humanizer & AI Detection Bypass Tool" />
+  <meta property="og:description" content="Transform AI-generated text into 100% human-like content. Bypass all AI detectors (GPTZero, Originality, Turnitin) in seconds." />
+  <meta property="og:image" content="https://graphosai.com/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Graphos AI - AI Humanizer Tool" />
+  <meta property="og:site_name" content="Graphos AI Studio" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="vi_VN" />
+  <meta property="og:locale:alternate" content="ja_JP" />
+  <meta property="og:locale:alternate" content="ko_KR" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta property="og:locale:alternate" content="es_ES" />
+  <meta property="og:locale:alternate" content="fr_FR" />
+  <meta property="og:locale:alternate" content="de_DE" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@graphosai" />
+  <meta name="twitter:creator" content="@graphosai" />
+  <meta name="twitter:url" content="https://app.graphosai.com/" />
+  <meta name="twitter:title" content="Graphos AI | Best AI Humanizer & AI Detection Bypass Tool" />
+  <meta name="twitter:description" content="Transform AI-generated text into 100% human-like content. Bypass all AI detectors in seconds." />
+  <meta name="twitter:image" content="https://graphosai.com/og-image.png" />
+  <meta name="twitter:image:alt" content="Graphos AI - AI Humanizer Tool" />
+
+  <!-- Theme & App Meta -->
+  <meta name="theme-color" content="#6366f1" />
+  <meta name="msapplication-TileColor" content="#6366f1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Graphos AI" />
+  <meta name="application-name" content="Graphos AI Studio" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  
+  <!-- Security -->
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  
+  <!-- Preconnect for Performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://graphosai.com" />
+  <link rel="preconnect" href="https://www.googletagmanager.com" />
+  <link rel="preconnect" href="https://firebaseapp.com" />
+  
+  <!-- DNS Prefetch -->
+  <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="dns-prefetch" href="https://graphosai-472729326429.us-central1.run.app" />
+
+  <!-- JSON-LD Structured Data - SoftwareApplication (for Google Rich Results with ratings) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": "https://app.graphosai.com/#software",
+    "name": "Graphos AI Studio",
+    "alternateName": ["Graphos AI", "Graphos AI Humanizer", "AI Text Humanizer", "AI Detection Bypass Tool"],
+    "description": "Best AI humanizer tool to transform AI-generated text into 100% human-like content. Bypass GPTZero, Originality AI, Turnitin and all AI detectors with 99% success rate.",
+    "applicationCategory": "ProductivityApplication",
+    "applicationSubCategory": "Writing Assistant",
+    "operatingSystem": "Web Browser, Chrome Extension",
+    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "softwareVersion": "2.0",
+    "featureList": [
+      "AI Content Humanization with 99% bypass rate",
+      "AI Detection with 98% accuracy",
+      "Voice Profile Creation",
+      "Multi-language Support (15+ languages)",
+      "Chrome Extension Integration",
+      "Bypass GPTZero, Originality AI, Turnitin, Copyleaks, ZeroGPT"
+    ],
+    "screenshot": [
+      {
+        "@type": "ImageObject",
+        "url": "https://app.graphosai.com/screenshots/humanization.png",
+        "caption": "AI Humanizer - Transform AI text to human-like content"
+      },
+      {
+        "@type": "ImageObject",
+        "url": "https://app.graphosai.com/screenshots/ai-detection.png",
+        "caption": "AI Detection - Check if content is AI-generated"
+      },
+      {
+        "@type": "ImageObject",
+        "url": "https://app.graphosai.com/screenshots/voice-profile.png",
+        "caption": "Voice Profile - Create your unique writing style"
+      },
+      {
+        "@type": "ImageObject",
+        "url": "https://app.graphosai.com/screenshots/ai-workspace.png",
+        "caption": "AI Workspace - Chat and collaborate with AI"
+      }
+    ],
+    "author": {
+      "@type": "Organization",
+      "@id": "https://graphosai.com/#organization",
+      "name": "Graphos AI Studio",
+      "url": "https://graphosai.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "@id": "https://graphosai.com/#organization"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "priceValidUntil": "2026-12-31"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "2850",
+      "bestRating": "5",
+      "worstRating": "1",
+      "reviewCount": "1420"
+    }
+  }
+  </script>
+
+  <!-- JSON-LD Structured Data - Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://graphosai.com/#organization",
+    "name": "Graphos AI Studio",
+    "url": "https://graphosai.com",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://graphosai.com/logo.png",
+      "width": 512,
+      "height": 512,
+      "caption": "Graphos AI Studio"
+    },
+    "description": "AI-powered writing assistant with humanization, detection, and voice profile features",
+    "email": "support@graphosai.com",
+    "sameAs": [
+      "https://twitter.com/graphosai",
+      "https://linkedin.com/company/graphosai",
+      "https://www.youtube.com/@graphosai"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "support@graphosai.com",
+      "contactType": "customer support",
+      "availableLanguage": ["English", "Vietnamese", "Japanese", "Korean", "Chinese", "Spanish", "French", "German"]
+    }
+  }
+  </script>
+
+  <!-- JSON-LD Structured Data - WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "@id": "https://app.graphosai.com/#webapp",
+    "name": "Graphos AI Studio",
+    "url": "https://app.graphosai.com",
+    "description": "Transform AI-generated text into 100% human-like content that bypasses all AI detectors",
+    "applicationCategory": "ProductivityApplication",
+    "browserRequirements": "Requires JavaScript",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "2850",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "author": {"@id": "https://graphosai.com/#organization"}
+  }
+  </script>
+
+  <!-- JSON-LD Structured Data - FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Graphos AI Humanizer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Graphos AI Humanizer is a tool that transforms AI-generated text (from ChatGPT, Claude, Gemini, etc.) into natural, human-like content that bypasses AI detection tools like GPTZero, Originality AI, and Turnitin with a 99% success rate."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can Graphos AI bypass GPTZero and Originality AI?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Graphos AI has a 99% success rate in bypassing major AI detectors including GPTZero, Originality AI, Turnitin, Copyleaks, and ZeroGPT while preserving the original meaning of your content."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is Graphos AI free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Graphos AI offers a free tier with limited credits. You can humanize AI text, detect AI content, and create voice profiles without any payment. Premium plans are available for heavy users."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does AI humanization work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our AI humanizer analyzes the patterns that AI detectors look for and rewrites your content to match natural human writing patterns while preserving the original meaning, tone, and context."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which AI detectors can Graphos AI bypass?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Graphos AI can bypass all major AI detectors including GPTZero, Originality AI, Turnitin, Copyleaks, ZeroGPT, Content at Scale, Sapling, and Writer.com AI detector."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- JSON-LD Structured Data - BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://graphosai.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "App",
+        "item": "https://app.graphosai.com"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+  <!-- Noscript SEO Fallback Content -->
+  <noscript>
+    <div style="padding: 40px; max-width: 800px; margin: 0 auto; font-family: system-ui, -apple-system, sans-serif; line-height: 1.6;">
+      <h1>Graphos AI Studio - Best AI Humanizer & AI Detection Bypass Tool</h1>
+      <p>Transform your AI-generated content into 100% human-like text that bypasses all AI detectors including GPTZero, Originality AI, Turnitin, and more.</p>
+      
+      <h2>Key Features</h2>
+      <ul>
+        <li><strong>AI Humanizer:</strong> Convert ChatGPT, Claude, Gemini text into undetectable human content</li>
+        <li><strong>AI Detection Bypass:</strong> Pass GPTZero, Originality AI, Turnitin, Copyleaks with 99% success rate</li>
+        <li><strong>Voice Profile:</strong> Create content that matches your unique writing style</li>
+        <li><strong>AI Detection:</strong> Check if content is AI-generated with 98% accuracy</li>
+        <li><strong>Multi-language Support:</strong> Works with 15+ languages</li>
+      </ul>
+      
+      <h2>Why Choose Graphos AI?</h2>
+      <ul>
+        <li>✓ 99% bypass rate on all major AI detectors</li>
+        <li>✓ Preserves original meaning and context</li>
+        <li>✓ Natural, human-like output</li>
+        <li>✓ Fast processing in seconds</li>
+        <li>✓ Free tier available</li>
+      </ul>
+      
+      <h2>How It Works</h2>
+      <ol>
+        <li>Paste your AI-generated text</li>
+        <li>Click "Humanize" button</li>
+        <li>Get 100% human-like content instantly</li>
+        <li>Copy and use anywhere - essays, articles, emails</li>
+      </ol>
+      
+      <p>Please enable JavaScript to use the full application.</p>
+      <p>
+        <a href="https://graphosai.com">Visit Homepage</a> |
+        <a href="mailto:support@graphosai.com">Contact Support</a>
+      </p>
+    </div>
+  </noscript>
+  
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

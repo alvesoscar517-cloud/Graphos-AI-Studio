@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
+import seoPrerender from './vite-plugin-seo-prerender.js'
 
 export default defineConfig(({ mode }) => ({
   // Base URL for deployment (use '/' for root domain)
@@ -15,7 +16,9 @@ export default defineConfig(({ mode }) => ({
           dest: '.'
         }
       ]
-    })
+    }),
+    // SEO Prerender plugin - injects static content for crawlers
+    seoPrerender()
   ],
   resolve: {
     alias: {

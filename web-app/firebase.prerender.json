@@ -1,11 +1,16 @@
 {
+  "_comment": "Firebase config với Cloud Functions prerender - Rename thành firebase.json để sử dụng",
   "hosting": {
     "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/api/**",
         "destination": "/index.html"
+      },
+      {
+        "source": "**",
+        "function": "prerender"
       }
     ],
     "headers": [
@@ -67,12 +72,6 @@
         "source": "/manifest.json",
         "headers": [
           { "key": "Cache-Control", "value": "no-cache" }
-        ]
-      },
-      {
-        "source": "/screenshots/**",
-        "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=604800" }
         ]
       }
     ]
