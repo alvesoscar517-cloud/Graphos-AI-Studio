@@ -8,13 +8,21 @@
 process.on('uncaughtException', (error) => {
   console.error('[FATAL] Uncaught Exception during startup:', error.message);
   console.error(error.stack);
-  process.exit(1);
+  // Don't exit immediately - let logs flush
+  setTimeout(() => process.exit(1), 3000);
 });
 
-console.log('[STARTUP] Loading dependencies...');
+console.log('[STARTUP] ====================================');
+console.log('[STARTUP] Starting Graphos AI Studio Backend');
+console.log('[STARTUP] ====================================');
 console.log('[STARTUP] Node version:', process.version);
 console.log('[STARTUP] NODE_ENV:', process.env.NODE_ENV);
 console.log('[STARTUP] PORT:', process.env.PORT);
+console.log('[STARTUP] GOOGLE_CLOUD_PROJECT:', process.env.GOOGLE_CLOUD_PROJECT);
+console.log('[STARTUP] ====================================');
+
+// Track startup errors but don't exit immediately
+const startupErrors = [];
 
 let express, config, corsMiddleware, errorHandler, notFoundHandler, requestTimeout;
 let rateLimitMiddleware, activityLoggerMiddleware, languageMiddleware;
@@ -24,123 +32,115 @@ let setupHealthCheck, queueService, startEmailWorker, stopEmailWorker;
 let startAnalysisWorker, stopAnalysisWorker, getCircuitBreakerStates;
 let realtimeEventsService, realtimeController;
 
-try {
-  express = require('express');
-  console.log('[STARTUP] [SUCCESS] express');
-} catch (e) { console.error('[STARTUP] [FAIL] express:', e.message); process.exit(1); }
+// Helper to load module with error tracking
+function loadModule(name, loader) {
+  try {
+    const result = loader();
+    console.log(`[STARTUP] [OK] ${name}`);
+    return result;
+  } catch (e) {
+    console.error(`[STARTUP] [FAIL] ${name}:`, e.message);
+    console.error(`[STARTUP] [FAIL] ${name} stack:`, e.stack);
+    startupErrors.push({ module: name, error: e.message });
+    return null;
+  }
+}
 
-try {
-  config = require('./src/config');
-  console.log('[STARTUP] [SUCCESS] config');
-} catch (e) { console.error('[STARTUP] [FAIL] config:', e.message); process.exit(1); }
+// Load critical modules first
+express = loadModule('express', () => require('express'));
+if (!express) {
+  console.error('[FATAL] Cannot start without express');
+  setTimeout(() => process.exit(1), 3000);
+}
 
-try {
-  corsMiddleware = require('./src/middleware/cors');
-  console.log('[STARTUP] [SUCCESS] cors middleware');
-} catch (e) { console.error('[STARTUP] [FAIL] cors middleware:', e.message); process.exit(1); }
+config = loadModule('config', () => require('./src/config'));
+if (!config) {
+  // Use defaults if config fails
+  config = { 
+    MAX_REQUEST_SIZE: '10mb', 
+    FEATURES: { ENABLE_RATE_LIMITING: false, ENABLE_CACHING: true, ENABLE_ANALYTICS: false, ENABLE_DEBUG_ENDPOINTS: true },
+    SECURITY: { SANITIZE_INPUT: false },
+    MAX_TEXT_LENGTH: 20000,
+    NODE_ENV: process.env.NODE_ENV || 'production',
+    PROJECT_ID: process.env.GOOGLE_CLOUD_PROJECT,
+    LOCATION: 'us-central1',
+    GEMINI_MODEL: 'gemini-2.5-flash',
+    PORT: 8080
+  };
+  console.log('[STARTUP] Using fallback config');
+}
 
-try {
-  const errorHandlerModule = require('./src/middleware/errorHandler.middleware');
+// Load other modules - continue even if some fail
+const errorHandlerModule = loadModule('errorHandler', () => require('./src/middleware/errorHandler.middleware'));
+if (errorHandlerModule) {
   errorHandler = errorHandlerModule.errorHandler;
   notFoundHandler = errorHandlerModule.notFoundHandler;
   requestTimeout = errorHandlerModule.requestTimeout;
-  console.log('[STARTUP] [SUCCESS] errorHandler middleware');
-} catch (e) { console.error('[STARTUP] [FAIL] errorHandler middleware:', e.message); process.exit(1); }
+} else {
+  // Fallback error handlers
+  errorHandler = (err, req, res, next) => res.status(500).json({ error: err.message });
+  notFoundHandler = (req, res) => res.status(404).json({ error: 'Not found' });
+  requestTimeout = () => (req, res, next) => next();
+}
 
-try {
-  rateLimitMiddleware = require('./src/middleware/rateLimit');
-  console.log('[STARTUP] [SUCCESS] rateLimit middleware');
-} catch (e) { console.error('[STARTUP] [FAIL] rateLimit middleware:', e.message); process.exit(1); }
+corsMiddleware = loadModule('cors', () => require('./src/middleware/cors')) || ((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
 
-try {
-  activityLoggerMiddleware = require('./src/middleware/activityLogger.middleware').activityLoggerMiddleware;
-  console.log('[STARTUP] [SUCCESS] activityLogger middleware');
-} catch (e) { console.error('[STARTUP] [FAIL] activityLogger middleware:', e.message); process.exit(1); }
+rateLimitMiddleware = loadModule('rateLimit', () => require('./src/middleware/rateLimit')) || ((req, res, next) => next());
+activityLoggerMiddleware = loadModule('activityLogger', () => require('./src/middleware/activityLogger.middleware').activityLoggerMiddleware) || ((req, res, next) => next());
+languageMiddleware = loadModule('language', () => require('./src/middleware/language.middleware').languageMiddleware) || ((req, res, next) => next());
+responseLocalizationMiddleware = loadModule('response.util', () => require('./src/utils/response.util').responseLocalizationMiddleware) || ((req, res, next) => next());
 
-try {
-  languageMiddleware = require('./src/middleware/language.middleware').languageMiddleware;
-  console.log('[STARTUP] [SUCCESS] language middleware');
-} catch (e) { console.error('[STARTUP] [FAIL] language middleware:', e.message); process.exit(1); }
-
-try {
-  responseLocalizationMiddleware = require('./src/utils/response.util').responseLocalizationMiddleware;
-  console.log('[STARTUP] [SUCCESS] response.util');
-} catch (e) { console.error('[STARTUP] [FAIL] response.util:', e.message); process.exit(1); }
-
-try {
-  const loggerModule = require('./src/utils/logger');
+const loggerModule = loadModule('logger', () => require('./src/utils/logger'));
+if (loggerModule) {
   correlationMiddleware = loggerModule.correlationMiddleware;
   requestLogger = loggerModule.requestLogger;
   logger = loggerModule;
-  console.log('[STARTUP] [SUCCESS] logger');
-} catch (e) { console.error('[STARTUP] [FAIL] logger:', e.message); process.exit(1); }
+} else {
+  correlationMiddleware = (req, res, next) => next();
+  requestLogger = (req, res, next) => next();
+  logger = { info: console.log, error: console.error, warn: console.warn };
+}
 
-try {
-  compressionMiddleware = require('./src/middleware/compression');
-  console.log('[STARTUP] [SUCCESS] compression middleware');
-} catch (e) { console.error('[STARTUP] [FAIL] compression middleware:', e.message); process.exit(1); }
+compressionMiddleware = loadModule('compression', () => require('./src/middleware/compression')) || ((req, res, next) => next());
+routes = loadModule('routes', () => require('./src/routes'));
+redisService = loadModule('redis.service', () => require('./src/services/redis.service')) || { 
+  isAvailable: () => false, 
+  initRedis: async () => false, 
+  close: async () => {}, 
+  getClient: () => null 
+};
+activityLogService = loadModule('activityLog.service', () => require('./src/services/activityLog.service')) || { flushBuffer: async () => {} };
+setupHealthCheck = loadModule('health', () => require('./src/utils/health').setupHealthCheck) || (() => {});
+queueService = loadModule('queue.service', () => require('./src/services/queue.service')) || { closeAll: async () => {} };
 
-try {
-  routes = require('./src/routes');
-  console.log('[STARTUP] [SUCCESS] routes');
-} catch (e) { console.error('[STARTUP] [FAIL] routes:', e.message); process.exit(1); }
+const emailWorker = loadModule('email.worker', () => require('./src/workers/email.worker'));
+startEmailWorker = emailWorker?.startEmailWorker || (() => {});
+stopEmailWorker = emailWorker?.stopEmailWorker || (async () => {});
 
-try {
-  redisService = require('./src/services/redis.service');
-  console.log('[STARTUP] [SUCCESS] redis.service');
-} catch (e) { console.error('[STARTUP] [FAIL] redis.service:', e.message); process.exit(1); }
+const analysisWorker = loadModule('analysis.worker', () => require('./src/workers/analysis.worker'));
+startAnalysisWorker = analysisWorker?.startAnalysisWorker || (() => {});
+stopAnalysisWorker = analysisWorker?.stopAnalysisWorker || (async () => {});
 
-try {
-  activityLogService = require('./src/services/activityLog.service');
-  console.log('[STARTUP] [SUCCESS] activityLog.service');
-} catch (e) { console.error('[STARTUP] [FAIL] activityLog.service:', e.message); process.exit(1); }
+getCircuitBreakerStates = loadModule('circuitBreaker', () => require('./src/utils/circuitBreaker').getAllStates) || (() => ({}));
+realtimeEventsService = loadModule('realtimeEvents.service', () => require('./src/services/realtimeEvents.service')) || { initialize: () => {}, shutdown: () => {} };
+realtimeController = loadModule('realtime.controller', () => require('./src/controllers/realtime.controller'));
+loadModule('envConfig.service', () => require('./src/services/envConfig.service'));
 
-try {
-  setupHealthCheck = require('./src/utils/health').setupHealthCheck;
-  console.log('[STARTUP] [SUCCESS] health util');
-} catch (e) { console.error('[STARTUP] [FAIL] health util:', e.message); process.exit(1); }
-
-try {
-  queueService = require('./src/services/queue.service');
-  console.log('[STARTUP] [SUCCESS] queue.service');
-} catch (e) { console.error('[STARTUP] [FAIL] queue.service:', e.message); process.exit(1); }
-
-try {
-  const emailWorker = require('./src/workers/email.worker');
-  startEmailWorker = emailWorker.startEmailWorker;
-  stopEmailWorker = emailWorker.stopEmailWorker;
-  console.log('[STARTUP] [SUCCESS] email.worker');
-} catch (e) { console.error('[STARTUP] [FAIL] email.worker:', e.message); process.exit(1); }
-
-try {
-  const analysisWorker = require('./src/workers/analysis.worker');
-  startAnalysisWorker = analysisWorker.startAnalysisWorker;
-  stopAnalysisWorker = analysisWorker.stopAnalysisWorker;
-  console.log('[STARTUP] [SUCCESS] analysis.worker');
-} catch (e) { console.error('[STARTUP] [FAIL] analysis.worker:', e.message); process.exit(1); }
-
-try {
-  getCircuitBreakerStates = require('./src/utils/circuitBreaker').getAllStates;
-  console.log('[STARTUP] [SUCCESS] circuitBreaker');
-} catch (e) { console.error('[STARTUP] [FAIL] circuitBreaker:', e.message); process.exit(1); }
-
-try {
-  realtimeEventsService = require('./src/services/realtimeEvents.service');
-  console.log('[STARTUP] [SUCCESS] realtimeEvents.service');
-} catch (e) { console.error('[STARTUP] [FAIL] realtimeEvents.service:', e.message); process.exit(1); }
-
-try {
-  realtimeController = require('./src/controllers/realtime.controller');
-  console.log('[STARTUP] [SUCCESS] realtime.controller');
-} catch (e) { console.error('[STARTUP] [FAIL] realtime.controller:', e.message); process.exit(1); }
-
-let envConfigService;
-try {
-  envConfigService = require('./src/services/envConfig.service');
-  console.log('[STARTUP] [SUCCESS] envConfig.service');
-} catch (e) { console.error('[STARTUP] [FAIL] envConfig.service:', e.message); process.exit(1); }
-
-console.log('[STARTUP] All dependencies loaded successfully!');
+// Report startup status
+if (startupErrors.length > 0) {
+  console.error('[STARTUP] ====================================');
+  console.error(`[STARTUP] WARNING: ${startupErrors.length} modules failed to load:`);
+  startupErrors.forEach(e => console.error(`[STARTUP]   - ${e.module}: ${e.error}`));
+  console.error('[STARTUP] ====================================');
+} else {
+  console.log('[STARTUP] All dependencies loaded successfully!');
+}
 
 // ============================================================================
 // INITIALIZE APP
@@ -347,7 +347,17 @@ if (config.FEATURES.ENABLE_DEBUG_ENDPOINTS) {
 // ROUTES
 // ============================================================================
 
-app.use('/', routes);
+if (routes) {
+  app.use('/', routes);
+} else {
+  // Fallback route if routes failed to load
+  app.use('/', (req, res) => {
+    res.status(503).json({ 
+      error: 'Service starting up',
+      startupErrors: startupErrors.map(e => e.module)
+    });
+  });
+}
 
 // ============================================================================
 // ERROR HANDLING
