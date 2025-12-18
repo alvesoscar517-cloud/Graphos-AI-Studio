@@ -15,6 +15,7 @@
     "sort": "Sắp xếp",
     "refresh": "Làm mới",
     "retry": "Thử lại",
+    "authorize": "Ủy quyền",
     "yes": "Có",
     "no": "Không",
     "ok": "OK",
@@ -91,7 +92,7 @@
     "signUp": "Đăng ký",
     "getStarted": "Bắt đầu",
     "appName": "Graphos AI Studio",
-    "signInTagline": "Đăng nhập để bảo vệ nội dung của bạn",
+    "signInTagline": "Viết chân thực cùng Graphos AI",
     "signOut": "Đăng xuất",
     "signInAgain": "Đăng nhập lại",
     "forgotPassword": "Quên mật khẩu?",
@@ -116,9 +117,12 @@
     "pleaseSignIn": "Vui lòng đăng nhập để sử dụng tính năng này",
     "needReauth": "Ứng dụng cần quyền truy cập Google Drive để đồng bộ ghi chú. Vui lòng đăng nhập lại để cấp quyền.",
     "drivePermissionRequired": "Yêu cầu quyền Drive",
+    "googleAuthRequired": "Cần ủy quyền Google",
+    "googleAuthRequiredDesc": "Thiết bị này cần ủy quyền truy cập Google Drive.",
     "confirmSignOut": "Bạn có chắc chắn muốn đăng xuất?",
     "confirmSignOutTitle": "Xác nhận đăng xuất",
     "signedOut": "Đã đăng xuất",
+    "accountSettings": "Cài đặt tài khoản",
     "email": {
       "signInWithEmail": "Đăng nhập bằng Email",
       "emailLabel": "Email",
@@ -1392,5 +1396,11 @@
   "securitySettings": {
     "ipAddress": "IP",
     "unknown": "Không xác định"
+  },
+  "unsupportedScreen": {
+    "title": "Graphos AI Studio không hỗ trợ màn hình này",
+    "description": "Vui lòng sử dụng chế độ ngang hoặc thiết bị lớn hơn để có trải nghiệm tốt nhất.",
+    "desktop": "Máy tính",
+    "tabletLandscape": "Tablet ngang"
   }
 }

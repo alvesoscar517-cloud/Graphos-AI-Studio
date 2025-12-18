@@ -1,6 +1,7 @@
 /**
  * TestimonialsSection - Premium testimonials with stats and carousel
  * Enhanced: Dec 2025 - Performance optimized, lazy loading images
+ * Updated: Localized avatars and names based on user's locale
  */
 import { useState, useEffect, memo, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -8,16 +9,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Icon from '@components/common/Icon'
 import { usePrefersReducedMotion } from '@hooks/useOptimizedAnimation'
 import { useAnimateOnScroll } from '@hooks/useIntersectionObserver'
+import { getLocalizedTestimonials } from '@utils/localizedAvatars'
 
-const TESTIMONIALS = [
+// Base testimonial data (quotes and features only - names/avatars come from localization)
+const TESTIMONIAL_BASE = [
   {
     id: 1,
     quoteKey: 'testimonials.quotes.1',
     defaultQuote: "Graphos AI has completely changed how I write content. The voice profile feature is incredible - it actually sounds like me!",
-    author: "Sarah Mitchell",
     roleKey: 'testimonials.roles.contentCreator',
     defaultRole: "Content Creator",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
     rating: 5,
     feature: 'voiceProfile'
   },
@@ -25,10 +26,8 @@ const TESTIMONIALS = [
     id: 2,
     quoteKey: 'testimonials.quotes.2',
     defaultQuote: "As a professor, I use the AI detection daily. It's accurate and helps me maintain academic integrity in my classes.",
-    author: "Dr. James Kim",
     roleKey: 'testimonials.roles.professor',
     defaultRole: "University Professor",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
     rating: 5,
     feature: 'aiDetection'
   },
@@ -36,10 +35,8 @@ const TESTIMONIALS = [
     id: 3,
     quoteKey: 'testimonials.quotes.3',
     defaultQuote: "The humanization feature saved me hours of editing. My AI-assisted drafts now read naturally and authentically.",
-    author: "Michael Roberts",
     roleKey: 'testimonials.roles.marketingManager',
     defaultRole: "Marketing Manager",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
     rating: 5,
     feature: 'humanization'
   },
@@ -47,10 +44,8 @@ const TESTIMONIALS = [
     id: 4,
     quoteKey: 'testimonials.quotes.4',
     defaultQuote: "Finally, an AI tool that helps me write faster without losing my personal touch. The workspace is intuitive and powerful.",
-    author: "Emily Thompson",
     roleKey: 'testimonials.roles.freelanceWriter',
     defaultRole: "Freelance Writer",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
     rating: 5,
     feature: 'workspace'
   },
@@ -58,10 +53,8 @@ const TESTIMONIALS = [
     id: 5,
     quoteKey: 'testimonials.quotes.5',
     defaultQuote: "I was skeptical at first, but the accuracy of the AI detection is impressive. It's become essential for my editorial work.",
-    author: "David Lee",
     roleKey: 'testimonials.roles.editor',
     defaultRole: "Editor-in-Chief",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
     rating: 5,
     feature: 'aiDetection'
   },
@@ -69,10 +62,8 @@ const TESTIMONIALS = [
     id: 6,
     quoteKey: 'testimonials.quotes.6',
     defaultQuote: "The Chrome extension makes it so easy to use anywhere. I can check and humanize content without leaving my workflow.",
-    author: "Lisa Chen",
     roleKey: 'testimonials.roles.socialMediaManager',
     defaultRole: "Social Media Manager",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face",
     rating: 5,
     feature: 'extension'
   }
@@ -216,16 +207,35 @@ const TestimonialCard = memo(({ testimonial, t }) => {
 TestimonialCard.displayName = 'TestimonialCard'
 
 const TestimonialsSection = memo(() => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(true) // Default paused - user controls navigation
   const prefersReducedMotion = usePrefersReducedMotion()
   const [sectionRef, isVisible] = useAnimateOnScroll(0.1)
 
-  const totalPages = useMemo(() => Math.ceil(TESTIMONIALS.length / 3), [])
+  // Get localized testimonials based on current language
+  const localizedPersonas = useMemo(() => 
+    getLocalizedTestimonials(i18n.language),
+    [i18n.language]
+  )
+
+  // Merge base testimonial data with localized names/avatars
+  const TESTIMONIALS = useMemo(
+    () =>
+      TESTIMONIAL_BASE.map((base, index) => ({
+        ...base,
+        author: localizedPersonas[index]?.name || base.defaultRole,
+        avatar:
+          localizedPersonas[index]?.avatar ||
+          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
+      })),
+    [localizedPersonas]
+  )
+
+  const totalPages = useMemo(() => Math.ceil(TESTIMONIALS.length / 3), [TESTIMONIALS.length])
   const visibleTestimonials = useMemo(() => 
     TESTIMONIALS.slice(activeIndex * 3, activeIndex * 3 + 3),
-    [activeIndex]
+    [activeIndex, TESTIMONIALS]
   )
 
   // Optional: Auto-play only when user explicitly enables it and section is visible

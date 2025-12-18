@@ -26,6 +26,86 @@ import {
 // ============================================================================
 
 const DEFAULT_TIMEOUT = 30000 // 30 seconds
+
+// ============================================================================
+// TIMEOUT TIERS FOR DIFFERENT OPERATION TYPES
+// ============================================================================
+
+// Standard AI timeout (2 minutes) - for detection, analysis, suggestions, translation
+const STANDARD_AI_TIMEOUT = 120000
+
+// Heavy AI timeout (3 minutes) - for rewrite, humanization check
+const HEAVY_AI_TIMEOUT = 180000
+
+// Iterative/Streaming timeout (5 minutes) - for iterative humanization, streaming
+const STREAMING_TIMEOUT = 300000
+
+// Endpoint timeout mapping
+const ENDPOINT_TIMEOUTS = {
+  // Standard AI operations (2 min)
+  '/authenticate': STANDARD_AI_TIMEOUT,
+  '/analysis/authenticate': STANDARD_AI_TIMEOUT,
+  '/analyze': STANDARD_AI_TIMEOUT,
+  '/analysis/analyze': STANDARD_AI_TIMEOUT,
+  '/suggest_improvements': STANDARD_AI_TIMEOUT,
+  '/analysis/suggest-improvements': STANDARD_AI_TIMEOUT,
+  '/api/translate': STANDARD_AI_TIMEOUT,
+  '/analysis/translate': STANDARD_AI_TIMEOUT,
+  '/add_sample': STANDARD_AI_TIMEOUT,
+  '/profiles/add-sample': STANDARD_AI_TIMEOUT,
+  
+  // Heavy AI operations (3 min)
+  '/rewrite': HEAVY_AI_TIMEOUT,
+  '/analysis/rewrite': HEAVY_AI_TIMEOUT,
+  '/check-humanization': HEAVY_AI_TIMEOUT,
+  '/analysis/check-humanization': HEAVY_AI_TIMEOUT,
+  '/api/chat': STANDARD_AI_TIMEOUT,
+  '/api/chat/humanized': HEAVY_AI_TIMEOUT,
+  '/add_samples_batch': HEAVY_AI_TIMEOUT,
+  '/profiles/add-samples-batch': HEAVY_AI_TIMEOUT,
+  '/finalize_profile': HEAVY_AI_TIMEOUT,
+  '/profiles/finalize': HEAVY_AI_TIMEOUT,
+  
+  // Streaming/Iterative operations (5 min)
+  '/rewrite_stream': STREAMING_TIMEOUT,
+  '/rewrite-stream': STREAMING_TIMEOUT,
+  '/analysis/rewrite-stream': STREAMING_TIMEOUT,
+  '/iterative-humanize': STREAMING_TIMEOUT,
+  '/analysis/iterative-humanize': STREAMING_TIMEOUT,
+  '/api/chat/stream': STREAMING_TIMEOUT,
+  '/api/chat/humanized/stream': STREAMING_TIMEOUT,
+  '/create_profile_complete': STREAMING_TIMEOUT,
+  '/create_profile_complete/stream': STREAMING_TIMEOUT,
+  '/profiles/create': STREAMING_TIMEOUT,
+}
+
+/**
+ * Get timeout for endpoint based on operation type
+ */
+function getTimeoutForEndpoint(endpoint) {
+  // Check exact match first
+  for (const [path, timeout] of Object.entries(ENDPOINT_TIMEOUTS)) {
+    if (endpoint === path || endpoint.endsWith(path)) {
+      return timeout
+    }
+  }
+  
+  // Check partial match for streaming endpoints
+  if (endpoint.includes('stream') || endpoint.includes('humanize')) {
+    return STREAMING_TIMEOUT
+  }
+  
+  // Check for AI-related endpoints
+  if (endpoint.includes('rewrite') || endpoint.includes('humaniz')) {
+    return HEAVY_AI_TIMEOUT
+  }
+  
+  if (endpoint.includes('authenticate') || endpoint.includes('analyze') || endpoint.includes('chat')) {
+    return STANDARD_AI_TIMEOUT
+  }
+  
+  return DEFAULT_TIMEOUT
+}
 const DEFAULT_RETRY_OPTIONS = {
   maxRetries: 2,
   baseDelay: 1000,
@@ -67,12 +147,15 @@ class ApiClient {
    * Make HTTP request with enhanced features
    */
   async request(endpoint, options = {}) {
+    // Get appropriate timeout based on endpoint type
+    const endpointTimeout = getTimeoutForEndpoint(endpoint)
+    
     const {
       method = 'GET',
       body = null,
       headers = {},
       params = null,
-      timeout = DEFAULT_TIMEOUT,
+      timeout = endpointTimeout,
       retry = true,
       includeAuth = true,
       signal = null
@@ -279,27 +362,28 @@ class ApiClient {
    * @returns {Promise<{token: string|null, authType: 'email'|'google'|null}>}
    */
   async getAuthTokenWithType() {
-    // Try email auth first (web app mode)
+    // First try JWT token from tokenService (works for both email and Google users)
+    // Both auth methods now get JWT tokens from backend:
+    // - Email users: JWT from /auth/email/login
+    // - Google users: JWT from /auth/email/google-login
     try {
-      const { getAuthMethod } = await import('../../utils/authStorage')
-      const authMethod = getAuthMethod()
-      
-      // Try to get token if authMethod is 'email' or not set
-      if (authMethod === 'email' || !authMethod) {
-        const token = await tokenService.getValidToken()
-        if (token && typeof token === 'string' && token.trim()) {
-          return { token, authType: 'email' }
-        }
+      const token = await tokenService.getValidToken()
+      if (token && typeof token === 'string' && token.trim()) {
+        // Always use 'email' auth type for JWT tokens
+        // Backend verifies JWT the same way regardless of original auth method
+        return { token, authType: 'email' }
       }
     } catch (error) {
       logError(error, { context: 'getAuthToken' })
     }
     
-    // Then try Chrome extension (Google OAuth)
+    // Fallback: Try Chrome extension (Google OAuth token directly)
+    // This is only used when user hasn't gone through backend login yet
     try {
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
         const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' })
         if (response?.token && typeof response.token === 'string') {
+          // This is a Google OAuth access token, not JWT
           return { token: response.token, authType: 'google' }
         }
       }
@@ -321,14 +405,18 @@ class ApiClient {
 
   /**
    * Handle 401 response - attempt token refresh and retry
+   * 
+   * Both email and Google users now use JWT tokens from backend,
+   * so token refresh should work for both auth methods.
    */
   async handleUnauthorized(endpoint, options, originalError) {
     try {
       const { getAuthMethod } = await import('../../utils/authStorage')
       const authMethod = getAuthMethod()
       
-      // Only attempt refresh for email auth
-      if (authMethod !== 'email') {
+      // Attempt refresh for both email and google auth (both use JWT now)
+      // Only skip if authMethod is explicitly something else (future auth methods)
+      if (authMethod && authMethod !== 'email' && authMethod !== 'google') {
         throw originalError
       }
 

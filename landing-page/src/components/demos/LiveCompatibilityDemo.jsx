@@ -138,7 +138,7 @@ const LiveCompatibilityDemo = () => {
     >
       <div className="flex min-h-[600px]">
         {/* Main Content Area */}
-        <div className="flex-1 p-6 lg:p-8 flex flex-col border-r border-gray-200 dark:border-slate-700">
+        <div className="flex-1 p-6 lg:p-8 flex flex-col lg:border-r lg:border-gray-200 lg:dark:border-slate-700">
           {/* Header */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
@@ -320,24 +320,24 @@ const LiveCompatibilityDemo = () => {
 
           {/* Footer Actions */}
           <div className="flex items-center justify-between mt-4">
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+            <span className="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline">
               <span className="font-semibold text-teal-600 dark:text-teal-400">
                 {currentSample?.text.length}
               </span>
               <span className="text-gray-400"> {t('demo.characters', 'characters')}</span>
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-auto">
               {showResult && (
                 <motion.button
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleReset}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-slate-700 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-all"
+                  className="flex items-center justify-center gap-2 p-2.5 sm:px-4 sm:py-2.5 bg-gray-100 dark:bg-slate-700 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-all"
                 >
                   <Icon name="rotate-ccw" size="sm" color="gray-medium" />
-                  {t('demo.reset', 'Reset')}
+                  <span className="hidden sm:inline">{t('demo.reset', 'Reset')}</span>
                 </motion.button>
               )}
 
@@ -363,8 +363,8 @@ const LiveCompatibilityDemo = () => {
           </div>
         </div>
 
-        {/* Sidebar */}
-        <div className="w-56 p-3 bg-gray-50 dark:bg-slate-800/50 flex flex-col gap-3 overflow-y-auto">
+        {/* Sidebar - Hidden on mobile */}
+        <div className="hidden lg:flex w-56 p-3 bg-gray-50 dark:bg-slate-800/50 flex-col gap-3 overflow-y-auto">
           {/* Voice Profile */}
           <div className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
             <div className="flex flex-col items-center gap-2">

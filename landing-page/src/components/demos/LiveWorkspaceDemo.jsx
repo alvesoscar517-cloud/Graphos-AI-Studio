@@ -282,10 +282,10 @@ const LiveWorkspaceDemo = () => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     onClick={resetDemo}
-                    className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                    className="inline-flex items-center justify-center gap-1.5 h-8 w-8 sm:w-auto sm:px-3 rounded-lg text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
                   >
                     <Icon name="rotate-ccw" size="xs" className="text-gray-500" />
-                    {t('demo.reset', 'Reset')}
+                    <span className="hidden sm:inline">{t('demo.reset', 'Reset')}</span>
                   </motion.button>
                 )}
                 <button

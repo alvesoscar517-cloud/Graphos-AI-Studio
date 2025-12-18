@@ -165,7 +165,7 @@ export const PAGE_SEO_CONFIG = {
       ko: ['AI 글쓰기 도구', 'AI 기능'],
       'zh-CN': ['AI写作工具', 'AI功能', 'AI工具包'],
     },
-    image: '/og-image.png',
+    image: '/screenshots/features.png',
     category: 'ProductivityApplication',
     rating: { value: '4.9', count: '1250' }
   },

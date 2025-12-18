@@ -21,6 +21,59 @@ import { ApiError, ERROR_MESSAGES } from './errorHandler';
 // ============================================================================
 
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
+
+// ============================================================================
+// TIMEOUT TIERS FOR DIFFERENT OPERATION TYPES
+// ============================================================================
+
+// Standard AI timeout (2 minutes) - for detection, analysis, suggestions
+const STANDARD_AI_TIMEOUT = 120000;
+
+// Heavy AI timeout (3 minutes) - for rewrite, humanization check
+const HEAVY_AI_TIMEOUT = 180000;
+
+// Iterative/Streaming timeout (5 minutes) - for iterative humanization, streaming
+const STREAMING_TIMEOUT = 300000;
+
+// Endpoint timeout mapping
+const ENDPOINT_TIMEOUTS = {
+  // Standard AI operations (2 min)
+  '/authenticate': STANDARD_AI_TIMEOUT,
+  '/analysis/authenticate': STANDARD_AI_TIMEOUT,
+  '/analyze': STANDARD_AI_TIMEOUT,
+  '/analysis/analyze': STANDARD_AI_TIMEOUT,
+  '/suggest_improvements': STANDARD_AI_TIMEOUT,
+  '/analysis/suggest-improvements': STANDARD_AI_TIMEOUT,
+  '/api/translate': STANDARD_AI_TIMEOUT,
+  '/analysis/translate': STANDARD_AI_TIMEOUT,
+  '/add_sample': STANDARD_AI_TIMEOUT,
+  '/profiles/add-sample': STANDARD_AI_TIMEOUT,
+  
+  // Heavy AI operations (3 min)
+  '/rewrite': HEAVY_AI_TIMEOUT,
+  '/analysis/rewrite': HEAVY_AI_TIMEOUT,
+  '/check-humanization': HEAVY_AI_TIMEOUT,
+  '/analysis/check-humanization': HEAVY_AI_TIMEOUT,
+  '/api/chat': STANDARD_AI_TIMEOUT,
+  '/api/chat/humanized': HEAVY_AI_TIMEOUT,
+  '/add_samples_batch': HEAVY_AI_TIMEOUT,
+  '/profiles/add-samples-batch': HEAVY_AI_TIMEOUT,
+  '/finalize_profile': HEAVY_AI_TIMEOUT,
+  '/profiles/finalize': HEAVY_AI_TIMEOUT,
+  
+  // Streaming/Iterative operations (5 min)
+  '/rewrite_stream': STREAMING_TIMEOUT,
+  '/rewrite-stream': STREAMING_TIMEOUT,
+  '/analysis/rewrite-stream': STREAMING_TIMEOUT,
+  '/iterative-humanize': STREAMING_TIMEOUT,
+  '/analysis/iterative-humanize': STREAMING_TIMEOUT,
+  '/api/chat/stream': STREAMING_TIMEOUT,
+  '/api/chat/humanized/stream': STREAMING_TIMEOUT,
+  '/create_profile_complete': STREAMING_TIMEOUT,
+  '/create_profile_complete/stream': STREAMING_TIMEOUT,
+  '/profiles/create': STREAMING_TIMEOUT,
+};
+
 const DEFAULT_RETRY = {
   limit: 2,
   methods: ['get', 'post', 'put', 'delete'],
@@ -28,6 +81,34 @@ const DEFAULT_RETRY = {
   afterStatusCodes: [413, 429, 503],
   maxRetryAfter: 60000, // Max 60 seconds retry-after
 };
+
+/**
+ * Get timeout for endpoint based on operation type
+ */
+function getTimeoutForEndpoint(endpoint) {
+  // Check exact match first
+  for (const [path, timeout] of Object.entries(ENDPOINT_TIMEOUTS)) {
+    if (endpoint === path || endpoint.endsWith(path)) {
+      return timeout;
+    }
+  }
+  
+  // Check partial match for streaming endpoints
+  if (endpoint.includes('stream') || endpoint.includes('humanize')) {
+    return STREAMING_TIMEOUT;
+  }
+  
+  // Check for AI-related endpoints
+  if (endpoint.includes('rewrite') || endpoint.includes('humaniz')) {
+    return HEAVY_AI_TIMEOUT;
+  }
+  
+  if (endpoint.includes('authenticate') || endpoint.includes('analyze') || endpoint.includes('chat')) {
+    return STANDARD_AI_TIMEOUT;
+  }
+  
+  return DEFAULT_TIMEOUT;
+}
 
 // ============================================================================
 // REQUEST ID GENERATION
@@ -43,26 +124,37 @@ function generateRequestId() {
 
 /**
  * Get auth token and type for API requests
+ * 
+ * IMPORTANT: Both email and Google users now use JWT tokens from backend.
+ * - Email users: JWT from /auth/email/login
+ * - Google users: JWT from /auth/email/google-login
+ * 
+ * X-Auth-Type should always be 'email' when using JWT tokens from tokenService,
+ * because backend verifies JWT tokens the same way for both auth methods.
+ * 
  * @returns {Promise<{token: string|null, authType: 'email'|'google'|null}>}
  */
 async function getAuthTokenWithType() {
+  // First try JWT token from tokenService (works for both email and Google users)
+  // Both auth methods now get JWT tokens from backend
   try {
-    const { getAuthMethod } = await import('../../utils/authStorage');
-    const authMethod = getAuthMethod();
-    
-    if (authMethod === 'email') {
-      const token = await tokenService.getValidToken();
-      if (token) return { token, authType: 'email' };
+    const token = await tokenService.getValidToken();
+    if (token) {
+      // Always use 'email' auth type for JWT tokens
+      // Backend verifies JWT the same way regardless of original auth method
+      return { token, authType: 'email' };
     }
   } catch (error) {
-    logger.warn('kyClient', `Failed to get email auth token: ${error.message}`);
+    logger.warn('kyClient', `Failed to get JWT token: ${error.message}`);
   }
   
-  // Try Chrome extension (Google OAuth)
+  // Fallback: Try Chrome extension (Google OAuth token directly)
+  // This is only used when user hasn't gone through backend login yet
   try {
     if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
       const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' });
       if (response?.token) {
+        // This is a Google OAuth access token, not JWT
         return { token: response.token, authType: 'google' };
       }
     }
@@ -272,28 +364,36 @@ class KyApiClient {
   }
   
   /**
-   * GET request
+   * GET request with dynamic timeout
    */
   async get(endpoint, options = {}) {
+    // Use dynamic timeout based on endpoint
+    const timeout = options.timeout || getTimeoutForEndpoint(endpoint);
+    
     const response = await this.ky.get(endpoint, {
       searchParams: options.params,
       ...options,
+      timeout,
       _startTime: Date.now()
     });
     return response.json();
   }
   
   /**
-   * POST request with automatic user_id injection
+   * POST request with automatic user_id injection and dynamic timeout
    */
   async post(endpoint, body = {}, options = {}) {
     // Add user_id to body
     const userId = await getUserId();
     const requestBody = userId ? { ...body, user_id: userId } : body;
     
+    // Use dynamic timeout based on endpoint
+    const timeout = options.timeout || getTimeoutForEndpoint(endpoint);
+    
     const response = await this.ky.post(endpoint, {
       json: requestBody,
       ...options,
+      timeout,
       _startTime: Date.now()
     });
     return response.json();

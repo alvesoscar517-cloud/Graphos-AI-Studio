@@ -15,6 +15,7 @@
     "sort": "Urutkan",
     "refresh": "Segarkan",
     "retry": "Coba Lagi",
+    "authorize": "Otorisasi",
     "yes": "Ya",
     "no": "Tidak",
     "ok": "OK",
@@ -248,12 +249,15 @@
     "pleaseSignIn": "Silakan masuk untuk menggunakan fitur ini",
     "needReauth": "Aplikasi memerlukan akses Google Drive untuk menyinkronkan catatan. Silakan masuk lagi untuk memberikan izin.",
     "drivePermissionRequired": "Izin Drive Diperlukan",
+    "googleAuthRequired": "Otorisasi Google Diperlukan",
+    "googleAuthRequiredDesc": "Perangkat ini perlu mengotorisasi akses Google Drive.",
     "confirmSignOut": "Apakah Anda yakin ingin keluar?",
     "confirmSignOutTitle": "Konfirmasi Keluar",
     "signedOut": "Telah keluar",
+    "accountSettings": "Pengaturan Akun",
     "getStarted": "Mulai",
     "appName": "Graphos AI Studio",
-    "signInTagline": "Masuk untuk menjaga konten Anda tetap asli",
+    "signInTagline": "Tulis secara autentik dengan Graphos AI",
     "errors": {
       "accountDeleted": "Akun ini telah dihapus. Silakan hubungi dukungan jika Anda percaya ini adalah kesalahan.",
       "accountSuspended": "Akun Anda telah ditangguhkan. Silakan hubungi dukungan untuk bantuan.",
@@ -1392,5 +1396,11 @@
   "securitySettings": {
     "ipAddress": "IP",
     "unknown": "Tidak diketahui"
+  },
+  "unsupportedScreen": {
+    "title": "Graphos AI Studio tidak mendukung layar ini",
+    "description": "Silakan gunakan mode lanskap atau perangkat yang lebih besar untuk pengalaman terbaik.",
+    "desktop": "Desktop",
+    "tabletLandscape": "Tablet lanskap"
   }
 }

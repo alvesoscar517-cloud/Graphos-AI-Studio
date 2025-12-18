@@ -2,7 +2,7 @@
  * EmailLoginForm Component
  * Uses React Hook Form + Zod for validation via useLoginForm hook
  */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLoginForm } from '@/hooks/forms'
 import { cn } from '@/lib/utils'
@@ -10,6 +10,8 @@ import { cn } from '@/lib/utils'
 const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogleSignIn, isLoading: externalLoading }) => {
   const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
+  const [shakeField, setShakeField] = useState(null) // 'email' | 'password' | null
+  const [lastShakeId, setLastShakeId] = useState(0) // Track unique shake triggers
 
   // Helper to parse error message and extract details
   const parseAuthError = (err) => {
@@ -45,8 +47,11 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
     register,
     handleSubmit,
     setError,
+    clearErrors,
     errors,
-    isLoading: formLoading
+    isLoading: formLoading,
+    watch,
+    submitCount
   } = useLoginForm(async (data) => {
     try {
       await onLogin(data.email, data.password, data.rememberMe)
@@ -103,6 +108,82 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
     }
   })
 
+  // Track previous submitCount to detect new submissions
+  const [prevSubmitCount, setPrevSubmitCount] = useState(0)
+  
+  // Trigger shake animation - only shake ONE field at a time
+  // Priority: email first (if has error), then password
+  const triggerShake = (field) => {
+    setShakeField(field)
+    setLastShakeId(id => id + 1)
+  }
+
+  // Clear shake after animation completes
+  useEffect(() => {
+    if (shakeField) {
+      const timer = setTimeout(() => setShakeField(null), 500)
+      return () => clearTimeout(timer)
+    }
+  }, [shakeField, lastShakeId])
+
+  // Detect new form submission and trigger appropriate shake
+  useEffect(() => {
+    if (submitCount > prevSubmitCount) {
+      setPrevSubmitCount(submitCount)
+      
+      // Priority: shake email if it has error, otherwise password
+      // Only shake ONE field - the first one with error
+      if (errors.email) {
+        triggerShake('email')
+      } else if (errors.password) {
+        triggerShake('password')
+      }
+    }
+  }, [submitCount, errors.email, errors.password, prevSubmitCount])
+
+  // Shake password field on root error (wrong credentials from server)
+  useEffect(() => {
+    if (errors.root) {
+      triggerShake('password')
+    }
+  }, [errors.root])
+
+  // Watch email and password values to clear errors when user starts typing
+  const emailValue = watch('email')
+  const passwordValue = watch('password')
+  
+  // Track previous values to detect actual changes
+  const [prevEmailValue, setPrevEmailValue] = useState(emailValue)
+  const [prevPasswordValue, setPrevPasswordValue] = useState(passwordValue)
+
+  // Clear email error when user modifies email field
+  useEffect(() => {
+    if (emailValue !== prevEmailValue) {
+      setPrevEmailValue(emailValue)
+      if (errors.email) {
+        clearErrors('email')
+      }
+      // Also clear root error when email changes
+      if (errors.root) {
+        clearErrors('root')
+      }
+    }
+  }, [emailValue, prevEmailValue, errors.email, errors.root, clearErrors])
+
+  // Clear password error when user modifies password field
+  useEffect(() => {
+    if (passwordValue !== prevPasswordValue) {
+      setPrevPasswordValue(passwordValue)
+      if (errors.password) {
+        clearErrors('password')
+      }
+      // Also clear root error when password changes
+      if (errors.root) {
+        clearErrors('root')
+      }
+    }
+  }, [passwordValue, prevPasswordValue, errors.password, errors.root, clearErrors])
+
   const isLoading = externalLoading || formLoading
 
   const inputClass = cn(
@@ -114,9 +195,21 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
   )
 
   const inputErrorClass = "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+  
+  // iOS-style shake animation class
+  const shakeClass = "animate-[shake_0.5s_ease-in-out]"
 
   return (
     <form className="w-full" onSubmit={handleSubmit}>
+      {/* iOS Shake Animation Keyframes */}
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+          20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+      `}</style>
+
       {/* Header */}
       <div className="text-center mb-4 sm:mb-5">
         <div className="mb-2 sm:mb-3">
@@ -131,7 +224,7 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
         <label htmlFor="email" className="block mb-1 sm:mb-1.5 text-xs sm:text-sm font-medium text-gray-600">
           {t('auth.email.emailLabel')}
         </label>
-        <div className="relative">
+        <div className={cn("relative", shakeField === 'email' && shakeClass)}>
           <span className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
             <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/>
@@ -147,6 +240,7 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
             className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.email && inputErrorClass)}
           />
         </div>
+        {/* Only show email error if email has error (priority) */}
         {errors.email && (
           <p className="mt-1 text-[10px] sm:text-xs text-red-500">{errors.email.message}</p>
         )}
@@ -157,7 +251,7 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
         <label htmlFor="password" className="block mb-1 sm:mb-1.5 text-xs sm:text-sm font-medium text-gray-600">
           {t('auth.email.passwordLabel')}
         </label>
-        <div className="relative">
+        <div className={cn("relative", shakeField === 'password' && shakeClass)}>
           <span className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
             <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -170,7 +264,7 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
             placeholder={t('auth.email.passwordPlaceholder')}
             disabled={isLoading}
             autoComplete="current-password"
-            className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm pr-10 sm:pr-12", errors.password && inputErrorClass)}
+            className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm pr-10 sm:pr-12", !errors.email && errors.password && inputErrorClass)}
           />
           <button
             type="button"
@@ -179,33 +273,51 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
             className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 rounded transition-all"
           >
             {showPassword ? (
-              <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+              <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
                 <line x1="1" y1="1" x2="23" y2="23"/>
               </svg>
             ) : (
-              <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
             )}
           </button>
         </div>
-        {errors.password && (
+        {/* Only show password error if email has NO error */}
+        {!errors.email && errors.password && (
           <p className="mt-1 text-[10px] sm:text-xs text-red-500">{errors.password.message}</p>
         )}
       </div>
 
-      {/* Remember Me */}
+      {/* Remember Me - Custom Round Checkbox */}
       <div className="flex items-center gap-2 mb-3 sm:mb-4">
         <input
           type="checkbox"
           id="rememberMe"
           {...register('rememberMe')}
           disabled={isLoading}
-          className="w-3.5 h-3.5 sm:w-4 sm:h-4 accent-system-blue rounded cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-          style={{ outline: 'none', boxShadow: 'none' }}
+          className="sr-only"
         />
-        <label htmlFor="rememberMe" className="text-xs sm:text-sm text-gray-600 cursor-pointer select-none">
+        <label 
+          htmlFor="rememberMe" 
+          className={cn(
+            "w-5 h-5 rounded-full border-2 shrink-0 relative cursor-pointer transition-colors",
+            watch('rememberMe') ? "border-system-blue" : "border-gray-300",
+            isLoading && "cursor-not-allowed opacity-50"
+          )}
+        >
+          {watch('rememberMe') && (
+            <div className="w-2.5 h-2.5 rounded-full bg-system-blue absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+          )}
+        </label>
+        <label 
+          htmlFor="rememberMe" 
+          className={cn(
+            "text-xs sm:text-sm text-gray-600 cursor-pointer select-none",
+            isLoading && "cursor-not-allowed opacity-50"
+          )}
+        >
           {t('auth.email.rememberMe', 'Remember me')}
         </label>
       </div>
@@ -283,8 +395,8 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
       {/* Terms */}
       <p className="mt-2.5 sm:mt-3 text-[9px] sm:text-[10px] text-gray-400 leading-relaxed text-center">
         {t('auth.termsAgreement')}{' '}
-        <span className="text-system-blue font-medium cursor-pointer hover:underline">{t('auth.termsOfService')}</span> {t('auth.and')}{' '}
-        <span className="text-system-blue font-medium cursor-pointer hover:underline">{t('auth.privacyPolicy')}</span>
+        <a href="https://graphosai.com/terms" target="_blank" rel="noopener noreferrer" className="text-system-blue font-medium cursor-pointer hover:underline no-underline">{t('auth.termsOfService')}</a> {t('auth.and')}{' '}
+        <a href="https://graphosai.com/privacy" target="_blank" rel="noopener noreferrer" className="text-system-blue font-medium cursor-pointer hover:underline no-underline">{t('auth.privacyPolicy')}</a>
       </p>
     </form>
   )

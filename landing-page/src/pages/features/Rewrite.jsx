@@ -952,19 +952,13 @@ const VoiceProfileIntegration = ({ t }) => {
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                   className="text-center"
                 >
-                  <div className="relative">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-emerald-600 to-teal-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-500/30 mb-2 sm:mb-3">
+                  <div className="mb-2 sm:mb-3">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-emerald-600 to-teal-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-500/30">
                       <Icon name="fingerprint" size="xl" className="icon-white sm:hidden" />
                       <Icon name="fingerprint" size="2xl" className="icon-white hidden sm:block" />
                     </div>
-                    {/* Pulse ring */}
-                    <motion.div
-                      animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="absolute inset-0 rounded-xl sm:rounded-2xl border-2 border-emerald-400"
-                    />
                   </div>
-                  <span className="text-xs sm:text-sm font-medium text-text-secondary">{t('features.labels.voiceProfile', 'Voice Profile')}</span>
+                  <span className="text-xs sm:text-sm font-medium text-text-secondary">{t('features.rewrite.integration.voiceProfileLabel', 'Voice Profile')}</span>
                 </motion.div>
                 
                 {/* Connection line with animated particles - Responsive */}
@@ -996,19 +990,19 @@ const VoiceProfileIntegration = ({ t }) => {
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
                   className="text-center"
                 >
-                  <div className="relative">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-emerald-500 to-green-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-500/30 mb-2 sm:mb-3">
+                  <div className="relative mb-2 sm:mb-3">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-emerald-500 to-green-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-500/30">
                       <Icon name="edit-3" size="xl" className="icon-white sm:hidden" />
                       <Icon name="edit-3" size="2xl" className="icon-white hidden sm:block" />
                     </div>
-                    {/* Pulse ring */}
+                    {/* Pulse ring - same animation as Voice Profile */}
                     <motion.div
-                      animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
-                      transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-                      className="absolute inset-0 rounded-xl sm:rounded-2xl border-2 border-green-400"
+                      animate={{ scale: [1, 1.2, 1], opacity: [0.6, 0, 0.6] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                      className="absolute inset-0 rounded-xl sm:rounded-2xl border-2 border-green-400 pointer-events-none"
                     />
                   </div>
-                  <span className="text-xs sm:text-sm font-medium text-text-secondary">{t('features.labels.aiRewrite', 'AI Rewrite')}</span>
+                  <span className="text-xs sm:text-sm font-medium text-text-secondary">{t('features.rewrite.integration.aiRewriteLabel', 'AI Rewrite')}</span>
                 </motion.div>
               </div>
               
@@ -1029,7 +1023,7 @@ const VoiceProfileIntegration = ({ t }) => {
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 italic leading-relaxed">
-                  "Your text has been transformed to match your unique writing style, vocabulary preferences, and tone..."
+                  "{t('features.rewrite.integration.resultDesc', 'Your text has been transformed to match your unique writing style, vocabulary preferences, and tone...')}"
                 </p>
               </motion.div>
             </div>

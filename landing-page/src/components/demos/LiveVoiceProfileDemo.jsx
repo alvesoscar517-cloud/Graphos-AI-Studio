@@ -1,18 +1,29 @@
 /**
  * LiveVoiceProfileDemo - Interactive Voice Profile visualization demo
  * Shows writing style analysis with animated metrics
+ * Updated: Localized names based on user's locale
  */
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppFrame } from './DemoWrapper'
 import Icon from '@components/common/Icon'
+import { getLocalizedTestimonials, generateAvatar } from '@utils/localizedAvatars'
 
-// Get i18n sample profiles
-const getSampleProfiles = (t) => [
+// Get initials from name
+const getInitials = (name) => {
+  const parts = name.split(' ')
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  }
+  return name.substring(0, 2).toUpperCase()
+}
+
+// Get i18n sample profiles with localized names
+const getSampleProfiles = (t, localizedNames) => [
   {
-    name: t('demoSamples.voiceProfile.sarah.name', 'Sarah Chen'),
-    avatar: 'SC',
+    name: localizedNames[0] || t('demoSamples.voiceProfile.sarah.name', 'Sarah Chen'),
+    avatar: getInitials(localizedNames[0] || 'Sarah Chen'),
     style: t('demoSamples.voiceProfile.sarah.style', 'Professional & Warm'),
     metrics: {
       formality: 65,
@@ -37,8 +48,8 @@ const getSampleProfiles = (t) => [
     tone: t('demoSamples.voiceProfile.sarah.tone', 'Warm & Approachable')
   },
   {
-    name: t('demoSamples.voiceProfile.alex.name', 'Alex Rivera'),
-    avatar: 'AR',
+    name: localizedNames[1] || t('demoSamples.voiceProfile.alex.name', 'Alex Rivera'),
+    avatar: getInitials(localizedNames[1] || 'Alex Rivera'),
     style: t('demoSamples.voiceProfile.alex.style', 'Casual & Creative'),
     metrics: {
       formality: 35,
@@ -63,8 +74,8 @@ const getSampleProfiles = (t) => [
     tone: t('demoSamples.voiceProfile.alex.tone', 'Fun & Energetic')
   },
   {
-    name: t('demoSamples.voiceProfile.james.name', 'Dr. James Park'),
-    avatar: 'JP',
+    name: localizedNames[2] || t('demoSamples.voiceProfile.james.name', 'Dr. James Park'),
+    avatar: getInitials(localizedNames[2] || 'Dr. James Park'),
     style: t('demoSamples.voiceProfile.james.style', 'Academic & Precise'),
     metrics: {
       formality: 88,
@@ -108,12 +119,19 @@ const MetricBar = ({ label, value, delay = 0 }) => (
 )
 
 const LiveVoiceProfileDemo = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [selectedProfile, setSelectedProfile] = useState(0)
   const [animationKey, setAnimationKey] = useState(0)
 
-  // Get i18n sample profiles
-  const SAMPLE_PROFILES = useMemo(() => getSampleProfiles(t), [t])
+  // Get localized names
+  const localizedPersonas = useMemo(() => 
+    getLocalizedTestimonials(i18n.language),
+    [i18n.language]
+  )
+  const localizedNames = localizedPersonas.map(p => p.name)
+
+  // Get i18n sample profiles with localized names
+  const SAMPLE_PROFILES = useMemo(() => getSampleProfiles(t, localizedNames), [t, localizedNames])
   const profile = SAMPLE_PROFILES[selectedProfile]
 
   const handleProfileChange = (index) => {

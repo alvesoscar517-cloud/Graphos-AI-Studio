@@ -419,6 +419,11 @@ async function login(email, password, options = {}) {
 
   logger.info('User logged in', { userId, email: normalizedEmail, rememberMe });
 
+  // Get best available picture (prefer user's own, fallback to Google linked)
+  const userPicture = userData.picture && userData.picture.trim() 
+    ? userData.picture 
+    : (userData.googleLinked?.googlePicture || '');
+
   return {
     success: true,
     user: {
@@ -426,7 +431,7 @@ async function login(email, password, options = {}) {
       email: normalizedEmail,
       name: userData.name,
       displayName: userData.displayName || userData.name,
-      picture: userData.picture || userData.googleLinked?.googlePicture || '',
+      picture: userPicture,
       tier: userData.tier,
       authProvider: 'email',
       hasGoogleLinked: !!userData.googleLinked,
@@ -1193,8 +1198,8 @@ async function linkGoogleWithOAuth(userId, googleData) {
     throw new Error('AUTH_INVALID_OPERATION: Only email users can link Google accounts');
   }
   
-  // Link Google account
-  await db.collection(USERS_COLLECTION).doc(userId).update({
+  // Link Google account and update user picture if not set
+  const updateData = {
     googleLinked: {
       googleEmail: normalizedGoogleEmail,
       googleName: name || normalizedGoogleEmail.split('@')[0],
@@ -1202,7 +1207,14 @@ async function linkGoogleWithOAuth(userId, googleData) {
       linkedAt: new Date(),
       driveEnabled: true // Flag to indicate Drive sync is available
     }
-  });
+  };
+  
+  // Update user's picture if they don't have one and Google provides one
+  if (googlePicture && !userData.picture) {
+    updateData.picture = googlePicture;
+  }
+  
+  await db.collection(USERS_COLLECTION).doc(userId).update(updateData);
   
   logger.info('Google account linked via OAuth', { userId, googleEmail: normalizedGoogleEmail });
   
@@ -1621,6 +1633,187 @@ async function loginWithLinkedGoogle(googleEmail, googleAccessToken) {
   };
 }
 
+/**
+ * Login or register with Google OAuth (for Google-only users)
+ * This creates a new user if not exists, or logs in existing Google user.
+ * 
+ * @param {string} googleAccessToken - Google OAuth access token
+ * @returns {Promise<{success: boolean, user: Object, accessToken: string, refreshToken: string, expiresIn: number, isNewUser: boolean}>}
+ */
+async function loginWithGoogleOAuth(googleAccessToken) {
+  // Verify Google token and get user info
+  let googleUserInfo;
+  try {
+    googleUserInfo = await httpGet('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        'Authorization': `Bearer ${googleAccessToken}`
+      }
+    });
+    
+    if (!googleUserInfo.email) {
+      throw new Error('AUTH_INVALID_TOKEN: No email in Google response');
+    }
+  } catch (error) {
+    if (error.message.startsWith('AUTH_')) {
+      throw error;
+    }
+    logger.error('Google token verification failed', { error: error.message });
+    throw new Error('AUTH_INVALID_TOKEN: Failed to verify Google token');
+  }
+  
+  const normalizedEmail = normalizeEmail(googleUserInfo.email);
+  const googleId = googleUserInfo.id;
+  
+  // Check if user exists with this Google ID or email
+  let userDoc = null;
+  let userId = null;
+  let isNewUser = false;
+  
+  // First, check by Google ID
+  const googleIdSnapshot = await db.collection(USERS_COLLECTION)
+    .where('googleId', '==', googleId)
+    .limit(1)
+    .get();
+  
+  if (!googleIdSnapshot.empty) {
+    userDoc = googleIdSnapshot.docs[0];
+    userId = userDoc.id;
+  } else {
+    // Check by email (for users who might have registered with same email)
+    const emailSnapshot = await db.collection(USERS_COLLECTION)
+      .where('email', '==', normalizedEmail)
+      .limit(1)
+      .get();
+    
+    if (!emailSnapshot.empty) {
+      const existingUser = emailSnapshot.docs[0].data();
+      
+      // If it's an email user, they should link Google instead
+      if (existingUser.authProvider === 'email') {
+        throw new Error('AUTH_EMAIL_EXISTS: An account with this email already exists. Please sign in with email/password and link your Google account.');
+      }
+      
+      userDoc = emailSnapshot.docs[0];
+      userId = userDoc.id;
+    }
+  }
+  
+  const now = new Date();
+  
+  if (!userDoc) {
+    // Create new Google user
+    isNewUser = true;
+    userId = `google_${googleId}`;
+    
+    const newUserData = {
+      userId,
+      email: normalizedEmail,
+      displayName: googleUserInfo.name || normalizedEmail.split('@')[0],
+      name: googleUserInfo.name || normalizedEmail.split('@')[0],
+      picture: googleUserInfo.picture || '',
+      googleId,
+      authProvider: 'google',
+      emailVerified: googleUserInfo.verified_email || true,
+      tier: 'free',
+      credits: {
+        balance: FREE_CREDITS,
+        purchased: 0,
+        used: 0,
+        bonus: FREE_CREDITS
+      },
+      createdAt: now,
+      lastLoginAt: now,
+      isNewUser: true,
+      usage: {
+        lastActivity: now.toISOString()
+      }
+    };
+    
+    await db.collection(USERS_COLLECTION).doc(userId).set(newUserData);
+    
+    // Log welcome bonus transaction
+    const transactionRef = db.collection('credit_transactions').doc();
+    await transactionRef.set({
+      userId,
+      type: 'addition',
+      amount: FREE_CREDITS,
+      feature: 'welcome_bonus',
+      description: 'Welcome bonus credits',
+      metadata: {
+        source: 'google_registration',
+        isFirstTransaction: true
+      },
+      timestamp: now.toISOString(),
+      balanceAfter: FREE_CREDITS
+    });
+    
+    logger.info('New Google user created', { userId, email: normalizedEmail, credits: FREE_CREDITS });
+    
+    // Send welcome notification
+    try {
+      await sendWelcomeNotification(userId, FREE_CREDITS);
+    } catch (notifError) {
+      logger.warn('Failed to send welcome notification', { userId, error: notifError.message });
+    }
+    
+    userDoc = await db.collection(USERS_COLLECTION).doc(userId).get();
+  } else {
+    // Existing user - update last login
+    const userData = userDoc.data();
+    
+    // Check if account is deleted
+    if (userData.deleted === true) {
+      throw new Error('AUTH_ACCOUNT_DELETED: This account has been deleted.');
+    }
+    
+    // Check if account is locked
+    if (userData.locked === true) {
+      throw new Error(`AUTH_ACCOUNT_SUSPENDED: Your account has been suspended.${userData.lockReason ? ` Reason: ${userData.lockReason}` : ''}`);
+    }
+    
+    await db.collection(USERS_COLLECTION).doc(userId).update({
+      lastLoginAt: now,
+      // Update Google info in case it changed
+      picture: googleUserInfo.picture || userData.picture || '',
+      displayName: googleUserInfo.name || userData.displayName,
+      googleId: googleId // Ensure googleId is set
+    });
+  }
+  
+  const userData = userDoc.data();
+  
+  // Generate tokens
+  const tokens = await generateTokens(userId, {
+    rememberMe: true, // Google login always remembers
+    userInfo: {
+      email: normalizedEmail,
+      name: userData.displayName || userData.name || googleUserInfo.name,
+      picture: userData.picture || googleUserInfo.picture || '',
+      emailVerified: true
+    }
+  });
+  
+  logger.info('Google user logged in', { userId, email: normalizedEmail, isNewUser });
+  
+  return {
+    success: true,
+    isNewUser,
+    user: {
+      userId,
+      email: normalizedEmail,
+      displayName: userData.displayName || userData.name || googleUserInfo.name,
+      name: userData.displayName || userData.name || googleUserInfo.name,
+      picture: userData.picture || googleUserInfo.picture || '',
+      tier: userData.tier || 'free',
+      authProvider: 'google',
+      credits: userData.credits || { balance: FREE_CREDITS }
+    },
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
+    expiresIn: tokens.expiresIn
+  };
+}
+
 module.exports = {
   register,
   verifyEmail,
@@ -1635,6 +1828,7 @@ module.exports = {
   unlinkGoogle,
   checkGoogleLinked,
   loginWithLinkedGoogle,
+  loginWithGoogleOAuth,
   resendVerificationOTP,
   getUserByEmail,
   getActiveSessions,

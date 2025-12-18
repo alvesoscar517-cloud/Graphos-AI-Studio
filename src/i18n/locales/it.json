@@ -15,6 +15,7 @@
     "sort": "Ordina",
     "refresh": "Aggiorna",
     "retry": "Riprova",
+    "authorize": "Autorizza",
     "yes": "Sì",
     "no": "No",
     "ok": "OK",
@@ -230,7 +231,7 @@
     "password": "Password",
     "getStarted": "Inizia",
     "appName": "Graphos AI Studio",
-    "signInTagline": "Accedi per mantenere autentico il tuo contenuto",
+    "signInTagline": "Scrivi autenticamente con Graphos AI",
     "confirmPassword": "Conferma password",
     "rememberMe": "Ricordami",
     "loginWithGoogle": "Accedi con Google",
@@ -251,9 +252,12 @@
     "pleaseSignIn": "Accedi per utilizzare questa funzione",
     "needReauth": "L'app necessita dell'accesso a Google Drive per sincronizzare le note. Accedi nuovamente per concedere l'autorizzazione.",
     "drivePermissionRequired": "Autorizzazione Drive richiesta",
+    "googleAuthRequired": "Autorizzazione Google richiesta",
+    "googleAuthRequiredDesc": "Questo dispositivo deve autorizzare l'accesso a Google Drive.",
     "confirmSignOut": "Sei sicuro di voler uscire?",
     "confirmSignOutTitle": "Conferma disconnessione",
     "signedOut": "Disconnesso",
+    "accountSettings": "Impostazioni account",
     "errors": {
       "accountDeleted": "Questo account è stato eliminato. Contatta il supporto se ritieni che sia un errore.",
       "accountSuspended": "Il tuo account è stato sospeso. Contatta il supporto per assistenza.",
@@ -1392,5 +1396,11 @@
   "securitySettings": {
     "ipAddress": "IP",
     "unknown": "Sconosciuto"
+  },
+  "unsupportedScreen": {
+    "title": "Graphos AI Studio non supporta questo schermo",
+    "description": "Utilizza la modalità orizzontale o un dispositivo più grande per la migliore esperienza.",
+    "desktop": "Desktop",
+    "tabletLandscape": "Tablet orizzontale"
   }
 }

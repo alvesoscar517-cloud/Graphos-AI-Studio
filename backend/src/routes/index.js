@@ -252,8 +252,16 @@ const debugProfileCreate = (req, res, next) => {
   next();
 };
 
+// Profile creation timeout (5 minutes) - for complete profile creation with many samples
+const profileCreationTimeout = (req, res, next) => {
+  req.setTimeout(300000);
+  res.setTimeout(300000);
+  next();
+};
+
 router.post('/create_profile_complete', 
   deprecationWarning('/profiles/create'),
+  profileCreationTimeout, // 5 minutes for profile creation
   debugProfileCreate, // Add debug logging first
   optionalAuth, checkLocked, activityLoggerMiddleware,
   profileCreationRateLimiter, // Add rate limiting BEFORE credit check
@@ -263,6 +271,7 @@ router.post('/create_profile_complete',
 
 // Streaming version with realtime progress
 router.post('/create_profile_complete/stream', 
+  streamingTimeout, // 5 minutes for streaming profile creation
   optionalAuth, checkLocked, activityLoggerMiddleware,
   profileCreationRateLimiter,
   creditMiddleware.profileComplete, 
@@ -271,6 +280,7 @@ router.post('/create_profile_complete/stream',
 
 router.post('/add_sample', 
   deprecationWarning('/profiles/add-sample'),
+  standardTimeout, // 2 minutes for single sample
   optionalAuth, checkLocked, activityLoggerMiddleware,
   validators.addSample, creditMiddleware.profileSampleAdd, 
   asyncHandler(profileController.addSample)
@@ -278,6 +288,7 @@ router.post('/add_sample',
 
 router.post('/add_samples_batch', 
   deprecationWarning('/profiles/add-samples-batch'),
+  heavyTimeout, // 3 minutes for batch samples
   optionalAuth, checkLocked, activityLoggerMiddleware,
   creditMiddleware.profileSamplesBatch, 
   asyncHandler(profileController.addSamplesBatch)
@@ -285,6 +296,7 @@ router.post('/add_samples_batch',
 
 router.post('/finalize_profile', 
   deprecationWarning('/profiles/finalize'),
+  heavyTimeout, // 3 minutes for finalization
   optionalAuth, checkLocked, activityLoggerMiddleware,
   creditMiddleware.profileFinalize, 
   asyncHandler(profileController.finalizeProfile)
@@ -315,9 +327,42 @@ const aiDetectionRateLimiter = operationRateLimiter('ai_detection', {
   blockDuration: 60 // Block for 1 minute if exceeded
 });
 
+// ============================================================================
+// TIMEOUT CONFIGURATION FOR LEGACY ROUTES
+// ============================================================================
+
+// Standard AI timeout (2 minutes) - for detection, analysis, suggestions
+const standardTimeout = (req, res, next) => {
+  req.setTimeout(120000);
+  res.setTimeout(120000);
+  next();
+};
+
+// Heavy AI timeout (3 minutes) - for rewrite, humanization check
+const heavyTimeout = (req, res, next) => {
+  req.setTimeout(180000);
+  res.setTimeout(180000);
+  next();
+};
+
+// Iterative timeout (5 minutes) - for iterative humanization (multiple passes)
+const iterativeTimeout = (req, res, next) => {
+  req.setTimeout(300000);
+  res.setTimeout(300000);
+  next();
+};
+
+// Streaming timeout (5 minutes) - for streaming operations
+const streamingTimeout = (req, res, next) => {
+  req.setTimeout(300000);
+  res.setTimeout(300000);
+  next();
+};
+
 // === Analysis legacy endpoints ===
 router.post('/authenticate', 
   deprecationWarning('/analysis/authenticate'),
+  standardTimeout, // 2 minutes for AI detection
   optionalAuth, checkLocked, activityLoggerMiddleware,
   aiDetectionRateLimiter, // Add rate limiting BEFORE credit check
   validators.detectAI, creditMiddleware.aiDetection, 
@@ -326,6 +371,7 @@ router.post('/authenticate',
 
 router.post('/analyze', 
   deprecationWarning('/analysis/analyze'),
+  standardTimeout, // 2 minutes for text analysis
   optionalAuth, checkLocked, activityLoggerMiddleware,
   validators.analyzeText, creditMiddleware.textAnalysis, 
   asyncHandler(analysisController.analyzeText)
@@ -333,6 +379,7 @@ router.post('/analyze',
 
 router.post('/suggest_improvements', 
   deprecationWarning('/analysis/suggest-improvements'),
+  standardTimeout, // 2 minutes for suggestions
   optionalAuth, checkLocked, activityLoggerMiddleware,
   validators.getSuggestions, creditMiddleware.improvementSuggestions, 
   asyncHandler(analysisController.suggestImprovements)
@@ -340,6 +387,7 @@ router.post('/suggest_improvements',
 
 router.post('/rewrite', 
   deprecationWarning('/analysis/rewrite'),
+  heavyTimeout, // 3 minutes for rewrite
   optionalAuth, checkLocked, activityLoggerMiddleware,
   validators.rewriteText, creditMiddleware.textRewrite, 
   asyncHandler(analysisController.rewriteText)
@@ -347,6 +395,7 @@ router.post('/rewrite',
 
 router.post('/rewrite_stream', 
   deprecationWarning('/analysis/rewrite-stream'),
+  streamingTimeout, // 5 minutes for streaming rewrite
   optionalAuth, checkLocked, activityLoggerMiddleware,
   validators.rewriteTextStream, creditMiddleware.textRewrite, 
   asyncHandler(analysisController.rewriteTextStream)
@@ -354,6 +403,7 @@ router.post('/rewrite_stream',
 
 router.post('/api/translate', 
   deprecationWarning('/analysis/translate'),
+  standardTimeout, // 2 minutes for translation
   optionalAuth, checkLocked, activityLoggerMiddleware,
   validators.translate, creditMiddleware.translation, 
   asyncHandler(analysisController.translateText)
@@ -361,6 +411,7 @@ router.post('/api/translate',
 
 router.post('/check-humanization', 
   deprecationWarning('/analysis/check-humanization'),
+  heavyTimeout, // 3 minutes for humanization check
   optionalAuth, checkLocked, activityLoggerMiddleware,
   creditMiddleware.checkHumanization, 
   asyncHandler(analysisController.checkHumanization)
@@ -368,6 +419,7 @@ router.post('/check-humanization',
 
 router.post('/iterative-humanize', 
   deprecationWarning('/analysis/iterative-humanize'),
+  iterativeTimeout, // 5 minutes for iterative humanization
   optionalAuth, checkLocked, activityLoggerMiddleware,
   validators.iterativeHumanize, creditMiddleware.iterativeHumanize, 
   asyncHandler(analysisController.iterativeHumanize)

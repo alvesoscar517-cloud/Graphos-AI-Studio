@@ -15,6 +15,7 @@
     "sort": "เรียงลำดับ",
     "refresh": "รีเฟรช",
     "retry": "ลองใหม่",
+    "authorize": "อนุญาต",
     "yes": "ใช่",
     "no": "ไม่",
     "ok": "ตกลง",
@@ -248,12 +249,15 @@
     "pleaseSignIn": "กรุณาเข้าสู่ระบบเพื่อใช้ฟีเจอร์นี้",
     "needReauth": "แอปต้องการสิทธิ์เข้าถึง Google Drive เพื่อซิงค์โน้ต กรุณาเข้าสู่ระบบอีกครั้งเพื่ออนุญาต",
     "drivePermissionRequired": "ต้องขอสิทธิ์ Drive",
+    "googleAuthRequired": "ต้องการการอนุญาต Google",
+    "googleAuthRequiredDesc": "อุปกรณ์นี้ต้องอนุญาตการเข้าถึง Google Drive",
     "confirmSignOut": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
     "confirmSignOutTitle": "ยืนยันการออกจากระบบ",
     "signedOut": "ออกจากระบบแล้ว",
+    "accountSettings": "ตั้งค่าบัญชี",
     "getStarted": "เริ่มต้น",
     "appName": "Graphos AI Studio",
-    "signInTagline": "เข้าสู่ระบบเพื่อรักษาความสมบูรณ์ของเนื้อหาของคุณ",
+    "signInTagline": "เขียนอย่างแท้จริงด้วย Graphos AI",
     "errors": {
       "accountDeleted": "บัญชีนี้ถูกลบแล้ว กรุณาติดต่อฝ่ายสนับสนุนหากคุณเชื่อว่านี่เป็นข้อผิดพลาด",
       "accountSuspended": "บัญชีของคุณถูกระงับ กรุณาติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือ",
@@ -1392,5 +1396,11 @@
   "securitySettings": {
     "ipAddress": "IP",
     "unknown": "ไม่ทราบ"
+  },
+  "unsupportedScreen": {
+    "title": "Graphos AI Studio ไม่รองรับหน้าจอนี้",
+    "description": "กรุณาใช้โหมดแนวนอนหรืออุปกรณ์ที่ใหญ่กว่าเพื่อประสบการณ์ที่ดีที่สุด",
+    "desktop": "เดสก์ท็อป",
+    "tabletLandscape": "แท็บเล็ตแนวนอน"
   }
 }

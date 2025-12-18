@@ -21,7 +21,7 @@ export default function AdminLogin() {
   const vantaRef = useRef(null);
   const vantaEffect = useRef(null);
 
-  // Vanta FOG background effect (same as main app - lighter than clouds)
+  // Vanta CELLS background effect (same as main app)
   useEffect(() => {
     if (!vantaRef.current) return;
 
@@ -36,31 +36,29 @@ export default function AdminLogin() {
           await new Promise(resolve => { threeScript.onload = resolve; });
         }
 
-        // Load Vanta FOG dynamically
-        if (!window.VANTA) {
+        // Load Vanta CELLS dynamically
+        if (!window.VANTA || !window.VANTA.CELLS) {
           const vantaScript = document.createElement('script');
-          vantaScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.fog.min.js';
+          vantaScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.cells.min.js';
           vantaScript.async = true;
           document.head.appendChild(vantaScript);
           await new Promise(resolve => { vantaScript.onload = resolve; });
         }
 
-        // Initialize Vanta FOG effect with Apple System Blue colors (same as main app)
+        // Initialize Vanta CELLS effect with Apple System Blue colors (same as main app)
         if (window.VANTA && vantaRef.current && !vantaEffect.current) {
-          vantaEffect.current = window.VANTA.FOG({
+          vantaEffect.current = window.VANTA.CELLS({
             el: vantaRef.current,
             mouseControls: true,
             touchControls: true,
             gyroControls: false,
             minHeight: 200.00,
             minWidth: 200.00,
-            highlightColor: 0x5AC8FA,  // Apple System Teal
-            midtoneColor: 0x007AFF,    // Apple System Blue
-            lowlightColor: 0x5856D6,   // Apple System Indigo
-            baseColor: 0x0051D5,       // Apple Blue Hover (darker)
-            blurFactor: 0.6,
-            speed: 1.2,
-            zoom: 1.0
+            scale: 1.00,
+            color1: 0x008c8c,    // Teal
+            color2: 0xc8e035,    // Lime Yellow (balanced)
+            size: 1.5,
+            speed: 1
           });
         }
       } catch (error) {

@@ -15,6 +15,7 @@ import SessionExpiredModal from './components/Auth/SessionExpiredModal'
 import WelcomeBanner from './components/Common/WelcomeBanner'
 import LowCreditsToast from './components/LowCreditsToast'
 import UpgradePlanModal from './components/UpgradePlanModal'
+import UnsupportedScreenOverlay from './components/Common/UnsupportedScreenOverlay'
 import { ErrorBoundaryProvider } from './contexts/ErrorBoundaryContext'
 import modal from './utils/modal'
 import { initTooltips } from './utils/tooltips'
@@ -132,6 +133,7 @@ function App() {
               <SessionExpiredModal />
               <WelcomeBanner />
               <ErrorReportListener />
+              <UnsupportedScreenOverlay />
             </AppProviders>
           </Router>
         </GlobalErrorHandler>

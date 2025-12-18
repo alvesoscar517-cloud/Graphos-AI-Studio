@@ -1,134 +1,44 @@
 /**
  * Web Authentication Module
  * 
- * Provides Google OAuth 2.0 authentication for web app using Firebase Auth.
- * This replaces chrome.identity API used in the Chrome Extension.
+ * Provides Google OAuth 2.0 authentication for web app using direct OAuth.
+ * This matches the Chrome Extension behavior (chrome.identity).
  * 
  * Requirements: 2.1, 2.2, 2.3, 2.4, 8.3
  */
 
 import { logger } from './logger'
-import { getFirebaseAuth, getGoogleProvider, initializeFirebase } from '../config/firebase'
-import { 
-  signInWithPopup, 
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  getRedirectResult
-} from 'firebase/auth'
+import {
+  signInWithGoogleOAuth,
+  getStoredGoogleToken,
+  getStoredUserInfo,
+  clearGoogleAuth,
+  isSignedInWithGoogle as checkGoogleSignIn,
+  AUTH_ERROR_CODES
+} from './googleOAuth'
+
+// Re-export error codes
+export { AUTH_ERROR_CODES }
 
 /**
- * Error codes for authentication failures
- */
-export const AUTH_ERROR_CODES = {
-  POPUP_BLOCKED: 'POPUP_BLOCKED',
-  POPUP_CLOSED: 'POPUP_CLOSED',
-  OAUTH_FAILED: 'OAUTH_FAILED',
-  NETWORK_ERROR: 'NETWORK_ERROR',
-  UNKNOWN_ERROR: 'UNKNOWN_ERROR'
-}
-
-/**
- * Sign in with Google using Firebase Auth popup
+ * Sign in with Google using OAuth popup (direct OAuth, not Firebase)
  * 
- * @returns {Promise<{success: boolean, userInfo?: object, accessToken?: string, idToken?: string, error?: string, code?: string}>}
+ * @returns {Promise<{success: boolean, userInfo?: object, accessToken?: string, error?: string, code?: string}>}
  */
 export async function signInWithGooglePopup() {
-  try {
-    // Ensure Firebase is initialized
-    initializeFirebase()
-    
-    const auth = getFirebaseAuth()
-    const provider = getGoogleProvider()
-    
-    if (!auth || !provider) {
-      throw new Error('Firebase Auth not initialized')
-    }
-    
-    logger.log('[WebAuth] Starting Google sign-in popup...')
-    
-    const result = await signInWithPopup(auth, provider)
-    
-    // Get the Google Access Token for Drive API from the credential
-    // @ts-ignore - _tokenResponse is internal but contains the OAuth token
-    const tokenResponse = result._tokenResponse || {}
-    const accessToken = tokenResponse.oauthAccessToken || null
-    
-    const user = result.user
-    
-    const userInfo = {
-      id: user.uid,
-      email: user.email,
-      name: user.displayName,
-      picture: user.photoURL,
-      emailVerified: user.emailVerified
-    }
-    
-    logger.log('[WebAuth] Google sign-in successful:', userInfo.email)
-    
-    // Get Firebase ID token for backend verification
-    const idToken = await user.getIdToken()
-    
-    return {
-      success: true,
-      userInfo,
-      accessToken,
-      idToken
-    }
-  } catch (error) {
-    logger.error('WebAuth', 'Google sign-in failed', error)
-    
-    // Map Firebase errors to our error codes
-    let code = AUTH_ERROR_CODES.UNKNOWN_ERROR
-    let message = error.message
-    
-    switch (error.code) {
-      case 'auth/popup-blocked':
-        code = AUTH_ERROR_CODES.POPUP_BLOCKED
-        message = 'Popup was blocked. Please allow popups for this site.'
-        break
-      case 'auth/popup-closed-by-user':
-      case 'auth/cancelled-popup-request':
-        code = AUTH_ERROR_CODES.POPUP_CLOSED
-        message = 'Sign-in was cancelled.'
-        break
-      case 'auth/network-request-failed':
-        code = AUTH_ERROR_CODES.NETWORK_ERROR
-        message = 'Network error. Please check your connection.'
-        break
-      case 'auth/unauthorized-domain':
-        code = AUTH_ERROR_CODES.OAUTH_FAILED
-        message = 'This domain is not authorized for OAuth. Please contact support.'
-        break
-      default:
-        code = AUTH_ERROR_CODES.OAUTH_FAILED
-    }
-    
-    return {
-      success: false,
-      error: message,
-      code
-    }
-  }
+  logger.log('[WebAuth] Starting Google sign-in (direct OAuth)...')
+  return signInWithGoogleOAuth()
 }
 
-
 /**
- * Sign out from Firebase Auth
+ * Sign out from Google OAuth
  * 
  * @returns {Promise<{success: boolean, error?: string}>}
  */
 export async function signOutWeb() {
   try {
-    const auth = getFirebaseAuth()
-    
-    if (!auth) {
-      logger.warn('WebAuth', 'Firebase Auth not initialized, nothing to sign out')
-      return { success: true }
-    }
-    
-    await firebaseSignOut(auth)
+    clearGoogleAuth()
     logger.log('[WebAuth] Signed out successfully')
-    
     return { success: true }
   } catch (error) {
     logger.error('WebAuth', 'Sign out failed', error)
@@ -140,27 +50,14 @@ export async function signOutWeb() {
 }
 
 /**
- * Get the current Google access token from Firebase Auth
+ * Get the current Google access token
  * Useful for Google Drive API calls
  * 
  * @returns {Promise<string|null>} The access token or null if not available
  */
 export async function getGoogleAccessTokenWeb() {
   try {
-    const auth = getFirebaseAuth()
-    
-    if (!auth || !auth.currentUser) {
-      return null
-    }
-    
-    // Re-authenticate to get fresh access token
-    // Note: Firebase doesn't store the OAuth access token, only the ID token
-    // For Drive access, we need to re-authenticate or use a different approach
-    const idToken = await auth.currentUser.getIdToken(true)
-    
-    // Return the ID token - for Drive access, we'll need to handle this differently
-    // The actual Google OAuth access token is only available during sign-in
-    return idToken
+    return getStoredGoogleToken()
   } catch (error) {
     logger.error('WebAuth', 'Failed to get access token', error)
     return null
@@ -169,61 +66,43 @@ export async function getGoogleAccessTokenWeb() {
 
 /**
  * Subscribe to auth state changes
+ * Note: Direct OAuth doesn't have real-time state changes like Firebase
+ * This is a simplified version that checks current state
  * 
  * @param {Function} callback - Called with user object or null
  * @returns {Function} Unsubscribe function
  */
 export function onWebAuthStateChanged(callback) {
-  const auth = getFirebaseAuth()
+  // Check current state immediately
+  const userInfo = getStoredUserInfo()
+  const token = getStoredGoogleToken()
   
-  if (!auth) {
-    logger.warn('WebAuth', 'Firebase Auth not initialized')
-    return () => {}
+  if (userInfo && token) {
+    callback(userInfo)
+  } else {
+    callback(null)
   }
   
-  return onAuthStateChanged(auth, (user) => {
-    if (user) {
-      callback({
-        id: user.uid,
-        email: user.email,
-        name: user.displayName,
-        picture: user.photoURL,
-        emailVerified: user.emailVerified
-      })
-    } else {
-      callback(null)
-    }
-  })
+  // Return no-op unsubscribe since we don't have real-time updates
+  return () => {}
 }
 
 /**
- * Check if user is currently signed in with Google via Firebase
+ * Check if user is currently signed in with Google
  * 
  * @returns {boolean}
  */
 export function isSignedInWithGoogle() {
-  const auth = getFirebaseAuth()
-  return auth?.currentUser != null
+  return checkGoogleSignIn()
 }
 
 /**
- * Get current Firebase user info
+ * Get current user info
  * 
  * @returns {object|null} User info or null
  */
 export function getCurrentWebUser() {
-  const auth = getFirebaseAuth()
-  const user = auth?.currentUser
-  
-  if (!user) return null
-  
-  return {
-    id: user.uid,
-    email: user.email,
-    name: user.displayName,
-    picture: user.photoURL,
-    emailVerified: user.emailVerified
-  }
+  return getStoredUserInfo()
 }
 
 export default {

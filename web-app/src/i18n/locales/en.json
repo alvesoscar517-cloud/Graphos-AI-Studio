@@ -15,6 +15,7 @@
     "sort": "Sort",
     "refresh": "Refresh",
     "retry": "Retry",
+    "authorize": "Authorize",
     "yes": "Yes",
     "no": "No",
     "ok": "OK",
@@ -91,7 +92,7 @@
     "signUp": "Sign Up",
     "getStarted": "Get Started",
     "appName": "Graphos AI Studio",
-    "signInTagline": "Sign in to keep your content authentic",
+    "signInTagline": "Write authentically with Graphos AI",
     "signOut": "Sign Out",
     "signInAgain": "Sign In Again",
     "forgotPassword": "Forgot Password?",
@@ -116,9 +117,12 @@
     "pleaseSignIn": "Please sign in to use this feature",
     "needReauth": "The app needs Google Drive access to sync notes. Please sign in again to grant permission.",
     "drivePermissionRequired": "Drive Permission Required",
+    "googleAuthRequired": "Google Authorization Required",
+    "googleAuthRequiredDesc": "This device needs to authorize Google Drive access.",
     "confirmSignOut": "Are you sure you want to sign out?",
     "confirmSignOutTitle": "Confirm Sign Out",
     "signedOut": "Signed out",
+    "accountSettings": "Account Settings",
     "email": {
       "signInWithEmail": "Sign in with Email",
       "emailLabel": "Email",
@@ -1393,5 +1397,11 @@
   "securitySettings": {
     "ipAddress": "IP",
     "unknown": "Unknown"
+  },
+  "unsupportedScreen": {
+    "title": "Graphos AI Studio doesn't support this screen",
+    "description": "Please use landscape mode or a larger device for the best experience.",
+    "desktop": "Desktop",
+    "tabletLandscape": "Tablet landscape"
   }
 }

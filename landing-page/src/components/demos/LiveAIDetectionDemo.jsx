@@ -145,7 +145,7 @@ const LiveAIDetectionDemo = () => {
 
           {/* Footer with Character Count and Action */}
           <div className="flex items-center justify-between mt-6">
-            <span className="text-sm text-green-600">
+            <span className="text-sm text-green-600 hidden sm:inline">
               <span className="font-semibold">{text.length}</span>
               <span className="text-gray-400">
                 {' '}

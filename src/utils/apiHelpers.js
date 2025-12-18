@@ -24,30 +24,40 @@ const API_BASE_URL = import.meta.env?.VITE_API_URL ||
 
 /**
  * Get authorization headers with auth type hint
- * Supports both email (JWT) and Google (Firebase) auth
+ * Supports both email (JWT) and Google (JWT from backend) auth
+ * 
+ * IMPORTANT: Both email and Google users now use JWT tokens from backend.
+ * - Email users: JWT from /auth/email/login
+ * - Google users: JWT from /auth/email/google-login
+ * 
+ * X-Auth-Type should always be 'email' when using JWT tokens,
+ * because backend verifies JWT tokens the same way for both auth methods.
+ * 
  * @returns {Promise<Record<string, string>>}
  */
 export async function getAuthHeaders() {
   try {
-    // First try email auth (JWT token)
-    const { getAuthMethod } = await import('./authStorage');
-    const authMethod = getAuthMethod();
-    
-    if (authMethod === 'email') {
-      const token = await tokenService.getValidToken();
-      if (token) {
-        return { 
-          'Authorization': `Bearer ${token}`,
-          'X-Auth-Type': 'email'
-        };
-      }
+    // First try JWT token from tokenService (works for both email and Google users)
+    // Both auth methods now get JWT tokens from backend
+    const token = await tokenService.getValidToken();
+    if (token) {
+      // Always use 'email' auth type for JWT tokens
+      // Backend verifies JWT the same way regardless of original auth method
+      return { 
+        'Authorization': `Bearer ${token}`,
+        'X-Auth-Type': 'email'
+      };
     }
     
-    // Try Google auth (Chrome extension)
+    // Fallback: Try Google OAuth token directly (for Drive API, not backend)
+    // This is only used when user hasn't gone through backend login yet
     if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
       try {
         const response = await chrome.runtime.sendMessage({ action: 'getAuthToken' });
         if (response?.token) {
+          // This is a Google OAuth access token, not JWT
+          // Backend will try to verify as Firebase ID token (may fail)
+          // This path should rarely be hit now that we use backend for Google login
           return { 
             'Authorization': `Bearer ${response.token}`,
             'X-Auth-Type': 'google'

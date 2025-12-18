@@ -15,6 +15,7 @@
     "sort": "정렬",
     "refresh": "새로고침",
     "retry": "재시도",
+    "authorize": "인증",
     "yes": "예",
     "no": "아니요",
     "ok": "확인",
@@ -248,12 +249,15 @@
     "pleaseSignIn": "이 기능을 사용하려면 로그인해 주세요",
     "needReauth": "노트를 동기화하려면 Google Drive 접근 권한이 필요합니다. 권한을 부여하려면 다시 로그인해 주세요.",
     "drivePermissionRequired": "Drive 권한 필요",
+    "googleAuthRequired": "Google 인증 필요",
+    "googleAuthRequiredDesc": "이 기기에서 Google Drive 접근 권한을 인증해야 합니다.",
     "confirmSignOut": "정말 로그아웃하시겠습니까?",
     "confirmSignOutTitle": "로그아웃 확인",
     "signedOut": "로그아웃됨",
+    "accountSettings": "계정 설정",
     "getStarted": "시작하기",
     "appName": "Graphos AI Studio",
-    "signInTagline": "콘텐츠의 진정성을 유지하려면 로그인하세요",
+    "signInTagline": "Graphos AI로 진정성 있게 작성하세요",
     "errors": {
       "accountDeleted": "이 계정은 삭제되었습니다. 오류라고 생각되면 지원팀에 문의하세요.",
       "accountSuspended": "계정이 정지되었습니다. 지원팀에 문의하세요.",
@@ -1392,5 +1396,11 @@
   "securitySettings": {
     "ipAddress": "IP",
     "unknown": "알 수 없음"
+  },
+  "unsupportedScreen": {
+    "title": "Graphos AI Studio는 이 화면을 지원하지 않습니다",
+    "description": "최상의 경험을 위해 가로 모드 또는 더 큰 기기를 사용해 주세요.",
+    "desktop": "데스크톱",
+    "tabletLandscape": "태블릿 가로"
   }
 }

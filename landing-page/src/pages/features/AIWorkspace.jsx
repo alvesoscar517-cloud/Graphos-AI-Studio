@@ -2,16 +2,18 @@
  * AIWorkspace - SEO-optimized AI Workspace feature page
  * Design: Neural Network/Brain theme - "Your AI Writing Partner"
  * Enhanced: Dec 2025 - Full SEO optimization
+ * Updated: Localized avatars and names based on user's locale
  */
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, lazy, Suspense, useEffect, useRef } from 'react'
+import { useState, lazy, Suspense, useEffect, useRef, useMemo } from 'react'
 import PageSEO from '@components/seo/PageSEO'
 import Breadcrumb from '@components/common/Breadcrumb'
 import Icon from '@components/common/Icon'
 import RelatedFeatures from '@components/common/RelatedFeatures'
 import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
 import FAQAccordion from '@components/common/FAQAccordion'
+import { getLocalizedFeatureTestimonials } from '@utils/localizedAvatars'
 
 // Lazy load components
 const LiveWorkspaceDemo = lazy(() => import('@components/demos/LiveWorkspaceDemo'))
@@ -1344,8 +1346,14 @@ const CTASection = ({ t }) => {
 // ============================================================================
 
 function AIWorkspace() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [openFaq, setOpenFaq] = useState(null)
+
+  // Get localized testimonials
+  const localizedPersonas = useMemo(() => 
+    getLocalizedFeatureTestimonials(i18n.language, 'aiWorkspace'),
+    [i18n.language]
+  )
 
   // Quick Actions data
   const quickActions = [
@@ -1380,6 +1388,13 @@ function AIWorkspace() {
     { step: 3, title: t('features.aiWorkspace.howItWorks.step3.title', 'Review & Refine'), desc: t('features.aiWorkspace.howItWorks.step3.desc', 'Edit, regenerate, or ask for adjustments'), icon: 'edit-3' },
   ]
 
+  // howItWorksSteps for SEO structured data
+  const howItWorksSteps = howItWorks.map(item => ({
+    step: item.step,
+    title: item.title,
+    desc: item.desc
+  }))
+
   // FAQ data
   const faqs = [
     { q: t('features.aiWorkspace.faq.q1', 'How does AI Workspace use my voice profile?'), a: t('features.aiWorkspace.faq.a1', 'When you chat with AI Workspace, it automatically applies your voice profile to all generated content. This means every email, post, or article will sound like you wrote it.') },
@@ -1403,25 +1418,25 @@ function AIWorkspace() {
     { feature: t('features.aiWorkspace.comparison.multimodal', 'Image Understanding'), us: '✓', others: '✗' },
   ]
 
-  // Testimonials data
+  // Testimonials data with localized personas
   const testimonials = [
     {
       quote: t('features.aiWorkspace.testimonials.writer.quote', 'AI Workspace has completely transformed how I write. The voice profile feature means every email sounds exactly like me, even when AI helps draft it.'),
-      author: t('features.aiWorkspace.testimonials.writer.author', 'Sarah Chen'),
-      role: t('features.aiWorkspace.testimonials.writer.role', 'Content Writer'),
-      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=face'
+      author: localizedPersonas[0]?.name || 'Sarah Chen',
+      role: localizedPersonas[0]?.role || t('features.aiWorkspace.testimonials.writer.role', 'Content Writer'),
+      avatar: localizedPersonas[0]?.avatar
     },
     {
       quote: t('features.aiWorkspace.testimonials.marketer.quote', 'The quick actions save me hours every week. I can draft social posts, emails, and blog intros in minutes instead of hours.'),
-      author: t('features.aiWorkspace.testimonials.marketer.author', 'Michael Torres'),
-      role: t('features.aiWorkspace.testimonials.marketer.role', 'Marketing Manager'),
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'
+      author: localizedPersonas[1]?.name || 'Michael Torres',
+      role: localizedPersonas[1]?.role || t('features.aiWorkspace.testimonials.marketer.role', 'Marketing Manager'),
+      avatar: localizedPersonas[1]?.avatar
     },
     {
       quote: t('features.aiWorkspace.testimonials.entrepreneur.quote', 'As a non-native English speaker, AI Workspace helps me communicate professionally while keeping my authentic voice. Game changer!'),
-      author: t('features.aiWorkspace.testimonials.entrepreneur.author', 'Emma Williams'),
-      role: t('features.aiWorkspace.testimonials.entrepreneur.role', 'Entrepreneur'),
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face'
+      author: localizedPersonas[2]?.name || 'Emma Williams',
+      role: localizedPersonas[2]?.role || t('features.aiWorkspace.testimonials.entrepreneur.role', 'Entrepreneur'),
+      avatar: localizedPersonas[2]?.avatar
     }
   ]
 

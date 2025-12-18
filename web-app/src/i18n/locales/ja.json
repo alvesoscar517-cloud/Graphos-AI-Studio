@@ -15,6 +15,7 @@
     "sort": "並べ替え",
     "refresh": "更新",
     "retry": "再試行",
+    "authorize": "認証",
     "yes": "はい",
     "no": "いいえ",
     "ok": "OK",
@@ -248,12 +249,15 @@
     "pleaseSignIn": "この機能を使用するにはサインインしてください",
     "needReauth": "ノートを同期するにはGoogle Driveへのアクセス権が必要です。再サインインして許可を与えてください。",
     "drivePermissionRequired": "Driveの許可が必要です",
+    "googleAuthRequired": "Google認証が必要です",
+    "googleAuthRequiredDesc": "このデバイスはGoogle Driveへのアクセスを認証する必要があります。",
     "confirmSignOut": "本当にサインアウトしますか？",
     "confirmSignOutTitle": "サインアウトの確認",
     "signedOut": "サインアウトしました",
+    "accountSettings": "アカウント設定",
     "getStarted": "始める",
     "appName": "Graphos AI Studio",
-    "signInTagline": "コンテンツの真正性を保つためにサインインしてください",
+    "signInTagline": "Graphos AIで本物の文章を書く",
     "errors": {
       "accountDeleted": "このアカウントは削除されています。これがエラーだと思われる場合はサポートにお問い合わせください。",
       "accountSuspended": "アカウントが停止されています。サポートにお問い合わせください。",
@@ -1392,5 +1396,11 @@
   "securitySettings": {
     "ipAddress": "IP",
     "unknown": "不明"
+  },
+  "unsupportedScreen": {
+    "title": "Graphos AI Studioはこの画面をサポートしていません",
+    "description": "最高の体験のために、横向きモードまたはより大きなデバイスをご使用ください。",
+    "desktop": "デスクトップ",
+    "tabletLandscape": "タブレット横向き"
   }
 }

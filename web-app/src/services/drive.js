@@ -16,7 +16,7 @@ let driveFolderId = null
  * Works for both Google-only users and email users with linked Google
  * 
  * Priority:
- * 1. For web app: Use Firebase Auth OAuth token
+ * 1. For web app: Use direct Google OAuth token
  * 2. For extension: Try chrome.identity, then stored accessToken
  * 
  * Requirements: 5.1, 5.2, 8.3
@@ -70,7 +70,7 @@ async function getGoogleAccessToken() {
  * Requirements: 5.2, 8.3
  */
 export async function requestGoogleAuth() {
-  // Web app: Use Firebase Auth popup
+  // Web app: Use direct Google OAuth popup
   if (isWebApp()) {
     return requestGoogleAuthWeb()
   }

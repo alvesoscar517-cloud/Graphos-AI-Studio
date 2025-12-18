@@ -427,7 +427,7 @@ const ScoreInterpretationSection = ({ t }) => {
                     onClick={() => setActiveScore(Math.floor((range.min + range.max) / 2))}
                     className={`w-full p-3 sm:p-4 rounded-lg sm:rounded-xl transition-all text-left ${
                       isActive
-                        ? `border-l-4 ${colorClasses[range.color].border} bg-white dark:bg-slate-800 shadow-sm`
+                        ? 'border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-sm'
                         : 'border border-gray-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 hover:border-gray-300 hover:bg-white dark:hover:bg-slate-800'
                     }`}
                   >

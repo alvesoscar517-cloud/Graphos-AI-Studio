@@ -3,7 +3,8 @@
     "description": "Identifichi i contenuti generati dall'IA con precisione e sicurezza.",
     "meta": {
       "description": "Rilevi i contenuti generati dall'IA con elevata precisione. Identifichi ChatGPT, GPT-4 e altri testi IA.",
-      "title": "Rilevamento IA - Graphos AI Studio"
+      "title": "Rilevamento IA - Graphos AI Studio",
+      "keywords": "rilevatore IA, rilevatore contenuti IA, rilevatore ChatGPT, rilevatore GPT-4, verificatore IA, rilevare scrittura IA"
     },
     "title": "Rilevamento IA"
   },
@@ -11,7 +12,8 @@
     "description": "Chatti con l'IA nel Suo stile di scrittura unico.",
     "meta": {
       "description": "Chatti con l'IA utilizzando il Suo profilo vocale. Ottenga assistenza alla scrittura personalizzata.",
-      "title": "Area di Lavoro IA - Graphos AI Studio"
+      "title": "Area di Lavoro IA - Graphos AI Studio",
+      "keywords": "chat IA, assistente scrittura IA, spazio lavoro IA, generatore contenuti IA, IA personalizzata"
     },
     "title": "Area di Lavoro IA"
   },
@@ -159,7 +161,8 @@
     "description": "Verifichi la corrispondenza del Suo stile di scrittura con analisi dettagliata.",
     "meta": {
       "description": "Analizzi quanto bene il Suo testo corrisponde al Suo stile di scrittura unico. Ottenga punteggi di compatibilità dettagliati, analisi delle deviazioni e suggerimenti di miglioramento.",
-      "title": "Punteggio Compatibilità - Verifichi la Corrispondenza di Stile | Graphos AI"
+      "title": "Punteggio Compatibilità - Verifichi la Corrispondenza di Stile | Graphos AI",
+      "keywords": "corrispondenza stile scrittura, punteggio compatibilità, analizzatore stile"
     },
     "title": "Punteggio Compatibilità"
   },
@@ -194,7 +197,8 @@
   "demo": {
     "after": "Dopo",
     "aiDetection": {
-      "result": "Risultato Rilevamento IA"
+      "result": "Risultato Rilevamento IA",
+      "title": "Rilevamento IA"
     },
     "aiIndicators": "Indicatori IA",
     "aiProbability": "Probabilità IA",
@@ -427,7 +431,7 @@
       "samples": "campioni",
       "tone": "tono"
     },
-    "tryHumanization": "Try Humanization Demo",
+    "tryHumanization": "Try Demo Umanizzazione",
     "humanizationDesc": "See how AI-generated text transforms into natural, human-like writing.",
     "originalAI": "Original (AI)",
     "humanLike": "Human-like",
@@ -436,62 +440,53 @@
     "nextExample": "Next Example",
     "humanizing": "Humanizing...",
     "wantToHumanize": "Want to humanize your own content?",
-    "tryAIDetection": "Try AI Detection Demo",
+    "tryAIDetection": "Try Demo Rilevamento IA",
     "aiDetectionDesc": "Paste any text below to see a simulated AI detection analysis. This is a demo - for accurate results, use the full application.",
     "pasteTextPlaceholder": "Paste your text here to analyze...",
     "wantMoreAccurate": "Want more accurate results with detailed analysis?",
     "traits": {
-      "conversational": "Conversational",
-      "empathetic": "Empathetic",
-      "clear": "Clear",
-      "engaging": "Engaging",
-      "playful": "Playful",
-      "creative": "Creative",
-      "informal": "Informal",
-      "storyteller": "Storyteller",
-      "analytical": "Analytical",
-      "precise": "Precise",
-      "structured": "Structured",
-      "evidenceBased": "Evidence-based"
+      "conversational": "Colloquiale",
+      "empathetic": "Empatico",
+      "clear": "Chiaro",
+      "engaging": "Coinvolgente",
+      "playful": "Giocoso",
+      "creative": "Creativo",
+      "informal": "Informale",
+      "storyteller": "Narratore",
+      "analytical": "Analitico",
+      "precise": "Preciso",
+      "structured": "Strutturato",
+      "evidenceBased": "Basato su prove"
     },
-    "sentenceLengthMedium": "Medium (12-18 words)",
-    "sentenceLengthVaried": "Varied (8-25 words)",
-    "sentenceLengthLong": "Long (18-28 words)",
+    "sentenceLengthMedium": "Medio (12-18 parole)",
+    "sentenceLengthVaried": "Variato (8-25 parole)",
+    "sentenceLengthLong": "Lungo (18-28 parole)",
     "voiceProfiles": {
-      "professional": "Professional Writer",
-      "casual": "Casual Blogger",
-      "academic": "Academic Style",
-      "personalBlog": "Personal Blog",
-      "creativeWriter": "Creative Writer"
+      "professional": "Scrittore Professionista",
+      "casual": "Blogger Casual",
+      "academic": "Stile Accademico",
+      "personalBlog": "Blog Personale",
+      "creativeWriter": "Scrittore Creativo"
     },
     "speed": {
-      "fast": "Fast",
-      "ultraFast": "Ultra Fast",
-      "quality": "Quality"
+      "fast": "Veloce",
+      "ultraFast": "Ultra Veloce",
+      "quality": "Qualità"
     },
     "tone": {
-      "conversational": "Conversational",
-      "formal": "Formal",
-      "expressive": "Expressive"
+      "conversational": "Colloquiale",
+      "formal": "Formale",
+      "expressive": "Espressivo"
     }
   },
   "deviations": {
     "description": "Trovi incongruenze di stile nella Sua scrittura.",
     "meta": {
       "description": "Identifichi frasi che deviano dal Suo stile di scrittura. Ottenga livelli di gravità, suggerimenti e corregga le incoerenze per mantenere la Sua voce unica.",
-      "title": "Deviazioni - Trovi Incoerenze di Stile | Graphos AI"
+      "title": "Deviazioni - Trovi Incoerenze di Stile | Graphos AI",
+      "keywords": "verificatore stile, coerenza scrittura, analizzatore tono, rilevatore incoerenze"
     },
     "title": "Deviazioni"
-  },
-  "exitPopup": {
-    "cta": "Richiedi i Miei Crediti Bonus",
-    "emailPlaceholder": "Inserisca la Sua email",
-    "noSpam": "Niente spam",
-    "noThanks": "No grazie, pagherò il prezzo intero",
-    "subtitle": "Si iscriva alla nostra newsletter e ottenga 50 crediti extra sul Suo primo acquisto!",
-    "success": "Fantastico! Controlli la Sua email per il codice bonus.",
-    "title": "Aspetti! Ottenga 50 Crediti Bonus",
-    "unsubscribe": "Disiscrizione in qualsiasi momento"
   },
   "extension": {
     "badge": "Estensione Chrome",
@@ -527,35 +522,35 @@
     "willWorkOn": "Funzionerà perfettamente su",
     "worksOn": "Funziona su",
     "demo": {
-      "sampleText": "The implementation of artificial intelligence in modern systems represents a paradigm shift...",
+      "sampleText": "L'implementazione dell'intelligenza artificiale nei sistemi moderni rappresenta un cambio di paradigma...",
       "detect": {
-        "action": "Detecting AI content...",
-        "result": "87% AI Probability"
+        "action": "Rilevamento contenuto IA...",
+        "result": "87% Probabilità IA"
       },
       "humanize": {
-        "action": "Humanizing text...",
-        "result": "Text humanized!"
+        "action": "Umanizzazione del testo...",
+        "result": "Testo umanizzato!"
       },
       "write": {
-        "action": "Generating in your voice...",
-        "result": "Content ready!"
+        "action": "Generazione con la tua voce...",
+        "result": "Contenuto pronto!"
       },
       "workspace": {
-        "action": "Opening workspace...",
-        "result": "Ready to chat!"
+        "action": "Apertura area di lavoro...",
+        "result": "Pronto per chattare!"
       }
     }
   },
   "faq": {
     "answers": {
       "credits": "I crediti sono la nostra valuta a consumo. Diverse funzionalità utilizzano quantità diverse in base alla lunghezza e complessità del testo. Il Rilevamento IA usa ~2-5 crediti, l'Umanizzazione ~2-8 crediti, la creazione del Profilo Vocale ~8-25 crediti, e l'Area di Lavoro IA ~1-3 crediti per messaggio. I crediti non scadono mai!",
-      "extension": "La nostra estensione Chrome Le permette di usare Graphos AI ovunque sul web. Selezioni testo su qualsiasi sito web per rilevare contenuto IA, umanizzare testo o generare contenuti nella Sua voce. Si integra perfettamente con Gmail, Google Docs, social media e altro.",
+      "extension": "La nostra estensione Chrome attualmente funziona come interfaccia principale dell'applicazione web. Funzionalità come selezionare testo su qualsiasi sito web per rilevare contenuto IA, umanizzare testo o generare contenuti nella Sua voce sono attualmente in sviluppo. Rimanga sintonizzato per gli aggiornamenti!",
       "freeTier": "Sì! Ogni nuovo utente riceve 100 crediti gratuiti per provare tutte le funzionalità. Nessuna carta di credito richiesta. Inoltre, il Suo primo acquisto ottiene 2x crediti bonus!",
       "howDetection": "Il nostro rilevamento IA raggiunge il 98% di precisione analizzando molteplici modelli linguistici inclusi modelli lessicali, semantici, strutturali e di contenuto. Usiamo analisi avanzate multi-passaggio per casi incerti per garantire risultati affidabili.",
       "humanization": "Il nostro motore di umanizzazione riscrive il testo generato da IA per corrispondere a modelli di scrittura umana naturale. Usa il Suo profilo vocale per mantenere il Suo stile unico rimuovendo impronte dell'IA come strutture ripetitive, transizioni formali e linguaggio generico.",
       "languages": "Graphos AI supporta 15 lingue tra cui Inglese, Vietnamita, Cinese, Giapponese, Coreano, Thailandese, Indonesiano, Malese, Arabo, Francese, Tedesco, Spagnolo, Portoghese, Italiano e Russo. Ogni lingua ha modelli di rilevamento e umanizzazione ottimizzati.",
       "privacy": "Assolutamente. Usiamo crittografia di livello aziendale per tutti i dati. I Suoi campioni di scrittura e profili vocali sono archiviati in modo sicuro e mai condivisi. Rispettiamo il GDPR e altre normative sulla privacy. Può cancellare i Suoi dati in qualsiasi momento.",
-      "refund": "Offriamo una garanzia di rimborso di 7 giorni su tutti gli acquisti di crediti. Se non è soddisfatto, contatti il nostro team di supporto per un rimborso completo. I crediti non utilizzati possono anche essere rimborsati entro 30 giorni dall'acquisto.",
+      "refund": "Tutti gli acquisti di crediti sono definitivi e non rimborsabili. La preghiamo di provare il nostro piano gratuito con 100 crediti prima dell'acquisto per assicurarsi che il nostro servizio soddisfi le Sue esigenze. Consigliamo di iniziare con poco e acquistare più crediti secondo necessità.",
       "voiceProfile": "Un Profilo Vocale è un'impronta digitale unica del Suo stile di scrittura. Analizzando i Suoi campioni di scrittura, catturiamo il Suo tono, preferenze di vocabolario, modelli di frase e caratteristiche chiave. Questo permette all'IA di generare contenuti che suonano autenticamente come Lei.",
       "whatIs": "Graphos AI Studio è un assistente di scrittura potenziato dall'IA che La aiuta a rilevare contenuti generati da IA, umanizzare la Sua scrittura e creare contenuti autentici che corrispondono alla Sua voce unica. Include una web app e un'estensione Chrome per un'integrazione fluida nel flusso di lavoro."
     },
@@ -673,6 +668,12 @@
         "subtitle": "La nostra analisi multi-livello garantisce un rilevamento accurato in pochi secondi",
         "title": "Come Funziona il Rilevamento IA"
       },
+      "layers": {
+        "lexical": "Modelli Lessicali",
+        "semantic": "Analisi Semantica",
+        "structure": "Verifica Struttura",
+        "statistical": "Modello Statistico"
+      },
       "pricing": {
         "free": "Gratis",
         "freeFeature1": "5 rilevamenti/giorno",
@@ -710,7 +711,7 @@
         "business": {
           "author": "Michael Torres",
           "quote": "Essenziale per il nostro team contenuti. Lo usiamo per verificare tutti i contenuti in arrivo prima della pubblicazione. I punteggi di confidenza ci danno tranquillità.",
-          "role": "Content Director, Startup Tech"
+          "role": "Direttore Contenuti, Startup Tech"
         },
         "education": {
           "author": "Dr. Sarah Chen",
@@ -739,7 +740,7 @@
         "business": {
           "desc": "Garantisca contenuti autentici in marketing, PR e comunicazioni aziendali",
           "stat": "Aziende",
-          "title": "Business"
+          "title": "Aziende"
         },
         "education": {
           "desc": "Insegnanti e professori possono verificare le consegne degli studenti per integrità accademica",
@@ -758,7 +759,7 @@
         }
       },
       "useCasesBadge": "Applicazioni nel Mondo Reale",
-      "useCasesCta": "Non",
+      "useCasesCta": "Non vedi il tuo caso d'uso? Supportiamo molti altri settori.",
       "useCasesSubtitle": "Scopra come i professionisti di vari settori usano il nostro rilevamento IA",
       "useCasesTitle": "Casi d'Uso",
       "whyChoose": "Perché Scegliere il Nostro Rilevamento IA?",
@@ -832,7 +833,7 @@
         "voiceMatch": "Integrazione Profilo Vocale"
       },
       "comparisonBadge": "Perché Sceglierci",
-      "comparisonDesc": "Veda perché Graphos AI Workspace si distingue dalla concorrenza",
+      "comparisonDesc": "Veda perché Graphos Area di lavoro IA si distingue dalla concorrenza",
       "comparisonTitle": "Come Ci Confrontiamo",
       "comparisonWins": "8 vantaggi chiave sui concorrenti",
       "ctaBadge": "Inizi a scrivere con la Sua voce",
@@ -897,12 +898,12 @@
         "marketer": {
           "author": "Michael Torres",
           "quote": "Le azioni rapide mi fanno risparmiare ore ogni settimana. Posso abbozzare post social, email e intro di blog in minuti invece che ore.",
-          "role": "Marketing Manager"
+          "role": "Responsabile Marketing"
         },
         "writer": {
           "author": "Sarah Chen",
           "quote": "Area di Lavoro IA ha completamente trasformato il mio modo di scrivere. La funzione profilo vocale significa che ogni email suona esattamente come me, anche quando l'IA aiuta a scriverla.",
-          "role": "Content Writer"
+          "role": "Scrittrice di Contenuti"
         }
       },
       "testimonialsBadge": "Cosa Dicono Gli Utenti",
@@ -922,25 +923,25 @@
       "useCases": {
         "business": {
           "desc": "Proposte, report e presentazioni che corrispondono al Suo brand",
-          "example": "",
+          "example": "\"Redigere una proposta\" → Documenti professionali nel Suo stile",
           "stat": "Produttività",
           "title": "Scrittura Business"
         },
         "content": {
           "desc": "Generi post blog, articoli e testi di marketing nella Sua voce",
-          "example": "",
+          "example": "\"Scrivere intro blog\" → Contenuti coinvolgenti che suonano come Lei",
           "stat": "Qualità contenuto",
           "title": "Creazione Contenuti"
         },
         "email": {
           "desc": "Abbozzi, risponda e segua email che suonano come se le avesse scritte Lei",
-          "example": "",
+          "example": "\"Redigere email di follow-up\" → Email professionale e personalizzata nella Sua voce",
           "stat": "Tempo risparmiato",
           "title": "Comunicazione Email"
         },
         "social": {
           "desc": "Crei post coinvolgenti per LinkedIn, Twitter e altro",
-          "example": "",
+          "example": "\"Creare post LinkedIn\" → Contenuti social autentici",
           "stat": "Coinvolgimento",
           "title": "Social Media"
         },
@@ -1066,7 +1067,7 @@
           "b2": "Personalizzazione",
           "b3": "Fiducia",
           "desc": "Verifichi che il contenuto generato da IA suoni come Lei prima di usarlo",
-          "example": "",
+          "example": "\"L'output di ChatGPT ottiene 45% - usi Riscrittura IA per trasformarlo nel Suo stile.\"",
           "title": "Controllo Contenuto IA"
         },
         "badge": "Casi d'Uso",
@@ -1075,7 +1076,7 @@
           "b2": "Controllo qualità",
           "b3": "Risparmio tempo",
           "desc": "Controlli se il contenuto in outsourcing o generato da IA corrisponde alla voce del Suo brand prima di pubblicare",
-          "example": "",
+          "example": "\"Questo post blog ottiene 78% - l'intro è ottima ma la conclusione ha bisogno di più del Suo tono conversazionale.\"",
           "title": "Revisione Contenuto"
         },
         "example": "Esempio",
@@ -1084,7 +1085,7 @@
           "b2": "Miglioramento",
           "b3": "Crescita",
           "desc": "Comprenda i Suoi modelli di scrittura e migliori la coerenza nel tempo",
-          "example": "",
+          "example": "\"Le Sue email formali ottengono 92% ma i post casual solo 58% - ha due voci distinte!\"",
           "title": "Apprendimento Stile"
         },
         "spotlight": "Caso d'Uso in Evidenza",
@@ -1094,7 +1095,7 @@
           "b2": "Strumento formazione",
           "b3": "Onboarding",
           "desc": "Garantisca che tutti i membri del team scrivano con una voce coerente che corrisponde alle linee guida del brand",
-          "example": "",
+          "example": "\"La bozza del nuovo scrittore ottiene 65% - condivida il Profilo Vocale per aiutarlo a corrispondere allo stile del team.\"",
           "title": "Allineamento Team"
         },
         "title": "Perfetto Per Ogni Scenario"
@@ -1249,6 +1250,14 @@
       "description": "Usi Graphos AI ovunque sul web",
       "title": "Estensione Chrome Disponibile"
     },
+    "labels": {
+      "aiGenerated": "Generato da IA",
+      "aiRewrite": "Riscrittura IA",
+      "aiScore": "PUNTEGGIO IA",
+      "aiWorkspace": "Area di Lavoro IA",
+      "humanizationPreview": "Anteprima Umanizzazione",
+      "voiceProfile": "Profilo Vocale"
+    },
     "humanization": {
       "accuracy": "precisione",
       "aiContent": "Contenuto IA Grezzo",
@@ -1311,9 +1320,46 @@
           "after": "Ecco una cosa che ho imparato: allenarsi aiuta davvero con lo stress. La mia ansia è migliorata così tanto da quando ho iniziato a muovermi di più.",
           "before": "La ricerca indica che l'esercizio fisico regolare contribuisce significativamente al miglioramento della salute mentale.",
           "style": "Personale & Autentico"
+        },
+        "ex3": {
+          "after": "L'IA sta cambiando tutto nel modo in cui lavoriamo, e onestamente? È sia entusiasmante che un po' spaventoso.",
+          "before": "La tecnologia dell'intelligenza artificiale presenta sia opportunità che sfide per la forza lavoro moderna.",
+          "style": "Professionale & Coinvolgente"
         }
       },
       "examplesTitle": "Veda la Differenza",
+      "transforms": {
+        "ex1": {
+          "from1": "L'implementazione di",
+          "from2": "pratiche sostenibili",
+          "from3": "ambienti aziendali",
+          "from4": "sempre più importante",
+          "to1": "Sa cosa mi frulla per la testa?",
+          "to2": "diventare ecologici",
+          "to3": "aziende",
+          "to4": "prendere sul serio"
+        },
+        "ex2": {
+          "from1": "La ricerca indica",
+          "from2": "esercizio fisico regolare",
+          "from3": "contribuisce significativamente",
+          "from4": "miglioramento della salute mentale",
+          "to1": "Ecco una cosa che ho imparato",
+          "to2": "allenarsi",
+          "to3": "aiuta davvero",
+          "to4": "stress e ansia"
+        },
+        "ex3": {
+          "from1": "La tecnologia dell'intelligenza artificiale",
+          "from2": "presenta sia",
+          "from3": "opportunità che sfide",
+          "from4": "forza lavoro moderna",
+          "to1": "L'IA",
+          "to2": "È sia",
+          "to3": "entusiasmante che spaventoso",
+          "to4": "modo in cui lavoriamo"
+        }
+      },
       "faq": {
         "a1": "La nostra IA analizza il testo in input e lo riscrive usando modelli di linguaggio naturale, strutture di frase varie, pronomi personali ed elementi conversazionali che sono caratteristici della scrittura umana.",
         "a2": "No. La nostra umanizzazione preserva il significato centrale e i punti chiave del Suo contenuto trasformando lo stile di scrittura per suonare più naturale e autentico.",
@@ -1368,6 +1414,10 @@
           "title": "Robotico & Rigido"
         }
       },
+      "preview": {
+        "after": "Sa cosa mi frulla per la testa ultimamente? Come le aziende stanno finalmente prendendo sul serio la questione ambientale...",
+        "before": "L'implementazione di pratiche sostenibili è diventata sempre più importante..."
+      },
       "processing": "elaborazione",
       "reset": "Reimposta",
       "stats": {
@@ -1387,7 +1437,7 @@
         "content": {
           "author": "Sarah Chen",
           "quote": "Questo strumento ha trasformato il modo in cui creo contenuti. I miei post di blog ora suonano genuinamente umani e coinvolgono i lettori molto meglio.",
-          "role": "Content Creator"
+          "role": "Creatrice di Contenuti"
         },
         "marketing": {
           "author": "Michael Torres",
@@ -1395,7 +1445,7 @@
           "role": "Direttore Marketing"
         },
         "subtitle": "Veda cosa dicono i nostri utenti sull'umanizzazione dei contenuti",
-        "title": "Amato dai Content Creator"
+        "title": "Amato dai Creatori di Contenuti"
       },
       "transform": "Trasforma",
       "transformations": "Trasformazioni Reali",
@@ -1413,26 +1463,26 @@
       "useCases": {
         "academic": {
           "desc": "Rifinisca riassunti di ricerca generati da IA per corrispondere agli standard accademici",
-          "example": "",
+          "example": "\"Si può osservare che...\" → \"I dati mostrano chiaramente...\"",
           "stat": "Punteggio leggibilità",
           "title": "Scrittura Accademica"
         },
         "content": {
           "desc": "Trasformi bozze IA in post blog, articoli e testi di marketing autentici",
-          "example": "",
+          "example": "\"L'implementazione di pratiche sostenibili...\" → \"Sa cosa mi ha occupato la mente ultimamente? Come le aziende stanno finalmente...\"",
           "stat": "Coinvolgimento blog",
           "title": "Creazione Contenuti"
         },
         "email": {
           "desc": "Renda le email assistite da IA personali e genuine",
-          "example": "",
+          "example": "\"Volevo contattarLa riguardo...\" → \"Ciao! Domanda veloce su...\"",
           "stat": "Aumento tasso apertura",
           "title": "Scrittura Email"
         },
         "preview": "Anteprima Trasformazione",
         "social": {
           "desc": "Crei post social coinvolgenti che connettono con il Suo pubblico",
-          "example": "",
+          "example": "\"Siamo lieti di annunciare...\" → \"Grande notizia! Abbiamo appena lanciato...\"",
           "stat": "Boost coinvolgimento",
           "title": "Social Media"
         },
@@ -1446,14 +1496,6 @@
       "whyHumanizeDesc": "Trasformi testo IA robotico in contenuto coinvolgente, autentico",
       "with": "Con Umanizzazione",
       "without": "Senza Umanizzazione"
-    },
-    "labels": {
-      "aiGenerated": "Generato da IA",
-      "aiRewrite": "Riscrittura IA",
-      "aiScore": "PUNTEGGIO IA",
-      "aiWorkspace": "Area di Lavoro IA",
-      "humanizationPreview": "Anteprima Umanizzazione",
-      "voiceProfile": "Profilo Vocale"
     },
     "placeholder": {
       "voiceProfile": "PROFILO VOCALE",
@@ -1547,13 +1589,16 @@
         "feature3": "Voce coerente su tutti i contenuti",
         "feature4": "Aggira il rilevamento IA naturalmente",
         "result": "Risultato: Suona esattamente come Lei!",
-        "title": "Potenziato dal Suo Profilo Vocale"
+        "resultDesc": "Il Suo testo è stato trasformato per corrispondere al Suo stile di scrittura unico, alle Sue preferenze di vocabolario e al Suo tono...",
+        "title": "Potenziato dal Suo Profilo Vocale",
+        "voiceProfileLabel": "Profilo Vocale",
+        "aiRewriteLabel": "Riscrittura IA"
       },
       "showcase": {
         "badge": "Guardi La Magia",
         "cta": "Provi Lei Stesso",
         "formal": {
-          "after": "Sai cosa",
+          "after": "Sai cosa mi frulla per la testa ultimamente? Come le aziende stanno finalmente prendendo sul serio la questione green. Non è più solo una moda—sta diventando la nuova normalità nel business.",
           "before": "L'implementazione di pratiche sostenibili negli ambienti aziendali è diventata sempre più importante negli ultimi anni.",
           "metric": "Coinvolgimento",
           "style": "Formale → Conversazionale"
@@ -1573,7 +1618,7 @@
         "subtitle": "Guardi come Riscrittura IA trasforma il Suo testo preservando il Suo messaggio",
         "title": "Trasformazioni Reali",
         "wordy": {
-          "after": "Lasciamo",
+          "after": "Incontriamoci presto per parlare di una possibile collaborazione. Quando ti va bene?",
           "before": "Le scrivo per informarla che vorrei richiedere un incontro alla Sua prima convenienza per discutere la possibilità di esplorare potenziali opportunità di collaborazione.",
           "metric": "Conteggio parole",
           "style": "Prolisso → Conciso"
@@ -1594,26 +1639,26 @@
       "useCases": {
         "academic": {
           "desc": "Rifinisca saggi e documenti mantenendo il tono accademico",
-          "example": "",
+          "example": "\"Si può osservare che...\" → \"I dati mostrano chiaramente...\"",
           "stat": "Punteggio chiarezza",
           "title": "Scrittura Accademica"
         },
         "content": {
           "desc": "Riscriva post blog, articoli e testi di marketing nella Sua voce",
-          "example": "",
+          "example": "\"Questo articolo discute...\" → \"Si è mai chiesto perché...? Le racconto...\"",
           "stat": "Tempo lettura",
           "title": "Creazione Contenuti"
         },
         "email": {
           "desc": "Trasformi email formali in messaggi amichevoli o viceversa",
-          "example": "",
+          "example": "\"Volevo contattarLa riguardo...\" → \"Ciao! Domanda veloce su...\"",
           "stat": "Tasso risposta",
           "title": "Scrittura Email"
         },
         "preview": "Anteprima Trasformazione",
         "social": {
           "desc": "Crei post coinvolgenti che suonano autenticamente Lei",
-          "example": "",
+          "example": "\"Siamo lieti di annunciare...\" → \"Grande notizia! Abbiamo appena lanciato...\"",
           "stat": "Coinvolgimento",
           "title": "Social Media"
         },
@@ -1782,7 +1827,7 @@
           "b2": "Analisi ritmo",
           "b3": "Adattamento genere",
           "desc": "Analizzi il Suo manoscritto per garantire voce coerente e complessità appropriata ovunque",
-          "example": "",
+          "example": "\"Il Suo manoscritto ha una lunghezza media di frase di 18 parole - perfetto per la narrativa letteraria.\"",
           "title": "Autori"
         },
         "badge": "Casi d'Uso",
@@ -1791,7 +1836,7 @@
           "b2": "Traccia progressi",
           "b3": "Strumento insegnamento",
           "desc": "Aiuti gli studenti a migliorare la loro scrittura fornendo feedback oggettivo su struttura e complessità",
-          "example": "",
+          "example": "\"Il saggio dello studente ha un punteggio di leggibilità di 45 - necessita semplificazione per il pubblico target.\"",
           "title": "Educatori"
         },
         "example": "Esempio",
@@ -1800,7 +1845,7 @@
           "b2": "Tono professionale",
           "b3": "Adattamento pubblico",
           "desc": "Garantisca che le Sue comunicazioni aziendali siano chiare, professionali e appropriate per il Suo pubblico",
-          "example": "",
+          "example": "\"Il Suo report ha una ricchezza di vocabolario di 0,82 - eccellente per documentazione tecnica.\"",
           "title": "Professionisti"
         },
         "spotlight": "Caso d'Uso in Evidenza",
@@ -1811,7 +1856,7 @@
           "b2": "Stile coerente",
           "b3": "Ottimizzazione SEO",
           "desc": "Ottimizzi i Suoi contenuti per leggibilità e coinvolgimento comprendendo i Suoi modelli di scrittura",
-          "example": "",
+          "example": "\"Il Suo post blog ha un punteggio di leggibilità di 72 - perfetto per il pubblico web.\"",
           "title": "Content Writer"
         }
       }
@@ -1919,16 +1964,34 @@
       "metrics": {
         "punctuation": "Stile Punteggiatura",
         "punctuationDesc": "I Suoi modelli di punteggiatura unici e preferenze",
+        "punctuationEx1": "Trattini lunghi",
+        "punctuationEx2": "Punto e virgola",
+        "punctuationEx3": "Punti esclamativi",
         "sentenceLength": "Struttura Frase",
         "sentenceLengthDesc": "Lunghezza tipica, complessità e ritmo delle Sue frasi",
+        "sentenceLengthEx1": "Breve e incisivo",
+        "sentenceLengthEx2": "Flusso medio",
+        "sentenceLengthEx3": "Complesso e dettagliato",
         "sentenceStarters": "Inizi Frase",
         "sentenceStartersDesc": "Come inizia tipicamente le frasi - soggetto prima, avverbi, domande",
+        "sentenceStartersEx1": "\"Penso che...\"",
+        "sentenceStartersEx2": "\"Tuttavia...\"",
+        "sentenceStartersEx3": "\"La chiave è...\"",
         "tone": "Marcatori Emotivi",
         "toneDesc": "Come esprime opinioni, sentimenti ed enfasi",
+        "toneEx1": "\"Sento che...\"",
+        "toneEx2": "\"Secondo me...\"",
+        "toneEx3": "\"Assolutamente!\"",
         "transitions": "Preferenze Transizione",
         "transitionsDesc": "Le Sue parole e frasi di collegamento preferite",
+        "transitionsEx1": "\"ma\"",
+        "transitionsEx2": "\"quindi\"",
+        "transitionsEx3": "\"d'altra parte\"",
         "vocabulary": "Modelli Vocabolario",
-        "vocabularyDesc": "Frasi comuni, parole preferite ed espressioni"
+        "vocabularyDesc": "Frasi comuni, parole preferite ed espressioni",
+        "vocabularyEx1": "\"onestamente\"",
+        "vocabularyEx2": "\"mi lasci spiegare\"",
+        "vocabularyEx3": "\"ecco il punto\""
       },
       "metricsBadge": "Analisi Profonda",
       "metricsDesc": "La nostra IA cattura ogni sfumatura del Suo stile di scrittura attraverso un'analisi completa",
@@ -1942,7 +2005,10 @@
         "analyzing2": "Rilevamento strutture frasi...",
         "analyzing3": "Identificazione marcatori tono...",
         "ready": "Pronto all'uso",
+        "sampleBlog": "\"Ecco il punto sulla produttività...\"",
+        "sampleEmail": "\"Ciao team, volevo solo condividere alcuni pensieri...\"",
         "sampleInput": "Il Suo Campione di Scrittura",
+        "sampleSocial": "\"Onestamente, questo ha cambiato tutto per me...\"",
         "step1": "Aggiungi Campioni Scrittura",
         "step1Desc": "Incolla email, post o qualsiasi testo che hai scritto",
         "step2": "IA Analizza Modelli",
@@ -1989,13 +2055,13 @@
       "useCases": {
         "business": {
           "desc": "Garantisca che tutte le comunicazioni del team corrispondano alla voce del brand",
-          "quote": "",
+          "quote": "\"La voce del nostro brand è ora coerente su oltre 50 membri del team.\"",
           "statLabel": "aziende",
           "title": "Comunicazione Aziendale"
         },
         "content": {
           "desc": "Generi post blog, articoli e testi che suonano come Lei",
-          "quote": "",
+          "quote": "\"Scrivo 3 volte più veloce e suona ancora autenticamente come me.\"",
           "statLabel": "articoli",
           "title": "Creazione Contenuti"
         },
@@ -2003,13 +2069,13 @@
         "ctaButton": "Crea Il Suo Profilo",
         "personal": {
           "desc": "Costruisca un brand personale coerente su tutti i Suoi contenuti",
-          "quote": "",
+          "quote": "\"I miei post LinkedIn finalmente suonano come me, non come un robot.\"",
           "statLabel": "creatori",
           "title": "Personal Branding"
         },
         "team": {
           "desc": "Condivida profili per mantenere una voce coerente in tutto il Suo team",
-          "quote": "",
+          "quote": "\"L'onboarding di nuovi scrittori è ora fluido con i profili condivisi.\"",
           "statLabel": "team",
           "title": "Collaborazione Team"
         }
@@ -2034,7 +2100,8 @@
     "gridTitle": "Scegli il Tuo Strumento",
     "meta": {
       "description": "Esplori tutte le funzionalità di Graphos AI Studio: Rilevamento IA, Umanizzazione, Profilo Vocale, Area di Lavoro IA, Riscrittura, e altro.",
-      "title": "Funzionalità - Graphos AI Studio"
+      "title": "Funzionalità - Graphos AI Studio",
+      "keywords": "strumenti scrittura IA, funzionalità rilevamento IA, umanizzazione contenuti, creatore profilo vocale"
     },
     "stats": {
       "extension": "Estensione Chrome",
@@ -2111,7 +2178,8 @@
     },
     "meta": {
       "description": "Rilevi contenuti generati da IA, umanizzi la Sua scrittura e crei contenuti autentici che suonano come Lei. Assistente di scrittura IA gratuito con estensione Chrome.",
-      "title": "Graphos AI Studio - Rilevamento IA, Umanizzazione & Profilo Vocale"
+      "title": "Graphos AI Studio - Rilevamento IA, Umanizzazione & Profilo Vocale",
+      "keywords": "rilevamento IA, rilevatore contenuti IA, rilevatore ChatGPT, umanizzare testo IA, assistente scrittura IA, profilo vocale, aggirare rilevamento IA, convertitore testo IA"
     }
   },
   "howItWorks": {
@@ -2146,7 +2214,8 @@
     "description": "Trasformi il testo IA in scrittura umana naturale, autentica.",
     "meta": {
       "description": "Trasformi il testo generato da IA in contenuto naturale, simil-umano preservando il significato.",
-      "title": "Umanizzazione Contenuti - Graphos AI Studio"
+      "title": "Umanizzazione Contenuti - Graphos AI Studio",
+      "keywords": "umanizzare testo IA, umanizzatore IA, aggirare rilevamento IA, IA non rilevabile, convertire IA in testo umano, umanizzare ChatGPT"
     },
     "title": "Umanizzazione Contenuti"
   },
@@ -2194,7 +2263,7 @@
       "noSubscription": "Nessun abbonamento",
       "securePayment": "Pagamento sicuro"
     },
-    "bestValue": "Miglior Valore",
+    "bestValue": "Migliore",
     "bonus": "bonus",
     "buyNow": "Acquista Ora",
     "creditCard": "Carta di Credito",
@@ -2257,7 +2326,8 @@
     "description": "Trasformi il testo nella Sua voce con la riscrittura potenziata dall'IA.",
     "meta": {
       "description": "Trasformi qualsiasi testo per adattarlo al Suo stile di scrittura unico. Riscrittura potenziata dall'IA che mantiene la Sua voce e tono.",
-      "title": "Riscrittura IA - Trasformi Testo nella Sua Voce | Graphos AI"
+      "title": "Riscrittura IA - Trasformi Testo nella Sua Voce | Graphos AI",
+      "keywords": "riscrivere IA, riscrittore testo, strumento parafrasi, trasformatore testo, parafrasatore IA"
     },
     "title": "Riscrittura IA"
   },
@@ -2295,7 +2365,7 @@
       "students": "Migliora scrittura accademica"
     },
     "userTypes": {
-      "contentCreators": "Content Creator",
+      "contentCreators": "Creatori di Contenuti",
       "developers": "Sviluppatori",
       "educators": "Educatori",
       "marketers": "Marketer",
@@ -2306,7 +2376,8 @@
     "description": "Analizzi le Sue metriche e modelli di scrittura.",
     "meta": {
       "description": "Ottenga statistiche di scrittura dettagliate inclusi conteggio parole, lunghezza frase, ricchezza vocabolario e punteggi di leggibilità.",
-      "title": "Statistiche - Analizzi le Sue Metriche di Scrittura | Graphos AI"
+      "title": "Statistiche - Analizzi le Sue Metriche di Scrittura | Graphos AI",
+      "keywords": "statistiche scrittura, analizzatore testo, contatore parole, punteggio leggibilità, analizzatore vocabolario"
     },
     "title": "Statistiche"
   },
@@ -2335,13 +2406,13 @@
       "6": "L'estensione Chrome lo rende così facile da usare ovunque. Posso controllare e umanizzare contenuti senza lasciare il mio flusso di lavoro."
     },
     "roles": {
-      "contentCreator": "Content Creator",
-      "customerSuccessLead": "Customer Success Lead",
+      "contentCreator": "Creatore di Contenuti",
+      "customerSuccessLead": "Responsabile Successo Clienti",
       "editor": "Caporedattore",
       "freelanceWriter": "Scrittore Freelance",
-      "marketingManager": "Marketing Manager",
+      "marketingManager": "Responsabile Marketing",
       "professor": "Professore Universitario",
-      "socialMediaManager": "Social Media Manager"
+      "socialMediaManager": "Responsabile Social Media"
     },
     "subtitle": "Veda cosa hanno da dire i nostri utenti sulla loro esperienza con Graphos AI Studio.",
     "title": "Amato dagli Scrittori in Tutto il Mondo"
@@ -2353,8 +2424,8 @@
         "title": "I Crediti Non Scadono Mai"
       },
       "refund": {
-        "desc": "Non soddisfatto? Ottieni un rimborso completo entro 7 giorni",
-        "title": "Rimborso in 7 Giorni"
+        "desc": "Provi 100 crediti gratuiti prima dell'acquisto",
+        "title": "Provi prima di acquistare"
       },
       "support": {
         "desc": "Ottieni aiuto quando ne hai bisogno via email",
@@ -2396,7 +2467,7 @@
       "testimonial": {
         "author": "Jennifer Park",
         "quote": "Le nostre risposte di supporto clienti sembrano più personali ora.",
-        "role": "Customer Success Lead"
+        "role": "Responsabile Successo Clienti"
       },
       "title": "Aziende"
     },
@@ -2410,9 +2481,9 @@
       "testimonial": {
         "author": "Amanda Foster",
         "quote": "Ora posso produrre il doppio dei contenuti mantenendo il mio tocco personale.",
-        "role": "Content Creator"
+        "role": "Creatrice di Contenuti"
       },
-      "title": "Content Creator"
+      "title": "Creatori di Contenuti"
     },
     "educators": {
       "benefits": {
@@ -2453,9 +2524,9 @@
       "testimonial": {
         "author": "Rachel Martinez",
         "quote": "I nostri tassi di apertura email sono migliorati del 40% con testi più umani.",
-        "role": "Marketing Manager"
+        "role": "Responsabile Marketing"
       },
-      "title": "Team Marketing"
+      "title": "Squadre di Marketing"
     },
     "startNow": "Inizi a usare Graphos AI",
     "students": {
@@ -2479,7 +2550,8 @@
     "description": "Catturi il Suo stile di scrittura unico e crei contenuti che suonano autenticamente come Lei.",
     "meta": {
       "description": "Crei il Suo profilo vocale di scrittura unico e generi contenuti che suonano come Lei.",
-      "title": "Profilo Vocale - Graphos AI Studio"
+      "title": "Profilo Vocale - Graphos AI Studio",
+      "keywords": "profilo vocale, stile scrittura IA, assistente scrittura personale, analizzatore tono, stile scrittura unico"
     },
     "title": "Profilo Vocale"
   },
@@ -2592,36 +2664,36 @@
     },
     "voiceProfile": {
       "sarah": {
-        "name": "Sarah Chen",
-        "style": "Professional & Warm",
-        "tone": "Warm & Approachable",
+        "name": "Giulia Rossi",
+        "style": "Professionale & Caloroso",
+        "tone": "Caloroso & Accessibile",
         "vocab": {
-          "0": "honestly",
-          "1": "I think",
-          "2": "let me explain",
-          "3": "here's the thing"
+          "0": "onestamente",
+          "1": "penso che",
+          "2": "lasciami spiegare",
+          "3": "il punto è"
         }
       },
       "alex": {
-        "name": "Alex Rivera",
-        "style": "Casual & Creative",
-        "tone": "Fun & Energetic",
+        "name": "Marco Bianchi",
+        "style": "Informale & Creativo",
+        "tone": "Divertente & Energico",
         "vocab": {
-          "0": "basically",
-          "1": "you know",
-          "2": "kind of",
+          "0": "praticamente",
+          "1": "sai",
+          "2": "tipo",
           "3": "super"
         }
       },
       "james": {
-        "name": "Dr. James Park",
-        "style": "Academic & Precise",
-        "tone": "Authoritative & Measured",
+        "name": "Dott. Luca Ferrari",
+        "style": "Accademico & Preciso",
+        "tone": "Autorevole & Misurato",
         "vocab": {
-          "0": "furthermore",
-          "1": "consequently",
-          "2": "research indicates",
-          "3": "data suggests"
+          "0": "inoltre",
+          "1": "di conseguenza",
+          "2": "la ricerca indica",
+          "3": "i dati suggeriscono"
         }
       }
     }

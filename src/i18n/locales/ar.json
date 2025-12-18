@@ -15,6 +15,7 @@
     "sort": "فرز",
     "refresh": "تحديث",
     "retry": "إعادة المحاولة",
+    "authorize": "تفويض",
     "yes": "نعم",
     "no": "لا",
     "ok": "موافق",
@@ -248,12 +249,15 @@
     "pleaseSignIn": "يرجى تسجيل الدخول لاستخدام هذه الميزة",
     "needReauth": "التطبيق يحتاج للوصول إلى Google Drive لمزامنة الملاحظات. يرجى تسجيل الدخول مجدداً لمنح الإذن.",
     "drivePermissionRequired": "مطلوب إذن Drive",
+    "googleAuthRequired": "مطلوب تفويض Google",
+    "googleAuthRequiredDesc": "يحتاج هذا الجهاز إلى تفويض الوصول إلى Google Drive.",
     "confirmSignOut": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
     "confirmSignOutTitle": "تأكيد الخروج",
     "signedOut": "تم تسجيل الخروج",
+    "accountSettings": "إعدادات الحساب",
     "getStarted": "ابدأ الآن",
     "appName": "استوديو جرافوس للذكاء الاصطناعي",
-    "signInTagline": "سجل الدخول للحفاظ على أصالة محتواك",
+    "signInTagline": "اكتب بأصالة مع Graphos AI",
     "errors": {
       "accountDeleted": "تم حذف هذا الحساب. يرجى الاتصال بالدعم إذا كنت تعتقد أن هذا خطأ.",
       "accountSuspended": "تم إيقاف حسابك. يرجى الاتصال بالدعم للحصول على المساعدة.",
@@ -1392,5 +1396,11 @@
   "securitySettings": {
     "ipAddress": "IP",
     "unknown": "غير معروف"
+  },
+  "unsupportedScreen": {
+    "title": "Graphos AI Studio لا يدعم هذه الشاشة",
+    "description": "يرجى استخدام الوضع الأفقي أو جهاز أكبر للحصول على أفضل تجربة.",
+    "desktop": "سطح المكتب",
+    "tabletLandscape": "جهاز لوحي أفقي"
   }
 }

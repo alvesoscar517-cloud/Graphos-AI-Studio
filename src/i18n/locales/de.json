@@ -15,6 +15,7 @@
     "sort": "Sortieren",
     "refresh": "Aktualisieren",
     "retry": "Wiederholen",
+    "authorize": "Autorisieren",
     "yes": "Ja",
     "no": "Nein",
     "ok": "OK",
@@ -248,12 +249,15 @@
     "pleaseSignIn": "Bitte melden Sie sich an, um diese Funktion zu nutzen",
     "needReauth": "Die App benötigt Zugriff auf Google Drive, um Notizen zu synchronisieren. Bitte melden Sie sich erneut an.",
     "drivePermissionRequired": "Drive-Berechtigung erforderlich",
+    "googleAuthRequired": "Google-Autorisierung erforderlich",
+    "googleAuthRequiredDesc": "Dieses Gerät muss den Zugriff auf Google Drive autorisieren.",
     "confirmSignOut": "Möchten Sie sich wirklich abmelden?",
     "confirmSignOutTitle": "Abmeldung bestätigen",
     "signedOut": "Abgemeldet",
+    "accountSettings": "Kontoeinstellungen",
     "getStarted": "Erste Schritte",
     "appName": "Graphos KI-Studio",
-    "signInTagline": "Melden Sie sich an, um Ihren Inhalt authentisch zu halten",
+    "signInTagline": "Schreiben Sie authentisch mit Graphos AI",
     "errors": {
       "accountDeleted": "Dieses Konto wurde gelöscht. Bitte kontaktieren Sie den Support, wenn Sie glauben, dass dies ein Fehler ist.",
       "accountSuspended": "Ihr Konto wurde gesperrt. Bitte kontaktieren Sie den Support für Hilfe.",
@@ -1392,5 +1396,11 @@
   "securitySettings": {
     "ipAddress": "IP",
     "unknown": "Unbekannt"
+  },
+  "unsupportedScreen": {
+    "title": "Graphos AI Studio unterstützt diesen Bildschirm nicht",
+    "description": "Bitte verwenden Sie den Querformat-Modus oder ein größeres Gerät für das beste Erlebnis.",
+    "desktop": "Desktop",
+    "tabletLandscape": "Tablet Querformat"
   }
 }

@@ -73,6 +73,16 @@ router.post('/check-google-linked', emailAuthController.checkGoogleLinked);
 router.post('/login-with-google', emailAuthController.loginWithLinkedGoogle);
 
 /**
+ * Login or register with Google OAuth (for Google-only users)
+ * POST /auth/email/google-login
+ * Body: { accessToken }
+ * 
+ * Creates a new user if not exists, or logs in existing Google user.
+ * Returns JWT tokens and welcome credits for new users.
+ */
+router.post('/google-login', emailAuthController.loginWithGoogleOAuth);
+
+/**
  * Reset password with OTP
  * POST /auth/email/reset-password
  * Body: { email, otp, newPassword }

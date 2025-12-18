@@ -37,7 +37,7 @@ const LoginOverlay = () => {
     setShouldShow(authLoading || !isAuthenticated)
   }, [authLoading, isAuthenticated])
 
-  // Vanta.js fog effect - load from node_modules (Chrome extension CSP blocks CDN)
+  // Vanta.js cells effect - load from node_modules (Chrome extension CSP blocks CDN)
   useEffect(() => {
     if (!shouldShow || !vantaRef.current || vantaEffect.current) return
 
@@ -46,12 +46,12 @@ const LoginOverlay = () => {
         // Import Three.js first
         const THREE = await import('three')
         
-        // Import Vanta FOG effect - it's a function that takes THREE as parameter
-        const FOG = (await import('vanta/dist/vanta.fog.min')).default
+        // Import Vanta CELLS effect - it's a function that takes THREE as parameter
+        const CELLS = (await import('vanta/dist/vanta.cells.min')).default
         
         // Initialize Vanta effect with Apple System Blue colors
         if (vantaRef.current && !vantaEffect.current) {
-          vantaEffect.current = FOG({
+          vantaEffect.current = CELLS({
             THREE: THREE,
             el: vantaRef.current,
             mouseControls: true,
@@ -59,13 +59,11 @@ const LoginOverlay = () => {
             gyroControls: false,
             minHeight: 200.00,
             minWidth: 200.00,
-            highlightColor: 0x5AC8FA,  // Apple System Teal
-            midtoneColor: 0x007AFF,    // Apple System Blue
-            lowlightColor: 0x5856D6,   // Apple System Indigo
-            baseColor: 0x0051D5,       // Apple Blue Hover (darker)
-            blurFactor: 0.6,
-            speed: 1.2,
-            zoom: 1.0
+            scale: 1.00,
+            color1: 0x008c8c,    // Teal
+            color2: 0xc8e035,    // Lime Yellow (balanced)
+            size: 1.5,
+            speed: 1
           })
         }
       } catch (error) {

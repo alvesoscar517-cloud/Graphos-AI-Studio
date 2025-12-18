@@ -409,9 +409,9 @@ const ProfileBuilderPreview = ({ t }) => {
                   </div>
                   <div className="p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-3">
                     {[
-                      { type: 'email', text: '"Hey team, just wanted to share some thoughts..."' },
-                      { type: 'blog', text: '"Here\'s the thing about productivity..."' },
-                      { type: 'social', text: '"Honestly, this changed everything for me..."' }
+                      { type: 'email', text: t('features.voiceProfile.preview.sampleEmail', '"Hey team, just wanted to share some thoughts..."') },
+                      { type: 'blog', text: t('features.voiceProfile.preview.sampleBlog', '"Here\'s the thing about productivity..."') },
+                      { type: 'social', text: t('features.voiceProfile.preview.sampleSocial', '"Honestly, this changed everything for me..."') }
                     ].map((sample, i) => (
                       <motion.div
                         key={i}
@@ -521,7 +521,11 @@ const ProfileBuilderPreview = ({ t }) => {
                     transition={{ delay: 0.8 }}
                     className="mt-3 sm:mt-4 flex flex-wrap gap-1.5 sm:gap-2"
                   >
-                    {['Conversational', 'Empathetic', 'Clear'].map((trait, i) => (
+                    {[
+                      t('demo.traits.conversational', 'Conversational'),
+                      t('demo.traits.empathetic', 'Empathetic'),
+                      t('demo.traits.clear', 'Clear')
+                    ].map((trait, i) => (
                       <span key={i} className="px-2 sm:px-3 py-0.5 sm:py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] sm:text-xs font-medium rounded-full">
                         {trait}
                       </span>
@@ -1333,42 +1337,66 @@ function VoiceProfile() {
                   icon: 'type',
                   title: t('features.voiceProfile.metrics.sentenceStarters', 'Sentence Starters'),
                   desc: t('features.voiceProfile.metrics.sentenceStartersDesc', 'How you typically begin sentences - subject-first, adverbs, questions'),
-                  examples: ['"I think..."', '"However..."', '"The key is..."'],
+                  examples: [
+                    t('features.voiceProfile.metrics.sentenceStartersEx1', '"I think..."'),
+                    t('features.voiceProfile.metrics.sentenceStartersEx2', '"However..."'),
+                    t('features.voiceProfile.metrics.sentenceStartersEx3', '"The key is..."')
+                  ],
                   color: 'indigo'
                 },
                 {
                   icon: 'link',
                   title: t('features.voiceProfile.metrics.transitions', 'Transition Preferences'),
                   desc: t('features.voiceProfile.metrics.transitionsDesc', 'Your preferred connecting words and phrases'),
-                  examples: ['"but"', '"therefore"', '"on the other hand"'],
+                  examples: [
+                    t('features.voiceProfile.metrics.transitionsEx1', '"but"'),
+                    t('features.voiceProfile.metrics.transitionsEx2', '"therefore"'),
+                    t('features.voiceProfile.metrics.transitionsEx3', '"on the other hand"')
+                  ],
                   color: 'violet'
                 },
                 {
                   icon: 'edit-2',
                   title: t('features.voiceProfile.metrics.punctuation', 'Punctuation Style'),
                   desc: t('features.voiceProfile.metrics.punctuationDesc', 'Your unique punctuation patterns and preferences'),
-                  examples: ['Em-dashes', 'Semicolons', 'Exclamation marks'],
+                  examples: [
+                    t('features.voiceProfile.metrics.punctuationEx1', 'Em-dashes'),
+                    t('features.voiceProfile.metrics.punctuationEx2', 'Semicolons'),
+                    t('features.voiceProfile.metrics.punctuationEx3', 'Exclamation marks')
+                  ],
                   color: 'purple'
                 },
                 {
                   icon: 'book-open',
                   title: t('features.voiceProfile.metrics.vocabulary', 'Vocabulary Patterns'),
                   desc: t('features.voiceProfile.metrics.vocabularyDesc', 'Common phrases, preferred words, and expressions'),
-                  examples: ['"honestly"', '"let me explain"', '"here\'s the thing"'],
+                  examples: [
+                    t('features.voiceProfile.metrics.vocabularyEx1', '"honestly"'),
+                    t('features.voiceProfile.metrics.vocabularyEx2', '"let me explain"'),
+                    t('features.voiceProfile.metrics.vocabularyEx3', '"here\'s the thing"')
+                  ],
                   color: 'blue'
                 },
                 {
                   icon: 'align-left',
                   title: t('features.voiceProfile.metrics.sentenceLength', 'Sentence Structure'),
                   desc: t('features.voiceProfile.metrics.sentenceLengthDesc', 'Typical length, complexity, and rhythm of your sentences'),
-                  examples: ['Short & punchy', 'Medium flow', 'Complex & detailed'],
+                  examples: [
+                    t('features.voiceProfile.metrics.sentenceLengthEx1', 'Short & punchy'),
+                    t('features.voiceProfile.metrics.sentenceLengthEx2', 'Medium flow'),
+                    t('features.voiceProfile.metrics.sentenceLengthEx3', 'Complex & detailed')
+                  ],
                   color: 'cyan'
                 },
                 {
                   icon: 'heart',
                   title: t('features.voiceProfile.metrics.tone', 'Emotional Markers'),
                   desc: t('features.voiceProfile.metrics.toneDesc', 'How you express opinions, feelings, and emphasis'),
-                  examples: ['"I feel..."', '"In my opinion..."', '"Absolutely!"'],
+                  examples: [
+                    t('features.voiceProfile.metrics.toneEx1', '"I feel..."'),
+                    t('features.voiceProfile.metrics.toneEx2', '"In my opinion..."'),
+                    t('features.voiceProfile.metrics.toneEx3', '"Absolutely!"')
+                  ],
                   color: 'pink'
                 }
               ].map((metric, index) => (
@@ -1567,10 +1595,13 @@ function VoiceProfile() {
                   ].map((lang, i) => (
                     <span 
                       key={i} 
-                      className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full overflow-hidden border-2 border-white dark:border-slate-600 shadow-sm inline-flex items-center justify-center bg-gray-100"
+                      className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full overflow-hidden border-2 border-white dark:border-slate-600 shadow-sm flex items-center justify-center"
                       title={lang.name}
                     >
-                      <span className={`fi fi-${lang.flag} fis text-[2rem] sm:text-[2.25rem] md:text-[2.5rem]`} />
+                      <span 
+                        className={`fi fis fi-${lang.flag} rounded-full`} 
+                        style={{ fontSize: '32px' }} 
+                      />
                     </span>
                   ))}
                   <span className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 border-2 border-white dark:border-slate-600 shadow-sm">

@@ -181,11 +181,25 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
     >
       <div className={cn("py-4", isCollapsed && "px-2")}>
         {isCollapsed ? (
-          <div className="text-[20px] text-text-primary font-bold text-center">G</div>
+          <a 
+            href="https://graphosai.com/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-[20px] text-text-primary font-bold text-center block no-underline hover:opacity-80 transition-opacity"
+          >
+            G
+          </a>
         ) : (
-          <h1 className="text-[26px] text-text-primary tracking-tighter leading-tight text-center whitespace-nowrap">
-            <span className="font-bold">Graphos</span> <span className="font-normal">AI Studio</span>
-          </h1>
+          <a 
+            href="https://graphosai.com/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block no-underline hover:opacity-80 transition-opacity"
+          >
+            <h1 className="text-[26px] text-text-primary tracking-tighter leading-tight text-center whitespace-nowrap">
+              <span className="font-bold">Graphos</span> <span className="font-normal">AI Studio</span>
+            </h1>
+          </a>
         )}
       </div>
 

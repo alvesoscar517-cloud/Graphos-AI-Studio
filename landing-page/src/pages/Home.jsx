@@ -13,7 +13,6 @@ import FeaturesSection from '@components/sections/FeaturesSection'
 import CTASection from '@components/sections/CTASection'
 import HowItWorksSection from '@components/sections/HowItWorksSection'
 import LoadingSpinner from '@components/common/LoadingSpinner'
-import ExitIntentPopup from '@components/common/ExitIntentPopup'
 
 // Lazy load heavy sections for better performance
 const ProductShowcaseSection = lazy(() => 
@@ -264,9 +263,6 @@ function Home() {
           <CTASection />
         </section>
       </main>
-
-      {/* Exit Intent Popup */}
-      <ExitIntentPopup />
     </>
   )
 }

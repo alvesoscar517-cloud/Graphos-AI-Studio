@@ -21,7 +21,7 @@ export function useChangePasswordForm(onSubmit) {
       newPassword: '',
       confirmPassword: '',
     },
-    mode: 'onBlur',
+    mode: 'onBlur', // Validate when user leaves the field
   })
 
   const handleSubmit = form.handleSubmit(async (data) => {

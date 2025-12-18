@@ -37,6 +37,7 @@ import { logError } from '../utils/errors'
 import { saveCredentials, preventAutoSignIn } from '../utils/credentialManager'
 import { isWebApp, isChromeExtension } from '../utils/environment'
 import { signInWithGooglePopup, signOutWeb } from '../utils/webAuth'
+import { clearGoogleAuth, getStoredGoogleToken } from '../utils/googleOAuth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://graphosai-472729326429.us-central1.run.app'
 
@@ -209,6 +210,140 @@ export const useAuthStore = create(
               return
             }
 
+            // Check for existing Google OAuth session (web app)
+            if (isWebApp()) {
+              const googleToken = getStoredGoogleToken()
+              if (googleToken) {
+                // We have a valid Google token, check for stored user info
+                const { getStoredUserInfo } = await import('../utils/googleOAuth')
+                const userInfo = getStoredUserInfo()
+                
+                if (userInfo?.email) {
+                  logger.log('[AUTH] initAuth - Found stored Google OAuth session')
+                  
+                  // Check if this Google email is linked to an existing email user
+                  let userId = userInfo.id || `user_${userInfo.email.replace(/[^a-zA-Z0-9]/g, '_')}`
+                  let linkedUser = null
+                  let hasGoogleLinked = false
+                  
+                  try {
+                    const checkResponse = await fetch(`${API_BASE_URL}/auth/email/check-google-linked`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ googleEmail: userInfo.email })
+                    })
+                    
+                    const checkData = await checkResponse.json()
+                    
+                    if (checkData.success && checkData.linked && checkData.user) {
+                      // Google email is linked - login with that account to get tokens
+                      logger.log('[AUTH] initAuth - Google email linked to email user, getting tokens:', checkData.userId)
+                      
+                      // Call login-with-google endpoint to get JWT tokens
+                      const loginResponse = await fetch(`${API_BASE_URL}/auth/email/login-with-google`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                          googleEmail: userInfo.email,
+                          googleAccessToken: googleToken
+                        })
+                      })
+                      
+                      const loginData = await loginResponse.json()
+                      
+                      if (loginResponse.ok && loginData.success) {
+                        userId = loginData.user.userId
+                        linkedUser = {
+                          ...loginData.user,
+                          id: loginData.user.userId,
+                          picture: userInfo.picture || loginData.user.picture
+                        }
+                        hasGoogleLinked = true
+                        
+                        // Store tokens
+                        setUserData(linkedUser)
+                        setStorageAuthMethod('email')
+                        setRememberMe(true)
+                        tokenService.setTokens({
+                          accessToken: loginData.accessToken,
+                          refreshToken: loginData.refreshToken,
+                          expiresIn: loginData.expiresIn || 3600
+                        })
+                        
+                        secureSet(AUTH_STORAGE_KEYS.USER_ID, userId)
+                        set({ 
+                          user: linkedUser, 
+                          token: loginData.accessToken,
+                          isAuthenticated: true, 
+                          authMethod: 'email',
+                          hasGoogleLinked: true,
+                          _sessionPersisted: true
+                        })
+                        set({ isLoading: false })
+                        return // Exit early, we're done
+                      }
+                    }
+                  } catch (checkError) {
+                    logger.log('[AUTH] initAuth - Check Google linked failed:', checkError.message)
+                  }
+                  
+                  // No linked account - try to login/register as Google-only user
+                  try {
+                    const googleLoginResponse = await fetch(`${API_BASE_URL}/auth/email/google-login`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ accessToken: googleToken })
+                    })
+                    
+                    const googleLoginData = await googleLoginResponse.json()
+                    
+                    if (googleLoginResponse.ok && googleLoginData.success) {
+                      const backendUser = {
+                        ...googleLoginData.user,
+                        id: googleLoginData.user.userId,
+                        picture: userInfo.picture || googleLoginData.user.picture
+                      }
+                      
+                      setUserData(backendUser)
+                      secureSet(AUTH_STORAGE_KEYS.USER_ID, googleLoginData.user.userId)
+                      setStorageAuthMethod('google')
+                      setRememberMe(true)
+                      
+                      tokenService.setTokens({
+                        accessToken: googleLoginData.accessToken,
+                        refreshToken: googleLoginData.refreshToken,
+                        expiresIn: googleLoginData.expiresIn || 3600
+                      })
+                      
+                      set({ 
+                        user: backendUser, 
+                        token: googleLoginData.accessToken,
+                        isAuthenticated: true, 
+                        authMethod: 'google',
+                        _sessionPersisted: true
+                      })
+                      set({ isLoading: false })
+                      return
+                    }
+                  } catch (backendError) {
+                    logger.log('[AUTH] initAuth - Backend Google login failed:', backendError.message)
+                  }
+                  
+                  // Fallback: local-only auth
+                  secureSet(AUTH_STORAGE_KEYS.USER_ID, userId)
+                  set({ 
+                    user: linkedUser || { ...userInfo, id: userId }, 
+                    isAuthenticated: true, 
+                    authMethod: 'google',
+                    hasGoogleLinked,
+                    _sessionPersisted: true
+                  })
+                  set({ isLoading: false })
+                  return
+                }
+              }
+            }
+
             // Check Chrome extension authentication (only in extension context)
             if (isChromeExtension()) {
               try {
@@ -321,12 +456,13 @@ export const useAuthStore = create(
             
             // Use different auth flow based on environment
             if (isWebApp()) {
-              // Web app: Use Firebase Auth popup
-              logger.log('[AUTH] Using web auth flow (Firebase)')
+              // Web app: Use direct Google OAuth (same as Chrome extension)
+              logger.log('[AUTH] Using web auth flow (direct Google OAuth)')
               response = await signInWithGooglePopup()
               
               if (response.success) {
                 googleAccessToken = response.accessToken
+                // Token is already stored by googleOAuth module
               }
             } else {
               // Chrome Extension: Use chrome.identity
@@ -423,18 +559,81 @@ export const useAuthStore = create(
                 logger.log('[AUTH] Check Google linked failed, continuing with normal sign in:', checkError.message)
               }
               
-              // No linked account found - create new Google-only user ID
-              const userId = response.userInfo.id || `user_${googleEmail.replace(/[^a-zA-Z0-9]/g, '_')}`
-              secureSet(AUTH_STORAGE_KEYS.USER_ID, userId)
-              
-              set({ 
-                user: { ...response.userInfo, id: userId }, 
-                isAuthenticated: true, 
-                authMethod: 'google', 
-                error: null 
-              })
-              
-              return { success: true }
+              // No linked account found - register/login as Google-only user via backend
+              // This creates user in database and gives welcome credits
+              try {
+                const googleLoginResponse = await fetch(`${API_BASE_URL}/auth/email/google-login`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ accessToken: googleAccessToken })
+                })
+                
+                const googleLoginData = await googleLoginResponse.json()
+                
+                if (googleLoginResponse.ok && googleLoginData.success) {
+                  // Use backend-generated user data
+                  const backendUser = {
+                    ...googleLoginData.user,
+                    id: googleLoginData.user.userId,
+                    picture: response.userInfo.picture || googleLoginData.user.picture
+                  }
+                  
+                  // Store user and tokens
+                  setUserData(backendUser)
+                  secureSet(AUTH_STORAGE_KEYS.USER_ID, googleLoginData.user.userId)
+                  setStorageAuthMethod('google')
+                  setRememberMe(true)
+                  
+                  // Store JWT tokens for API calls
+                  tokenService.setTokens({
+                    accessToken: googleLoginData.accessToken,
+                    refreshToken: googleLoginData.refreshToken,
+                    expiresIn: googleLoginData.expiresIn || 3600
+                  })
+                  
+                  set({ 
+                    user: backendUser, 
+                    token: googleLoginData.accessToken,
+                    isAuthenticated: true, 
+                    authMethod: 'google',
+                    error: null,
+                    _sessionPersisted: true
+                  })
+                  
+                  logger.log('[AUTH] Google-only user logged in via backend', { 
+                    userId: googleLoginData.user.userId, 
+                    isNewUser: googleLoginData.isNewUser 
+                  })
+                  
+                  return { success: true, isNewUser: googleLoginData.isNewUser }
+                } else {
+                  // Backend rejected - might be email conflict
+                  const error = new Error(googleLoginData.error || 'Google login failed')
+                  error.code = googleLoginData.code
+                  throw error
+                }
+              } catch (backendError) {
+                // If backend call fails, fall back to local-only auth (no credits)
+                logger.warn('Auth', 'Backend Google login failed, using local auth:', backendError.message)
+                
+                // Re-throw if it's a known error code
+                if (backendError.code === 'AUTH_EMAIL_EXISTS') {
+                  throw backendError
+                }
+                
+                // Fallback: local-only auth without backend user creation
+                const userId = response.userInfo.id || `user_${googleEmail.replace(/[^a-zA-Z0-9]/g, '_')}`
+                secureSet(AUTH_STORAGE_KEYS.USER_ID, userId)
+                
+                set({ 
+                  user: { ...response.userInfo, id: userId }, 
+                  isAuthenticated: true, 
+                  authMethod: 'google', 
+                  error: null 
+                })
+                
+                return { success: true }
+              }
             }
             
             throw new Error('Sign in failed')
@@ -857,9 +1056,10 @@ export const useAuthStore = create(
             
             // Use different auth flow based on environment
             if (isWebApp()) {
-              // Web app: Use Firebase Auth popup
+              // Web app: Use direct Google OAuth (same as Chrome extension)
               googleResponse = await signInWithGooglePopup()
               googleAccessToken = googleResponse.accessToken
+              // Token is already stored by googleOAuth module
             } else if (isChromeExtension()) {
               // Chrome Extension: Use chrome.identity
               googleResponse = await chrome.runtime.sendMessage({ action: 'signIn' })
@@ -956,8 +1156,8 @@ export const useAuthStore = create(
             
             // Clear Google OAuth token
             if (isWebApp()) {
-              // Web app: Sign out from Firebase Auth
-              await signOutWeb()
+              // Web app: Clear Google OAuth tokens
+              clearGoogleAuth()
             } else if (isChromeExtension()) {
               // Chrome Extension: Clear from chrome.storage
               await chrome.storage.local.remove(['accessToken', 'userInfo', 'driveFolderId'])
@@ -991,8 +1191,8 @@ export const useAuthStore = create(
             
             // Sign out from appropriate auth provider
             if (isWebApp()) {
-              // Web app: Sign out from Firebase Auth
-              await signOutWeb()
+              // Web app: Clear Google OAuth tokens
+              clearGoogleAuth()
             } else if (isChromeExtension() && authMethod === 'google') {
               // Chrome Extension: Sign out via background script
               await chrome.runtime.sendMessage({ action: 'signOut' })

@@ -433,16 +433,7 @@
     },
     "title": "Deviations"
   },
-  "exitPopup": {
-    "cta": "Claim My Bonus Credits",
-    "emailPlaceholder": "Enter your email",
-    "noSpam": "No spam",
-    "noThanks": "No thanks, I'll pay full price",
-    "subtitle": "Subscribe to our newsletter and get 50 extra credits on your first purchase!",
-    "success": "Awesome! Check your email for the bonus code.",
-    "title": "Wait! Get 50 Bonus Credits",
-    "unsubscribe": "Unsubscribe anytime"
-  },
+
   "extension": {
     "badge": "Chrome Extension",
     "comingSoon": "COMING SOON",

@@ -228,7 +228,7 @@ const LiveHumanizationDemo = () => {
 
         {/* Footer with Action */}
         <div className="flex items-center justify-between mt-4">
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-500 hidden sm:inline">
             {isComplete ? (
               <span className="flex items-center gap-1.5">
                 <Icon name="check-circle" size="xs" className="text-green-500" />
@@ -244,17 +244,17 @@ const LiveHumanizationDemo = () => {
             )}
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-auto">
             {isComplete && (
               <motion.button
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleReset}
-                className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-200 transition-all"
+                className="flex items-center justify-center gap-2 p-2.5 sm:px-4 sm:py-2.5 bg-gray-100 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-200 transition-all"
               >
                 <Icon name="rotate-ccw" size="sm" className="text-gray-500" />
-                {t('demo.reset', 'Reset')}
+                <span className="hidden sm:inline">{t('demo.reset', 'Reset')}</span>
               </motion.button>
             )}
 

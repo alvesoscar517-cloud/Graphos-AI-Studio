@@ -2,6 +2,7 @@
  * AIDetection - SEO-optimized AI Detection feature page
  * Enhanced: Dec 2025 - Full SEO optimization for Google crawling
  * Features: Comprehensive structured data, semantic HTML, multi-language SEO
+ * Updated: Localized avatars and names based on user's locale
  */
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -13,6 +14,7 @@ import Breadcrumb from '@components/common/Breadcrumb'
 import Icon from '@components/common/Icon'
 import RelatedFeatures from '@components/common/RelatedFeatures'
 import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
+import { getLocalizedFeatureTestimonials, getLocalizedSocialProofAvatars } from '@utils/localizedAvatars'
 
 // Lazy load components for better performance
 const LiveAIDetectionDemo = lazy(() => import('@components/demos/LiveAIDetectionDemo'))
@@ -205,7 +207,7 @@ const StatCard = ({ value, label, suffix = '', prefix = '' }) => {
 
 
 function AIDetection() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [openFaq, setOpenFaq] = useState(null)
 
   const benefits = [
@@ -242,24 +244,36 @@ function AIDetection() {
     { feature: t('features.aiDetection.comparison.languages', 'Multi-language Support'), us: '15+', others: '3-5' },
   ]
 
+  // Get localized testimonials
+  const localizedPersonas = useMemo(() => 
+    getLocalizedFeatureTestimonials(i18n.language, 'aiDetection'),
+    [i18n.language]
+  )
+  
+  // Get localized social proof avatars
+  const socialProofAvatars = useMemo(() => 
+    getLocalizedSocialProofAvatars(i18n.language, 3),
+    [i18n.language]
+  )
+
   const testimonials = [
     {
       quote: t('features.aiDetection.testimonials.education.quote', 'This tool has saved me countless hours checking student papers. The accuracy is impressive and the detailed indicators help me understand exactly what to look for.'),
-      author: t('features.aiDetection.testimonials.education.author', 'Dr. Sarah Chen'),
-      role: t('features.aiDetection.testimonials.education.role', 'University Professor'),
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face'
+      author: localizedPersonas[0]?.name || 'Dr. Sarah Chen',
+      role: localizedPersonas[0]?.role || t('features.aiDetection.testimonials.education.role', 'University Professor'),
+      avatar: localizedPersonas[0]?.avatar
     },
     {
       quote: t('features.aiDetection.testimonials.business.quote', 'Essential for our content team. We use it to verify all incoming content before publication. The confidence scores give us peace of mind.'),
-      author: t('features.aiDetection.testimonials.business.author', 'Michael Torres'),
-      role: t('features.aiDetection.testimonials.business.role', 'Content Director, Tech Startup'),
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
+      author: localizedPersonas[1]?.name || 'Michael Torres',
+      role: localizedPersonas[1]?.role || t('features.aiDetection.testimonials.business.role', 'Content Director, Tech Startup'),
+      avatar: localizedPersonas[1]?.avatar
     },
     {
       quote: t('features.aiDetection.testimonials.freelance.quote', 'As a freelance editor, I need to ensure the content I receive is authentic. This tool is fast, accurate, and the privacy-first approach is exactly what I need.'),
-      author: t('features.aiDetection.testimonials.freelance.author', 'Emma Williams'),
-      role: t('features.aiDetection.testimonials.freelance.role', 'Freelance Editor'),
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face'
+      author: localizedPersonas[2]?.name || 'Emma Williams',
+      role: localizedPersonas[2]?.role || t('features.aiDetection.testimonials.freelance.role', 'Freelance Editor'),
+      avatar: localizedPersonas[2]?.avatar
     }
   ]
 
@@ -775,10 +789,10 @@ function AIDetection() {
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
                     {[
-                      { label: 'Lexical Patterns', icon: 'type', active: true },
-                      { label: 'Semantic Analysis', icon: 'brain', active: false },
-                      { label: 'Structure Check', icon: 'layout', active: false },
-                      { label: 'Statistical Model', icon: 'activity', active: false }
+                      { label: t('features.aiDetection.layers.lexical', 'Lexical Patterns'), icon: 'type', active: true },
+                      { label: t('features.aiDetection.layers.semantic', 'Semantic Analysis'), icon: 'brain', active: false },
+                      { label: t('features.aiDetection.layers.structure', 'Structure Check'), icon: 'layout', active: false },
+                      { label: t('features.aiDetection.layers.statistical', 'Statistical Model'), icon: 'activity', active: false }
                     ].map((layer, idx) => (
                       <motion.div
                         key={layer.label}
@@ -830,7 +844,7 @@ function AIDetection() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-text-primary text-xs sm:text-sm">
-                        {t('demo.aiDetection', 'AI Detection')}
+                        {t('demo.aiDetection.title', 'AI Detection')}
                       </h4>
                       <p className="text-[10px] sm:text-xs text-text-tertiary">
                         {t('features.aiDetection.sampleDesc', 'Sample result with confidence score')}
@@ -1496,9 +1510,9 @@ function AIDetection() {
             >
               <div className="inline-flex items-center gap-2 sm:gap-3 md:gap-4 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 bg-bg-secondary/50 rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-700">
                 <div className="flex -space-x-1.5 sm:-space-x-2">
-                  <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&crop=face" alt="User" className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover" />
-                  <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt="User" className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover" />
-                  <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" alt="User" className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover" />
+                  {socialProofAvatars.map((avatar, index) => (
+                    <img key={index} src={avatar} alt="User" className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover" />
+                  ))}
                 </div>
                 <span className="text-xs sm:text-sm text-text-secondary">
                   <span className="font-semibold text-text-primary">50K+</span> {t('features.aiDetection.comparison.usersCount', 'users trust us')}

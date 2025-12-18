@@ -15,7 +15,7 @@ export function useForgotPasswordForm(onSubmit) {
   const form = useForm({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: { email: '' },
-    mode: 'onBlur',
+    mode: 'onBlur', // Validate when user leaves the field
   })
 
   const handleSubmit = form.handleSubmit(async (data) => {
@@ -50,7 +50,7 @@ export function useResetPasswordForm(onSubmit) {
       newPassword: '',
       confirmPassword: '',
     },
-    mode: 'onBlur',
+    mode: 'onBlur', // Validate when user leaves the field
   })
 
   const handleSubmit = form.handleSubmit(async (data) => {

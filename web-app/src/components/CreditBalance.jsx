@@ -69,12 +69,13 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
       <button 
         className={cn(
           "w-full py-2.5 px-4 rounded-3xl text-xs font-medium cursor-pointer",
-          "transition-colors duration-200",
+          "transition-colors duration-200 flex items-center justify-center gap-1.5",
           "bg-bg-primary border border-border-light text-text-primary",
           "hover:bg-bg-hover hover:border-border-hover"
         )}
         onClick={onUpgradeClick}
       >
+        <img src="/icon/crown-power.svg" alt="" className="w-4 h-4" />
         {t('credits.upgradePlan')}
       </button>
     </div>

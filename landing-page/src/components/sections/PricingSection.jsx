@@ -1,6 +1,7 @@
 /**
  * PricingSection - Premium pricing with animated cards
  * Enhanced: Dec 2025 - Full-width layout, updated features, payment icons
+ * Updated: Dec 2025 - Local currency display synced with app's UpgradePlanModal
  */
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -15,7 +16,6 @@ const CREDIT_PACKAGES = [
   { id: 'power', credits: 6000, bonus: 2400, price: 99.99, icon: 'crown-ultimate', description: 'Power', bestValue: true }
 ]
 
-// Updated features based on actual sidebar functionality (removed Translation)
 const CREDIT_USES = [
   { icon: 'shield-check', key: 'aiDetection', cost: '~2-5', description: 'Detect AI-generated content' },
   { icon: 'wand-sparkles', key: 'humanization', cost: '~5-15', description: 'Make text more human-like' },
@@ -25,61 +25,116 @@ const CREDIT_USES = [
   { icon: 'bar-chart-4', key: 'styleAnalysis', cost: '~1-3', description: 'Analyze writing patterns' }
 ]
 
+// Currency mapping by language code with exchange rates (synced with app's UpgradePlanModal)
 const CURRENCY_CONFIG = {
-  vi: { rate: 25400, symbol: '₫', position: 'after', largeNumber: true },
-  ja: { rate: 154, symbol: '¥', position: 'before' },
-  ko: { rate: 1380, symbol: '₩', position: 'before', largeNumber: true },
-  zh: { rate: 7.25, symbol: '¥', position: 'before' },
-  th: { rate: 35.5, symbol: '฿', position: 'before' },
-  id: { rate: 16200, symbol: 'Rp', position: 'before', largeNumber: true },
-  de: { rate: 0.92, symbol: '€', position: 'after' },
-  fr: { rate: 0.92, symbol: '€', position: 'after' },
-  es: { rate: 0.92, symbol: '€', position: 'after' },
-  pt: { rate: 6.1, symbol: 'R$', position: 'before' }
+  vi: { currency: 'VND', rate: 25400, symbol: 'đ', position: 'after', largeNumber: true },
+  ja: { currency: 'JPY', rate: 154, symbol: '\u00A5', position: 'before', largeNumber: false },
+  ko: { currency: 'KRW', rate: 1380, symbol: '\u20A9', position: 'before', largeNumber: true },
+  zh: { currency: 'CNY', rate: 7.25, symbol: '\u00A5', position: 'before', largeNumber: false },
+  'zh-CN': { currency: 'CNY', rate: 7.25, symbol: '\u00A5', position: 'before', largeNumber: false },
+  th: { currency: 'THB', rate: 35.5, symbol: '\u0E3F', position: 'before', largeNumber: false },
+  id: { currency: 'IDR', rate: 16200, symbol: 'Rp', position: 'before', largeNumber: true },
+  hi: { currency: 'INR', rate: 84, symbol: '\u20B9', position: 'before', largeNumber: false },
+  ru: { currency: 'RUB', rate: 103, symbol: '\u20BD', position: 'after', largeNumber: false },
+  ar: { currency: 'SAR', rate: 3.75, symbol: 'SAR', position: 'after', largeNumber: false },
+  de: { currency: 'EUR', rate: 0.92, symbol: '\u20AC', position: 'after', largeNumber: false },
+  fr: { currency: 'EUR', rate: 0.92, symbol: '\u20AC', position: 'after', largeNumber: false },
+  es: { currency: 'EUR', rate: 0.92, symbol: '\u20AC', position: 'after', largeNumber: false },
+  it: { currency: 'EUR', rate: 0.92, symbol: '\u20AC', position: 'after', largeNumber: false },
+  pt: { currency: 'BRL', rate: 6.1, symbol: 'R$', position: 'before', largeNumber: false },
+  en: null
 }
 
-const formatLocalCurrency = (usdPrice, langCode) => {
-  const config = CURRENCY_CONFIG[langCode]
+/**
+ * Format local currency with smart display for large numbers
+ */
+const formatLocalCurrency = (usdPrice, langCode, isPerCredit = false) => {
+  const config = CURRENCY_CONFIG[langCode] || CURRENCY_CONFIG[langCode?.split('-')[0]]
   if (!config || usdPrice === 0) return null
+  
   const localPrice = usdPrice * config.rate
-  const formatted = config.largeNumber 
-    ? `${Math.floor(Math.round(localPrice / 1000) * 1000 / 1000).toLocaleString()}.000`
-    : Math.round(localPrice).toLocaleString()
-  return config.position === 'before' ? `${config.symbol}${formatted}` : `${formatted}${config.symbol}`
+  
+  let formatted
+  if (config.largeNumber) {
+    if (isPerCredit) {
+      const roundedPrice = Math.round(localPrice)
+      formatted = { main: String(roundedPrice), suffix: '' }
+    } else {
+      const roundedPrice = Math.round(localPrice / 1000) * 1000
+      const mainPart = Math.floor(roundedPrice / 1000)
+      formatted = { main: String(mainPart).replace(/\B(?=(\d{3})+(?!\d))/g, ','), suffix: '.000' }
+    }
+  } else {
+    if (isPerCredit) {
+      formatted = { main: localPrice.toFixed(localPrice < 1 ? 3 : 2), suffix: '' }
+    } else {
+      formatted = { main: String(Math.round(localPrice)), suffix: '' }
+    }
+  }
+  
+  return { ...config, price: localPrice, formatted }
 }
 
-
+const renderLocalPrice = (usdPrice, langCode, isLarge = false, isPerCredit = false) => {
+  const localData = formatLocalCurrency(usdPrice, langCode, isPerCredit)
+  if (!localData) return null
+  
+  const { symbol, position, formatted } = localData
+  
+  if (isLarge) {
+    return (
+      <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-text-primary tracking-tight">
+        {position === 'before' && <span className="text-sm sm:text-base text-text-muted">{symbol}</span>}
+        {formatted.main}
+        {formatted.suffix && <span className="text-sm sm:text-base text-text-muted opacity-60">{formatted.suffix}</span>}
+        {position === 'after' && <span className="text-sm sm:text-base text-text-muted">{symbol}</span>}
+      </span>
+    )
+  }
+  
+  return (
+    <span className="text-[10px] sm:text-xs text-text-muted">
+      {position === 'before' && symbol}
+      {formatted.main}
+      {formatted.suffix && <span className="text-[9px] sm:text-[10px] opacity-70">{formatted.suffix}</span>}
+      {position === 'after' && symbol}
+    </span>
+  )
+}
 
 
 const PricingSection = () => {
   const { t, i18n } = useTranslation()
-  const currentLang = i18n.language?.split('-')[0] || 'en'
-  const showLocalCurrency = useMemo(() => currentLang !== 'en' && CURRENCY_CONFIG[currentLang], [currentLang])
+  const currentLang = i18n.language || 'en'
+  const baseLang = currentLang.split('-')[0]
+  
+  // Check if we should show local currency - try full lang code first, then base
+  const showLocalCurrency = useMemo(() => {
+    if (currentLang === 'en' || baseLang === 'en') return false
+    return CURRENCY_CONFIG[currentLang] || CURRENCY_CONFIG[baseLang]
+  }, [currentLang, baseLang])
+  
+  // Get the lang code to use for currency formatting
+  const currencyLang = useMemo(() => {
+    if (CURRENCY_CONFIG[currentLang]) return currentLang
+    if (CURRENCY_CONFIG[baseLang]) return baseLang
+    return 'en'
+  }, [currentLang, baseLang])
 
   const getTotalCredits = (pkg) => pkg.credits + pkg.bonus
   const getPricePerCredit = (pkg) => pkg.price === 0 ? '0' : (pkg.price / getTotalCredits(pkg)).toFixed(3)
   const getBonusPercent = (pkg) => pkg.bonus > 0 ? Math.round((pkg.bonus / pkg.credits) * 100) : 0
 
-
   return (
     <section id="pricing" className="py-12 sm:py-16 lg:py-20 xl:py-28 relative overflow-hidden">
-      {/* Background - Enhanced gradient */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-[300px] sm:w-[400px] lg:w-[500px] h-[300px] sm:h-[400px] lg:h-[500px] bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-[250px] sm:w-[350px] lg:w-[400px] h-[250px] sm:h-[350px] lg:h-[400px] bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[500px] lg:w-[600px] h-[400px] sm:h-[500px] lg:h-[600px] bg-gradient-to-br from-primary/3 to-purple-500/3 rounded-full blur-3xl" />
-        {/* SVG Background Pattern */}
-        <img 
-          src="/images/backgrounds/bg-wave-4.svg" 
-          alt="" 
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover opacity-100"
-        />
+        <img src="/images/backgrounds/bg-wave-4.svg" alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-100" />
       </div>
 
-      {/* Container with reduced max-width for better card display */}
       <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative">
-        {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-8 sm:mb-10 lg:mb-14">
           <motion.span initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-bg-primary text-primary text-xs sm:text-sm font-semibold rounded-full mb-3 sm:mb-5 border border-gray-200 dark:border-gray-700 shadow-sm">
             <Icon name="credit-card" size="sm" className="icon-primary" />
@@ -89,7 +144,6 @@ const PricingSection = () => {
           <p className="text-base sm:text-lg text-text-secondary max-w-xl sm:max-w-2xl mx-auto px-2 sm:px-0">{t('pricing.subtitle', 'Buy credits when you need them. No subscription required. Credits never expire.')}</p>
         </motion.div>
 
-        {/* Pricing Cards - Full width grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5 mb-8 sm:mb-10 lg:mb-14">
           {CREDIT_PACKAGES.map((pkg, index) => (
             <motion.div
@@ -121,7 +175,6 @@ const PricingSection = () => {
               <div className={`h-full bg-bg-primary rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 border transition-all duration-300 hover:shadow-xl flex flex-col ${
                 pkg.popular ? 'border-primary/30 shadow-lg shadow-primary/10' : pkg.isFree ? 'border-green-500/20' : pkg.bestValue ? 'border-amber-500/20' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
               }`}>
-                {/* Icon */}
                 <div className="flex justify-center mb-2 sm:mb-3 lg:mb-4 pt-1 sm:pt-2">
                   <div className={`w-10 sm:w-12 lg:w-14 h-10 sm:h-12 lg:h-14 rounded-lg sm:rounded-xl flex items-center justify-center border shadow-sm ${
                     pkg.isFree ? 'bg-green-500/10 border-green-500/20' : pkg.popular ? 'bg-primary/10 border-primary/20' : pkg.bestValue ? 'bg-amber-500/10 border-amber-500/20' : 'bg-bg-primary border-gray-200 dark:border-gray-700'
@@ -135,21 +188,20 @@ const PricingSection = () => {
                 </div>
                 <h3 className="text-center text-sm sm:text-base lg:text-lg font-bold text-text-primary mb-2 sm:mb-3">{pkg.description}</h3>
 
-                {/* Price */}
                 <div className="text-center mb-2 sm:mb-3 lg:mb-4">
                   {pkg.isFree ? (
                     <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-500">{t('pricing.free', 'Free')}</span>
+                  ) : showLocalCurrency ? (
+                    renderLocalPrice(pkg.price, currencyLang, true)
                   ) : (
                     <>
                       <span className="text-xs sm:text-sm text-text-muted">$</span>
                       <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-text-primary">{pkg.price.toFixed(2).split('.')[0]}</span>
                       <span className="text-sm sm:text-base lg:text-lg text-text-muted">.{pkg.price.toFixed(2).split('.')[1]}</span>
-                      {showLocalCurrency && <span className="text-[10px] sm:text-xs text-text-muted block mt-0.5 sm:mt-1">≈ {formatLocalCurrency(pkg.price, currentLang)}</span>}
                     </>
                   )}
                 </div>
 
-                {/* Credits with x2 display for first purchase */}
                 <div className="text-center mb-2 sm:mb-3 lg:mb-4">
                   <div className="flex items-center justify-center gap-1 sm:gap-1.5 flex-wrap">
                     <Icon name="coins" size="sm" className="text-amber-500 sm:!w-5 sm:!h-5" />
@@ -167,17 +219,15 @@ const PricingSection = () => {
                     )}
                   </div>
                   
-                  {/* x2 First Purchase Badge - show for all paid packages */}
                   {!pkg.isFree && (
                     <div className="mt-1.5 sm:mt-2">
                       <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 bg-primary/10 rounded-full">
-                        <span className="text-[10px] sm:text-xs font-black text-primary">×2</span>
+                        <span className="text-[10px] sm:text-xs font-black text-primary">x2</span>
                         <span className="text-[10px] sm:text-xs font-semibold text-primary hidden sm:inline">{t('pricing.firstPurchase', 'First purchase')}</span>
                       </span>
                     </div>
                   )}
                   
-                  {/* Bonus badge */}
                   {pkg.bonus > 0 && (
                     <div className="mt-1.5 sm:mt-2">
                       <span className="inline-flex items-center gap-0.5 sm:gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 bg-green-500/10 rounded-full">
@@ -188,7 +238,15 @@ const PricingSection = () => {
                   )}
                 </div>
 
-                {!pkg.isFree && <p className="text-center text-[10px] sm:text-xs text-text-muted mb-2 sm:mb-3 lg:mb-4 hidden sm:block">~${getPricePerCredit(pkg)}/credit</p>}
+                {!pkg.isFree && (
+                  <p className="text-center text-[10px] sm:text-xs text-text-muted mb-2 sm:mb-3 lg:mb-4 hidden sm:block">
+                    ~{showLocalCurrency ? (
+                      <>{renderLocalPrice(pkg.price / getTotalCredits(pkg), currencyLang, false, true)}</>
+                    ) : (
+                      <>${getPricePerCredit(pkg)}</>
+                    )}/{t('pricing.perCredit', 'credit')}
+                  </p>
+                )}
 
                 {pkg.isFree && pkg.features && (
                   <div className="space-y-1.5 sm:space-y-2 mb-2 sm:mb-3 lg:mb-4 hidden sm:block">
@@ -201,7 +259,6 @@ const PricingSection = () => {
                   </div>
                 )}
 
-                {/* Spacer to push button to bottom */}
                 <div className="flex-grow" />
 
                 <motion.a
@@ -225,7 +282,7 @@ const PricingSection = () => {
           ))}
         </div>
 
-        {/* Credit Uses - Updated features from sidebar */}
+
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-bg-primary rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 xl:p-10 border border-gray-200 dark:border-gray-700 mb-8 sm:mb-10 lg:mb-12">
           <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-text-primary text-center mb-2 sm:mb-3">{t('pricing.whatCreditsFor', 'What Can You Do With Credits?')}</h3>
           <p className="text-xs sm:text-sm text-text-muted text-center mb-6 sm:mb-8 lg:mb-10">{t('pricing.creditCostNote', 'Approximate credits per use (varies by text length)')}</p>
@@ -250,7 +307,6 @@ const PricingSection = () => {
           </div>
         </motion.div>
 
-        {/* Benefits - Enhanced grid */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 xl:gap-5 mb-8 sm:mb-10 lg:mb-12">
           {[
             { icon: 'infinity', key: 'neverExpire', fallback: 'Credits never expire', filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(95%) contrast(90%)', bg: 'bg-green-500/10' },
@@ -274,17 +330,14 @@ const PricingSection = () => {
           ))}
         </motion.div>
 
-        {/* Payment Footer - Enhanced with real icons */}
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="flex flex-col items-center gap-4 sm:gap-5 lg:gap-6">
-          {showLocalCurrency && <p className="text-[10px] sm:text-xs text-text-muted italic">{t('pricing.localCurrencyNote', '* Local currency estimates may vary')}</p>}
+          {showLocalCurrency && <p className="text-[10px] sm:text-xs text-text-muted italic">{t('pricing.localCurrencyNote', '* Local currency estimates may vary based on current exchange rates')}</p>}
           
-          {/* Powered by Lemon Squeezy */}
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="text-xs sm:text-sm text-text-muted">{t('pricing.poweredBy', 'Powered by')}</span>
             <img src="/icon/lemonsqueezy-with-name.svg" alt="Lemon Squeezy" className="h-5 sm:h-6 opacity-70 hover:opacity-100 transition-opacity" />
           </div>
           
-          {/* Payment Methods - Using actual payment icons */}
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-text-muted">
             <span className="hidden sm:inline">{t('pricing.acceptedPayments', 'We accept')}:</span>
             <div className="flex items-center gap-2 sm:gap-3">
@@ -296,7 +349,6 @@ const PricingSection = () => {
             </div>
           </div>
           
-          {/* Security badge */}
           <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-text-muted text-center">
             <img src="/icon/lock.svg" alt="secure" className="w-3.5 sm:w-4 h-3.5 sm:h-4 opacity-60" />
             <span>{t('pricing.secureCheckout', 'Secure checkout with 256-bit SSL encryption')}</span>
@@ -308,6 +360,3 @@ const PricingSection = () => {
 }
 
 export default PricingSection
-
-
-

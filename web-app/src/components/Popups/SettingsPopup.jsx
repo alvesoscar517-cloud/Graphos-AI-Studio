@@ -205,20 +205,30 @@ const SettingsPopup = ({ onClose, onViewChange }) => {
         )}
 
         {/* Terms */}
-        <div className="dropdown-item">
+        <a 
+          href="https://graphosai.com/terms" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="dropdown-item no-underline text-inherit"
+        >
           <Icon name="file-text" alt={t('settings.termsOfService')} size="md" />
           <span className="flex-1 text-sm whitespace-nowrap">
             {t('settings.termsOfService')}
           </span>
-        </div>
+        </a>
 
         {/* Privacy */}
-        <div className="dropdown-item">
+        <a 
+          href="https://graphosai.com/privacy" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="dropdown-item no-underline text-inherit"
+        >
           <Icon name="shield" alt={t('settings.privacyPolicy')} size="md" />
           <span className="flex-1 text-sm whitespace-nowrap">
             {t('settings.privacyPolicy')}
           </span>
-        </div>
+        </a>
 
         {/* Feedback */}
         <div className="dropdown-item" onClick={() => setShowFeedbackModal(true)}>

@@ -6,6 +6,7 @@ import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import Icon from '@components/common/Icon'
+import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
 
 // Get extension features with i18n support
 const getExtensionFeatures = (t) => [
@@ -77,11 +78,11 @@ const SUPPORTED_SITES = [
 ]
 
 function ChromeExtensionSection() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [activeFeature, setActiveFeature] = useState('detect')
   
-  // Get i18n extension features
-  const EXTENSION_FEATURES = useMemo(() => getExtensionFeatures(t), [t])
+  // Get i18n extension features - re-compute when language changes
+  const EXTENSION_FEATURES = useMemo(() => getExtensionFeatures(t), [t, i18n.language])
   const [isAnimating, setIsAnimating] = useState(false)
 
   const handleFeatureClick = (featureId) => {
@@ -264,13 +265,13 @@ function ChromeExtensionSection() {
                     <div className="flex items-center gap-3">
                       {isAnimating ? (
                         <div className="flex-1 flex items-center gap-3 py-2.5 px-4 bg-bg-secondary rounded-lg">
-                          <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-                          <span className="text-base text-text-secondary">{currentFeature?.demo.action}</span>
+                          <ThreeDotsLoading size="sm" />
+                          <span className="text-sm sm:text-base text-text-secondary">{currentFeature?.demo.action}</span>
                         </div>
                       ) : (
                         <div className="flex-1 flex items-center gap-3 py-2.5 px-4 bg-bg-secondary rounded-lg">
                           <Icon name={currentFeature?.demo.icon} size="md" className={currentFeature?.demo.color} />
-                          <span className="text-base font-medium text-text-primary">{currentFeature?.demo.result}</span>
+                          <span className="text-sm sm:text-base font-medium text-text-primary">{currentFeature?.demo.result}</span>
                         </div>
                       )}
                       <button className="px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-hover transition-all whitespace-nowrap">

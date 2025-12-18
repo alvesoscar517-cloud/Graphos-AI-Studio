@@ -1,13 +1,25 @@
 /**
  * UseCasesSection - Premium use cases with interactive cards
  * Enhanced: Dec 2025 - Better visual design, animated transitions, testimonial cards
+ * Updated: Localized avatars and names based on user's locale
  */
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import Icon from '@components/common/Icon'
+import { getLocalizedUseCaseTestimonial } from '@utils/localizedAvatars'
 
-const USE_CASES = [
+// Use case keys mapping to localization
+const USE_CASE_KEYS = {
+  'content-creators': 'contentCreators',
+  'students': 'students',
+  'marketers': 'marketers',
+  'educators': 'educators',
+  'businesses': 'businesses',
+  'freelancers': 'freelancers'
+}
+
+const USE_CASES_BASE = [
   {
     id: 'content-creators',
     icon: 'pen-tool',
@@ -23,8 +35,7 @@ const USE_CASES = [
     testimonial: { 
       quoteKey: 'useCases.contentCreators.testimonial.quote',
       authorKey: 'useCases.contentCreators.testimonial.author',
-      roleKey: 'useCases.contentCreators.testimonial.role',
-      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=face"
+      roleKey: 'useCases.contentCreators.testimonial.role'
     }
   },
   {
@@ -42,8 +53,7 @@ const USE_CASES = [
     testimonial: { 
       quoteKey: 'useCases.students.testimonial.quote',
       authorKey: 'useCases.students.testimonial.author',
-      roleKey: 'useCases.students.testimonial.role',
-      avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=face"
+      roleKey: 'useCases.students.testimonial.role'
     }
   },
   {
@@ -61,8 +71,7 @@ const USE_CASES = [
     testimonial: { 
       quoteKey: 'useCases.marketers.testimonial.quote',
       authorKey: 'useCases.marketers.testimonial.author',
-      roleKey: 'useCases.marketers.testimonial.role',
-      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&crop=face"
+      roleKey: 'useCases.marketers.testimonial.role'
     }
   },
   {
@@ -80,8 +89,7 @@ const USE_CASES = [
     testimonial: { 
       quoteKey: 'useCases.educators.testimonial.quote',
       authorKey: 'useCases.educators.testimonial.author',
-      roleKey: 'useCases.educators.testimonial.role',
-      avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face"
+      roleKey: 'useCases.educators.testimonial.role'
     }
   },
   {
@@ -99,8 +107,7 @@ const USE_CASES = [
     testimonial: { 
       quoteKey: 'useCases.businesses.testimonial.quote',
       authorKey: 'useCases.businesses.testimonial.author',
-      roleKey: 'useCases.businesses.testimonial.role',
-      avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face"
+      roleKey: 'useCases.businesses.testimonial.role'
     }
   },
   {
@@ -118,15 +125,32 @@ const USE_CASES = [
     testimonial: { 
       quoteKey: 'useCases.freelancers.testimonial.quote',
       authorKey: 'useCases.freelancers.testimonial.author',
-      roleKey: 'useCases.freelancers.testimonial.role',
-      avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face"
+      roleKey: 'useCases.freelancers.testimonial.role'
     }
   }
 ]
 
 function UseCasesSection() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [activeCase, setActiveCase] = useState('content-creators')
+  
+  // Get localized use cases with avatars
+  const USE_CASES = useMemo(() => 
+    USE_CASES_BASE.map(useCase => {
+      const localized = getLocalizedUseCaseTestimonial(i18n.language, USE_CASE_KEYS[useCase.id])
+      return {
+        ...useCase,
+        testimonial: {
+          ...useCase.testimonial,
+          localizedName: localized.name,
+          localizedRole: localized.role,
+          avatar: localized.avatar
+        }
+      }
+    }),
+    [i18n.language]
+  )
+  
   const currentCase = USE_CASES.find(uc => uc.id === activeCase)
 
   return (
@@ -237,7 +261,7 @@ function UseCasesSection() {
                       <Icon name="check" size="xs" className="text-gray-600" />
                     </div>
                     <span className="text-sm sm:text-base text-gray-700">
-                      {t(`useCases.${currentCase.id}.benefits.${benefit.key}`, benefit.default)}
+                      {t(`useCases.${USE_CASE_KEYS[currentCase.id]}.benefits.${benefit.key}`, benefit.default)}
                     </span>
                   </motion.li>
                 ))}
@@ -265,16 +289,16 @@ function UseCasesSection() {
                 <div className="flex items-center gap-3 sm:gap-4">
                   <img 
                     src={currentCase?.testimonial.avatar} 
-                    alt={t(currentCase?.testimonial.authorKey)}
+                    alt={currentCase?.testimonial.localizedName}
                     className="w-10 sm:w-12 h-10 sm:h-12 rounded-full object-cover shadow-md flex-shrink-0 ring-2 ring-white"
                     loading="lazy"
                   />
                   <div className="min-w-0">
                     <div className="font-semibold text-sm sm:text-base text-gray-900 truncate">
-                      {t(currentCase?.testimonial.authorKey)}
+                      {currentCase?.testimonial.localizedName}
                     </div>
                     <div className="text-gray-500 text-xs sm:text-sm truncate">
-                      {t(currentCase?.testimonial.roleKey)}
+                      {currentCase?.testimonial.localizedRole}
                     </div>
                   </div>
                 </div>

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { cn } from '../../lib/utils'
 
 const LinkGoogleAccount = ({ isLinked, linkedEmail, onLink, onUnlink, isLoading }) => {
   const { t } = useTranslation()
@@ -28,7 +27,7 @@ const LinkGoogleAccount = ({ isLinked, linkedEmail, onLink, onUnlink, isLoading 
   }
 
   return (
-    <div className="p-5 bg-bg-secondary rounded-xl border border-border">
+    <div className="p-5 bg-bg-secondary dark:bg-bg-primary rounded-xl border border-border">
       <div className="flex items-center gap-3 mb-3">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -45,12 +44,12 @@ const LinkGoogleAccount = ({ isLinked, linkedEmail, onLink, onUnlink, isLoading 
       
       {isLinked && linkedEmail && (
         <>
-          <div className="flex items-center gap-2 p-3 bg-bg-primary rounded-lg mb-4">
+          <div className="flex items-center gap-2 p-3 bg-bg-primary dark:bg-bg-secondary rounded-lg mb-4 border border-transparent dark:border-border">
             <span className="text-xs text-text-muted">{t('auth.email.linkedAs')}</span>
             <span className="text-sm font-medium text-text-primary">{linkedEmail}</span>
           </div>
-          <div className="flex items-center gap-2 px-3 py-2.5 bg-green-50 border border-green-200 rounded-lg mb-4 text-sm text-green-700 font-medium">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34A853" strokeWidth="2">
+          <div className="flex items-center gap-2 px-3 py-2.5 bg-transparent border border-border-light rounded-lg mb-4 text-sm text-text-secondary font-medium">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
             </svg>
             <span>{t('auth.email.driveSyncEnabled') || 'Google Drive sync enabled'}</span>
@@ -58,19 +57,28 @@ const LinkGoogleAccount = ({ isLinked, linkedEmail, onLink, onUnlink, isLoading 
         </>
       )}
       
-      {error && <div className="flex items-center gap-2.5 p-3.5 mb-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
-        <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="#dc2626"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>{error}
+      {error && <div className="flex items-center gap-2.5 p-3.5 mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400">
+        <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>{error}
       </div>}
       
       {isLinked ? (
         <button type="button" onClick={handleUnlink} disabled={isLoading || localLoading}
-          className="w-full py-3 px-4 text-sm font-medium rounded-lg bg-white text-red-600 border border-red-200 hover:bg-red-50 disabled:opacity-60 disabled:cursor-not-allowed transition-all">
-          {localLoading ? <><span className="inline-block w-4 h-4 border-2 border-transparent border-t-current rounded-full animate-spin mr-2 align-middle"/>{t('auth.email.unlinking')}</> : t('auth.email.unlinkGoogle')}
+          className="flex items-center justify-center gap-2 w-full py-3 px-4 text-sm font-medium rounded-lg bg-transparent text-text-secondary border border-border-light hover:bg-bg-hover hover:text-text-primary hover:border-border-hover disabled:opacity-60 disabled:cursor-not-allowed transition-all">
+          {localLoading ? (
+            <><span className="inline-block w-4 h-4 border-2 border-transparent border-t-current rounded-full animate-spin"/>{t('auth.email.unlinking')}</>
+          ) : (
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+              {t('auth.email.unlinkGoogle')}
+            </>
+          )}
         </button>
       ) : (
         <>
           <button type="button" onClick={handleLink} disabled={isLoading || localLoading}
-            className="flex items-center justify-center gap-2.5 w-full py-3 px-4 bg-bg-primary border border-border rounded-lg text-sm font-medium text-text-primary hover:bg-bg-secondary hover:border-border-hover disabled:opacity-60 disabled:cursor-not-allowed transition-all">
+            className="flex items-center justify-center gap-2.5 w-full py-3 px-4 bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg text-sm font-medium text-text-primary hover:bg-bg-secondary dark:hover:bg-bg-hover hover:border-border-hover disabled:opacity-60 disabled:cursor-not-allowed transition-all">
             {localLoading ? <span className="inline-block w-4 h-4 border-2 border-transparent border-t-current rounded-full animate-spin"/> : (
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>

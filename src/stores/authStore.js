@@ -285,7 +285,53 @@ export const useAuthStore = create(
                       logger.log('[AUTH] initAuth - Check Google linked failed:', checkError.message)
                     }
                     
-                    // No linked account or login failed - use Google-only auth
+                    // No linked account - try to login/register as Google-only user via backend
+                    const storageResult = await chrome.storage.local.get(['accessToken'])
+                    const googleAccessToken = storageResult.accessToken
+                    
+                    if (googleAccessToken) {
+                      try {
+                        const googleLoginResponse = await fetch(`${API_BASE_URL}/auth/email/google-login`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ accessToken: googleAccessToken })
+                        })
+                        
+                        const googleLoginData = await googleLoginResponse.json()
+                        
+                        if (googleLoginResponse.ok && googleLoginData.success) {
+                          const backendUser = {
+                            ...googleLoginData.user,
+                            id: googleLoginData.user.userId,
+                            picture: userInfo.picture || googleLoginData.user.picture
+                          }
+                          
+                          setUserData(backendUser)
+                          secureSet(AUTH_STORAGE_KEYS.USER_ID, googleLoginData.user.userId)
+                          setStorageAuthMethod('google')
+                          setRememberMe(true)
+                          
+                          tokenService.setTokens({
+                            accessToken: googleLoginData.accessToken,
+                            refreshToken: googleLoginData.refreshToken,
+                            expiresIn: googleLoginData.expiresIn || 3600
+                          })
+                          
+                          set({ 
+                            user: backendUser, 
+                            token: googleLoginData.accessToken,
+                            isAuthenticated: true, 
+                            authMethod: 'google',
+                            _sessionPersisted: true
+                          })
+                          return // Exit early, we're done
+                        }
+                      } catch (backendError) {
+                        logger.log('[AUTH] initAuth - Backend Google login failed:', backendError.message)
+                      }
+                    }
+                    
+                    // Fallback: local-only auth
                     secureSet(AUTH_STORAGE_KEYS.USER_ID, userId)
                     set({ 
                       user: linkedUser || { ...userInfo, id: userId }, 
@@ -408,7 +454,73 @@ export const useAuthStore = create(
                 logger.log('[AUTH] Check Google linked failed, continuing with normal sign in:', checkError.message)
               }
               
-              // No linked account found - create new Google-only user ID
+              // No linked account found - register/login as Google-only user via backend
+              // This creates user in database and gives welcome credits
+              const storageResult = await chrome.storage.local.get(['accessToken'])
+              const googleAccessToken = storageResult.accessToken
+              
+              if (googleAccessToken) {
+                try {
+                  const googleLoginResponse = await fetch(`${API_BASE_URL}/auth/email/google-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ accessToken: googleAccessToken })
+                  })
+                  
+                  const googleLoginData = await googleLoginResponse.json()
+                  
+                  if (googleLoginResponse.ok && googleLoginData.success) {
+                    // Use backend-generated user data
+                    const backendUser = {
+                      ...googleLoginData.user,
+                      id: googleLoginData.user.userId,
+                      picture: response.userInfo.picture || googleLoginData.user.picture
+                    }
+                    
+                    // Store user and tokens
+                    setUserData(backendUser)
+                    secureSet(AUTH_STORAGE_KEYS.USER_ID, googleLoginData.user.userId)
+                    setStorageAuthMethod('google')
+                    setRememberMe(true)
+                    
+                    // Store JWT tokens for API calls
+                    tokenService.setTokens({
+                      accessToken: googleLoginData.accessToken,
+                      refreshToken: googleLoginData.refreshToken,
+                      expiresIn: googleLoginData.expiresIn || 3600
+                    })
+                    
+                    set({ 
+                      user: backendUser, 
+                      token: googleLoginData.accessToken,
+                      isAuthenticated: true, 
+                      authMethod: 'google',
+                      error: null,
+                      _sessionPersisted: true
+                    })
+                    
+                    logger.log('[AUTH] Google-only user logged in via backend', { 
+                      userId: googleLoginData.user.userId, 
+                      isNewUser: googleLoginData.isNewUser 
+                    })
+                    
+                    return { success: true, isNewUser: googleLoginData.isNewUser }
+                  } else if (googleLoginData.code === 'AUTH_EMAIL_EXISTS') {
+                    // Email exists as email user - throw error
+                    const error = new Error(googleLoginData.error || 'Please sign in with email/password and link your Google account')
+                    error.code = 'EMAIL_USER_EXISTS'
+                    error.i18nKey = 'auth.email.googleEmailInUse'
+                    throw error
+                  }
+                } catch (backendError) {
+                  if (backendError.code === 'EMAIL_USER_EXISTS') {
+                    throw backendError
+                  }
+                  logger.log('[AUTH] Backend Google login failed, using local auth:', backendError.message)
+                }
+              }
+              
+              // Fallback: local-only auth (if backend call fails)
               const userId = response.userInfo.id || `user_${googleEmail.replace(/[^a-zA-Z0-9]/g, '_')}`
               secureSet(AUTH_STORAGE_KEYS.USER_ID, userId)
               

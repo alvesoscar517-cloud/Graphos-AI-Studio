@@ -15,6 +15,7 @@
     "sort": "क्रमबद्ध करें",
     "refresh": "रिफ्रेश",
     "retry": "पुनः प्रयास करें",
+    "authorize": "अधिकृत करें",
     "yes": "हाँ",
     "no": "नहीं",
     "ok": "ठीक है",
@@ -248,12 +249,15 @@
     "pleaseSignIn": "इस सुविधा का उपयोग करने के लिए कृपया साइन इन करें",
     "needReauth": "नोट्स सिंक करने के लिए ऐप को Google Drive एक्सेस की आवश्यकता है। अनुमति देने के लिए कृपया फिर से साइन इन करें।",
     "drivePermissionRequired": "Drive अनुमति आवश्यक",
+    "googleAuthRequired": "Google प्राधिकरण आवश्यक",
+    "googleAuthRequiredDesc": "इस डिवाइस को Google Drive एक्सेस को अधिकृत करने की आवश्यकता है।",
     "confirmSignOut": "क्या आप वाकई साइन आउट करना चाहते हैं?",
     "confirmSignOutTitle": "साइन आउट की पुष्टि करें",
     "signedOut": "साइन आउट किया गया",
+    "accountSettings": "खाता सेटिंग्स",
     "getStarted": "शुरुआत करें",
     "appName": "ग्राफोस एआई स्टूडियो",
-    "signInTagline": "अपनी सामग्री को प्रामाणिक रखने के लिए साइन इन करें",
+    "signInTagline": "Graphos AI के साथ प्रामाणिक रूप से लिखें",
     "errors": {
       "accountDeleted": "यह खाता हटा दिया गया है। यदि आप मानते हैं कि यह एक त्रुटि है तो कृपया समर्थन से संपर्क करें।",
       "accountSuspended": "आपका खाता निलंबित कर दिया गया है। सहायता के लिए कृपया समर्थन से संपर्क करें।",
@@ -1392,5 +1396,11 @@
   "securitySettings": {
     "ipAddress": "IP",
     "unknown": "अज्ञात"
+  },
+  "unsupportedScreen": {
+    "title": "Graphos AI Studio इस स्क्रीन का समर्थन नहीं करता",
+    "description": "सर्वोत्तम अनुभव के लिए कृपया लैंडस्केप मोड या बड़े डिवाइस का उपयोग करें।",
+    "desktop": "डेस्कटॉप",
+    "tabletLandscape": "टैबलेट लैंडस्केप"
   }
 }

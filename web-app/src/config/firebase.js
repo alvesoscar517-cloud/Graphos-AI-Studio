@@ -1,10 +1,11 @@
 /**
  * Firebase Configuration for Frontend
  * Firestore Realtime listeners for instant updates
- * Firebase Auth for web authentication
  * 
  * Note: Firebase API key is designed to be public.
  * Security is enforced via Firestore Security Rules.
+ * 
+ * Google OAuth is handled separately via googleOAuth.js (direct OAuth, not Firebase Auth)
  * 
  * Requirements: 2.1
  */
@@ -12,7 +13,6 @@
 import { logger } from '../utils/logger'
 import { initializeApp } from 'firebase/app'
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
-import { getAuth, GoogleAuthProvider } from 'firebase/auth'
 
 // Firebase config - API key is public, security via Firestore Rules
 const firebaseConfig = {
@@ -26,14 +26,10 @@ const firebaseConfig = {
 
 let app = null
 let db = null
-let auth = null
-let googleProvider = null
 
 export function initializeFirebase() {
-  if (app) return { app, db, auth, googleProvider }
+  if (app) return { app, db }
   
-  // Config is hardcoded, no need to check
-
   try {
     app = initializeApp(firebaseConfig)
     db = initializeFirestore(app, {
@@ -42,19 +38,11 @@ export function initializeFirebase() {
       })
     })
     
-    // Initialize Firebase Auth
-    auth = getAuth(app)
-    googleProvider = new GoogleAuthProvider()
-    // Request additional scopes for Google Drive access
-    googleProvider.addScope('https://www.googleapis.com/auth/drive.file')
-    googleProvider.addScope('profile')
-    googleProvider.addScope('email')
-    
-    logger.log('[Firebase] Initialized successfully with Auth')
-    return { app, db, auth, googleProvider }
+    logger.log('[Firebase] Initialized successfully (Firestore only)')
+    return { app, db }
   } catch (error) {
     console.error('[Firebase] Initialization error:', error)
-    return { app: null, db: null, auth: null, googleProvider: null }
+    return { app: null, db: null }
   }
 }
 
@@ -63,14 +51,4 @@ export function getDb() {
   return db
 }
 
-export function getFirebaseAuth() {
-  if (!auth) initializeFirebase()
-  return auth
-}
-
-export function getGoogleProvider() {
-  if (!googleProvider) initializeFirebase()
-  return googleProvider
-}
-
-export { app, db, auth, googleProvider }
+export { app, db }

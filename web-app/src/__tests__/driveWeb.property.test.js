@@ -12,11 +12,17 @@ import * as fc from 'fast-check'
 import { secureSet, secureGet, clearAuthStorage } from '../utils/authStorage'
 
 // Define Drive storage keys locally (same as in driveWeb.js)
+// Note: OAuth tokens are now managed by googleOAuth module
 const DRIVE_STORAGE_KEYS = {
-  ACCESS_TOKEN: 'drive_access_token',
-  TOKEN_EXPIRY: 'drive_token_expiry',
   FOLDER_ID: 'drive_folder_id',
   CONVERSATIONS_FOLDER_ID: 'drive_conversations_folder_id'
+}
+
+// Google OAuth storage keys (from googleOAuth.js)
+const OAUTH_STORAGE_KEYS = {
+  ACCESS_TOKEN: 'google_access_token',
+  TOKEN_EXPIRY: 'google_token_expiry',
+  USER_INFO: 'google_user_info'
 }
 
 describe('Drive Web Service - Property Tests', () => {
@@ -42,20 +48,20 @@ describe('Drive Web Service - Property Tests', () => {
    * a valid Authorization header with Bearer token
    */
   describe('Drive API Authorization Header', () => {
-    it('stored Drive tokens can be retrieved correctly', () => {
+    it('stored Google OAuth tokens can be retrieved correctly', () => {
       fc.assert(
         fc.property(
           // Generate OAuth-like tokens
           fc.string({ minLength: 20, maxLength: 200 }).filter(s => /^[a-zA-Z0-9._-]+$/.test(s)),
           fc.integer({ min: Date.now(), max: Date.now() + 7200000 }), // Expiry within 2 hours
           (token, expiry) => {
-            // Store Drive token
-            secureSet(DRIVE_STORAGE_KEYS.ACCESS_TOKEN, token)
-            secureSet(DRIVE_STORAGE_KEYS.TOKEN_EXPIRY, expiry.toString())
+            // Store Google OAuth token (used by Drive)
+            secureSet(OAUTH_STORAGE_KEYS.ACCESS_TOKEN, token)
+            secureSet(OAUTH_STORAGE_KEYS.TOKEN_EXPIRY, expiry.toString())
             
             // Retrieve and verify
-            const storedToken = secureGet(DRIVE_STORAGE_KEYS.ACCESS_TOKEN)
-            const storedExpiry = secureGet(DRIVE_STORAGE_KEYS.TOKEN_EXPIRY)
+            const storedToken = secureGet(OAUTH_STORAGE_KEYS.ACCESS_TOKEN)
+            const storedExpiry = secureGet(OAUTH_STORAGE_KEYS.TOKEN_EXPIRY)
             
             expect(storedToken).toBe(token)
             expect(parseInt(storedExpiry, 10)).toBe(expiry)
@@ -113,9 +119,9 @@ describe('Drive Web Service - Property Tests', () => {
           fc.integer({ min: -3600000, max: 3600000 }), // Time offset from now
           (timeOffset) => {
             const expiryTime = Date.now() + timeOffset
-            secureSet(DRIVE_STORAGE_KEYS.TOKEN_EXPIRY, expiryTime.toString())
+            secureSet(OAUTH_STORAGE_KEYS.TOKEN_EXPIRY, expiryTime.toString())
             
-            const storedExpiry = parseInt(secureGet(DRIVE_STORAGE_KEYS.TOKEN_EXPIRY), 10)
+            const storedExpiry = parseInt(secureGet(OAUTH_STORAGE_KEYS.TOKEN_EXPIRY), 10)
             const isExpired = Date.now() >= storedExpiry
             const expectedExpired = timeOffset <= 0
             
@@ -136,6 +142,24 @@ describe('Drive Web Service - Property Tests', () => {
       const uniqueKeys = new Set(keys)
       
       expect(uniqueKeys.size).toBe(keys.length)
+    })
+
+    it('all OAuth storage keys are unique', () => {
+      const keys = Object.values(OAUTH_STORAGE_KEYS)
+      const uniqueKeys = new Set(keys)
+      
+      expect(uniqueKeys.size).toBe(keys.length)
+    })
+
+    it('Drive storage keys do not conflict with OAuth storage keys', () => {
+      const driveKeys = Object.values(DRIVE_STORAGE_KEYS)
+      const oauthKeys = Object.values(OAUTH_STORAGE_KEYS)
+      
+      driveKeys.forEach(driveKey => {
+        oauthKeys.forEach(oauthKey => {
+          expect(driveKey).not.toBe(oauthKey)
+        })
+      })
     })
 
     it('Drive storage keys do not conflict with auth storage keys', () => {

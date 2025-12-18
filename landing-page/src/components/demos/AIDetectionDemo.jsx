@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
+import Icon from '@components/common/Icon'
 
 /**
  * Simulated AI detection result
@@ -75,15 +76,17 @@ function AIDetectionDemo() {
         />
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-text-muted">
+          <span className="text-sm text-text-muted hidden sm:inline">
             {text.length}/2000 {t('demo.characters', 'characters')}
           </span>
-          <div className="flex gap-2">
+          <div className="flex gap-2 ml-auto">
             <button
               onClick={handleClear}
-              className="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors"
+              className="p-2 sm:px-4 sm:py-2 text-text-secondary hover:text-text-primary transition-colors"
+              title={t('common.clear', 'Clear')}
             >
-              {t('common.clear', 'Clear')}
+              <span className="hidden sm:inline">{t('common.clear', 'Clear')}</span>
+              <Icon name="x" size="sm" className="sm:hidden" />
             </button>
             <button
               onClick={handleAnalyze}

@@ -3,7 +3,8 @@
     "description": "Identifikasi konten yang dihasilkan AI dengan presisi dan keyakinan.",
     "meta": {
       "description": "Deteksi konten yang dihasilkan AI dengan akurasi tinggi. Identifikasi ChatGPT, GPT-4, dan tulisan AI lainnya.",
-      "title": "Deteksi AI - Graphos AI Studio"
+      "title": "Deteksi AI - Graphos AI Studio",
+      "keywords": "detektor AI, detektor konten AI, detektor ChatGPT, detektor GPT-4, pemeriksa AI, mendeteksi tulisan AI"
     },
     "title": "Deteksi AI"
   },
@@ -11,7 +12,8 @@
     "description": "Mengobrol dengan AI dalam gaya penulisan unik Anda.",
     "meta": {
       "description": "Mengobrol dengan AI menggunakan profil suara Anda. Dapatkan bantuan penulisan yang dipersonalisasi.",
-      "title": "Ruang Kerja AI - Graphos AI Studio"
+      "title": "Ruang Kerja AI - Graphos AI Studio",
+      "keywords": "obrolan AI, asisten penulisan AI, ruang kerja AI, generator konten AI, AI yang dipersonalisasi"
     },
     "title": "Ruang Kerja AI"
   },
@@ -159,7 +161,8 @@
     "description": "Periksa kecocokan gaya penulisan Anda dengan analisis terperinci.",
     "meta": {
       "description": "Analisis seberapa baik teks Anda cocok dengan gaya penulisan unik Anda. Dapatkan skor kompatibilitas terperinci, analisis penyimpangan, dan saran perbaikan.",
-      "title": "Skor Kompatibilitas - Periksa Kecocokan Gaya Penulisan Anda | Graphos AI"
+      "title": "Skor Kompatibilitas - Periksa Kecocokan Gaya Penulisan Anda | Graphos AI",
+      "keywords": "kecocokan gaya penulisan, skor kompatibilitas, penganalisis gaya"
     },
     "title": "Skor Kompatibilitas"
   },
@@ -194,7 +197,8 @@
   "demo": {
     "after": "Sesudah",
     "aiDetection": {
-      "result": "Hasil Deteksi AI"
+      "result": "Hasil Deteksi AI",
+      "title": "Deteksi AI"
     },
     "aiIndicators": "Indikator AI",
     "aiProbability": "Probabilitas AI",
@@ -245,7 +249,7 @@
       "tips": {
         "focus": "Fokus pada penyimpangan berat terlebih dahulu",
         "hover": "Arahkan kursor ke kalimat yang disorot untuk detail",
-        "rewrite": "Gunakan AI Rewrite untuk memperbaiki masalah"
+        "rewrite": "Gunakan Penulisan Ulang AI untuk memperbaiki masalah"
       },
       "title": "Penyimpangan"
     },
@@ -427,7 +431,7 @@
       "samples": "sampel",
       "tone": "nada"
     },
-    "tryHumanization": "Try Humanization Demo",
+    "tryHumanization": "Try Demo Humanisasi",
     "humanizationDesc": "See how AI-generated text transforms into natural, human-like writing.",
     "originalAI": "Original (AI)",
     "humanLike": "Human-like",
@@ -436,62 +440,53 @@
     "nextExample": "Next Example",
     "humanizing": "Humanizing...",
     "wantToHumanize": "Want to humanize your own content?",
-    "tryAIDetection": "Try AI Detection Demo",
+    "tryAIDetection": "Try Demo Deteksi AI",
     "aiDetectionDesc": "Paste any text below to see a simulated AI detection analysis. This is a demo - for accurate results, use the full application.",
     "pasteTextPlaceholder": "Paste your text here to analyze...",
     "wantMoreAccurate": "Want more accurate results with detailed analysis?",
     "traits": {
-      "conversational": "Conversational",
-      "empathetic": "Empathetic",
-      "clear": "Clear",
-      "engaging": "Engaging",
-      "playful": "Playful",
-      "creative": "Creative",
+      "conversational": "Percakapan",
+      "empathetic": "Empatik",
+      "clear": "Jelas",
+      "engaging": "Menarik",
+      "playful": "Ceria",
+      "creative": "Kreatif",
       "informal": "Informal",
-      "storyteller": "Storyteller",
-      "analytical": "Analytical",
-      "precise": "Precise",
-      "structured": "Structured",
-      "evidenceBased": "Evidence-based"
+      "storyteller": "Pencerita",
+      "analytical": "Analitis",
+      "precise": "Presisi",
+      "structured": "Terstruktur",
+      "evidenceBased": "Berbasis bukti"
     },
-    "sentenceLengthMedium": "Medium (12-18 words)",
-    "sentenceLengthVaried": "Varied (8-25 words)",
-    "sentenceLengthLong": "Long (18-28 words)",
+    "sentenceLengthMedium": "Sedang (12-18 kata)",
+    "sentenceLengthVaried": "Bervariasi (8-25 kata)",
+    "sentenceLengthLong": "Panjang (18-28 kata)",
     "voiceProfiles": {
-      "professional": "Professional Writer",
-      "casual": "Casual Blogger",
-      "academic": "Academic Style",
-      "personalBlog": "Personal Blog",
-      "creativeWriter": "Creative Writer"
+      "professional": "Penulis Profesional",
+      "casual": "Blogger Kasual",
+      "academic": "Gaya Akademis",
+      "personalBlog": "Blog Pribadi",
+      "creativeWriter": "Penulis Kreatif"
     },
     "speed": {
-      "fast": "Fast",
-      "ultraFast": "Ultra Fast",
-      "quality": "Quality"
+      "fast": "Cepat",
+      "ultraFast": "Ultra Cepat",
+      "quality": "Kualitas"
     },
     "tone": {
-      "conversational": "Conversational",
+      "conversational": "Percakapan",
       "formal": "Formal",
-      "expressive": "Expressive"
+      "expressive": "Ekspresif"
     }
   },
   "deviations": {
     "description": "Temukan ketidakkonsistenan gaya dalam tulisan Anda.",
     "meta": {
       "description": "Identifikasi kalimat yang menyimpang dari gaya penulisan Anda. Dapatkan tingkat keparahan, saran, dan perbaiki ketidakkonsistenan untuk mempertahankan suara unik Anda.",
-      "title": "Penyimpangan - Temukan Ketidakkonsistenan Gaya | Graphos AI"
+      "title": "Penyimpangan - Temukan Ketidakkonsistenan Gaya | Graphos AI",
+      "keywords": "pemeriksa gaya, konsistensi penulisan, penganalisis nada, pencari ketidakkonsistenan"
     },
     "title": "Penyimpangan"
-  },
-  "exitPopup": {
-    "cta": "Klaim Kredit Bonus Saya",
-    "emailPlaceholder": "Masukkan email Anda",
-    "noSpam": "Tidak ada spam",
-    "noThanks": "Tidak, terima kasih, saya akan membayar harga penuh",
-    "subtitle": "Berlangganan buletin kami dan dapatkan 50 kredit ekstra pada pembelian pertama Anda!",
-    "success": "Luar biasa! Periksa email Anda untuk kode bonus.",
-    "title": "Tunggu! Dapatkan 50 Kredit Bonus",
-    "unsubscribe": "Berhenti berlangganan kapan saja"
   },
   "extension": {
     "badge": "Ekstensi Chrome",
@@ -527,35 +522,35 @@
     "willWorkOn": "Akan bekerja dengan lancar di",
     "worksOn": "Bekerja pada",
     "demo": {
-      "sampleText": "The implementation of artificial intelligence in modern systems represents a paradigm shift...",
+      "sampleText": "Implementasi kecerdasan buatan dalam sistem modern merupakan pergeseran paradigma...",
       "detect": {
-        "action": "Detecting AI content...",
-        "result": "87% AI Probability"
+        "action": "Mendeteksi konten AI...",
+        "result": "87% Probabilitas AI"
       },
       "humanize": {
-        "action": "Humanizing text...",
-        "result": "Text humanized!"
+        "action": "Memanusiakan teks...",
+        "result": "Teks telah dimanusiakan!"
       },
       "write": {
-        "action": "Generating in your voice...",
-        "result": "Content ready!"
+        "action": "Menghasilkan dengan suara Anda...",
+        "result": "Konten siap!"
       },
       "workspace": {
-        "action": "Opening workspace...",
-        "result": "Ready to chat!"
+        "action": "Membuka ruang kerja...",
+        "result": "Siap untuk mengobrol!"
       }
     }
   },
   "faq": {
     "answers": {
       "credits": "Kredit adalah mata uang bayar-sesuai-penggunaan kami. Fitur yang berbeda menggunakan jumlah yang berbeda berdasarkan panjang dan kompleksitas teks. Deteksi AI menggunakan ~2-5 kredit, Humanisasi ~2-8 kredit, Pembuatan Profil Suara ~8-25 kredit, dan Ruang Kerja AI ~1-3 kredit per pesan. Kredit tidak pernah kedaluwarsa!",
-      "extension": "Ekstensi Chrome kami memungkinkan Anda menggunakan Graphos AI di mana saja di web. Pilih teks di situs web mana pun untuk mendeteksi konten AI, memanusiakan teks, atau menghasilkan konten dengan suara Anda. Ini terintegrasi dengan mulus dengan Gmail, Google Docs, media sosial, dan banyak lagi.",
+      "extension": "Ekstensi Chrome kami saat ini berfungsi sebagai antarmuka aplikasi web utama. Fitur seperti memilih teks di situs web mana pun untuk mendeteksi konten AI, memanusiakan teks, atau menghasilkan konten dengan suara Anda sedang dalam pengembangan. Nantikan pembaruan!",
       "freeTier": "Ya! Setiap pengguna baru mendapatkan 100 kredit gratis untuk mencoba semua fitur. Tidak perlu kartu kredit. Plus, pembelian pertama Anda mendapatkan 2x kredit bonus!",
       "howDetection": "Deteksi AI kami mencapai akurasi 98% dengan menganalisis berbagai pola linguistik termasuk leksikal, semantik, struktural, dan pola konten. Kami menggunakan analisis multi-pass tingkat lanjut untuk kasus yang tidak pasti guna memastikan hasil yang andal.",
       "humanization": "Mesin humanisasi kami menulis ulang teks yang dihasilkan AI agar sesuai dengan pola penulisan manusia yang alami. Ini menggunakan profil suara Anda untuk mempertahankan gaya unik Anda sambil menghapus jejak AI seperti struktur berulang, transisi formal, dan bahasa generik.",
       "languages": "Graphos AI mendukung 15 bahasa termasuk Inggris, Vietnam, Cina, Jepang, Korea, Thailand, Indonesia, Melayu, Arab, Prancis, Jerman, Spanyol, Portugis, Italia, dan Rusia. Setiap bahasa memiliki pola deteksi dan humanisasi yang dioptimalkan.",
       "privacy": "Tentu saja. Kami menggunakan enkripsi tingkat perusahaan untuk semua data. Sampel tulisan dan profil suara Anda disimpan dengan aman dan tidak pernah dibagikan. Kami mematuhi GDPR dan peraturan privasi lainnya. Anda dapat menghapus data Anda kapan saja.",
-      "refund": "Kami menawarkan jaminan uang kembali 7 hari untuk semua pembelian kredit. Jika Anda tidak puas, hubungi tim dukungan kami untuk pengembalian dana penuh. Kredit yang tidak digunakan juga dapat dikembalikan dalam waktu 30 hari setelah pembelian.",
+      "refund": "Semua pembelian kredit bersifat final dan tidak dapat dikembalikan. Silakan coba paket gratis kami dengan 100 kredit sebelum membeli untuk memastikan layanan kami memenuhi kebutuhan Anda. Kami menyarankan untuk memulai dengan jumlah kecil dan membeli lebih banyak kredit sesuai kebutuhan.",
       "voiceProfile": "Profil Suara adalah sidik jari unik dari gaya penulisan Anda. Dengan menganalisis sampel tulisan Anda, kami menangkap nada, preferensi kosakata, pola kalimat, dan karakteristik utama Anda. Ini memungkinkan AI untuk menghasilkan konten yang terdengar otentik seperti Anda.",
       "whatIs": "Graphos AI Studio adalah asisten penulisan bertenaga AI yang membantu Anda mendeteksi konten yang dihasilkan AI, memanusiakan tulisan Anda, dan membuat konten otentik yang sesuai dengan suara unik Anda. Ini mencakup aplikasi web dan ekstensi Chrome untuk integrasi alur kerja yang mulus."
     },
@@ -673,6 +668,12 @@
         "subtitle": "Analisis multi-lapis kami menjamin deteksi yang akurat hanya dalam hitungan detik",
         "title": "Cara Kerja Deteksi AI"
       },
+      "layers": {
+        "lexical": "Pola Leksikal",
+        "semantic": "Analisis Semantik",
+        "structure": "Pemeriksaan Struktur",
+        "statistical": "Model Statistik"
+      },
       "pricing": {
         "free": "Gratis",
         "freeFeature1": "5 deteksi/hari",
@@ -758,7 +759,7 @@
         }
       },
       "useCasesBadge": "Aplikasi Dunia Nyata",
-      "useCasesCta": "Jangan",
+      "useCasesCta": "Tidak melihat kasus penggunaan Anda? Kami mendukung banyak industri lainnya.",
       "useCasesSubtitle": "Temukan bagaimana profesional di berbagai industri menggunakan deteksi AI kami",
       "useCasesTitle": "Kasus Penggunaan",
       "whyChoose": "Mengapa Memilih Deteksi AI Kami?",
@@ -832,7 +833,7 @@
         "voiceMatch": "Integrasi Profil Suara"
       },
       "comparisonBadge": "Mengapa Memilih Kami",
-      "comparisonDesc": "Lihat mengapa Graphos AI Workspace menonjol dari kompetisi",
+      "comparisonDesc": "Lihat mengapa Graphos Ruang Kerja AI menonjol dari kompetisi",
       "comparisonTitle": "Bagaimana Kami Membandingkan",
       "comparisonWins": "8 keunggulan utama dibandingkan pesaing",
       "ctaBadge": "Mulai menulis dengan suara Anda",
@@ -922,25 +923,25 @@
       "useCases": {
         "business": {
           "desc": "Proposal, laporan, dan presentasi yang sesuai dengan merek Anda",
-          "example": "",
+          "example": "\"Buat proposal\" → Dokumen profesional dalam gaya Anda",
           "stat": "Produktivitas",
           "title": "Penulisan Bisnis"
         },
         "content": {
           "desc": "Hasilkan postingan blog, artikel, dan salinan pemasaran dalam suara Anda",
-          "example": "",
+          "example": "\"Tulis intro blog\" → Konten menarik yang terdengar seperti Anda",
           "stat": "Kualitas konten",
           "title": "Pembuatan Konten"
         },
         "email": {
           "desc": "Draf, balas, dan tindak lanjuti email yang terdengar seperti Anda yang menulisnya",
-          "example": "",
+          "example": "\"Buat email tindak lanjut\" → Email profesional dan personal dalam suara Anda",
           "stat": "Waktu dihemat",
           "title": "Komunikasi Email"
         },
         "social": {
           "desc": "Buat postingan menarik untuk LinkedIn, Twitter, dan lainnya",
-          "example": "",
+          "example": "\"Buat postingan LinkedIn\" → Konten sosial yang autentik",
           "stat": "Keterlibatan",
           "title": "Media Sosial"
         },
@@ -997,7 +998,7 @@
         "a2": "Analisis multi-lapis kami mencapai akurasi tinggi dengan menggabungkan penyematan AI dengan perbandingan statistik. Semakin banyak sampel dalam Profil Suara Anda, semakin akurat hasilnya. Kami juga memberikan skor keyakinan sehingga Anda tahu seberapa andal setiap analisis.",
         "a3": "Skor Vektor mengukur kesamaan semantik - seberapa dekat makna dan gaya teks Anda dengan profil Anda. Skor Statistik menganalisis pola struktural seperti panjang kalimat, kekayaan kosakata, dan penggunaan tanda baca. Bersama-sama mereka memberikan gambaran lengkap tentang pencocokan gaya.",
         "a4": "Saat menganalisis teks, kami mengidentifikasi kalimat yang menyimpang dari gaya Anda dan mengklasifikasikannya sebagai Ringan (perbedaan kecil), Sedang (perbedaan nyata), atau Berat (ketidakcocokan gaya yang signifikan). Ini membantu Anda fokus pada area yang paling penting untuk ditingkatkan.",
-        "a5": "Ya! Setelah melihat Skor Kompatibilitas Anda, Anda dapat menggunakan fitur AI Rewrite kami untuk secara otomatis mengubah teks agar lebih sesuai dengan Profil Suara Anda. Versi yang ditulis ulang biasanya mendapat skor 20-40% lebih tinggi.",
+        "a5": "Ya! Setelah melihat Skor Kompatibilitas Anda, Anda dapat menggunakan fitur Penulisan Ulang AI kami untuk secara otomatis mengubah teks agar lebih sesuai dengan Profil Suara Anda. Versi yang ditulis ulang biasanya mendapat skor 20-40% lebih tinggi.",
         "a6": "Analisis teks dikenakan biaya 2 kredit dasar ditambah sedikit jumlah per kata (0,002 kredit/kata). Analisis 500 kata yang khas membutuhkan sekitar 3 kredit. Pengguna premium mendapatkan lebih banyak kredit dan pemrosesan prioritas.",
         "badge": "FAQ",
         "desc": "Semua yang perlu Anda ketahui tentang Skor Kompatibilitas",
@@ -1066,7 +1067,7 @@
           "b2": "Personalisasi",
           "b3": "Kepercayaan",
           "desc": "Verifikasi bahwa konten yang dihasilkan AI terdengar seperti Anda sebelum menggunakannya",
-          "example": "",
+          "example": "\"Output ChatGPT mendapat skor 45% - gunakan Penulisan Ulang AI untuk mengubahnya sesuai gaya Anda.\"",
           "title": "Pemeriksaan Konten AI"
         },
         "badge": "Kasus Penggunaan",
@@ -1075,7 +1076,7 @@
           "b2": "Kontrol kualitas",
           "b3": "Penghematan waktu",
           "desc": "Periksa apakah konten outsourcing atau buatan AI cocok dengan suara merek Anda sebelum diterbitkan",
-          "example": "",
+          "example": "\"Postingan blog ini mendapat skor 78% - intro bagus tapi kesimpulan butuh lebih banyak nada percakapan Anda.\"",
           "title": "Tinjauan Konten"
         },
         "example": "Contoh",
@@ -1084,7 +1085,7 @@
           "b2": "Perbaikan",
           "b3": "Pertumbuhan",
           "desc": "Pahami pola penulisan Anda dan tingkatkan konsistensi dari waktu ke waktu",
-          "example": "",
+          "example": "\"Email formal Anda mendapat skor 92% tapi postingan santai hanya 58% - Anda punya dua suara berbeda!\"",
           "title": "Pembelajaran Gaya"
         },
         "spotlight": "Kasus Penggunaan Unggulan",
@@ -1094,7 +1095,7 @@
           "b2": "Alat pelatihan",
           "b3": "Orientasi",
           "desc": "Pastikan semua anggota tim menulis dengan suara konsisten yang sesuai dengan pedoman merek Anda",
-          "example": "",
+          "example": "\"Draf penulis baru mendapat skor 65% - bagikan Profil Suara untuk membantu mereka menyesuaikan gaya tim.\"",
           "title": "Penyelarasan Tim"
         },
         "title": "Sempurna Untuk Setiap Skenario"
@@ -1144,7 +1145,7 @@
         "a1": "Penyimpangan adalah kalimat dalam teks Anda yang tidak sesuai dengan gaya penulisan unik Anda yang ditangkap dalam Profil Suara Anda. AI kami membandingkan setiap kalimat dengan profil Anda dan mengidentifikasi kalimat yang berbeda secara signifikan dalam nada, kosakata, atau struktur.",
         "a2": "Kami menggunakan ambang dinamis berdasarkan Profil Suara Anda. Penyimpangan ringan (kemiripan 0,4-0,5) hampir tidak terlihat. Penyimpangan sedang (0,3-0,4) adalah perbedaan yang nyata. Penyimpangan berat (<0,3) adalah ketidakcocokan gaya yang signifikan yang jelas berbeda dari suara Anda.",
         "a3": "Skor Kompatibilitas memberi Anda persentase keseluruhan tentang seberapa baik teks Anda cocok dengan gaya Anda. Penyimpangan masuk lebih dalam dengan mengidentifikasi dengan tepat kalimat mana yang menyimpang dan seberapa parah, sehingga Anda tahu persis apa yang harus diperbaiki.",
-        "a4": "Ya! Setelah mengidentifikasi penyimpangan, Anda dapat mengklik kalimat yang disorot untuk melihat saran. Anda juga dapat menggunakan fitur AI Rewrite kami untuk secara otomatis mengubah kalimat yang menyimpang agar sesuai dengan Profil Suara Anda.",
+        "a4": "Ya! Setelah mengidentifikasi penyimpangan, Anda dapat mengklik kalimat yang disorot untuk melihat saran. Anda juga dapat menggunakan fitur Penulisan Ulang AI kami untuk secara otomatis mengubah kalimat yang menyimpang agar sesuai dengan Profil Suara Anda.",
         "a5": "Deteksi penyimpangan sudah termasuk dalam biaya analisis teks: 2 kredit dasar ditambah 0,002 kredit per kata. Analisis 500 kata yang khas membutuhkan sekitar 3 kredit dan mencakup Skor Kompatibilitas dan deteksi Penyimpangan.",
         "a6": "Kabar baik! Jika tidak ada penyimpangan yang ditemukan, itu berarti teks Anda sangat cocok dengan Profil Suara Anda. Anda akan melihat pesan sukses yang mengonfirmasi bahwa teks Anda konsisten dengan gaya penulisan Anda.",
         "badge": "FAQ",
@@ -1210,7 +1211,7 @@
           "b2": "Personalisasi",
           "b3": "Kepercayaan",
           "desc": "Identifikasi bagian mana dari konten buatan AI yang perlu dihumanisasi",
-          "example": "Output ChatGPT memiliki 8 penyimpangan - gunakan AI Rewrite pada yang berat terlebih dahulu.",
+          "example": "Output ChatGPT memiliki 8 penyimpangan - gunakan Penulisan Ulang AI pada yang berat terlebih dahulu.",
           "title": "Pemeriksaan Konten AI"
         },
         "badge": "Kasus Penggunaan",
@@ -1248,6 +1249,14 @@
       "cta": "Instal Ekstensi",
       "description": "Gunakan Graphos AI di mana saja di web",
       "title": "Ekstensi Chrome Tersedia"
+    },
+    "labels": {
+      "aiGenerated": "Buatan AI",
+      "aiRewrite": "AI Tulis Ulang",
+      "aiScore": "SKOR AI",
+      "aiWorkspace": "Ruang Kerja AI",
+      "humanizationPreview": "Pratinjau Humanisasi",
+      "voiceProfile": "Profil Suara"
     },
     "humanization": {
       "accuracy": "akurasi",
@@ -1311,9 +1320,46 @@
           "after": "Ini sesuatu yang saya pelajari: olahraga benar-benar membantu mengatasi stres. Kecemasan saya menjadi jauh lebih baik sejak saya mulai lebih banyak bergerak.",
           "before": "Penelitian menunjukkan bahwa latihan fisik secara teratur berkontribusi signifikan terhadap peningkatan kesehatan mental.",
           "style": "Pribadi & Otentik"
+        },
+        "ex3": {
+          "after": "AI mengubah segalanya tentang cara kita bekerja, dan jujur? Ini menarik sekaligus sedikit menakutkan.",
+          "before": "Teknologi kecerdasan buatan menghadirkan peluang dan tantangan bagi tenaga kerja modern.",
+          "style": "Profesional & Menarik"
         }
       },
       "examplesTitle": "Lihat Perbedaannya",
+      "transforms": {
+        "ex1": {
+          "from1": "Penerapan",
+          "from2": "praktik berkelanjutan",
+          "from3": "lingkungan perusahaan",
+          "from4": "semakin penting",
+          "to1": "Tahu apa yang ada di pikiran saya?",
+          "to2": "ramah lingkungan",
+          "to3": "perusahaan",
+          "to4": "serius"
+        },
+        "ex2": {
+          "from1": "Penelitian menunjukkan",
+          "from2": "latihan fisik teratur",
+          "from3": "berkontribusi signifikan",
+          "from4": "peningkatan kesehatan mental",
+          "to1": "Ini sesuatu yang saya pelajari",
+          "to2": "olahraga",
+          "to3": "benar-benar membantu",
+          "to4": "stres dan kecemasan"
+        },
+        "ex3": {
+          "from1": "Teknologi kecerdasan buatan",
+          "from2": "menghadirkan",
+          "from3": "peluang dan tantangan",
+          "from4": "tenaga kerja modern",
+          "to1": "AI",
+          "to2": "Ini sekaligus",
+          "to3": "menarik dan menakutkan",
+          "to4": "cara kita bekerja"
+        }
+      },
       "faq": {
         "a1": "AI kami menganalisis teks input dan menulis ulang menggunakan pola bahasa alami, struktur kalimat yang bervariasi, kata ganti orang, dan elemen percakapan yang merupakan ciri khas tulisan manusia.",
         "a2": "Tidak. Humanisasi kami mempertahankan makna inti dan poin-poin utama konten Anda sambil mengubah gaya penulisan agar terdengar lebih alami dan otentik.",
@@ -1368,6 +1414,10 @@
           "title": "Robotik & Kaku"
         }
       },
+      "preview": {
+        "after": "Tahu apa yang ada di pikiran saya akhir-akhir ini? Bagaimana perusahaan akhirnya serius soal ramah lingkungan...",
+        "before": "Penerapan praktik berkelanjutan menjadi semakin penting..."
+      },
       "processing": "memproses",
       "reset": "Atur ulang",
       "stats": {
@@ -1413,26 +1463,26 @@
       "useCases": {
         "academic": {
           "desc": "Sempurnakan ringkasan penelitian yang dihasilkan AI agar sesuai dengan standar akademik",
-          "example": "",
+          "example": "\"Dapat diamati bahwa...\" → \"Data dengan jelas menunjukkan...\"",
           "stat": "Skor keterbacaan",
           "title": "Penulisan Akademik"
         },
         "content": {
           "desc": "Ubah draf AI menjadi postingan blog, artikel, dan salinan pemasaran yang otentik",
-          "example": "",
+          "example": "\"Implementasi praktik berkelanjutan...\" → \"Tahu apa yang ada di pikiran saya akhir-akhir ini? Bagaimana perusahaan akhirnya...\"",
           "stat": "Keterlibatan blog",
           "title": "Pembuatan Konten"
         },
         "email": {
           "desc": "Buat email yang dibantu AI terdengar pribadi dan tulus",
-          "example": "",
+          "example": "\"Saya ingin menghubungi mengenai...\" → \"Hai! Pertanyaan cepat tentang...\"",
           "stat": "Peningkatan tingkat buka",
           "title": "Penulisan Email"
         },
         "preview": "Pratinjau Transformasi",
         "social": {
           "desc": "Buat postingan sosial menarik yang terhubung dengan audiens Anda",
-          "example": "",
+          "example": "\"Kami dengan senang hati mengumumkan...\" → \"Berita besar! Kami baru saja meluncurkan...\"",
           "stat": "Peningkatan keterlibatan",
           "title": "Media Sosial"
         },
@@ -1446,14 +1496,6 @@
       "whyHumanizeDesc": "Ubah teks AI robotik menjadi konten yang menarik dan otentik",
       "with": "Dengan Humanisasi",
       "without": "Tanpa Humanisasi"
-    },
-    "labels": {
-      "aiGenerated": "Buatan AI",
-      "aiRewrite": "AI Tulis Ulang",
-      "aiScore": "SKOR AI",
-      "aiWorkspace": "Ruang Kerja AI",
-      "humanizationPreview": "Pratinjau Humanisasi",
-      "voiceProfile": "Profil Suara"
     },
     "placeholder": {
       "voiceProfile": "PROFIL SUARA",
@@ -1494,21 +1536,21 @@
         "rewriteBtn": "Tulis Ulang",
         "rewritten": "Ditulis Ulang",
         "sectionDesc": "Rasakan kekuatan transformasi teks yang digerakkan oleh AI. Tidak perlu mendaftar.",
-        "sectionTitle": "Coba AI Rewrite Sekarang",
+        "sectionTitle": "Coba Penulisan Ulang AI Sekarang",
         "subtitle": "Ubah teks agar sesuai dengan gaya penulisan Anda",
         "tip1": "Coba sampel berbeda untuk melihat berbagai transformasi",
         "tip2": "Alihkan opsi untuk menyesuaikan output",
-        "title": "AI Rewrite",
+        "title": "Penulisan Ulang AI",
         "transformComplete": "Transformasi selesai"
       },
       "faq": {
-        "a1": "AI Rewrite menggunakan Profil Suara Anda untuk memahami gaya penulisan unik Anda. Kemudian mengubah teks apa pun agar sesuai dengan kosakata, nada, dan pola kalimat Anda sambil mempertahankan makna aslinya.",
+        "a1": "Penulisan Ulang AI menggunakan Profil Suara Anda untuk memahami gaya penulisan unik Anda. Kemudian mengubah teks apa pun agar sesuai dengan kosakata, nada, dan pola kalimat Anda sambil mempertahankan makna aslinya.",
         "a2": "Meskipun Anda dapat menggunakan penulisan ulang dasar tanpa profil, memiliki Profil Suara secara signifikan meningkatkan hasil. Ini memungkinkan AI untuk mencocokkan gaya penulisan spesifik Anda daripada menggunakan transformasi umum.",
-        "a3": "Ya! AI Rewrite kami dirancang untuk menghasilkan teks yang alami dan mirip manusia. Jika dikombinasikan dengan Profil Suara Anda, hasilnya biasanya mendapat skor sangat rendah pada alat deteksi AI.",
+        "a3": "Ya! Penulisan Ulang AI kami dirancang untuk menghasilkan teks yang alami dan mirip manusia. Jika dikombinasikan dengan Profil Suara Anda, hasilnya biasanya mendapat skor sangat rendah pada alat deteksi AI.",
         "a4": "Kami mendukung 15+ bahasa termasuk Inggris, Vietnam, Spanyol, Prancis, Jerman, dan banyak lagi. AI secara otomatis mendeteksi bahasa input dan mempertahankan kualitas dalam output.",
         "a5": "Penulisan ulang membutuhkan biaya sekitar 1,5 kredit dasar + 0,0008 kredit per kata. Biaya pastinya tergantung pada panjang teks dan model AI yang dipilih.",
         "a6": "Ya! Anda dapat menulis ulang dokumen hingga 50.000 karakter. Untuk dokumen yang lebih panjang, kami menyarankan penggunaan AI Studio kami yang memberikan pengalaman editor lengkap.",
-        "q1": "Bagaimana cara kerja AI Rewrite?",
+        "q1": "Bagaimana cara kerja Penulisan Ulang AI?",
         "q2": "Apakah saya memerlukan Profil Suara untuk menggunakan Rewrite?",
         "q3": "Apakah teks yang ditulis ulang akan lolos deteksi AI?",
         "q4": "Bahasa apa saja yang didukung?",
@@ -1516,7 +1558,7 @@
         "q6": "Bisakah saya menulis ulang dokumen panjang?"
       },
       "faqBadge": "FAQ",
-      "faqDesc": "Semua yang perlu Anda ketahui tentang AI Rewrite",
+      "faqDesc": "Semua yang perlu Anda ketahui tentang Penulisan Ulang AI",
       "faqTitle": "Pertanyaan yang Sering Diajukan",
       "heroDesc": "Ubah teks apa pun agar sesuai dengan gaya penulisan unik Anda. Didukung oleh Profil Suara Anda untuk hasil yang otentik dan tidak terdeteksi.",
       "heroHighlight": "Ubah Kata-Kata Anda",
@@ -1536,24 +1578,27 @@
       },
       "howItWorksBadge": "Proses Sederhana",
       "howItWorksDesc": "Ubah teks Anda dalam tiga langkah sederhana",
-      "howItWorksTitle": "Cara Kerja AI Rewrite",
+      "howItWorksTitle": "Cara Kerja Penulisan Ulang AI",
       "integration": {
         "badge": "Integrasi Kuat",
         "cta1": "Buat Profil Suara",
         "cta2": "Coba Demo",
-        "desc": "AI Rewrite menggunakan Profil Suara Anda untuk mengubah teks menjadi gaya penulisan unik Anda. Semakin sering Anda menggunakannya, semakin baik ia memahami suara Anda.",
+        "desc": "Penulisan Ulang AI menggunakan Profil Suara Anda untuk mengubah teks menjadi gaya penulisan unik Anda. Semakin sering Anda menggunakannya, semakin baik ia memahami suara Anda.",
         "feature1": "Cocok dengan kosakata dan nada Anda",
         "feature2": "Belajar dari pola penulisan Anda",
         "feature3": "Suara yang konsisten di semua konten",
         "feature4": "Melewati deteksi AI secara alami",
         "result": "Hasil: Terdengar persis seperti Anda!",
-        "title": "Didukung oleh Profil Suara Anda"
+        "resultDesc": "Teks Anda telah diubah agar sesuai dengan gaya penulisan unik, preferensi kosakata, dan nada Anda...",
+        "title": "Didukung oleh Profil Suara Anda",
+        "voiceProfileLabel": "Profil Suara",
+        "aiRewriteLabel": "AI Tulis Ulang"
       },
       "showcase": {
         "badge": "Lihat Keajaibannya",
         "cta": "Coba Sendiri",
         "formal": {
-          "after": "Tahu tidak",
+          "after": "Tahu nggak apa yang lagi ada di pikiran aku akhir-akhir ini? Gimana perusahaan-perusahaan akhirnya serius soal go green. Ini bukan cuma tren lagi—ini jadi standar baru di dunia bisnis.",
           "before": "Penerapan praktik berkelanjutan dalam lingkungan perusahaan menjadi semakin penting dalam beberapa tahun terakhir.",
           "metric": "Keterlibatan",
           "style": "Formal → Percakapan"
@@ -1570,10 +1615,10 @@
           "metric": "Kejelasan",
           "style": "Pasif → Aktif"
         },
-        "subtitle": "Lihat bagaimana AI Rewrite mengubah teks Anda sambil mempertahankan pesan Anda",
+        "subtitle": "Lihat bagaimana Penulisan Ulang AI mengubah teks Anda sambil mempertahankan pesan Anda",
         "title": "Transformasi Nyata",
         "wordy": {
-          "after": "Mari",
+          "after": "Yuk ketemu sebentar buat bahas kemungkinan kolaborasi. Kapan kamu bisa?",
           "before": "Saya menulis untuk menginformasikan kepada Anda bahwa saya ingin meminta pertemuan pada kenyamanan paling awal Anda untuk membahas kemungkinan mengeksplorasi peluang kolaborasi potensial.",
           "metric": "Jumlah kata",
           "style": "Bertele-tele → Ringkas"
@@ -1585,7 +1630,7 @@
         "speed": "Kecepatan",
         "users": "Pengguna Bahagia"
       },
-      "title": "AI Rewrite",
+      "title": "Penulisan Ulang AI",
       "trust": {
         "instant": "Hasil instan",
         "noCard": "Tidak perlu kartu kredit",
@@ -1594,26 +1639,26 @@
       "useCases": {
         "academic": {
           "desc": "Poles esai dan makalah sambil mempertahankan nada akademis",
-          "example": "",
+          "example": "\"Dapat diamati bahwa...\" → \"Data dengan jelas menunjukkan...\"",
           "stat": "Skor kejelasan",
           "title": "Penulisan Akademik"
         },
         "content": {
           "desc": "Tulis ulang postingan blog, artikel, dan salinan pemasaran dalam suara Anda",
-          "example": "",
+          "example": "\"Artikel ini membahas...\" → \"Pernah bertanya-tanya mengapa...? Biar saya ceritakan...\"",
           "stat": "Waktu baca",
           "title": "Pembuatan Konten"
         },
         "email": {
           "desc": "Ubah email formal menjadi pesan ramah atau sebaliknya",
-          "example": "",
+          "example": "\"Saya ingin menghubungi mengenai...\" → \"Hai! Pertanyaan cepat tentang...\"",
           "stat": "Tingkat respons",
           "title": "Penulisan Email"
         },
         "preview": "Pratinjau Transformasi",
         "social": {
           "desc": "Buat postingan menarik yang terdengar otentik seperti Anda",
-          "example": "",
+          "example": "\"Kami dengan senang hati mengumumkan...\" → \"Berita besar! Kami baru saja meluncurkan...\"",
           "stat": "Keterlibatan",
           "title": "Media Sosial"
         },
@@ -1782,7 +1827,7 @@
           "b2": "Analisis kecepatan",
           "b3": "Kecocokan genre",
           "desc": "Analisis manuskrip Anda untuk memastikan suara yang konsisten dan kompleksitas yang sesuai di seluruh bagian",
-          "example": "",
+          "example": "\"Manuskrip Anda memiliki panjang kalimat rata-rata 18 kata - sempurna untuk fiksi sastra.\"",
           "title": "Penulis"
         },
         "badge": "Kasus Penggunaan",
@@ -1791,7 +1836,7 @@
           "b2": "Lacak kemajuan",
           "b3": "Alat pengajaran",
           "desc": "Bantu siswa meningkatkan tulisan mereka dengan memberikan umpan balik objektif tentang struktur dan kompleksitas",
-          "example": "",
+          "example": "\"Esai siswa memiliki skor keterbacaan 45 - perlu disederhanakan untuk audiens target.\"",
           "title": "Pendidik"
         },
         "example": "Contoh",
@@ -1800,7 +1845,7 @@
           "b2": "Nada profesional",
           "b3": "Kecocokan audiens",
           "desc": "Pastikan komunikasi bisnis Anda jelas, profesional, dan sesuai untuk audiens Anda",
-          "example": "",
+          "example": "\"Laporan Anda memiliki kekayaan kosakata 0,82 - sangat baik untuk dokumentasi teknis.\"",
           "title": "Profesional"
         },
         "spotlight": "Kasus Penggunaan Unggulan",
@@ -1811,7 +1856,7 @@
           "b2": "Gaya konsisten",
           "b3": "Optimasi SEO",
           "desc": "Optimalkan konten Anda untuk keterbacaan dan keterlibatan dengan memahami pola penulisan Anda",
-          "example": "",
+          "example": "\"Postingan blog Anda memiliki skor keterbacaan 72 - sempurna untuk audiens web.\"",
           "title": "Penulis Konten"
         }
       }
@@ -1919,16 +1964,34 @@
       "metrics": {
         "punctuation": "Gaya Tanda Baca",
         "punctuationDesc": "Pola tanda baca unik dan preferensi Anda",
+        "punctuationEx1": "Tanda pisah panjang",
+        "punctuationEx2": "Titik koma",
+        "punctuationEx3": "Tanda seru",
         "sentenceLength": "Struktur Kalimat",
         "sentenceLengthDesc": "Panjang tipikal, kompleksitas, dan ritme kalimat Anda",
+        "sentenceLengthEx1": "Pendek & padat",
+        "sentenceLengthEx2": "Aliran sedang",
+        "sentenceLengthEx3": "Kompleks & detail",
         "sentenceStarters": "Pembuka Kalimat",
         "sentenceStartersDesc": "Bagaimana Anda biasanya memulai kalimat - subjek-pertama, kata keterangan, pertanyaan",
+        "sentenceStartersEx1": "\"Saya pikir...\"",
+        "sentenceStartersEx2": "\"Namun...\"",
+        "sentenceStartersEx3": "\"Kuncinya adalah...\"",
         "tone": "Penanda Emosional",
         "toneDesc": "Bagaimana Anda mengekspresikan pendapat, perasaan, dan penekanan",
+        "toneEx1": "\"Saya merasa...\"",
+        "toneEx2": "\"Menurut saya...\"",
+        "toneEx3": "\"Tentu saja!\"",
         "transitions": "Preferensi Transisi",
         "transitionsDesc": "Kata dan frasa penghubung pilihan Anda",
+        "transitionsEx1": "\"tetapi\"",
+        "transitionsEx2": "\"oleh karena itu\"",
+        "transitionsEx3": "\"di sisi lain\"",
         "vocabulary": "Pola Kosakata",
-        "vocabularyDesc": "Frasa umum, kata-kata pilihan, dan ekspresi"
+        "vocabularyDesc": "Frasa umum, kata-kata pilihan, dan ekspresi",
+        "vocabularyEx1": "\"jujur\"",
+        "vocabularyEx2": "\"biar saya jelaskan\"",
+        "vocabularyEx3": "\"begini masalahnya\""
       },
       "metricsBadge": "Analisis Mendalam",
       "metricsDesc": "AI kami menangkap setiap nuansa gaya penulisan Anda melalui analisis komprehensif",
@@ -1942,7 +2005,10 @@
         "analyzing2": "Mendeteksi struktur kalimat...",
         "analyzing3": "Mengidentifikasi penanda nada...",
         "ready": "Siap digunakan",
+        "sampleBlog": "\"Begini masalahnya tentang produktivitas...\"",
+        "sampleEmail": "\"Hai tim, hanya ingin berbagi beberapa pemikiran...\"",
         "sampleInput": "Sampel Tulisan Anda",
+        "sampleSocial": "\"Jujur, ini mengubah segalanya bagi saya...\"",
         "step1": "Tambahkan Sampel Tulisan",
         "step1Desc": "Tempel email, postingan, atau teks apa pun yang Anda tulis",
         "step2": "AI Menganalisis Pola",
@@ -1989,13 +2055,13 @@
       "useCases": {
         "business": {
           "desc": "Pastikan semua komunikasi tim sesuai dengan suara merek",
-          "quote": "",
+          "quote": "\"Suara merek kami sekarang konsisten di lebih dari 50 anggota tim.\"",
           "statLabel": "perusahaan",
           "title": "Komunikasi Bisnis"
         },
         "content": {
           "desc": "Hasilkan postingan blog, artikel, dan salinan yang terdengar seperti Anda",
-          "quote": "",
+          "quote": "\"Saya menulis 3x lebih cepat dan masih terdengar otentik seperti saya.\"",
           "statLabel": "artikel",
           "title": "Pembuatan Konten"
         },
@@ -2003,13 +2069,13 @@
         "ctaButton": "Buat Profil Anda",
         "personal": {
           "desc": "Bangun merek pribadi yang konsisten di semua konten Anda",
-          "quote": "",
+          "quote": "\"Postingan LinkedIn saya akhirnya terdengar seperti saya, bukan robot.\"",
           "statLabel": "kreator",
           "title": "Personal Branding"
         },
         "team": {
           "desc": "Bagikan profil untuk mempertahankan suara yang konsisten di seluruh tim Anda",
-          "quote": "",
+          "quote": "\"Onboarding penulis baru sekarang mulus dengan profil bersama.\"",
           "statLabel": "tim",
           "title": "Kolaborasi Tim"
         }
@@ -2034,7 +2100,8 @@
     "gridTitle": "Pilih Alat Anda",
     "meta": {
       "description": "Jelajahi semua fitur Graphos AI Studio: Deteksi AI, Humanisasi, Profil Suara, Ruang Kerja AI, Tulis Ulang, dan banyak lagi.",
-      "title": "Fitur - Graphos AI Studio"
+      "title": "Fitur - Graphos AI Studio",
+      "keywords": "alat penulisan AI, fitur deteksi AI, humanisasi konten, pembuat profil suara"
     },
     "stats": {
       "extension": "Ekstensi Chrome",
@@ -2111,7 +2178,8 @@
     },
     "meta": {
       "description": "Deteksi konten yang dihasilkan AI, humanisasi tulisan Anda, dan buat konten otentik yang terdengar seperti Anda. Asisten penulisan AI gratis dengan ekstensi Chrome.",
-      "title": "Graphos AI Studio - Deteksi AI, Humanisasi & Profil Suara"
+      "title": "Graphos AI Studio - Deteksi AI, Humanisasi & Profil Suara",
+      "keywords": "deteksi AI, detektor konten AI, detektor ChatGPT, humanisasi teks AI, asisten penulisan AI, profil suara, melewati deteksi AI, konverter teks AI"
     }
   },
   "howItWorks": {
@@ -2146,7 +2214,8 @@
     "description": "Ubah teks AI menjadi tulisan manusia yang alami dan otentik.",
     "meta": {
       "description": "Ubah teks yang dihasilkan AI menjadi konten alami seperti manusia sambil mempertahankan makna.",
-      "title": "Humanisasi Konten - Graphos AI Studio"
+      "title": "Humanisasi Konten - Graphos AI Studio",
+      "keywords": "humanisasi teks AI, humanizer AI, melewati deteksi AI, AI tidak terdeteksi, mengubah AI ke teks manusia, humanisasi ChatGPT"
     },
     "title": "Humanisasi Konten"
   },
@@ -2173,7 +2242,7 @@
     "pricing": "Harga",
     "privacy": "Kebijakan Privasi",
     "resources": "Sumber Daya",
-    "rewrite": "AI Rewrite",
+    "rewrite": "Penulisan Ulang AI",
     "rewriteDesc": "Ubah teks dalam suara Anda",
     "statistics": "Statistik",
     "statisticsDesc": "Analisis metrik penulisan Anda",
@@ -2194,7 +2263,7 @@
       "noSubscription": "Tanpa langganan",
       "securePayment": "Pembayaran aman"
     },
-    "bestValue": "Nilai Terbaik",
+    "bestValue": "Terbaik",
     "bonus": "bonus",
     "buyNow": "Beli Sekarang",
     "creditCard": "Kartu Kredit",
@@ -2257,9 +2326,10 @@
     "description": "Ubah teks dalam suara Anda dengan penulisan ulang bertenaga AI.",
     "meta": {
       "description": "Ubah teks apa pun agar sesuai dengan gaya penulisan unik Anda. Penulisan ulang bertenaga AI yang mempertahankan suara dan nada Anda.",
-      "title": "AI Rewrite - Ubah Teks dalam Suara Anda | Graphos AI"
+      "title": "Penulisan Ulang AI - Ubah Teks dalam Suara Anda | Graphos AI",
+      "keywords": "menulis ulang AI, penulis ulang teks, alat parafrase, pengubah teks, parafrase AI"
     },
-    "title": "AI Rewrite"
+    "title": "Penulisan Ulang AI"
   },
   "seo": {
     "howToUse": "Cara Menggunakan Graphos AI Studio",
@@ -2306,7 +2376,8 @@
     "description": "Analisis metrik dan pola penulisan Anda.",
     "meta": {
       "description": "Dapatkan statistik penulisan terperinci termasuk jumlah kata, panjang kalimat, kekayaan kosakata, dan skor keterbacaan.",
-      "title": "Statistik - Analisis Metrik Penulisan Anda | Graphos AI"
+      "title": "Statistik - Analisis Metrik Penulisan Anda | Graphos AI",
+      "keywords": "statistik penulisan, penganalisis teks, penghitung kata, skor keterbacaan, penganalisis kosakata"
     },
     "title": "Statistik"
   },
@@ -2353,8 +2424,8 @@
         "title": "Kredit Tidak Pernah Kedaluwarsa"
       },
       "refund": {
-        "desc": "Tidak puas? Dapatkan pengembalian dana penuh dalam 7 hari",
-        "title": "Uang Kembali 7 Hari"
+        "desc": "Coba 100 kredit gratis sebelum membeli",
+        "title": "Coba sebelum membeli"
       },
       "support": {
         "desc": "Dapatkan bantuan saat Anda membutuhkannya melalui email",
@@ -2479,7 +2550,8 @@
     "description": "Tangkap gaya penulisan unik Anda dan buat konten yang terdengar otentik seperti Anda.",
     "meta": {
       "description": "Buat profil suara penulisan unik Anda dan hasilkan konten yang terdengar seperti Anda.",
-      "title": "Profil Suara - Graphos AI Studio"
+      "title": "Profil Suara - Graphos AI Studio",
+      "keywords": "profil suara, gaya penulisan AI, asisten penulisan pribadi, penganalisis nada, gaya penulisan unik"
     },
     "title": "Profil Suara"
   },
@@ -2592,36 +2664,36 @@
     },
     "voiceProfile": {
       "sarah": {
-        "name": "Sarah Chen",
-        "style": "Professional & Warm",
-        "tone": "Warm & Approachable",
+        "name": "Sari Wulandari",
+        "style": "Profesional & Hangat",
+        "tone": "Hangat & Ramah",
         "vocab": {
-          "0": "honestly",
-          "1": "I think",
-          "2": "let me explain",
-          "3": "here's the thing"
+          "0": "sejujurnya",
+          "1": "menurut saya",
+          "2": "biar saya jelaskan",
+          "3": "intinya adalah"
         }
       },
       "alex": {
-        "name": "Alex Rivera",
-        "style": "Casual & Creative",
-        "tone": "Fun & Energetic",
+        "name": "Budi Santoso",
+        "style": "Santai & Kreatif",
+        "tone": "Menyenangkan & Energik",
         "vocab": {
-          "0": "basically",
-          "1": "you know",
-          "2": "kind of",
-          "3": "super"
+          "0": "pada dasarnya",
+          "1": "kamu tahu",
+          "2": "semacam",
+          "3": "banget"
         }
       },
       "james": {
-        "name": "Dr. James Park",
-        "style": "Academic & Precise",
-        "tone": "Authoritative & Measured",
+        "name": "Dr. Agus Pratama",
+        "style": "Akademis & Presisi",
+        "tone": "Berwibawa & Terukur",
         "vocab": {
-          "0": "furthermore",
-          "1": "consequently",
-          "2": "research indicates",
-          "3": "data suggests"
+          "0": "selain itu",
+          "1": "oleh karena itu",
+          "2": "penelitian menunjukkan",
+          "3": "data menunjukkan"
         }
       }
     }

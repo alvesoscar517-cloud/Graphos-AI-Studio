@@ -3,7 +3,8 @@
     "description": "精确且自信地识别AI生成的内容。",
     "meta": {
       "description": "高精度检测AI生成内容。识别ChatGPT、GPT-4及其他AI写作。",
-      "title": "AI检测 - Graphos AI Studio"
+      "title": "AI检测 - Graphos AI Studio",
+      "keywords": "AI检测器, AI内容检测器, ChatGPT检测器, GPT-4检测器, AI检查器, 检测AI写作, AI文本检测器"
     },
     "title": "AI检测"
   },
@@ -11,7 +12,8 @@
     "description": "以你独特的写作风格与AI对话。",
     "meta": {
       "description": "使用你的声音档案与AI聊天。获取个性化的写作辅助。",
-      "title": "AI工作区 - Graphos AI Studio"
+      "title": "AI工作区 - Graphos AI Studio",
+      "keywords": "AI聊天, AI写作助手, AI工作区, AI内容生成器, 个性化AI"
     },
     "title": "AI工作区"
   },
@@ -159,7 +161,8 @@
     "description": "通过详细分析检查你的写作风格匹配度。",
     "meta": {
       "description": "分析文本与你独特写作风格的匹配程度。获取详细的兼容性评分、偏差分析和改进建议。",
-      "title": "兼容性评分 - 检查你的写作风格匹配度 | Graphos AI"
+      "title": "兼容性评分 - 检查你的写作风格匹配度 | Graphos AI",
+      "keywords": "写作风格匹配, 兼容性评分, 风格分析器, 声音匹配检查器"
     },
     "title": "兼容性评分"
   },
@@ -194,7 +197,8 @@
   "demo": {
     "after": "之后",
     "aiDetection": {
-      "result": "AI检测结果"
+      "result": "AI检测结果",
+      "title": "AI检测"
     },
     "aiIndicators": "AI指标",
     "aiProbability": "AI概率",
@@ -479,19 +483,10 @@
     "description": "找出你写作中的风格不一致之处。",
     "meta": {
       "description": "识别偏离你写作风格的句子。获取严重程度分级、建议并修复不一致之处，以保持你独特的声音。",
-      "title": "偏差 - 找出风格不一致 | Graphos AI"
+      "title": "偏差 - 找出风格不一致 | Graphos AI",
+      "keywords": "风格检查器, 写作一致性, 语调分析器, 风格不一致查找器"
     },
     "title": "偏差"
-  },
-  "exitPopup": {
-    "cta": "领取我的奖励积分",
-    "emailPlaceholder": "输入你的邮箱",
-    "noSpam": "无垃圾邮件",
-    "noThanks": "不用了，我愿意全额支付",
-    "subtitle": "订阅我们的通讯，首次购买即可额外获得50积分！",
-    "success": "太棒了！请查收邮件获取奖励代码。",
-    "title": "等一下！领取50奖励积分",
-    "unsubscribe": "随时取消订阅"
   },
   "extension": {
     "badge": "Chrome扩展",
@@ -549,13 +544,13 @@
   "faq": {
     "answers": {
       "credits": "积分是我们“按需付费”的货币。不同功能根据文本长度和复杂性消耗不同数量的积分。AI检测消耗约2-5积分，人性化约2-8积分，声音档案创建约8-25积分，AI工作区每条消息约1-3积分。积分永不过期！",
-      "extension": "我们的Chrome扩展允许你在网络上的任何地方使用 Graphos AI。在任何网站上选择文本即可检测AI内容、人性化文本或用你的声音生成内容。它与Gmail、Google Docs、社交媒体等无缝集成。",
+      "extension": "我们的Chrome扩展目前作为主要的Web应用程序界面运行。在任何网站上选择文本以检测AI内容、人性化文本或用您的声音生成内容等功能正在开发中。敬请期待更新！",
       "freeTier": "是的！每个新用户均可获得100个免费积分来试用所有功能。无需信用卡。此外，你的首次购买将获得2倍奖励积分！",
       "howDetection": "我们的AI检测通过分析多种语言模式（包括词汇、语义、结构和内容模式）实现98%的准确率。对于不确定的情况，我们使用高级多通道分析以确保结果可靠。",
       "humanization": "我们的人性化引擎将AI生成的文本重写为符合人类自然写作模式的内容。它使用你的声音档案来保持你独特的风格，同时消除AI指纹，如重复结构、正式过渡和通用语言。",
       "languages": "Graphos AI 支持15种语言，包括英语、越南语、中文、日语、韩语、泰语、印尼语、马来语、阿拉伯语、法语、德语、西班牙语、葡萄牙语、意大利语和俄语。每种语言都有优化的检测和人性化模式。",
       "privacy": "绝对安全。我们对所有数据使用企业级加密。你的写作样本和声音档案被安全存储且从不共享。我们遵守GDPR和其他隐私法规。你可以随时删除你的数据。",
-      "refund": "我们为所有积分购买提供7天退款保证。如果你不满意，请联系我们的支持团队进行全额退款。未使用的积分也可以在购买后30天内退款。",
+      "refund": "所有积分购买均为最终交易，不可退款。请在购买前先试用我们的100个免费积分，以确保我们的服务满足您的需求。我们建议从小额开始，根据需要购买更多积分。",
       "voiceProfile": "声音档案是你写作风格的独特指纹。通过分析你的写作样本，我们捕捉你的语气、词汇偏好、句子模式和关键特征。这使得AI能够生成听起来真实像你的内容。",
       "whatIs": "Graphos AI Studio 是一个AI驱动的写作助手，帮助你检测AI生成的内容，人性化你的写作，并创建符合你独特声音的真实内容。它包括一个Web应用程序和Chrome扩展，可无缝集成到工作流程中。"
     },
@@ -673,6 +668,12 @@
         "subtitle": "我们的多层分析确保在几秒钟内实现精确检测",
         "title": "AI检测如何工作"
       },
+      "layers": {
+        "lexical": "词汇模式",
+        "semantic": "语义分析",
+        "structure": "结构检查",
+        "statistical": "统计模型"
+      },
       "pricing": {
         "free": "免费",
         "freeFeature1": "5次检测/天",
@@ -758,7 +759,7 @@
         }
       },
       "useCasesBadge": "实际应用",
-      "useCasesCta": "Don",
+      "useCasesCta": "没有看到您的使用案例？我们支持更多行业。",
       "useCasesSubtitle": "发现各行各业的专业人士如何使用我们的AI检测",
       "useCasesTitle": "使用案例",
       "whyChoose": "为何选择我们的AI检测？",
@@ -922,25 +923,25 @@
       "useCases": {
         "business": {
           "desc": "符合你品牌的提案、报告和演示",
-          "example": "",
+          "example": "\"起草提案\" → 你风格的专业文档",
           "stat": "生产力",
           "title": "商业写作"
         },
         "content": {
           "desc": "用你的声音生成博客文章、文章和营销文案",
-          "example": "",
+          "example": "\"写博客开头\" → 听起来像你的吸引人内容",
           "stat": "内容质量",
           "title": "内容创作"
         },
         "email": {
           "desc": "起草、回复和跟进邮件，听起来就像你亲手写的",
-          "example": "",
+          "example": "\"起草跟进邮件\" → 你声音中的专业个性化邮件",
           "stat": "节省时间",
           "title": "邮件沟通"
         },
         "social": {
           "desc": "为LinkedIn、Twitter等创建引人入胜的帖子",
-          "example": "",
+          "example": "\"创建LinkedIn帖子\" → 真实的社交内容",
           "stat": "参与度",
           "title": "社交媒体"
         },
@@ -1066,7 +1067,7 @@
           "b2": "个性化",
           "b3": "信任",
           "desc": "在使用前验证AI生成的内容听起来像你",
-          "example": "",
+          "example": "\"ChatGPT输出得分45% - 使用AI重写将其转换为你的风格。\"",
           "title": "AI内容检查"
         },
         "badge": "使用案例",
@@ -1075,7 +1076,7 @@
           "b2": "质量控制",
           "b3": "节省时间",
           "desc": "在发布前检查外包或AI生成的内容是否匹配你的品牌声音",
-          "example": "",
+          "example": "\"这篇博客文章得分78% - 开头很棒，但结尾需要更多你的对话语气。\"",
           "title": "内容审查"
         },
         "example": "示例",
@@ -1084,7 +1085,7 @@
           "b2": "改进",
           "b3": "成长",
           "desc": "了解你的写作模式并随时间提高一致性",
-          "example": "",
+          "example": "\"你的正式邮件得分92%，但休闲帖子只有58% - 你有两种不同的声音！\"",
           "title": "风格学习"
         },
         "spotlight": "精选使用案例",
@@ -1094,7 +1095,7 @@
           "b2": "培训工具",
           "b3": "入职",
           "desc": "确保所有团队成员以符合品牌准则的一致声音写作",
-          "example": "",
+          "example": "\"新写手的草稿得分65% - 分享声音档案帮助他们匹配团队风格。\"",
           "title": "团队对齐"
         },
         "title": "完美适用于各种场景"
@@ -1249,6 +1250,14 @@
       "description": "在网页任何地方使用 Graphos AI",
       "title": "Chrome扩展可用"
     },
+    "labels": {
+      "aiGenerated": "AI生成",
+      "aiRewrite": "AI重写",
+      "aiScore": "AI分数",
+      "aiWorkspace": "AI工作区",
+      "humanizationPreview": "人性化预览",
+      "voiceProfile": "声音档案"
+    },
     "humanization": {
       "accuracy": "准确率",
       "aiContent": "原始AI内容",
@@ -1311,9 +1320,46 @@
           "after": "这是我学到的一点：锻炼真的有助于缓解压力。自从我开始多动动后，我的焦虑好多了。",
           "before": "研究表明，定期体育锻炼对心理健康改善有显著贡献。",
           "style": "个人 & 真实"
+        },
+        "ex3": {
+          "after": "AI正在改变我们工作的一切，说实话？既令人兴奋又有点可怕。",
+          "before": "人工智能技术为现代劳动力带来了机遇和挑战。",
+          "style": "专业 & 吸引人"
         }
       },
       "examplesTitle": "查看差异",
+      "transforms": {
+        "ex1": {
+          "from1": "实施",
+          "from2": "可持续实践",
+          "from3": "企业环境",
+          "from4": "越来越重要",
+          "to1": "你知道我在想什么吗？",
+          "to2": "环保",
+          "to3": "公司",
+          "to4": "认真对待"
+        },
+        "ex2": {
+          "from1": "研究表明",
+          "from2": "定期体育锻炼",
+          "from3": "显著贡献",
+          "from4": "心理健康改善",
+          "to1": "这是我学到的",
+          "to2": "锻炼",
+          "to3": "真的有帮助",
+          "to4": "压力和焦虑"
+        },
+        "ex3": {
+          "from1": "人工智能技术",
+          "from2": "带来了",
+          "from3": "机遇和挑战",
+          "from4": "现代劳动力",
+          "to1": "AI",
+          "to2": "既是",
+          "to3": "令人兴奋又可怕",
+          "to4": "我们工作的方式"
+        }
+      },
       "faq": {
         "a1": "我们的AI分析输入文本，并使用自然语言模式、多样的句子结构、人称代词和人类写作特有的对话元素进行重写。",
         "a2": "不。我们的人性化保留你内容的核心含义和关键点，同时转换写作风格以听起来更自然和真实。",
@@ -1368,6 +1414,10 @@
           "title": "机械生硬"
         }
       },
+      "preview": {
+        "after": "你知道我最近一直在想什么吗？就是企业终于开始认真对待环保问题了...",
+        "before": "可持续实践的实施变得越来越重要..."
+      },
       "processing": "处理中",
       "reset": "重置",
       "stats": {
@@ -1413,26 +1463,26 @@
       "useCases": {
         "academic": {
           "desc": "润色AI生成的研究摘要以符合学术标准",
-          "example": "",
+          "example": "\"可以观察到...\" → \"数据清楚地表明...\"",
           "stat": "可读性分数",
           "title": "学术写作"
         },
         "content": {
           "desc": "将AI草稿转换为真实的博客文章、文章和营销文案",
-          "example": "",
+          "example": "\"可持续实践的实施...\" → \"你知道最近什么事情一直在我脑海里吗？企业终于开始...\"",
           "stat": "博客参与度",
           "title": "内容创作"
         },
         "email": {
           "desc": "让AI辅助的邮件听起来个性化和真诚",
-          "example": "",
+          "example": "\"我想就...联系你\" → \"嗨！关于...有个快速问题\"",
           "stat": "打开率增加",
           "title": "邮件写作"
         },
         "preview": "转换预览",
         "social": {
           "desc": "创建与受众建立联系的引人入胜的社交帖子",
-          "example": "",
+          "example": "\"我们很高兴地宣布...\" → \"大新闻！我们刚刚发布了...\"",
           "stat": "参与度提升",
           "title": "社交媒体"
         },
@@ -1446,14 +1496,6 @@
       "whyHumanizeDesc": "将机械的AI文本转换为引人入胜、真实的内容",
       "with": "有人性化",
       "without": "无人性化"
-    },
-    "labels": {
-      "aiGenerated": "AI生成",
-      "aiRewrite": "AI重写",
-      "aiScore": "AI分数",
-      "aiWorkspace": "AI工作区",
-      "humanizationPreview": "人性化预览",
-      "voiceProfile": "声音档案"
     },
     "placeholder": {
       "voiceProfile": "声音档案",
@@ -1547,13 +1589,16 @@
         "feature3": "所有内容中一致的声音",
         "feature4": "自然地绕过AI检测",
         "result": "结果：听起来完全像你！",
-        "title": "由你的声音档案驱动"
+        "resultDesc": "你的文本已被转换以匹配你独特的写作风格、词汇偏好和语调...",
+        "title": "由你的声音档案驱动",
+        "voiceProfileLabel": "声音档案",
+        "aiRewriteLabel": "AI重写"
       },
       "showcase": {
         "badge": "见证奇迹",
         "cta": "亲自试试",
         "formal": {
-          "after": "你知道吗",
+          "after": "你知道我最近一直在想什么吗？就是企业终于开始认真对待环保了。这已经不只是潮流了——它正在成为商业的新常态。",
           "before": "近年来，在企业环境中实施可持续实践变得越来越重要。",
           "metric": "参与度",
           "style": "正式 → 对话式"
@@ -1573,7 +1618,7 @@
         "subtitle": "观看AI重写如何在保留信息的同时转换你的文本",
         "title": "真实转换",
         "wordy": {
-          "after": "让我们",
+          "after": "我们找个时间见面聊聊合作的事吧。你什么时候方便？",
           "before": "我写信通知您，我想请求在您最早方便的时候开会，讨论探索潜在合作机会的可能性。",
           "metric": "字数",
           "style": "冗长 → 简洁"
@@ -1594,26 +1639,26 @@
       "useCases": {
         "academic": {
           "desc": "润色论文和文章，同时保持学术语气",
-          "example": "",
+          "example": "\"可以观察到...\" → \"数据清楚地表明...\"",
           "stat": "清晰度分数",
           "title": "学术写作"
         },
         "content": {
           "desc": "用你的声音重写博客文章、文章和营销文案",
-          "example": "",
+          "example": "\"本文讨论...\" → \"你有没有想过为什么...？让我告诉你...\"",
           "stat": "阅读时间",
           "title": "内容创作"
         },
         "email": {
           "desc": "将正式邮件转换为友好信息，反之亦然",
-          "example": "",
+          "example": "\"我想就...联系你\" → \"嗨！关于...有个快速问题\"",
           "stat": "回复率",
           "title": "邮件写作"
         },
         "preview": "转换预览",
         "social": {
           "desc": "创建听起来真实的引人入胜的帖子",
-          "example": "",
+          "example": "\"我们很高兴地宣布...\" → \"大新闻！我们刚刚发布了...\"",
           "stat": "参与度",
           "title": "社交媒体"
         },
@@ -1782,7 +1827,7 @@
           "b2": "节奏分析",
           "b3": "体裁契合",
           "desc": "分析你的手稿以确保通篇声音一致且复杂性适当",
-          "example": "",
+          "example": "\"你的手稿平均句子长度为18个词 - 非常适合文学小说。\"",
           "title": "作者"
         },
         "badge": "使用案例",
@@ -1791,7 +1836,7 @@
           "b2": "跟踪进度",
           "b3": "教学工具",
           "desc": "通过提供结构和复杂性方面的客观反馈帮助学生改进写作",
-          "example": "",
+          "example": "\"学生的论文可读性分数为45 - 需要为目标受众简化。\"",
           "title": "教育工作者"
         },
         "example": "示例",
@@ -1800,7 +1845,7 @@
           "b2": "专业语气",
           "b3": "受众契合",
           "desc": "确保你的商业沟通清晰、专业且适合受众",
-          "example": "",
+          "example": "\"你的报告词汇丰富度为0.82 - 非常适合技术文档。\"",
           "title": "专业人士"
         },
         "spotlight": "精选使用案例",
@@ -1811,7 +1856,7 @@
           "b2": "一致的风格",
           "b3": "SEO优化",
           "desc": "通过了解你的写作模式来优化内容的可读性和参与度",
-          "example": "",
+          "example": "\"你的博客文章可读性分数为72 - 非常适合网络受众。\"",
           "title": "内容写作者"
         }
       }
@@ -1919,16 +1964,34 @@
       "metrics": {
         "punctuation": "标点符号风格",
         "punctuationDesc": "你独特的标点符号模式和偏好",
+        "punctuationEx1": "破折号",
+        "punctuationEx2": "分号",
+        "punctuationEx3": "感叹号",
         "sentenceLength": "句子结构",
         "sentenceLengthDesc": "你句子的典型长度、复杂性和节奏",
+        "sentenceLengthEx1": "简短有力",
+        "sentenceLengthEx2": "中等流畅",
+        "sentenceLengthEx3": "复杂详细",
         "sentenceStarters": "句子开头",
         "sentenceStartersDesc": "你通常如何开始句子——主语优先、副词、疑问",
+        "sentenceStartersEx1": "\"我认为...\"",
+        "sentenceStartersEx2": "\"然而...\"",
+        "sentenceStartersEx3": "\"关键是...\"",
         "tone": "情感标记",
         "toneDesc": "你如何表达观点、感受和强调",
+        "toneEx1": "\"我觉得...\"",
+        "toneEx2": "\"在我看来...\"",
+        "toneEx3": "\"当然！\"",
         "transitions": "过渡偏好",
         "transitionsDesc": "你偏好的连接词和短语",
+        "transitionsEx1": "\"但是\"",
+        "transitionsEx2": "\"因此\"",
+        "transitionsEx3": "\"另一方面\"",
         "vocabulary": "词汇模式",
-        "vocabularyDesc": "常用短语、偏好词汇和表达"
+        "vocabularyDesc": "常用短语、偏好词汇和表达",
+        "vocabularyEx1": "\"说实话\"",
+        "vocabularyEx2": "\"让我解释\"",
+        "vocabularyEx3": "\"问题是\""
       },
       "metricsBadge": "深度分析",
       "metricsDesc": "我们的AI通过全面分析捕捉你写作风格的每一个细微差别",
@@ -1942,7 +2005,10 @@
         "analyzing2": "正在检测句子结构...",
         "analyzing3": "正在识别语气标记...",
         "ready": "准备就绪",
+        "sampleBlog": "\"关于生产力，是这样的...\"",
+        "sampleEmail": "\"嗨团队，想分享一些想法...\"",
         "sampleInput": "你的写作样本",
+        "sampleSocial": "\"说实话，这改变了我的一切...\"",
         "step1": "添加写作样本",
         "step1Desc": "粘贴邮件、帖子或你写过的任何文本",
         "step2": "AI分析模式",
@@ -1989,13 +2055,13 @@
       "useCases": {
         "business": {
           "desc": "确保所有团队沟通匹配你的品牌声音",
-          "quote": "",
+          "quote": "\"我们的品牌声音现在在50多名团队成员中保持一致。\"",
           "statLabel": "公司",
           "title": "商业沟通"
         },
         "content": {
           "desc": "生成听起来像你的博客文章、文章和文案",
-          "quote": "",
+          "quote": "\"我写作速度快了3倍，而且听起来仍然是真实的我。\"",
           "statLabel": "文章",
           "title": "内容创作"
         },
@@ -2003,13 +2069,13 @@
         "ctaButton": "创建你的档案",
         "personal": {
           "desc": "在你所有的内容中建立一致的个人品牌",
-          "quote": "",
+          "quote": "\"我的LinkedIn帖子终于听起来像我，而不是机器人。\"",
           "statLabel": "创作者",
           "title": "个人品牌"
         },
         "team": {
           "desc": "分享档案以在你的团队中保持一致的声音",
-          "quote": "",
+          "quote": "\"通过共享档案，新作者的入职现在很顺畅。\"",
           "statLabel": "团队",
           "title": "团队协作"
         }
@@ -2034,7 +2100,8 @@
     "gridTitle": "选择你的工具",
     "meta": {
       "description": "探索 Graphos AI Studio 的所有功能：AI检测、人性化、声音档案、AI工作区、重写等。",
-      "title": "功能 - Graphos AI Studio"
+      "title": "功能 - Graphos AI Studio",
+      "keywords": "AI写作工具, AI检测功能, 内容人性化, 声音档案创建器, AI工作区"
     },
     "stats": {
       "extension": "Chrome扩展",
@@ -2111,7 +2178,8 @@
     },
     "meta": {
       "description": "检测AI生成的内容，人性化你的写作，并创建听起来像你的真实内容。带有Chrome扩展的免费AI写作助手。",
-      "title": "Graphos AI Studio - AI检测、人性化 & 声音档案"
+      "title": "Graphos AI Studio - AI检测、人性化 & 声音档案",
+      "keywords": "AI检测, AI内容检测器, ChatGPT检测器, AI文本人性化, AI写作助手, 声音档案, 绕过AI检测, AI文本转换器"
     }
   },
   "howItWorks": {
@@ -2146,7 +2214,8 @@
     "description": "将AI文本转换为自然、真实的人类写作。",
     "meta": {
       "description": "将AI生成的文本转换为自然、类人的内容，同时保留含义。",
-      "title": "内容人性化 - Graphos AI Studio"
+      "title": "内容人性化 - Graphos AI Studio",
+      "keywords": "人性化AI文本, AI人性化工具, 绕过AI检测, AI转人类文本, 人性化ChatGPT, AI内容人性化"
     },
     "title": "内容人性化"
   },
@@ -2257,7 +2326,8 @@
     "description": "利用AI驱动的重写功能，用你的声音转换文本。",
     "meta": {
       "description": "将任何文本转换为匹配你独特的写作风格。保持你声音和语气的AI重写。",
-      "title": "AI重写 - 用你的声音转换文本 | Graphos AI"
+      "title": "AI重写 - 用你的声音转换文本 | Graphos AI",
+      "keywords": "AI重写, 文本重写器, 改写工具, 文本转换器, AI改写器"
     },
     "title": "AI重写"
   },
@@ -2306,7 +2376,8 @@
     "description": "分析你的写作指标和模式。",
     "meta": {
       "description": "获取详细的写作统计，包括字数、句长、词汇丰富度和可读性分数。",
-      "title": "统计 - 分析你的写作指标 | Graphos AI"
+      "title": "统计 - 分析你的写作指标 | Graphos AI",
+      "keywords": "写作统计, 文本分析器, 字数统计工具, 可读性评分, 词汇分析器"
     },
     "title": "统计"
   },
@@ -2353,8 +2424,8 @@
         "title": "积分永不过期"
       },
       "refund": {
-        "desc": "不满意？7天内全额退款",
-        "title": "7天退款保证"
+        "desc": "购买前先试用100个免费积分",
+        "title": "先试后买"
       },
       "support": {
         "desc": "需要时通过邮件获取帮助",
@@ -2479,7 +2550,8 @@
     "description": "捕捉你独特的写作风格，并创建听起来真实像你的内容。",
     "meta": {
       "description": "创建你独特的写作声音档案，并生成听起来像你的内容。",
-      "title": "声音档案 - Graphos AI Studio"
+      "title": "声音档案 - Graphos AI Studio",
+      "keywords": "声音档案, 写作风格AI, 个人写作助手, 语调分析器, 独特写作风格"
     },
     "title": "声音档案"
   },

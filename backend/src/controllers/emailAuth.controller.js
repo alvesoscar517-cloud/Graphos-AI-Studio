@@ -1094,3 +1094,50 @@ exports.loginWithLinkedGoogle = async (req, res) => {
     });
   }
 };
+
+/**
+ * Login or register with Google OAuth (for Google-only users)
+ * POST /auth/google/login
+ * Body: { accessToken }
+ * 
+ * This endpoint creates a new user if not exists, or logs in existing Google user.
+ * Returns JWT tokens for subsequent API calls.
+ */
+exports.loginWithGoogleOAuth = async (req, res) => {
+  try {
+    const { accessToken } = req.body;
+    
+    if (!accessToken) {
+      return res.status(400).json({
+        success: false,
+        error: 'Google access token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+    
+    const result = await emailAuthService.loginWithGoogleOAuth(accessToken);
+    
+    res.json(result);
+    
+  } catch (error) {
+    logger.error('Google OAuth login error', { error: error.message });
+    
+    const errorCode = error.message.split(':')[0];
+    const errorMessage = error.message.split(': ')[1] || error.message;
+    
+    let statusCode = 500;
+    if (errorCode === 'AUTH_INVALID_TOKEN') {
+      statusCode = 401;
+    } else if (errorCode === 'AUTH_EMAIL_EXISTS') {
+      statusCode = 409; // Conflict - email already exists as email user
+    } else if (errorCode === 'AUTH_ACCOUNT_DELETED' || errorCode === 'AUTH_ACCOUNT_SUSPENDED') {
+      statusCode = 403;
+    }
+    
+    res.status(statusCode).json({
+      success: false,
+      error: errorMessage,
+      code: errorCode
+    });
+  }
+};

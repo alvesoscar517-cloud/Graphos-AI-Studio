@@ -3,6 +3,7 @@
     "description": "Identify AI-generated content with precision and confidence.",
     "meta": {
       "description": "Detect AI-generated content with high accuracy. Identify ChatGPT, GPT-4, and other AI writing.",
+      "keywords": "AI detector, AI content detector, ChatGPT detector, GPT-4 detector, AI checker, detect AI writing, AI detection tool, AI text detector, check AI content",
       "title": "AI Detection - Graphos AI Studio"
     },
     "title": "AI Detection"
@@ -11,6 +12,7 @@
     "description": "Chat with AI in your unique writing style.",
     "meta": {
       "description": "Chat with AI using your voice profile. Get personalized writing assistance.",
+      "keywords": "AI chat, AI writing assistant, AI workspace, chat with AI, AI content generator, personalized AI, voice profile AI, AI writing tool",
       "title": "AI Workspace - Graphos AI Studio"
     },
     "title": "AI Workspace"
@@ -159,7 +161,8 @@
     "description": "Check your writing style match with detailed analysis.",
     "meta": {
       "description": "Analyze how well your text matches your unique writing style. Get detailed compatibility scores, deviation analysis, and improvement suggestions.",
-      "title": "Compatibility Score - Check Your Writing Style Match | Graphos AI"
+      "title": "Compatibility Score - Check Your Writing Style Match | Graphos AI",
+      "keywords": "writing style match, compatibility score, style analyzer, voice match checker, writing tone match"
     },
     "title": "Compatibility Score"
   },
@@ -194,7 +197,8 @@
   "demo": {
     "after": "After",
     "aiDetection": {
-      "result": "AI Detection Result"
+      "result": "AI Detection Result",
+      "title": "AI Detection"
     },
     "aiIndicators": "AI Indicators",
     "aiProbability": "AI Probability",
@@ -479,19 +483,10 @@
     "description": "Find style inconsistencies in your writing.",
     "meta": {
       "description": "Identify sentences that deviate from your writing style. Get severity levels, suggestions, and fix inconsistencies to maintain your unique voice.",
-      "title": "Deviations - Find Style Inconsistencies | Graphos AI"
+      "title": "Deviations - Find Style Inconsistencies | Graphos AI",
+      "keywords": "style checker, writing consistency, tone analyzer, style inconsistency finder, writing style checker, voice consistency"
     },
     "title": "Deviations"
-  },
-  "exitPopup": {
-    "cta": "Claim My Bonus Credits",
-    "emailPlaceholder": "Enter your email",
-    "noSpam": "No spam",
-    "noThanks": "No thanks, I'll pay full price",
-    "subtitle": "Subscribe to our newsletter and get 50 extra credits on your first purchase!",
-    "success": "Awesome! Check your email for the bonus code.",
-    "title": "Wait! Get 50 Bonus Credits",
-    "unsubscribe": "Unsubscribe anytime"
   },
   "extension": {
     "badge": "Chrome Extension",
@@ -549,13 +544,13 @@
   "faq": {
     "answers": {
       "credits": "Credits are our pay-as-you-go currency. Different features use different amounts based on text length and complexity. AI Detection uses ~2-5 credits, Humanization ~2-8 credits, Voice Profile creation ~8-25 credits, and AI Workspace ~1-3 credits per message. Credits never expire!",
-      "extension": "Our Chrome extension lets you use Graphos AI anywhere on the web. Select text on any website to detect AI content, humanize text, or generate content in your voice. It integrates seamlessly with Gmail, Google Docs, social media, and more.",
+      "extension": "Our Chrome extension currently serves as the main web application interface. Features like selecting text on any website to detect AI content, humanize text, or generate content in your voice are currently in development. Stay tuned for updates!",
       "freeTier": "Yes! Every new user gets 100 free credits to try all features. No credit card required. Plus, your first purchase gets 2x bonus credits!",
       "howDetection": "Our AI detection achieves 98% accuracy by analyzing multiple linguistic patterns including lexical, semantic, structural, and content patterns. We use advanced multi-pass analysis for uncertain cases to ensure reliable results.",
       "humanization": "Our humanization engine rewrites AI-generated text to match natural human writing patterns. It uses your voice profile to maintain your unique style while removing AI fingerprints like repetitive structures, formal transitions, and generic language.",
       "languages": "Graphos AI supports 15 languages including English, Vietnamese, Chinese, Japanese, Korean, Thai, Indonesian, Malay, Arabic, French, German, Spanish, Portuguese, Italian, and Russian. Each language has optimized detection and humanization patterns.",
       "privacy": "Absolutely. We use enterprise-grade encryption for all data. Your writing samples and voice profiles are stored securely and never shared. We comply with GDPR and other privacy regulations. You can delete your data at any time.",
-      "refund": "We offer a 7-day money-back guarantee on all credit purchases. If you're not satisfied, contact our support team for a full refund. Unused credits can also be refunded within 30 days of purchase.",
+      "refund": "All credit purchases are final and non-refundable. Please try our free tier with 100 credits before purchasing to ensure our service meets your needs. We recommend starting small and purchasing more credits as needed.",
       "voiceProfile": "A Voice Profile is a unique fingerprint of your writing style. By analyzing your writing samples, we capture your tone, vocabulary preferences, sentence patterns, and key characteristics. This allows AI to generate content that sounds authentically like you.",
       "whatIs": "Graphos AI Studio is an AI-powered writing assistant that helps you detect AI-generated content, humanize your writing, and create authentic content that matches your unique voice. It includes a web app and Chrome extension for seamless workflow integration."
     },
@@ -673,6 +668,12 @@
         "subtitle": "Our multi-layer analysis ensures accurate detection in just seconds",
         "title": "How AI Detection Works"
       },
+      "layers": {
+        "lexical": "Lexical Patterns",
+        "semantic": "Semantic Analysis",
+        "structure": "Structure Check",
+        "statistical": "Statistical Model"
+      },
       "pricing": {
         "free": "Free",
         "freeFeature1": "5 detections/day",
@@ -758,7 +759,7 @@
         }
       },
       "useCasesBadge": "Real-World Applications",
-      "useCasesCta": "Don",
+      "useCasesCta": "Don't see your use case? We support many more industries.",
       "useCasesSubtitle": "Discover how professionals across industries use our AI detection",
       "useCasesTitle": "Use Cases",
       "whyChoose": "Why Choose Our AI Detection?",
@@ -922,25 +923,25 @@
       "useCases": {
         "business": {
           "desc": "Proposals, reports, and presentations that match your brand",
-          "example": "",
+          "example": "\"Draft a proposal\" → Professional documents in your style",
           "stat": "Productivity",
           "title": "Business Writing"
         },
         "content": {
           "desc": "Generate blog posts, articles, and marketing copy in your voice",
-          "example": "",
+          "example": "\"Write a blog intro\" → Engaging content that sounds like you",
           "stat": "Content quality",
           "title": "Content Creation"
         },
         "email": {
           "desc": "Draft, reply, and follow up on emails that sound like you wrote them",
-          "example": "",
+          "example": "\"Draft a follow-up email\" → Professional, personalized email in your voice",
           "stat": "Time saved",
           "title": "Email Communication"
         },
         "social": {
           "desc": "Create engaging posts for LinkedIn, Twitter, and more",
-          "example": "",
+          "example": "\"Create a LinkedIn post\" → Authentic social content",
           "stat": "Engagement",
           "title": "Social Media"
         },
@@ -1066,7 +1067,7 @@
           "b2": "Personalization",
           "b3": "Trust",
           "desc": "Verify that AI-generated content sounds like you before using it",
-          "example": "",
+          "example": "\"ChatGPT output scores 45% - use AI Rewrite to transform it to match your style.\"",
           "title": "AI Content Check"
         },
         "badge": "Use Cases",
@@ -1075,7 +1076,7 @@
           "b2": "Quality control",
           "b3": "Time savings",
           "desc": "Check if outsourced or AI-generated content matches your brand voice before publishing",
-          "example": "",
+          "example": "\"This blog post scores 78% - the intro is great but the conclusion needs more of your conversational tone.\"",
           "title": "Content Review"
         },
         "example": "Example",
@@ -1084,7 +1085,7 @@
           "b2": "Improvement",
           "b3": "Growth",
           "desc": "Understand your writing patterns and improve consistency over time",
-          "example": "",
+          "example": "\"Your formal emails score 92% but casual posts only 58% - you have two distinct voices!\"",
           "title": "Style Learning"
         },
         "spotlight": "Featured Use Case",
@@ -1094,7 +1095,7 @@
           "b2": "Training tool",
           "b3": "Onboarding",
           "desc": "Ensure all team members write in a consistent voice that matches your brand guidelines",
-          "example": "",
+          "example": "\"New writer's draft scores 65% - share the Voice Profile to help them match the team style.\"",
           "title": "Team Alignment"
         },
         "title": "Perfect For Every Scenario"
@@ -1249,6 +1250,14 @@
       "description": "Use Graphos AI anywhere on the web",
       "title": "Chrome Extension Available"
     },
+    "labels": {
+      "aiGenerated": "AI Generated",
+      "aiRewrite": "AI Rewrite",
+      "aiScore": "AI SCORE",
+      "aiWorkspace": "AI Workspace",
+      "humanizationPreview": "Humanization Preview",
+      "voiceProfile": "Voice Profile"
+    },
     "humanization": {
       "accuracy": "accuracy",
       "aiContent": "Raw AI Content",
@@ -1311,9 +1320,46 @@
           "after": "Here's something I've learned: working out really does help with stress. My anxiety has gotten so much better since I started moving more.",
           "before": "Research indicates that regular physical exercise contributes significantly to mental health improvement.",
           "style": "Personal & Authentic"
+        },
+        "ex3": {
+          "after": "AI is changing everything about how we work, and honestly? It's both exciting and a little scary.",
+          "before": "Artificial intelligence technology presents both opportunities and challenges for the modern workforce.",
+          "style": "Professional & Engaging"
         }
       },
       "examplesTitle": "See the Difference",
+      "transforms": {
+        "ex1": {
+          "from1": "The implementation of",
+          "from2": "sustainable practices",
+          "from3": "corporate environments",
+          "from4": "increasingly important",
+          "to1": "You know what's been on my mind?",
+          "to2": "going green",
+          "to3": "companies",
+          "to4": "getting serious"
+        },
+        "ex2": {
+          "from1": "Research indicates",
+          "from2": "regular physical exercise",
+          "from3": "contributes significantly",
+          "from4": "mental health improvement",
+          "to1": "Here's something I've learned",
+          "to2": "working out",
+          "to3": "really does help",
+          "to4": "stress & anxiety"
+        },
+        "ex3": {
+          "from1": "Artificial intelligence technology",
+          "from2": "presents both",
+          "from3": "opportunities and challenges",
+          "from4": "modern workforce",
+          "to1": "AI",
+          "to2": "It's both",
+          "to3": "exciting and scary",
+          "to4": "how we work"
+        }
+      },
       "faq": {
         "a1": "Our AI analyzes the input text and rewrites it using natural language patterns, varied sentence structures, personal pronouns, and conversational elements that are characteristic of human writing.",
         "a2": "No. Our humanization preserves the core meaning and key points of your content while transforming the writing style to sound more natural and authentic.",
@@ -1368,6 +1414,10 @@
           "title": "Robotic & Stiff"
         }
       },
+      "preview": {
+        "after": "You know what's been on my mind lately? How companies are finally getting serious about going green...",
+        "before": "The implementation of sustainable practices has become increasingly important..."
+      },
       "processing": "processing",
       "reset": "Reset",
       "stats": {
@@ -1413,26 +1463,26 @@
       "useCases": {
         "academic": {
           "desc": "Refine AI-generated research summaries to match academic standards",
-          "example": "",
+          "example": "\"It can be observed that...\" → \"The data clearly shows...\"",
           "stat": "Readability score",
           "title": "Academic Writing"
         },
         "content": {
           "desc": "Transform AI drafts into authentic blog posts, articles, and marketing copy",
-          "example": "",
+          "example": "\"The implementation of sustainable practices...\" → \"You know what's been on my mind lately? How companies are finally...\"",
           "stat": "Blog engagement",
           "title": "Content Creation"
         },
         "email": {
           "desc": "Make AI-assisted emails sound personal and genuine",
-          "example": "",
+          "example": "\"I wanted to reach out regarding...\" → \"Hey! Quick question about...\"",
           "stat": "Open rate increase",
           "title": "Email Writing"
         },
         "preview": "Transformation Preview",
         "social": {
           "desc": "Create engaging social posts that connect with your audience",
-          "example": "",
+          "example": "\"We are pleased to announce...\" → \"Big news! We just launched...\"",
           "stat": "Engagement boost",
           "title": "Social Media"
         },
@@ -1446,14 +1496,6 @@
       "whyHumanizeDesc": "Transform robotic AI text into engaging, authentic content",
       "with": "With Humanization",
       "without": "Without Humanization"
-    },
-    "labels": {
-      "aiGenerated": "AI Generated",
-      "aiRewrite": "AI Rewrite",
-      "aiScore": "AI SCORE",
-      "aiWorkspace": "AI Workspace",
-      "humanizationPreview": "Humanization Preview",
-      "voiceProfile": "Voice Profile"
     },
     "placeholder": {
       "voiceProfile": "VOICE PROFILE",
@@ -1538,6 +1580,7 @@
       "howItWorksDesc": "Transform your text in three simple steps",
       "howItWorksTitle": "How AI Rewrite Works",
       "integration": {
+        "aiRewriteLabel": "AI Rewrite",
         "badge": "Powerful Integration",
         "cta1": "Create Voice Profile",
         "cta2": "Try Demo",
@@ -1547,13 +1590,15 @@
         "feature3": "Consistent voice across all content",
         "feature4": "Bypasses AI detection naturally",
         "result": "Result: Sounds exactly like you!",
-        "title": "Powered by Your Voice Profile"
+        "resultDesc": "Your text has been transformed to match your unique writing style, vocabulary preferences, and tone...",
+        "title": "Powered by Your Voice Profile",
+        "voiceProfileLabel": "Voice Profile"
       },
       "showcase": {
         "badge": "See The Magic",
         "cta": "Try It Yourself",
         "formal": {
-          "after": "You know what",
+          "after": "You know what's been on my mind lately? How companies are finally getting serious about going green. It's not just a trend anymore—it's becoming the new normal in business.",
           "before": "The implementation of sustainable practices in corporate environments has become increasingly important in recent years.",
           "metric": "Engagement",
           "style": "Formal → Conversational"
@@ -1573,7 +1618,7 @@
         "subtitle": "Watch how AI Rewrite transforms your text while preserving your message",
         "title": "Real Transformations",
         "wordy": {
-          "after": "Let",
+          "after": "Let's meet soon to discuss a potential collaboration. When works for you?",
           "before": "I am writing to inform you that I would like to request a meeting at your earliest convenience to discuss the possibility of exploring potential collaboration opportunities.",
           "metric": "Word count",
           "style": "Wordy → Concise"
@@ -1594,26 +1639,26 @@
       "useCases": {
         "academic": {
           "desc": "Polish essays and papers while maintaining academic tone",
-          "example": "",
+          "example": "\"It can be observed that...\" → \"The data clearly shows...\"",
           "stat": "Clarity score",
           "title": "Academic Writing"
         },
         "content": {
           "desc": "Rewrite blog posts, articles, and marketing copy in your voice",
-          "example": "",
+          "example": "\"This article discusses...\" → \"Ever wondered why...? Let me tell you...\"",
           "stat": "Read time",
           "title": "Content Creation"
         },
         "email": {
           "desc": "Transform formal emails into friendly messages or vice versa",
-          "example": "",
+          "example": "\"I wanted to reach out regarding...\" → \"Hey! Quick question about...\"",
           "stat": "Response rate",
           "title": "Email Writing"
         },
         "preview": "Transformation Preview",
         "social": {
           "desc": "Create engaging posts that sound authentically you",
-          "example": "",
+          "example": "\"We are pleased to announce...\" → \"Big news! We just launched...\"",
           "stat": "Engagement",
           "title": "Social Media"
         },
@@ -1782,7 +1827,7 @@
           "b2": "Pacing analysis",
           "b3": "Genre fit",
           "desc": "Analyze your manuscript to ensure consistent voice and appropriate complexity throughout",
-          "example": "",
+          "example": "\"Your manuscript has an average sentence length of 18 words - perfect for literary fiction.\"",
           "title": "Authors"
         },
         "badge": "Use Cases",
@@ -1791,7 +1836,7 @@
           "b2": "Track progress",
           "b3": "Teaching tool",
           "desc": "Help students improve their writing by providing objective feedback on structure and complexity",
-          "example": "",
+          "example": "\"Student's essay has a readability score of 45 - needs simplification for target audience.\"",
           "title": "Educators"
         },
         "example": "Example",
@@ -1800,7 +1845,7 @@
           "b2": "Professional tone",
           "b3": "Audience fit",
           "desc": "Ensure your business communications are clear, professional, and appropriate for your audience",
-          "example": "",
+          "example": "\"Your report has a vocabulary richness of 0.82 - excellent for technical documentation.\"",
           "title": "Professionals"
         },
         "spotlight": "Featured Use Case",
@@ -1811,7 +1856,7 @@
           "b2": "Consistent style",
           "b3": "SEO optimization",
           "desc": "Optimize your content for readability and engagement by understanding your writing patterns",
-          "example": "",
+          "example": "\"Your blog post has a readability score of 72 - perfect for web audiences.\"",
           "title": "Content Writers"
         }
       }
@@ -1919,16 +1964,34 @@
       "metrics": {
         "punctuation": "Punctuation Style",
         "punctuationDesc": "Your unique punctuation patterns and preferences",
+        "punctuationEx1": "Em-dashes",
+        "punctuationEx2": "Semicolons",
+        "punctuationEx3": "Exclamation marks",
         "sentenceLength": "Sentence Structure",
         "sentenceLengthDesc": "Typical length, complexity, and rhythm of your sentences",
+        "sentenceLengthEx1": "Short & punchy",
+        "sentenceLengthEx2": "Medium flow",
+        "sentenceLengthEx3": "Complex & detailed",
         "sentenceStarters": "Sentence Starters",
         "sentenceStartersDesc": "How you typically begin sentences - subject-first, adverbs, questions",
+        "sentenceStartersEx1": "\"I think...\"",
+        "sentenceStartersEx2": "\"However...\"",
+        "sentenceStartersEx3": "\"The key is...\"",
         "tone": "Emotional Markers",
         "toneDesc": "How you express opinions, feelings, and emphasis",
+        "toneEx1": "\"I feel...\"",
+        "toneEx2": "\"In my opinion...\"",
+        "toneEx3": "\"Absolutely!\"",
         "transitions": "Transition Preferences",
         "transitionsDesc": "Your preferred connecting words and phrases",
+        "transitionsEx1": "\"but\"",
+        "transitionsEx2": "\"therefore\"",
+        "transitionsEx3": "\"on the other hand\"",
         "vocabulary": "Vocabulary Patterns",
-        "vocabularyDesc": "Common phrases, preferred words, and expressions"
+        "vocabularyDesc": "Common phrases, preferred words, and expressions",
+        "vocabularyEx1": "\"honestly\"",
+        "vocabularyEx2": "\"let me explain\"",
+        "vocabularyEx3": "\"here's the thing\""
       },
       "metricsBadge": "Deep Analysis",
       "metricsDesc": "Our AI captures every nuance of your writing style through comprehensive analysis",
@@ -1942,7 +2005,10 @@
         "analyzing2": "Detecting sentence structures...",
         "analyzing3": "Identifying tone markers...",
         "ready": "Ready to use",
+        "sampleBlog": "\"Here's the thing about productivity...\"",
+        "sampleEmail": "\"Hey team, just wanted to share some thoughts...\"",
         "sampleInput": "Your Writing Sample",
+        "sampleSocial": "\"Honestly, this changed everything for me...\"",
         "step1": "Add Writing Samples",
         "step1Desc": "Paste emails, posts, or any text you\\'ve written",
         "step2": "AI Analyzes Patterns",
@@ -1989,13 +2055,13 @@
       "useCases": {
         "business": {
           "desc": "Ensure all team communications match your brand voice",
-          "quote": "",
+          "quote": "\"Our brand voice is now consistent across 50+ team members.\"",
           "statLabel": "companies",
           "title": "Business Communication"
         },
         "content": {
           "desc": "Generate blog posts, articles, and copy that sound like you",
-          "quote": "",
+          "quote": "\"I write 3x faster and it still sounds authentically me.\"",
           "statLabel": "articles",
           "title": "Content Creation"
         },
@@ -2003,13 +2069,13 @@
         "ctaButton": "Create Your Profile",
         "personal": {
           "desc": "Build a consistent personal brand across all your content",
-          "quote": "",
+          "quote": "\"My LinkedIn posts finally sound like me, not a robot.\"",
           "statLabel": "creators",
           "title": "Personal Branding"
         },
         "team": {
           "desc": "Share profiles to maintain consistent voice across your team",
-          "quote": "",
+          "quote": "\"Onboarding new writers is now seamless with shared profiles.\"",
           "statLabel": "teams",
           "title": "Team Collaboration"
         }
@@ -2034,7 +2100,8 @@
     "gridTitle": "Choose Your Tool",
     "meta": {
       "description": "Explore all features of Graphos AI Studio: AI Detection, Humanization, Voice Profile, AI Workspace, Rewrite, and more.",
-      "title": "Features - Graphos AI Studio"
+      "title": "Features - Graphos AI Studio",
+      "keywords": "AI writing tools, AI detection features, content humanization, voice profile creator, AI workspace, writing assistant features"
     },
     "stats": {
       "extension": "Chrome Extension",
@@ -2111,6 +2178,7 @@
     },
     "meta": {
       "description": "Detect AI-generated content, humanize your writing, and create authentic content that sounds like you. Free AI writing assistant with Chrome extension.",
+      "keywords": "AI detection, AI content detector, ChatGPT detector, GPT detector, humanize AI text, AI humanizer, AI writing assistant, voice profile, AI content checker, bypass AI detection, undetectable AI, AI text converter",
       "title": "Graphos AI Studio - AI Detection, Humanization & Voice Profile"
     }
   },
@@ -2146,6 +2214,7 @@
     "description": "Transform AI text into natural, authentic human writing.",
     "meta": {
       "description": "Transform AI-generated text into natural, human-like content while preserving meaning.",
+      "keywords": "humanize AI text, AI humanizer, bypass AI detection, undetectable AI, AI to human text, humanize ChatGPT, make AI text human, AI content humanizer",
       "title": "Content Humanization - Graphos AI Studio"
     },
     "title": "Content Humanization"
@@ -2194,7 +2263,7 @@
       "noSubscription": "No subscription",
       "securePayment": "Secure payment"
     },
-    "bestValue": "Best Value",
+    "bestValue": "Best",
     "bonus": "bonus",
     "buyNow": "Buy Now",
     "creditCard": "Credit Card",
@@ -2257,7 +2326,8 @@
     "description": "Transform text in your voice with AI-powered rewriting.",
     "meta": {
       "description": "Transform any text to match your unique writing style. AI-powered rewriting that maintains your voice and tone.",
-      "title": "AI Rewrite - Transform Text in Your Voice | Graphos AI"
+      "title": "AI Rewrite - Transform Text in Your Voice | Graphos AI",
+      "keywords": "AI rewrite, text rewriter, paraphrase tool, reword text, AI paraphraser, content rewriter, text transformer, rewrite in my voice"
     },
     "title": "AI Rewrite"
   },
@@ -2306,7 +2376,8 @@
     "description": "Analyze your writing metrics and patterns.",
     "meta": {
       "description": "Get detailed writing statistics including word count, sentence length, vocabulary richness, and readability scores.",
-      "title": "Statistics - Analyze Your Writing Metrics | Graphos AI"
+      "title": "Statistics - Analyze Your Writing Metrics | Graphos AI",
+      "keywords": "writing statistics, text analyzer, word count tool, readability score, vocabulary analyzer, writing metrics, text analysis tool"
     },
     "title": "Statistics"
   },
@@ -2353,8 +2424,8 @@
         "title": "Credits Never Expire"
       },
       "refund": {
-        "desc": "Not satisfied? Get a full refund within 7 days",
-        "title": "7-Day Money Back"
+        "desc": "Try 100 free credits before purchasing",
+        "title": "Try Before You Buy"
       },
       "support": {
         "desc": "Get help when you need it via email",
@@ -2479,6 +2550,7 @@
     "description": "Capture your unique writing style and create content that sounds authentically you.",
     "meta": {
       "description": "Create your unique writing voice profile and generate content that sounds like you.",
+      "keywords": "voice profile, writing style AI, personal writing assistant, AI voice clone, writing tone analyzer, unique writing style, AI content in your voice",
       "title": "Voice Profile - Graphos AI Studio"
     },
     "title": "Voice Profile"

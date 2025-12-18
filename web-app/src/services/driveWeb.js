@@ -1,21 +1,21 @@
 /**
  * Google Drive Service for Web App
  * 
- * Provides Google Drive integration using OAuth 2.0 popup flow.
- * This replaces chrome.identity API used in the Chrome Extension.
+ * Provides Google Drive integration using direct OAuth 2.0.
+ * This matches Chrome Extension behavior (chrome.identity).
  * 
  * Requirements: 5.1, 5.2, 8.3
  */
 
 import { logger } from '../utils/logger'
 import { secureGet, secureSet, secureRemove } from '../utils/authStorage'
-import { getFirebaseAuth, getGoogleProvider, initializeFirebase } from '../config/firebase'
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import { 
+  getGoogleAccessToken as getOAuthToken, 
+  requestGoogleAuth as requestOAuth
+} from '../utils/googleOAuth'
 
-// Storage keys for Drive tokens
+// Storage keys for Drive-specific data
 const DRIVE_STORAGE_KEYS = {
-  ACCESS_TOKEN: 'drive_access_token',
-  TOKEN_EXPIRY: 'drive_token_expiry',
   FOLDER_ID: 'drive_folder_id',
   CONVERSATIONS_FOLDER_ID: 'drive_conversations_folder_id'
 }
@@ -26,26 +26,13 @@ const CONVERSATIONS_FOLDER_NAME = 'Graphos AI Workspace'
 
 /**
  * Get Google access token for Drive operations
- * Uses Firebase Auth to get OAuth token with Drive scope
+ * Uses direct OAuth (same token as sign-in, includes Drive scope)
  * 
  * @returns {Promise<string>} Access token
  * @throws {Error} NEED_GOOGLE_AUTH if no token available
  */
 export async function getGoogleAccessTokenWeb() {
-  // Check for cached token
-  const cachedToken = secureGet(DRIVE_STORAGE_KEYS.ACCESS_TOKEN)
-  const tokenExpiry = secureGet(DRIVE_STORAGE_KEYS.TOKEN_EXPIRY)
-  
-  if (cachedToken && tokenExpiry) {
-    const expiryTime = parseInt(tokenExpiry, 10)
-    // Token valid if more than 5 minutes remaining
-    if (Date.now() < expiryTime - 5 * 60 * 1000) {
-      return cachedToken
-    }
-  }
-  
-  // Need to get fresh token via Firebase Auth
-  throw new Error('NEED_GOOGLE_AUTH')
+  return getOAuthToken()
 }
 
 /**
@@ -55,50 +42,18 @@ export async function getGoogleAccessTokenWeb() {
  * @returns {Promise<string>} Access token
  */
 export async function requestGoogleAuthWeb() {
-  try {
-    initializeFirebase()
-    const auth = getFirebaseAuth()
-    
-    // Create provider with Drive scope
-    const provider = new GoogleAuthProvider()
-    provider.addScope('https://www.googleapis.com/auth/drive.file')
-    provider.addScope('profile')
-    provider.addScope('email')
-    
-    logger.log('[DriveWeb] Requesting Google authorization...')
-    
-    const result = await signInWithPopup(auth, provider)
-    
-    // Get the OAuth access token
-    // @ts-ignore - _tokenResponse is internal but contains the OAuth token
-    const tokenResponse = result._tokenResponse || {}
-    const accessToken = tokenResponse.oauthAccessToken
-    
-    if (!accessToken) {
-      throw new Error('Failed to get Google access token')
-    }
-    
-    // Cache the token (expires in 1 hour typically)
-    const expiryTime = Date.now() + 3600 * 1000
-    secureSet(DRIVE_STORAGE_KEYS.ACCESS_TOKEN, accessToken)
-    secureSet(DRIVE_STORAGE_KEYS.TOKEN_EXPIRY, expiryTime.toString())
-    
-    logger.log('[DriveWeb] Google authorization successful')
-    
-    return accessToken
-  } catch (error) {
-    logger.error('DriveWeb', 'Failed to get Google auth', error)
-    throw error
-  }
+  logger.log('[DriveWeb] Requesting Google authorization...')
+  const token = await requestOAuth()
+  logger.log('[DriveWeb] Google authorization successful')
+  return token
 }
 
 
 /**
- * Clear Drive tokens from storage
+ * Clear Drive folder IDs from storage
+ * Note: OAuth tokens are managed by googleOAuth module
  */
 export function clearDriveTokens() {
-  secureRemove(DRIVE_STORAGE_KEYS.ACCESS_TOKEN)
-  secureRemove(DRIVE_STORAGE_KEYS.TOKEN_EXPIRY)
   secureRemove(DRIVE_STORAGE_KEYS.FOLDER_ID)
   secureRemove(DRIVE_STORAGE_KEYS.CONVERSATIONS_FOLDER_ID)
 }

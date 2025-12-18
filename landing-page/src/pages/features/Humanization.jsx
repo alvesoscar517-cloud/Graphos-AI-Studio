@@ -1,16 +1,18 @@
 /**
  * Humanization - SEO-optimized Content Humanization feature page
  * Enhanced: Dec 2025 - Full SEO optimization
+ * Updated: Localized avatars and names based on user's locale
  */
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, lazy, Suspense, useEffect, useRef } from 'react'
+import { useState, lazy, Suspense, useEffect, useRef, useMemo } from 'react'
 import PageSEO from '@components/seo/PageSEO'
 import Breadcrumb from '@components/common/Breadcrumb'
 import Icon from '@components/common/Icon'
 import RelatedFeatures from '@components/common/RelatedFeatures'
 import ThreeDotsLoading from '@components/common/ThreeDotsLoading'
 import FAQAccordion from '@components/common/FAQAccordion'
+import { getLocalizedFeatureTestimonials, getLocalizedSocialProofAvatars } from '@utils/localizedAvatars'
 
 // Lazy load the live demo
 const LiveHumanizationDemo = lazy(() => import('@components/demos/LiveHumanizationDemo'))
@@ -675,10 +677,10 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
       after: beforeAfterExamples[0]?.after || "You know what's been on my mind lately? How companies are finally getting serious about going green.",
       // Key phrase transformations to highlight
       transforms: [
-        { from: 'The implementation of', to: "You know what's been on my mind?" },
-        { from: 'sustainable practices', to: 'going green' },
-        { from: 'corporate environments', to: 'companies' },
-        { from: 'increasingly important', to: 'getting serious' },
+        { from: t('features.humanization.transforms.ex1.from1', 'The implementation of'), to: t('features.humanization.transforms.ex1.to1', "You know what's been on my mind?") },
+        { from: t('features.humanization.transforms.ex1.from2', 'sustainable practices'), to: t('features.humanization.transforms.ex1.to2', 'going green') },
+        { from: t('features.humanization.transforms.ex1.from3', 'corporate environments'), to: t('features.humanization.transforms.ex1.to3', 'companies') },
+        { from: t('features.humanization.transforms.ex1.from4', 'increasingly important'), to: t('features.humanization.transforms.ex1.to4', 'getting serious') },
       ]
     },
     {
@@ -688,23 +690,23 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
       before: beforeAfterExamples[1]?.before || 'Research indicates that regular physical exercise contributes significantly to mental health improvement.',
       after: beforeAfterExamples[1]?.after || "Here's something I've learned: working out really does help with stress. My anxiety has gotten so much better since I started moving more.",
       transforms: [
-        { from: 'Research indicates', to: "Here's something I've learned" },
-        { from: 'regular physical exercise', to: 'working out' },
-        { from: 'contributes significantly', to: 'really does help' },
-        { from: 'mental health improvement', to: 'stress & anxiety' },
+        { from: t('features.humanization.transforms.ex2.from1', 'Research indicates'), to: t('features.humanization.transforms.ex2.to1', "Here's something I've learned") },
+        { from: t('features.humanization.transforms.ex2.from2', 'regular physical exercise'), to: t('features.humanization.transforms.ex2.to2', 'working out') },
+        { from: t('features.humanization.transforms.ex2.from3', 'contributes significantly'), to: t('features.humanization.transforms.ex2.to3', 'really does help') },
+        { from: t('features.humanization.transforms.ex2.from4', 'mental health improvement'), to: t('features.humanization.transforms.ex2.to4', 'stress & anxiety') },
       ]
     },
     {
-      style: 'Professional & Engaging',
+      style: beforeAfterExamples[2]?.style || 'Professional & Engaging',
       icon: 'briefcase',
       color: 'blue',
-      before: 'Artificial intelligence technology presents both opportunities and challenges for the modern workforce.',
-      after: "AI is changing everything about how we work, and honestly? It's both exciting and a little scary.",
+      before: beforeAfterExamples[2]?.before || 'Artificial intelligence technology presents both opportunities and challenges for the modern workforce.',
+      after: beforeAfterExamples[2]?.after || "AI is changing everything about how we work, and honestly? It's both exciting and a little scary.",
       transforms: [
-        { from: 'Artificial intelligence technology', to: 'AI' },
-        { from: 'presents both', to: "It's both" },
-        { from: 'opportunities and challenges', to: 'exciting and scary' },
-        { from: 'modern workforce', to: 'how we work' },
+        { from: t('features.humanization.transforms.ex3.from1', 'Artificial intelligence technology'), to: t('features.humanization.transforms.ex3.to1', 'AI') },
+        { from: t('features.humanization.transforms.ex3.from2', 'presents both'), to: t('features.humanization.transforms.ex3.to2', "It's both") },
+        { from: t('features.humanization.transforms.ex3.from3', 'opportunities and challenges'), to: t('features.humanization.transforms.ex3.to3', 'exciting and scary') },
+        { from: t('features.humanization.transforms.ex3.from4', 'modern workforce'), to: t('features.humanization.transforms.ex3.to4', 'how we work') },
       ]
     }
   ]
@@ -873,7 +875,7 @@ const RealTransformationsSection = ({ t, beforeAfterExamples }) => {
                     <Icon name="cpu" size="xs" color="gray-medium" />
                   </div>
                   <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    {t('demo.before', 'Before')} - AI Generated
+                    {t('demo.before', 'Before')} - {t('features.labels.aiGenerated', 'AI Generated')}
                   </span>
                 </div>
                 
@@ -1103,8 +1105,19 @@ const StatCard = ({ value, label, icon }) => {
 }
 
 function Humanization() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [openFaq, setOpenFaq] = useState(null)
+
+  // Get localized testimonials and avatars
+  const localizedPersonas = useMemo(() => 
+    getLocalizedFeatureTestimonials(i18n.language, 'humanization'),
+    [i18n.language]
+  )
+  
+  const socialProofAvatars = useMemo(() => 
+    getLocalizedSocialProofAvatars(i18n.language, 3),
+    [i18n.language]
+  )
 
   const benefits = [
     { icon: 'sparkles', title: t('features.humanization.benefits.natural.title', 'Natural Flow'), description: t('features.humanization.benefits.natural.desc', 'Transform robotic text into conversational, engaging content that reads naturally') },
@@ -1130,6 +1143,11 @@ function Humanization() {
       before: t('features.humanization.examples.ex2.before', 'Research indicates that regular physical exercise contributes significantly to mental health improvement.'),
       after: t('features.humanization.examples.ex2.after', "Here's something I've learned: working out really does help with stress. My anxiety has gotten so much better since I started moving more."),
       style: t('features.humanization.examples.ex2.style', 'Personal & Authentic')
+    },
+    {
+      before: t('features.humanization.examples.ex3.before', 'Artificial intelligence technology presents both opportunities and challenges for the modern workforce.'),
+      after: t('features.humanization.examples.ex3.after', "AI is changing everything about how we work, and honestly? It's both exciting and a little scary."),
+      style: t('features.humanization.examples.ex3.style', 'Professional & Engaging')
     }
   ]
 
@@ -1529,7 +1547,7 @@ function Humanization() {
                       </div>
                       <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <p className="text-sm text-gray-600 line-through opacity-60">
-                          The implementation of sustainable practices has become increasingly important...
+                          {t('features.humanization.preview.before', 'The implementation of sustainable practices has become increasingly important...')}
                         </p>
                       </div>
                     </div>
@@ -1555,7 +1573,7 @@ function Humanization() {
                       </div>
                       <div className="p-3 bg-gradient-to-r from-amber-100/90 to-orange-100/70 rounded-lg border border-amber-300/70">
                         <p className="text-sm text-gray-800">
-                          You know what's been on my mind lately? How companies are finally getting serious about going green...
+                          {t('features.humanization.preview.after', "You know what's been on my mind lately? How companies are finally getting serious about going green...")}
                         </p>
                       </div>
                     </div>
@@ -1896,9 +1914,9 @@ function Humanization() {
             >
               <div className="inline-flex items-center gap-4 px-5 py-3 bg-bg-secondary/50 rounded-xl border border-gray-200 dark:border-gray-700">
                 <div className="flex -space-x-2">
-                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=face" alt="User" className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover" />
-                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" alt="User" className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover" />
-                  <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=40&h=40&fit=crop&crop=face" alt="User" className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover" />
+                  {socialProofAvatars.map((avatar, index) => (
+                    <img key={index} src={avatar} alt="User" className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover" />
+                  ))}
                 </div>
                 <span className="text-sm text-text-secondary">
                   <span className="font-semibold text-text-primary">50K+</span> {t('features.humanization.comparison.usersCount', 'users trust us')}
@@ -1947,21 +1965,21 @@ function Humanization() {
               {[
                 {
                   quote: t('features.humanization.testimonials.content.quote', 'This tool has transformed how I create content. My blog posts now sound genuinely human and engage readers much better.'),
-                  author: t('features.humanization.testimonials.content.author', 'Sarah Chen'),
-                  role: t('features.humanization.testimonials.content.role', 'Content Creator'),
-                  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face'
+                  author: localizedPersonas[0]?.name || 'Sarah Chen',
+                  role: localizedPersonas[0]?.role || t('features.humanization.testimonials.content.role', 'Content Creator'),
+                  avatar: localizedPersonas[0]?.avatar
                 },
                 {
                   quote: t('features.humanization.testimonials.marketing.quote', 'Our marketing emails now feel personal and authentic. Open rates have increased by 40% since we started using Graphos.'),
-                  author: t('features.humanization.testimonials.marketing.author', 'Michael Torres'),
-                  role: t('features.humanization.testimonials.marketing.role', 'Marketing Director'),
-                  avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'
+                  author: localizedPersonas[1]?.name || 'Michael Torres',
+                  role: localizedPersonas[1]?.role || t('features.humanization.testimonials.marketing.role', 'Marketing Director'),
+                  avatar: localizedPersonas[1]?.avatar
                 },
                 {
                   quote: t('features.humanization.testimonials.academic.quote', 'Perfect for refining AI-assisted research summaries. The academic style option maintains professionalism while adding natural flow.'),
-                  author: t('features.humanization.testimonials.academic.author', 'Dr. Emma Williams'),
-                  role: t('features.humanization.testimonials.academic.role', 'Research Professor'),
-                  avatar: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=100&h=100&fit=crop&crop=face'
+                  author: localizedPersonas[2]?.name || 'Dr. Emma Williams',
+                  role: localizedPersonas[2]?.role || t('features.humanization.testimonials.academic.role', 'Research Professor'),
+                  avatar: localizedPersonas[2]?.avatar
                 }
               ].map((testimonial, index) => (
                 <motion.div

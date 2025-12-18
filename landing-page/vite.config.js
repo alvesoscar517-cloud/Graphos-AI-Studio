@@ -57,19 +57,21 @@ export default defineConfig({
       output: {
         // Improved chunk splitting for better caching
         manualChunks: (id) => {
-          // Core React - smallest, most cached
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+          // Core React + scheduler - MUST be in same chunk to avoid undefined errors
+          if (id.includes('node_modules/react/') || 
+              id.includes('node_modules/react-dom/') ||
+              id.includes('node_modules/scheduler/')) {
             return 'react-core'
           }
-          // Router - separate for route-based caching
-          if (id.includes('react-router')) {
-            return 'router'
+          // React-dependent libraries - bundle together to ensure React loads first
+          if (id.includes('react-router') || id.includes('react-i18next')) {
+            return 'react-libs'
           }
-          // i18n - loaded early but separate
-          if (id.includes('i18next') || id.includes('react-i18next')) {
+          // i18n core
+          if (id.includes('i18next') && !id.includes('react-i18next')) {
             return 'i18n'
           }
-          // Heavy animation libraries - lazy loaded
+          // Heavy animation libraries
           if (id.includes('framer-motion')) {
             return 'animation-framer'
           }

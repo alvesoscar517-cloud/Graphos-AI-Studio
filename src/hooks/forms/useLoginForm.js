@@ -25,7 +25,7 @@ export function useLoginForm(onSubmit) {
       password: '',
       rememberMe: wasRemembered, // Tự động tick nếu đã từng remember
     },
-    mode: 'onBlur',
+    mode: 'onBlur', // Validate when user leaves the field (not while typing)
   })
 
   const handleSubmit = form.handleSubmit(async (data) => {
@@ -45,6 +45,7 @@ export function useLoginForm(onSubmit) {
     isLoading: form.formState.isSubmitting,
     errors: form.formState.errors,
     rootError: form.formState.errors.root?.message,
+    submitCount: form.formState.submitCount,
   }
 }
 

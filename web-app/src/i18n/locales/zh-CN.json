@@ -15,6 +15,7 @@
     "sort": "排序",
     "refresh": "刷新",
     "retry": "重试",
+    "authorize": "授权",
     "yes": "是",
     "no": "否",
     "ok": "确定",
@@ -248,12 +249,15 @@
     "pleaseSignIn": "请登录以使用此功能",
     "needReauth": "应用需要 Google Drive 访问权限以同步笔记。请重新登录以授予权限。",
     "drivePermissionRequired": "需要 Drive 权限",
+    "googleAuthRequired": "需要 Google 授权",
+    "googleAuthRequiredDesc": "此设备需要授权访问 Google Drive。",
     "confirmSignOut": "您确定要退出登录吗？",
     "confirmSignOutTitle": "确认退出",
     "signedOut": "已退出登录",
+    "accountSettings": "账户设置",
     "getStarted": "开始使用",
     "appName": "Graphos AI Studio",
-    "signInTagline": "登录以保持您的内容真实性",
+    "signInTagline": "使用 Graphos AI 真实写作",
     "errors": {
       "accountDeleted": "此账户已被删除。如果您认为这是错误，请联系支持。",
       "accountSuspended": "您的账户已被暂停。请联系支持以获得帮助。",
@@ -1392,5 +1396,11 @@
   "securitySettings": {
     "ipAddress": "IP",
     "unknown": "未知"
+  },
+  "unsupportedScreen": {
+    "title": "Graphos AI Studio 不支持此屏幕",
+    "description": "请使用横屏模式或更大的设备以获得最佳体验。",
+    "desktop": "桌面电脑",
+    "tabletLandscape": "平板横屏"
   }
 }

@@ -23,7 +23,7 @@ export function useRegisterForm(onSubmit) {
       confirmPassword: '',
       displayName: '',
     },
-    mode: 'onChange',
+    mode: 'onBlur', // Validate when user leaves the field (not while typing)
   })
 
   const password = form.watch('password')

@@ -3,7 +3,8 @@
     "description": "Identifizieren Sie KI-generierte Inhalte mit Präzision und Sicherheit.",
     "meta": {
       "description": "Erkennen Sie KI-generierte Inhalte mit hoher Genauigkeit. Identifizieren Sie ChatGPT, GPT-4 und andere KI-Texte.",
-      "title": "KI-Erkennung - Graphos AI Studio"
+      "title": "KI-Erkennung - Graphos AI Studio",
+      "keywords": "KI-Detektor, KI-Inhaltsdetektor, ChatGPT-Detektor, GPT-4-Detektor, KI-Prüfer, KI-Schreiben erkennen"
     },
     "title": "KI-Erkennung"
   },
@@ -11,7 +12,8 @@
     "description": "Chatten Sie mit der KI in Ihrem einzigartigen Schreibstil.",
     "meta": {
       "description": "Chatten Sie mit der KI unter Verwendung Ihres Stimmprofils. Erhalten Sie personalisierte Schreibunterstützung.",
-      "title": "KI-Arbeitsbereich - Graphos AI Studio"
+      "title": "KI-Arbeitsbereich - Graphos AI Studio",
+      "keywords": "KI-Chat, KI-Schreibassistent, KI-Arbeitsbereich, KI-Inhaltsgenerator, personalisierte KI"
     },
     "title": "KI-Arbeitsbereich"
   },
@@ -159,7 +161,8 @@
     "description": "Prüfen Sie Ihre Schreibstil-Übereinstimmung mit detaillierter Analyse.",
     "meta": {
       "description": "Analysieren Sie, wie gut Ihr Text zu Ihrem einzigartigen Schreibstil passt. Erhalten Sie detaillierte Kompatibilitätsscores, Abweichungsanalysen und Verbesserungsvorschläge.",
-      "title": "Kompatibilitätsscore - Prüfen Sie Ihre Stil-Übereinstimmung | Graphos AI"
+      "title": "Kompatibilitätsscore - Prüfen Sie Ihre Stil-Übereinstimmung | Graphos AI",
+      "keywords": "Schreibstil-Übereinstimmung, Kompatibilitätsbewertung, Stilanalysator"
     },
     "title": "Kompatibilitätsscore"
   },
@@ -194,7 +197,8 @@
   "demo": {
     "after": "Nachher",
     "aiDetection": {
-      "result": "KI-Erkennungsergebnis"
+      "result": "KI-Erkennungsergebnis",
+      "title": "KI-Erkennung"
     },
     "aiIndicators": "KI-Indikatoren",
     "aiProbability": "KI-Wahrscheinlichkeit",
@@ -427,7 +431,7 @@
       "samples": "Proben",
       "tone": "Tonfall"
     },
-    "tryHumanization": "Try Humanization Demo",
+    "tryHumanization": "Try Humanisierung Demo",
     "humanizationDesc": "See how AI-generated text transforms into natural, human-like writing.",
     "originalAI": "Original (AI)",
     "humanLike": "Human-like",
@@ -436,62 +440,53 @@
     "nextExample": "Next Example",
     "humanizing": "Humanizing...",
     "wantToHumanize": "Want to humanize your own content?",
-    "tryAIDetection": "Try AI Detection Demo",
+    "tryAIDetection": "Try KI-Erkennung Demo",
     "aiDetectionDesc": "Paste any text below to see a simulated AI detection analysis. This is a demo - for accurate results, use the full application.",
     "pasteTextPlaceholder": "Paste your text here to analyze...",
     "wantMoreAccurate": "Want more accurate results with detailed analysis?",
     "traits": {
-      "conversational": "Conversational",
-      "empathetic": "Empathetic",
-      "clear": "Clear",
-      "engaging": "Engaging",
-      "playful": "Playful",
-      "creative": "Creative",
-      "informal": "Informal",
-      "storyteller": "Storyteller",
-      "analytical": "Analytical",
-      "precise": "Precise",
-      "structured": "Structured",
-      "evidenceBased": "Evidence-based"
+      "conversational": "Gesprächig",
+      "empathetic": "Einfühlsam",
+      "clear": "Klar",
+      "engaging": "Fesselnd",
+      "playful": "Verspielt",
+      "creative": "Kreativ",
+      "informal": "Informell",
+      "storyteller": "Geschichtenerzähler",
+      "analytical": "Analytisch",
+      "precise": "Präzise",
+      "structured": "Strukturiert",
+      "evidenceBased": "Evidenzbasiert"
     },
-    "sentenceLengthMedium": "Medium (12-18 words)",
-    "sentenceLengthVaried": "Varied (8-25 words)",
-    "sentenceLengthLong": "Long (18-28 words)",
+    "sentenceLengthMedium": "Mittel (12-18 Wörter)",
+    "sentenceLengthVaried": "Variiert (8-25 Wörter)",
+    "sentenceLengthLong": "Lang (18-28 Wörter)",
     "voiceProfiles": {
-      "professional": "Professional Writer",
+      "professional": "Professioneller Autor",
       "casual": "Casual Blogger",
-      "academic": "Academic Style",
-      "personalBlog": "Personal Blog",
-      "creativeWriter": "Creative Writer"
+      "academic": "Akademischer Stil",
+      "personalBlog": "Persönlicher Blog",
+      "creativeWriter": "Kreativer Autor"
     },
     "speed": {
-      "fast": "Fast",
-      "ultraFast": "Ultra Fast",
-      "quality": "Quality"
+      "fast": "Schnell",
+      "ultraFast": "Ultra Schnell",
+      "quality": "Qualität"
     },
     "tone": {
-      "conversational": "Conversational",
-      "formal": "Formal",
-      "expressive": "Expressive"
+      "conversational": "Gesprächig",
+      "formal": "Formell",
+      "expressive": "Ausdrucksstark"
     }
   },
   "deviations": {
     "description": "Finden Sie Stil-Inkonsistenzen in Ihrem Schreiben.",
     "meta": {
       "description": "Identifizieren Sie Sätze, die von Ihrem Schreibstil abweichen. Erhalten Sie Schweregrade, Vorschläge und beheben Sie Inkonsistenzen, um Ihre einzigartige Stimme zu wahren.",
-      "title": "Abweichungen - Stil-Inkonsistenzen finden | Graphos AI"
+      "title": "Abweichungen - Stil-Inkonsistenzen finden | Graphos AI",
+      "keywords": "Stilprüfer, Schreibkonsistenz, Tonanalysator, Stilinkonsistenz-Finder"
     },
     "title": "Abweichungen"
-  },
-  "exitPopup": {
-    "cta": "Meine Bonus-Credits anfordern",
-    "emailPlaceholder": "Geben Sie Ihre E-Mail ein",
-    "noSpam": "Kein Spam",
-    "noThanks": "Nein danke, ich zahle den vollen Preis",
-    "subtitle": "Abonnieren Sie unseren Newsletter und erhalten Sie 50 zusätzliche Credits bei Ihrem ersten Kauf!",
-    "success": "Großartig! Prüfen Sie Ihre E-Mail für den Bonuscode.",
-    "title": "Warten Sie! Holen Sie sich 50 Bonus-Credits",
-    "unsubscribe": "Jederzeit abbestellbar"
   },
   "extension": {
     "badge": "Chrome-Erweiterung",
@@ -527,35 +522,35 @@
     "willWorkOn": "Wird nahtlos funktionieren auf",
     "worksOn": "Funktioniert auf",
     "demo": {
-      "sampleText": "The implementation of artificial intelligence in modern systems represents a paradigm shift...",
+      "sampleText": "Die Implementierung künstlicher Intelligenz in modernen Systemen stellt einen Paradigmenwechsel dar...",
       "detect": {
-        "action": "Detecting AI content...",
-        "result": "87% AI Probability"
+        "action": "KI-Inhalte werden erkannt...",
+        "result": "87% KI-Wahrscheinlichkeit"
       },
       "humanize": {
-        "action": "Humanizing text...",
-        "result": "Text humanized!"
+        "action": "Text wird humanisiert...",
+        "result": "Text humanisiert!"
       },
       "write": {
-        "action": "Generating in your voice...",
-        "result": "Content ready!"
+        "action": "Generiere in Ihrer Stimme...",
+        "result": "Inhalt bereit!"
       },
       "workspace": {
-        "action": "Opening workspace...",
-        "result": "Ready to chat!"
+        "action": "Arbeitsbereich wird geöffnet...",
+        "result": "Bereit zum Chatten!"
       }
     }
   },
   "faq": {
     "answers": {
       "credits": "Credits sind unsere Währung für die Nutzung. Verschiedene Funktionen verbrauchen unterschiedliche Mengen basierend auf Textlänge und Komplexität. KI-Erkennung verbraucht ~2-5 Credits, Humanisierung ~2-8 Credits, Stimmprofil-Erstellung ~8-25 Credits und KI-Arbeitsbereich ~1-3 Credits pro Nachricht. Credits verfallen nie!",
-      "extension": "Unsere Chrome-Erweiterung ermöglicht es Ihnen, Graphos AI überall im Web zu nutzen. Markieren Sie Text auf einer beliebigen Website, um KI-Inhalte zu erkennen, Text zu humanisieren oder Inhalte in Ihrer Stimme zu generieren. Sie integriert sich nahtlos in Gmail, Google Docs, soziale Medien und mehr.",
+      "extension": "Unsere Chrome-Erweiterung dient derzeit als Hauptschnittstelle der Web-Anwendung. Funktionen wie das Markieren von Text auf einer beliebigen Website zur Erkennung von KI-Inhalten, Humanisierung von Text oder Generierung von Inhalten in Ihrer Stimme befinden sich derzeit in der Entwicklung. Bleiben Sie dran für Updates!",
       "freeTier": "Ja! Jeder neue Benutzer erhält 100 kostenlose Credits, um alle Funktionen auszuprobieren. Keine Kreditkarte erforderlich. Außerdem erhalten Sie bei Ihrem ersten Kauf 2x Bonus-Credits!",
       "howDetection": "Unsere KI-Erkennung erreicht 98% Genauigkeit durch Analyse mehrerer linguistischer Muster, einschließlich lexikalischer, semantischer, struktureller und inhaltlicher Muster. Wir verwenden fortschrittliche Multi-Pass-Analysen für unsichere Fälle, um zuverlässige Ergebnisse zu gewährleisten.",
       "humanization": "Unsere Humanisierungs-Engine schreibt KI-generierten Text um, damit er natürlichen menschlichen Schreibmustern entspricht. Sie nutzt Ihr Stimmprofil, um Ihren einzigartigen Stil beizubehalten, während KI-Fingerabdrücke wie repetitive Strukturen, formale Übergänge und generische Sprache entfernt werden.",
       "languages": "Graphos AI unterstützt 15 Sprachen, darunter Englisch, Vietnamesisch, Chinesisch, Japanisch, Koreanisch, Thai, Indonesisch, Malaiisch, Arabisch, Französisch, Deutsch, Spanisch, Portugiesisch, Italienisch und Russisch. Jede Sprache hat optimierte Erkennungs- und Humanisierungsmuster.",
       "privacy": "Absolut. Wir verwenden Verschlüsselung auf Unternehmensniveau für alle Daten. Ihre Schreibproben und Stimmprofile werden sicher gespeichert und niemals geteilt. Wir halten uns an die DSGVO und andere Datenschutzbestimmungen. Sie können Ihre Daten jederzeit löschen.",
-      "refund": "Wir bieten eine 7-tägige Geld-zurück-Garantie auf alle Credit-Käufe. Wenn Sie nicht zufrieden sind, kontaktieren Sie unser Support-Team für eine volle Rückerstattung. Ungenutzte Credits können ebenfalls innerhalb von 30 Tagen nach dem Kauf erstattet werden.",
+      "refund": "Alle Credit-Käufe sind endgültig und nicht erstattungsfähig. Bitte probieren Sie unsere kostenlose Stufe mit 100 Credits aus, bevor Sie kaufen, um sicherzustellen, dass unser Service Ihren Bedürfnissen entspricht. Wir empfehlen, klein anzufangen und bei Bedarf mehr Credits zu kaufen.",
       "voiceProfile": "Ein Stimmprofil ist ein einzigartiger Fingerabdruck Ihres Schreibstils. Durch die Analyse Ihrer Schreibproben erfassen wir Ihren Tonfall, Vokabelvorlieben, Satzmuster und Hauptmerkmale. Dies ermöglicht der KI, Inhalte zu generieren, die authentisch nach Ihnen klingen.",
       "whatIs": "Graphos AI Studio ist ein KI-gestützter Schreibassistent, der Ihnen hilft, KI-generierte Inhalte zu erkennen, Ihr Schreiben zu humanisieren und authentische Inhalte zu erstellen, die Ihrer einzigartigen Stimme entsprechen. Es umfasst eine Web-App und eine Chrome-Erweiterung für eine nahtlose Workflow-Integration."
     },
@@ -673,6 +668,12 @@
         "subtitle": "Unsere mehrschichtige Analyse garantiert präzise Erkennung in nur wenigen Sekunden",
         "title": "Wie KI-Erkennung funktioniert"
       },
+      "layers": {
+        "lexical": "Lexikalische Muster",
+        "semantic": "Semantische Analyse",
+        "structure": "Strukturprüfung",
+        "statistical": "Statistisches Modell"
+      },
       "pricing": {
         "free": "Kostenlos",
         "freeFeature1": "5 Erkennungen/Tag",
@@ -710,7 +711,7 @@
         "business": {
           "author": "Michael Torres",
           "quote": "Unverzichtbar für unser Content-Team. Wir nutzen es, um alle eingehenden Inhalte vor der Veröffentlichung zu verifizieren. Die Konfidenzscores geben uns Sicherheit.",
-          "role": "Content Director, Tech Startup"
+          "role": "Inhaltsleiter, Tech-Startup"
         },
         "education": {
           "author": "Dr. Sarah Chen",
@@ -758,7 +759,7 @@
         }
       },
       "useCasesBadge": "Anwendungen in der Praxis",
-      "useCasesCta": "Nicht",
+      "useCasesCta": "Sehen Sie Ihren Anwendungsfall nicht? Wir unterstützen viele weitere Branchen.",
       "useCasesSubtitle": "Entdecken Sie, wie Profis in verschiedenen Branchen unsere KI-Erkennung nutzen",
       "useCasesTitle": "Anwendungsfälle",
       "whyChoose": "Warum unsere KI-Erkennung wählen?",
@@ -832,25 +833,25 @@
         "voiceMatch": "Stimmprofil-Integration"
       },
       "comparisonBadge": "Warum uns wählen",
-      "comparisonDesc": "Sehen Sie, warum Graphos AI Workspace sich von der Konkurrenz abhebt",
+      "comparisonDesc": "Sehen Sie, warum Graphos KI-Arbeitsbereich sich von der Konkurrenz abhebt",
       "comparisonTitle": "Unser Vergleich",
       "comparisonWins": "8 Hauptvorteile gegenüber Wettbewerbern",
       "ctaBadge": "Starten Sie das Schreiben in Ihrer Stimme",
       "ctaDesc": "Chatten Sie mit der KI in Ihrem einzigartigen Schreibstil.",
-      "ctaTitle": "Starten Sie die Nutzung von AI Workspace",
+      "ctaTitle": "Starten Sie die Nutzung von KI-Arbeitsbereich",
       "demo": {
         "subtitle": "Erleben Sie personalisierte KI-Schreibunterstützung. Keine Anmeldung erforderlich.",
-        "title": "Probieren Sie AI Workspace jetzt aus"
+        "title": "Probieren Sie KI-Arbeitsbereich jetzt aus"
       },
       "faq": {
-        "a1": "Wenn Sie mit AI Workspace chatten, wendet es automatisch Ihr Stimmprofil auf alle generierten Inhalte an. Das bedeutet, jede E-Mail, jeder Beitrag oder Artikel klingt, als hätten Sie ihn geschrieben.",
-        "a2": "Ja! Sie können AI Workspace auch ohne Stimmprofil nutzen, dann generiert es Inhalte in einem neutralen, professionellen Ton. Die Erstellung eines Stimmprofils verbessert die Personalisierung jedoch erheblich.",
-        "a3": "AI Workspace kann bei E-Mails, Blogbeiträgen, Social-Media-Inhalten, Geschäftsangeboten, Produktbeschreibungen, Marketingtexten und vielem mehr helfen. Nutzen Sie Schnellaktionen oder beschreiben Sie, was Sie benötigen.",
+        "a1": "Wenn Sie mit KI-Arbeitsbereich chatten, wendet es automatisch Ihr Stimmprofil auf alle generierten Inhalte an. Das bedeutet, jede E-Mail, jeder Beitrag oder Artikel klingt, als hätten Sie ihn geschrieben.",
+        "a2": "Ja! Sie können KI-Arbeitsbereich auch ohne Stimmprofil nutzen, dann generiert es Inhalte in einem neutralen, professionellen Ton. Die Erstellung eines Stimmprofils verbessert die Personalisierung jedoch erheblich.",
+        "a3": "KI-Arbeitsbereich kann bei E-Mails, Blogbeiträgen, Social-Media-Inhalten, Geschäftsangeboten, Produktbeschreibungen, Marketingtexten und vielem mehr helfen. Nutzen Sie Schnellaktionen oder beschreiben Sie, was Sie benötigen.",
         "a4": "Ihr Konversationsverlauf wird lokal gespeichert und kann über Sitzungen hinweg abgerufen werden. Sie können ihn jederzeit in den Einstellungen löschen. Wir priorisieren Ihren Datenschutz.",
         "a5": "Absolut! Alle generierten Inhalte sind vollständig editierbar. Sie können sie verfeinern, erweitern oder die KI bitten, sie mit anderen Parametern neu zu generieren.",
-        "a6": "AI Workspace nutzt fortschrittliche Gemini-Modelle, einschließlich Gemini 2.5 Flash für schnelle Antworten und Gemini 2.5 Pro für komplexe Aufgaben. Sie können Modelle je nach Bedarf wechseln.",
+        "a6": "KI-Arbeitsbereich nutzt fortschrittliche Gemini-Modelle, einschließlich Gemini 2.5 Flash für schnelle Antworten und Gemini 2.5 Pro für komplexe Aufgaben. Sie können Modelle je nach Bedarf wechseln.",
         "a7": "Credits werden basierend auf Eingabe- und Ausgabe-Token berechnet. Kürzere Konversationen kosten weniger. Sie können die Credit-Kosten für jede Nachricht in Echtzeit sehen.",
-        "q1": "Wie nutzt AI Workspace mein Stimmprofil?",
+        "q1": "Wie nutzt KI-Arbeitsbereich mein Stimmprofil?",
         "q2": "Kann ich es ohne Stimmprofil nutzen?",
         "q3": "Welche Arten von Inhalten kann ich erstellen?",
         "q4": "Wird mein Konversationsverlauf gespeichert?",
@@ -859,7 +860,7 @@
         "q7": "Wie viele Credits kostet es?"
       },
       "faqBadge": "FAQ",
-      "faqDesc": "Alles, was Sie über AI Workspace wissen müssen",
+      "faqDesc": "Alles, was Sie über KI-Arbeitsbereich wissen müssen",
       "faqTitle": "Häufig gestellte Fragen",
       "howItWorks": {
         "step1": {
@@ -877,7 +878,7 @@
       },
       "howItWorksBadge": "Einfacher Prozess",
       "howItWorksDesc": "Erhalten Sie personalisierte KI-Antworten in drei einfachen Schritten",
-      "howItWorksTitle": "Wie AI Workspace funktioniert",
+      "howItWorksTitle": "Wie KI-Arbeitsbereich funktioniert",
       "moreActions": "+ 20 weitere Vorlagen in der App verfügbar",
       "quickActionsBadge": "Ein-Klick-Vorlagen",
       "quickActionsDesc": "Starten Sie das Schreiben sofort mit vorgefertigten Vorlagen für gängige Aufgaben",
@@ -891,18 +892,18 @@
       "testimonials": {
         "entrepreneur": {
           "author": "Emma Williams",
-          "quote": "Als Nicht-Muttersprachlerin hilft mir AI Workspace, professionell zu kommunizieren und dabei meine authentische Stimme zu behalten. Ein echter Game-Changer!",
+          "quote": "Als Nicht-Muttersprachlerin hilft mir KI-Arbeitsbereich, professionell zu kommunizieren und dabei meine authentische Stimme zu behalten. Ein echter Game-Changer!",
           "role": "Unternehmerin"
         },
         "marketer": {
           "author": "Michael Torres",
           "quote": "Die Schnellaktionen sparen mir jede Woche Stunden. Ich kann soziale Beiträge, E-Mails und Blog-Intros in Minuten statt Stunden entwerfen.",
-          "role": "Marketing Manager"
+          "role": "Marketingleiter"
         },
         "writer": {
           "author": "Sarah Chen",
-          "quote": "AI Workspace hat meine Schreibweise völlig verändert. Die Stimmprofil-Funktion bedeutet, dass jede E-Mail genau wie ich klingt, selbst wenn die KI beim Entwurf hilft.",
-          "role": "Content Writer"
+          "quote": "KI-Arbeitsbereich hat meine Schreibweise völlig verändert. Die Stimmprofil-Funktion bedeutet, dass jede E-Mail genau wie ich klingt, selbst wenn die KI beim Entwurf hilft.",
+          "role": "Inhaltsautorin"
         }
       },
       "testimonialsBadge": "Was Nutzer sagen",
@@ -922,35 +923,35 @@
       "useCases": {
         "business": {
           "desc": "Angebote, Berichte und Präsentationen, die zu Ihrer Marke passen",
-          "example": "",
+          "example": "\"Angebot erstellen\" → Professionelle Dokumente in Ihrem Stil",
           "stat": "Produktivität",
           "title": "Geschäftsschreiben"
         },
         "content": {
           "desc": "Generieren Sie Blogbeiträge, Artikel und Marketingtexte in Ihrer Stimme",
-          "example": "",
+          "example": "\"Blog-Intro schreiben\" → Ansprechende Inhalte, die nach Ihnen klingen",
           "stat": "Inhaltsqualität",
           "title": "Content-Erstellung"
         },
         "email": {
           "desc": "Entwerfen, antworten und nachfassen von E-Mails, die klingen, als hätten Sie sie geschrieben",
-          "example": "",
+          "example": "\"Follow-up-E-Mail verfassen\" → Professionelle, personalisierte E-Mail in Ihrer Stimme",
           "stat": "Zeit gespart",
           "title": "E-Mail-Kommunikation"
         },
         "social": {
           "desc": "Erstellen Sie ansprechende Beiträge für LinkedIn, Twitter und mehr",
-          "example": "",
+          "example": "\"LinkedIn-Beitrag erstellen\" → Authentische Social-Media-Inhalte",
           "stat": "Engagement",
           "title": "Soziale Medien"
         },
         "spotlight": "Spotlight"
       },
       "useCasesBadge": "Anwendungsfälle",
-      "useCasesDesc": "Sehen Sie, wie AI Workspace Ihren Workflow transformiert",
+      "useCasesDesc": "Sehen Sie, wie KI-Arbeitsbereich Ihren Workflow transformiert",
       "useCasesTitle": "Perfekt für",
       "voiceApplied": "Stimmprofil: Locker & Freundlich angewendet",
-      "whyUse": "Warum AI Workspace nutzen?",
+      "whyUse": "Warum KI-Arbeitsbereich nutzen?",
       "whyUseDesc": "Erleben Sie die Zukunft der personalisierten KI-Schreibunterstützung"
     },
     "compatibility": {
@@ -1066,7 +1067,7 @@
           "b2": "Personalisierung",
           "b3": "Vertrauen",
           "desc": "Verifizieren Sie, dass KI-generierte Inhalte wie Sie klingen, bevor Sie sie verwenden",
-          "example": "",
+          "example": "\"ChatGPT-Ausgabe erreicht 45% - nutzen Sie KI-Rewrite, um sie an Ihren Stil anzupassen.\"",
           "title": "KI-Inhaltsprüfung"
         },
         "badge": "Anwendungsfälle",
@@ -1075,7 +1076,7 @@
           "b2": "Qualitätskontrolle",
           "b3": "Zeitersparnis",
           "desc": "Prüfen Sie, ob ausgelagerte oder KI-generierte Inhalte Ihrer Markenstimme entsprechen, bevor Sie sie veröffentlichen",
-          "example": "",
+          "example": "\"Dieser Blogbeitrag erreicht 78% - die Einleitung ist großartig, aber der Schluss braucht mehr von Ihrem konversationellen Ton.\"",
           "title": "Inhaltsüberprüfung"
         },
         "example": "Beispiel",
@@ -1084,7 +1085,7 @@
           "b2": "Verbesserung",
           "b3": "Wachstum",
           "desc": "Verstehen Sie Ihre Schreibmuster und verbessern Sie die Konsistenz im Laufe der Zeit",
-          "example": "",
+          "example": "\"Ihre formellen E-Mails erreichen 92%, aber lockere Beiträge nur 58% - Sie haben zwei verschiedene Stimmen!\"",
           "title": "Stillernen"
         },
         "spotlight": "Vorgestellter Anwendungsfall",
@@ -1094,7 +1095,7 @@
           "b2": "Schulungstool",
           "b3": "Onboarding",
           "desc": "Stellen Sie sicher, dass alle Teammitglieder in einer konsistenten Stimme schreiben, die Ihren Markenrichtlinien entspricht",
-          "example": "",
+          "example": "\"Der Entwurf des neuen Autors erreicht 65% - teilen Sie das Stimmprofil, um ihm zu helfen, den Teamstil zu treffen.\"",
           "title": "Team-Ausrichtung"
         },
         "title": "Perfekt für jedes Szenario"
@@ -1249,6 +1250,14 @@
       "description": "Nutzen Sie Graphos AI überall im Web",
       "title": "Chrome-Erweiterung verfügbar"
     },
+    "labels": {
+      "aiGenerated": "KI-generiert",
+      "aiRewrite": "KI-Rewrite",
+      "aiScore": "KI-SCORE",
+      "aiWorkspace": "KI-Arbeitsbereich",
+      "humanizationPreview": "Humanisierungsvorschau",
+      "voiceProfile": "Stimmprofil"
+    },
     "humanization": {
       "accuracy": "Genauigkeit",
       "aiContent": "Roher KI-Inhalt",
@@ -1311,9 +1320,46 @@
           "after": "Hier ist etwas, das ich gelernt habe: Training hilft wirklich gegen Stress. Meine Angst ist so viel besser geworden, seit ich mich mehr bewege.",
           "before": "Forschungsergebnisse zeigen, dass regelmäßige körperliche Bewegung signifikant zur Verbesserung der psychischen Gesundheit beiträgt.",
           "style": "Persönlich & Authentisch"
+        },
+        "ex3": {
+          "after": "KI verändert alles an unserer Arbeit, und ehrlich? Es ist sowohl aufregend als auch ein bisschen beängstigend.",
+          "before": "Künstliche Intelligenz bietet sowohl Chancen als auch Herausforderungen für die moderne Arbeitswelt.",
+          "style": "Professionell & Ansprechend"
         }
       },
       "examplesTitle": "Sehen Sie den Unterschied",
+      "transforms": {
+        "ex1": {
+          "from1": "Die Umsetzung von",
+          "from2": "nachhaltigen Praktiken",
+          "from3": "Unternehmensumgebungen",
+          "from4": "zunehmend wichtiger",
+          "to1": "Wissen Sie, was mir durch den Kopf geht?",
+          "to2": "Umweltschutz",
+          "to3": "Unternehmen",
+          "to4": "ernst machen"
+        },
+        "ex2": {
+          "from1": "Forschungsergebnisse zeigen",
+          "from2": "regelmäßige körperliche Bewegung",
+          "from3": "signifikant beiträgt",
+          "from4": "psychischen Gesundheit",
+          "to1": "Hier ist etwas, das ich gelernt habe",
+          "to2": "Training",
+          "to3": "wirklich hilft",
+          "to4": "Stress & Angst"
+        },
+        "ex3": {
+          "from1": "Künstliche Intelligenz",
+          "from2": "bietet sowohl",
+          "from3": "Chancen als auch Herausforderungen",
+          "from4": "moderne Arbeitswelt",
+          "to1": "KI",
+          "to2": "Es ist sowohl",
+          "to3": "aufregend und beängstigend",
+          "to4": "unsere Arbeit"
+        }
+      },
       "faq": {
         "a1": "Unsere KI analysiert den Eingabetext und schreibt ihn unter Verwendung natürlicher Sprachmuster, variierter Satzstrukturen, Personalpronomen und konversationeller Elemente um, die charakteristisch für menschliches Schreiben sind.",
         "a2": "Nein. Unsere Humanisierung bewahrt die Kernbedeutung und die Schlüsselpunkte Ihres Inhalts, während der Schreibstil transformiert wird, um natürlicher und authentischer zu klingen.",
@@ -1368,6 +1414,10 @@
           "title": "Roboterhaft & Steif"
         }
       },
+      "preview": {
+        "after": "Wissen Sie, was mir in letzter Zeit durch den Kopf geht? Wie Unternehmen endlich ernst machen mit dem Umweltschutz...",
+        "before": "Die Umsetzung nachhaltiger Praktiken ist zunehmend wichtiger geworden..."
+      },
       "processing": "verarbeite",
       "reset": "Zurücksetzen",
       "stats": {
@@ -1387,15 +1437,15 @@
         "content": {
           "author": "Sarah Chen",
           "quote": "Dieses Tool hat meine Content-Erstellung transformiert. Meine Blogbeiträge klingen jetzt wirklich menschlich und binden Leser viel besser ein.",
-          "role": "Content Creator"
+          "role": "Inhaltserstellerin"
         },
         "marketing": {
           "author": "Michael Torres",
           "quote": "Unsere Marketing-E-Mails fühlen sich jetzt persönlich und authentisch an. Die Öffnungsraten sind um 40% gestiegen, seit wir Graphos nutzen.",
-          "role": "Marketing Director"
+          "role": "Marketingleiter"
         },
         "subtitle": "Sehen Sie, was unsere Nutzer über Inhalts-Humanisierung sagen",
-        "title": "Geliebt von Content Creators"
+        "title": "Geliebt von Inhaltserstellern"
       },
       "transform": "Transformieren",
       "transformations": "Echte Transformationen",
@@ -1413,26 +1463,26 @@
       "useCases": {
         "academic": {
           "desc": "Verfeinern Sie KI-generierte Forschungszusammenfassungen, um akademischen Standards zu entsprechen",
-          "example": "",
+          "example": "\"Es kann beobachtet werden, dass...\" → \"Die Daten zeigen deutlich...\"",
           "stat": "Lesbarkeitsscore",
           "title": "Akademisches Schreiben"
         },
         "content": {
           "desc": "Transformieren Sie KI-Entwürfe in authentische Blogbeiträge, Artikel und Marketingtexte",
-          "example": "",
+          "example": "\"Die Umsetzung nachhaltiger Praktiken...\" → \"Wissen Sie, was mich in letzter Zeit beschäftigt? Wie Unternehmen endlich...\"",
           "stat": "Blog-Engagement",
           "title": "Content-Erstellung"
         },
         "email": {
           "desc": "Lassen Sie KI-gestützte E-Mails persönlich und echt klingen",
-          "example": "",
+          "example": "\"Ich wollte mich bezüglich...\" → \"Hey! Kurze Frage zu...\"",
           "stat": "Öffnungsraten-Anstieg",
           "title": "E-Mail-Schreiben"
         },
         "preview": "Transformationsvorschau",
         "social": {
           "desc": "Erstellen Sie ansprechende Social-Media-Beiträge, die Ihr Publikum verbinden",
-          "example": "",
+          "example": "\"Wir freuen uns, bekannt zu geben...\" → \"Große Neuigkeiten! Wir haben gerade gestartet...\"",
           "stat": "Engagement-Boost",
           "title": "Soziale Medien"
         },
@@ -1446,14 +1496,6 @@
       "whyHumanizeDesc": "Transformieren Sie roboterhaften KI-Text in ansprechenden, authentischen Inhalt",
       "with": "Mit Humanisierung",
       "without": "Ohne Humanisierung"
-    },
-    "labels": {
-      "aiGenerated": "KI-generiert",
-      "aiRewrite": "KI-Rewrite",
-      "aiScore": "KI-SCORE",
-      "aiWorkspace": "KI-Arbeitsbereich",
-      "humanizationPreview": "Humanisierungsvorschau",
-      "voiceProfile": "Stimmprofil"
     },
     "placeholder": {
       "voiceProfile": "STIMMPROFIL",
@@ -1547,13 +1589,16 @@
         "feature3": "Konsistente Stimme über alle Inhalte hinweg",
         "feature4": "Umgeht KI-Erkennung natürlich",
         "result": "Ergebnis: Klingt genau wie Sie!",
-        "title": "Angetrieben von Ihrem Stimmprofil"
+        "resultDesc": "Ihr Text wurde transformiert, um Ihrem einzigartigen Schreibstil, Ihren Vokabelpräferenzen und Ihrem Ton zu entsprechen...",
+        "title": "Angetrieben von Ihrem Stimmprofil",
+        "voiceProfileLabel": "Stimmprofil",
+        "aiRewriteLabel": "KI-Umschreiben"
       },
       "showcase": {
         "badge": "Sehen Sie die Magie",
         "cta": "Probieren Sie es selbst",
         "formal": {
-          "after": "Weißt du was",
+          "after": "Weißt du, was mich in letzter Zeit beschäftigt? Wie Unternehmen endlich ernst machen mit dem Thema Nachhaltigkeit. Das ist kein Trend mehr—es wird zur neuen Normalität im Business.",
           "before": "Die Implementierung nachhaltiger Praktiken in Unternehmensumgebungen ist in den letzten Jahren zunehmend wichtig geworden.",
           "metric": "Engagement",
           "style": "Formal → Konversationell"
@@ -1573,7 +1618,7 @@
         "subtitle": "Sehen Sie, wie KI-Rewrite Ihren Text transformiert und dabei Ihre Botschaft bewahrt",
         "title": "Echte Transformationen",
         "wordy": {
-          "after": "Lassen Sie uns",
+          "after": "Lass uns bald treffen, um über eine mögliche Zusammenarbeit zu sprechen. Wann passt es dir?",
           "before": "Ich schreibe Ihnen, um Sie zu informieren, dass ich gerne ein Treffen zum frühestmöglichen Zeitpunkt beantragen würde, um die Möglichkeit zu erörtern, potenzielle Kooperationsmöglichkeiten zu erkunden.",
           "metric": "Wortanzahl",
           "style": "Wortreich → Prägnant"
@@ -1594,26 +1639,26 @@
       "useCases": {
         "academic": {
           "desc": "Polieren Sie Essays und Arbeiten auf und behalten Sie den akademischen Ton bei",
-          "example": "",
+          "example": "\"Es kann beobachtet werden, dass...\" → \"Die Daten zeigen deutlich...\"",
           "stat": "Klarheitsscore",
           "title": "Akademisches Schreiben"
         },
         "content": {
           "desc": "Schreiben Sie Blogbeiträge, Artikel und Marketingtexte in Ihrer Stimme um",
-          "example": "",
+          "example": "\"Dieser Artikel behandelt...\" → \"Haben Sie sich jemals gefragt, warum...? Lassen Sie mich erzählen...\"",
           "stat": "Lesezeit",
           "title": "Content-Erstellung"
         },
         "email": {
           "desc": "Transformieren Sie formale E-Mails in freundliche Nachrichten oder umgekehrt",
-          "example": "",
+          "example": "\"Ich wollte mich bezüglich...\" → \"Hey! Kurze Frage zu...\"",
           "stat": "Antwortrate",
           "title": "E-Mail-Schreiben"
         },
         "preview": "Transformationsvorschau",
         "social": {
           "desc": "Erstellen Sie ansprechende Beiträge, die authentisch nach Ihnen klingen",
-          "example": "",
+          "example": "\"Wir freuen uns, bekannt zu geben...\" → \"Große Neuigkeiten! Wir haben gerade gestartet...\"",
           "stat": "Engagement",
           "title": "Soziale Medien"
         },
@@ -1782,7 +1827,7 @@
           "b2": "Tempoanalyse",
           "b3": "Genre-Passung",
           "desc": "Analysieren Sie Ihr Manuskript, um konsistente Stimme und angemessene Komplexität durchgehend sicherzustellen",
-          "example": "",
+          "example": "\"Ihr Manuskript hat eine durchschnittliche Satzlänge von 18 Wörtern - perfekt für literarische Fiktion.\"",
           "title": "Autoren"
         },
         "badge": "Anwendungsfälle",
@@ -1791,7 +1836,7 @@
           "b2": "Fortschritt verfolgen",
           "b3": "Lehrwerkzeug",
           "desc": "Helfen Sie Studenten, ihr Schreiben zu verbessern, indem Sie objektives Feedback zu Struktur und Komplexität geben",
-          "example": "",
+          "example": "\"Der Aufsatz des Studenten hat einen Lesbarkeitsscore von 45 - muss für die Zielgruppe vereinfacht werden.\"",
           "title": "Pädagogen"
         },
         "example": "Beispiel",
@@ -1800,7 +1845,7 @@
           "b2": "Professioneller Ton",
           "b3": "Publikumsanpassung",
           "desc": "Stellen Sie sicher, dass Ihre Geschäftskommunikation klar, professionell und für Ihr Publikum angemessen ist",
-          "example": "",
+          "example": "\"Ihr Bericht hat einen Vokabelreichtum von 0,82 - ausgezeichnet für technische Dokumentation.\"",
           "title": "Profis"
         },
         "spotlight": "Vorgestellter Anwendungsfall",
@@ -1811,7 +1856,7 @@
           "b2": "Konsistenter Stil",
           "b3": "SEO-Optimierung",
           "desc": "Optimieren Sie Ihre Inhalte für Lesbarkeit und Engagement durch Verständnis Ihrer Schreibmuster",
-          "example": "",
+          "example": "\"Ihr Blogbeitrag hat einen Lesbarkeitsscore von 72 - perfekt für Web-Publikum.\"",
           "title": "Content-Autoren"
         }
       }
@@ -1832,7 +1877,7 @@
       "badge": "Ihre einzigartige Schreib-DNA",
       "benefits": {
         "ai": {
-          "desc": "Nutzen Sie Ihr Profil mit AI Workspace für personalisierte Inhaltserstellung",
+          "desc": "Nutzen Sie Ihr Profil mit KI-Arbeitsbereich für personalisierte Inhaltserstellung",
           "title": "KI-Integration"
         },
         "analysis": {
@@ -1891,7 +1936,7 @@
           "title": "Profil erstellt"
         },
         "step4": {
-          "desc": "Wenden Sie Ihr Profil auf Humanisierung, AI Workspace und Inhaltserstellung an",
+          "desc": "Wenden Sie Ihr Profil auf Humanisierung, KI-Arbeitsbereich und Inhaltserstellung an",
           "title": "Überall nutzen"
         }
       },
@@ -1919,16 +1964,34 @@
       "metrics": {
         "punctuation": "Interpunktionsstil",
         "punctuationDesc": "Ihre einzigartigen Interpunktionsmuster und Präferenzen",
+        "punctuationEx1": "Gedankenstriche",
+        "punctuationEx2": "Semikolons",
+        "punctuationEx3": "Ausrufezeichen",
         "sentenceLength": "Satzstruktur",
         "sentenceLengthDesc": "Typische Länge, Komplexität und Rhythmus Ihrer Sätze",
+        "sentenceLengthEx1": "Kurz & prägnant",
+        "sentenceLengthEx2": "Mittlerer Fluss",
+        "sentenceLengthEx3": "Komplex & detailliert",
         "sentenceStarters": "Satzanfänge",
         "sentenceStartersDesc": "Wie Sie typischerweise Sätze beginnen - Subjekt zuerst, Adverbien, Fragen",
+        "sentenceStartersEx1": "\"Ich denke...\"",
+        "sentenceStartersEx2": "\"Jedoch...\"",
+        "sentenceStartersEx3": "\"Der Schlüssel ist...\"",
         "tone": "Emotionsmarker",
         "toneDesc": "Wie Sie Meinungen, Gefühle und Betonung ausdrücken",
+        "toneEx1": "\"Ich fühle...\"",
+        "toneEx2": "\"Meiner Meinung nach...\"",
+        "toneEx3": "\"Absolut!\"",
         "transitions": "Übergangspräferenzen",
         "transitionsDesc": "Ihre bevorzugten Verbindungswörter und Phrasen",
+        "transitionsEx1": "\"aber\"",
+        "transitionsEx2": "\"daher\"",
+        "transitionsEx3": "\"andererseits\"",
         "vocabulary": "Vokabelmuster",
-        "vocabularyDesc": "Gängige Phrasen, bevorzugte Wörter und Ausdrücke"
+        "vocabularyDesc": "Gängige Phrasen, bevorzugte Wörter und Ausdrücke",
+        "vocabularyEx1": "\"ehrlich gesagt\"",
+        "vocabularyEx2": "\"lassen Sie mich erklären\"",
+        "vocabularyEx3": "\"die Sache ist die\""
       },
       "metricsBadge": "Tiefenanalyse",
       "metricsDesc": "Unsere KI erfasst jede Nuance Ihres Schreibstils durch umfassende Analyse",
@@ -1942,7 +2005,10 @@
         "analyzing2": "Erkenne Satzstrukturen...",
         "analyzing3": "Identifiziere Tonfallmarker...",
         "ready": "Bereit zur Nutzung",
+        "sampleBlog": "\"Das ist die Sache mit der Produktivität...\"",
+        "sampleEmail": "\"Hey Team, ich wollte nur ein paar Gedanken teilen...\"",
         "sampleInput": "Ihre Schreibprobe",
+        "sampleSocial": "\"Ehrlich gesagt, das hat alles für mich verändert...\"",
         "step1": "Schreibproben hinzufügen",
         "step1Desc": "E-Mails, Posts oder jeden Text einfügen, den Sie geschrieben haben",
         "step2": "KI analysiert Muster",
@@ -1989,13 +2055,13 @@
       "useCases": {
         "business": {
           "desc": "Stellen Sie sicher, dass alle Teamkommunikationen zur Markenstimme passen",
-          "quote": "",
+          "quote": "\"Unsere Markenstimme ist jetzt bei über 50 Teammitgliedern konsistent.\"",
           "statLabel": "Unternehmen",
           "title": "Geschäftskommunikation"
         },
         "content": {
           "desc": "Generieren Sie Blogbeiträge, Artikel und Texte, die nach Ihnen klingen",
-          "quote": "",
+          "quote": "\"Ich schreibe 3x schneller und es klingt immer noch authentisch nach mir.\"",
           "statLabel": "Artikel",
           "title": "Content-Erstellung"
         },
@@ -2003,13 +2069,13 @@
         "ctaButton": "Profil erstellen",
         "personal": {
           "desc": "Bauen Sie eine konsistente persönliche Marke über alle Ihre Inhalte auf",
-          "quote": "",
+          "quote": "\"Meine LinkedIn-Posts klingen endlich wie ich, nicht wie ein Roboter.\"",
           "statLabel": "Ersteller",
           "title": "Personal Branding"
         },
         "team": {
           "desc": "Teilen Sie Profile, um eine konsistente Stimme in Ihrem Team zu wahren",
-          "quote": "",
+          "quote": "\"Das Onboarding neuer Autoren ist jetzt nahtlos mit geteilten Profilen.\"",
           "statLabel": "Teams",
           "title": "Team-Kollaboration"
         }
@@ -2034,7 +2100,8 @@
     "gridTitle": "Wählen Sie Ihr Tool",
     "meta": {
       "description": "Erkunden Sie alle Funktionen von Graphos AI Studio: KI-Erkennung, Humanisierung, Stimmprofil, KI-Arbeitsbereich, Rewrite und mehr.",
-      "title": "Funktionen - Graphos AI Studio"
+      "title": "Funktionen - Graphos AI Studio",
+      "keywords": "KI-Schreibwerkzeuge, KI-Erkennungsfunktionen, Inhaltshumanisierung, Stimmprofil-Ersteller"
     },
     "stats": {
       "extension": "Chrome-Erweiterung",
@@ -2111,7 +2178,8 @@
     },
     "meta": {
       "description": "Erkennen Sie KI-generierte Inhalte, humanisieren Sie Ihr Schreiben und erstellen Sie authentische Inhalte, die nach Ihnen klingen. Kostenloser KI-Schreibassistent mit Chrome-Erweiterung.",
-      "title": "Graphos AI Studio - KI-Erkennung, Humanisierung & Stimmprofil"
+      "title": "Graphos AI Studio - KI-Erkennung, Humanisierung & Stimmprofil",
+      "keywords": "KI-Erkennung, KI-Inhaltsdetektor, ChatGPT-Detektor, KI-Text humanisieren, KI-Schreibassistent, Stimmprofil, KI-Erkennung umgehen, KI-Textkonverter"
     }
   },
   "howItWorks": {
@@ -2130,7 +2198,7 @@
       "title": "Humanisieren Sie Ihren Inhalt"
     },
     "step4": {
-      "description": "Nutzen Sie AI Workspace, um Inhalte zu generieren, die authentisch nach Ihnen klingen. Perfekt für E-Mails, Posts und mehr.",
+      "description": "Nutzen Sie KI-Arbeitsbereich, um Inhalte zu generieren, die authentisch nach Ihnen klingen. Perfekt für E-Mails, Posts und mehr.",
       "title": "Chatten Sie in Ihrer Stimme"
     },
     "steps": {
@@ -2146,7 +2214,8 @@
     "description": "Transformieren Sie KI-Text in natürliches, authentisches menschliches Schreiben.",
     "meta": {
       "description": "Transformieren Sie KI-generierten Text in natürlichen, menschenähnlichen Inhalt unter Beibehaltung der Bedeutung.",
-      "title": "Inhalts-Humanisierung - Graphos AI Studio"
+      "title": "Inhalts-Humanisierung - Graphos AI Studio",
+      "keywords": "KI-Text humanisieren, KI-Humanisierer, KI-Erkennung umgehen, unerkennbare KI, KI zu menschlichem Text, ChatGPT humanisieren"
     },
     "title": "Inhalts-Humanisierung"
   },
@@ -2194,7 +2263,7 @@
       "noSubscription": "Kein Abonnement",
       "securePayment": "Sichere Zahlung"
     },
-    "bestValue": "Bester Wert",
+    "bestValue": "Bestpreis",
     "bonus": "Bonus",
     "buyNow": "Jetzt kaufen",
     "creditCard": "Kreditkarte",
@@ -2257,7 +2326,8 @@
     "description": "Transformieren Sie Text in Ihre Stimme mit KI-gestütztem Umschreiben.",
     "meta": {
       "description": "Transformieren Sie jeden Text, damit er Ihrem einzigartigen Schreibstil entspricht. KI-gestütztes Umschreiben, das Ihre Stimme und Ihren Tonfall beibehält.",
-      "title": "KI-Rewrite - Text in Ihre Stimme transformieren | Graphos AI"
+      "title": "KI-Rewrite - Text in Ihre Stimme transformieren | Graphos AI",
+      "keywords": "KI-Umschreiben, Textumschreiber, Paraphrasierungstool, Texttransformator, KI-Paraphrasierer"
     },
     "title": "KI-Rewrite"
   },
@@ -2295,7 +2365,7 @@
       "students": "Verbessern Sie akademisches Schreiben"
     },
     "userTypes": {
-      "contentCreators": "Content Creators",
+      "contentCreators": "Inhaltsersteller",
       "developers": "Entwickler",
       "educators": "Pädagogen",
       "marketers": "Marketer",
@@ -2306,7 +2376,8 @@
     "description": "Analysieren Sie Ihre Schreibmetriken und -muster.",
     "meta": {
       "description": "Erhalten Sie detaillierte Schreibstatistiken einschließlich Wortanzahl, Satzlänge, Vokabelreichtum und Lesbarkeitsscores.",
-      "title": "Statistiken - Analysieren Sie Ihre Schreibmetriken | Graphos AI"
+      "title": "Statistiken - Analysieren Sie Ihre Schreibmetriken | Graphos AI",
+      "keywords": "Schreibstatistiken, Textanalysator, Wortzähler, Lesbarkeitsbewertung, Vokabelanalysator"
     },
     "title": "Statistiken"
   },
@@ -2335,13 +2406,13 @@
       "6": "Die Chrome-Erweiterung macht die Nutzung überall so einfach. Ich kann Inhalte prüfen und humanisieren, ohne meinen Workflow zu verlassen."
     },
     "roles": {
-      "contentCreator": "Content Creator",
-      "customerSuccessLead": "Customer Success Lead",
+      "contentCreator": "Inhaltsersteller",
+      "customerSuccessLead": "Kundenerfolgsleiter",
       "editor": "Chefredakteur",
       "freelanceWriter": "Freiberuflicher Autor",
-      "marketingManager": "Marketing Manager",
+      "marketingManager": "Marketingleiter",
       "professor": "Universitätsprofessor",
-      "socialMediaManager": "Social Media Manager"
+      "socialMediaManager": "Social-Media-Manager"
     },
     "subtitle": "Sehen Sie, was unsere Nutzer über ihre Erfahrungen mit Graphos AI Studio zu sagen haben.",
     "title": "Geliebt von Autoren weltweit"
@@ -2353,8 +2424,8 @@
         "title": "Credits verfallen nie"
       },
       "refund": {
-        "desc": "Nicht zufrieden? Erhalten Sie innerhalb von 7 Tagen eine volle Rückerstattung",
-        "title": "7-Tage Geld-zurück"
+        "desc": "Testen Sie 100 kostenlose Credits vor dem Kauf",
+        "title": "Vor dem Kauf testen"
       },
       "support": {
         "desc": "Erhalten Sie Hilfe, wenn Sie sie brauchen, per E-Mail",
@@ -2396,7 +2467,7 @@
       "testimonial": {
         "author": "Jennifer Park",
         "quote": "Unsere Kundensupport-Antworten fühlen sich jetzt persönlicher an.",
-        "role": "Customer Success Lead"
+        "role": "Kundenerfolgsleiter"
       },
       "title": "Unternehmen"
     },
@@ -2410,9 +2481,9 @@
       "testimonial": {
         "author": "Amanda Foster",
         "quote": "Ich kann jetzt doppelt so viel Inhalt produzieren und dabei meine persönliche Note behalten.",
-        "role": "Content Creator"
+        "role": "Inhaltserstellerin"
       },
-      "title": "Content Creators"
+      "title": "Inhaltsersteller"
     },
     "educators": {
       "benefits": {
@@ -2453,7 +2524,7 @@
       "testimonial": {
         "author": "Rachel Martinez",
         "quote": "Unsere E-Mail-Öffnungsraten verbesserten sich um 40% mit menschlicher klingenden Texten.",
-        "role": "Marketing Manager"
+        "role": "Marketingleiterin"
       },
       "title": "Marketing-Teams"
     },
@@ -2479,7 +2550,8 @@
     "description": "Erfassen Sie Ihren einzigartigen Schreibstil und erstellen Sie Inhalte, die authentisch nach Ihnen klingen.",
     "meta": {
       "description": "Erstellen Sie Ihr einzigartiges Schreibstimmprofil und generieren Sie Inhalte, die wie Sie klingen.",
-      "title": "Stimmprofil - Graphos AI Studio"
+      "title": "Stimmprofil - Graphos AI Studio",
+      "keywords": "Stimmprofil, Schreibstil-KI, persönlicher Schreibassistent, Tonanalysator, einzigartiger Schreibstil"
     },
     "title": "Stimmprofil"
   },
@@ -2592,36 +2664,36 @@
     },
     "voiceProfile": {
       "sarah": {
-        "name": "Sarah Chen",
-        "style": "Professional & Warm",
-        "tone": "Warm & Approachable",
+        "name": "Anna Müller",
+        "style": "Professionell & Warmherzig",
+        "tone": "Warmherzig & Zugänglich",
         "vocab": {
-          "0": "honestly",
-          "1": "I think",
-          "2": "let me explain",
-          "3": "here's the thing"
+          "0": "ehrlich gesagt",
+          "1": "ich denke",
+          "2": "lass mich erklären",
+          "3": "die Sache ist"
         }
       },
       "alex": {
-        "name": "Alex Rivera",
-        "style": "Casual & Creative",
-        "tone": "Fun & Energetic",
+        "name": "Max Schmidt",
+        "style": "Locker & Kreativ",
+        "tone": "Lustig & Energisch",
         "vocab": {
-          "0": "basically",
-          "1": "you know",
-          "2": "kind of",
+          "0": "im Grunde",
+          "1": "weißt du",
+          "2": "irgendwie",
           "3": "super"
         }
       },
       "james": {
-        "name": "Dr. James Park",
-        "style": "Academic & Precise",
-        "tone": "Authoritative & Measured",
+        "name": "Dr. Hans Weber",
+        "style": "Akademisch & Präzise",
+        "tone": "Autoritativ & Bedacht",
         "vocab": {
-          "0": "furthermore",
-          "1": "consequently",
-          "2": "research indicates",
-          "3": "data suggests"
+          "0": "darüber hinaus",
+          "1": "folglich",
+          "2": "Forschung zeigt",
+          "3": "Daten deuten darauf hin"
         }
       }
     }
