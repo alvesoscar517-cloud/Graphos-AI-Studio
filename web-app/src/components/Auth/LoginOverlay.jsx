@@ -354,8 +354,8 @@ const LoginOverlay = () => {
       }}
     >
       <div className={cn(
-        "relative z-10 w-full max-w-[400px] text-center my-auto",
-        "py-6 px-5 sm:py-8 sm:px-8 pb-5 sm:pb-6 bg-white rounded-2xl",
+        "relative z-10 w-full max-w-[360px] text-center my-auto",
+        "py-5 px-4 sm:py-6 sm:px-6 pb-4 sm:pb-5 bg-white rounded-2xl",
         "border border-black/[0.04] shadow-modal animate-slide-up-slow"
       )}>
         {authMode === 'select' && (

@@ -435,6 +435,11 @@ export const useAuthStore = create(
                     _sessionPersisted: true
                   })
                   
+                  // Dispatch event for auto-sync with Google Drive
+                  window.dispatchEvent(new CustomEvent('auth-signin', { 
+                    detail: { hasGoogleLinked: true, authMethod: 'email' } 
+                  }))
+                  
                   return { success: true, linkedAccount: true }
                 }
                 
@@ -503,6 +508,11 @@ export const useAuthStore = create(
                       userId: googleLoginData.user.userId, 
                       isNewUser: googleLoginData.isNewUser 
                     })
+                    
+                    // Dispatch event for auto-sync with Google Drive
+                    window.dispatchEvent(new CustomEvent('auth-signin', { 
+                      detail: { hasGoogleLinked: true, authMethod: 'google', isNewUser: googleLoginData.isNewUser } 
+                    }))
                     
                     return { success: true, isNewUser: googleLoginData.isNewUser }
                   } else if (googleLoginData.code === 'AUTH_EMAIL_EXISTS') {

@@ -228,6 +228,272 @@
     .fm-rose { background: linear-gradient(135deg, #f43f5e, #e11d48); }
     .fm-orange { background: linear-gradient(135deg, #f97316, #ea580c); }
     .fm-sky { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
+    
+    /* ============================================== */
+    /* PRICING PLANS THEMES */
+    /* ============================================== */
+    
+    /* Common Pricing Styles */
+    .crown-icon {
+      width: 200px; height: 200px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 20px 40px rgba(255, 185, 51, 0.4));
+    }
+    
+    .pricing-title {
+      font-size: 96px !important; font-weight: 900 !important;
+      letter-spacing: 8px; margin-bottom: 12px !important;
+    }
+    
+    .pricing-subtitle {
+      font-size: 32px !important; font-weight: 500 !important;
+      opacity: 0.8;
+    }
+    
+    .price-badge {
+      position: absolute; top: 40px; right: 50px;
+      padding: 12px 28px; border-radius: 50px;
+      font-size: 28px; font-weight: 800;
+      backdrop-filter: blur(10px);
+    }
+    
+    .popular-badge {
+      position: absolute; top: 100px; right: 50px;
+      padding: 10px 24px; border-radius: 50px;
+      font-size: 16px; font-weight: 700; letter-spacing: 1px;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      color: white;
+    }
+    
+    .best-value-badge {
+      position: absolute; top: 100px; right: 50px;
+      padding: 10px 24px; border-radius: 50px;
+      font-size: 16px; font-weight: 700; letter-spacing: 1px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+    
+    .pricing-glow {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 700px; height: 700px; pointer-events: none; border-radius: 50%;
+    }
+    
+    /* BASIC Plan - Teal/Cyan theme */
+    .pricing-basic { 
+      background: linear-gradient(135deg, #0f1f1f 0%, #134e4a 40%, #0f766e 60%, #0f1f1f 100%);
+    }
+    .pricing-glow-basic {
+      background: radial-gradient(circle, rgba(20, 184, 166, 0.25) 0%, transparent 60%);
+    }
+    .pricing-basic .pricing-title {
+      background: linear-gradient(135deg, #ffffff 0%, #5eead4 50%, #2dd4bf 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .pricing-basic .pricing-subtitle { color: rgba(94, 234, 212, 0.8); }
+    .price-badge-basic {
+      background: rgba(20, 184, 166, 0.2); border: 2px solid rgba(20, 184, 166, 0.5);
+      color: #5eead4;
+    }
+    .crown-basic { filter: drop-shadow(0 20px 50px rgba(20, 184, 166, 0.5)); }
+    
+    /* PRO Plan - Purple/Violet theme */
+    .pricing-pro { 
+      background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 40%, #6d28d9 60%, #1e1b4b 100%);
+    }
+    .pricing-glow-pro {
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 60%);
+    }
+    .pricing-pro .pricing-title {
+      background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 50%, #a78bfa 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .pricing-pro .pricing-subtitle { color: rgba(196, 181, 253, 0.8); }
+    .price-badge-pro {
+      background: rgba(139, 92, 246, 0.2); border: 2px solid rgba(139, 92, 246, 0.5);
+      color: #c4b5fd;
+    }
+    .crown-pro { filter: drop-shadow(0 20px 50px rgba(139, 92, 246, 0.5)); }
+    
+    /* PRO+ Plan - Rose/Pink theme */
+    .pricing-pro-plus { 
+      background: linear-gradient(135deg, #1c1017 0%, #831843 40%, #be185d 60%, #1c1017 100%);
+    }
+    .pricing-glow-pro-plus {
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, transparent 60%);
+    }
+    .pricing-pro-plus .pricing-title {
+      background: linear-gradient(135deg, #ffffff 0%, #fbcfe8 50%, #f9a8d4 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .pricing-pro-plus .pricing-subtitle { color: rgba(251, 207, 232, 0.8); }
+    .price-badge-pro-plus {
+      background: rgba(236, 72, 153, 0.2); border: 2px solid rgba(236, 72, 153, 0.5);
+      color: #fbcfe8;
+    }
+    .crown-pro-plus { filter: drop-shadow(0 20px 50px rgba(236, 72, 153, 0.5)); }
+    
+    /* ULTIMATE Plan - Gold/Amber theme */
+    .pricing-ultimate { 
+      background: linear-gradient(135deg, #1c1410 0%, #78350f 40%, #b45309 60%, #1c1410 100%);
+    }
+    .pricing-glow-ultimate {
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, transparent 60%);
+    }
+    .pricing-ultimate .pricing-title {
+      background: linear-gradient(135deg, #ffffff 0%, #fde68a 50%, #fcd34d 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .pricing-ultimate .pricing-subtitle { color: rgba(253, 230, 138, 0.8); }
+    .price-badge-ultimate {
+      background: rgba(245, 158, 11, 0.2); border: 2px solid rgba(245, 158, 11, 0.5);
+      color: #fde68a;
+    }
+    .crown-ultimate { filter: drop-shadow(0 20px 50px rgba(245, 158, 11, 0.6)); }
+    
+    /* Pricing cards use 1600x1200 (4:3) */
+    .pricing-basic, .pricing-pro, .pricing-pro-plus, .pricing-ultimate {
+      width: 1600px !important; height: 1200px !important;
+    }
+    .pricing-basic .crown-icon, .pricing-pro .crown-icon, 
+    .pricing-pro-plus .crown-icon, .pricing-ultimate .crown-icon {
+      width: 280px; height: 280px; margin-bottom: 40px;
+    }
+    .pricing-basic .pricing-title, .pricing-pro .pricing-title,
+    .pricing-pro-plus .pricing-title, .pricing-ultimate .pricing-title {
+      font-size: 120px !important;
+    }
+    .pricing-basic .pricing-subtitle, .pricing-pro .pricing-subtitle,
+    .pricing-pro-plus .pricing-subtitle, .pricing-ultimate .pricing-subtitle {
+      font-size: 42px !important;
+    }
+
+    /* Pricing Overview Card - 1600x1200 */
+    .pricing-overview {
+      width: 1600px !important; height: 1200px !important;
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 30%, #0f172a 60%, #0a0a1a 100%);
+    }
+    .pricing-overview-glow {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 1200px; height: 1200px; pointer-events: none;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(20, 184, 166, 0.15) 0%, transparent 30%),
+        radial-gradient(circle at 40% 50%, rgba(139, 92, 246, 0.12) 0%, transparent 30%),
+        radial-gradient(circle at 60% 50%, rgba(236, 72, 153, 0.12) 0%, transparent 30%),
+        radial-gradient(circle at 80% 30%, rgba(245, 158, 11, 0.15) 0%, transparent 30%);
+    }
+    .pricing-overview .overview-title {
+      font-size: 72px; font-weight: 900; margin-bottom: 60px; margin-top: 40px;
+      background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #c7d2fe 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .pricing-grid {
+      display: flex; gap: 30px; justify-content: center; align-items: flex-end;
+    }
+    .pricing-card {
+      width: 320px; border-radius: 24px; padding: 40px 30px;
+      display: flex; flex-direction: column; align-items: center;
+      backdrop-filter: blur(20px); transition: transform 0.3s;
+      position: relative;
+    }
+    .pricing-card-basic {
+      height: 420px;
+      background: linear-gradient(180deg, rgba(20, 184, 166, 0.15) 0%, rgba(20, 184, 166, 0.05) 100%);
+      border: 2px solid rgba(20, 184, 166, 0.3);
+    }
+    .pricing-card-pro {
+      height: 480px;
+      background: linear-gradient(180deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.05) 100%);
+      border: 2px solid rgba(139, 92, 246, 0.4);
+    }
+    .pricing-card-pro-plus {
+      height: 520px;
+      background: linear-gradient(180deg, rgba(236, 72, 153, 0.2) 0%, rgba(236, 72, 153, 0.05) 100%);
+      border: 2px solid rgba(236, 72, 153, 0.4);
+    }
+    .pricing-card-ultimate {
+      height: 560px;
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.05) 100%);
+      border: 2px solid rgba(245, 158, 11, 0.5);
+      box-shadow: 0 0 60px rgba(245, 158, 11, 0.2);
+    }
+    .card-crown { width: 100px; height: 100px; margin-bottom: 20px; }
+    .card-name { font-size: 28px; font-weight: 800; color: white; margin-bottom: 8px; letter-spacing: 2px; }
+    .card-price { font-size: 48px; font-weight: 900; margin-bottom: 8px; }
+    .card-price-basic { color: #5eead4; }
+    .card-price-pro { color: #c4b5fd; }
+    .card-price-pro-plus { color: #fbcfe8; }
+    .card-price-ultimate { color: #fde68a; }
+    .card-period { font-size: 16px; color: rgba(255,255,255,0.5); }
+    .card-features { margin-top: 24px; text-align: left; width: 100%; }
+    .card-feature { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 15px; color: rgba(255,255,255,0.8); }
+    .card-feature svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .card-feature-basic svg { stroke: #5eead4; }
+    .card-feature-pro svg { stroke: #c4b5fd; }
+    .card-feature-pro-plus svg { stroke: #fbcfe8; }
+    .card-feature-ultimate svg { stroke: #fde68a; }
+    .pricing-basic .price-badge, .pricing-pro .price-badge,
+    .pricing-pro-plus .price-badge, .pricing-ultimate .price-badge {
+      font-size: 36px; padding: 16px 36px;
+    }
+
+    /* ============================================== */
+    /* PRICING HERO - Visual Only Promo Card */
+    /* ============================================== */
+    .pricing-hero {
+      width: 1600px !important; height: 1200px !important;
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 30%, #0f172a 60%, #0a0a1a 100%);
+      position: relative; overflow: hidden;
+    }
+    .pricing-hero-glow {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 1400px; height: 1400px; pointer-events: none;
+      background: 
+        radial-gradient(circle at 15% 50%, rgba(20, 184, 166, 0.2) 0%, transparent 25%),
+        radial-gradient(circle at 38% 50%, rgba(139, 92, 246, 0.2) 0%, transparent 25%),
+        radial-gradient(circle at 62% 50%, rgba(236, 72, 153, 0.2) 0%, transparent 25%),
+        radial-gradient(circle at 85% 50%, rgba(245, 158, 11, 0.25) 0%, transparent 25%);
+    }
+    .hero-crowns {
+      display: flex; align-items: flex-end; justify-content: center;
+      gap: 60px; position: absolute; bottom: 200px; left: 50%; transform: translateX(-50%);
+    }
+    .hero-crown { display: flex; align-items: center; justify-content: center; }
+    .hero-crown svg { width: 100%; height: 100%; }
+    .hero-crown-basic {
+      width: 180px; height: 180px;
+      filter: drop-shadow(0 0 40px rgba(20, 184, 166, 0.6)) drop-shadow(0 0 80px rgba(20, 184, 166, 0.3));
+      animation: float 4s ease-in-out infinite;
+    }
+    .hero-crown-pro {
+      width: 220px; height: 220px;
+      filter: drop-shadow(0 0 50px rgba(139, 92, 246, 0.6)) drop-shadow(0 0 100px rgba(139, 92, 246, 0.3));
+      animation: float 4s ease-in-out infinite 0.5s;
+    }
+    .hero-crown-pro-plus {
+      width: 260px; height: 260px;
+      filter: drop-shadow(0 0 60px rgba(236, 72, 153, 0.6)) drop-shadow(0 0 120px rgba(236, 72, 153, 0.3));
+      animation: float 4s ease-in-out infinite 1s;
+    }
+    .hero-crown-ultimate {
+      width: 320px; height: 320px;
+      filter: drop-shadow(0 0 80px rgba(245, 158, 11, 0.7)) drop-shadow(0 0 150px rgba(245, 158, 11, 0.4));
+      animation: float 4s ease-in-out infinite 1.5s;
+    }
+    .hero-sparkles { position: absolute; inset: 0; pointer-events: none; }
+    .sparkle {
+      position: absolute; width: 8px; height: 8px;
+      background: white; border-radius: 50%;
+      animation: sparkle 2s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 1; transform: scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -666,15 +932,297 @@
         </div>
       </div>
     </div>
+
+    <!-- ============================================== -->
+    <!-- LEMON SQUEEZY PRICING PLANS OG IMAGES -->
+    <!-- ============================================== -->
+
+    <!-- 9. BASIC Plan - $4.99 -->
+    <div class="og-wrapper">
+      <span class="og-label">pricing-basic.png (1600×1200) - BASIC PLAN $4.99</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('pricing-basic', 'pricing-basic.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+        <button class="btn-download secondary" onclick="downloadCard('pricing-basic', 'pricing-basic.jpg')">JPG</button>
+        <button class="btn-download secondary" onclick="downloadCardSVG('pricing-basic', 'pricing-basic.svg')">SVG</button>
+      </div>
+      <div class="og-card pricing-basic" id="pricing-basic">
+        <div class="decoration-circles"></div>
+        <div class="pricing-glow pricing-glow-basic"></div>
+        
+        <div class="logo">
+          <div class="logo-icon" style="border-radius: 16px; overflow: hidden;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#000" d="M187.5 75.43c-27.58 0-49.95 22.37-49.95 49.95s22.37 49.95 49.95 49.95 49.95-22.37 49.95-49.95-22.37-49.95-49.95-49.95z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+          </div>
+          <span class="logo-text">Graphos AI</span>
+        </div>
+        
+        <!-- Price Badge -->
+        <div class="price-badge price-badge-basic">$4.99</div>
+        
+        <!-- Crown Icon - Basic -->
+        <div class="crown-icon crown-basic">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%">
+            <path fill="#ffb933" d="M 362.4375 286.050781 C 361.84375 293.265625 355.8125 298.820312 348.566406 298.820312 C 293.941406 298.820312 80.992188 298.820312 26.371094 298.820312 C 19.121094 298.820312 13.089844 293.265625 12.5 286.050781 C 10.09375 256.6875 4.109375 183.652344 0.648438 141.40625 C 0.199219 135.910156 3.042969 130.664062 7.902344 128.042969 C 12.757812 125.417969 18.710938 125.910156 23.066406 129.300781 C 47.730469 148.476562 84.152344 176.789062 101.277344 190.105469 C 103.671875 191.96875 106.765625 192.695312 109.742188 192.097656 C 112.722656 191.5 115.289062 189.636719 116.78125 186.992188 C 129.316406 164.757812 158.671875 112.695312 175.339844 83.128906 C 177.808594 78.753906 182.441406 76.050781 187.46875 76.050781 C 192.492188 76.050781 197.128906 78.753906 199.59375 83.128906 C 216.261719 112.695312 245.617188 164.757812 258.152344 186.992188 C 259.644531 189.636719 262.214844 191.5 265.191406 192.097656 C 268.171875 192.695312 271.261719 191.96875 273.65625 190.105469 C 290.785156 176.789062 327.203125 148.476562 351.867188 129.300781 C 356.226562 125.910156 362.175781 125.417969 367.035156 128.042969 C 371.890625 130.664062 374.734375 135.910156 374.285156 141.40625 C 370.824219 183.652344 364.84375 256.6875 362.4375 286.050781 Z"/>
+          </svg>
+        </div>
+        
+        <h2 class="og-title pricing-title">BASIC</h2>
+        <p class="og-subtitle pricing-subtitle">Starter Plan</p>
+        
+        <div class="url-badge">graphosai.com</div>
+      </div>
+    </div>
+
+    <!-- 10. PRO Plan - $14.99 -->
+    <div class="og-wrapper">
+      <span class="og-label">pricing-pro.png (1600×1200) - PRO PLAN $14.99</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('pricing-pro', 'pricing-pro.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+        <button class="btn-download secondary" onclick="downloadCard('pricing-pro', 'pricing-pro.jpg')">JPG</button>
+        <button class="btn-download secondary" onclick="downloadCardSVG('pricing-pro', 'pricing-pro.svg')">SVG</button>
+      </div>
+      <div class="og-card pricing-pro" id="pricing-pro">
+        <div class="decoration-circles"></div>
+        <div class="pricing-glow pricing-glow-pro"></div>
+        
+        <div class="logo">
+          <div class="logo-icon" style="border-radius: 16px; overflow: hidden;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#000" d="M187.5 75.43c-27.58 0-49.95 22.37-49.95 49.95s22.37 49.95 49.95 49.95 49.95-22.37 49.95-49.95-22.37-49.95-49.95-49.95z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+          </div>
+          <span class="logo-text">Graphos AI</span>
+        </div>
+        
+        <!-- Price Badge -->
+        <div class="price-badge price-badge-pro">$14.99</div>
+        
+        <!-- Crown Icon - Pro (with base) -->
+        <div class="crown-icon crown-pro">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%">
+            <path fill="#ffb933" d="M 351.765625 260.199219 L 23.1875 260.199219 C 23.1875 260.199219 9.050781 177.574219 0.96875 130.363281 C -0.03125 124.515625 2.433594 118.613281 7.296875 115.21875 C 12.160156 111.824219 18.546875 111.546875 23.6875 114.503906 C 45.90625 127.296875 75.835938 144.53125 92.554688 154.15625 C 99.636719 158.238281 108.671875 156.027344 113.078125 149.136719 C 127.285156 126.917969 157.339844 79.910156 174.585938 52.9375 C 177.398438 48.535156 182.257812 45.875 187.476562 45.875 C 192.695312 45.875 197.554688 48.535156 200.367188 52.9375 C 217.613281 79.910156 247.667969 126.917969 261.875 149.136719 C 266.28125 156.027344 275.316406 158.238281 282.398438 154.15625 C 299.121094 144.53125 329.046875 127.296875 351.269531 114.503906 C 356.40625 111.546875 362.792969 111.824219 367.65625 115.21875 C 372.519531 118.613281 374.984375 124.515625 373.984375 130.363281 C 365.90625 177.574219 351.765625 260.199219 351.765625 260.199219 Z M 351.765625 287.097656 L 351.765625 314.058594 C 351.765625 322.515625 344.914062 329.371094 336.460938 329.371094 C 281.378906 329.371094 93.574219 329.371094 38.492188 329.371094 C 30.039062 329.371094 23.1875 322.515625 23.1875 314.058594 C 23.1875 301.957031 23.1875 287.097656 23.1875 287.097656 Z"/>
+          </svg>
+        </div>
+        
+        <h2 class="og-title pricing-title">PRO</h2>
+        <p class="og-subtitle pricing-subtitle">Professional Plan</p>
+        
+        <div class="url-badge">graphosai.com</div>
+      </div>
+    </div>
+
+    <!-- 11. PRO+ Plan - $49.99 -->
+    <div class="og-wrapper">
+      <span class="og-label">pricing-pro-plus.png (1600×1200) - PRO+ PLAN $49.99</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('pricing-pro-plus', 'pricing-pro-plus.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+        <button class="btn-download secondary" onclick="downloadCard('pricing-pro-plus', 'pricing-pro-plus.jpg')">JPG</button>
+        <button class="btn-download secondary" onclick="downloadCardSVG('pricing-pro-plus', 'pricing-pro-plus.svg')">SVG</button>
+      </div>
+      <div class="og-card pricing-pro-plus" id="pricing-pro-plus">
+        <div class="decoration-circles"></div>
+        <div class="pricing-glow pricing-glow-pro-plus"></div>
+        
+        <div class="logo">
+          <div class="logo-icon" style="border-radius: 16px; overflow: hidden;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#000" d="M187.5 75.43c-27.58 0-49.95 22.37-49.95 49.95s22.37 49.95 49.95 49.95 49.95-22.37 49.95-49.95-22.37-49.95-49.95-49.95z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+          </div>
+          <span class="logo-text">Graphos AI</span>
+        </div>
+        
+        <!-- Price Badge -->
+        <div class="price-badge price-badge-pro-plus">$49.99</div>
+        
+        <!-- Crown Icon - Pro+ (with gems) -->
+        <div class="crown-icon crown-pro-plus">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%">
+            <path fill="#ffb933" d="M 337.191406 175.667969 C 337.191406 175.667969 317.589844 274.761719 310.984375 308.160156 C 309.738281 314.460938 304.207031 319 297.78125 319 C 257.332031 319 117.652344 319 77.203125 319 C 70.777344 319 65.25 314.460938 64.003906 308.160156 C 57.398438 274.761719 37.796875 175.667969 37.796875 175.667969 C 35.722656 176.097656 33.574219 176.328125 31.375 176.328125 C 14.125 176.328125 0.117188 162.332031 0.117188 145.09375 C 0.117188 127.851562 14.125 113.855469 31.375 113.855469 C 48.625 113.855469 62.632812 127.851562 62.632812 145.09375 C 62.632812 153.746094 59.101562 161.585938 53.402344 167.242188 C 53.402344 167.242188 92.597656 191.449219 112.925781 204.003906 C 116.042969 205.929688 119.808594 206.5 123.359375 205.585938 C 126.90625 204.671875 129.925781 202.355469 131.722656 199.164062 C 146.128906 173.613281 178.140625 116.824219 178.140625 116.824219 C 165.453125 112.847656 156.234375 100.996094 156.234375 87.011719 C 156.234375 69.773438 170.242188 55.777344 187.492188 55.777344 C 204.746094 55.777344 218.75 69.773438 218.75 87.011719 C 218.75 100.996094 209.535156 112.847656 196.847656 116.824219 C 196.847656 116.824219 228.859375 173.613281 243.261719 199.164062 C 245.058594 202.355469 248.082031 204.671875 251.628906 205.585938 C 255.175781 206.5 258.945312 205.929688 262.058594 204.003906 C 282.386719 191.449219 321.585938 167.242188 321.585938 167.242188 C 315.886719 161.585938 312.355469 153.746094 312.355469 145.09375 C 312.355469 127.851562 326.359375 113.855469 343.613281 113.855469 C 360.863281 113.855469 374.871094 127.851562 374.871094 145.09375 C 374.871094 162.332031 360.863281 176.328125 343.613281 176.328125 C 341.410156 176.328125 339.261719 176.097656 337.191406 175.667969 Z"/>
+          </svg>
+        </div>
+        
+        <h2 class="og-title pricing-title">PRO+</h2>
+        <p class="og-subtitle pricing-subtitle">Advanced Plan</p>
+        
+        <div class="url-badge">graphosai.com</div>
+      </div>
+    </div>
+
+    <!-- 12. ULTIMATE Plan - $149.99 -->
+    <div class="og-wrapper">
+      <span class="og-label">pricing-ultimate.png (1600×1200) - ULTIMATE PLAN $149.99</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('pricing-ultimate', 'pricing-ultimate.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+        <button class="btn-download secondary" onclick="downloadCard('pricing-ultimate', 'pricing-ultimate.jpg')">JPG</button>
+        <button class="btn-download secondary" onclick="downloadCardSVG('pricing-ultimate', 'pricing-ultimate.svg')">SVG</button>
+      </div>
+      <div class="og-card pricing-ultimate" id="pricing-ultimate">
+        <div class="decoration-circles"></div>
+        <div class="pricing-glow pricing-glow-ultimate"></div>
+        
+        <div class="logo">
+          <div class="logo-icon" style="border-radius: 16px; overflow: hidden;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#000" d="M187.5 75.43c-27.58 0-49.95 22.37-49.95 49.95s22.37 49.95 49.95 49.95 49.95-22.37 49.95-49.95-22.37-49.95-49.95-49.95z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+          </div>
+          <span class="logo-text">Graphos AI</span>
+        </div>
+        
+        <!-- Price Badge -->
+        <div class="price-badge price-badge-ultimate">$149.99</div>
+        
+        <!-- Crown Icon - Ultimate (with 3 gems) -->
+        <div class="crown-icon crown-ultimate">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%">
+            <path fill="#ffb933" d="M 302.867188 315.730469 C 301.882812 320.710938 297.511719 324.304688 292.433594 324.304688 C 256.292969 324.304688 118.757812 324.304688 82.621094 324.304688 C 77.542969 324.304688 73.171875 320.710938 72.183594 315.730469 C 67.65625 292.820312 55.152344 229.554688 48.25 194.628906 C 47.429688 190.476562 49.148438 186.234375 52.625 183.824219 C 56.101562 181.414062 60.675781 181.292969 64.277344 183.515625 C 81.847656 194.375 106.222656 209.4375 119.433594 217.601562 C 121.894531 219.125 124.875 219.578125 127.679688 218.855469 C 130.480469 218.132812 132.871094 216.296875 134.292969 213.777344 C 144.328125 195.953125 165.875 157.707031 178.257812 135.722656 C 180.144531 132.375 183.6875 130.304688 187.527344 130.304688 C 191.367188 130.304688 194.910156 132.375 196.792969 135.722656 C 209.175781 157.707031 230.722656 195.953125 240.761719 213.777344 C 242.183594 216.296875 244.570312 218.132812 247.375 218.855469 C 250.179688 219.578125 253.15625 219.125 255.621094 217.601562 C 268.832031 209.4375 293.203125 194.375 310.777344 183.515625 C 314.375 181.292969 318.949219 181.414062 322.429688 183.824219 C 325.90625 186.234375 327.625 190.476562 326.804688 194.628906 C 319.898438 229.554688 307.394531 292.820312 302.867188 315.730469 Z M 26.796875 112.542969 C 41.535156 112.542969 53.496094 124.507812 53.496094 139.242188 C 53.496094 153.980469 41.535156 165.941406 26.796875 165.941406 C 12.0625 165.941406 0.0976562 153.980469 0.0976562 139.242188 C 0.0976562 124.507812 12.0625 112.542969 26.796875 112.542969 Z M 348.253906 112.542969 C 362.992188 112.542969 374.957031 124.507812 374.957031 139.242188 C 374.957031 153.980469 362.992188 165.941406 348.253906 165.941406 C 333.519531 165.941406 321.554688 153.980469 321.554688 139.242188 C 321.554688 124.507812 333.519531 112.542969 348.253906 112.542969 Z M 187.527344 50.597656 C 202.261719 50.597656 214.226562 62.558594 214.226562 77.296875 C 214.226562 92.03125 202.261719 103.996094 187.527344 103.996094 C 172.789062 103.996094 160.828125 92.03125 160.828125 77.296875 C 160.828125 62.558594 172.789062 50.597656 187.527344 50.597656 Z"/>
+          </svg>
+        </div>
+        
+        <h2 class="og-title pricing-title">ULTIMATE</h2>
+        <p class="og-subtitle pricing-subtitle">Enterprise Plan</p>
+        
+        <div class="url-badge">graphosai.com</div>
+      </div>
+    </div>
+
+    <!-- 13. PRICING OVERVIEW - All 4 Plans -->
+    <div class="og-wrapper">
+      <span class="og-label">pricing-overview.png (1600×1200) - ALL PRICING PLANS</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('pricing-overview', 'pricing-overview.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+        <button class="btn-download secondary" onclick="downloadCard('pricing-overview', 'pricing-overview.jpg')">JPG</button>
+        <button class="btn-download secondary" onclick="downloadCardSVG('pricing-overview', 'pricing-overview.svg')">SVG</button>
+      </div>
+      <div class="og-card pricing-overview" id="pricing-overview">
+        <div class="decoration-circles"></div>
+        <div class="pricing-overview-glow"></div>
+        <div class="logo">
+          <div class="logo-icon" style="border-radius: 16px; overflow: hidden;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/></svg>
+          </div>
+          <span class="logo-text">Graphos AI</span>
+        </div>
+        <h2 class="overview-title">Choose Your Plan</h2>
+        <div class="pricing-grid">
+          <div class="pricing-card pricing-card-basic">
+            <div class="card-crown"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%"><path fill="#5eead4" d="M 362.4375 286.050781 C 361.84375 293.265625 355.8125 298.820312 348.566406 298.820312 C 293.941406 298.820312 80.992188 298.820312 26.371094 298.820312 C 19.121094 298.820312 13.089844 293.265625 12.5 286.050781 C 10.09375 256.6875 4.109375 183.652344 0.648438 141.40625 C 0.199219 135.910156 3.042969 130.664062 7.902344 128.042969 C 12.757812 125.417969 18.710938 125.910156 23.066406 129.300781 C 47.730469 148.476562 84.152344 176.789062 101.277344 190.105469 C 103.671875 191.96875 106.765625 192.695312 109.742188 192.097656 C 112.722656 191.5 115.289062 189.636719 116.78125 186.992188 C 129.316406 164.757812 158.671875 112.695312 175.339844 83.128906 C 177.808594 78.753906 182.441406 76.050781 187.46875 76.050781 C 192.492188 76.050781 197.128906 78.753906 199.59375 83.128906 C 216.261719 112.695312 245.617188 164.757812 258.152344 186.992188 C 259.644531 189.636719 262.214844 191.5 265.191406 192.097656 C 268.171875 192.695312 271.261719 191.96875 273.65625 190.105469 C 290.785156 176.789062 327.203125 148.476562 351.867188 129.300781 C 356.226562 125.910156 362.175781 125.417969 367.035156 128.042969 C 371.890625 130.664062 374.734375 135.910156 374.285156 141.40625 C 370.824219 183.652344 364.84375 256.6875 362.4375 286.050781 Z"/></svg></div>
+            <div class="card-name">BASIC</div>
+            <div class="card-price card-price-basic">$4.99</div>
+            <div class="card-period">one-time</div>
+            <div class="card-features">
+              <div class="card-feature card-feature-basic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>5,000 words</div>
+              <div class="card-feature card-feature-basic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>AI Detection</div>
+              <div class="card-feature card-feature-basic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Basic Humanize</div>
+            </div>
+          </div>
+          <div class="pricing-card pricing-card-pro">
+            <div class="card-crown"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%"><path fill="#c4b5fd" d="M 351.765625 260.199219 L 23.1875 260.199219 C 23.1875 260.199219 9.050781 177.574219 0.96875 130.363281 C -0.03125 124.515625 2.433594 118.613281 7.296875 115.21875 C 12.160156 111.824219 18.546875 111.546875 23.6875 114.503906 C 45.90625 127.296875 75.835938 144.53125 92.554688 154.15625 C 99.636719 158.238281 108.671875 156.027344 113.078125 149.136719 C 127.285156 126.917969 157.339844 79.910156 174.585938 52.9375 C 177.398438 48.535156 182.257812 45.875 187.476562 45.875 C 192.695312 45.875 197.554688 48.535156 200.367188 52.9375 C 217.613281 79.910156 247.667969 126.917969 261.875 149.136719 C 266.28125 156.027344 275.316406 158.238281 282.398438 154.15625 C 299.121094 144.53125 329.046875 127.296875 351.269531 114.503906 C 356.40625 111.546875 362.792969 111.824219 367.65625 115.21875 C 372.519531 118.613281 374.984375 124.515625 373.984375 130.363281 C 365.90625 177.574219 351.765625 260.199219 351.765625 260.199219 Z M 351.765625 287.097656 L 351.765625 314.058594 C 351.765625 322.515625 344.914062 329.371094 336.460938 329.371094 C 281.378906 329.371094 93.574219 329.371094 38.492188 329.371094 C 30.039062 329.371094 23.1875 322.515625 23.1875 314.058594 C 23.1875 301.957031 23.1875 287.097656 23.1875 287.097656 Z"/></svg></div>
+            <div class="card-name">PRO</div>
+            <div class="card-price card-price-pro">$14.99</div>
+            <div class="card-period">one-time</div>
+            <div class="card-features">
+              <div class="card-feature card-feature-pro"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>20,000 words</div>
+              <div class="card-feature card-feature-pro"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>All Detection</div>
+              <div class="card-feature card-feature-pro"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Pro Humanize</div>
+              <div class="card-feature card-feature-pro"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Voice Profile</div>
+            </div>
+          </div>
+          <div class="pricing-card pricing-card-pro-plus">
+            <div class="card-crown"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%"><path fill="#fbcfe8" d="M 337.191406 175.667969 C 337.191406 175.667969 317.589844 274.761719 310.984375 308.160156 C 309.738281 314.460938 304.207031 319 297.78125 319 C 257.332031 319 117.652344 319 77.203125 319 C 70.777344 319 65.25 314.460938 64.003906 308.160156 C 57.398438 274.761719 37.796875 175.667969 37.796875 175.667969 C 35.722656 176.097656 33.574219 176.328125 31.375 176.328125 C 14.125 176.328125 0.117188 162.332031 0.117188 145.09375 C 0.117188 127.851562 14.125 113.855469 31.375 113.855469 C 48.625 113.855469 62.632812 127.851562 62.632812 145.09375 C 62.632812 153.746094 59.101562 161.585938 53.402344 167.242188 C 53.402344 167.242188 92.597656 191.449219 112.925781 204.003906 C 116.042969 205.929688 119.808594 206.5 123.359375 205.585938 C 126.90625 204.671875 129.925781 202.355469 131.722656 199.164062 C 146.128906 173.613281 178.140625 116.824219 178.140625 116.824219 C 165.453125 112.847656 156.234375 100.996094 156.234375 87.011719 C 156.234375 69.773438 170.242188 55.777344 187.492188 55.777344 C 204.746094 55.777344 218.75 69.773438 218.75 87.011719 C 218.75 100.996094 209.535156 112.847656 196.847656 116.824219 C 196.847656 116.824219 228.859375 173.613281 243.261719 199.164062 C 245.058594 202.355469 248.082031 204.671875 251.628906 205.585938 C 255.175781 206.5 258.945312 205.929688 262.058594 204.003906 C 282.386719 191.449219 321.585938 167.242188 321.585938 167.242188 C 315.886719 161.585938 312.355469 153.746094 312.355469 145.09375 C 312.355469 127.851562 326.359375 113.855469 343.613281 113.855469 C 360.863281 113.855469 374.871094 127.851562 374.871094 145.09375 C 374.871094 162.332031 360.863281 176.328125 343.613281 176.328125 C 341.410156 176.328125 339.261719 176.097656 337.191406 175.667969 Z"/></svg></div>
+            <div class="card-name">PRO+</div>
+            <div class="card-price card-price-pro-plus">$49.99</div>
+            <div class="card-period">one-time</div>
+            <div class="card-features">
+              <div class="card-feature card-feature-pro-plus"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>100,000 words</div>
+              <div class="card-feature card-feature-pro-plus"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>All Features</div>
+              <div class="card-feature card-feature-pro-plus"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>AI Workspace</div>
+              <div class="card-feature card-feature-pro-plus"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Priority Support</div>
+            </div>
+          </div>
+          <div class="pricing-card pricing-card-ultimate">
+            <div class="card-crown"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%"><path fill="#fde68a" d="M 302.867188 315.730469 C 301.882812 320.710938 297.511719 324.304688 292.433594 324.304688 C 256.292969 324.304688 118.757812 324.304688 82.621094 324.304688 C 77.542969 324.304688 73.171875 320.710938 72.183594 315.730469 C 67.65625 292.820312 55.152344 229.554688 48.25 194.628906 C 47.429688 190.476562 49.148438 186.234375 52.625 183.824219 C 56.101562 181.414062 60.675781 181.292969 64.277344 183.515625 C 81.847656 194.375 106.222656 209.4375 119.433594 217.601562 C 121.894531 219.125 124.875 219.578125 127.679688 218.855469 C 130.480469 218.132812 132.871094 216.296875 134.292969 213.777344 C 144.328125 195.953125 165.875 157.707031 178.257812 135.722656 C 180.144531 132.375 183.6875 130.304688 187.527344 130.304688 C 191.367188 130.304688 194.910156 132.375 196.792969 135.722656 C 209.175781 157.707031 230.722656 195.953125 240.761719 213.777344 C 242.183594 216.296875 244.570312 218.132812 247.375 218.855469 C 250.179688 219.578125 253.15625 219.125 255.621094 217.601562 C 268.832031 209.4375 293.203125 194.375 310.777344 183.515625 C 314.375 181.292969 318.949219 181.414062 322.429688 183.824219 C 325.90625 186.234375 327.625 190.476562 326.804688 194.628906 C 319.898438 229.554688 307.394531 292.820312 302.867188 315.730469 Z M 26.796875 112.542969 C 41.535156 112.542969 53.496094 124.507812 53.496094 139.242188 C 53.496094 153.980469 41.535156 165.941406 26.796875 165.941406 C 12.0625 165.941406 0.0976562 153.980469 0.0976562 139.242188 C 0.0976562 124.507812 12.0625 112.542969 26.796875 112.542969 Z M 348.253906 112.542969 C 362.992188 112.542969 374.957031 124.507812 374.957031 139.242188 C 374.957031 153.980469 362.992188 165.941406 348.253906 165.941406 C 333.519531 165.941406 321.554688 153.980469 321.554688 139.242188 C 321.554688 124.507812 333.519531 112.542969 348.253906 112.542969 Z M 187.527344 50.597656 C 202.261719 50.597656 214.226562 62.558594 214.226562 77.296875 C 214.226562 92.03125 202.261719 103.996094 187.527344 103.996094 C 172.789062 103.996094 160.828125 92.03125 160.828125 77.296875 C 160.828125 62.558594 172.789062 50.597656 187.527344 50.597656 Z"/></svg></div>
+            <div class="card-name">ULTIMATE</div>
+            <div class="card-price card-price-ultimate">$149.99</div>
+            <div class="card-period">one-time</div>
+            <div class="card-features">
+              <div class="card-feature card-feature-ultimate"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Unlimited words</div>
+              <div class="card-feature card-feature-ultimate"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Everything in Pro+</div>
+              <div class="card-feature card-feature-ultimate"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>API Access</div>
+              <div class="card-feature card-feature-ultimate"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>White Label</div>
+              <div class="card-feature card-feature-ultimate"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Dedicated Support</div>
+            </div>
+          </div>
+        </div>
+        <div class="url-badge" style="bottom: 50px;">graphosai.com</div>
+      </div>
+    </div>
+
+    <!-- 14. PRICING HERO - Visual Only -->
+    <div class="og-wrapper">
+      <span class="og-label">pricing-hero.png (1600×1200) - VISUAL PROMO</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('pricing-hero', 'pricing-hero.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+        <button class="btn-download secondary" onclick="downloadCard('pricing-hero', 'pricing-hero.jpg')">JPG</button>
+        <button class="btn-download secondary" onclick="downloadCardSVG('pricing-hero', 'pricing-hero.svg')">SVG</button>
+      </div>
+      <div class="og-card pricing-hero" id="pricing-hero">
+        <div class="pricing-hero-glow"></div>
+        <div class="hero-sparkles">
+          <div class="sparkle" style="top:15%;left:10%;animation-delay:0s;"></div>
+          <div class="sparkle" style="top:25%;left:20%;animation-delay:0.3s;"></div>
+          <div class="sparkle" style="top:10%;left:35%;animation-delay:0.6s;"></div>
+          <div class="sparkle" style="top:20%;left:50%;animation-delay:0.9s;"></div>
+          <div class="sparkle" style="top:15%;left:65%;animation-delay:1.2s;"></div>
+          <div class="sparkle" style="top:25%;left:80%;animation-delay:1.5s;"></div>
+          <div class="sparkle" style="top:10%;left:90%;animation-delay:1.8s;"></div>
+          <div class="sparkle" style="top:70%;left:15%;animation-delay:0.2s;"></div>
+          <div class="sparkle" style="top:80%;left:30%;animation-delay:0.5s;"></div>
+          <div class="sparkle" style="top:75%;left:45%;animation-delay:0.8s;"></div>
+          <div class="sparkle" style="top:85%;left:60%;animation-delay:1.1s;"></div>
+          <div class="sparkle" style="top:70%;left:75%;animation-delay:1.4s;"></div>
+          <div class="sparkle" style="top:80%;left:88%;animation-delay:1.7s;"></div>
+        </div>
+        <div class="logo" style="top:50px;left:50%;transform:translateX(-50%);position:absolute;">
+          <div class="logo-icon" style="border-radius:20px;overflow:hidden;width:80px;height:80px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/></svg>
+          </div>
+        </div>
+        <div class="hero-crowns">
+          <div class="hero-crown hero-crown-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375"><path fill="#5eead4" d="M 362.4375 286.050781 C 361.84375 293.265625 355.8125 298.820312 348.566406 298.820312 C 293.941406 298.820312 80.992188 298.820312 26.371094 298.820312 C 19.121094 298.820312 13.089844 293.265625 12.5 286.050781 C 10.09375 256.6875 4.109375 183.652344 0.648438 141.40625 C 0.199219 135.910156 3.042969 130.664062 7.902344 128.042969 C 12.757812 125.417969 18.710938 125.910156 23.066406 129.300781 C 47.730469 148.476562 84.152344 176.789062 101.277344 190.105469 C 103.671875 191.96875 106.765625 192.695312 109.742188 192.097656 C 112.722656 191.5 115.289062 189.636719 116.78125 186.992188 C 129.316406 164.757812 158.671875 112.695312 175.339844 83.128906 C 177.808594 78.753906 182.441406 76.050781 187.46875 76.050781 C 192.492188 76.050781 197.128906 78.753906 199.59375 83.128906 C 216.261719 112.695312 245.617188 164.757812 258.152344 186.992188 C 259.644531 189.636719 262.214844 191.5 265.191406 192.097656 C 268.171875 192.695312 271.261719 191.96875 273.65625 190.105469 C 290.785156 176.789062 327.203125 148.476562 351.867188 129.300781 C 356.226562 125.910156 362.175781 125.417969 367.035156 128.042969 C 371.890625 130.664062 374.734375 135.910156 374.285156 141.40625 C 370.824219 183.652344 364.84375 256.6875 362.4375 286.050781 Z"/></svg></div>
+          <div class="hero-crown hero-crown-pro"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375"><path fill="#c4b5fd" d="M 351.765625 260.199219 L 23.1875 260.199219 C 23.1875 260.199219 9.050781 177.574219 0.96875 130.363281 C -0.03125 124.515625 2.433594 118.613281 7.296875 115.21875 C 12.160156 111.824219 18.546875 111.546875 23.6875 114.503906 C 45.90625 127.296875 75.835938 144.53125 92.554688 154.15625 C 99.636719 158.238281 108.671875 156.027344 113.078125 149.136719 C 127.285156 126.917969 157.339844 79.910156 174.585938 52.9375 C 177.398438 48.535156 182.257812 45.875 187.476562 45.875 C 192.695312 45.875 197.554688 48.535156 200.367188 52.9375 C 217.613281 79.910156 247.667969 126.917969 261.875 149.136719 C 266.28125 156.027344 275.316406 158.238281 282.398438 154.15625 C 299.121094 144.53125 329.046875 127.296875 351.269531 114.503906 C 356.40625 111.546875 362.792969 111.824219 367.65625 115.21875 C 372.519531 118.613281 374.984375 124.515625 373.984375 130.363281 C 365.90625 177.574219 351.765625 260.199219 351.765625 260.199219 Z M 351.765625 287.097656 L 351.765625 314.058594 C 351.765625 322.515625 344.914062 329.371094 336.460938 329.371094 C 281.378906 329.371094 93.574219 329.371094 38.492188 329.371094 C 30.039062 329.371094 23.1875 322.515625 23.1875 314.058594 C 23.1875 301.957031 23.1875 287.097656 23.1875 287.097656 Z"/></svg></div>
+          <div class="hero-crown hero-crown-pro-plus"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375"><path fill="#fbcfe8" d="M 337.191406 175.667969 C 337.191406 175.667969 317.589844 274.761719 310.984375 308.160156 C 309.738281 314.460938 304.207031 319 297.78125 319 C 257.332031 319 117.652344 319 77.203125 319 C 70.777344 319 65.25 314.460938 64.003906 308.160156 C 57.398438 274.761719 37.796875 175.667969 37.796875 175.667969 C 35.722656 176.097656 33.574219 176.328125 31.375 176.328125 C 14.125 176.328125 0.117188 162.332031 0.117188 145.09375 C 0.117188 127.851562 14.125 113.855469 31.375 113.855469 C 48.625 113.855469 62.632812 127.851562 62.632812 145.09375 C 62.632812 153.746094 59.101562 161.585938 53.402344 167.242188 C 53.402344 167.242188 92.597656 191.449219 112.925781 204.003906 C 116.042969 205.929688 119.808594 206.5 123.359375 205.585938 C 126.90625 204.671875 129.925781 202.355469 131.722656 199.164062 C 146.128906 173.613281 178.140625 116.824219 178.140625 116.824219 C 165.453125 112.847656 156.234375 100.996094 156.234375 87.011719 C 156.234375 69.773438 170.242188 55.777344 187.492188 55.777344 C 204.746094 55.777344 218.75 69.773438 218.75 87.011719 C 218.75 100.996094 209.535156 112.847656 196.847656 116.824219 C 196.847656 116.824219 228.859375 173.613281 243.261719 199.164062 C 245.058594 202.355469 248.082031 204.671875 251.628906 205.585938 C 255.175781 206.5 258.945312 205.929688 262.058594 204.003906 C 282.386719 191.449219 321.585938 167.242188 321.585938 167.242188 C 315.886719 161.585938 312.355469 153.746094 312.355469 145.09375 C 312.355469 127.851562 326.359375 113.855469 343.613281 113.855469 C 360.863281 113.855469 374.871094 127.851562 374.871094 145.09375 C 374.871094 162.332031 360.863281 176.328125 343.613281 176.328125 C 341.410156 176.328125 339.261719 176.097656 337.191406 175.667969 Z"/></svg></div>
+          <div class="hero-crown hero-crown-ultimate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375"><path fill="#fde68a" d="M 302.867188 315.730469 C 301.882812 320.710938 297.511719 324.304688 292.433594 324.304688 C 256.292969 324.304688 118.757812 324.304688 82.621094 324.304688 C 77.542969 324.304688 73.171875 320.710938 72.183594 315.730469 C 67.65625 292.820312 55.152344 229.554688 48.25 194.628906 C 47.429688 190.476562 49.148438 186.234375 52.625 183.824219 C 56.101562 181.414062 60.675781 181.292969 64.277344 183.515625 C 81.847656 194.375 106.222656 209.4375 119.433594 217.601562 C 121.894531 219.125 124.875 219.578125 127.679688 218.855469 C 130.480469 218.132812 132.871094 216.296875 134.292969 213.777344 C 144.328125 195.953125 165.875 157.707031 178.257812 135.722656 C 180.144531 132.375 183.6875 130.304688 187.527344 130.304688 C 191.367188 130.304688 194.910156 132.375 196.792969 135.722656 C 209.175781 157.707031 230.722656 195.953125 240.761719 213.777344 C 242.183594 216.296875 244.570312 218.132812 247.375 218.855469 C 250.179688 219.578125 253.15625 219.125 255.621094 217.601562 C 268.832031 209.4375 293.203125 194.375 310.777344 183.515625 C 314.375 181.292969 318.949219 181.414062 322.429688 183.824219 C 325.90625 186.234375 327.625 190.476562 326.804688 194.628906 C 319.898438 229.554688 307.394531 292.820312 302.867188 315.730469 Z M 26.796875 112.542969 C 41.535156 112.542969 53.496094 124.507812 53.496094 139.242188 C 53.496094 153.980469 41.535156 165.941406 26.796875 165.941406 C 12.0625 165.941406 0.0976562 153.980469 0.0976562 139.242188 C 0.0976562 124.507812 12.0625 112.542969 26.796875 112.542969 Z M 348.253906 112.542969 C 362.992188 112.542969 374.957031 124.507812 374.957031 139.242188 C 374.957031 153.980469 362.992188 165.941406 348.253906 165.941406 C 333.519531 165.941406 321.554688 153.980469 321.554688 139.242188 C 321.554688 124.507812 333.519531 112.542969 348.253906 112.542969 Z M 187.527344 50.597656 C 202.261719 50.597656 214.226562 62.558594 214.226562 77.296875 C 214.226562 92.03125 202.261719 103.996094 187.527344 103.996094 C 172.789062 103.996094 160.828125 92.03125 160.828125 77.296875 C 160.828125 62.558594 172.789062 50.597656 187.527344 50.597656 Z"/></svg></div>
+        </div>
+      </div>
+    </div>
     
   </div>
   
-  <!-- html-to-image - best CSS support for modern browsers -->
+  <!-- html-to-image - best CSS support for modern browsers -->""
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
   
   <script>
     const OG_WIDTH = 1200;
     const OG_HEIGHT = 630;
+    
+    // Pricing cards use different size
+    const PRICING_WIDTH = 1600;
+    const PRICING_HEIGHT = 1200;
+    const pricingCards = ['pricing-basic', 'pricing-pro', 'pricing-pro-plus', 'pricing-ultimate', 'pricing-overview', 'pricing-hero'];
     
     // Download single card using html-to-image
     async function downloadCard(cardId, filename) {
@@ -684,6 +1232,10 @@
         return;
       }
       
+      const isPricing = pricingCards.includes(cardId);
+      const width = isPricing ? PRICING_WIDTH : OG_WIDTH;
+      const height = isPricing ? PRICING_HEIGHT : OG_HEIGHT;
+      
       const btn = event.target.closest('button');
       const originalText = btn.innerHTML;
       btn.innerHTML = '<span style="display:flex;align-items:center;gap:6px;">⏳ Generating...</span>';
@@ -691,8 +1243,8 @@
       
       try {
         const dataUrl = await htmlToImage.toPng(card, {
-          width: OG_WIDTH,
-          height: OG_HEIGHT,
+          width: width,
+          height: height,
           pixelRatio: 2,
           skipAutoScale: true,
           cacheBust: true,
@@ -712,6 +1264,26 @@
         btn.innerHTML = '<span style="display:flex;align-items:center;gap:6px;">❌ Failed</span>';
         setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
       }
+    }
+    
+    // Download as SVG
+    async function downloadCardSVG(cardId, filename) {
+      const card = document.getElementById(cardId);
+      if (!card) { alert('Card not found: ' + cardId); return; }
+      
+      const isPricing = pricingCards.includes(cardId);
+      const width = isPricing ? PRICING_WIDTH : OG_WIDTH;
+      const height = isPricing ? PRICING_HEIGHT : OG_HEIGHT;
+      
+      try {
+        const svgData = await htmlToImage.toSvg(card, {
+          width: width, height: height, pixelRatio: 2
+        });
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = svgData;
+        link.click();
+      } catch (err) { console.error('SVG download failed:', err); }
     }
     
     // Download all cards - filenames match SEO config in PageSEO.jsx

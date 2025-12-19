@@ -1993,11 +1993,13 @@
 }
 
 .notification-modal-icon.question img {
-  opacity: 0.7;
+  filter: none;
+  opacity: 0.6;
 }
 
 .dark .notification-modal-icon.question img {
   filter: invert(1) brightness(2);
+  opacity: 0.8;
 }
 
 .notification-modal-header-text {

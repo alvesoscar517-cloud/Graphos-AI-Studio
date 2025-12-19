@@ -183,7 +183,7 @@ const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile, loading }) =
       ) : profiles.length === 0 ? (
         <EmptyProfileCard />
       ) : (
-        <div className="relative overflow-visible">
+        <div className="relative overflow-hidden">
           <div 
             className={cn(
               "flex gap-5 will-change-transform pb-2",

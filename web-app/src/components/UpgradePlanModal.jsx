@@ -217,7 +217,11 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
         {/* Error Banner */}
         {createCheckout.error && (
           <div className="flex items-center gap-2.5 py-3 px-6 mx-6 bg-red-400/10 rounded-lg">
-            <img src="/icon/alert-circle.svg" alt="" className="w-4 h-4 shrink-0" />
+            <svg className="w-4 h-4 shrink-0 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
             <span className="flex-1 text-sm text-red-400 font-medium">{createCheckout.error.message}</span>
             <button 
               className="bg-transparent border-none w-6 h-6 rounded flex items-center justify-center cursor-pointer opacity-60 hover:opacity-100"
@@ -225,7 +229,10 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
               data-tooltip={t('common.close')}
               data-tooltip-position="left"
             >
-              <img src="/icon/x.svg" alt="" className="w-3.5 h-3.5" />
+              <svg className="w-3.5 h-3.5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
           </div>
         )}
@@ -234,12 +241,12 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
         {isFirstPurchaseEligible && (
           <div className="mx-6 mb-2 p-3 bg-bg-secondary rounded-xl">
             <div className="flex items-center justify-center gap-2.5">
-              <img src="/icon/party-popper.svg" alt="" className="w-5 h-5 shrink-0" style={{ filter: 'brightness(0) saturate(100%) invert(69%) sepia(61%) saturate(2000%) hue-rotate(10deg) brightness(100%) contrast(96%)' }} />
+              <img src="/icon/gift-banner.svg" alt="" className="w-5 h-5 shrink-0" />
               <div className="text-center">
                 <span className="text-sm font-bold text-amber-500">{t('billing.firstPurchaseTitle', 'WELCOME OFFER')}</span>
                 <span className="text-sm font-medium text-amber-500 ml-2">{t('billing.firstPurchaseDesc', 'Double credits on your first purchase!')}</span>
               </div>
-              <img src="/icon/gift.svg" alt="" className="w-5 h-5 shrink-0" style={{ filter: 'brightness(0) saturate(100%) invert(69%) sepia(61%) saturate(2000%) hue-rotate(10deg) brightness(100%) contrast(96%)' }} />
+              <img src="/icon/gift-banner.svg" alt="" className="w-5 h-5 shrink-0" />
             </div>
           </div>
         )}
@@ -267,11 +274,11 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                     {/* First Purchase x2 Badge */}
                     {isFirstPurchaseEligible && (
                       <img 
-                        src="/icon/x2-badge.svg" 
+                        src="/icon/x2-credits.svg" 
                         alt="x2" 
                         className={cn(
-                          "absolute -top-3.5 -right-3 w-9 h-9 drop-shadow-md",
-                          "max-sm:static max-sm:order-[-1] max-sm:w-8 max-sm:h-8"
+                          "absolute -top-3 right-0 w-10 h-10 drop-shadow-md",
+                          "max-sm:static max-sm:order-[-1] max-sm:w-9 max-sm:h-9"
                         )}
                       />
                     )}

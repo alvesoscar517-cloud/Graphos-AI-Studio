@@ -143,6 +143,63 @@ export const WorkspaceProvider = ({ children }) => {
     }
   }, [user])
 
+  // Auto-sync with Google Drive when user signs in with Google or has Google linked
+  useEffect(() => {
+    const handleAuthSignIn = async (event) => {
+      const { hasGoogleLinked, authMethod, isNewUser } = event.detail || {}
+      
+      // Only auto-sync if user has Google access (Google auth or linked Google)
+      if (!hasGoogleLinked && authMethod !== 'google') {
+        return
+      }
+      
+      // Skip sync for brand new users (nothing to sync yet)
+      if (isNewUser) {
+        logger.log('[SYNC] New user, skipping initial Drive sync')
+        return
+      }
+      
+      logger.log('[SYNC] User signed in with Google access, starting auto-sync...')
+      
+      // Small delay to ensure auth is fully set up
+      setTimeout(async () => {
+        try {
+          const { loadConversationsFromDrive } = await import('../services/drive')
+          const driveConversations = await loadConversationsFromDrive()
+          
+          if (driveConversations && driveConversations.length > 0) {
+            // Merge with local conversations
+            setConversations(prev => {
+              const localIds = new Set(prev.map(c => c.id))
+              const newFromDrive = driveConversations.filter(c => !localIds.has(c.id))
+              
+              // Update existing if Drive version is newer
+              const merged = prev.map(local => {
+                const driveVersion = driveConversations.find(d => d.id === local.id)
+                if (driveVersion && new Date(driveVersion.updated) > new Date(local.updated)) {
+                  return { ...driveVersion, driveId: driveVersion.driveId }
+                }
+                return local
+              })
+              
+              const all = [...merged, ...newFromDrive]
+                .sort((a, b) => new Date(b.updated) - new Date(a.updated))
+              
+              logger.log(`[SYNC] Auto-synced: ${driveConversations.length} from Drive, ${newFromDrive.length} new`)
+              return all
+            })
+          }
+        } catch (error) {
+          // Silent fail for auto-sync - don't interrupt user experience
+          logger.log('[SYNC] Auto-sync failed (will retry on manual sync):', error.message)
+        }
+      }, 1500)
+    }
+    
+    window.addEventListener('auth-signin', handleAuthSignIn)
+    return () => window.removeEventListener('auth-signin', handleAuthSignIn)
+  }, [])
+
   // Save ref to track last saved state (avoid unnecessary writes)
   const lastSavedRef = useRef(null)
 

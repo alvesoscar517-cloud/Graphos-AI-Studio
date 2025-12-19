@@ -551,6 +551,11 @@ export function clearAuthStorage() {
     clearStorageData(sessionStorage)
   }
   
+  // Clear Zustand persist storage from chrome.storage.local (for Chrome Extension)
+  if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+    chrome.storage.local.remove(['auth-storage', 'userInfo', 'accessToken', 'driveFolderId', 'conversationsFolderId']).catch(() => {})
+  }
+  
   // Clear storage cache
   storageCache = {}
 

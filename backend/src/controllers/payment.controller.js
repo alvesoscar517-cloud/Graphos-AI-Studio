@@ -7,7 +7,7 @@
 const { db, FieldValue } = require('../config/firebase');
 const lemonSqueezy = require('../services/lemonsqueezy.service');
 const creditService = require('../services/credit.service');
-const { CREDIT_PACKAGES, getPackageByVariantId, getPackageByPrice } = require('../config/pricing');
+const { CREDIT_PACKAGES, getCreditPackages, getPackageByVariantId, getPackageByPrice } = require('../config/pricing');
 const logger = require('../utils/logger');
 const realtimeController = require('./realtime.controller');
 const autoNotification = require('../services/autoNotification.service');
@@ -217,9 +217,10 @@ async function handleOrderCreated(data, customData) {
   
   // Try to find package: 1) from custom_data, 2) from variant ID, 3) from price
   let foundPkg = null;
+  const currentPackages = getCreditPackages();
   
-  if (packageId && CREDIT_PACKAGES[packageId]) {
-    foundPkg = { packageId, ...CREDIT_PACKAGES[packageId] };
+  if (packageId && currentPackages[packageId]) {
+    foundPkg = { packageId, ...currentPackages[packageId] };
     logger.info('Package found from custom_data', { packageId });
   } else if (variantId) {
     foundPkg = getPackageByVariantId(variantId);
@@ -556,8 +557,9 @@ async function handlePaymentSuccess(data, customData) {
   });
 
   // Add recurring credits if subscription
-  if (userId && packageId && CREDIT_PACKAGES[packageId]) {
-    const pkg = CREDIT_PACKAGES[packageId];
+  const subscriptionPackages = getCreditPackages();
+  if (userId && packageId && subscriptionPackages[packageId]) {
+    const pkg = subscriptionPackages[packageId];
     const totalCredits = pkg.credits + pkg.bonus;
     
     await creditService.addCredits(userId, totalCredits, 'subscription_renewal', {

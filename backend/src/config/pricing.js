@@ -436,6 +436,7 @@ module.exports = {
   MODEL_COSTS,
   FEATURE_COSTS,
   CREDIT_PACKAGES,
+  getCreditPackages,
   calculateFeatureCost,
   calculateOutputCost,
   getFeaturePricingInfo,

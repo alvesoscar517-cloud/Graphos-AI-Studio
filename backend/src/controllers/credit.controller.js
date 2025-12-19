@@ -4,7 +4,7 @@
  */
 
 const { db } = require('../config/firebase');
-const { CREDIT_PACKAGES } = require('../config/pricing');
+const { CREDIT_PACKAGES, getCreditPackages } = require('../config/pricing');
 const creditService = require('../services/credit.service');
 const logger = require('../utils/logger');
 const { createLocalizer } = require('../utils/localized-messages.util');
@@ -35,7 +35,8 @@ exports.getCreditPackages = async (req, res) => {
       isFirstPurchaseEligible = ordersSnapshot.empty;
     }
     
-    const packages = Object.entries(CREDIT_PACKAGES).map(([key, pkg]) => {
+    // Use getCreditPackages() to get latest config from Firestore
+    const packages = Object.entries(getCreditPackages()).map(([key, pkg]) => {
       const baseTotal = pkg.credits + pkg.bonus;
       // First purchase: Double the credits (x2)
       const firstPurchaseBonus = isFirstPurchaseEligible ? baseTotal : 0;
@@ -79,7 +80,7 @@ exports.purchaseCreditPackage = async (req, res) => {
       return res.status(400).json({ success: false, ...l.error('invalid_input') });
     }
     
-    const pkg = CREDIT_PACKAGES[package_id];
+    const pkg = getCreditPackages()[package_id];
     
     if (!pkg) {
       return res.status(400).json({ success: false, ...l.error('invalid_input'), details: 'Invalid package_id' });

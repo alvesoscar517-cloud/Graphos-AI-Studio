@@ -169,12 +169,45 @@ async function signInWithGoogle() {
   }
 }
 
-// Handle sign out (only clear storage, keep token cache)
+// Handle sign out (clear storage and revoke token)
 async function signOut() {
   try {
     console.log('[DOOR] Starting sign out...');
     
-    // Clear storage only, keep token cached for quick re-login
+    const result = await chrome.storage.local.get(['accessToken']);
+    
+    // Remove cached token to force account picker on next login
+    if (result.accessToken && typeof result.accessToken === 'string') {
+      try {
+        await chrome.identity.removeCachedAuthToken({ 
+          token: result.accessToken 
+        });
+        console.log('[SUCCESS] Token removed from cache');
+      } catch (tokenError) {
+        console.warn('[WARNING] Could not remove token:', tokenError);
+      }
+      
+      // Revoke token from Google to fully sign out
+      try {
+        await fetch(`https://accounts.google.com/o/oauth2/revoke?token=${result.accessToken}`);
+        console.log('[SUCCESS] Token revoked from Google');
+      } catch (revokeError) {
+        console.warn('[WARNING] Could not revoke token:', revokeError);
+      }
+    }
+    
+    // Clear any other cached tokens
+    try {
+      const allTokens = await chrome.identity.getAuthToken({ interactive: false });
+      const tokenStr = typeof allTokens === 'string' ? allTokens : allTokens?.token;
+      if (tokenStr) {
+        await chrome.identity.removeCachedAuthToken({ token: tokenStr });
+      }
+    } catch (e) {
+      // Ignore - no additional tokens
+    }
+    
+    // Clear storage
     await chrome.storage.local.remove(['userInfo', 'accessToken']);
     console.log('[SUCCESS] Sign out complete');
     
