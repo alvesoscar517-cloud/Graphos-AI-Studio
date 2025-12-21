@@ -106,18 +106,10 @@ function Home() {
     language: currentLang
   }), [t, currentLang])
 
-  // Software Application structured data
+  // Software Application structured data (no aggregateRating - already in index.html)
   const softwareData = useMemo(() => ({
     name: 'Graphos AI Studio',
-    description: t('home.meta.description'),
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      ratingCount: '1250',
-      bestRating: '5',
-      worstRating: '1',
-      reviewCount: '890'
-    }
+    description: t('home.meta.description')
   }), [t])
 
   // WebPage structured data

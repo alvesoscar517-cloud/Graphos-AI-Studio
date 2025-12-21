@@ -77,6 +77,7 @@ router.post('/send-feedback', optionalAuth, async (req, res) => {
     try {
       const nodemailer = require('nodemailer');
       const { newTicketEmail } = require('../services/emailTemplate.service');
+      const { generateCidAttachments } = require('../utils/emailCid');
       
       // Use SMTP config from Firestore > config > defaults
       const smtpHost = envConfig.get('SMTP_HOST') || config.SMTP_HOST || 'smtp.gmail.com';
@@ -106,7 +107,10 @@ router.post('/send-feedback', optionalAuth, async (req, res) => {
         adminPanelUrl: config.ADMIN_PANEL_URL || 'https://admin.graphosai.com'
       });
 
-      const attachments = [];
+      // Generate CID attachments for embedded images
+      const cidAttachments = generateCidAttachments(htmlContent);
+      
+      const attachments = [...cidAttachments];
       if (images && images.length > 0) {
         images.forEach((imageData, index) => {
           const matches = imageData.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);

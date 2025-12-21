@@ -208,7 +208,7 @@ function FeaturesSection() {
               </div>
             </div>
             <motion.a
-              href="https://chrome.google.com/webstore"
+              href="https://chromewebstore.google.com/detail/nedkeccobejcenjdkegndfejblbjplol"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.02, y: -1 }}

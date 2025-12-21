@@ -153,7 +153,7 @@ const ORGANIZATION_SCHEMA = {
   ]
 }
 
-// WebApplication Schema
+// WebApplication Schema (no aggregateRating - already in SoftwareApplication)
 const WEB_APP_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
@@ -169,13 +169,6 @@ const WEB_APP_SCHEMA = {
     '@type': 'Offer',
     price: '0',
     priceCurrency: 'USD'
-  },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.9',
-    ratingCount: '2850',
-    bestRating: '5',
-    worstRating: '1'
   }
 }
 

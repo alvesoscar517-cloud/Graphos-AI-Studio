@@ -151,6 +151,7 @@ exports.replyToTicket = async (req, res) => {
         const nodemailer = require('nodemailer');
         const config = require('../config');
         const { supportReplyEmail } = require('../services/emailTemplate.service');
+        const { generateCidAttachments } = require('../utils/emailCid');
         
         // Use new SMTP config with fallback to legacy (Firestore > config > process.env)
         const smtpUser = envConfig.get('SMTP_USER') || config.SMTP_USER;
@@ -195,12 +196,16 @@ exports.replyToTicket = async (req, res) => {
           lang: userLang
         });
         
+        // Generate CID attachments for embedded images
+        const cidAttachments = generateCidAttachments(htmlContent);
+        
         await transporter.sendMail({
           from: `"${fromName}" <${supportEmail}>`,
           replyTo: supportEmail,
           to: ticket.userEmail,
           subject: `Re: ${ticket.title} - #${id.substring(0, 8)}`,
-          html: htmlContent
+          html: htmlContent,
+          attachments: cidAttachments
         });
         
         logger.info(`[SUCCESS] Email sent to ${ticket.userEmail} (lang: ${userLang})`);

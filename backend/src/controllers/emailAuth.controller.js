@@ -5,6 +5,7 @@
 
 const emailAuthService = require('../services/emailAuth.service');
 const { otpVerificationEmail, passwordResetEmail, newDeviceLoginEmail, passwordChangedEmail } = require('../services/emailTemplate.service');
+const { generateCidAttachments } = require('../utils/emailCid');
 const { createLocalizer } = require('../utils/localized-messages.util');
 const logger = require('../utils/logger');
 const nodemailer = require('nodemailer');
@@ -112,11 +113,15 @@ async function sendOTPEmail(email, code, type, userName, locale) {
   
   try {
     const smtp = getSmtpConfig();
+    // Generate CID attachments for embedded images
+    const cidAttachments = generateCidAttachments(html);
+    
     const result = await getTransporter().sendMail({
       from: `"${smtp.fromName}" <${smtp.fromEmail}>`,
       to: email,
       subject,
-      html
+      html,
+      attachments: cidAttachments
     });
     
     logger.info('OTP email sent successfully', { 
@@ -338,11 +343,14 @@ exports.login = async (req, res) => {
         });
         
         const smtp = getSmtpConfig();
+        const cidAttachments = generateCidAttachments(html);
+        
         await getTransporter().sendMail({
           from: `"${smtp.fromName}" <${smtp.fromEmail}>`,
           to: email,
           subject: 'New Device Login - Graphos AI Studio',
-          html
+          html,
+          attachments: cidAttachments
         });
         
         logger.info('New device login email sent', { email });
@@ -718,11 +726,14 @@ exports.changePassword = async (req, res) => {
         });
         
         const smtp = getSmtpConfig();
+        const cidAttachments = generateCidAttachments(html);
+        
         await getTransporter().sendMail({
           from: `"${smtp.fromName}" <${smtp.fromEmail}>`,
           to: req.user.email,
           subject: 'Password Changed - Graphos AI Studio',
-          html
+          html,
+          attachments: cidAttachments
         });
         
         logger.info('Password changed email sent', { userId });

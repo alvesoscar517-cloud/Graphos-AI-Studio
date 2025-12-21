@@ -108,7 +108,7 @@ function CTASection() {
                 <Icon name="arrow-right" size="md" color="primary" className="group-hover:translate-x-0.5 transition-transform" />
               </motion.a>
               <motion.a
-                href="https://chrome.google.com/webstore"
+                href="https://chromewebstore.google.com/detail/nedkeccobejcenjdkegndfejblbjplol"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.02, y: -1 }}

@@ -9,6 +9,7 @@ const nodemailer = require('nodemailer');
 const config = require('../config');
 const envConfig = require('../config/envConfigHelper');
 const logger = require('../utils/logger');
+const { generateCidAttachments } = require('../utils/emailCid');
 const { 
   otpVerificationEmail, 
   passwordResetEmail, 
@@ -93,17 +94,18 @@ function refreshTransporter() {
 // ============================================================================
 
 /**
- * Send email with retry logic
+ * Send email with retry logic and CID attachments
  * 
  * @param {Object} options
  * @param {string} options.to - Recipient email
  * @param {string} options.subject - Email subject
  * @param {string} options.html - HTML content
  * @param {string} [options.text] - Plain text content
+ * @param {Array} [options.attachments] - Additional attachments
  * @param {number} [options.retries=2] - Number of retries
  * @returns {Promise<{success: boolean, messageId?: string, error?: string}>}
  */
-async function sendEmail({ to, subject, html, text, retries = 2 }) {
+async function sendEmail({ to, subject, html, text, attachments = [], retries = 2 }) {
   const smtp = getSmtpConfig();
   const transport = getTransporter();
   
@@ -112,12 +114,16 @@ async function sendEmail({ to, subject, html, text, retries = 2 }) {
     return { success: false, error: 'SMTP not configured' };
   }
   
+  // Generate CID attachments from HTML content
+  const cidAttachments = generateCidAttachments(html);
+  
   const mailOptions = {
     from: `"${smtp.fromName}" <${smtp.fromEmail}>`,
     to,
     subject,
     html,
-    text: text || html.replace(/<[^>]*>/g, '') // Strip HTML for plain text
+    text: text || html.replace(/<[^>]*>/g, ''), // Strip HTML for plain text
+    attachments: [...cidAttachments, ...attachments] // Combine CID and custom attachments
   };
   
   let lastError = null;

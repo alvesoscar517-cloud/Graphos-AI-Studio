@@ -126,14 +126,7 @@ function generateSoftwareApplicationSchema(data = {}) {
       priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       seller: { '@id': `${BASE_CONFIG.siteUrl}/#organization` }
     },
-    aggregateRating: data.aggregateRating || {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      ratingCount: '1250',
-      bestRating: '5',
-      worstRating: '1',
-      reviewCount: '890'
-    },
+    aggregateRating: data.aggregateRating,
     ...data
   }
 }

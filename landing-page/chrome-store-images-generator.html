@@ -1,0 +1,3437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chrome Web Store Images Generator - Graphos AI Studio</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: white;
+      padding: 40px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; font-size: 28px; color: #94a3b8; }
+    .instructions { 
+      text-align: center; margin-bottom: 40px; color: #64748b; font-size: 14px; line-height: 1.8;
+      max-width: 800px; margin-left: auto; margin-right: auto;
+    }
+    .size-info { 
+      background: rgba(139, 92, 246, 0.1); 
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px; 
+      padding: 20px; 
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .size-info h3 { color: #a78bfa; margin-bottom: 12px; font-size: 16px; }
+    .size-info ul { list-style: none; }
+    .size-info li { 
+      padding: 8px 0; 
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-between;
+    }
+    .size-info li:last-child { border-bottom: none; }
+    .size-info .label { color: #94a3b8; }
+    .size-info .value { color: #22d3ee; font-weight: 600; }
+    
+    .og-container { display: flex; flex-direction: column; gap: 60px; align-items: center; }
+    .og-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .og-label { font-size: 14px; color: #94a3b8; font-weight: 500; }
+    .og-actions { display: flex; gap: 12px; margin-top: 8px; }
+    .btn-download {
+      padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer;
+      font-size: 13px; font-weight: 600; transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-download.primary { background: #8b5cf6; color: white; }
+    .btn-download.primary:hover { background: #7c3aed; }
+    .btn-download-all {
+      margin-bottom: 30px; padding: 14px 28px; border-radius: 12px;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white;
+      border: none; cursor: pointer; font-size: 16px; font-weight: 700;
+      display: flex; align-items: center; gap: 10px; transition: all 0.2s;
+    }
+    .btn-download-all:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); }
+    
+    .section-title {
+      font-size: 20px;
+      color: #e2e8f0;
+      margin: 40px 0 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+      width: 100%;
+      max-width: 1400px;
+      text-align: center;
+    }
+    
+    /* ============================================== */
+    /* SCREENSHOT CARDS - 1280x800 */
+    /* ============================================== */
+    
+    .screenshot-card {
+      width: 1280px; height: 800px;
+      overflow: hidden; position: relative;
+      display: flex; flex-direction: column;
+      background: #f8fafc;
+    }
+    
+    /* Marketing + Demo Layout */
+    .screenshot-marketing {
+      background: transparent;
+    }
+    
+    .marketing-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    
+    .ai-detection-bg {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #1e40af 70%, #0f172a 100%);
+    }
+    
+    .marketing-glow {
+      position: absolute;
+      top: 50%;
+      left: 30%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    
+    .ai-detection-glow {
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.1) 40%, transparent 70%);
+    }
+    
+    /* Radar Background SVG */
+    .radar-bg {
+      position: absolute;
+      top: 50%;
+      left: 25%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 700px;
+      opacity: 0.8;
+    }
+    
+    /* ============================================== */
+    /* SCREENSHOT 2 - HUMANIZATION STYLES */
+    /* ============================================== */
+    
+    .humanization-bg {
+      background: linear-gradient(135deg, #1c1917 0%, #451a03 40%, #78350f 70%, #1c1917 100%);
+    }
+    
+    .humanization-glow {
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, rgba(245, 158, 11, 0.1) 40%, transparent 70%);
+      left: 70%;
+    }
+    
+    .transformation-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1000px;
+      height: 800px;
+      opacity: 0.9;
+    }
+    
+    /* Reversed layout - Demo left, Marketing right */
+    .marketing-layout-reversed {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: row-reverse;
+      padding: 40px;
+      gap: 40px;
+    }
+    
+    .marketing-content-right {
+      flex: 0 0 360px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px 0;
+      text-align: left;
+    }
+    
+    .humanization-icon {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+    
+    .humanization-title {
+      background: linear-gradient(135deg, #ffffff 0%, #fcd34d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .pill-amber-solid {
+      background: rgba(251, 191, 36, 0.25);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+    }
+    
+    /* Perspective Demo Window - 3D effect */
+    .demo-window-perspective {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      perspective: 1200px;
+      padding-right: 20px;
+    }
+    
+    .demo-app-frame-perspective {
+      width: 680px;
+      height: 500px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 
+        -30px 30px 80px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      transform: rotateY(12deg) rotateX(2deg) translateZ(0);
+      transform-style: preserve-3d;
+    }
+    
+    /* Humanization Demo specific */
+    .demo-humanization-content {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .demo-humanization-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    
+    .demo-humanization-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .demo-humanization-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .demo-humanization-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .demo-humanization-subtitle {
+      font-size: 10px;
+      color: #64748b;
+    }
+    
+    .demo-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 500;
+    }
+    
+    .demo-status-badge.humanized {
+      background: #dcfce7;
+      color: #166534;
+    }
+    
+    .demo-status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+    
+    .demo-humanization-textarea {
+      flex: 1;
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .demo-amber-line {
+      height: 14px;
+      border-radius: 4px;
+      background: #fde68a;
+    }
+    
+    .demo-humanization-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+    
+    .demo-complete-text {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #22c55e;
+    }
+    
+    .demo-humanize-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border: none;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+      opacity: 0.5;
+    }
+    
+    /* ============================================== */
+    /* SCREENSHOT 3 - VOICE PROFILE STYLES */
+    /* ============================================== */
+    
+    .voice-profile-bg {
+      background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 40%, #6d28d9 70%, #1e1b4b 100%);
+    }
+    
+    .voice-profile-glow {
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, rgba(99, 102, 241, 0.1) 40%, transparent 70%);
+    }
+    
+    .dna-bg {
+      position: absolute;
+      top: 50%;
+      left: 35%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 700px;
+      opacity: 0.9;
+    }
+    
+    .voice-profile-icon {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    }
+    
+    .voice-profile-title {
+      background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .pill-purple-solid {
+      background: rgba(139, 92, 246, 0.25);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+    
+    /* Floating Demo Window */
+    .demo-window-floating {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .demo-app-frame-floating {
+      width: 720px;
+      height: 540px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 
+        0 40px 100px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 60px rgba(139, 92, 246, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Voice Profile Demo specific */
+    .demo-voice-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    .demo-voice-sidebar {
+      width: 200px;
+      padding: 16px;
+      background: #f8fafc;
+      border-right: 1px solid #e2e8f0;
+    }
+    
+    .demo-voice-sidebar-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 12px;
+    }
+    
+    .demo-profile-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    
+    .demo-profile-card.active {
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .demo-profile-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .demo-profile-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .demo-profile-desc {
+      font-size: 10px;
+      color: #64748b;
+    }
+    
+    .demo-voice-main {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .demo-voice-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    
+    .demo-voice-avatar-large {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .demo-voice-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .demo-voice-style {
+      font-size: 12px;
+      color: #8b5cf6;
+    }
+    
+    .demo-metrics-section {
+      margin-bottom: 16px;
+    }
+    
+    .demo-metrics-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+    
+    .demo-metric-bar {
+      margin-bottom: 10px;
+    }
+    
+    .demo-metric-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    
+    .demo-metric-label {
+      font-size: 10px;
+      color: #64748b;
+    }
+    
+    .demo-metric-value {
+      font-size: 10px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .demo-metric-track {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .demo-metric-fill {
+      height: 100%;
+      background: #8b5cf6;
+      border-radius: 3px;
+    }
+    
+    .demo-traits-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    
+    .demo-traits-box {
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 10px;
+    }
+    
+    .demo-traits-title {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 9px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+    
+    .demo-traits-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    
+    .demo-trait-tag {
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 9px;
+      font-weight: 500;
+    }
+    
+    .demo-trait-tag.purple {
+      background: #ede9fe;
+      color: #7c3aed;
+    }
+    
+    .demo-trait-tag.gray {
+      background: white;
+      color: #64748b;
+    }
+    
+    /* ============================================== */
+    /* SCREENSHOT 4 - AI WORKSPACE STYLES */
+    /* ============================================== */
+    
+    .ai-workspace-bg {
+      background: linear-gradient(135deg, #042f2e 0%, #134e4a 40%, #0d9488 70%, #042f2e 100%);
+    }
+    
+    .ai-workspace-glow {
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(20, 184, 166, 0.1) 40%, transparent 70%);
+      left: 70%;
+    }
+    
+    .neural-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1000px;
+      height: 800px;
+      opacity: 0.9;
+    }
+    
+    .ai-workspace-icon {
+      background: linear-gradient(135deg, #06b6d4, #0d9488);
+    }
+    
+    .ai-workspace-title {
+      background: linear-gradient(135deg, #ffffff 0%, #a5f3fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .pill-cyan-solid {
+      background: rgba(6, 182, 212, 0.25);
+      border: 1px solid rgba(6, 182, 212, 0.4);
+    }
+    
+    /* Perspective Demo Window - Left side, tilted right */
+    .demo-window-perspective-left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      perspective: 1200px;
+      padding-right: 20px;
+    }
+    
+    .demo-app-frame-perspective-left {
+      width: 680px;
+      height: 520px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 
+        -30px 30px 80px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      transform: rotateY(12deg) rotateX(2deg) translateZ(0);
+      transform-style: preserve-3d;
+    }
+    
+    /* AI Workspace Demo specific */
+    .demo-workspace-content {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+    }
+    
+    .demo-chat-messages {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: hidden;
+    }
+    
+    .demo-chat-user {
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    .demo-chat-user-bubble {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px 16px 4px 16px;
+      padding: 12px 16px;
+      max-width: 70%;
+    }
+    
+    .demo-chat-ai {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .demo-chat-ai-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #06b6d4, #0d9488);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .demo-chat-ai-bubble {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .demo-cyan-line {
+      height: 12px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #e0f2fe 0%, #cffafe 50%, #e0f2fe 100%);
+    }
+    
+    .demo-chat-actions {
+      display: flex;
+      gap: 4px;
+      margin-top: 8px;
+    }
+    
+    .demo-chat-action-btn {
+      padding: 5px;
+      border-radius: 6px;
+      background: transparent;
+      border: none;
+    }
+    
+    .demo-workspace-input {
+      margin-top: 16px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    
+    .demo-workspace-input-area {
+      padding: 12px 16px;
+    }
+    
+    .demo-workspace-input-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-top: 1px solid #f1f5f9;
+    }
+    
+    .demo-workspace-input-left {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .demo-model-selector {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      font-size: 11px;
+      color: #64748b;
+    }
+    
+    .demo-send-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: #0f172a;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* ============================================== */
+    /* SCREENSHOT 5 - AI REWRITE STYLES */
+    /* ============================================== */
+    
+    .ai-rewrite-bg {
+      background: linear-gradient(135deg, #022c22 0%, #064e3b 40%, #059669 70%, #022c22 100%);
+    }
+    
+    .ai-rewrite-glow {
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, rgba(52, 211, 153, 0.1) 40%, transparent 70%);
+    }
+    
+    .transform-flow-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1000px;
+      height: 800px;
+      opacity: 0.9;
+    }
+    
+    .ai-rewrite-icon {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+    
+    .ai-rewrite-title {
+      background: linear-gradient(135deg, #ffffff 0%, #a7f3d0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .pill-emerald-solid {
+      background: rgba(16, 185, 129, 0.25);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    
+    /* Floating Demo Window for Rewrite */
+    .demo-app-frame-floating-emerald {
+      width: 700px;
+      height: 520px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 
+        0 40px 100px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 60px rgba(16, 185, 129, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* AI Rewrite Demo specific */
+    .demo-rewrite-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    .demo-rewrite-main {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .demo-rewrite-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    
+    .demo-rewrite-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .demo-rewrite-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .demo-rewrite-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .demo-rewrite-subtitle {
+      font-size: 10px;
+      color: #64748b;
+    }
+    
+    .demo-rewrite-styles {
+      display: flex;
+      gap: 6px;
+    }
+    
+    .demo-style-btn {
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 500;
+      border: none;
+    }
+    
+    .demo-style-btn.active {
+      background: #10b981;
+      color: white;
+    }
+    
+    .demo-style-btn:not(.active) {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+    
+    .demo-rewrite-status {
+      margin-bottom: 10px;
+    }
+    
+    .demo-status-rewritten {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 500;
+    }
+    
+    .demo-rewrite-textarea {
+      flex: 1;
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 1px solid #6ee7b7;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .demo-emerald-line {
+      height: 12px;
+      border-radius: 4px;
+      background: #a7f3d0;
+    }
+    
+    .demo-rewrite-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+    }
+    
+    .demo-rewrite-complete {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #22c55e;
+    }
+    
+    .demo-rewrite-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      opacity: 0.5;
+    }
+    
+    .demo-rewrite-sidebar {
+      width: 180px;
+      padding: 14px;
+      background: #f8fafc;
+      border-left: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .demo-sidebar-card {
+      padding: 12px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+    }
+    
+    .demo-sidebar-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 6px;
+    }
+    
+    .demo-sidebar-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .demo-sidebar-desc {
+      font-size: 9px;
+      color: #64748b;
+    }
+    
+    .demo-option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .demo-option-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: #475569;
+    }
+    
+    .demo-toggle {
+      width: 28px;
+      height: 16px;
+      border-radius: 8px;
+      position: relative;
+    }
+    
+    .demo-toggle.on {
+      background: #10b981;
+    }
+    
+    .demo-toggle.on::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: white;
+      top: 2px;
+      right: 2px;
+    }
+    
+    .marketing-layout {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      padding: 40px;
+      gap: 40px;
+    }
+    
+    /* Marketing Content - Left Side */
+    .marketing-content {
+      flex: 0 0 340px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px 0;
+    }
+    
+    .marketing-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    
+    .marketing-logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .marketing-logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+    }
+    
+    .marketing-feature-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .ai-detection-icon {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+    
+    .marketing-title {
+      font-size: 48px;
+      font-weight: 800;
+      margin: 0 0 16px 0;
+      line-height: 1.1;
+    }
+    
+    .ai-detection-title {
+      background: linear-gradient(135deg, #ffffff 0%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .marketing-subtitle {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.7);
+      margin: 0 0 32px 0;
+      line-height: 1.5;
+    }
+    
+    .marketing-pills {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .marketing-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      width: fit-content;
+    }
+    
+    .pill-blue-solid {
+      background: rgba(59, 130, 246, 0.25);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+    
+    .marketing-url {
+      position: absolute;
+      bottom: 30px;
+      left: 50px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.4);
+      z-index: 1;
+    }
+    
+    /* Demo Window Container - Right Side */
+    .demo-window-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .demo-app-frame {
+      width: 100%;
+      max-width: 780px;
+      height: 580px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .demo-window-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .demo-window-dots {
+      display: flex;
+      gap: 6px;
+    }
+    
+    .demo-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    
+    .demo-dot.red { background: #ef4444; }
+    .demo-dot.yellow { background: #eab308; }
+    .demo-dot.green { background: #22c55e; }
+    
+    .demo-window-title {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    
+    .demo-app-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    /* Demo Editor Panel */
+    .demo-editor-panel {
+      flex: 1.2;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #e2e8f0;
+    }
+    
+    .demo-sample-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .demo-sample-label {
+      font-size: 11px;
+      color: #64748b;
+    }
+    
+    .demo-sample-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .demo-sample-btn.active {
+      background: #3b82f6;
+      color: white;
+    }
+    
+    .demo-sample-btn:not(.active) {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+    
+    .demo-text-area {
+      flex: 1;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .demo-shimmer-line {
+      height: 14px;
+      border-radius: 4px;
+      background: #e2e8f0;
+    }
+    
+    .demo-editor-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+    
+    .demo-char-count {
+      font-size: 11px;
+      color: #22c55e;
+    }
+    
+    .demo-char-count strong {
+      font-weight: 600;
+    }
+    
+    .demo-detect-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+    }
+    
+    /* Demo Results Panel */
+    .demo-results-panel {
+      flex: 0.8;
+      padding: 20px;
+      background: white;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .demo-results-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .demo-results-icon {
+      width: 36px;
+      height: 36px;
+      background: #dbeafe;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .demo-results-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .demo-results-subtitle {
+      font-size: 11px;
+      color: #64748b;
+    }
+    
+    .demo-score-container {
+      display: flex;
+      justify-content: center;
+      margin: 12px 0;
+    }
+    
+    .demo-score-circle {
+      position: relative;
+      width: 100px;
+      height: 100px;
+    }
+    
+    .demo-score-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 28px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    
+    .demo-score-value span {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    
+    .demo-verdict {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    
+    .demo-verdict-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .demo-confidence {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .demo-confidence-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 10px;
+      color: #64748b;
+    }
+    
+    .demo-confidence-value {
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .demo-confidence-track {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .demo-confidence-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #10b981);
+      border-radius: 3px;
+    }
+    
+    .demo-indicators {
+      flex: 1;
+    }
+    
+    .demo-indicators-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+    
+    .demo-indicator-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+    }
+    
+    .demo-indicator-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .demo-indicator-icon.warning {
+      background: #fef3c7;
+    }
+    
+    .demo-indicator-shimmer {
+      height: 10px;
+      border-radius: 3px;
+      background: #e2e8f0;
+    }
+    
+    /* App Frame - Original style for other screenshots */
+    .app-frame {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    /* Window Header */
+    .window-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .window-dots {
+      display: flex;
+      gap: 8px;
+    }
+    .window-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+    .window-dot.red { background: #ef4444; }
+    .window-dot.yellow { background: #eab308; }
+    .window-dot.green { background: #22c55e; }
+    .window-title {
+      flex: 1;
+      text-align: center;
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    
+    /* App Content */
+    .app-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    /* Shimmer Effect */
+    .shimmer {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Shimmer Text Lines */
+    .shimmer-line {
+      height: 16px;
+      margin-bottom: 12px;
+      border-radius: 4px;
+    }
+    .shimmer-line.short { width: 60%; }
+    .shimmer-line.medium { width: 80%; }
+    .shimmer-line.long { width: 95%; }
+    .shimmer-line.xs { width: 40%; }
+    
+    /* ============================================== */
+    /* COMMON UI COMPONENTS */
+    /* ============================================== */
+    
+    .icon-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+    .icon-box svg {
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+    
+    /* Progress Circle */
+    .progress-circle {
+      position: relative;
+      width: 140px;
+      height: 140px;
+    }
+    .progress-circle svg {
+      transform: rotate(-90deg);
+    }
+    .progress-circle .bg {
+      fill: none;
+      stroke: #e2e8f0;
+      stroke-width: 10;
+    }
+    .progress-circle .progress {
+      fill: none;
+      stroke-width: 10;
+      stroke-linecap: round;
+    }
+    .progress-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 36px;
+      font-weight: 700;
+    }
+    
+    /* Metric Bar */
+    .metric-bar {
+      margin-bottom: 16px;
+    }
+    .metric-bar-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+    .metric-bar-label { color: #64748b; }
+    .metric-bar-value { color: #1e293b; font-weight: 600; }
+    .metric-bar-track {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .metric-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+    
+    /* Tags */
+    .tag {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    
+    /* Feature Header */
+    .feature-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .feature-header .icon-box {
+      width: 48px;
+      height: 48px;
+    }
+    .feature-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 4px 0;
+    }
+    .feature-header p {
+      font-size: 13px;
+      color: #64748b;
+      margin: 0;
+    }
+    
+    /* Sample Buttons */
+    .sample-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .sample-btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+    .sample-btn.active {
+      background: #3b82f6;
+      color: white;
+    }
+    .sample-btn:not(.active) {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+    
+    /* Text Area */
+    .text-area {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 24px;
+      min-height: 300px;
+    }
+    
+    /* Status Badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    
+    /* Indicator Item */
+    .indicator-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 13px;
+      color: #475569;
+    }
+    .indicator-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Chat Message */
+    .chat-message {
+      margin-bottom: 16px;
+    }
+    .chat-message.user {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .chat-message.user .bubble {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 12px 16px;
+      max-width: 70%;
+    }
+    .chat-message.ai .bubble {
+      max-width: 100%;
+    }
+    
+    /* Profile Card */
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .profile-card.active {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .profile-info h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 2px 0;
+    }
+    .profile-info p {
+      font-size: 11px;
+      color: #64748b;
+      margin: 0;
+    }
+    
+    /* Toggle Switch */
+    .toggle-switch {
+      width: 36px;
+      height: 20px;
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+    }
+    .toggle-switch.on { background: #10b981; }
+    .toggle-switch.off { background: #cbd5e1; }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: white;
+      top: 2px;
+      transition: left 0.2s;
+    }
+    .toggle-switch.on::after { left: 18px; }
+    .toggle-switch.off::after { left: 2px; }
+    
+    /* Option Row */
+    .option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 8px;
+    }
+    .option-row .label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #475569;
+    }
+    .option-row .label svg {
+      width: 14px;
+      height: 14px;
+      stroke: #94a3b8;
+    }
+    
+    /* ============================================== */
+    /* SMALL PROMO TILE - 440x280 (UPGRADED) */
+    /* ============================================== */
+    
+    .small-promo {
+      width: 440px; height: 280px;
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 30%, #0f172a 60%, #0a0a1a 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .small-promo-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    
+    .small-promo-pattern {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 350px;
+      opacity: 0.8;
+    }
+    
+    .small-promo-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 24px;
+    }
+    
+    .small-promo .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      z-index: 2;
+    }
+    .small-promo .logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .small-promo .logo-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+    }
+    .small-promo .title {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #c4b5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .small-promo .subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 20px;
+    }
+    .small-promo .pills {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .small-promo .pills-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+    .small-promo .pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      backdrop-filter: blur(10px);
+    }
+    .small-promo .pill svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+    .small-promo .pill-blue { background: rgba(59, 130, 246, 0.35); border: 1px solid rgba(59, 130, 246, 0.5); }
+    .small-promo .pill-amber { background: rgba(245, 158, 11, 0.35); border: 1px solid rgba(245, 158, 11, 0.5); }
+    .small-promo .pill-purple { background: rgba(139, 92, 246, 0.35); border: 1px solid rgba(139, 92, 246, 0.5); }
+    .small-promo .pill-cyan { background: rgba(6, 182, 212, 0.35); border: 1px solid rgba(6, 182, 212, 0.5); }
+    .small-promo .pill-emerald { background: rgba(16, 185, 129, 0.35); border: 1px solid rgba(16, 185, 129, 0.5); }
+    
+    /* ============================================== */
+    /* MARQUEE PROMO TILE - 1400x560 (UPGRADED) */
+    /* ============================================== */
+    
+    .marquee-promo {
+      width: 1400px; height: 560px;
+      background: linear-gradient(135deg, #0a0a1a 0%, #0f172a 40%, #1e1b4b 70%, #0a0a1a 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .marquee-promo-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    
+
+    
+    .marquee-promo-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 900px;
+      height: 500px;
+      background: 
+        radial-gradient(ellipse at 30% 50%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    
+    .marquee-promo-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 50px;
+    }
+    
+    .marquee-promo .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: absolute;
+      top: 40px;
+      left: 50px;
+      z-index: 2;
+    }
+    .marquee-promo .logo-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .marquee-promo .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+    }
+    .marquee-promo .url {
+      position: absolute;
+      bottom: 40px;
+      left: 50px;
+      font-size: 16px;
+      color: rgba(255,255,255,0.5);
+      z-index: 2;
+    }
+    .marquee-promo .title {
+      font-size: 76px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 40%, #c4b5fd 70%, #fcd34d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+    }
+    .marquee-promo .subtitle {
+      font-size: 22px;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 40px;
+      line-height: 1.5;
+      max-width: 800px;
+    }
+    .marquee-promo .pills {
+      display: flex;
+      gap: 14px;
+    }
+    .marquee-promo .pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 22px;
+      border-radius: 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+      backdrop-filter: blur(10px);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .marquee-promo .pill svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+    .marquee-promo .pill-blue { background: rgba(59, 130, 246, 0.3); border: 1px solid rgba(59, 130, 246, 0.5); box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2); }
+    .marquee-promo .pill-amber { background: rgba(245, 158, 11, 0.3); border: 1px solid rgba(245, 158, 11, 0.5); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.2); }
+    .marquee-promo .pill-purple { background: rgba(139, 92, 246, 0.3); border: 1px solid rgba(139, 92, 246, 0.5); box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2); }
+    .marquee-promo .pill-cyan { background: rgba(6, 182, 212, 0.3); border: 1px solid rgba(6, 182, 212, 0.5); box-shadow: 0 4px 20px rgba(6, 182, 212, 0.2); }
+    .marquee-promo .pill-emerald { background: rgba(16, 185, 129, 0.3); border: 1px solid rgba(16, 185, 129, 0.5); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2); }
+    
+
+  </style>
+</head>
+<body>
+  <h1>Chrome Web Store Images Generator - Graphos AI Studio</h1>
+  
+  <div class="size-info">
+    <h3>📐 Kích thước yêu cầu</h3>
+    <ul>
+      <li><span class="label">Global Screenshots (5 ảnh)</span><span class="value">1280×800</span></li>
+      <li><span class="label">Small Promo Tile</span><span class="value">440×280</span></li>
+      <li><span class="label">Marquee Promo Tile</span><span class="value">1400×560</span></li>
+    </ul>
+  </div>
+  
+  <div style="text-align: center;">
+    <button class="btn-download-all" onclick="downloadAll()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+      Download All (7 images)
+    </button>
+  </div>
+  
+  <div class="og-container">
+    
+    <h2 class="section-title">📸 Global Screenshots (1280×800)</h2>
+
+    <!-- Screenshot 1: AI Detection Demo - Marketing + Demo Layout -->
+    <div class="og-wrapper">
+      <span class="og-label">screenshot-1-detection.png (1280×800) - AI Detection</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('screenshot-1', 'screenshot-1-detection.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+      </div>
+      <div class="screenshot-card screenshot-marketing" id="screenshot-1">
+        <!-- Background with gradient, radar and glow -->
+        <div class="marketing-bg ai-detection-bg">
+          <!-- Radar SVG Background -->
+          <svg class="radar-bg" viewBox="0 0 800 800" fill="none">
+            <!-- Concentric circles -->
+            <circle cx="400" cy="400" r="80" stroke="rgba(59, 130, 246, 0.3)" stroke-width="1.5" fill="none" />
+            <circle cx="400" cy="400" r="140" stroke="rgba(59, 130, 246, 0.25)" stroke-width="1.5" fill="none" />
+            <circle cx="400" cy="400" r="200" stroke="rgba(59, 130, 246, 0.2)" stroke-width="1.5" fill="none" />
+            <circle cx="400" cy="400" r="260" stroke="rgba(59, 130, 246, 0.15)" stroke-width="1" fill="none" />
+            <circle cx="400" cy="400" r="320" stroke="rgba(59, 130, 246, 0.12)" stroke-width="1" fill="none" />
+            <circle cx="400" cy="400" r="380" stroke="rgba(59, 130, 246, 0.08)" stroke-width="1" fill="none" />
+            
+            <!-- Cross lines -->
+            <line x1="400" y1="20" x2="400" y2="780" stroke="rgba(59, 130, 246, 0.15)" stroke-width="1" />
+            <line x1="20" y1="400" x2="780" y2="400" stroke="rgba(59, 130, 246, 0.15)" stroke-width="1" />
+            
+            <!-- Diagonal lines -->
+            <line x1="117" y1="117" x2="683" y2="683" stroke="rgba(59, 130, 246, 0.1)" stroke-width="1" />
+            <line x1="683" y1="117" x2="117" y2="683" stroke="rgba(59, 130, 246, 0.1)" stroke-width="1" />
+            
+            <!-- Scanner sweep gradient -->
+            <defs>
+              <linearGradient id="radarScannerGradient" x1="400" y1="400" x2="750" y2="50" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(59, 130, 246, 0.3)" />
+                <stop offset="100%" stop-color="rgba(59, 130, 246, 0)" />
+              </linearGradient>
+              <radialGradient id="radarCenterGlow" cx="400" cy="400" r="150" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(59, 130, 246, 0.25)" />
+                <stop offset="100%" stop-color="rgba(59, 130, 246, 0)" />
+              </radialGradient>
+            </defs>
+            
+            <!-- Scanner sweep - pie slice -->
+            <path d="M400,400 L400,0 A400,400 0 0,1 683,117 Z" fill="url(#radarScannerGradient)" opacity="0.7"/>
+            
+            <!-- Scanner line -->
+            <line x1="400" y1="400" x2="683" y2="117" stroke="rgba(59, 130, 246, 0.6)" stroke-width="2" stroke-linecap="round"/>
+            
+            <!-- Center glow -->
+            <circle cx="400" cy="400" r="150" fill="url(#radarCenterGlow)" />
+            
+            <!-- Center dot -->
+            <circle cx="400" cy="400" r="6" fill="rgba(59, 130, 246, 0.8)" />
+            <circle cx="400" cy="400" r="3" fill="rgba(59, 130, 246, 1)" />
+            
+            <!-- Detection points -->
+            <circle cx="480" cy="320" r="5" fill="rgba(34, 197, 94, 0.9)" />
+            <circle cx="480" cy="320" r="10" fill="rgba(34, 197, 94, 0.3)" />
+            
+            <circle cx="350" cy="280" r="4" fill="rgba(59, 130, 246, 0.7)" />
+            <circle cx="350" cy="280" r="8" fill="rgba(59, 130, 246, 0.25)" />
+            
+            <circle cx="520" cy="380" r="4" fill="rgba(139, 92, 246, 0.7)" />
+            <circle cx="520" cy="380" r="8" fill="rgba(139, 92, 246, 0.25)" />
+            
+            <circle cx="300" cy="350" r="3" fill="rgba(245, 158, 11, 0.7)" />
+            <circle cx="300" cy="350" r="6" fill="rgba(245, 158, 11, 0.25)" />
+          </svg>
+          
+          <div class="marketing-glow ai-detection-glow"></div>
+          <div class="decoration-circles"></div>
+        </div>
+        
+        <!-- Content Layout: Marketing Left + Demo Right -->
+        <div class="marketing-layout">
+          <!-- Left: Marketing Content -->
+          <div class="marketing-content">
+            <!-- Logo -->
+            <div class="marketing-logo">
+              <div class="marketing-logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+              </div>
+              <span class="marketing-logo-text">Graphos AI</span>
+            </div>
+            
+            <!-- Feature Icon -->
+            <div class="marketing-feature-icon ai-detection-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg>
+            </div>
+            
+            <!-- Title -->
+            <h2 class="marketing-title ai-detection-title">AI Detection</h2>
+            
+            <!-- Subtitle -->
+            <p class="marketing-subtitle">Detect AI-generated content<br>with industry-leading accuracy</p>
+            
+            <!-- Feature Pills -->
+            <div class="marketing-pills">
+              <div class="marketing-pill pill-blue-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                98% Accuracy
+              </div>
+              <div class="marketing-pill pill-blue-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Real-time
+              </div>
+              <div class="marketing-pill pill-blue-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                Multi-language
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right: Demo Window -->
+          <div class="demo-window-container">
+            <div class="demo-app-frame">
+              <!-- Window Header - Less rounded for realistic feel -->
+              <div class="demo-window-header">
+                <div class="demo-window-dots">
+                  <div class="demo-dot red"></div>
+                  <div class="demo-dot yellow"></div>
+                  <div class="demo-dot green"></div>
+                </div>
+                <div class="demo-window-title">AI Detection</div>
+                <div style="width: 52px;"></div>
+              </div>
+              
+              <!-- Demo Content -->
+              <div class="demo-app-content">
+                <!-- Left Panel - Text Editor -->
+                <div class="demo-editor-panel">
+                  <!-- Sample Buttons -->
+                  <div class="demo-sample-buttons">
+                    <span class="demo-sample-label">Try sample:</span>
+                    <button class="demo-sample-btn active">AI Text</button>
+                    <button class="demo-sample-btn">Human</button>
+                    <button class="demo-sample-btn">Mixed</button>
+                  </div>
+                  
+                  <!-- Text Area with Shimmer -->
+                  <div class="demo-text-area">
+                    <div class="demo-shimmer-line" style="width: 95%;"></div>
+                    <div class="demo-shimmer-line" style="width: 88%;"></div>
+                    <div class="demo-shimmer-line" style="width: 92%;"></div>
+                    <div class="demo-shimmer-line" style="width: 78%;"></div>
+                    <div class="demo-shimmer-line" style="width: 85%;"></div>
+                    <div class="demo-shimmer-line" style="width: 90%;"></div>
+                    <div class="demo-shimmer-line" style="width: 72%;"></div>
+                    <div class="demo-shimmer-line" style="width: 60%;"></div>
+                  </div>
+                  
+                  <!-- Footer -->
+                  <div class="demo-editor-footer">
+                    <span class="demo-char-count"><strong>1,247</strong> / 50+ chars</span>
+                    <button class="demo-detect-btn">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                      Detect AI
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Right Panel - Results -->
+                <div class="demo-results-panel">
+                  <!-- Header -->
+                  <div class="demo-results-header">
+                    <div class="demo-results-icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
+                    <div>
+                      <div class="demo-results-title">AI Detection</div>
+                      <div class="demo-results-subtitle">Content Analysis</div>
+                    </div>
+                  </div>
+                  
+                  <!-- Score Circle -->
+                  <div class="demo-score-container">
+                    <div class="demo-score-circle">
+                      <svg width="100" height="100" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="url(#demoBlueGrad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="22.62" transform="rotate(-90 50 50)"/>
+                        <defs>
+                          <linearGradient id="demoBlueGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#93c5fd"/>
+                            <stop offset="100%" stop-color="#2563eb"/>
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div class="demo-score-value">91<span>%</span></div>
+                    </div>
+                  </div>
+                  
+                  <!-- Verdict Badge -->
+                  <div class="demo-verdict">
+                    <div class="demo-verdict-badge">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                      Likely AI Generated
+                    </div>
+                  </div>
+                  
+                  <!-- Confidence Bar -->
+                  <div class="demo-confidence">
+                    <div class="demo-confidence-header">
+                      <span>Confidence</span>
+                      <span class="demo-confidence-value">87%</span>
+                    </div>
+                    <div class="demo-confidence-track">
+                      <div class="demo-confidence-fill" style="width: 87%;"></div>
+                    </div>
+                  </div>
+                  
+                  <!-- AI Indicators -->
+                  <div class="demo-indicators">
+                    <div class="demo-indicators-header">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                      AI Indicators (4)
+                    </div>
+                    <div class="demo-indicator-item">
+                      <div class="demo-indicator-icon warning">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>
+                      </div>
+                      <div class="demo-indicator-shimmer" style="width: 140px;"></div>
+                    </div>
+                    <div class="demo-indicator-item">
+                      <div class="demo-indicator-icon warning">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>
+                      </div>
+                      <div class="demo-indicator-shimmer" style="width: 120px;"></div>
+                    </div>
+                    <div class="demo-indicator-item">
+                      <div class="demo-indicator-icon warning">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>
+                      </div>
+                      <div class="demo-indicator-shimmer" style="width: 150px;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- URL Badge -->
+        <div class="marketing-url">graphosai.com</div>
+      </div>
+    </div>
+    
+    <!-- Screenshot 2: Humanization Demo -->
+    <!-- Screenshot 2: Humanization Demo - Marketing + Tilted Demo Layout -->
+    <div class="og-wrapper">
+      <span class="og-label">screenshot-2-humanization.png (1280×800) - Humanization</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('screenshot-2', 'screenshot-2-humanization.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+      </div>
+      <div class="screenshot-card screenshot-marketing" id="screenshot-2">
+        <!-- Background with transformation flow -->
+        <div class="marketing-bg humanization-bg">
+          <!-- Transformation SVG Background -->
+          <svg class="transformation-bg" viewBox="0 0 1000 800" fill="none">
+            <defs>
+              <linearGradient id="aiToHumanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(148, 163, 184, 0.3)" />
+                <stop offset="50%" stop-color="rgba(251, 191, 36, 0.2)" />
+                <stop offset="100%" stop-color="rgba(251, 146, 60, 0.3)" />
+              </linearGradient>
+              <radialGradient id="transformCenterGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(251, 191, 36, 0.3)" />
+                <stop offset="100%" stop-color="transparent" />
+              </radialGradient>
+            </defs>
+            
+            <!-- Left side - AI/Grid patterns (cold) -->
+            <g opacity="0.5">
+              <line x1="50" y1="150" x2="350" y2="150" stroke="rgba(148, 163, 184, 0.25)" stroke-width="1"/>
+              <line x1="50" y1="220" x2="350" y2="220" stroke="rgba(148, 163, 184, 0.2)" stroke-width="1" stroke-dasharray="4 4"/>
+              <line x1="50" y1="290" x2="350" y2="290" stroke="rgba(148, 163, 184, 0.25)" stroke-width="1"/>
+              <line x1="50" y1="360" x2="350" y2="360" stroke="rgba(148, 163, 184, 0.2)" stroke-width="1" stroke-dasharray="4 4"/>
+              <line x1="50" y1="430" x2="350" y2="430" stroke="rgba(148, 163, 184, 0.25)" stroke-width="1"/>
+              <line x1="50" y1="500" x2="350" y2="500" stroke="rgba(148, 163, 184, 0.2)" stroke-width="1" stroke-dasharray="4 4"/>
+              <line x1="50" y1="570" x2="350" y2="570" stroke="rgba(148, 163, 184, 0.25)" stroke-width="1"/>
+              <line x1="50" y1="640" x2="350" y2="640" stroke="rgba(148, 163, 184, 0.2)" stroke-width="1" stroke-dasharray="4 4"/>
+              
+              <line x1="100" y1="120" x2="100" y2="680" stroke="rgba(148, 163, 184, 0.15)" stroke-width="1"/>
+              <line x1="175" y1="120" x2="175" y2="680" stroke="rgba(148, 163, 184, 0.15)" stroke-width="1"/>
+              <line x1="250" y1="120" x2="250" y2="680" stroke="rgba(148, 163, 184, 0.15)" stroke-width="1"/>
+              <line x1="325" y1="120" x2="325" y2="680" stroke="rgba(148, 163, 184, 0.15)" stroke-width="1"/>
+              
+              <!-- Binary dots -->
+              <circle cx="120" cy="180" r="3" fill="rgba(148, 163, 184, 0.4)"/>
+              <circle cx="200" cy="250" r="2" fill="rgba(148, 163, 184, 0.3)"/>
+              <circle cx="150" cy="320" r="3" fill="rgba(148, 163, 184, 0.4)"/>
+              <circle cx="280" cy="390" r="2" fill="rgba(148, 163, 184, 0.3)"/>
+              <circle cx="180" cy="460" r="3" fill="rgba(148, 163, 184, 0.4)"/>
+              <circle cx="240" cy="530" r="2" fill="rgba(148, 163, 184, 0.3)"/>
+            </g>
+            
+            <!-- Center transformation zone -->
+            <ellipse cx="500" cy="400" rx="150" ry="250" fill="url(#transformCenterGlow)" />
+            
+            <!-- Flow lines from AI to Human -->
+            <path d="M350 200 Q450 200 500 250 Q550 300 650 280" stroke="rgba(251, 191, 36, 0.35)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M350 320 Q450 330 500 360 Q550 390 650 370" stroke="rgba(251, 191, 36, 0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M350 440 Q450 440 500 420 Q550 400 650 430" stroke="rgba(251, 191, 36, 0.4)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M350 560 Q450 550 500 500 Q550 450 650 490" stroke="rgba(251, 191, 36, 0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            
+            <!-- Right side - Human/Organic curves (warm) -->
+            <g opacity="0.6">
+              <path d="M620 180 Q700 220 760 200 Q820 180 880 220" stroke="rgba(251, 146, 60, 0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M640 280 Q700 320 780 300 Q840 280 900 320" stroke="rgba(251, 146, 60, 0.25)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              <path d="M620 380 Q680 420 760 400 Q820 380 880 420" stroke="rgba(251, 146, 60, 0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M640 480 Q700 520 780 500 Q840 480 900 520" stroke="rgba(251, 146, 60, 0.25)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              <path d="M620 580 Q680 620 760 600 Q820 580 880 620" stroke="rgba(251, 146, 60, 0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+              
+              <!-- Organic dots -->
+              <circle cx="700" cy="240" r="4" fill="rgba(251, 146, 60, 0.5)"/>
+              <circle cx="780" cy="340" r="3" fill="rgba(251, 146, 60, 0.4)"/>
+              <circle cx="720" cy="440" r="4" fill="rgba(251, 146, 60, 0.5)"/>
+              <circle cx="800" cy="540" r="3" fill="rgba(251, 146, 60, 0.4)"/>
+            </g>
+            
+            <!-- Transformation particles -->
+            <circle cx="480" cy="350" r="5" fill="rgba(251, 191, 36, 0.6)"/>
+            <circle cx="520" cy="400" r="4" fill="rgba(251, 191, 36, 0.5)"/>
+            <circle cx="490" cy="450" r="6" fill="rgba(251, 191, 36, 0.4)"/>
+            <circle cx="510" cy="320" r="4" fill="rgba(251, 191, 36, 0.5)"/>
+            <circle cx="470" cy="480" r="5" fill="rgba(251, 191, 36, 0.6)"/>
+            
+            <!-- Arrow in center -->
+            <g transform="translate(500, 400)">
+              <path d="M-25 0 L15 0 M5 -8 L15 0 L5 8" stroke="rgba(251, 146, 60, 0.6)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+          </svg>
+          
+          <div class="marketing-glow humanization-glow"></div>
+          <div class="decoration-circles"></div>
+        </div>
+        
+        <!-- Content Layout: Demo Left (tilted) + Marketing Right -->
+        <div class="marketing-layout-reversed">
+          <!-- Right: Marketing Content -->
+          <div class="marketing-content-right">
+            <!-- Logo -->
+            <div class="marketing-logo">
+              <div class="marketing-logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+              </div>
+              <span class="marketing-logo-text">Graphos AI</span>
+            </div>
+            
+            <!-- Feature Icon -->
+            <div class="marketing-feature-icon humanization-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/>
+              </svg>
+            </div>
+            
+            <!-- Title -->
+            <h2 class="marketing-title humanization-title">Humanization</h2>
+            
+            <!-- Subtitle -->
+            <p class="marketing-subtitle">Transform AI-generated text<br>into authentic human writing</p>
+            
+            <!-- Feature Pills -->
+            <div class="marketing-pills">
+              <div class="marketing-pill pill-amber-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Bypass AI Detection
+              </div>
+              <div class="marketing-pill pill-amber-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                Natural Tone
+              </div>
+              <div class="marketing-pill pill-amber-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                Multiple Styles
+              </div>
+            </div>
+          </div>
+          
+          <!-- Left: Perspective Demo Window -->
+          <div class="demo-window-perspective">
+            <div class="demo-app-frame-perspective">
+              <!-- Window Header -->
+              <div class="demo-window-header">
+                <div class="demo-window-dots">
+                  <div class="demo-dot red"></div>
+                  <div class="demo-dot yellow"></div>
+                  <div class="demo-dot green"></div>
+                </div>
+                <div class="demo-window-title">Content Humanization</div>
+                <div style="width: 52px;"></div>
+              </div>
+              
+              <!-- Demo Content -->
+              <div class="demo-humanization-content">
+                <!-- Header -->
+                <div class="demo-humanization-header">
+                  <div class="demo-humanization-info">
+                    <div class="demo-humanization-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+                    </div>
+                    <div>
+                      <div class="demo-humanization-title">Content Humanization</div>
+                      <div class="demo-humanization-subtitle">Transform AI text to human-like</div>
+                    </div>
+                  </div>
+                  <div class="demo-sample-buttons">
+                    <button class="demo-sample-btn active" style="background: #8b5cf6; color: white;">Formal</button>
+                    <button class="demo-sample-btn">Academic</button>
+                  </div>
+                </div>
+                
+                <!-- Status Badge -->
+                <div style="margin-bottom: 10px;">
+                  <span class="demo-status-badge humanized">
+                    <span class="demo-status-dot"></span>
+                    Humanized
+                  </span>
+                </div>
+                
+                <!-- Text Area with Amber shimmer (static) -->
+                <div class="demo-humanization-textarea">
+                  <div class="demo-amber-line" style="width: 95%;"></div>
+                  <div class="demo-amber-line" style="width: 88%;"></div>
+                  <div class="demo-amber-line" style="width: 92%;"></div>
+                  <div class="demo-amber-line" style="width: 78%;"></div>
+                  <div class="demo-amber-line" style="width: 85%;"></div>
+                  <div class="demo-amber-line" style="width: 90%;"></div>
+                  <div class="demo-amber-line" style="width: 65%;"></div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="demo-humanization-footer">
+                  <span class="demo-complete-text">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Transformation complete
+                  </span>
+                  <button class="demo-humanize-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+                    Humanize
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- URL Badge -->
+        <div class="marketing-url">graphosai.com</div>
+      </div>
+    </div>
+
+    <!-- Screenshot 3: Voice Profile Demo - Marketing + Floating Demo Layout -->
+    <div class="og-wrapper">
+      <span class="og-label">screenshot-3-voice.png (1280×800) - Voice Profile</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('screenshot-3', 'screenshot-3-voice.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+      </div>
+      <div class="screenshot-card screenshot-marketing" id="screenshot-3">
+        <!-- Background with DNA/Fingerprint pattern -->
+        <div class="marketing-bg voice-profile-bg">
+          <!-- DNA Helix / Fingerprint SVG Background -->
+          <svg class="dna-bg" viewBox="0 0 800 700" fill="none">
+            <defs>
+              <linearGradient id="dnaGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="rgba(139, 92, 246, 0.4)" />
+                <stop offset="100%" stop-color="rgba(99, 102, 241, 0.1)" />
+              </linearGradient>
+              <linearGradient id="dnaGradient2" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="rgba(167, 139, 250, 0.3)" />
+                <stop offset="100%" stop-color="rgba(139, 92, 246, 0.1)" />
+              </linearGradient>
+              <radialGradient id="dnaCenterGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(139, 92, 246, 0.25)" />
+                <stop offset="100%" stop-color="transparent" />
+              </radialGradient>
+            </defs>
+            
+            <!-- DNA Helix Strand 1 -->
+            <path d="M100 50 Q200 150 150 250 Q100 350 200 450 Q300 550 250 650" 
+                  stroke="url(#dnaGradient1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M150 50 Q250 150 200 250 Q150 350 250 450 Q350 550 300 650" 
+                  stroke="url(#dnaGradient2)" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+            
+            <!-- DNA Helix Strand 2 -->
+            <path d="M200 50 Q100 150 150 250 Q200 350 100 450 Q0 550 50 650" 
+                  stroke="url(#dnaGradient1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M250 50 Q150 150 200 250 Q250 350 150 450 Q50 550 100 650" 
+                  stroke="url(#dnaGradient2)" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+            
+            <!-- Connecting rungs -->
+            <line x1="125" y1="100" x2="175" y2="100" stroke="rgba(139, 92, 246, 0.3)" stroke-width="2"/>
+            <line x1="140" y1="200" x2="160" y2="200" stroke="rgba(139, 92, 246, 0.25)" stroke-width="2"/>
+            <line x1="150" y1="300" x2="150" y2="300" stroke="rgba(139, 92, 246, 0.3)" stroke-width="2"/>
+            <line x1="175" y1="400" x2="125" y2="400" stroke="rgba(139, 92, 246, 0.25)" stroke-width="2"/>
+            <line x1="200" y1="500" x2="100" y2="500" stroke="rgba(139, 92, 246, 0.3)" stroke-width="2"/>
+            
+            <!-- Fingerprint curves (right side) -->
+            <g transform="translate(550, 200)" opacity="0.5">
+              <path d="M0 150 Q50 100 100 150 Q150 200 100 250 Q50 300 0 250" stroke="rgba(167, 139, 250, 0.4)" stroke-width="2" fill="none"/>
+              <path d="M20 150 Q60 110 100 150 Q140 190 100 230 Q60 270 20 230" stroke="rgba(167, 139, 250, 0.35)" stroke-width="1.5" fill="none"/>
+              <path d="M40 150 Q70 120 100 150 Q130 180 100 210 Q70 240 40 210" stroke="rgba(167, 139, 250, 0.3)" stroke-width="1.5" fill="none"/>
+              <path d="M55 150 Q77 130 100 150 Q123 170 100 190 Q77 210 55 190" stroke="rgba(167, 139, 250, 0.25)" stroke-width="1" fill="none"/>
+              <path d="M70 150 Q85 140 100 150 Q115 160 100 170 Q85 180 70 170" stroke="rgba(167, 139, 250, 0.2)" stroke-width="1" fill="none"/>
+            </g>
+            
+            <!-- Floating particles -->
+            <circle cx="300" cy="150" r="4" fill="rgba(139, 92, 246, 0.5)"/>
+            <circle cx="450" cy="250" r="3" fill="rgba(167, 139, 250, 0.4)"/>
+            <circle cx="350" cy="400" r="5" fill="rgba(139, 92, 246, 0.3)"/>
+            <circle cx="500" cy="500" r="3" fill="rgba(167, 139, 250, 0.4)"/>
+            <circle cx="250" cy="550" r="4" fill="rgba(139, 92, 246, 0.35)"/>
+            <circle cx="600" cy="350" r="3" fill="rgba(167, 139, 250, 0.3)"/>
+            <circle cx="400" cy="100" r="3" fill="rgba(139, 92, 246, 0.4)"/>
+            
+            <!-- Center glow -->
+            <ellipse cx="400" cy="350" rx="200" ry="250" fill="url(#dnaCenterGlow)" />
+          </svg>
+          
+          <div class="marketing-glow voice-profile-glow"></div>
+        </div>
+        
+        <!-- Content Layout: Marketing Left + Demo Right (Floating) -->
+        <div class="marketing-layout">
+          <!-- Left: Marketing Content -->
+          <div class="marketing-content">
+            <!-- Logo -->
+            <div class="marketing-logo">
+              <div class="marketing-logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+              </div>
+              <span class="marketing-logo-text">Graphos AI</span>
+            </div>
+            
+            <!-- Feature Icon -->
+            <div class="marketing-feature-icon voice-profile-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            
+            <!-- Title -->
+            <h2 class="marketing-title voice-profile-title">Voice Profile</h2>
+            
+            <!-- Subtitle -->
+            <p class="marketing-subtitle">Capture your unique writing style<br>and apply it to any content</p>
+            
+            <!-- Feature Pills -->
+            <div class="marketing-pills">
+              <div class="marketing-pill pill-purple-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                Style Analysis
+              </div>
+              <div class="marketing-pill pill-purple-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                Writing Metrics
+              </div>
+              <div class="marketing-pill pill-purple-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Multiple Profiles
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right: Floating Demo Window -->
+          <div class="demo-window-floating">
+            <div class="demo-app-frame-floating">
+              <!-- Window Header -->
+              <div class="demo-window-header">
+                <div class="demo-window-dots">
+                  <div class="demo-dot red"></div>
+                  <div class="demo-dot yellow"></div>
+                  <div class="demo-dot green"></div>
+                </div>
+                <div class="demo-window-title">Voice Profile</div>
+                <div style="width: 52px;"></div>
+              </div>
+          
+              <!-- Demo Content -->
+              <div class="demo-voice-content">
+                <!-- Left Sidebar - Profile List -->
+                <div class="demo-voice-sidebar">
+                  <div class="demo-voice-sidebar-title">Select a Profile</div>
+                  
+                  <div class="demo-profile-card active">
+                    <div class="demo-profile-avatar" style="background: #8b5cf6; color: white;">SC</div>
+                    <div>
+                      <div class="demo-profile-name">Sarah Chen</div>
+                      <div class="demo-profile-desc">Professional & Warm</div>
+                    </div>
+                  </div>
+                  
+                  <div class="demo-profile-card">
+                    <div class="demo-profile-avatar" style="background: #e2e8f0; color: #64748b;">AR</div>
+                    <div>
+                      <div class="demo-profile-name">Alex Rivera</div>
+                      <div class="demo-profile-desc">Casual & Creative</div>
+                    </div>
+                  </div>
+                  
+                  <div class="demo-profile-card">
+                    <div class="demo-profile-avatar" style="background: #e2e8f0; color: #64748b;">JP</div>
+                    <div>
+                      <div class="demo-profile-name">Dr. James Park</div>
+                      <div class="demo-profile-desc">Academic & Precise</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Right Panel - Profile Details -->
+                <div class="demo-voice-main">
+                  <!-- Profile Header -->
+                  <div class="demo-voice-header">
+                    <div class="demo-voice-avatar-large" style="background: #8b5cf6;">SC</div>
+                    <div>
+                      <div class="demo-voice-name">Sarah Chen</div>
+                      <div class="demo-voice-style">Professional & Warm</div>
+                    </div>
+                  </div>
+                  
+                  <!-- Writing Metrics -->
+                  <div class="demo-metrics-section">
+                    <div class="demo-metrics-title">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                      Writing Metrics
+                    </div>
+                    
+                    <div class="demo-metric-bar">
+                      <div class="demo-metric-header">
+                        <span class="demo-metric-label">Formality</span>
+                        <span class="demo-metric-value">65%</span>
+                      </div>
+                      <div class="demo-metric-track">
+                        <div class="demo-metric-fill" style="width: 65%;"></div>
+                      </div>
+                    </div>
+                    
+                    <div class="demo-metric-bar">
+                      <div class="demo-metric-header">
+                        <span class="demo-metric-label">Creativity</span>
+                        <span class="demo-metric-value">78%</span>
+                      </div>
+                      <div class="demo-metric-track">
+                        <div class="demo-metric-fill" style="width: 78%;"></div>
+                      </div>
+                    </div>
+                    
+                    <div class="demo-metric-bar">
+                      <div class="demo-metric-header">
+                        <span class="demo-metric-label">Empathy</span>
+                        <span class="demo-metric-value">85%</span>
+                      </div>
+                      <div class="demo-metric-track">
+                        <div class="demo-metric-fill" style="width: 85%;"></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Traits & Vocabulary -->
+                  <div class="demo-traits-section">
+                    <div class="demo-traits-box">
+                      <div class="demo-traits-title">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/></svg>
+                        Writing Traits
+                      </div>
+                      <div class="demo-traits-tags">
+                        <span class="demo-trait-tag purple">Conversational</span>
+                        <span class="demo-trait-tag purple">Empathetic</span>
+                        <span class="demo-trait-tag purple">Clear</span>
+                      </div>
+                    </div>
+                    
+                    <div class="demo-traits-box">
+                      <div class="demo-traits-title">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                        Signature Words
+                      </div>
+                      <div class="demo-traits-tags">
+                        <span class="demo-trait-tag gray">"honestly"</span>
+                        <span class="demo-trait-tag gray">"I think"</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- URL Badge -->
+        <div class="marketing-url">graphosai.com</div>
+      </div>
+    </div>
+    
+    <!-- Screenshot 4: AI Workspace Demo - Marketing + Perspective Demo Layout -->
+    <div class="og-wrapper">
+      <span class="og-label">screenshot-4-workspace.png (1280×800) - AI Workspace</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('screenshot-4', 'screenshot-4-workspace.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+      </div>
+      <div class="screenshot-card screenshot-marketing" id="screenshot-4">
+        <!-- Background with Neural Network pattern -->
+        <div class="marketing-bg ai-workspace-bg">
+          <!-- Neural Network SVG Background -->
+          <svg class="neural-bg" viewBox="0 0 1000 800" fill="none">
+            <defs>
+              <linearGradient id="neuralGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(6, 182, 212, 0.3)" />
+                <stop offset="50%" stop-color="rgba(20, 184, 166, 0.4)" />
+                <stop offset="100%" stop-color="rgba(6, 182, 212, 0.3)" />
+              </linearGradient>
+              <radialGradient id="neuralCenterGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(6, 182, 212, 0.25)" />
+                <stop offset="100%" stop-color="transparent" />
+              </radialGradient>
+            </defs>
+            
+            <!-- Neural Network Connections -->
+            <g stroke="url(#neuralGradient)" stroke-width="1.5" opacity="0.6">
+              <!-- Input to Hidden 1 -->
+              <path d="M150 150 Q300 200 350 250" fill="none" />
+              <path d="M150 250 Q300 280 350 300" fill="none" />
+              <path d="M150 350 Q300 360 350 370" fill="none" />
+              <path d="M150 450 Q300 440 350 430" fill="none" />
+              <path d="M150 550 Q300 520 350 490" fill="none" />
+              <path d="M150 650 Q300 600 350 550" fill="none" />
+              
+              <!-- Hidden 1 to Hidden 2 -->
+              <path d="M350 250 Q450 300 500 340" fill="none" />
+              <path d="M350 300 Q450 340 500 370" fill="none" />
+              <path d="M350 370 Q450 390 500 410" fill="none" />
+              <path d="M350 430 Q450 430 500 440" fill="none" />
+              <path d="M350 490 Q450 470 500 470" fill="none" />
+              <path d="M350 550 Q450 510 500 500" fill="none" />
+              
+              <!-- Hidden 2 to Output -->
+              <path d="M500 340 Q600 370 650 390" fill="none" />
+              <path d="M500 410 Q600 410 650 420" fill="none" />
+              <path d="M500 470 Q600 450 650 450" fill="none" />
+              
+              <!-- Output to Final -->
+              <path d="M650 390 Q750 410 850 420" fill="none" />
+              <path d="M650 420 Q750 420 850 420" fill="none" />
+              <path d="M650 450 Q750 430 850 420" fill="none" />
+            </g>
+            
+            <!-- Neural Nodes - Input Layer -->
+            <g>
+              <circle cx="150" cy="150" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="150" r="5" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="150" cy="250" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="250" r="5" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="150" cy="350" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="350" r="5" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="150" cy="450" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="450" r="5" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="150" cy="550" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="550" r="5" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="150" cy="650" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="650" r="5" fill="rgba(6, 182, 212, 0.5)" />
+            </g>
+            
+            <!-- Neural Nodes - Hidden Layer 1 -->
+            <g>
+              <circle cx="350" cy="250" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="250" r="4" fill="rgba(20, 184, 166, 0.5)" />
+              <circle cx="350" cy="300" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="300" r="4" fill="rgba(20, 184, 166, 0.5)" />
+              <circle cx="350" cy="370" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="370" r="4" fill="rgba(20, 184, 166, 0.5)" />
+              <circle cx="350" cy="430" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="430" r="4" fill="rgba(20, 184, 166, 0.5)" />
+              <circle cx="350" cy="490" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="490" r="4" fill="rgba(20, 184, 166, 0.5)" />
+              <circle cx="350" cy="550" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="550" r="4" fill="rgba(20, 184, 166, 0.5)" />
+            </g>
+            
+            <!-- Neural Nodes - Hidden Layer 2 -->
+            <g>
+              <circle cx="500" cy="340" r="8" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="500" cy="340" r="4" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="500" cy="410" r="8" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="500" cy="410" r="4" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="500" cy="470" r="8" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="500" cy="470" r="4" fill="rgba(6, 182, 212, 0.5)" />
+            </g>
+            
+            <!-- Neural Nodes - Output Layer -->
+            <g>
+              <circle cx="650" cy="390" r="10" fill="rgba(20, 184, 166, 0.2)" />
+              <circle cx="650" cy="390" r="5" fill="rgba(20, 184, 166, 0.6)" />
+              <circle cx="650" cy="420" r="10" fill="rgba(20, 184, 166, 0.2)" />
+              <circle cx="650" cy="420" r="5" fill="rgba(20, 184, 166, 0.6)" />
+              <circle cx="650" cy="450" r="10" fill="rgba(20, 184, 166, 0.2)" />
+              <circle cx="650" cy="450" r="5" fill="rgba(20, 184, 166, 0.6)" />
+            </g>
+            
+            <!-- Final Output Node -->
+            <g>
+              <circle cx="850" cy="420" r="16" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="850" cy="420" r="10" fill="rgba(6, 182, 212, 0.3)" />
+              <circle cx="850" cy="420" r="5" fill="rgba(6, 182, 212, 0.7)" />
+            </g>
+            
+            <!-- Center glow -->
+            <ellipse cx="500" cy="400" rx="200" ry="180" fill="url(#neuralCenterGlow)" />
+            
+            <!-- Chat bubble hint -->
+            <g transform="translate(500, 400)">
+              <rect x="-25" y="-15" width="50" height="30" rx="6" fill="rgba(6, 182, 212, 0.1)" stroke="rgba(6, 182, 212, 0.2)" stroke-width="1" />
+              <circle cx="-8" cy="0" r="2.5" fill="rgba(6, 182, 212, 0.4)" />
+              <circle cx="0" cy="0" r="2.5" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="8" cy="0" r="2.5" fill="rgba(6, 182, 212, 0.4)" />
+            </g>
+            
+            <!-- Floating particles -->
+            <circle cx="250" cy="200" r="3" fill="rgba(6, 182, 212, 0.4)" />
+            <circle cx="420" cy="280" r="2" fill="rgba(20, 184, 166, 0.4)" />
+            <circle cx="580" cy="350" r="3" fill="rgba(6, 182, 212, 0.4)" />
+            <circle cx="720" cy="380" r="2" fill="rgba(20, 184, 166, 0.4)" />
+            <circle cx="300" cy="480" r="3" fill="rgba(6, 182, 212, 0.4)" />
+            <circle cx="450" cy="520" r="2" fill="rgba(20, 184, 166, 0.4)" />
+          </svg>
+          
+          <div class="marketing-glow ai-workspace-glow"></div>
+        </div>
+        
+        <!-- Content Layout: Demo Left (perspective) + Marketing Right -->
+        <div class="marketing-layout-reversed">
+          <!-- Right: Marketing Content -->
+          <div class="marketing-content-right">
+            <!-- Logo -->
+            <div class="marketing-logo">
+              <div class="marketing-logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+              </div>
+              <span class="marketing-logo-text">Graphos AI</span>
+            </div>
+            
+            <!-- Feature Icon -->
+            <div class="marketing-feature-icon ai-workspace-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/>
+              </svg>
+            </div>
+            
+            <!-- Title -->
+            <h2 class="marketing-title ai-workspace-title">AI Workspace</h2>
+            
+            <!-- Subtitle -->
+            <p class="marketing-subtitle">Your intelligent writing partner<br>for any task</p>
+            
+            <!-- Feature Pills -->
+            <div class="marketing-pills">
+              <div class="marketing-pill pill-cyan-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+                Smart Chat
+              </div>
+              <div class="marketing-pill pill-cyan-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Quick Actions
+              </div>
+              <div class="marketing-pill pill-cyan-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                Context-Aware
+              </div>
+            </div>
+          </div>
+          
+          <!-- Left: Perspective Demo Window -->
+          <div class="demo-window-perspective-left">
+            <div class="demo-app-frame-perspective-left">
+              <!-- Window Header -->
+              <div class="demo-window-header">
+                <div class="demo-window-dots">
+                  <div class="demo-dot red"></div>
+                  <div class="demo-dot yellow"></div>
+                  <div class="demo-dot green"></div>
+                </div>
+                <div class="demo-window-title">AI Workspace</div>
+                <div style="width: 52px;"></div>
+              </div>
+              
+              <!-- Demo Content -->
+              <div class="demo-workspace-content">
+                <!-- Chat Messages -->
+                <div class="demo-chat-messages">
+                  <!-- User Message -->
+                  <div class="demo-chat-user">
+                    <div class="demo-chat-user-bubble">
+                      <div class="demo-shimmer-line" style="width: 180px; background: #e2e8f0;"></div>
+                      <div class="demo-shimmer-line" style="width: 120px; margin-top: 6px; background: #e2e8f0;"></div>
+                    </div>
+                  </div>
+                  
+                  <!-- AI Response -->
+                  <div class="demo-chat-ai">
+                    <div class="demo-chat-ai-avatar">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+                    </div>
+                    <div class="demo-chat-ai-bubble">
+                      <div class="demo-cyan-line" style="width: 95%;"></div>
+                      <div class="demo-cyan-line" style="width: 88%;"></div>
+                      <div class="demo-cyan-line" style="width: 92%;"></div>
+                      <div class="demo-cyan-line" style="width: 75%;"></div>
+                      <div class="demo-cyan-line" style="width: 85%;"></div>
+                      <div class="demo-cyan-line" style="width: 60%;"></div>
+                      
+                      <!-- Action buttons -->
+                      <div class="demo-chat-actions">
+                        <div class="demo-chat-action-btn">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        </div>
+                        <div class="demo-chat-action-btn">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                        </div>
+                        <div class="demo-chat-action-btn">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Input Area -->
+                <div class="demo-workspace-input">
+                  <div class="demo-workspace-input-area">
+                    <div class="demo-shimmer-line" style="width: 160px; background: #e2e8f0;"></div>
+                  </div>
+                  <div class="demo-workspace-input-footer">
+                    <div class="demo-workspace-input-left">
+                      <div class="demo-chat-action-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                      </div>
+                      <div class="demo-model-selector">
+                        Graphos Hyper
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                      </div>
+                    </div>
+                    <div class="demo-send-btn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- URL Badge -->
+        <div class="marketing-url">graphosai.com</div>
+      </div>
+    </div>
+
+    <!-- Screenshot 5: AI Rewrite Demo - Marketing + Floating Demo Layout -->
+    <div class="og-wrapper">
+      <span class="og-label">screenshot-5-rewrite.png (1280×800) - AI Rewrite</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('screenshot-5', 'screenshot-5-rewrite.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+      </div>
+      <div class="screenshot-card screenshot-marketing" id="screenshot-5">
+        <!-- Background with Transformation Flow pattern -->
+        <div class="marketing-bg ai-rewrite-bg">
+          <!-- Transformation Flow SVG Background -->
+          <svg class="transform-flow-bg" viewBox="0 0 1000 800" fill="none">
+            <defs>
+              <linearGradient id="transformFlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(16, 185, 129, 0.3)" />
+                <stop offset="50%" stop-color="rgba(52, 211, 153, 0.4)" />
+                <stop offset="100%" stop-color="rgba(16, 185, 129, 0.3)" />
+              </linearGradient>
+              <radialGradient id="transformCenterGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(16, 185, 129, 0.25)" />
+                <stop offset="100%" stop-color="transparent" />
+              </radialGradient>
+            </defs>
+            
+            <!-- Left side - Original text (rigid/gray) -->
+            <g opacity="0.5">
+              <line x1="80" y1="200" x2="220" y2="200" stroke="rgba(148, 163, 184, 0.4)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="260" x2="200" y2="260" stroke="rgba(148, 163, 184, 0.35)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="320" x2="240" y2="320" stroke="rgba(148, 163, 184, 0.4)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="380" x2="180" y2="380" stroke="rgba(148, 163, 184, 0.35)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="440" x2="210" y2="440" stroke="rgba(148, 163, 184, 0.4)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="500" x2="190" y2="500" stroke="rgba(148, 163, 184, 0.35)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="560" x2="230" y2="560" stroke="rgba(148, 163, 184, 0.4)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="620" x2="160" y2="620" stroke="rgba(148, 163, 184, 0.35)" stroke-width="8" stroke-linecap="round"/>
+              <rect x="60" y="180" width="200" height="480" rx="8" fill="none" stroke="rgba(148, 163, 184, 0.2)" stroke-width="2" stroke-dasharray="8 4"/>
+            </g>
+            
+            <!-- Center transformation zone -->
+            <ellipse cx="500" cy="400" rx="180" ry="250" fill="url(#transformCenterGlow)" />
+            
+            <!-- Transformation flow arrows -->
+            <g stroke="url(#transformFlowGrad)" stroke-width="3" fill="none" stroke-linecap="round">
+              <path d="M280 220 Q400 250 500 280 Q600 310 700 290" />
+              <path d="M280 320 Q400 340 500 360 Q600 380 700 360" />
+              <path d="M280 420 Q400 420 500 420 Q600 420 700 420" />
+              <path d="M280 520 Q400 500 500 480 Q600 460 700 480" />
+              <path d="M280 620 Q400 580 500 540 Q600 500 700 530" />
+            </g>
+            
+            <!-- Arrow heads -->
+            <polygon points="700,290 680,280 680,300" fill="rgba(16, 185, 129, 0.5)" />
+            <polygon points="700,360 680,350 680,370" fill="rgba(16, 185, 129, 0.5)" />
+            <polygon points="700,420 680,410 680,430" fill="rgba(16, 185, 129, 0.6)" />
+            <polygon points="700,480 680,470 680,490" fill="rgba(16, 185, 129, 0.5)" />
+            <polygon points="700,530 680,520 680,540" fill="rgba(16, 185, 129, 0.5)" />
+            
+            <!-- Right side - Transformed text (organic/green) -->
+            <g opacity="0.6">
+              <path d="M750 280 Q800 290 850 280 Q900 270 940 285" stroke="rgba(16, 185, 129, 0.5)" stroke-width="8" stroke-linecap="round" fill="none"/>
+              <path d="M750 350 Q800 340 850 350 Q900 360 920 345" stroke="rgba(16, 185, 129, 0.45)" stroke-width="8" stroke-linecap="round" fill="none"/>
+              <path d="M750 420 Q800 430 850 420 Q900 410 950 425" stroke="rgba(16, 185, 129, 0.5)" stroke-width="8" stroke-linecap="round" fill="none"/>
+              <path d="M750 490 Q800 480 850 490 Q900 500 930 485" stroke="rgba(16, 185, 129, 0.45)" stroke-width="8" stroke-linecap="round" fill="none"/>
+              <path d="M750 560 Q800 570 850 560 Q900 550 940 565" stroke="rgba(16, 185, 129, 0.5)" stroke-width="8" stroke-linecap="round" fill="none"/>
+              <rect x="730" y="260" width="240" height="340" rx="16" fill="none" stroke="rgba(16, 185, 129, 0.25)" stroke-width="2"/>
+            </g>
+            
+            <!-- Center transformation icon -->
+            <g transform="translate(500, 400)">
+              <circle cx="0" cy="0" r="35" fill="rgba(16, 185, 129, 0.1)" stroke="rgba(16, 185, 129, 0.3)" stroke-width="2" />
+              <path d="M-12 0 L8 0 M3 -6 L12 0 L3 6" stroke="rgba(16, 185, 129, 0.6)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            
+            <!-- Floating particles -->
+            <circle cx="350" cy="280" r="4" fill="rgba(16, 185, 129, 0.5)" />
+            <circle cx="450" cy="350" r="3" fill="rgba(52, 211, 153, 0.4)" />
+            <circle cx="550" cy="300" r="4" fill="rgba(16, 185, 129, 0.5)" />
+            <circle cx="600" cy="450" r="3" fill="rgba(52, 211, 153, 0.4)" />
+            <circle cx="400" cy="500" r="4" fill="rgba(16, 185, 129, 0.5)" />
+            <circle cx="520" cy="550" r="3" fill="rgba(52, 211, 153, 0.4)" />
+          </svg>
+          
+          <div class="marketing-glow ai-rewrite-glow"></div>
+        </div>
+        
+        <!-- Content Layout: Marketing Left + Demo Right (Floating) -->
+        <div class="marketing-layout">
+          <!-- Left: Marketing Content -->
+          <div class="marketing-content">
+            <!-- Logo -->
+            <div class="marketing-logo">
+              <div class="marketing-logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+              </div>
+              <span class="marketing-logo-text">Graphos AI</span>
+            </div>
+            
+            <!-- Feature Icon -->
+            <div class="marketing-feature-icon ai-rewrite-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                <path d="m15 5 4 4"/>
+              </svg>
+            </div>
+            
+            <!-- Title -->
+            <h2 class="marketing-title ai-rewrite-title">AI Rewrite</h2>
+            
+            <!-- Subtitle -->
+            <p class="marketing-subtitle">Transform your text to match<br>any writing style instantly</p>
+            
+            <!-- Feature Pills -->
+            <div class="marketing-pills">
+              <div class="marketing-pill pill-emerald-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                Style Transform
+              </div>
+              <div class="marketing-pill pill-emerald-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Voice Match
+              </div>
+              <div class="marketing-pill pill-emerald-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                One-Click
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right: Floating Demo Window -->
+          <div class="demo-window-floating">
+            <div class="demo-app-frame-floating-emerald">
+              <!-- Window Header -->
+              <div class="demo-window-header">
+                <div class="demo-window-dots">
+                  <div class="demo-dot red"></div>
+                  <div class="demo-dot yellow"></div>
+                  <div class="demo-dot green"></div>
+                </div>
+                <div class="demo-window-title">AI Rewrite</div>
+                <div style="width: 52px;"></div>
+              </div>
+              
+              <!-- Demo Content -->
+              <div class="demo-rewrite-content">
+                <!-- Main Panel -->
+                <div class="demo-rewrite-main">
+                  <!-- Header -->
+                  <div class="demo-rewrite-header">
+                    <div class="demo-rewrite-info">
+                      <div class="demo-rewrite-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                      </div>
+                      <div>
+                        <div class="demo-rewrite-title">AI Rewrite</div>
+                        <div class="demo-rewrite-subtitle">Transform to your style</div>
+                      </div>
+                    </div>
+                    <div class="demo-rewrite-styles">
+                      <button class="demo-style-btn active">Professional</button>
+                      <button class="demo-style-btn">Casual</button>
+                      <button class="demo-style-btn">Concise</button>
+                    </div>
+                  </div>
+                  
+                  <!-- Status -->
+                  <div class="demo-rewrite-status">
+                    <span class="demo-status-rewritten">
+                      <span style="width: 5px; height: 5px; border-radius: 50%; background: #22c55e;"></span>
+                      Rewritten
+                    </span>
+                  </div>
+                  
+                  <!-- Text Area -->
+                  <div class="demo-rewrite-textarea">
+                    <div class="demo-emerald-line" style="width: 95%;"></div>
+                    <div class="demo-emerald-line" style="width: 88%;"></div>
+                    <div class="demo-emerald-line" style="width: 92%;"></div>
+                    <div class="demo-emerald-line" style="width: 75%;"></div>
+                    <div class="demo-emerald-line" style="width: 85%;"></div>
+                    <div class="demo-emerald-line" style="width: 65%;"></div>
+                  </div>
+                  
+                  <!-- Footer -->
+                  <div class="demo-rewrite-footer">
+                    <span class="demo-rewrite-complete">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      Transformation complete
+                    </span>
+                    <button class="demo-rewrite-btn">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                      Rewrite
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="demo-rewrite-sidebar">
+                  <!-- Voice Profile -->
+                  <div class="demo-sidebar-card">
+                    <div class="demo-sidebar-icon" style="background: #d1fae5;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <div class="demo-sidebar-title">Professional</div>
+                    <div class="demo-sidebar-desc">8 samples</div>
+                  </div>
+                  
+                  <!-- Model -->
+                  <div class="demo-sidebar-card">
+                    <div class="demo-sidebar-icon" style="background: #dbeafe;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    </div>
+                    <div class="demo-sidebar-title">Graphos Hyper</div>
+                    <div class="demo-sidebar-desc">Fast</div>
+                  </div>
+                  
+                  <!-- Options -->
+                  <div class="demo-option-row">
+                    <span class="demo-option-label">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                      Vocabulary
+                    </span>
+                    <div class="demo-toggle on"></div>
+                  </div>
+                  
+                  <div class="demo-option-row">
+                    <span class="demo-option-label">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                      Anti-AI
+                    </span>
+                    <div class="demo-toggle on"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- URL Badge -->
+        <div class="marketing-url">graphosai.com</div>
+      </div>
+    </div>
+    
+    <!-- ============================================== -->
+    <!-- PROMO TILES -->
+    <!-- ============================================== -->
+    
+    <h2 class="section-title">🏷️ Small Promo Tile (440×280)</h2>
+    
+    <div class="og-wrapper">
+      <span class="og-label">small-promo-tile.png (440×280)</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('small-promo', 'small-promo-tile.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+      </div>
+      <div class="small-promo" id="small-promo">
+        <!-- Background with combined pattern -->
+        <div class="small-promo-bg">
+          <svg class="small-promo-pattern" viewBox="0 0 500 350" fill="none">
+            <defs>
+              <radialGradient id="smallCenterGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(139, 92, 246, 0.2)" />
+                <stop offset="100%" stop-color="transparent" />
+              </radialGradient>
+            </defs>
+            
+            <!-- Multi-color glow -->
+            <ellipse cx="250" cy="175" rx="200" ry="150" fill="url(#smallCenterGlow)" />
+            
+            <!-- Radar circles (blue) -->
+            <circle cx="100" cy="120" r="40" stroke="rgba(59, 130, 246, 0.2)" stroke-width="1" fill="none" />
+            <circle cx="100" cy="120" r="25" stroke="rgba(59, 130, 246, 0.15)" stroke-width="1" fill="none" />
+            <circle cx="100" cy="120" r="3" fill="rgba(59, 130, 246, 0.5)" />
+            
+            <!-- Neural nodes (cyan) -->
+            <circle cx="400" cy="100" r="4" fill="rgba(6, 182, 212, 0.4)" />
+            <circle cx="420" cy="130" r="3" fill="rgba(6, 182, 212, 0.3)" />
+            <circle cx="380" cy="140" r="3" fill="rgba(6, 182, 212, 0.3)" />
+            <line x1="400" y1="100" x2="420" y2="130" stroke="rgba(6, 182, 212, 0.2)" stroke-width="1" />
+            <line x1="400" y1="100" x2="380" y2="140" stroke="rgba(6, 182, 212, 0.2)" stroke-width="1" />
+            
+            <!-- Transformation arrows (amber) -->
+            <path d="M80 230 Q150 220 180 230" stroke="rgba(245, 158, 11, 0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <polygon points="180,230 170,225 170,235" fill="rgba(245, 158, 11, 0.4)" />
+            
+            <!-- DNA strand hint (purple) -->
+            <path d="M350 200 Q370 220 350 240 Q330 260 350 280" stroke="rgba(139, 92, 246, 0.25)" stroke-width="2" fill="none" />
+            <path d="M370 200 Q350 220 370 240 Q390 260 370 280" stroke="rgba(139, 92, 246, 0.2)" stroke-width="2" fill="none" />
+            
+            <!-- Floating particles -->
+            <circle cx="150" cy="80" r="2" fill="rgba(59, 130, 246, 0.4)" />
+            <circle cx="300" cy="60" r="2" fill="rgba(139, 92, 246, 0.4)" />
+            <circle cx="450" cy="200" r="2" fill="rgba(6, 182, 212, 0.4)" />
+            <circle cx="50" cy="250" r="2" fill="rgba(245, 158, 11, 0.4)" />
+            <circle cx="200" cy="300" r="2" fill="rgba(16, 185, 129, 0.4)" />
+          </svg>
+        </div>
+        
+        <!-- Content -->
+        <div class="small-promo-content">
+          <div class="logo">
+            <div class="logo-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+            </div>
+            <span class="logo-text">Graphos AI</span>
+          </div>
+          <div class="title">Graphos AI Studio</div>
+          <div class="subtitle">AI writing assistant that sounds like you</div>
+          <div class="pills">
+            <div class="pills-row">
+              <div class="pill pill-blue">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Detect
+              </div>
+              <div class="pill pill-amber">
+                <svg viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+                Humanize
+              </div>
+              <div class="pill pill-purple">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Voice
+              </div>
+            </div>
+            <div class="pills-row">
+              <div class="pill pill-cyan">
+                <svg viewBox="0 0 24 24"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+                Chat
+              </div>
+              <div class="pill pill-emerald">
+                <svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                Rewrite
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <h2 class="section-title">🎬 Marquee Promo Tile (1400×560)</h2>
+    
+    <div class="og-wrapper">
+      <span class="og-label">marquee-promo-tile.png (1400×560)</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('marquee-promo', 'marquee-promo-tile.png')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+      </div>
+      <div class="marquee-promo" id="marquee-promo">
+        <!-- Background - Simplified -->
+        <div class="marquee-promo-bg">
+          <div class="marquee-promo-glow"></div>
+        </div>
+        
+        <!-- Content -->
+        <div class="marquee-promo-content">
+          <div class="logo">
+            <div class="logo-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+            </div>
+            <span class="logo-text">Graphos AI</span>
+          </div>
+          <div class="url">graphosai.com</div>
+          <div class="title">Graphos AI Studio</div>
+          <div class="subtitle">AI-powered writing assistant for authentic content.<br>Detect AI, humanize text, and write in your unique voice.</div>
+          <div class="pills">
+            <div class="pill pill-blue">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              98% AI Detection
+            </div>
+            <div class="pill pill-amber">
+              <svg viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+              Humanize AI Text
+            </div>
+            <div class="pill pill-purple">
+              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Your Unique Voice
+            </div>
+            <div class="pill pill-cyan">
+              <svg viewBox="0 0 24 24"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+              AI Workspace
+            </div>
+            <div class="pill pill-emerald">
+              <svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+              Smart Rewrite
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- JavaScript for downloading -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    async function downloadCard(elementId, filename) {
+      const element = document.getElementById(elementId);
+      if (!element) {
+        alert('Element not found: ' + elementId);
+        return;
+      }
+      
+      try {
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: null,
+          logging: false
+        });
+        
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (error) {
+        console.error('Download error:', error);
+        alert('Error downloading. Please try again.');
+      }
+    }
+    
+    async function downloadAll() {
+      const images = [
+        { id: 'screenshot-1', name: 'screenshot-1-detection.png' },
+        { id: 'screenshot-2', name: 'screenshot-2-humanization.png' },
+        { id: 'screenshot-3', name: 'screenshot-3-voice.png' },
+        { id: 'screenshot-4', name: 'screenshot-4-workspace.png' },
+        { id: 'screenshot-5', name: 'screenshot-5-rewrite.png' },
+        { id: 'small-promo', name: 'small-promo-tile.png' },
+        { id: 'marquee-promo', name: 'marquee-promo-tile.png' }
+      ];
+      
+      for (const img of images) {
+        await downloadCard(img.id, img.name);
+        await new Promise(resolve => setTimeout(resolve, 800));
+      }
+    }
+  </script>
+</body>
+</html>

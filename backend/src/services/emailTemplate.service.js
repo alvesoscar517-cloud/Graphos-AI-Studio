@@ -7,7 +7,15 @@
  */
 
 const envConfig = require('../config/envConfigHelper');
+const { cidIcon, cidLogo, cidHeaderIcon, cidSrc } = require('../utils/emailCid');
+
+// Keep ICON_BASE_URL as fallback for external references (optional)
 const ICON_BASE_URL = envConfig.get('ICON_BASE_URL', 'https://alvesoscar517-cloud.github.io/icons-for-Gmail');
+
+// Use CID-based functions for email templates
+const icon = cidIcon;
+const logo = cidLogo;
+const headerIcon = cidHeaderIcon;
 
 // ============================================================================
 // TRANSLATIONS (15 languages)
@@ -1285,32 +1293,8 @@ const ICON_FILES = {
   user: 'user', calendar: 'calendar', alertCircle: 'circle-alert'
 };
 
-function getIconUrl(name, color = 'black') {
-  const fileName = ICON_FILES[name] || name;
-  return `${ICON_BASE_URL}/${fileName}-${color}.png`;
-}
-
-function icon(name, color = 'black', size = 20) {
-  const colorVariant = (color === 'white' || color === '#ffffff') ? 'white' : 'black';
-  if (!ICON_BASE_URL) return '';
-  return `<img src="${getIconUrl(name, colorVariant)}" alt="${name}" width="${size}" height="${size}" style="display:block;margin:0 auto;"/>`;
-}
-
-function logo(size = 36) {
-  if (!ICON_BASE_URL) return '';
-  return `<img src="${ICON_BASE_URL}/content.png" alt="Graphos AI Studio" width="${size}" height="${size}" style="display:block;border-radius:10px;"/>`;
-}
-
-// Header icon with circular background - email-safe table layout
-function headerIcon(name, color = 'black', iconSize = 32, circleSize = 80) {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 24px;">
-  <tr>
-    <td style="width:${circleSize}px;height:${circleSize}px;background-color:#f5f5f7;border-radius:50%;text-align:center;vertical-align:middle;">
-      ${icon(name, color, iconSize)}
-    </td>
-  </tr>
-</table>`;
-}
+// Note: icon, logo, headerIcon functions are now imported from emailCid.js
+// They use CID references instead of external URLs for better email deliverability
 
 
 // ============================================================================
@@ -1580,8 +1564,8 @@ function newDeviceLoginEmail({ userName, deviceInfo, ipAddress, location, loginT
         <!-- Was this you? -->
         <div style="background-color:#f5f5f7;border-radius:20px;padding:24px;margin-bottom:24px;">
           <p style="margin:0 0 16px;color:#1d1d1f;font-size:15px;font-weight:600;">${t('newDeviceLogin.wasYou', lang)}</p>
-          <p style="margin:0 0 12px;color:#1d1d1f;font-size:14px;line-height:1.5;"><img src="${ICON_BASE_URL}/circle-check-black.png" alt="Yes" width="16" height="16" style="display:inline-block;vertical-align:middle;margin-right:6px;"/> ${t('newDeviceLogin.wasYouYes', lang)}</p>
-          <p style="margin:0;color:#1d1d1f;font-size:14px;line-height:1.5;"><img src="${ICON_BASE_URL}/circle-alert-black.png" alt="No" width="16" height="16" style="display:inline-block;vertical-align:middle;margin-right:6px;"/> ${t('newDeviceLogin.wasYouNo', lang)}</p>
+          <p style="margin:0 0 12px;color:#1d1d1f;font-size:14px;line-height:1.5;"><img src="${cidSrc('check', 'black')}" alt="Yes" width="16" height="16" style="display:inline-block;vertical-align:middle;margin-right:6px;"/> ${t('newDeviceLogin.wasYouYes', lang)}</p>
+          <p style="margin:0;color:#1d1d1f;font-size:14px;line-height:1.5;"><img src="${cidSrc('alertCircle', 'black')}" alt="No" width="16" height="16" style="display:inline-block;vertical-align:middle;margin-right:6px;"/> ${t('newDeviceLogin.wasYouNo', lang)}</p>
         </div>
         
         <!-- CTA -->

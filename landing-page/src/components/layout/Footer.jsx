@@ -21,7 +21,7 @@ function Footer() {
       { to: '/features/deviations', label: t('nav.deviations', 'Deviations') },
       { to: '/features/statistics', label: t('nav.statistics', 'Statistics') },
       { to: '/features/ai-workspace', label: t('nav.aiWorkspace', 'AI Workspace') },
-      { href: 'https://chrome.google.com/webstore', label: t('nav.chromeExtension', 'Chrome Extension'), external: true }
+      { href: 'https://chromewebstore.google.com/detail/nedkeccobejcenjdkegndfejblbjplol', label: t('nav.chromeExtension', 'Chrome Extension'), external: true }
     ],
     resources: [
       { href: '#faq', label: t('nav.faq', 'FAQ') },
