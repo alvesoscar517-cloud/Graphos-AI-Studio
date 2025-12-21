@@ -26,6 +26,7 @@ import {
 } from 'firebase/firestore'
 import { initializeFirebase } from '../config/firebase'
 import { logger } from '../utils/logger'
+import { getCurrentUser } from './firebaseAuth'
 
 // Collection names
 const COLLECTIONS = {
@@ -53,6 +54,26 @@ function getFirestore() {
     db = firebase.db
   }
   return db
+}
+
+/**
+ * Check if Firebase Auth is ready for Firestore operations
+ * Returns true if user is authenticated with Firebase Auth
+ */
+function isFirebaseAuthReady() {
+  const user = getCurrentUser()
+  return !!user
+}
+
+/**
+ * Ensure Firebase Auth is ready before Firestore write operations
+ * Throws error if not authenticated - caller should handle gracefully
+ */
+function ensureFirebaseAuth(operation) {
+  if (!isFirebaseAuthReady()) {
+    logger.warn('FirestoreData', `Firebase Auth not ready for ${operation}, skipping Firestore write`)
+    throw new Error('FIREBASE_AUTH_NOT_READY')
+  }
 }
 
 /**
@@ -177,6 +198,9 @@ export async function getNote(userId, noteId) {
  * @param {Object} note - Note data
  */
 export async function saveNote(userId, note) {
+  // Check Firebase Auth before write operation
+  ensureFirebaseAuth('saveNote')
+  
   const firestore = getFirestore()
   
   try {
@@ -215,6 +239,9 @@ export async function saveNote(userId, note) {
  * @param {string} noteId - Note ID
  */
 export async function deleteNote(userId, noteId) {
+  // Check Firebase Auth before write operation
+  ensureFirebaseAuth('deleteNote')
+  
   const firestore = getFirestore()
   
   try {
@@ -242,6 +269,9 @@ export async function deleteNote(userId, noteId) {
  * @param {Array} notes - Array of notes
  */
 export async function saveNotesBatch(userId, notes) {
+  // Check Firebase Auth before write operation
+  ensureFirebaseAuth('saveNotesBatch')
+  
   const firestore = getFirestore()
   
   try {
@@ -365,6 +395,9 @@ export async function getConversation(userId, conversationId) {
  * Create or update a conversation
  */
 export async function saveConversation(userId, conversation) {
+  // Check Firebase Auth before write operation
+  ensureFirebaseAuth('saveConversation')
+  
   const firestore = getFirestore()
   
   try {
@@ -404,6 +437,9 @@ export async function saveConversation(userId, conversation) {
  * Delete a conversation and its messages
  */
 export async function deleteConversation(userId, conversationId) {
+  // Check Firebase Auth before write operation
+  ensureFirebaseAuth('deleteConversation')
+  
   const firestore = getFirestore()
   
   try {
@@ -495,6 +531,9 @@ export async function getMessages(userId, conversationId, options = {}) {
  * Save a message
  */
 export async function saveMessage(userId, conversationId, message) {
+  // Check Firebase Auth before write operation
+  ensureFirebaseAuth('saveMessage')
+  
   const firestore = getFirestore()
   
   try {
@@ -537,6 +576,9 @@ export async function saveMessage(userId, conversationId, message) {
  * Save multiple messages
  */
 export async function saveMessagesBatch(userId, conversationId, messages) {
+  // Check Firebase Auth before write operation
+  ensureFirebaseAuth('saveMessagesBatch')
+  
   const firestore = getFirestore()
   
   try {
@@ -572,6 +614,9 @@ export async function saveMessagesBatch(userId, conversationId, messages) {
  * Delete a message
  */
 export async function deleteMessage(userId, messageId) {
+  // Check Firebase Auth before write operation
+  ensureFirebaseAuth('deleteMessage')
+  
   const firestore = getFirestore()
   
   try {

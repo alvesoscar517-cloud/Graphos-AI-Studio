@@ -1358,15 +1358,17 @@ async function generateTokens(userId, options = {}) {
     : TOKEN_CONFIG.REFRESH_TOKEN_EXPIRY_DAYS;
 
   // Generate access token as JWT with embedded user info
+  // NOTE: Don't include picture in JWT - it can be very large (base64 avatar)
+  // Picture should be fetched from user data when needed
   const accessToken = jwt.sign(
     {
       userId,
       type: 'email_auth',
-      // Embed user info to avoid DB lookups
+      // Embed minimal user info to avoid DB lookups
       email: userInfo?.email || '',
       name: userInfo?.name || '',
-      picture: userInfo?.picture || '',
       emailVerified: userInfo?.emailVerified ?? true
+      // picture is NOT included - can be base64 data URL which is too large for headers
     },
     config.JWT_SECRET,
     {
