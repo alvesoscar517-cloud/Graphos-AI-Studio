@@ -107,9 +107,7 @@ export async function uploadAvatar(file, userId) {
     const base64Avatar = await resizeImage(file)
     
     // Upload via backend API (backend uses Admin SDK to write to Firestore)
-    const response = await kyClient.post('user/avatar', {
-      json: { avatar: base64Avatar }
-    }).json()
+    const response = await kyClient.post('api/user/avatar', { avatar: base64Avatar })
 
     if (!response.success) {
       throw new Error(response.error || 'Failed to upload avatar')
@@ -131,7 +129,7 @@ export async function uploadAvatar(file, userId) {
  */
 export async function removeAvatar(userId) {
   try {
-    const response = await kyClient.delete('user/avatar').json()
+    const response = await kyClient.delete('api/user/avatar')
 
     if (!response.success) {
       throw new Error(response.error || 'Failed to remove avatar')
@@ -153,7 +151,7 @@ export async function removeAvatar(userId) {
  */
 export async function getAvatar(userId) {
   try {
-    const response = await kyClient.get('user/avatar').json()
+    const response = await kyClient.get('api/user/avatar')
     
     if (response.success) {
       return response.avatar || null

@@ -234,13 +234,19 @@ app.use(responseLocalizationMiddleware);
 // 12. Input sanitization middleware (if enabled)
 if (config.SECURITY.SANITIZE_INPUT) {
   const { sanitizeMiddleware } = require('./src/utils/sanitize');
-  app.use(sanitizeMiddleware({
-    sanitizeBody: true,
-    sanitizeQuery: true,
-    sanitizeParams: true,
-    textFields: ['text', 'content', 'message', 'sentence'],
-    maxTextLength: config.MAX_TEXT_LENGTH,
-  }));
+  app.use((req, res, next) => {
+    // Skip sanitization for avatar upload (base64 data would be corrupted)
+    if (req.path === '/api/user/avatar' && req.method === 'POST') {
+      return next();
+    }
+    return sanitizeMiddleware({
+      sanitizeBody: true,
+      sanitizeQuery: true,
+      sanitizeParams: true,
+      textFields: ['text', 'content', 'message', 'sentence'],
+      maxTextLength: config.MAX_TEXT_LENGTH,
+    })(req, res, next);
+  });
 }
 
 // ============================================================================
