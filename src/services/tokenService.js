@@ -202,6 +202,19 @@ class TokenService {
         refreshToken: data.refreshToken,
         expiresIn: data.expiresIn || 3600
       })
+      
+      // Restore Firebase Auth session if custom token provided
+      // This is needed for direct Firestore access (notes, conversations sync)
+      if (data.firebaseCustomToken) {
+        try {
+          const { signInWithCustomToken } = await import('./firebaseAuth')
+          await signInWithCustomToken(data.firebaseCustomToken)
+          logger.log('[TokenService] Firebase Auth session restored after token refresh')
+        } catch (firebaseError) {
+          logger.warn('TokenService', 'Firebase custom token sign-in failed (non-critical)', firebaseError.message)
+          // Continue - user can still use API, just not direct Firestore
+        }
+      }
 
       return data.accessToken
 

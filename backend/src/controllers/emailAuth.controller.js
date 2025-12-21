@@ -910,7 +910,8 @@ exports.refreshToken = async (req, res) => {
       success: true,
       accessToken: result.accessToken,
       refreshToken: result.refreshToken, // New refresh token (rotation)
-      expiresIn: result.expiresIn
+      expiresIn: result.expiresIn,
+      firebaseCustomToken: result.firebaseCustomToken // For Firebase Auth session restore
     });
     
   } catch (error) {

@@ -172,10 +172,20 @@ export const useAuthStore = create(
                 _sessionPersisted: rememberMeEnabled // Sync with current rememberMe preference
               })
               
-              // Check if token needs refresh
-              if (tokenService.needsRefresh()) {
-                logger.log('[AUTH] Token needs refresh, refreshing...')
-                await tokenService.refreshAccessToken()
+              // Always refresh token on app startup to:
+              // 1. Get fresh firebaseCustomToken for Firestore access
+              // 2. Verify token is still valid on server
+              // 3. Extend token lifetime (sliding expiration)
+              const refreshToken = secureGet(AUTH_STORAGE_KEYS.REFRESH_TOKEN)
+              if (refreshToken) {
+                logger.log('[AUTH] Refreshing token to restore Firebase Auth session...')
+                try {
+                  await tokenService.refreshAccessToken()
+                  logger.log('[AUTH] Token refreshed and Firebase Auth session restored')
+                } catch (refreshError) {
+                  logger.warn('Auth', 'Token refresh failed on startup', refreshError.message)
+                  // Continue with existing token - API calls may still work
+                }
               }
               
               // Verify token in background (don't block UI)

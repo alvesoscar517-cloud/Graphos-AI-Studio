@@ -49,6 +49,33 @@ const PASSWORD_HISTORY_COUNT = 5; // Number of previous passwords to check
 const SESSION_COLLECTION = 'user_sessions';
 const LOGIN_HISTORY_COLLECTION = 'login_history';
 
+/**
+ * Get user's best available profile picture
+ * Priority: avatar (uploaded) > picture > googleLinked.googlePicture
+ * @param {Object} userData - User data from Firestore
+ * @returns {string} Profile picture URL or empty string
+ */
+function getUserPicture(userData) {
+  if (!userData) return '';
+  
+  // Priority 1: User uploaded avatar
+  if (userData.avatar && userData.avatar.trim()) {
+    return userData.avatar;
+  }
+  
+  // Priority 2: Picture field (from Google OAuth or other sources)
+  if (userData.picture && userData.picture.trim()) {
+    return userData.picture;
+  }
+  
+  // Priority 3: Linked Google account picture
+  if (userData.googleLinked?.googlePicture) {
+    return userData.googleLinked.googlePicture;
+  }
+  
+  return '';
+}
+
 // Disposable email domains (common ones)
 const DISPOSABLE_EMAIL_DOMAINS = [
   'tempmail.com', 'throwaway.email', 'guerrillamail.com', 'mailinator.com',
@@ -432,7 +459,7 @@ async function login(email, password, options = {}) {
     userInfo: {
       email: normalizedEmail,
       name: userData.name,
-      picture: userData.picture || '',
+      picture: getUserPicture(userData),
       emailVerified: userData.emailVerified
     }
   });
@@ -456,10 +483,8 @@ async function login(email, password, options = {}) {
 
   logger.info('User logged in', { userId, email: normalizedEmail, rememberMe });
 
-  // Get best available picture (prefer user's own, fallback to Google linked)
-  const userPicture = userData.picture && userData.picture.trim() 
-    ? userData.picture 
-    : (userData.googleLinked?.googlePicture || '');
+  // Get best available picture using helper function
+  const userPicture = getUserPicture(userData);
 
   return {
     success: true,
@@ -1449,10 +1474,28 @@ async function refreshAccessToken(refreshToken) {
     userInfo: {
       email: userData.email,
       name: userData.name,
-      picture: userData.picture || '',
+      picture: getUserPicture(userData),
       emailVerified: userData.emailVerified
     }
   });
+  
+  // Generate Firebase Custom Token for client-side Firebase Auth session restore
+  // This allows email users to maintain Firestore access after token refresh
+  let firebaseCustomToken = null;
+  try {
+    firebaseCustomToken = await admin.auth().createCustomToken(userId, {
+      email: userData.email,
+      name: userData.name,
+      authProvider: 'email'
+    });
+    logger.debug('Firebase custom token created for token refresh', { userId });
+  } catch (customTokenError) {
+    logger.warn('Failed to create Firebase custom token on refresh', { 
+      userId, 
+      error: customTokenError.message 
+    });
+    // Non-critical - user can still use API, just not direct Firestore
+  }
   
   logger.info('Access token refreshed', { 
     userId, 
@@ -1460,7 +1503,10 @@ async function refreshAccessToken(refreshToken) {
     daysUntilExpiry: Math.round(daysUntilExpiry)
   });
   
-  return newTokens;
+  return {
+    ...newTokens,
+    firebaseCustomToken
+  };
 }
 
 /**
@@ -1537,7 +1583,7 @@ async function checkGoogleLinked(googleEmail) {
         userId: userDoc.id,
         email: userData.email,
         displayName: userData.displayName,
-        picture: userData.picture || userData.googleLinked?.googlePicture,
+        picture: getUserPicture(userData),
         tier: userData.tier,
         authProvider: 'email',
         googleLinked: {
@@ -1639,7 +1685,7 @@ async function loginWithLinkedGoogle(googleEmail, googleAccessToken) {
     userInfo: {
       email: userData.email,
       name: userData.displayName || userData.name,
-      picture: userData.picture || userData.googleLinked?.googlePicture || '',
+      picture: getUserPicture(userData),
       emailVerified: true
     }
   });
@@ -1653,7 +1699,7 @@ async function loginWithLinkedGoogle(googleEmail, googleAccessToken) {
       email: userData.email,
       displayName: userData.displayName || userData.name,
       name: userData.displayName || userData.name,
-      picture: userData.picture || userData.googleLinked?.googlePicture || '',
+      picture: getUserPicture(userData),
       tier: userData.tier,
       authProvider: 'email',
       googleLinked: {
