@@ -169,7 +169,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
               />
             )}
             <div 
-              className={`text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-xl shrink-0 ${isTypingTitle ? 'animate-pulse' : ''}`}
+              className={`text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-[200px] shrink ${isTypingTitle ? 'animate-pulse' : ''}`}
             >
               {stripHelpPrefix(displayTitle)}
             </div>
@@ -186,12 +186,20 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
 
           <div className="flex items-center gap-1">
             <button 
-              className="p-1.5 bg-transparent border-none cursor-pointer rounded-full w-8 h-8 flex items-center justify-center transition-colors duration-200 hover:bg-bg-hover"
+              className={cn(
+                "flex items-center justify-center p-2",
+                "bg-transparent text-text-primary",
+                "border border-border-light",
+                "rounded-full cursor-pointer",
+                "transition-all duration-200",
+                "hover:bg-bg-hover",
+                "hover:border-border-hover"
+              )}
               onClick={clearConversation}
               data-tooltip={t('common.new')} 
               data-tooltip-position="left"
             >
-              <img src="/icon/plus.svg" alt={t('workspace.newChat')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+              <img src="/icon/plus.svg" alt={t('workspace.newChat')} className="w-4 h-4 opacity-70 icon-invert" />
             </button>
             {rightSidebarHidden && (
               <button 

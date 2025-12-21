@@ -396,18 +396,21 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
 
               {/* CTA Button - Overlay style */}
               {selectedNotif.translations?.[userLang]?.cta && selectedNotif.ctaAction && (
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  padding: '16px',
-                  background: 'linear-gradient(to top, var(--color-bg-primary) 70%, transparent)',
-                  paddingTop: '32px',
-                  pointerEvents: 'none'
-                }}>
+                <div 
+                  className="notif-cta-container"
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    padding: '16px',
+                    background: 'linear-gradient(to top, var(--color-bg-primary) 70%, transparent)',
+                    paddingTop: '32px',
+                    pointerEvents: 'none'
+                  }}>
                   <button 
                     onClick={() => handleCtaClick(selectedNotif)}
+                    className="notif-cta-button"
                     style={{
                       width: '100%',
                       padding: '12px 16px',

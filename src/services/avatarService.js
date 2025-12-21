@@ -8,8 +8,7 @@
  */
 
 import { logger } from '../utils/logger'
-import { db } from '../config/firebase'
-import { doc, updateDoc, getDoc } from 'firebase/firestore'
+import { kyClient } from './api/kyClient'
 
 // Configuration
 export const AVATAR_CONFIG = {
@@ -91,9 +90,9 @@ export async function resizeImage(file, targetSize = AVATAR_CONFIG.TARGET_SIZE) 
 }
 
 /**
- * Process and upload avatar
+ * Process and upload avatar via backend API
  * @param {File} file - Avatar file
- * @param {string} userId - User ID
+ * @param {string} userId - User ID (not used directly, auth handled by backend)
  * @returns {Promise<{ success: boolean, avatarUrl?: string, error?: string }>}
  */
 export async function uploadAvatar(file, userId) {
@@ -107,16 +106,18 @@ export async function uploadAvatar(file, userId) {
     // Resize
     const base64Avatar = await resizeImage(file)
     
-    // Save to Firestore user document
-    const userRef = doc(db, 'users', userId)
-    await updateDoc(userRef, {
-      avatar: base64Avatar,
-      avatarUpdatedAt: new Date().toISOString()
-    })
+    // Upload via backend API (backend uses Admin SDK to write to Firestore)
+    const response = await kyClient.post('user/avatar', {
+      json: { avatar: base64Avatar }
+    }).json()
+
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to upload avatar')
+    }
 
     logger.log('[AvatarService] Avatar uploaded for user:', userId)
     
-    return { success: true, avatarUrl: base64Avatar }
+    return { success: true, avatarUrl: response.avatarUrl || base64Avatar }
   } catch (error) {
     logger.error('AvatarService', 'Failed to upload avatar', error)
     return { success: false, error: error.message }
@@ -124,17 +125,17 @@ export async function uploadAvatar(file, userId) {
 }
 
 /**
- * Remove avatar
- * @param {string} userId - User ID
+ * Remove avatar via backend API
+ * @param {string} userId - User ID (not used directly, auth handled by backend)
  * @returns {Promise<{ success: boolean, error?: string }>}
  */
 export async function removeAvatar(userId) {
   try {
-    const userRef = doc(db, 'users', userId)
-    await updateDoc(userRef, {
-      avatar: null,
-      avatarUpdatedAt: new Date().toISOString()
-    })
+    const response = await kyClient.delete('user/avatar').json()
+
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to remove avatar')
+    }
 
     logger.log('[AvatarService] Avatar removed for user:', userId)
     
@@ -146,17 +147,16 @@ export async function removeAvatar(userId) {
 }
 
 /**
- * Get avatar for user
- * @param {string} userId - User ID
+ * Get avatar for user via backend API
+ * @param {string} userId - User ID (not used directly, auth handled by backend)
  * @returns {Promise<string|null>} - Avatar URL or null
  */
 export async function getAvatar(userId) {
   try {
-    const userRef = doc(db, 'users', userId)
-    const userDoc = await getDoc(userRef)
+    const response = await kyClient.get('user/avatar').json()
     
-    if (userDoc.exists()) {
-      return userDoc.data().avatar || null
+    if (response.success) {
+      return response.avatar || null
     }
     
     return null

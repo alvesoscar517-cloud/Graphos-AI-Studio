@@ -14,6 +14,7 @@ const notificationRoutes = require('./notification.routes');
 const creditRoutes = require('./credit.routes');
 const paymentRoutes = require('./payment.routes');
 const realtimeRoutes = require('./realtime.routes');
+const avatarRoutes = require('./avatar.routes');
 const paymentController = require('../controllers/payment.controller');
 
 // Middleware
@@ -245,6 +246,9 @@ router.use('/api/payment', authenticate, paymentRoutes);
 
 // Realtime routes (SSE)
 router.use('/api/realtime', protectedMiddleware, realtimeRoutes);
+
+// Avatar routes
+router.use('/api/user/avatar', protectedMiddleware, avatarRoutes);
 
 // Internal API for backend-to-backend communication (broadcast notifications)
 const realtimeController = require('../controllers/realtime.controller');

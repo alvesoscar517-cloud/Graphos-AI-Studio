@@ -87,51 +87,93 @@ export async function initDB() {
 
 
 /**
- * Get all notes from IndexedDB
+ * Get all notes from IndexedDB for a specific user
+ * @param {string} userId - User ID to filter notes (optional for backward compatibility)
  */
-export async function getNotesFromDB() {
+export async function getNotesFromDB(userId = null) {
   if (!db) await initDB()
 
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([NOTES_STORE], 'readonly')
     const store = transaction.objectStore(NOTES_STORE)
-    const request = store.getAll()
+    
+    // If userId provided, use index to filter
+    if (userId) {
+      const index = store.index('userId')
+      const request = index.getAll(userId)
+      
+      request.onsuccess = () => {
+        resolve(request.result || [])
+      }
+      
+      request.onerror = () => {
+        logger.error('IndexedDB', 'Failed to get notes from IndexedDB', request.error)
+        reject(request.error)
+      }
+    } else {
+      // Backward compatibility: get all notes
+      const request = store.getAll()
 
-    request.onsuccess = () => {
-      resolve(request.result)
-    }
+      request.onsuccess = () => {
+        resolve(request.result)
+      }
 
-    request.onerror = () => {
-      logger.error('IndexedDB', 'Failed to get notes from IndexedDB', request.error)
-      reject(request.error)
+      request.onerror = () => {
+        logger.error('IndexedDB', 'Failed to get notes from IndexedDB', request.error)
+        reject(request.error)
+      }
     }
   })
 }
 
 /**
- * Save notes to IndexedDB
+ * Save notes to IndexedDB for a specific user
+ * @param {Array} notes - Notes to save
+ * @param {string} userId - User ID (optional, will clear only user's notes if provided)
  */
-export async function saveNotesToDB(notes) {
+export async function saveNotesToDB(notes, userId = null) {
   if (!db) await initDB()
 
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([NOTES_STORE], 'readwrite')
     const store = transaction.objectStore(NOTES_STORE)
 
-    // Clear existing notes
-    store.clear()
+    if (userId) {
+      // Clear only this user's notes first
+      const index = store.index('userId')
+      const cursorRequest = index.openCursor(userId)
+      
+      cursorRequest.onsuccess = (event) => {
+        const cursor = event.target.result
+        if (cursor) {
+          store.delete(cursor.primaryKey)
+          cursor.continue()
+        }
+      }
+    } else {
+      // Clear all notes (backward compatibility)
+      store.clear()
+    }
 
-    // Add all notes
-    notes.forEach(note => {
-      store.put(note)
-    })
+    // Add all notes after clearing
+    transaction.oncomplete = async () => {
+      const addTransaction = db.transaction([NOTES_STORE], 'readwrite')
+      const addStore = addTransaction.objectStore(NOTES_STORE)
+      
+      notes.forEach(note => {
+        // Ensure userId is set on each note
+        addStore.put({ ...note, userId: note.userId || userId })
+      })
 
-    transaction.oncomplete = () => {
-      resolve()
+      addTransaction.oncomplete = () => resolve()
+      addTransaction.onerror = () => {
+        logger.error('IndexedDB', 'Failed to save notes to IndexedDB', addTransaction.error)
+        reject(addTransaction.error)
+      }
     }
 
     transaction.onerror = () => {
-      logger.error('IndexedDB', 'Failed to save notes to IndexedDB', transaction.error)
+      logger.error('IndexedDB', 'Failed to clear notes from IndexedDB', transaction.error)
       reject(transaction.error)
     }
   })
@@ -183,22 +225,138 @@ export async function deleteNoteFromDB(noteId) {
 
 /**
  * Clear all notes from IndexedDB
+ * @param {string} userId - User ID (optional, if provided only clears user's notes)
  */
-export async function clearNotesDB() {
+export async function clearNotesDB(userId = null) {
   if (!db) await initDB()
 
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([NOTES_STORE], 'readwrite')
     const store = transaction.objectStore(NOTES_STORE)
-    const request = store.clear()
+    
+    if (userId) {
+      // Clear only this user's notes
+      const index = store.index('userId')
+      const cursorRequest = index.openCursor(userId)
+      
+      cursorRequest.onsuccess = (event) => {
+        const cursor = event.target.result
+        if (cursor) {
+          store.delete(cursor.primaryKey)
+          cursor.continue()
+        }
+      }
+      
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = () => {
+        logger.error('IndexedDB', 'Failed to clear notes from IndexedDB', transaction.error)
+        reject(transaction.error)
+      }
+    } else {
+      // Clear all notes
+      const request = store.clear()
 
-    request.onsuccess = () => {
-      resolve()
+      request.onsuccess = () => {
+        resolve()
+      }
+
+      request.onerror = () => {
+        logger.error('IndexedDB', 'Failed to clear notes from IndexedDB', request.error)
+        reject(request.error)
+      }
+    }
+  })
+}
+
+/**
+ * Clear ALL user data from IndexedDB (for logout)
+ * Clears notes, conversations, messages, and sync queue for a specific user
+ * @param {string} userId - User ID
+ */
+export async function clearAllUserData(userId) {
+  if (!userId) {
+    logger.warn('IndexedDB', 'clearAllUserData called without userId')
+    return
+  }
+  
+  if (!db) await initDB()
+  
+  try {
+    // Clear notes for this user
+    await clearNotesDB(userId)
+    
+    // Clear conversations for this user
+    await clearConversationsDB(userId)
+    
+    // Clear messages for this user
+    await clearMessagesDB(userId)
+    
+    // Clear sync queue for this user
+    await clearSyncQueueForUser(userId)
+    
+    logger.log('[IndexedDB] Cleared all data for user:', userId)
+  } catch (error) {
+    logger.error('IndexedDB', 'Failed to clear all user data', error)
+    throw error
+  }
+}
+
+/**
+ * Clear messages for a specific user
+ * @param {string} userId - User ID
+ */
+export async function clearMessagesDB(userId) {
+  if (!db) await initDB()
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([MESSAGES_STORE], 'readwrite')
+    const store = transaction.objectStore(MESSAGES_STORE)
+    const index = store.index('userId')
+    const cursorRequest = index.openCursor(userId)
+
+    cursorRequest.onsuccess = (event) => {
+      const cursor = event.target.result
+      if (cursor) {
+        store.delete(cursor.primaryKey)
+        cursor.continue()
+      }
     }
 
-    request.onerror = () => {
-      logger.error('IndexedDB', 'Failed to clear notes from IndexedDB', request.error)
-      reject(request.error)
+    transaction.oncomplete = () => resolve()
+
+    transaction.onerror = () => {
+      logger.error('IndexedDB', 'Failed to clear messages from IndexedDB', transaction.error)
+      reject(transaction.error)
+    }
+  })
+}
+
+/**
+ * Clear sync queue for a specific user
+ * @param {string} userId - User ID
+ */
+export async function clearSyncQueueForUser(userId) {
+  if (!db) await initDB()
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([SYNC_QUEUE_STORE], 'readwrite')
+    const store = transaction.objectStore(SYNC_QUEUE_STORE)
+    const index = store.index('userId')
+    const cursorRequest = index.openCursor(userId)
+
+    cursorRequest.onsuccess = (event) => {
+      const cursor = event.target.result
+      if (cursor) {
+        store.delete(cursor.primaryKey)
+        cursor.continue()
+      }
+    }
+
+    transaction.oncomplete = () => resolve()
+
+    transaction.onerror = () => {
+      logger.error('IndexedDB', 'Failed to clear sync queue from IndexedDB', transaction.error)
+      reject(transaction.error)
     }
   })
 }
@@ -721,7 +879,8 @@ export default {
   initDB,
   getNotesFromDB, saveNotesToDB, saveNoteToDB, deleteNoteFromDB, clearNotesDB, updateNoteSyncStatus,
   getConversationsFromDB, saveConversationsToDB, saveConversationToDB, deleteConversationFromDB, clearConversationsDB, updateConversationSyncStatus,
-  getMessagesFromDB, saveMessageToDB, saveMessagesToDB, deleteMessageFromDB, deleteMessagesForConversation,
-  addToSyncQueue, getPendingSyncItems, updateSyncQueueItem, removeSyncQueueItem, clearSyncedItems, getSyncQueueStats, getPendingSyncItems_Store,
+  getMessagesFromDB, saveMessageToDB, saveMessagesToDB, deleteMessageFromDB, deleteMessagesForConversation, clearMessagesDB,
+  addToSyncQueue, getPendingSyncItems, updateSyncQueueItem, removeSyncQueueItem, clearSyncedItems, getSyncQueueStats, getPendingSyncItems_Store, clearSyncQueueForUser,
+  clearAllUserData,
   SyncStatus, SyncOperation
 }

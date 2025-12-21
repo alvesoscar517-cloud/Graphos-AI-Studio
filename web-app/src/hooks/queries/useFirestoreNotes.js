@@ -52,7 +52,9 @@ const truncateTitleToWords = (title, maxWords = 7) => {
  */
 export function useFirestoreNotes(options = {}) {
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  // Firestore rules require userId in document to match request.auth.uid
+  const userId = user?.userId || user?.uid || user?.id
   
   return useQuery({
     queryKey: queryKeys.notes.list(),
@@ -60,13 +62,8 @@ export function useFirestoreNotes(options = {}) {
       // Initialize IndexedDB
       await initDB()
       
-      // Load from IndexedDB first (fast, offline-first)
-      let notes = await getNotesFromDB()
-      
-      // Filter by userId if available
-      if (userId) {
-        notes = notes.filter(n => !n.userId || n.userId === userId)
-      }
+      // Load from IndexedDB first (fast, offline-first) - filter by userId
+      let notes = await getNotesFromDB(userId)
       
       // Try to sync with Firestore in background if online
       if (isNetworkOnline() && userId) {
@@ -77,8 +74,8 @@ export function useFirestoreNotes(options = {}) {
             // Merge: Firestore is source of truth for synced items
             const mergedNotes = mergeNotes(notes, firestoreNotes)
             
-            // Update IndexedDB cache
-            await saveNotesToDB(mergedNotes)
+            // Update IndexedDB cache - pass userId to only update this user's notes
+            await saveNotesToDB(mergedNotes, userId)
             
             logger.log('[useFirestoreNotes] Synced', firestoreNotes.length, 'notes from Firestore')
             return mergedNotes
@@ -150,7 +147,8 @@ export function useFirestoreNote(noteId, options = {}) {
 export function useCreateFirestoreNote() {
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
 
   return useMutation({
     mutationFn: async (noteData = {}) => {
@@ -199,7 +197,8 @@ export function useCreateFirestoreNote() {
 export function useUpdateFirestoreNote() {
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
   let saveTimeout = null
 
   return useMutation({
@@ -263,7 +262,8 @@ export function useUpdateFirestoreNote() {
 export function useDeleteFirestoreNote() {
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
 
   return useMutation({
     mutationFn: async (noteId) => {
@@ -343,7 +343,8 @@ export function useVisibleFirestoreNotes() {
 export function useSyncFirestoreNotes() {
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
   
   return useMutation({
     mutationFn: async () => {

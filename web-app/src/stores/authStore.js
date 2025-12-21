@@ -893,7 +893,20 @@ export const useAuthStore = create(
         
         signOut: async () => {
           try {
-            const { authMethod } = get()
+            const { authMethod, user } = get()
+            const userId = user?.userId || user?.uid || user?.id
+            
+            // Clear IndexedDB data for this user BEFORE signing out
+            // This ensures data isolation between users
+            if (userId) {
+              try {
+                const { clearAllUserData } = await import('../services/indexedDB')
+                await clearAllUserData(userId)
+                logger.log('[AUTH] Cleared IndexedDB data for user:', userId)
+              } catch (e) {
+                logger.warn('Auth', 'Failed to clear IndexedDB data:', e.message)
+              }
+            }
             
             // Sign out from Firebase Auth
             try {
@@ -905,8 +918,7 @@ export const useAuthStore = create(
             
             // Sign out from appropriate auth provider
             if (isWebApp()) {
-              // Web app: Sign out from Firebase Auth
-              await firebaseSignOut()
+              // Web app: Sign out from Firebase Auth (already done above)
             } else if (isChromeExtension() && authMethod === 'google') {
               // Chrome Extension: Sign out via background script
               await chrome.runtime.sendMessage({ action: 'signOut' })

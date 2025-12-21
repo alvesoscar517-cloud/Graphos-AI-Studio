@@ -398,7 +398,7 @@
   --color-icon-bg-error: rgba(239, 68, 68, 0.15);
   
   /* Selection color */
-  --color-selection: rgba(79, 172, 254, 0.2);
+  --color-selection: rgba(139, 92, 246, 0.25);
   
   /* Background selection for utilities */
   --background-color-selection: var(--color-selection);
@@ -522,7 +522,7 @@
   --color-icon-bg-error: #2A2A2A;
   
   /* Selection color - Dark Mode */
-  --color-selection: rgba(0, 113, 227, 0.3);
+  --color-selection: rgba(139, 92, 246, 0.35);
 }
 
 /* ============================================
@@ -694,26 +694,26 @@
     width: 100%;
   }
 
-  /* Text selection - Light mode (inspired by Apple/Notion) */
+  /* Text selection - Light mode (purple theme) */
   ::selection {
-    background-color: rgba(0, 122, 255, 0.25);
+    background-color: rgba(139, 92, 246, 0.25);
     color: inherit;
   }
   
   ::-moz-selection {
-    background-color: rgba(0, 122, 255, 0.25);
+    background-color: rgba(139, 92, 246, 0.25);
     color: inherit;
   }
 }
 
-/* Text selection - Dark mode (inspired by Linear/Discord) */
+/* Text selection - Dark mode (purple theme) */
 .dark ::selection {
-  background-color: rgba(99, 102, 241, 0.4);
+  background-color: rgba(139, 92, 246, 0.35);
   color: inherit;
 }
 
 .dark ::-moz-selection {
-  background-color: rgba(99, 102, 241, 0.4);
+  background-color: rgba(139, 92, 246, 0.35);
   color: inherit;
 }
 
@@ -2603,7 +2603,16 @@
 
 /* Notification detail modal dark mode */
 .dark .notif-detail-popup {
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: none;
+}
+
+/* Remove gradient glow effect on CTA button in dark mode */
+.dark .notif-cta-container {
+  background: var(--color-bg-primary) !important;
+}
+
+.dark .notif-cta-button {
+  box-shadow: none !important;
 }
 
 /* ============================================

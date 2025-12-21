@@ -32,7 +32,9 @@ const MESSAGES_PAGE_SIZE = 50
  */
 export function useFirestoreMessages(conversationId, options = {}) {
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  // Firestore rules require userId in document to match request.auth.uid
+  const userId = user?.userId || user?.uid || user?.id
   
   return useQuery({
     queryKey: queryKeys.messages.list(conversationId),
@@ -77,7 +79,8 @@ export function useFirestoreMessages(conversationId, options = {}) {
  */
 export function useInfiniteFirestoreMessages(conversationId, options = {}) {
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
   
   return useInfiniteQuery({
     queryKey: [...queryKeys.messages.list(conversationId), 'infinite'],
@@ -156,7 +159,8 @@ function mergeMessages(local, remote) {
 export function useAddFirestoreMessage() {
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
 
   return useMutation({
     mutationFn: async ({ conversationId, messageData }) => {
@@ -209,7 +213,8 @@ export function useAddFirestoreMessage() {
 export function useUpdateFirestoreMessage() {
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
 
   return useMutation({
     mutationFn: async ({ conversationId, messageId, data }) => {
@@ -261,7 +266,8 @@ export function useUpdateFirestoreMessage() {
 export function useDeleteFirestoreMessage() {
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
 
   return useMutation({
     mutationFn: async ({ conversationId, messageId }) => {
@@ -310,7 +316,8 @@ export function useDeleteFirestoreMessage() {
 export function useBatchAddMessages() {
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
 
   return useMutation({
     mutationFn: async ({ conversationId, messages }) => {

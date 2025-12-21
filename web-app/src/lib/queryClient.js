@@ -4,6 +4,7 @@
  */
 
 import { QueryClient } from '@tanstack/react-query'
+import { logger } from '../utils/logger'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,5 +34,14 @@ export const queryClient = new QueryClient({
     },
   },
 })
+
+// Listen for sign out event to clear all cached data
+// This ensures data isolation between users
+if (typeof window !== 'undefined') {
+  window.addEventListener('auth-signout', () => {
+    logger.log('[SECURITY] Clearing React Query cache on sign out')
+    queryClient.clear()
+  })
+}
 
 export default queryClient

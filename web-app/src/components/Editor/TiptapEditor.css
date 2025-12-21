@@ -44,18 +44,15 @@
   outline: none;
 }
 
-/* Placeholder - only show when editor is completely empty */
-.tiptap-editor .ProseMirror.tiptap-empty > p.is-editor-empty:first-child::before {
+/* Placeholder - show when editor is empty */
+.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
-  color: var(--color-text-muted);
+  color: var(--color-text-tertiary);
   pointer-events: none;
   height: 0;
-}
-
-/* Hide placeholder on non-first empty paragraphs */
-.tiptap-editor .ProseMirror p.is-empty:not(:first-child)::before {
-  content: none !important;
+  opacity: 0.4;
+  font-weight: 400;
 }
 
 /* Paragraph spacing */
@@ -187,19 +184,6 @@
 /* Focus styles */
 .tiptap-editor .ProseMirror:focus-visible {
   outline: none;
-}
-
-/* Placeholder styling - only for first empty paragraph when editor is empty */
-.tiptap-editor .ProseMirror.tiptap-empty > .is-empty:first-child::before {
-  content: attr(data-placeholder);
-  color: var(--color-text-muted);
-  pointer-events: none;
-  position: absolute;
-}
-
-/* Ensure no placeholder on other empty elements */
-.tiptap-editor .ProseMirror:not(.tiptap-empty) .is-empty::before {
-  content: none !important;
 }
 
 

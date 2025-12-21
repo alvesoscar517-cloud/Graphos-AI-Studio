@@ -346,38 +346,40 @@ const AIStudioEditorEnhanced = ({
       "bg-bg-tertiary",
       "h-full w-full box-border"
     )}>
-      <header className={cn(
-        "flex flex-col",
-        "border-b border-border-light",
-        "bg-bg-tertiary shrink-0"
-      )}>
-        {/* Top row - title and actions */}
-        <div className="flex items-center gap-2 py-2 px-4 h-14 max-md:px-3 max-md:gap-1">
-          <button 
-            className={cn(
-              "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
-              "w-8 h-8 shrink-0 flex items-center justify-center",
-              "transition-colors duration-200",
-              "hover:bg-bg-hover"
-            )}
-            onClick={onToggleLeftSidebar}
-            data-tooltip={t('common.menu')} 
-            data-tooltip-position="right"
-          >
-            <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
-          </button>
-          
-          <div className="flex items-center gap-2 min-w-0 flex-1 max-md:gap-1">
-            <div 
-              className={cn(
-                "text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default shrink-0",
-                "max-w-xl",
-                isTypingTitle && "animate-pulse"
-              )}
-            >
-              {displayTitle || t('editor.untitled')}
-            </div>
+      {/* Header block - floating panel with rounded corners like sidebar */}
+      <div className="shrink-0 p-2 pb-0">
+        <header className={cn(
+          "flex flex-col",
+          "bg-bg-tertiary rounded-lg",
+          "border border-border-light"
+        )}>
+          {/* Top row - title and actions */}
+          <div className="flex items-center gap-2 py-2 px-4 h-12 max-md:px-3 max-md:gap-1 @container">
             <button 
+              className={cn(
+                "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
+                "w-8 h-8 shrink-0 flex items-center justify-center",
+                "transition-colors duration-200",
+                "hover:bg-bg-hover"
+              )}
+              onClick={onToggleLeftSidebar}
+              data-tooltip={t('common.menu')} 
+              data-tooltip-position="right"
+            >
+              <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+            </button>
+            
+            <div className="flex items-center gap-2 min-w-0 flex-1 max-md:gap-1 overflow-hidden">
+              <div 
+                className={cn(
+                  "text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default",
+                  "max-w-[300px] shrink",
+                  isTypingTitle && "animate-pulse"
+                )}
+              >
+                {displayTitle || t('editor.untitled')}
+              </div>
+              <button 
               className={cn(
                 "bg-transparent border-none p-1.5 cursor-pointer rounded-md shrink-0",
                 "flex items-center justify-center opacity-50 transition-all duration-200",
@@ -392,12 +394,12 @@ const AIStudioEditorEnhanced = ({
               <img src="/icon/pencil.svg" alt={t('common.edit')} className="w-3.5 h-3.5 icon-invert" />
             </button>
             
-            <div className="max-lg:hidden">
+            <div className="hidden @[800px]:block">
               <TokenBadge text={currentNote?.content || ''} />
             </div>
           </div>
           
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 shrink-0">
             {hasHighlights && showHighlights && (
               <button 
                 className={cn(
@@ -422,56 +424,46 @@ const AIStudioEditorEnhanced = ({
 
             <button 
               className={cn(
-                "flex items-center justify-center gap-1.5 py-1.5 px-3.5",
+                "flex items-center justify-center p-2",
                 "bg-transparent text-text-primary",
                 "border border-border-light",
-                "rounded-pill text-sm font-medium cursor-pointer",
+                "rounded-full text-sm font-medium cursor-pointer",
                 "transition-all duration-200",
                 "hover:bg-bg-hover",
-                "hover:border-border-hover",
-                "max-lg:py-1.5 max-lg:px-3",
-                "max-md:p-2 max-md:rounded-full"
+                "hover:border-border-hover"
               )}
               onClick={onCreateNote}
               data-tooltip={t('common.new')}
-              data-tooltip-collapsed={t('common.new')}
             >
               <img src="/icon/plus.svg" alt={t('common.new')} className="w-4 h-4 opacity-70 icon-invert" />
-              <span className="max-md:hidden">{t('common.new')}</span>
             </button>
             <button 
               className={cn(
-                "flex items-center justify-center gap-1.5 py-1.5 px-3.5",
+                "flex items-center justify-center p-2",
                 "bg-transparent text-text-primary",
                 "border border-border-light",
-                "rounded-pill text-sm font-medium cursor-pointer",
+                "rounded-full text-sm font-medium cursor-pointer",
                 "transition-all duration-200",
                 "hover:bg-bg-hover",
-                "hover:border-border-hover",
-                "max-lg:py-1.5 max-lg:px-3",
-                "max-md:p-2 max-md:rounded-full"
+                "hover:border-border-hover"
               )}
               onClick={() => fileInputRef.current?.click()}
               data-tooltip={t('common.upload')}
-              data-tooltip-collapsed={t('common.upload')}
             >
               <img src="/icon/upload.svg" alt={t('common.upload')} className="w-4 h-4 opacity-70 icon-invert" />
-              <span className="max-md:hidden">{t('common.upload')}</span>
             </button>
 
             {/* Export Dropdown */}
             <div ref={exportMenuRef} className="relative">
               <button 
                 className={cn(
-                  "flex items-center justify-center gap-1.5 py-1.5 px-3.5",
+                  "flex items-center justify-center p-2",
                   "bg-transparent text-text-primary",
                   "border border-border-light",
-                  "rounded-pill text-sm font-medium cursor-pointer",
+                  "rounded-full text-sm font-medium cursor-pointer",
                   "transition-all duration-200",
                   "hover:bg-bg-hover",
                   "hover:border-border-hover",
-                  "max-lg:py-1.5 max-lg:px-3",
-                  "max-md:p-2 max-md:rounded-full",
                   isExporting && "opacity-50 cursor-wait"
                 )}
                 onClick={() => setShowExportMenu(!showExportMenu)}
@@ -479,8 +471,6 @@ const AIStudioEditorEnhanced = ({
                 data-tooltip={t('common.download') || 'Download'}
               >
                 <img src="/icon/download.svg" alt={t('common.download') || 'Download'} className="w-4 h-4 opacity-70 icon-invert" />
-                <span className="max-md:hidden">{isExporting ? '...' : t('common.download') || 'Download'}</span>
-                <img src="/icon/chevron-down.svg" alt="" className="w-3 h-3 opacity-50 icon-invert max-md:hidden" />
               </button>
 
               {/* Export Menu Dropdown */}
@@ -556,16 +546,17 @@ const AIStudioEditorEnhanced = ({
           </div>
         </div>
 
-        {/* Toolbar row - always visible but disabled when processing */}
-        <div className="px-4 pb-2">
-          <EditorToolbar 
-            editor={tiptapEditor}
-            visible={true}
-            disabled={isProcessing}
-            className="border-none shadow-none rounded-lg"
-          />
-        </div>
-      </header>
+          {/* Toolbar row - always visible but disabled when processing */}
+          <div className="px-4 pb-2">
+            <EditorToolbar 
+              editor={tiptapEditor}
+              visible={true}
+              disabled={isProcessing}
+              className="border-none shadow-none rounded-lg"
+            />
+          </div>
+        </header>
+      </div>
 
       <div className={cn(
         "relative flex-1 p-0 m-0 border-none",

@@ -72,7 +72,8 @@ function TiptapEditorComponent({
       }),
       Placeholder.configure({
         placeholder: placeholder || t('editor.enterYourText'),
-        emptyEditorClass: 'tiptap-empty',
+        emptyEditorClass: 'is-editor-empty',
+        showOnlyWhenEditable: false,
       }),
       Underline,
       TextAlign.configure({

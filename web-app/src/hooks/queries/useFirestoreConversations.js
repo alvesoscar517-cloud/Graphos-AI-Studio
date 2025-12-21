@@ -31,7 +31,8 @@ import { logger } from '@/utils/logger'
  */
 export function useFirestoreConversations(options = {}) {
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
   
   return useQuery({
     queryKey: queryKeys.conversations.list(),
@@ -114,7 +115,8 @@ export function useFirestoreConversation(conversationId, options = {}) {
 export function useCreateFirestoreConversation() {
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
 
   return useMutation({
     mutationFn: async (convData = {}) => {
@@ -158,7 +160,8 @@ export function useCreateFirestoreConversation() {
 export function useUpdateFirestoreConversation() {
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
 
   return useMutation({
     mutationFn: async ({ conversationId, data }) => {
@@ -209,7 +212,8 @@ export function useUpdateFirestoreConversation() {
 export function useDeleteFirestoreConversation() {
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const userId = user?.id || user?.uid || user?.userId
+  // IMPORTANT: Use userId (backend ID = Firebase Auth UID) for Firestore operations
+  const userId = user?.userId || user?.uid || user?.id
 
   return useMutation({
     mutationFn: async (conversationId) => {
