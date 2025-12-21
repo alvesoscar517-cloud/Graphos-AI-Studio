@@ -100,9 +100,10 @@ async function sendOTPEmail(email, code, type, userName, locale) {
   }
 
   const templateFn = type === 'verification' ? otpVerificationEmail : passwordResetEmail;
-  const subject = type === 'verification' 
-    ? 'Verify Your Email - Graphos AI Studio'
-    : 'Reset Your Password - Graphos AI Studio';
+  
+  // Import translation function to get localized subject
+  const { getEmailSubject } = require('../services/emailTemplate.service');
+  const subject = getEmailSubject(type === 'verification' ? 'otpVerification' : 'passwordReset', locale);
   
   const html = templateFn({
     code,
@@ -332,6 +333,9 @@ exports.login = async (req, res) => {
     // Send new device login notification if this is a new device
     if (result.isNewDevice && result.user) {
       try {
+        const { getEmailSubject } = require('../services/emailTemplate.service');
+        const userLang = locale || 'en';
+        
         const html = newDeviceLoginEmail({
           userName: result.user.name || email.split('@')[0],
           deviceInfo: deviceInfo.userAgent,
@@ -339,7 +343,7 @@ exports.login = async (req, res) => {
           location: 'Unknown',
           loginTime: new Date(),
           secureAccountUrl: process.env.APP_URL ? `${process.env.APP_URL}/settings/security` : null,
-          lang: locale || 'en'
+          lang: userLang
         });
         
         const smtp = getSmtpConfig();
@@ -348,7 +352,7 @@ exports.login = async (req, res) => {
         await getTransporter().sendMail({
           from: `"${smtp.fromName}" <${smtp.fromEmail}>`,
           to: email,
-          subject: 'New Device Login - Graphos AI Studio',
+          subject: getEmailSubject('newDeviceLogin', userLang),
           html,
           attachments: cidAttachments
         });
@@ -597,101 +601,6 @@ exports.resetPassword = async (req, res) => {
 };
 
 /**
- * Link Google account
- * POST /auth/email/link-google
- * Now accepts OAuth access token instead of Firebase ID token
- */
-exports.linkGoogle = async (req, res) => {
-  const l = createLocalizer(req);
-  
-  try {
-    const { googleAccessToken, googleEmail, googleName, googlePicture } = req.body;
-    const userId = req.userId; // From auth middleware
-    
-    if (!googleAccessToken || !googleEmail) {
-      return res.status(400).json({
-        success: false,
-        error: 'Google access token and email are required',
-        code: 'MISSING_FIELDS'
-      });
-    }
-    
-    const result = await emailAuthService.linkGoogleWithOAuth(userId, {
-      accessToken: googleAccessToken,
-      email: googleEmail,
-      name: googleName,
-      picture: googlePicture
-    });
-    
-    res.json({
-      success: true,
-      googleEmail: result.googleEmail,
-      googlePicture: result.googlePicture,
-      message: 'Google account linked successfully. Drive sync is now enabled.'
-    });
-    
-  } catch (error) {
-    logger.error('Link Google error', { error: error.message });
-    
-    const errorCode = error.message.split(':')[0];
-    const errorMessage = error.message.split(': ')[1] || error.message;
-    
-    let statusCode = 500;
-    if (errorCode === 'AUTH_GOOGLE_ALREADY_LINKED' || 
-        errorCode === 'AUTH_GOOGLE_EMAIL_IN_USE' || 
-        errorCode === 'AUTH_GOOGLE_EMAIL_HAS_ACCOUNT') {
-      statusCode = 409;
-    } else if (errorCode === 'AUTH_USER_NOT_FOUND' || errorCode === 'AUTH_INVALID_OPERATION') {
-      statusCode = 400;
-    } else if (errorCode === 'AUTH_INVALID_TOKEN') {
-      statusCode = 401;
-    }
-    
-    res.status(statusCode).json({
-      success: false,
-      error: errorMessage,
-      code: errorCode
-    });
-  }
-};
-
-/**
- * Unlink Google account
- * POST /auth/email/unlink-google
- */
-exports.unlinkGoogle = async (req, res) => {
-  const l = createLocalizer(req);
-  
-  try {
-    const userId = req.userId; // From auth middleware
-    
-    await emailAuthService.unlinkGoogle(userId);
-    
-    res.json({
-      success: true,
-      message: 'Google account unlinked successfully'
-    });
-    
-  } catch (error) {
-    logger.error('Unlink Google error', { error: error.message });
-    
-    const errorCode = error.message.split(':')[0];
-    const errorMessage = error.message.split(': ')[1] || error.message;
-    
-    let statusCode = 500;
-    if (errorCode === 'AUTH_USER_NOT_FOUND' || errorCode === 'AUTH_NO_GOOGLE_LINKED') {
-      statusCode = 400;
-    }
-    
-    res.status(statusCode).json({
-      success: false,
-      error: errorMessage,
-      code: errorCode
-    });
-  }
-};
-
-/**
  * Change password for authenticated user
  * POST /auth/email/change-password
  */
@@ -719,10 +628,13 @@ exports.changePassword = async (req, res) => {
     // Send password changed notification email
     if (result.success && req.user?.email) {
       try {
+        const { getEmailSubject } = require('../services/emailTemplate.service');
+        const userLang = locale || 'en';
+        
         const html = passwordChangedEmail({
           userName: req.user.name || req.user.email.split('@')[0],
           changedAt: new Date(),
-          lang: locale || 'en'
+          lang: userLang
         });
         
         const smtp = getSmtpConfig();
@@ -731,7 +643,7 @@ exports.changePassword = async (req, res) => {
         await getTransporter().sendMail({
           from: `"${smtp.fromName}" <${smtp.fromEmail}>`,
           to: req.user.email,
-          subject: 'Password Changed - Graphos AI Studio',
+          subject: getEmailSubject('passwordChanged', userLang),
           html,
           attachments: cidAttachments
         });
@@ -1021,92 +933,6 @@ exports.refreshToken = async (req, res) => {
 };
 
 /**
- * Check if Google email is linked to an existing email user
- * POST /auth/google/check-linked
- * Body: { googleEmail }
- * 
- * This endpoint is called when a user signs in with Google to check
- * if they should use an existing email account (that has Google linked)
- * instead of creating a new Google-only account.
- */
-exports.checkGoogleLinked = async (req, res) => {
-  try {
-    const { googleEmail } = req.body;
-    
-    if (!googleEmail) {
-      return res.status(400).json({
-        success: false,
-        error: 'Google email is required',
-        code: 'MISSING_EMAIL'
-      });
-    }
-    
-    const result = await emailAuthService.checkGoogleLinked(googleEmail);
-    
-    res.json({
-      success: true,
-      ...result
-    });
-    
-  } catch (error) {
-    logger.error('Check Google linked error', { error: error.message });
-    
-    res.status(500).json({
-      success: false,
-      error: 'Failed to check Google linked status',
-      code: 'CHECK_LINKED_ERROR'
-    });
-  }
-};
-
-/**
- * Login with Google for a linked email account
- * POST /auth/email/login-with-google
- * Body: { googleEmail, googleAccessToken }
- * 
- * This endpoint is used when a user signs in with Google and their
- * Google email is linked to an existing email account.
- */
-exports.loginWithLinkedGoogle = async (req, res) => {
-  try {
-    const { googleEmail, googleAccessToken } = req.body;
-    
-    if (!googleEmail || !googleAccessToken) {
-      return res.status(400).json({
-        success: false,
-        error: 'Google email and access token are required',
-        code: 'MISSING_FIELDS'
-      });
-    }
-    
-    const result = await emailAuthService.loginWithLinkedGoogle(googleEmail, googleAccessToken);
-    
-    res.json(result);
-    
-  } catch (error) {
-    logger.error('Login with linked Google error', { error: error.message });
-    
-    const errorCode = error.message.split(':')[0];
-    const errorMessage = error.message.split(': ')[1] || error.message;
-    
-    let statusCode = 500;
-    if (errorCode === 'AUTH_INVALID_TOKEN') {
-      statusCode = 401;
-    } else if (errorCode === 'AUTH_NO_LINKED_ACCOUNT') {
-      statusCode = 404;
-    } else if (errorCode === 'AUTH_ACCOUNT_DELETED' || errorCode === 'AUTH_ACCOUNT_SUSPENDED') {
-      statusCode = 403;
-    }
-    
-    res.status(statusCode).json({
-      success: false,
-      error: errorMessage,
-      code: errorCode
-    });
-  }
-};
-
-/**
  * Login or register with Google OAuth (for Google-only users)
  * POST /auth/google/login
  * Body: { accessToken }
@@ -1132,6 +958,68 @@ exports.loginWithGoogleOAuth = async (req, res) => {
     
   } catch (error) {
     logger.error('Google OAuth login error', { error: error.message });
+    
+    const errorCode = error.message.split(':')[0];
+    const errorMessage = error.message.split(': ')[1] || error.message;
+    
+    let statusCode = 500;
+    if (errorCode === 'AUTH_INVALID_TOKEN') {
+      statusCode = 401;
+    } else if (errorCode === 'AUTH_EMAIL_EXISTS') {
+      statusCode = 409; // Conflict - email already exists as email user
+    } else if (errorCode === 'AUTH_ACCOUNT_DELETED' || errorCode === 'AUTH_ACCOUNT_SUSPENDED') {
+      statusCode = 403;
+    }
+    
+    res.status(statusCode).json({
+      success: false,
+      error: errorMessage,
+      code: errorCode
+    });
+  }
+};
+
+
+/**
+ * Login or register with Firebase Auth (Google Sign-In via Firebase)
+ * POST /auth/firebase/google-login
+ * Body: { firebaseIdToken, email, name, picture }
+ * 
+ * This endpoint verifies Firebase ID token and creates/logs in user.
+ * Used by both Extension (launchWebAuthFlow) and Web App (signInWithPopup).
+ * Returns JWT tokens for subsequent API calls.
+ */
+exports.loginWithFirebaseGoogle = async (req, res) => {
+  try {
+    const { firebaseIdToken, email, name, picture } = req.body;
+    
+    if (!firebaseIdToken) {
+      return res.status(400).json({
+        success: false,
+        error: 'Firebase ID token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+    
+    const result = await emailAuthService.loginWithFirebaseGoogle({
+      firebaseIdToken,
+      email,
+      name,
+      picture
+    });
+    
+    // Log login activity
+    if (result.user?.userId) {
+      activityLogService.logActivity(result.user.userId, 'login', {
+        source: 'firebase_google',
+        isNewUser: result.isNewUser
+      }).catch(err => logger.warn('Failed to log firebase login activity', { error: err.message }));
+    }
+    
+    res.json(result);
+    
+  } catch (error) {
+    logger.error('Firebase Google login error', { error: error.message });
     
     const errorCode = error.message.split(':')[0];
     const errorMessage = error.message.split(': ')[1] || error.message;

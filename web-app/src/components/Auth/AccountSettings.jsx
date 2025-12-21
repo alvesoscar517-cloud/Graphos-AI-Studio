@@ -1,32 +1,43 @@
 import { useTranslation } from 'react-i18next'
-import { useUser, useAuthMethod, useHasGoogleLinked, useAuth } from '../../stores/authStore'
-import LinkGoogleAccount from './LinkGoogleAccount'
+import { useUser, useAuthMethod, useAuthStore } from '../../stores/authStore'
+import AvatarUpload from '../Profile/AvatarUpload'
 
 const AccountSettings = () => {
   const { t } = useTranslation()
   const user = useUser()
   const authMethod = useAuthMethod()
-  const hasGoogleLinked = useHasGoogleLinked()
-  const { linkGoogleAccount, unlinkGoogleAccount } = useAuth()
+  const updateUser = useAuthStore((state) => state.updateUser)
 
   if (!user) return null
 
+  const handleAvatarChange = (avatarUrl) => {
+    updateUser({ avatar: avatarUrl })
+  }
+
   return (
     <div className="p-5">
+      {/* Avatar Section */}
+      <div className="flex flex-col items-center mb-6 pb-6 border-b border-border">
+        <AvatarUpload 
+          user={user}
+          authMethod={authMethod}
+          onAvatarChange={handleAvatarChange}
+          size="lg"
+        />
+      </div>
+
       {/* Account Info */}
-      <div className="flex items-center gap-4 p-4 bg-bg-secondary dark:bg-bg-primary rounded-xl mb-5 border border-border">
-        <div className="w-14 h-14 rounded-full overflow-hidden shrink-0">
-          {user.picture ? (
-            <img src={user.picture} alt={user.name} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center text-xl font-semibold">
-              {user.name?.charAt(0)?.toUpperCase() || 'U'}
-            </div>
-          )}
+      <div className="flex flex-col gap-3 p-4 bg-bg-secondary dark:bg-bg-primary rounded-xl mb-5 border border-border">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-text-muted">{t('profile.name', 'Name')}</span>
+          <span className="text-sm font-medium text-text-primary">{user.name}</span>
         </div>
-        <div>
-          <h3 className="m-0 mb-1 text-base font-semibold text-text-primary">{user.name}</h3>
-          <p className="m-0 mb-2 text-sm text-text-muted">{user.email}</p>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-text-muted">{t('profile.email', 'Email')}</span>
+          <span className="text-sm font-medium text-text-primary">{user.email}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-text-muted">{t('profile.signInMethod', 'Sign-in method')}</span>
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-bg-primary dark:bg-bg-secondary border border-border dark:border-border-light rounded-full text-xs font-medium text-text-muted">
             {authMethod === 'google' ? (
               <><svg width="14" height="14" viewBox="0 0 18 18" fill="none">
@@ -44,31 +55,18 @@ const AccountSettings = () => {
         </div>
       </div>
 
-      {/* Google Account Link Section - Only for email users */}
-      {authMethod === 'email' && (
-        <LinkGoogleAccount 
-          isLinked={hasGoogleLinked} 
-          linkedEmail={user.googleLinked?.googleEmail} 
-          onLink={linkGoogleAccount} 
-          onUnlink={unlinkGoogleAccount}
-          isLoading={false}
-        />
-      )}
-
-      {/* Google user info */}
-      {authMethod === 'google' && (
-        <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-          <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-green-600 dark:text-green-400">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-          </div>
-          <div>
-            <h4 className="m-0 mb-0.5 text-sm font-semibold text-green-800 dark:text-green-300">{t('auth.email.googleLinkTitle')}</h4>
-            <p className="m-0 text-sm text-green-700 dark:text-green-400">{t('auth.email.driveSyncEnabled')}</p>
-          </div>
+      {/* Cloud Sync Info */}
+      <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          </svg>
         </div>
-      )}
+        <div>
+          <h4 className="m-0 mb-0.5 text-sm font-semibold text-blue-800 dark:text-blue-300">{t('settings.cloudSync') || 'Cloud Sync'}</h4>
+          <p className="m-0 text-sm text-blue-700 dark:text-blue-400">{t('settings.cloudSyncDesc') || 'Your data is automatically synced across devices'}</p>
+        </div>
+      </div>
     </div>
   )
 }

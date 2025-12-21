@@ -263,6 +263,24 @@
     "priority_urgent": "紧急"
   },
 
+  "welcome_email": {
+    "subject": "欢迎加入 Graphos AI Studio",
+    "greeting": "欢迎您",
+    "intro": "感谢您加入 Graphos AI Studio。我们很高兴您成为我们作家和创作者社区的一员。",
+    "get_started": "开始使用",
+    "feature1_title": "AI 检测",
+    "feature1_desc": "分析文本以高精度检测 AI 生成的内容。",
+    "feature2_title": "声音配置",
+    "feature2_desc": "创建独特的声音配置以保持您真实的写作风格。",
+    "feature3_title": "文本人性化",
+    "feature3_desc": "将 AI 生成的文本转化为自然的人类化内容。",
+    "help_title": "需要帮助？",
+    "help_desc": "我们的支持团队随时为您提供帮助。请随时联系我们。",
+    "contact_support": "联系支持",
+    "footer": "此邮件是因为您在 Graphos AI Studio 上创建了账户而发送的。",
+    "copyright": "Graphos AI Studio。版权所有。"
+  },
+
   "common": {
     "loading": "加载中...",
     "processing": "处理中...",

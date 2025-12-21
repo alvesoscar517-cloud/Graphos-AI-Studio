@@ -15,7 +15,12 @@ const {
   passwordResetEmail, 
   welcomeEmail,
   newDeviceLoginEmail,
-  passwordChangedEmail 
+  passwordChangedEmail,
+  purchaseConfirmationEmail,
+  firstPurchaseBonusEmail,
+  lowCreditsEmail,
+  reEngagementEmail,
+  getEmailSubject
 } = require('./emailTemplate.service');
 
 // ============================================================================
@@ -198,7 +203,7 @@ async function sendOTPEmail(to, code, lang = 'en') {
   
   return sendEmail({
     to,
-    subject: 'Verify Your Email - Graphos AI Studio',
+    subject: getEmailSubject('otpVerification', lang),
     html,
     retries: 3 // More retries for OTP
   });
@@ -217,7 +222,7 @@ async function sendPasswordResetEmail(to, code, lang = 'en') {
   
   return sendEmail({
     to,
-    subject: 'Reset Your Password - Graphos AI Studio',
+    subject: getEmailSubject('passwordReset', lang),
     html,
     retries: 3
   });
@@ -240,7 +245,7 @@ async function sendWelcomeEmail(to, name, lang = 'en') {
   
   return sendEmail({
     to,
-    subject: 'Welcome to Graphos AI Studio!',
+    subject: getEmailSubject('welcome', lang),
     html,
     retries: 2
   });
@@ -261,7 +266,7 @@ async function sendNewDeviceLoginEmail(to, deviceInfo, lang = 'en') {
   
   return sendEmail({
     to,
-    subject: 'New Device Login - Graphos AI Studio',
+    subject: getEmailSubject('newDeviceLogin', lang),
     html,
     retries: 2
   });
@@ -279,7 +284,7 @@ async function sendPasswordChangedEmail(to, name, lang = 'en') {
   
   return sendEmail({
     to,
-    subject: 'Password Changed - Graphos AI Studio',
+    subject: getEmailSubject('passwordChanged', lang),
     html,
     retries: 2
   });
@@ -321,6 +326,106 @@ async function sendNotificationEmail(to, subject, content, lang = 'en') {
 }
 
 // ============================================================================
+// NEW EMAIL FUNCTIONS - Purchase, Low Credits, Re-engagement
+// ============================================================================
+
+/**
+ * Send purchase confirmation email
+ * @param {string} to - Recipient email
+ * @param {Object} data - Purchase data
+ * @param {string} lang - Language code
+ */
+async function sendPurchaseConfirmationEmail(to, data, lang = 'en') {
+  const html = purchaseConfirmationEmail({
+    userName: data.userName || to.split('@')[0],
+    packageName: data.packageName,
+    creditsAdded: data.creditsAdded,
+    newBalance: data.newBalance,
+    orderId: data.orderId,
+    amount: data.amount,
+    currency: data.currency || 'USD',
+    dashboardUrl: data.dashboardUrl,
+    lang
+  });
+  
+  return sendEmail({
+    to,
+    subject: getEmailSubject('purchaseConfirmation', lang),
+    html,
+    retries: 2
+  });
+}
+
+/**
+ * Send first purchase bonus email
+ * @param {string} to - Recipient email
+ * @param {Object} data - Bonus data
+ * @param {string} lang - Language code
+ */
+async function sendFirstPurchaseBonusEmail(to, data, lang = 'en') {
+  const html = firstPurchaseBonusEmail({
+    userName: data.userName || to.split('@')[0],
+    baseCredits: data.baseCredits,
+    bonusCredits: data.bonusCredits,
+    totalCredits: data.totalCredits,
+    newBalance: data.newBalance,
+    dashboardUrl: data.dashboardUrl,
+    lang
+  });
+  
+  return sendEmail({
+    to,
+    subject: getEmailSubject('firstPurchaseBonus', lang),
+    html,
+    retries: 2
+  });
+}
+
+/**
+ * Send low credits warning email
+ * @param {string} to - Recipient email
+ * @param {Object} data - Credits data
+ * @param {string} lang - Language code
+ */
+async function sendLowCreditsEmail(to, data, lang = 'en') {
+  const html = lowCreditsEmail({
+    userName: data.userName || to.split('@')[0],
+    currentBalance: data.currentBalance,
+    pricingUrl: data.pricingUrl,
+    lang
+  });
+  
+  return sendEmail({
+    to,
+    subject: getEmailSubject('lowCredits', lang),
+    html,
+    retries: 2
+  });
+}
+
+/**
+ * Send re-engagement email
+ * @param {string} to - Recipient email
+ * @param {Object} data - User data
+ * @param {string} lang - Language code
+ */
+async function sendReEngagementEmail(to, data, lang = 'en') {
+  const html = reEngagementEmail({
+    userName: data.userName || to.split('@')[0],
+    currentCredits: data.currentCredits || 0,
+    dashboardUrl: data.dashboardUrl,
+    lang
+  });
+  
+  return sendEmail({
+    to,
+    subject: getEmailSubject('reEngagement', lang),
+    html,
+    retries: 2
+  });
+}
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 
@@ -336,5 +441,11 @@ module.exports = {
   sendWelcomeEmail,
   sendNewDeviceLoginEmail,
   sendPasswordChangedEmail,
-  sendNotificationEmail
+  sendNotificationEmail,
+  
+  // New email functions
+  sendPurchaseConfirmationEmail,
+  sendFirstPurchaseBonusEmail,
+  sendLowCreditsEmail,
+  sendReEngagementEmail
 };

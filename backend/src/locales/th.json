@@ -263,6 +263,24 @@
     "priority_urgent": "เร่งด่วน"
   },
 
+  "welcome_email": {
+    "subject": "Yindi tonrap su Graphos AI Studio",
+    "greeting": "Yindi tonrap",
+    "intro": "Khobkhun thi khao ruam Graphos AI Studio. Rao tuen ten thi mi khun pen suan nueng khong chumchon nak khian lae nak sang san khong rao.",
+    "get_started": "Roem ton",
+    "feature1_title": "Truat cha AI",
+    "feature1_desc": "Wikhro khwam khong khun phuea truat cha nuea ha thi sang doi AI duai khwam maen yam sung.",
+    "feature2_title": "Profai siang",
+    "feature2_desc": "Sang profai siang thi mi ekkalak phuea raksa saili kan khian thi thae ching khong khun.",
+    "feature3_title": "Tham hai pen manut",
+    "feature3_desc": "Plaeng nuea ha thi sang doi AI hai pen nuea ha thi pen thammachat lae khlaai manut.",
+    "help_title": "Tongkan khwam chuai luea?",
+    "help_desc": "Thim sapphot khong rao phrom thi cha chuai luea khun. Tidto rao dai talot wela.",
+    "contact_support": "Tidto fai sapphot",
+    "footer": "Email ni thuk song phro khun dai sang banchi bon Graphos AI Studio.",
+    "copyright": "Graphos AI Studio. Sanguan sitthi thuk prakan."
+  },
+
   "common": {
     "loading": "กำลังโหลด...",
     "processing": "กำลังประมวลผล...",

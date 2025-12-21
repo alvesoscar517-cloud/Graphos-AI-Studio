@@ -22,6 +22,7 @@ import modal from './utils/modal'
 import { initTooltips } from './utils/tooltips'
 import { initStorageCleanup } from './utils/storageCleanup'
 import { migrateToSecureStorage } from './utils/authStorage'
+import SyncStatusIndicator from './components/ui/SyncStatusIndicator'
 
 // Separate component to access auth context
 function AppContent() {
@@ -137,6 +138,7 @@ function App() {
               <WelcomeBanner />
               <ErrorReportListener />
               <UnsupportedScreenOverlay />
+              <SyncStatusIndicator />
             </AppProviders>
           </Router>
         </GlobalErrorHandler>

@@ -263,6 +263,24 @@
     "priority_urgent": "Dringend"
   },
 
+  "welcome_email": {
+    "subject": "Willkommen bei Graphos AI Studio",
+    "greeting": "Willkommen",
+    "intro": "Vielen Dank, dass Sie Graphos AI Studio beigetreten sind. Wir freuen uns, Sie als Teil unserer Gemeinschaft von Autoren und Kreativen zu haben.",
+    "get_started": "Loslegen",
+    "feature1_title": "KI-Erkennung",
+    "feature1_desc": "Analysieren Sie Ihren Text, um KI-generierte Inhalte mit hoher Genauigkeit zu erkennen.",
+    "feature2_title": "Stimmprofile",
+    "feature2_desc": "Erstellen Sie einzigartige Stimmprofile, um Ihren authentischen Schreibstil beizubehalten.",
+    "feature3_title": "Text-Humanisierung",
+    "feature3_desc": "Verwandeln Sie KI-generierten Text in naturlichen, menschlichen Inhalt.",
+    "help_title": "Brauchen Sie Hilfe?",
+    "help_desc": "Unser Support-Team ist hier, um Ihnen zu helfen. Kontaktieren Sie uns jederzeit.",
+    "contact_support": "Support kontaktieren",
+    "footer": "Diese E-Mail wurde gesendet, weil Sie ein Konto bei Graphos AI Studio erstellt haben.",
+    "copyright": "Graphos AI Studio. Alle Rechte vorbehalten."
+  },
+
   "common": {
     "loading": "Lädt...",
     "processing": "Verarbeite...",

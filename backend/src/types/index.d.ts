@@ -50,7 +50,6 @@ export interface EmailAuthUser {
   emailVerified: boolean;
   name?: string;
   picture?: string;
-  hasGoogleLinked?: boolean;
   authProvider: 'email';
   createdAt: Date;
   updatedAt: Date;

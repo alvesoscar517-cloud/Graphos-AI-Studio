@@ -2,6 +2,11 @@
  * Login Form Hook
  * React Hook Form + Zod validation
  * Supports auto-fill remembered email (like Google, GitHub, Facebook)
+ * 
+ * UX Flow (giống các ứng dụng lớn):
+ * - Email: LUÔN được lưu và hiển thị sẵn khi quay lại
+ * - Password: Browser auto-fill (nếu user cho phép browser lưu)
+ * - Remember me: Nếu tick = tự động đăng nhập, không tick = chỉ hiển thị email
  */
 
 import { useForm } from 'react-hook-form'
@@ -14,16 +19,20 @@ import { getRememberedEmail, isRememberMeEnabled } from '@/utils/authStorage'
  * @param {Function} onSubmit - Callback when form is submitted successfully
  */
 export function useLoginForm(onSubmit) {
-  // Lấy email đã nhớ để auto-fill (giống Google, GitHub)
+  // Lấy email đã nhớ để auto-fill (giống Google, GitHub, Facebook)
+  // Email LUÔN được lưu sau mỗi lần đăng nhập thành công
   const rememberedEmail = getRememberedEmail()
-  const wasRemembered = isRememberMeEnabled() || !!rememberedEmail
+  
+  // Chỉ tự động tick "Remember me" nếu user đã từng chọn option này
+  // Không tự động tick chỉ vì có email được nhớ
+  const wasRememberMeEnabled = isRememberMeEnabled()
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: rememberedEmail || '',
       password: '',
-      rememberMe: wasRemembered, // Tự động tick nếu đã từng remember
+      rememberMe: wasRememberMeEnabled, // Chỉ tick nếu user đã từng chọn
     },
     mode: 'onBlur', // Validate when user leaves the field (not while typing)
   })

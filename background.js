@@ -41,14 +41,117 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
 
 // Check authentication status
 async function checkAuthStatus() {
-  const result = await chrome.storage.local.get(['userInfo', 'accessToken']);
-  return result.userInfo && result.accessToken;
+  const result = await chrome.storage.local.get(['userInfo', 'accessToken', 'googleIdToken']);
+  // Support both old accessToken and new googleIdToken
+  return result.userInfo && (result.accessToken || result.googleIdToken);
 }
 
-// Handle Google sign in
-async function signInWithGoogle() {
+/**
+ * Generate a random nonce for OAuth security
+ */
+function generateNonce() {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Extract ID token from OAuth redirect URL
+ */
+function extractIdTokenFromUrl(url) {
+  const hashParams = new URLSearchParams(url.split('#')[1]);
+  return hashParams.get('id_token');
+}
+
+/**
+ * Handle Google sign in using launchWebAuthFlow (Firebase Auth compatible)
+ * This returns a Google ID token that can be used with Firebase signInWithCredential
+ */
+async function signInWithGoogleFirebase() {
   try {
-    console.log('[SECURE] Starting Google sign in...');
+    console.log('[SECURE] Starting Google sign in with launchWebAuthFlow...');
+    
+    const manifest = chrome.runtime.getManifest();
+    const clientId = manifest.oauth2?.client_id;
+    
+    if (!clientId) {
+      throw new Error('OAuth2 client_id not found in manifest');
+    }
+    
+    const redirectUri = chrome.identity.getRedirectURL();
+    const nonce = generateNonce();
+    const scope = 'openid email profile';
+    
+    // Build OAuth URL for Google - request ID token directly
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${clientId}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `response_type=id_token&` +
+      `scope=${encodeURIComponent(scope)}&` +
+      `nonce=${nonce}&` +
+      `prompt=select_account`;
+    
+    console.log('[AUTH] Launching web auth flow...');
+    
+    // Launch web auth flow
+    const responseUrl = await chrome.identity.launchWebAuthFlow({
+      url: authUrl,
+      interactive: true
+    });
+    
+    if (!responseUrl) {
+      throw new Error('No response from Google OAuth');
+    }
+    
+    // Extract ID token from response URL
+    const idToken = extractIdTokenFromUrl(responseUrl);
+    
+    if (!idToken) {
+      throw new Error('No ID token in OAuth response');
+    }
+    
+    console.log('[SUCCESS] Got Google ID token');
+    
+    // Decode ID token to get user info (JWT payload is base64 encoded)
+    const payload = JSON.parse(atob(idToken.split('.')[1]));
+    
+    const userData = {
+      email: payload.email,
+      name: payload.name || 'User',
+      picture: payload.picture || '',
+      id: payload.sub // Google user ID
+    };
+    
+    // Save user info and ID token (not access token)
+    await chrome.storage.local.set({
+      userInfo: userData,
+      googleIdToken: idToken, // Store ID token for Firebase Auth
+      accessToken: null // Clear old access token
+    });
+    
+    console.log('[SUCCESS] Saved to storage:', userData);
+    
+    return { 
+      success: true, 
+      userInfo: userData,
+      idToken: idToken // Return ID token for Firebase signInWithCredential
+    };
+  } catch (error) {
+    console.error('[FAIL] Sign in error:', error);
+    
+    // Handle user cancellation
+    if (error.message?.includes('canceled') || error.message?.includes('closed') || error.message?.includes('user denied')) {
+      return { success: false, error: 'User cancelled sign-in', cancelled: true };
+    }
+    
+    return { success: false, error: error.message };
+  }
+}
+
+// Handle Google sign in (legacy method using getAuthToken - kept for backward compatibility)
+async function signInWithGoogleLegacy() {
+  try {
+    console.log('[SECURE] Starting Google sign in (legacy)...');
     
     // Clear any old cached token first
     try {
@@ -76,7 +179,7 @@ async function signInWithGoogle() {
     
     console.log('[SUCCESS] Got auth token');
     
-    // Get user information words Google API
+    // Get user information from Google API
     const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -169,6 +272,14 @@ async function signInWithGoogle() {
   }
 }
 
+// Main sign in function - uses Firebase-compatible flow by default
+async function signInWithGoogle(useFirebaseAuth = true) {
+  if (useFirebaseAuth) {
+    return signInWithGoogleFirebase();
+  }
+  return signInWithGoogleLegacy();
+}
+
 // Handle sign out (clear storage and revoke token)
 async function signOut() {
   try {
@@ -207,8 +318,8 @@ async function signOut() {
       // Ignore - no additional tokens
     }
     
-    // Clear storage
-    await chrome.storage.local.remove(['userInfo', 'accessToken']);
+    // Clear storage (including new googleIdToken)
+    await chrome.storage.local.remove(['userInfo', 'accessToken', 'googleIdToken']);
     console.log('[SUCCESS] Sign out complete');
     
     return { success: true };
@@ -257,8 +368,8 @@ async function switchAccount() {
       console.log('[INFO] No additional tokens to clear');
     }
     
-    // Clear storage
-    await chrome.storage.local.remove(['userInfo', 'accessToken']);
+    // Clear storage (including new googleIdToken)
+    await chrome.storage.local.remove(['userInfo', 'accessToken', 'googleIdToken']);
     console.log('[SUCCESS] Account switch complete - will show account picker on next login');
     
     return { success: true };
@@ -268,7 +379,7 @@ async function switchAccount() {
   }
 }
 
-// Listen for messages words content script
+// Listen for messages from content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'checkAuth') {
     checkAuthStatus().then(sendResponse);
@@ -276,7 +387,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   if (request.action === 'signIn') {
-    signInWithGoogle().then(sendResponse);
+    // Use Firebase-compatible flow by default, unless explicitly requesting legacy
+    const useFirebaseAuth = request.useFirebaseAuth !== false;
+    signInWithGoogle(useFirebaseAuth).then(sendResponse);
+    return true;
+  }
+  
+  // New action for Firebase Auth flow specifically
+  if (request.action === 'signInFirebase') {
+    signInWithGoogleFirebase().then(sendResponse);
     return true;
   }
   
@@ -293,6 +412,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'getUserInfo') {
     chrome.storage.local.get(['userInfo']).then(result => {
       sendResponse(result.userInfo || null);
+    });
+    return true;
+  }
+  
+  // Get stored Google ID token for Firebase Auth
+  if (request.action === 'getGoogleIdToken') {
+    chrome.storage.local.get(['googleIdToken']).then(result => {
+      sendResponse(result.googleIdToken || null);
     });
     return true;
   }

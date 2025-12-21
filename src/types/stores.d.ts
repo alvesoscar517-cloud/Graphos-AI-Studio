@@ -24,20 +24,18 @@ export interface AuthStoreState {
   isAuthenticated: boolean;
   isLoading: boolean;
   authMethod: 'google' | 'email' | null;
-  hasGoogleLinked: boolean;
   error: string | null;
 }
 
 export interface AuthStoreActions {
   // Internal
-  _setAuth: (user: User | null, token: string | null, authMethod: string | null, hasGoogleLinked?: boolean) => void;
+  _setAuth: (user: User | null, token: string | null, authMethod: string | null) => void;
   _clearAuth: () => void;
   
   // State setters
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   setAuthMethod: (method: 'google' | 'email' | null) => void;
-  setHasGoogleLinked: (linked: boolean) => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
   updateUser: (updates: Partial<User>) => void;
@@ -54,10 +52,6 @@ export interface AuthStoreActions {
   changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
   deleteAccount: (password?: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<{ success: boolean; error?: string }>;
-  
-  // Google linking
-  linkGoogleAccount: () => Promise<{ success: boolean; error?: string }>;
-  unlinkGoogleAccount: () => Promise<{ success: boolean; error?: string }>;
   
   // Session management
   getActiveSessions: () => Promise<{ success: boolean; sessions: Session[]; error?: string }>;

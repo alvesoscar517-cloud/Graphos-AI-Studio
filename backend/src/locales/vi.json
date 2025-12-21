@@ -263,6 +263,24 @@
     "priority_urgent": "Khẩn cấp"
   },
 
+  "welcome_email": {
+    "subject": "Chào mừng đến với Graphos AI Studio",
+    "greeting": "Chào mừng bạn",
+    "intro": "Cảm ơn bạn đã tham gia Graphos AI Studio. Chúng tôi rất vui khi có bạn là một phần của cộng đồng người viết và sáng tạo.",
+    "get_started": "Bắt đầu ngay",
+    "feature1_title": "Phát hiện AI",
+    "feature1_desc": "Phân tích văn bản để phát hiện nội dung do AI tạo ra với độ chính xác cao.",
+    "feature2_title": "Hồ sơ giọng văn",
+    "feature2_desc": "Tạo hồ sơ giọng văn độc đáo để duy trì phong cách viết chân thực của bạn.",
+    "feature3_title": "Nhân hóa văn bản",
+    "feature3_desc": "Chuyển đổi văn bản AI thành nội dung tự nhiên, giống người viết.",
+    "help_title": "Cần hỗ trợ?",
+    "help_desc": "Đội ngũ hỗ trợ của chúng tôi luôn sẵn sàng giúp đỡ bạn. Hãy liên hệ bất cứ lúc nào.",
+    "contact_support": "Liên hệ hỗ trợ",
+    "footer": "Email này được gửi vì bạn đã tạo tài khoản trên Graphos AI Studio.",
+    "copyright": "Graphos AI Studio. Bảo lưu mọi quyền."
+  },
+
   "common": {
     "loading": "Đang tải...",
     "processing": "Đang xử lý...",

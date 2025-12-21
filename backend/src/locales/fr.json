@@ -263,6 +263,24 @@
     "priority_urgent": "Urgent"
   },
 
+  "welcome_email": {
+    "subject": "Bienvenue sur Graphos AI Studio",
+    "greeting": "Bienvenue",
+    "intro": "Merci de rejoindre Graphos AI Studio. Nous sommes ravis de vous compter parmi notre communaute d'ecrivains et de createurs.",
+    "get_started": "Commencer",
+    "feature1_title": "Detection IA",
+    "feature1_desc": "Analysez votre texte pour detecter le contenu genere par IA avec une grande precision.",
+    "feature2_title": "Profils Vocaux",
+    "feature2_desc": "Creez des profils vocaux uniques pour maintenir votre style d'ecriture authentique.",
+    "feature3_title": "Humanisation du Texte",
+    "feature3_desc": "Transformez le texte genere par IA en contenu naturel et humain.",
+    "help_title": "Besoin d'aide?",
+    "help_desc": "Notre equipe de support est la pour vous aider. N'hesitez pas a nous contacter.",
+    "contact_support": "Contacter le Support",
+    "footer": "Cet email a ete envoye car vous avez cree un compte sur Graphos AI Studio.",
+    "copyright": "Graphos AI Studio. Tous droits reserves."
+  },
+
   "common": {
     "loading": "Chargement...",
     "processing": "Traitement...",

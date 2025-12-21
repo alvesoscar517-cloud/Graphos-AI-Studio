@@ -22,6 +22,19 @@
 
 const { db } = require('../config/firebase');
 const { v4: uuidv4 } = require('uuid');
+const logger = require('../utils/logger');
+
+// Email queue service for sending emails
+const { 
+  queuePurchaseConfirmationEmail, 
+  queueFirstPurchaseBonusEmail, 
+  queueLowCreditsEmail, 
+  queueReEngagementEmail 
+} = require('./emailQueue.service');
+
+// App URLs for email CTAs
+const APP_URL = process.env.APP_URL || 'https://app.graphosai.com';
+const PRICING_URL = process.env.PRICING_URL || 'https://graphosai.com/pricing';
 
 // Notification templates with full i18n support (15 languages)
 const NOTIFICATION_TEMPLATES = {
@@ -810,16 +823,49 @@ async function sendWelcomeNotification(userId, freeCredits = 100) {
 }
 
 /**
- * Send purchase completed notification
+ * Send purchase completed notification + email
+ * @param {string} userId - User ID
+ * @param {string} packageName - Package name
+ * @param {number} creditsAdded - Credits added
+ * @param {number} newBalance - New balance
+ * @param {Object} orderInfo - Order info (orderId, amount, currency)
  */
-async function sendPurchaseNotification(userId, packageName, creditsAdded, newBalance) {
+async function sendPurchaseNotification(userId, packageName, creditsAdded, newBalance, orderInfo = {}) {
   try {
+    // Send in-app notification
     const notification = createFromTemplate('PURCHASE_COMPLETED', {
       packageName,
       credits: creditsAdded,
       balance: newBalance
     });
-    return await sendToUser(userId, notification);
+    const notifResult = await sendToUser(userId, notification);
+
+    // Send email notification
+    try {
+      const userDoc = await db.collection('users').doc(userId).get();
+      const userData = userDoc.exists ? userDoc.data() : null;
+      
+      if (userData?.email) {
+        const lang = userData.language || userData.preferredLanguage || 'en';
+        await queuePurchaseConfirmationEmail(userData.email, {
+          userName: userData.displayName || userData.name || userData.email.split('@')[0],
+          packageName,
+          creditsAdded,
+          newBalance,
+          orderId: orderInfo.orderId || 'N/A',
+          amount: orderInfo.amount,
+          currency: orderInfo.currency || 'USD',
+          dashboardUrl: APP_URL
+        }, lang);
+        
+        logger.info('[AUTO-NOTIF] Purchase confirmation email queued', { userId, email: userData.email });
+      }
+    } catch (emailError) {
+      logger.error('[AUTO-NOTIF] Failed to queue purchase email:', emailError);
+      // Don't fail the whole operation if email fails
+    }
+
+    return notifResult;
   } catch (error) {
     logger.error('[AUTO-NOTIF] Send purchase notification error:', error);
     return null;
@@ -827,7 +873,7 @@ async function sendPurchaseNotification(userId, packageName, creditsAdded, newBa
 }
 
 /**
- * Send low credits warning
+ * Send low credits warning + email
  */
 async function sendLowCreditsWarning(userId, remainingCredits) {
   try {
@@ -847,8 +893,30 @@ async function sendLowCreditsWarning(userId, remainingCredits) {
       return null; // Already warned recently
     }
 
+    // Send in-app notification
     const notification = createFromTemplate('LOW_CREDITS', { credits: remainingCredits });
-    return await sendToUser(userId, notification);
+    const notifResult = await sendToUser(userId, notification);
+
+    // Send email notification
+    try {
+      const userDoc = await db.collection('users').doc(userId).get();
+      const userData = userDoc.exists ? userDoc.data() : null;
+      
+      if (userData?.email) {
+        const lang = userData.language || userData.preferredLanguage || 'en';
+        await queueLowCreditsEmail(userData.email, {
+          userName: userData.displayName || userData.name || userData.email.split('@')[0],
+          currentBalance: remainingCredits,
+          pricingUrl: PRICING_URL
+        }, lang);
+        
+        logger.info('[AUTO-NOTIF] Low credits warning email queued', { userId, email: userData.email });
+      }
+    } catch (emailError) {
+      logger.error('[AUTO-NOTIF] Failed to queue low credits email:', emailError);
+    }
+
+    return notifResult;
   } catch (error) {
     logger.error('[AUTO-NOTIF] Send low credits warning error:', error);
     return null;
@@ -924,9 +992,8 @@ async function sendNewFeatureAnnouncement(featureName, description, targetView =
 // Import localization service for number formatting
 const localizationService = require('./localization.service');
 
-const logger = require('../utils/logger');
 /**
- * Send first purchase bonus notification with detailed breakdown
+ * Send first purchase bonus notification + email with detailed breakdown
  */
 async function sendFirstPurchaseBonusNotification(userId, packageName, baseCredits, bonusCredits, userLang = 'en') {
   try {
@@ -937,13 +1004,40 @@ async function sendFirstPurchaseBonusNotification(userId, packageName, baseCredi
     const formattedBonus = localizationService.formatNumber(bonusCredits, userLang);
     const formattedTotal = localizationService.formatNumber(totalCredits, userLang);
     
+    // Send in-app notification
     const notification = createFromTemplate('FIRST_PURCHASE_BONUS', {
       packageName,
       baseCredits: formattedBase,
       bonusCredits: formattedBonus,
       totalCredits: formattedTotal
     });
-    return await sendToUser(userId, notification);
+    const notifResult = await sendToUser(userId, notification);
+
+    // Send email notification
+    try {
+      const userDoc = await db.collection('users').doc(userId).get();
+      const userData = userDoc.exists ? userDoc.data() : null;
+      
+      if (userData?.email) {
+        const lang = userData.language || userData.preferredLanguage || userLang;
+        const newBalance = userData.credits?.balance || totalCredits;
+        
+        await queueFirstPurchaseBonusEmail(userData.email, {
+          userName: userData.displayName || userData.name || userData.email.split('@')[0],
+          baseCredits,
+          bonusCredits,
+          totalCredits,
+          newBalance,
+          dashboardUrl: APP_URL
+        }, lang);
+        
+        logger.info('[AUTO-NOTIF] First purchase bonus email queued', { userId, email: userData.email });
+      }
+    } catch (emailError) {
+      logger.error('[AUTO-NOTIF] Failed to queue first purchase bonus email:', emailError);
+    }
+
+    return notifResult;
   } catch (error) {
     logger.error('[AUTO-NOTIF] Send first purchase bonus notification error:', error);
     return null;
@@ -985,7 +1079,7 @@ async function sendFirstAnalysisNotification(userId) {
 }
 
 /**
- * Send re-engagement notification for inactive users
+ * Send re-engagement notification + email for inactive users
  */
 async function sendReEngagementNotification(userId, remainingCredits, userLang = 'en') {
   try {
@@ -1003,8 +1097,31 @@ async function sendReEngagementNotification(userId, remainingCredits, userLang =
     }
 
     const formattedCredits = localizationService.formatNumber(remainingCredits, userLang);
+    
+    // Send in-app notification
     const notification = createFromTemplate('RE_ENGAGEMENT', { credits: formattedCredits });
-    return await sendToUser(userId, notification);
+    const notifResult = await sendToUser(userId, notification);
+
+    // Send email notification
+    try {
+      const userDoc = await db.collection('users').doc(userId).get();
+      const userData = userDoc.exists ? userDoc.data() : null;
+      
+      if (userData?.email) {
+        const lang = userData.language || userData.preferredLanguage || userLang;
+        await queueReEngagementEmail(userData.email, {
+          userName: userData.displayName || userData.name || userData.email.split('@')[0],
+          currentCredits: remainingCredits,
+          dashboardUrl: APP_URL
+        }, lang);
+        
+        logger.info('[AUTO-NOTIF] Re-engagement email queued', { userId, email: userData.email });
+      }
+    } catch (emailError) {
+      logger.error('[AUTO-NOTIF] Failed to queue re-engagement email:', emailError);
+    }
+
+    return notifResult;
   } catch (error) {
     logger.error('[AUTO-NOTIF] Send re-engagement notification error:', error);
     return null;

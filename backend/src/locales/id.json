@@ -263,6 +263,24 @@
     "priority_urgent": "Mendesak"
   },
 
+  "welcome_email": {
+    "subject": "Selamat datang di Graphos AI Studio",
+    "greeting": "Selamat datang",
+    "intro": "Terima kasih telah bergabung dengan Graphos AI Studio. Kami senang memiliki Anda sebagai bagian dari komunitas penulis dan kreator kami.",
+    "get_started": "Mulai",
+    "feature1_title": "Deteksi AI",
+    "feature1_desc": "Analisis teks Anda untuk mendeteksi konten yang dihasilkan AI dengan akurasi tinggi.",
+    "feature2_title": "Profil Suara",
+    "feature2_desc": "Buat profil suara unik untuk mempertahankan gaya penulisan autentik Anda.",
+    "feature3_title": "Humanisasi Teks",
+    "feature3_desc": "Ubah teks yang dihasilkan AI menjadi konten yang alami dan manusiawi.",
+    "help_title": "Butuh bantuan?",
+    "help_desc": "Tim dukungan kami siap membantu Anda. Jangan ragu untuk menghubungi kami.",
+    "contact_support": "Hubungi Dukungan",
+    "footer": "Email ini dikirim karena Anda membuat akun di Graphos AI Studio.",
+    "copyright": "Graphos AI Studio. Hak cipta dilindungi."
+  },
+
   "common": {
     "loading": "Memuat...",
     "processing": "Memproses...",

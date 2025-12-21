@@ -30,7 +30,12 @@ const ICON_FILES = {
   user: 'user',
   calendar: 'calendar',
   alertCircle: 'circle-alert',
-  logo: 'content'
+  logo: 'content',
+  // New icons for purchase/notification emails
+  gift: 'gift',
+  rocket: 'rocket',
+  sparkles: 'sparkles',
+  zap: 'zap'
 };
 
 // ============================================================================

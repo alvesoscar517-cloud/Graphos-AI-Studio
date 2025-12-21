@@ -16,6 +16,7 @@ const { addJob, addDelayedJob, getQueue, QUEUE_NAMES } = require('./queue.servic
 const logger = require('../utils/logger');
 const config = require('../config');
 const envConfig = require('../config/envConfigHelper');
+const { getEmailSubject } = require('./emailTemplate.service');
 
 // ============================================================================
 // CONFIGURATION
@@ -180,7 +181,7 @@ async function queueWelcomeEmail(to, name, lang = 'en') {
   return addJob(QUEUE_NAMES.EMAIL, 'welcome', {
     type: 'welcome',
     to,
-    subject: 'Welcome to Graphos AI Studio',
+    subject: getEmailSubject('welcome', lang),
     data: { name, lang }
   }, {
     priority: EMAIL_PRIORITY.WELCOME,
@@ -193,11 +194,13 @@ async function queueWelcomeEmail(to, name, lang = 'en') {
  * Queue a security alert email (new device login, password changed)
  */
 async function queueSecurityAlertEmail(to, alertType, data, lang = 'en') {
+  const subjectType = alertType === 'new_device' ? 'newDeviceLogin' : 'passwordChanged';
+  
   return addJob(QUEUE_NAMES.EMAIL, 'security_alert', {
     type: 'security_alert',
     alertType,
     to,
-    subject: alertType === 'new_device' ? 'New Device Login' : 'Security Alert',
+    subject: getEmailSubject(subjectType, lang),
     data: { ...data, lang }
   }, {
     priority: EMAIL_PRIORITY.SECURITY_ALERT,

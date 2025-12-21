@@ -263,6 +263,24 @@
     "priority_urgent": "Urgente"
   },
 
+  "welcome_email": {
+    "subject": "Benvenuto su Graphos AI Studio",
+    "greeting": "Benvenuto",
+    "intro": "Grazie per esserti unito a Graphos AI Studio. Siamo entusiasti di averti come parte della nostra comunita di scrittori e creatori.",
+    "get_started": "Inizia",
+    "feature1_title": "Rilevamento IA",
+    "feature1_desc": "Analizza il tuo testo per rilevare contenuti generati dall'IA con alta precisione.",
+    "feature2_title": "Profili Vocali",
+    "feature2_desc": "Crea profili vocali unici per mantenere il tuo stile di scrittura autentico.",
+    "feature3_title": "Umanizzazione del Testo",
+    "feature3_desc": "Trasforma il testo generato dall'IA in contenuti naturali e umani.",
+    "help_title": "Hai bisogno di aiuto?",
+    "help_desc": "Il nostro team di supporto e qui per aiutarti. Non esitare a contattarci.",
+    "contact_support": "Contatta il Supporto",
+    "footer": "Questa email e stata inviata perche hai creato un account su Graphos AI Studio.",
+    "copyright": "Graphos AI Studio. Tutti i diritti riservati."
+  },
+
   "common": {
     "loading": "Caricamento...",
     "processing": "Elaborazione...",

@@ -105,6 +105,72 @@ const translations = {
       learnMore: 'Learn More',
       viewDetails: 'View Details',
       preheader: 'You have a new notification'
+    },
+    // Purchase confirmation email
+    purchaseConfirmation: {
+      title: 'Payment Successful!',
+      subtitle: 'Thank you for your purchase',
+      greeting: 'Great news!',
+      instruction: 'Your payment has been processed successfully. Here are the details of your purchase:',
+      orderDetails: 'Order Details',
+      package: 'Package',
+      creditsAdded: 'Credits Added',
+      newBalance: 'New Balance',
+      orderId: 'Order ID',
+      date: 'Date',
+      amount: 'Amount',
+      thankYou: 'Thank you for choosing Graphos AI Studio. Your credits are ready to use!',
+      startUsing: 'Start Using Credits',
+      footerText: 'Payment confirmation from Graphos AI Studio',
+      preheader: 'Your payment was successful - {credits} credits added'
+    },
+    // First purchase bonus email
+    firstPurchaseBonus: {
+      title: 'Welcome Bonus Unlocked!',
+      subtitle: 'Double credits on your first purchase',
+      greeting: 'Congratulations!',
+      instruction: 'As a thank you for your first purchase, we\'ve doubled your credits!',
+      bonusDetails: 'Bonus Details',
+      baseCredits: 'Base Credits',
+      bonusCredits: 'Bonus Credits (x2)',
+      totalCredits: 'Total Credits',
+      newBalance: 'New Balance',
+      specialOffer: 'This is a one-time welcome bonus for new customers.',
+      enjoyCredits: 'Enjoy your credits and explore all our AI features!',
+      exploreFeatures: 'Explore Features',
+      footerText: 'Welcome bonus notification from Graphos AI Studio',
+      preheader: 'You received {bonus} bonus credits on your first purchase!'
+    },
+    // Low credits warning email
+    lowCredits: {
+      title: 'Credits Running Low',
+      subtitle: 'Time to top up your account',
+      greeting: 'Heads up!',
+      instruction: 'Your credit balance is getting low. Top up now to continue using our AI features without interruption.',
+      currentBalance: 'Current Balance',
+      credits: 'credits',
+      recommendation: 'We recommend keeping at least 50 credits for uninterrupted service.',
+      topUpNow: 'Top Up Now',
+      packages: 'View our credit packages and choose the one that fits your needs.',
+      footerText: 'Account notification from Graphos AI Studio',
+      preheader: 'Your credit balance is low - only {credits} credits remaining'
+    },
+    // Re-engagement email
+    reEngagement: {
+      title: 'We Miss You!',
+      subtitle: 'Come back and explore what\'s new',
+      greeting: 'It\'s been a while!',
+      instruction: 'We noticed you haven\'t visited in a while. Here\'s what you\'ve been missing:',
+      whatsNew: 'What\'s New',
+      feature1: 'Improved AI analysis accuracy',
+      feature2: 'Faster processing speeds',
+      feature3: 'New voice profile features',
+      yourCredits: 'Your Credits',
+      creditsWaiting: 'You still have {credits} credits waiting for you.',
+      comeBack: 'Come Back',
+      weAreHere: 'We\'re here to help you create amazing content. See you soon!',
+      footerText: 'We miss you at Graphos AI Studio',
+      preheader: 'We miss you! Your {credits} credits are waiting'
     }
   },
 
@@ -192,6 +258,68 @@ const translations = {
       learnMore: 'Tìm hiểu thêm',
       viewDetails: 'Xem chi tiết',
       preheader: 'Bạn có thông báo mới'
+    },
+    purchaseConfirmation: {
+      title: 'Thanh toán thành công!',
+      subtitle: 'Cảm ơn bạn đã mua hàng',
+      greeting: 'Tin vui!',
+      instruction: 'Thanh toán của bạn đã được xử lý thành công. Dưới đây là chi tiết đơn hàng:',
+      orderDetails: 'Chi tiết đơn hàng',
+      package: 'Gói',
+      creditsAdded: 'Credits được thêm',
+      newBalance: 'Số dư mới',
+      orderId: 'Mã đơn hàng',
+      date: 'Ngày',
+      amount: 'Số tiền',
+      thankYou: 'Cảm ơn bạn đã chọn Graphos AI Studio. Credits của bạn đã sẵn sàng sử dụng!',
+      startUsing: 'Bắt đầu sử dụng',
+      footerText: 'Xác nhận thanh toán từ Graphos AI Studio',
+      preheader: 'Thanh toán thành công - đã thêm {credits} credits'
+    },
+    firstPurchaseBonus: {
+      title: 'Mở khóa thưởng chào mừng!',
+      subtitle: 'Nhân đôi credits cho lần mua đầu tiên',
+      greeting: 'Chúc mừng!',
+      instruction: 'Để cảm ơn lần mua đầu tiên, chúng tôi đã nhân đôi credits cho bạn!',
+      bonusDetails: 'Chi tiết thưởng',
+      baseCredits: 'Credits cơ bản',
+      bonusCredits: 'Credits thưởng (x2)',
+      totalCredits: 'Tổng credits',
+      newBalance: 'Số dư mới',
+      specialOffer: 'Đây là ưu đãi chào mừng một lần dành cho khách hàng mới.',
+      enjoyCredits: 'Tận hưởng credits và khám phá tất cả tính năng AI!',
+      exploreFeatures: 'Khám phá tính năng',
+      footerText: 'Thông báo thưởng chào mừng từ Graphos AI Studio',
+      preheader: 'Bạn nhận được {bonus} credits thưởng cho lần mua đầu tiên!'
+    },
+    lowCredits: {
+      title: 'Credits sắp hết',
+      subtitle: 'Đã đến lúc nạp thêm',
+      greeting: 'Lưu ý!',
+      instruction: 'Số dư credits của bạn đang thấp. Nạp ngay để tiếp tục sử dụng các tính năng AI không gián đoạn.',
+      currentBalance: 'Số dư hiện tại',
+      credits: 'credits',
+      recommendation: 'Chúng tôi khuyên bạn nên giữ ít nhất 50 credits để sử dụng liên tục.',
+      topUpNow: 'Nạp ngay',
+      packages: 'Xem các gói credits và chọn gói phù hợp với nhu cầu của bạn.',
+      footerText: 'Thông báo tài khoản từ Graphos AI Studio',
+      preheader: 'Số dư credits thấp - chỉ còn {credits} credits'
+    },
+    reEngagement: {
+      title: 'Chúng tôi nhớ bạn!',
+      subtitle: 'Quay lại và khám phá những gì mới',
+      greeting: 'Đã lâu rồi!',
+      instruction: 'Chúng tôi nhận thấy bạn chưa ghé thăm trong một thời gian. Đây là những gì bạn đã bỏ lỡ:',
+      whatsNew: 'Có gì mới',
+      feature1: 'Cải thiện độ chính xác phân tích AI',
+      feature2: 'Tốc độ xử lý nhanh hơn',
+      feature3: 'Tính năng hồ sơ giọng nói mới',
+      yourCredits: 'Credits của bạn',
+      creditsWaiting: 'Bạn vẫn còn {credits} credits đang chờ.',
+      comeBack: 'Quay lại',
+      weAreHere: 'Chúng tôi ở đây để giúp bạn tạo nội dung tuyệt vời. Hẹn gặp lại!',
+      footerText: 'Chúng tôi nhớ bạn tại Graphos AI Studio',
+      preheader: 'Chúng tôi nhớ bạn! {credits} credits đang chờ bạn'
     }
   },
 
@@ -273,6 +401,68 @@ const translations = {
       goToDashboard: '前往仪表板',
       footerText: '来自 Graphos AI Studio 的自动消息',
       preheader: '您的账户已准备就绪'
+    },
+    purchaseConfirmation: {
+      title: '支付成功！',
+      subtitle: '感谢您的购买',
+      greeting: '好消息！',
+      instruction: '您的付款已成功处理。以下是您的订单详情：',
+      orderDetails: '订单详情',
+      package: '套餐',
+      creditsAdded: '已添加积分',
+      newBalance: '新余额',
+      orderId: '订单号',
+      date: '日期',
+      amount: '金额',
+      thankYou: '感谢您选择 Graphos AI Studio。您的积分已可使用！',
+      startUsing: '开始使用',
+      footerText: '来自 Graphos AI Studio 的付款确认',
+      preheader: '支付成功 - 已添加 {credits} 积分'
+    },
+    firstPurchaseBonus: {
+      title: '解锁欢迎奖励！',
+      subtitle: '首次购买双倍积分',
+      greeting: '恭喜！',
+      instruction: '为感谢您的首次购买，我们已为您双倍积分！',
+      bonusDetails: '奖励详情',
+      baseCredits: '基础积分',
+      bonusCredits: '奖励积分 (x2)',
+      totalCredits: '总积分',
+      newBalance: '新余额',
+      specialOffer: '这是新客户的一次性欢迎奖励。',
+      enjoyCredits: '享受您的积分，探索所有AI功能！',
+      exploreFeatures: '探索功能',
+      footerText: '来自 Graphos AI Studio 的欢迎奖励通知',
+      preheader: '您首次购买获得 {bonus} 奖励积分！'
+    },
+    lowCredits: {
+      title: '积分即将用完',
+      subtitle: '是时候充值了',
+      greeting: '提醒！',
+      instruction: '您的积分余额较低。立即充值以继续使用我们的AI功能。',
+      currentBalance: '当前余额',
+      credits: '积分',
+      recommendation: '我们建议保持至少50积分以确保服务不中断。',
+      topUpNow: '立即充值',
+      packages: '查看我们的积分套餐，选择适合您的。',
+      footerText: '来自 Graphos AI Studio 的账户通知',
+      preheader: '积分余额较低 - 仅剩 {credits} 积分'
+    },
+    reEngagement: {
+      title: '我们想念您！',
+      subtitle: '回来看看有什么新功能',
+      greeting: '好久不见！',
+      instruction: '我们注意到您有一段时间没有访问了。以下是您错过的内容：',
+      whatsNew: '最新动态',
+      feature1: '提升AI分析准确度',
+      feature2: '更快的处理速度',
+      feature3: '新的语音配置功能',
+      yourCredits: '您的积分',
+      creditsWaiting: '您还有 {credits} 积分等待使用。',
+      comeBack: '回来看看',
+      weAreHere: '我们随时帮助您创建精彩内容。期待再见！',
+      footerText: '我们在 Graphos AI Studio 想念您',
+      preheader: '我们想念您！{credits} 积分等待您使用'
     }
   },
 
@@ -354,6 +544,68 @@ const translations = {
       goToDashboard: 'ダッシュボードへ',
       footerText: 'Graphos AI Studio からの自動メッセージ',
       preheader: 'アカウントの準備ができました'
+    },
+    purchaseConfirmation: {
+      title: '支払い完了！',
+      subtitle: 'ご購入ありがとうございます',
+      greeting: '朗報です！',
+      instruction: 'お支払いが正常に処理されました。ご注文の詳細は以下の通りです：',
+      orderDetails: '注文詳細',
+      package: 'パッケージ',
+      creditsAdded: '追加クレジット',
+      newBalance: '新しい残高',
+      orderId: '注文ID',
+      date: '日付',
+      amount: '金額',
+      thankYou: 'Graphos AI Studio をお選びいただきありがとうございます。クレジットはすぐにご利用いただけます！',
+      startUsing: '使用開始',
+      footerText: 'Graphos AI Studio からの支払い確認',
+      preheader: '支払い完了 - {credits} クレジット追加'
+    },
+    firstPurchaseBonus: {
+      title: 'ウェルカムボーナス獲得！',
+      subtitle: '初回購入でクレジット2倍',
+      greeting: 'おめでとうございます！',
+      instruction: '初回購入のお礼として、クレジットを2倍にしました！',
+      bonusDetails: 'ボーナス詳細',
+      baseCredits: '基本クレジット',
+      bonusCredits: 'ボーナスクレジット (x2)',
+      totalCredits: '合計クレジット',
+      newBalance: '新しい残高',
+      specialOffer: 'これは新規のお客様への一度限りのウェルカムボーナスです。',
+      enjoyCredits: 'クレジットを楽しんで、すべてのAI機能を探索してください！',
+      exploreFeatures: '機能を探索',
+      footerText: 'Graphos AI Studio からのウェルカムボーナス通知',
+      preheader: '初回購入で {bonus} ボーナスクレジット獲得！'
+    },
+    lowCredits: {
+      title: 'クレジット残高が少なくなっています',
+      subtitle: 'チャージの時間です',
+      greeting: 'お知らせ！',
+      instruction: 'クレジット残高が少なくなっています。AI機能を中断なく使用するために今すぐチャージしてください。',
+      currentBalance: '現在の残高',
+      credits: 'クレジット',
+      recommendation: 'サービスを中断なく利用するために、少なくとも50クレジットを維持することをお勧めします。',
+      topUpNow: '今すぐチャージ',
+      packages: 'クレジットパッケージを見て、ニーズに合ったものを選んでください。',
+      footerText: 'Graphos AI Studio からのアカウント通知',
+      preheader: 'クレジット残高が少ない - 残り {credits} クレジット'
+    },
+    reEngagement: {
+      title: 'お会いできなくて寂しいです！',
+      subtitle: '戻ってきて新機能をチェック',
+      greeting: 'お久しぶりです！',
+      instruction: 'しばらくお見えになっていないようです。見逃したものをご紹介します：',
+      whatsNew: '新着情報',
+      feature1: 'AI分析精度の向上',
+      feature2: '処理速度の高速化',
+      feature3: '新しい音声プロファイル機能',
+      yourCredits: 'あなたのクレジット',
+      creditsWaiting: 'まだ {credits} クレジットが待っています。',
+      comeBack: '戻る',
+      weAreHere: '素晴らしいコンテンツ作成をお手伝いします。またお会いしましょう！',
+      footerText: 'Graphos AI Studio でお待ちしています',
+      preheader: 'お会いできなくて寂しいです！{credits} クレジットが待っています'
     }
   },
 
@@ -435,6 +687,68 @@ const translations = {
       goToDashboard: '대시보드로 이동',
       footerText: 'Graphos AI Studio의 자동 메시지',
       preheader: '계정이 준비되었습니다'
+    },
+    purchaseConfirmation: {
+      title: '결제 완료!',
+      subtitle: '구매해 주셔서 감사합니다',
+      greeting: '좋은 소식입니다!',
+      instruction: '결제가 성공적으로 처리되었습니다. 주문 세부 정보는 다음과 같습니다:',
+      orderDetails: '주문 세부 정보',
+      package: '패키지',
+      creditsAdded: '추가된 크레딧',
+      newBalance: '새 잔액',
+      orderId: '주문 ID',
+      date: '날짜',
+      amount: '금액',
+      thankYou: 'Graphos AI Studio를 선택해 주셔서 감사합니다. 크레딧을 바로 사용하실 수 있습니다!',
+      startUsing: '사용 시작',
+      footerText: 'Graphos AI Studio 결제 확인',
+      preheader: '결제 완료 - {credits} 크레딧 추가됨'
+    },
+    firstPurchaseBonus: {
+      title: '웰컴 보너스 획득!',
+      subtitle: '첫 구매 시 크레딧 2배',
+      greeting: '축하합니다!',
+      instruction: '첫 구매에 대한 감사의 표시로 크레딧을 2배로 드렸습니다!',
+      bonusDetails: '보너스 세부 정보',
+      baseCredits: '기본 크레딧',
+      bonusCredits: '보너스 크레딧 (x2)',
+      totalCredits: '총 크레딧',
+      newBalance: '새 잔액',
+      specialOffer: '이것은 신규 고객을 위한 일회성 웰컴 보너스입니다.',
+      enjoyCredits: '크레딧을 즐기고 모든 AI 기능을 탐색하세요!',
+      exploreFeatures: '기능 탐색',
+      footerText: 'Graphos AI Studio 웰컴 보너스 알림',
+      preheader: '첫 구매로 {bonus} 보너스 크레딧 획득!'
+    },
+    lowCredits: {
+      title: '크레딧이 부족합니다',
+      subtitle: '충전할 시간입니다',
+      greeting: '알림!',
+      instruction: '크레딧 잔액이 부족합니다. AI 기능을 중단 없이 사용하려면 지금 충전하세요.',
+      currentBalance: '현재 잔액',
+      credits: '크레딧',
+      recommendation: '서비스 중단 없이 사용하려면 최소 50 크레딧을 유지하는 것이 좋습니다.',
+      topUpNow: '지금 충전',
+      packages: '크레딧 패키지를 보고 필요에 맞는 것을 선택하세요.',
+      footerText: 'Graphos AI Studio 계정 알림',
+      preheader: '크레딧 잔액 부족 - {credits} 크레딧만 남음'
+    },
+    reEngagement: {
+      title: '보고 싶었어요!',
+      subtitle: '돌아와서 새로운 기능을 확인하세요',
+      greeting: '오랜만이에요!',
+      instruction: '한동안 방문하지 않으셨네요. 놓친 것들을 소개합니다:',
+      whatsNew: '새로운 소식',
+      feature1: 'AI 분석 정확도 향상',
+      feature2: '더 빠른 처리 속도',
+      feature3: '새로운 음성 프로필 기능',
+      yourCredits: '내 크레딧',
+      creditsWaiting: '아직 {credits} 크레딧이 기다리고 있습니다.',
+      comeBack: '돌아오기',
+      weAreHere: '멋진 콘텐츠 제작을 도와드리겠습니다. 곧 만나요!',
+      footerText: 'Graphos AI Studio에서 기다리고 있어요',
+      preheader: '보고 싶었어요! {credits} 크레딧이 기다리고 있습니다'
     }
   },
 
@@ -516,6 +830,68 @@ const translations = {
       goToDashboard: 'Aller au tableau de bord',
       footerText: 'Message automatique de Graphos AI Studio',
       preheader: 'Votre compte est prêt'
+    },
+    purchaseConfirmation: {
+      title: 'Paiement réussi !',
+      subtitle: 'Merci pour votre achat',
+      greeting: 'Bonne nouvelle !',
+      instruction: 'Votre paiement a été traité avec succès. Voici les détails de votre commande :',
+      orderDetails: 'Détails de la commande',
+      package: 'Forfait',
+      creditsAdded: 'Crédits ajoutés',
+      newBalance: 'Nouveau solde',
+      orderId: 'N° de commande',
+      date: 'Date',
+      amount: 'Montant',
+      thankYou: 'Merci d\'avoir choisi Graphos AI Studio. Vos crédits sont prêts à être utilisés !',
+      startUsing: 'Commencer à utiliser',
+      footerText: 'Confirmation de paiement de Graphos AI Studio',
+      preheader: 'Paiement réussi - {credits} crédits ajoutés'
+    },
+    firstPurchaseBonus: {
+      title: 'Bonus de bienvenue débloqué !',
+      subtitle: 'Crédits doublés pour votre premier achat',
+      greeting: 'Félicitations !',
+      instruction: 'Pour vous remercier de votre premier achat, nous avons doublé vos crédits !',
+      bonusDetails: 'Détails du bonus',
+      baseCredits: 'Crédits de base',
+      bonusCredits: 'Crédits bonus (x2)',
+      totalCredits: 'Total des crédits',
+      newBalance: 'Nouveau solde',
+      specialOffer: 'C\'est un bonus de bienvenue unique pour les nouveaux clients.',
+      enjoyCredits: 'Profitez de vos crédits et explorez toutes nos fonctionnalités IA !',
+      exploreFeatures: 'Explorer les fonctionnalités',
+      footerText: 'Notification de bonus de bienvenue de Graphos AI Studio',
+      preheader: 'Vous avez reçu {bonus} crédits bonus pour votre premier achat !'
+    },
+    lowCredits: {
+      title: 'Crédits bientôt épuisés',
+      subtitle: 'Il est temps de recharger',
+      greeting: 'Attention !',
+      instruction: 'Votre solde de crédits est faible. Rechargez maintenant pour continuer à utiliser nos fonctionnalités IA sans interruption.',
+      currentBalance: 'Solde actuel',
+      credits: 'crédits',
+      recommendation: 'Nous recommandons de maintenir au moins 50 crédits pour un service ininterrompu.',
+      topUpNow: 'Recharger maintenant',
+      packages: 'Consultez nos forfaits de crédits et choisissez celui qui vous convient.',
+      footerText: 'Notification de compte de Graphos AI Studio',
+      preheader: 'Solde de crédits faible - seulement {credits} crédits restants'
+    },
+    reEngagement: {
+      title: 'Vous nous manquez !',
+      subtitle: 'Revenez découvrir les nouveautés',
+      greeting: 'Ça fait longtemps !',
+      instruction: 'Nous avons remarqué que vous n\'êtes pas venu depuis un moment. Voici ce que vous avez manqué :',
+      whatsNew: 'Nouveautés',
+      feature1: 'Précision d\'analyse IA améliorée',
+      feature2: 'Vitesses de traitement plus rapides',
+      feature3: 'Nouvelles fonctionnalités de profil vocal',
+      yourCredits: 'Vos crédits',
+      creditsWaiting: 'Vous avez encore {credits} crédits qui vous attendent.',
+      comeBack: 'Revenir',
+      weAreHere: 'Nous sommes là pour vous aider à créer du contenu incroyable. À bientôt !',
+      footerText: 'Vous nous manquez chez Graphos AI Studio',
+      preheader: 'Vous nous manquez ! {credits} crédits vous attendent'
     }
   },
 
@@ -597,6 +973,68 @@ const translations = {
       goToDashboard: 'Zum Dashboard',
       footerText: 'Automatische Nachricht von Graphos AI Studio',
       preheader: 'Ihr Konto ist bereit'
+    },
+    purchaseConfirmation: {
+      title: 'Zahlung erfolgreich!',
+      subtitle: 'Vielen Dank für Ihren Kauf',
+      greeting: 'Gute Nachrichten!',
+      instruction: 'Ihre Zahlung wurde erfolgreich verarbeitet. Hier sind die Details Ihrer Bestellung:',
+      orderDetails: 'Bestelldetails',
+      package: 'Paket',
+      creditsAdded: 'Hinzugefügte Credits',
+      newBalance: 'Neuer Kontostand',
+      orderId: 'Bestellnummer',
+      date: 'Datum',
+      amount: 'Betrag',
+      thankYou: 'Vielen Dank, dass Sie sich für Graphos AI Studio entschieden haben. Ihre Credits sind einsatzbereit!',
+      startUsing: 'Jetzt nutzen',
+      footerText: 'Zahlungsbestätigung von Graphos AI Studio',
+      preheader: 'Zahlung erfolgreich - {credits} Credits hinzugefügt'
+    },
+    firstPurchaseBonus: {
+      title: 'Willkommensbonus freigeschaltet!',
+      subtitle: 'Doppelte Credits bei Ihrem ersten Kauf',
+      greeting: 'Herzlichen Glückwunsch!',
+      instruction: 'Als Dankeschön für Ihren ersten Kauf haben wir Ihre Credits verdoppelt!',
+      bonusDetails: 'Bonusdetails',
+      baseCredits: 'Basis-Credits',
+      bonusCredits: 'Bonus-Credits (x2)',
+      totalCredits: 'Gesamt-Credits',
+      newBalance: 'Neuer Kontostand',
+      specialOffer: 'Dies ist ein einmaliger Willkommensbonus für Neukunden.',
+      enjoyCredits: 'Genießen Sie Ihre Credits und entdecken Sie alle KI-Funktionen!',
+      exploreFeatures: 'Funktionen entdecken',
+      footerText: 'Willkommensbonus-Benachrichtigung von Graphos AI Studio',
+      preheader: 'Sie haben {bonus} Bonus-Credits für Ihren ersten Kauf erhalten!'
+    },
+    lowCredits: {
+      title: 'Credits werden knapp',
+      subtitle: 'Zeit zum Aufladen',
+      greeting: 'Hinweis!',
+      instruction: 'Ihr Credit-Guthaben ist niedrig. Laden Sie jetzt auf, um unsere KI-Funktionen ohne Unterbrechung weiter zu nutzen.',
+      currentBalance: 'Aktueller Kontostand',
+      credits: 'Credits',
+      recommendation: 'Wir empfehlen, mindestens 50 Credits für einen unterbrechungsfreien Service zu halten.',
+      topUpNow: 'Jetzt aufladen',
+      packages: 'Sehen Sie sich unsere Credit-Pakete an und wählen Sie das passende.',
+      footerText: 'Kontobenachrichtigung von Graphos AI Studio',
+      preheader: 'Niedriger Credit-Stand - nur noch {credits} Credits'
+    },
+    reEngagement: {
+      title: 'Wir vermissen Sie!',
+      subtitle: 'Kommen Sie zurück und entdecken Sie Neues',
+      greeting: 'Lange nicht gesehen!',
+      instruction: 'Wir haben bemerkt, dass Sie eine Weile nicht da waren. Hier ist, was Sie verpasst haben:',
+      whatsNew: 'Neuigkeiten',
+      feature1: 'Verbesserte KI-Analysegenauigkeit',
+      feature2: 'Schnellere Verarbeitungsgeschwindigkeiten',
+      feature3: 'Neue Stimmprofil-Funktionen',
+      yourCredits: 'Ihre Credits',
+      creditsWaiting: 'Sie haben noch {credits} Credits, die auf Sie warten.',
+      comeBack: 'Zurückkommen',
+      weAreHere: 'Wir sind hier, um Ihnen bei der Erstellung großartiger Inhalte zu helfen. Bis bald!',
+      footerText: 'Wir vermissen Sie bei Graphos AI Studio',
+      preheader: 'Wir vermissen Sie! {credits} Credits warten auf Sie'
     }
   },
 
@@ -678,6 +1116,68 @@ const translations = {
       goToDashboard: 'Ir al panel',
       footerText: 'Mensaje automático de Graphos AI Studio',
       preheader: 'Tu cuenta está lista'
+    },
+    purchaseConfirmation: {
+      title: '¡Pago exitoso!',
+      subtitle: 'Gracias por tu compra',
+      greeting: '¡Buenas noticias!',
+      instruction: 'Tu pago se ha procesado correctamente. Aquí están los detalles de tu pedido:',
+      orderDetails: 'Detalles del pedido',
+      package: 'Paquete',
+      creditsAdded: 'Créditos añadidos',
+      newBalance: 'Nuevo saldo',
+      orderId: 'ID de pedido',
+      date: 'Fecha',
+      amount: 'Importe',
+      thankYou: '¡Gracias por elegir Graphos AI Studio. Tus créditos están listos para usar!',
+      startUsing: 'Empezar a usar',
+      footerText: 'Confirmación de pago de Graphos AI Studio',
+      preheader: 'Pago exitoso - {credits} créditos añadidos'
+    },
+    firstPurchaseBonus: {
+      title: '¡Bono de bienvenida desbloqueado!',
+      subtitle: 'Créditos dobles en tu primera compra',
+      greeting: '¡Felicidades!',
+      instruction: '¡Como agradecimiento por tu primera compra, hemos duplicado tus créditos!',
+      bonusDetails: 'Detalles del bono',
+      baseCredits: 'Créditos base',
+      bonusCredits: 'Créditos de bono (x2)',
+      totalCredits: 'Total de créditos',
+      newBalance: 'Nuevo saldo',
+      specialOffer: 'Este es un bono de bienvenida único para nuevos clientes.',
+      enjoyCredits: '¡Disfruta tus créditos y explora todas nuestras funciones de IA!',
+      exploreFeatures: 'Explorar funciones',
+      footerText: 'Notificación de bono de bienvenida de Graphos AI Studio',
+      preheader: '¡Recibiste {bonus} créditos de bono en tu primera compra!'
+    },
+    lowCredits: {
+      title: 'Créditos agotándose',
+      subtitle: 'Es hora de recargar',
+      greeting: '¡Atención!',
+      instruction: 'Tu saldo de créditos está bajo. Recarga ahora para seguir usando nuestras funciones de IA sin interrupciones.',
+      currentBalance: 'Saldo actual',
+      credits: 'créditos',
+      recommendation: 'Recomendamos mantener al menos 50 créditos para un servicio ininterrumpido.',
+      topUpNow: 'Recargar ahora',
+      packages: 'Consulta nuestros paquetes de créditos y elige el que mejor se adapte a ti.',
+      footerText: 'Notificación de cuenta de Graphos AI Studio',
+      preheader: 'Saldo de créditos bajo - solo quedan {credits} créditos'
+    },
+    reEngagement: {
+      title: '¡Te extrañamos!',
+      subtitle: 'Vuelve y descubre las novedades',
+      greeting: '¡Hace tiempo!',
+      instruction: 'Notamos que no has visitado en un tiempo. Esto es lo que te has perdido:',
+      whatsNew: 'Novedades',
+      feature1: 'Precisión de análisis de IA mejorada',
+      feature2: 'Velocidades de procesamiento más rápidas',
+      feature3: 'Nuevas funciones de perfil de voz',
+      yourCredits: 'Tus créditos',
+      creditsWaiting: 'Todavía tienes {credits} créditos esperándote.',
+      comeBack: 'Volver',
+      weAreHere: 'Estamos aquí para ayudarte a crear contenido increíble. ¡Hasta pronto!',
+      footerText: 'Te extrañamos en Graphos AI Studio',
+      preheader: '¡Te extrañamos! {credits} créditos te esperan'
     }
   },
 
@@ -759,6 +1259,68 @@ const translations = {
       goToDashboard: 'Ir para o painel',
       footerText: 'Mensagem automática do Graphos AI Studio',
       preheader: 'Sua conta está pronta'
+    },
+    purchaseConfirmation: {
+      title: 'Pagamento bem-sucedido!',
+      subtitle: 'Obrigado pela sua compra',
+      greeting: 'Ótimas notícias!',
+      instruction: 'Seu pagamento foi processado com sucesso. Aqui estão os detalhes do seu pedido:',
+      orderDetails: 'Detalhes do pedido',
+      package: 'Pacote',
+      creditsAdded: 'Créditos adicionados',
+      newBalance: 'Novo saldo',
+      orderId: 'ID do pedido',
+      date: 'Data',
+      amount: 'Valor',
+      thankYou: 'Obrigado por escolher o Graphos AI Studio. Seus créditos estão prontos para usar!',
+      startUsing: 'Começar a usar',
+      footerText: 'Confirmação de pagamento do Graphos AI Studio',
+      preheader: 'Pagamento bem-sucedido - {credits} créditos adicionados'
+    },
+    firstPurchaseBonus: {
+      title: 'Bônus de boas-vindas desbloqueado!',
+      subtitle: 'Créditos em dobro na sua primeira compra',
+      greeting: 'Parabéns!',
+      instruction: 'Como agradecimento pela sua primeira compra, dobramos seus créditos!',
+      bonusDetails: 'Detalhes do bônus',
+      baseCredits: 'Créditos base',
+      bonusCredits: 'Créditos de bônus (x2)',
+      totalCredits: 'Total de créditos',
+      newBalance: 'Novo saldo',
+      specialOffer: 'Este é um bônus de boas-vindas único para novos clientes.',
+      enjoyCredits: 'Aproveite seus créditos e explore todos os recursos de IA!',
+      exploreFeatures: 'Explorar recursos',
+      footerText: 'Notificação de bônus de boas-vindas do Graphos AI Studio',
+      preheader: 'Você recebeu {bonus} créditos de bônus na sua primeira compra!'
+    },
+    lowCredits: {
+      title: 'Créditos acabando',
+      subtitle: 'Hora de recarregar',
+      greeting: 'Atenção!',
+      instruction: 'Seu saldo de créditos está baixo. Recarregue agora para continuar usando nossos recursos de IA sem interrupção.',
+      currentBalance: 'Saldo atual',
+      credits: 'créditos',
+      recommendation: 'Recomendamos manter pelo menos 50 créditos para um serviço ininterrupto.',
+      topUpNow: 'Recarregar agora',
+      packages: 'Veja nossos pacotes de créditos e escolha o que melhor se adapta a você.',
+      footerText: 'Notificação de conta do Graphos AI Studio',
+      preheader: 'Saldo de créditos baixo - apenas {credits} créditos restantes'
+    },
+    reEngagement: {
+      title: 'Sentimos sua falta!',
+      subtitle: 'Volte e descubra as novidades',
+      greeting: 'Faz tempo!',
+      instruction: 'Notamos que você não nos visitou há um tempo. Veja o que você perdeu:',
+      whatsNew: 'Novidades',
+      feature1: 'Precisão de análise de IA aprimorada',
+      feature2: 'Velocidades de processamento mais rápidas',
+      feature3: 'Novos recursos de perfil de voz',
+      yourCredits: 'Seus créditos',
+      creditsWaiting: 'Você ainda tem {credits} créditos esperando por você.',
+      comeBack: 'Voltar',
+      weAreHere: 'Estamos aqui para ajudá-lo a criar conteúdo incrível. Até breve!',
+      footerText: 'Sentimos sua falta no Graphos AI Studio',
+      preheader: 'Sentimos sua falta! {credits} créditos estão esperando'
     }
   },
 
@@ -840,6 +1402,68 @@ const translations = {
       goToDashboard: 'Vai alla dashboard',
       footerText: 'Messaggio automatico da Graphos AI Studio',
       preheader: 'Il tuo account è pronto'
+    },
+    purchaseConfirmation: {
+      title: 'Pagamento riuscito!',
+      subtitle: 'Grazie per il tuo acquisto',
+      greeting: 'Ottime notizie!',
+      instruction: 'Il tuo pagamento è stato elaborato con successo. Ecco i dettagli del tuo ordine:',
+      orderDetails: 'Dettagli ordine',
+      package: 'Pacchetto',
+      creditsAdded: 'Crediti aggiunti',
+      newBalance: 'Nuovo saldo',
+      orderId: 'ID ordine',
+      date: 'Data',
+      amount: 'Importo',
+      thankYou: 'Grazie per aver scelto Graphos AI Studio. I tuoi crediti sono pronti per l\'uso!',
+      startUsing: 'Inizia a usare',
+      footerText: 'Conferma di pagamento da Graphos AI Studio',
+      preheader: 'Pagamento riuscito - {credits} crediti aggiunti'
+    },
+    firstPurchaseBonus: {
+      title: 'Bonus di benvenuto sbloccato!',
+      subtitle: 'Crediti raddoppiati sul tuo primo acquisto',
+      greeting: 'Congratulazioni!',
+      instruction: 'Come ringraziamento per il tuo primo acquisto, abbiamo raddoppiato i tuoi crediti!',
+      bonusDetails: 'Dettagli bonus',
+      baseCredits: 'Crediti base',
+      bonusCredits: 'Crediti bonus (x2)',
+      totalCredits: 'Totale crediti',
+      newBalance: 'Nuovo saldo',
+      specialOffer: 'Questo è un bonus di benvenuto una tantum per i nuovi clienti.',
+      enjoyCredits: 'Goditi i tuoi crediti ed esplora tutte le funzionalità IA!',
+      exploreFeatures: 'Esplora funzionalità',
+      footerText: 'Notifica bonus di benvenuto da Graphos AI Studio',
+      preheader: 'Hai ricevuto {bonus} crediti bonus sul tuo primo acquisto!'
+    },
+    lowCredits: {
+      title: 'Crediti in esaurimento',
+      subtitle: 'È ora di ricaricare',
+      greeting: 'Attenzione!',
+      instruction: 'Il tuo saldo crediti è basso. Ricarica ora per continuare a usare le nostre funzionalità IA senza interruzioni.',
+      currentBalance: 'Saldo attuale',
+      credits: 'crediti',
+      recommendation: 'Consigliamo di mantenere almeno 50 crediti per un servizio ininterrotto.',
+      topUpNow: 'Ricarica ora',
+      packages: 'Consulta i nostri pacchetti di crediti e scegli quello più adatto a te.',
+      footerText: 'Notifica account da Graphos AI Studio',
+      preheader: 'Saldo crediti basso - solo {credits} crediti rimasti'
+    },
+    reEngagement: {
+      title: 'Ci manchi!',
+      subtitle: 'Torna a scoprire le novità',
+      greeting: 'È passato un po\'!',
+      instruction: 'Abbiamo notato che non ci visiti da un po\'. Ecco cosa ti sei perso:',
+      whatsNew: 'Novità',
+      feature1: 'Precisione dell\'analisi IA migliorata',
+      feature2: 'Velocità di elaborazione più rapide',
+      feature3: 'Nuove funzionalità del profilo vocale',
+      yourCredits: 'I tuoi crediti',
+      creditsWaiting: 'Hai ancora {credits} crediti che ti aspettano.',
+      comeBack: 'Torna',
+      weAreHere: 'Siamo qui per aiutarti a creare contenuti fantastici. A presto!',
+      footerText: 'Ci manchi su Graphos AI Studio',
+      preheader: 'Ci manchi! {credits} crediti ti aspettano'
     }
   },
 
@@ -921,6 +1545,68 @@ const translations = {
       goToDashboard: 'Перейти в панель',
       footerText: 'Автоматическое сообщение от Graphos AI Studio',
       preheader: 'Ваш аккаунт готов'
+    },
+    purchaseConfirmation: {
+      title: 'Оплата успешна!',
+      subtitle: 'Спасибо за покупку',
+      greeting: 'Отличные новости!',
+      instruction: 'Ваш платёж успешно обработан. Вот детали вашего заказа:',
+      orderDetails: 'Детали заказа',
+      package: 'Пакет',
+      creditsAdded: 'Добавлено кредитов',
+      newBalance: 'Новый баланс',
+      orderId: 'ID заказа',
+      date: 'Дата',
+      amount: 'Сумма',
+      thankYou: 'Спасибо, что выбрали Graphos AI Studio. Ваши кредиты готовы к использованию!',
+      startUsing: 'Начать использовать',
+      footerText: 'Подтверждение оплаты от Graphos AI Studio',
+      preheader: 'Оплата успешна - добавлено {credits} кредитов'
+    },
+    firstPurchaseBonus: {
+      title: 'Приветственный бонус разблокирован!',
+      subtitle: 'Двойные кредиты при первой покупке',
+      greeting: 'Поздравляем!',
+      instruction: 'В благодарность за первую покупку мы удвоили ваши кредиты!',
+      bonusDetails: 'Детали бонуса',
+      baseCredits: 'Базовые кредиты',
+      bonusCredits: 'Бонусные кредиты (x2)',
+      totalCredits: 'Всего кредитов',
+      newBalance: 'Новый баланс',
+      specialOffer: 'Это единоразовый приветственный бонус для новых клиентов.',
+      enjoyCredits: 'Наслаждайтесь кредитами и исследуйте все функции ИИ!',
+      exploreFeatures: 'Исследовать функции',
+      footerText: 'Уведомление о приветственном бонусе от Graphos AI Studio',
+      preheader: 'Вы получили {bonus} бонусных кредитов за первую покупку!'
+    },
+    lowCredits: {
+      title: 'Кредиты заканчиваются',
+      subtitle: 'Пора пополнить',
+      greeting: 'Внимание!',
+      instruction: 'Ваш баланс кредитов низкий. Пополните сейчас, чтобы продолжить использовать наши функции ИИ без перерывов.',
+      currentBalance: 'Текущий баланс',
+      credits: 'кредитов',
+      recommendation: 'Рекомендуем поддерживать минимум 50 кредитов для бесперебойной работы.',
+      topUpNow: 'Пополнить сейчас',
+      packages: 'Посмотрите наши пакеты кредитов и выберите подходящий.',
+      footerText: 'Уведомление об аккаунте от Graphos AI Studio',
+      preheader: 'Низкий баланс кредитов - осталось только {credits} кредитов'
+    },
+    reEngagement: {
+      title: 'Мы скучаем по вам!',
+      subtitle: 'Вернитесь и узнайте, что нового',
+      greeting: 'Давно не виделись!',
+      instruction: 'Мы заметили, что вы давно не заходили. Вот что вы пропустили:',
+      whatsNew: 'Что нового',
+      feature1: 'Улучшенная точность анализа ИИ',
+      feature2: 'Более быстрая скорость обработки',
+      feature3: 'Новые функции голосового профиля',
+      yourCredits: 'Ваши кредиты',
+      creditsWaiting: 'У вас ещё есть {credits} кредитов, которые вас ждут.',
+      comeBack: 'Вернуться',
+      weAreHere: 'Мы здесь, чтобы помочь вам создавать потрясающий контент. До скорой встречи!',
+      footerText: 'Мы скучаем по вам в Graphos AI Studio',
+      preheader: 'Мы скучаем по вам! {credits} кредитов ждут вас'
     }
   },
 
@@ -1002,6 +1688,68 @@ const translations = {
       goToDashboard: 'الذهاب إلى لوحة التحكم',
       footerText: 'رسالة تلقائية من Graphos AI Studio',
       preheader: 'حسابك جاهز'
+    },
+    purchaseConfirmation: {
+      title: 'تم الدفع بنجاح!',
+      subtitle: 'شكراً لشرائك',
+      greeting: 'أخبار رائعة!',
+      instruction: 'تمت معالجة دفعتك بنجاح. إليك تفاصيل طلبك:',
+      orderDetails: 'تفاصيل الطلب',
+      package: 'الباقة',
+      creditsAdded: 'الرصيد المضاف',
+      newBalance: 'الرصيد الجديد',
+      orderId: 'رقم الطلب',
+      date: 'التاريخ',
+      amount: 'المبلغ',
+      thankYou: 'شكراً لاختيارك Graphos AI Studio. رصيدك جاهز للاستخدام!',
+      startUsing: 'ابدأ الاستخدام',
+      footerText: 'تأكيد الدفع من Graphos AI Studio',
+      preheader: 'تم الدفع بنجاح - تمت إضافة {credits} رصيد'
+    },
+    firstPurchaseBonus: {
+      title: 'تم فتح مكافأة الترحيب!',
+      subtitle: 'رصيد مضاعف في أول عملية شراء',
+      greeting: 'تهانينا!',
+      instruction: 'شكراً لأول عملية شراء، قمنا بمضاعفة رصيدك!',
+      bonusDetails: 'تفاصيل المكافأة',
+      baseCredits: 'الرصيد الأساسي',
+      bonusCredits: 'رصيد المكافأة (x2)',
+      totalCredits: 'إجمالي الرصيد',
+      newBalance: 'الرصيد الجديد',
+      specialOffer: 'هذه مكافأة ترحيب لمرة واحدة للعملاء الجدد.',
+      enjoyCredits: 'استمتع برصيدك واستكشف جميع ميزات الذكاء الاصطناعي!',
+      exploreFeatures: 'استكشف الميزات',
+      footerText: 'إشعار مكافأة الترحيب من Graphos AI Studio',
+      preheader: 'حصلت على {bonus} رصيد مكافأة في أول عملية شراء!'
+    },
+    lowCredits: {
+      title: 'الرصيد ينفد',
+      subtitle: 'حان وقت الشحن',
+      greeting: 'تنبيه!',
+      instruction: 'رصيدك منخفض. اشحن الآن لمواصلة استخدام ميزات الذكاء الاصطناعي دون انقطاع.',
+      currentBalance: 'الرصيد الحالي',
+      credits: 'رصيد',
+      recommendation: 'نوصي بالحفاظ على 50 رصيد على الأقل لخدمة متواصلة.',
+      topUpNow: 'اشحن الآن',
+      packages: 'اطلع على باقات الرصيد واختر ما يناسبك.',
+      footerText: 'إشعار الحساب من Graphos AI Studio',
+      preheader: 'رصيد منخفض - متبقي {credits} رصيد فقط'
+    },
+    reEngagement: {
+      title: 'نفتقدك!',
+      subtitle: 'عد واكتشف الجديد',
+      greeting: 'مرحباً من جديد!',
+      instruction: 'لاحظنا أنك لم تزرنا منذ فترة. إليك ما فاتك:',
+      whatsNew: 'ما الجديد',
+      feature1: 'دقة تحليل ذكاء اصطناعي محسّنة',
+      feature2: 'سرعات معالجة أسرع',
+      feature3: 'ميزات ملف صوتي جديدة',
+      yourCredits: 'رصيدك',
+      creditsWaiting: 'لا يزال لديك {credits} رصيد في انتظارك.',
+      comeBack: 'عد الآن',
+      weAreHere: 'نحن هنا لمساعدتك في إنشاء محتوى رائع. نراك قريباً!',
+      footerText: 'نفتقدك في Graphos AI Studio',
+      preheader: 'نفتقدك! {credits} رصيد في انتظارك'
     }
   },
 
@@ -1083,6 +1831,68 @@ const translations = {
       goToDashboard: 'ไปที่แดชบอร์ด',
       footerText: 'ข้อความอัตโนมัติจาก Graphos AI Studio',
       preheader: 'บัญชีของคุณพร้อมแล้ว'
+    },
+    purchaseConfirmation: {
+      title: 'ชำระเงินสำเร็จ!',
+      subtitle: 'ขอบคุณสำหรับการซื้อ',
+      greeting: 'ข่าวดี!',
+      instruction: 'การชำระเงินของคุณดำเนินการสำเร็จแล้ว นี่คือรายละเอียดคำสั่งซื้อ:',
+      orderDetails: 'รายละเอียดคำสั่งซื้อ',
+      package: 'แพ็คเกจ',
+      creditsAdded: 'เครดิตที่เพิ่ม',
+      newBalance: 'ยอดคงเหลือใหม่',
+      orderId: 'รหัสคำสั่งซื้อ',
+      date: 'วันที่',
+      amount: 'จำนวนเงิน',
+      thankYou: 'ขอบคุณที่เลือก Graphos AI Studio เครดิตของคุณพร้อมใช้งานแล้ว!',
+      startUsing: 'เริ่มใช้งาน',
+      footerText: 'การยืนยันการชำระเงินจาก Graphos AI Studio',
+      preheader: 'ชำระเงินสำเร็จ - เพิ่ม {credits} เครดิต'
+    },
+    firstPurchaseBonus: {
+      title: 'ปลดล็อคโบนัสต้อนรับ!',
+      subtitle: 'เครดิตสองเท่าสำหรับการซื้อครั้งแรก',
+      greeting: 'ยินดีด้วย!',
+      instruction: 'เพื่อขอบคุณสำหรับการซื้อครั้งแรก เราได้เพิ่มเครดิตเป็นสองเท่าให้คุณ!',
+      bonusDetails: 'รายละเอียดโบนัส',
+      baseCredits: 'เครดิตพื้นฐาน',
+      bonusCredits: 'เครดิตโบนัส (x2)',
+      totalCredits: 'เครดิตทั้งหมด',
+      newBalance: 'ยอดคงเหลือใหม่',
+      specialOffer: 'นี่คือโบนัสต้อนรับครั้งเดียวสำหรับลูกค้าใหม่',
+      enjoyCredits: 'เพลิดเพลินกับเครดิตและสำรวจฟีเจอร์ AI ทั้งหมด!',
+      exploreFeatures: 'สำรวจฟีเจอร์',
+      footerText: 'การแจ้งเตือนโบนัสต้อนรับจาก Graphos AI Studio',
+      preheader: 'คุณได้รับ {bonus} เครดิตโบนัสจากการซื้อครั้งแรก!'
+    },
+    lowCredits: {
+      title: 'เครดิตใกล้หมด',
+      subtitle: 'ถึงเวลาเติมเงิน',
+      greeting: 'แจ้งเตือน!',
+      instruction: 'ยอดเครดิตของคุณต่ำ เติมเงินตอนนี้เพื่อใช้ฟีเจอร์ AI ต่อไปโดยไม่หยุดชะงัก',
+      currentBalance: 'ยอดคงเหลือปัจจุบัน',
+      credits: 'เครดิต',
+      recommendation: 'เราแนะนำให้รักษาอย่างน้อย 50 เครดิตเพื่อบริการที่ไม่หยุดชะงัก',
+      topUpNow: 'เติมเงินตอนนี้',
+      packages: 'ดูแพ็คเกจเครดิตและเลือกแพ็คเกจที่เหมาะกับคุณ',
+      footerText: 'การแจ้งเตือนบัญชีจาก Graphos AI Studio',
+      preheader: 'ยอดเครดิตต่ำ - เหลือเพียง {credits} เครดิต'
+    },
+    reEngagement: {
+      title: 'เราคิดถึงคุณ!',
+      subtitle: 'กลับมาดูว่ามีอะไรใหม่',
+      greeting: 'นานไม่ได้เจอ!',
+      instruction: 'เราสังเกตว่าคุณไม่ได้มาเยี่ยมชมสักพัก นี่คือสิ่งที่คุณพลาดไป:',
+      whatsNew: 'มีอะไรใหม่',
+      feature1: 'ความแม่นยำในการวิเคราะห์ AI ที่ดีขึ้น',
+      feature2: 'ความเร็วในการประมวลผลที่เร็วขึ้น',
+      feature3: 'ฟีเจอร์โปรไฟล์เสียงใหม่',
+      yourCredits: 'เครดิตของคุณ',
+      creditsWaiting: 'คุณยังมี {credits} เครดิตรอคุณอยู่',
+      comeBack: 'กลับมา',
+      weAreHere: 'เราพร้อมช่วยคุณสร้างเนื้อหาที่ยอดเยี่ยม แล้วพบกัน!',
+      footerText: 'เราคิดถึงคุณที่ Graphos AI Studio',
+      preheader: 'เราคิดถึงคุณ! {credits} เครดิตรอคุณอยู่'
     }
   },
 
@@ -1164,6 +1974,68 @@ const translations = {
       goToDashboard: 'Ke Dashboard',
       footerText: 'Pesan otomatis dari Graphos AI Studio',
       preheader: 'Akun Anda siap'
+    },
+    purchaseConfirmation: {
+      title: 'Pembayaran Berhasil!',
+      subtitle: 'Terima kasih atas pembelian Anda',
+      greeting: 'Kabar baik!',
+      instruction: 'Pembayaran Anda telah berhasil diproses. Berikut detail pesanan Anda:',
+      orderDetails: 'Detail Pesanan',
+      package: 'Paket',
+      creditsAdded: 'Kredit Ditambahkan',
+      newBalance: 'Saldo Baru',
+      orderId: 'ID Pesanan',
+      date: 'Tanggal',
+      amount: 'Jumlah',
+      thankYou: 'Terima kasih telah memilih Graphos AI Studio. Kredit Anda siap digunakan!',
+      startUsing: 'Mulai Gunakan',
+      footerText: 'Konfirmasi pembayaran dari Graphos AI Studio',
+      preheader: 'Pembayaran berhasil - {credits} kredit ditambahkan'
+    },
+    firstPurchaseBonus: {
+      title: 'Bonus Selamat Datang Terbuka!',
+      subtitle: 'Kredit ganda untuk pembelian pertama',
+      greeting: 'Selamat!',
+      instruction: 'Sebagai ucapan terima kasih atas pembelian pertama Anda, kami telah menggandakan kredit Anda!',
+      bonusDetails: 'Detail Bonus',
+      baseCredits: 'Kredit Dasar',
+      bonusCredits: 'Kredit Bonus (x2)',
+      totalCredits: 'Total Kredit',
+      newBalance: 'Saldo Baru',
+      specialOffer: 'Ini adalah bonus selamat datang satu kali untuk pelanggan baru.',
+      enjoyCredits: 'Nikmati kredit Anda dan jelajahi semua fitur AI!',
+      exploreFeatures: 'Jelajahi Fitur',
+      footerText: 'Notifikasi bonus selamat datang dari Graphos AI Studio',
+      preheader: 'Anda menerima {bonus} kredit bonus untuk pembelian pertama!'
+    },
+    lowCredits: {
+      title: 'Kredit Hampir Habis',
+      subtitle: 'Saatnya mengisi ulang',
+      greeting: 'Perhatian!',
+      instruction: 'Saldo kredit Anda rendah. Isi ulang sekarang untuk terus menggunakan fitur AI tanpa gangguan.',
+      currentBalance: 'Saldo Saat Ini',
+      credits: 'kredit',
+      recommendation: 'Kami menyarankan untuk menjaga minimal 50 kredit untuk layanan tanpa gangguan.',
+      topUpNow: 'Isi Ulang Sekarang',
+      packages: 'Lihat paket kredit kami dan pilih yang sesuai dengan kebutuhan Anda.',
+      footerText: 'Notifikasi akun dari Graphos AI Studio',
+      preheader: 'Saldo kredit rendah - hanya tersisa {credits} kredit'
+    },
+    reEngagement: {
+      title: 'Kami Merindukanmu!',
+      subtitle: 'Kembali dan lihat yang baru',
+      greeting: 'Sudah lama!',
+      instruction: 'Kami perhatikan Anda sudah lama tidak berkunjung. Ini yang Anda lewatkan:',
+      whatsNew: 'Yang Baru',
+      feature1: 'Akurasi analisis AI yang ditingkatkan',
+      feature2: 'Kecepatan pemrosesan lebih cepat',
+      feature3: 'Fitur profil suara baru',
+      yourCredits: 'Kredit Anda',
+      creditsWaiting: 'Anda masih memiliki {credits} kredit yang menunggu.',
+      comeBack: 'Kembali',
+      weAreHere: 'Kami di sini untuk membantu Anda membuat konten yang luar biasa. Sampai jumpa!',
+      footerText: 'Kami merindukanmu di Graphos AI Studio',
+      preheader: 'Kami merindukanmu! {credits} kredit menunggu Anda'
     }
   },
 
@@ -1245,6 +2117,68 @@ const translations = {
       goToDashboard: 'Ke Dashboard',
       footerText: 'Mesej automatik daripada Graphos AI Studio',
       preheader: 'Akaun anda sedia'
+    },
+    purchaseConfirmation: {
+      title: 'Pembayaran Berjaya!',
+      subtitle: 'Terima kasih atas pembelian anda',
+      greeting: 'Berita baik!',
+      instruction: 'Pembayaran anda telah berjaya diproses. Berikut adalah butiran pesanan anda:',
+      orderDetails: 'Butiran Pesanan',
+      package: 'Pakej',
+      creditsAdded: 'Kredit Ditambah',
+      newBalance: 'Baki Baru',
+      orderId: 'ID Pesanan',
+      date: 'Tarikh',
+      amount: 'Jumlah',
+      thankYou: 'Terima kasih kerana memilih Graphos AI Studio. Kredit anda sedia untuk digunakan!',
+      startUsing: 'Mula Guna',
+      footerText: 'Pengesahan pembayaran daripada Graphos AI Studio',
+      preheader: 'Pembayaran berjaya - {credits} kredit ditambah'
+    },
+    firstPurchaseBonus: {
+      title: 'Bonus Selamat Datang Dibuka!',
+      subtitle: 'Kredit berganda untuk pembelian pertama',
+      greeting: 'Tahniah!',
+      instruction: 'Sebagai tanda terima kasih atas pembelian pertama anda, kami telah menggandakan kredit anda!',
+      bonusDetails: 'Butiran Bonus',
+      baseCredits: 'Kredit Asas',
+      bonusCredits: 'Kredit Bonus (x2)',
+      totalCredits: 'Jumlah Kredit',
+      newBalance: 'Baki Baru',
+      specialOffer: 'Ini adalah bonus selamat datang sekali sahaja untuk pelanggan baru.',
+      enjoyCredits: 'Nikmati kredit anda dan terokai semua ciri AI!',
+      exploreFeatures: 'Terokai Ciri',
+      footerText: 'Pemberitahuan bonus selamat datang daripada Graphos AI Studio',
+      preheader: 'Anda menerima {bonus} kredit bonus untuk pembelian pertama!'
+    },
+    lowCredits: {
+      title: 'Kredit Hampir Habis',
+      subtitle: 'Masa untuk tambah nilai',
+      greeting: 'Perhatian!',
+      instruction: 'Baki kredit anda rendah. Tambah nilai sekarang untuk terus menggunakan ciri AI tanpa gangguan.',
+      currentBalance: 'Baki Semasa',
+      credits: 'kredit',
+      recommendation: 'Kami mengesyorkan untuk mengekalkan sekurang-kurangnya 50 kredit untuk perkhidmatan tanpa gangguan.',
+      topUpNow: 'Tambah Nilai Sekarang',
+      packages: 'Lihat pakej kredit kami dan pilih yang sesuai dengan keperluan anda.',
+      footerText: 'Pemberitahuan akaun daripada Graphos AI Studio',
+      preheader: 'Baki kredit rendah - hanya tinggal {credits} kredit'
+    },
+    reEngagement: {
+      title: 'Kami Rindu Anda!',
+      subtitle: 'Kembali dan lihat apa yang baru',
+      greeting: 'Lama tidak jumpa!',
+      instruction: 'Kami perasan anda sudah lama tidak melawat. Ini yang anda terlepas:',
+      whatsNew: 'Apa Yang Baru',
+      feature1: 'Ketepatan analisis AI yang dipertingkat',
+      feature2: 'Kelajuan pemprosesan lebih pantas',
+      feature3: 'Ciri profil suara baru',
+      yourCredits: 'Kredit Anda',
+      creditsWaiting: 'Anda masih mempunyai {credits} kredit yang menunggu.',
+      comeBack: 'Kembali',
+      weAreHere: 'Kami di sini untuk membantu anda mencipta kandungan yang hebat. Jumpa lagi!',
+      footerText: 'Kami rindu anda di Graphos AI Studio',
+      preheader: 'Kami rindu anda! {credits} kredit menunggu anda'
     }
   }
 };
@@ -1290,7 +2224,8 @@ const ICON_FILES = {
   check: 'circle-check', message: 'message-square', mail: 'mail',
   creditCard: 'credit-card', file: 'file-text', database: 'database',
   download: 'download', barChart: 'chart-bar', info: 'info',
-  user: 'user', calendar: 'calendar', alertCircle: 'circle-alert'
+  user: 'user', calendar: 'calendar', alertCircle: 'circle-alert',
+  gift: 'gift', rocket: 'rocket', sparkles: 'sparkles', zap: 'zap'
 };
 
 // Note: icon, logo, headerIcon functions are now imported from emailCid.js
@@ -1321,11 +2256,16 @@ function appleBase({ content, footerText, lang = DEFAULT_LANG }) {
           <tr>
             <td style="padding:32px 40px;text-align:center;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr><td align="center" style="padding-bottom:20px;">${logo(36)}</td></tr>
+                <tr>
+                  <td align="center" style="padding-bottom:20px;">
+                    <a href="https://graphosai.com" style="text-decoration:none;">${logo(36)}</a>
+                  </td>
+                </tr>
                 <tr>
                   <td align="center">
                     <p style="margin:0 0 8px;color:#86868b;font-size:12px;line-height:1.5;font-weight:400;">${footerText}</p>
-                    <p style="margin:0;color:#86868b;font-size:11px;">© ${year} Graphos AI Studio</p>
+                    <p style="margin:0 0 8px;color:#86868b;font-size:11px;">© ${year} <a href="https://graphosai.com" style="color:#86868b;text-decoration:none;">Graphos AI Studio</a></p>
+                    <p style="margin:0;color:#86868b;font-size:11px;">Support: <a href="mailto:Support@graphosai.com" style="color:#0066cc;text-decoration:none;">Support@graphosai.com</a></p>
                   </td>
                 </tr>
               </table>
@@ -1847,6 +2787,358 @@ function notificationEmail({ title, message, ctaText, ctaUrl, type = 'info', lan
 }
 
 // ============================================================================
+// PURCHASE CONFIRMATION EMAIL - Apple Style
+// ============================================================================
+
+/**
+ * Purchase Confirmation Email Template
+ * Sent when user successfully purchases credits
+ */
+function purchaseConfirmationEmail({ 
+  userName, 
+  packageName, 
+  creditsAdded, 
+  newBalance, 
+  orderId, 
+  amount, 
+  currency = 'USD',
+  dashboardUrl,
+  lang = DEFAULT_LANG 
+}) {
+  const locale = getLocale(lang);
+  const formattedDate = new Date().toLocaleDateString(locale, { dateStyle: 'medium' });
+  const formattedAmount = amount ? `${currency} ${amount}` : '';
+
+  const content = `
+    <!-- Header -->
+    <tr>
+      <td style="padding:48px 40px 32px;text-align:center;">
+        ${headerIcon('creditCard', 'black', 32)}
+        <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">${t('purchaseConfirmation.title', lang)}</h1>
+        <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">${t('purchaseConfirmation.subtitle', lang)}</p>
+      </td>
+    </tr>
+    <!-- Content -->
+    <tr>
+      <td style="padding:0 40px 40px;">
+        <p style="margin:0 0 24px;color:#1d1d1f;font-size:17px;line-height:1.5;text-align:center;">${t('hi', lang)} <strong>${userName}</strong>,</p>
+        <p style="margin:0 0 32px;color:#86868b;font-size:15px;line-height:1.6;text-align:center;">${t('purchaseConfirmation.instruction', lang)}</p>
+        
+        <!-- Order Details -->
+        <div style="background-color:#f5f5f7;border-radius:20px;padding:24px;margin-bottom:24px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+            <tr>
+              <td width="28">${icon('file', 'black', 16)}</td>
+              <td style="color:#86868b;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:500;">${t('purchaseConfirmation.orderDetails', lang)}</td>
+            </tr>
+          </table>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);color:#86868b;font-size:13px;">${t('purchaseConfirmation.package', lang)}</td>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);text-align:right;color:#1d1d1f;font-size:14px;font-weight:600;">${packageName}</td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);color:#86868b;font-size:13px;">${t('purchaseConfirmation.creditsAdded', lang)}</td>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);text-align:right;color:#1d1d1f;font-size:14px;font-weight:600;">+${creditsAdded}</td>
+            </tr>
+            ${formattedAmount ? `
+            <tr>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);color:#86868b;font-size:13px;">${t('purchaseConfirmation.amount', lang)}</td>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);text-align:right;color:#1d1d1f;font-size:14px;font-weight:600;">${formattedAmount}</td>
+            </tr>` : ''}
+            <tr>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);color:#86868b;font-size:13px;">${t('purchaseConfirmation.date', lang)}</td>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);text-align:right;color:#1d1d1f;font-size:14px;">${formattedDate}</td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0;color:#86868b;font-size:13px;">${t('purchaseConfirmation.orderId', lang)}</td>
+              <td style="padding:12px 0;text-align:right;color:#1d1d1f;font-size:12px;font-family:'SF Mono','Courier New',monospace;">${orderId}</td>
+            </tr>
+          </table>
+        </div>
+        
+        <!-- New Balance Highlight -->
+        <div style="background-color:#1d1d1f;border-radius:20px;padding:24px;text-align:center;margin-bottom:24px;">
+          <p style="margin:0 0 8px;color:rgba(255,255,255,0.6);font-size:12px;text-transform:uppercase;letter-spacing:1px;">${t('purchaseConfirmation.newBalance', lang)}</p>
+          <p style="margin:0;color:#ffffff;font-size:36px;font-weight:700;">${newBalance} <span style="font-size:16px;font-weight:400;">credits</span></p>
+        </div>
+        
+        <p style="margin:0 0 24px;color:#86868b;font-size:14px;line-height:1.5;text-align:center;">${t('purchaseConfirmation.thankYou', lang)}</p>
+        
+        <!-- CTA Button -->
+        ${dashboardUrl ? `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center" style="padding:8px 0;">
+              <a href="${dashboardUrl}" style="display:inline-block;padding:16px 40px;background-color:#1d1d1f;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;border-radius:980px;">${t('purchaseConfirmation.startUsing', lang)}</a>
+            </td>
+          </tr>
+        </table>` : ''}
+      </td>
+    </tr>`;
+
+  return appleBase({ content, footerText: t('purchaseConfirmation.footerText', lang), lang });
+}
+
+// ============================================================================
+// FIRST PURCHASE BONUS EMAIL - Apple Style
+// ============================================================================
+
+/**
+ * First Purchase Bonus Email Template
+ * Sent when user makes their first purchase and receives double credits
+ */
+function firstPurchaseBonusEmail({ 
+  userName, 
+  baseCredits, 
+  bonusCredits, 
+  totalCredits, 
+  newBalance,
+  dashboardUrl,
+  lang = DEFAULT_LANG 
+}) {
+  const content = `
+    <!-- Header -->
+    <tr>
+      <td style="padding:48px 40px 32px;text-align:center;">
+        ${headerIcon('gift', 'black', 32)}
+        <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">${t('firstPurchaseBonus.title', lang)}</h1>
+        <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">${t('firstPurchaseBonus.subtitle', lang)}</p>
+      </td>
+    </tr>
+    <!-- Content -->
+    <tr>
+      <td style="padding:0 40px 40px;">
+        <p style="margin:0 0 24px;color:#1d1d1f;font-size:17px;line-height:1.5;text-align:center;">${t('firstPurchaseBonus.greeting', lang)} <strong>${userName}</strong>!</p>
+        <p style="margin:0 0 32px;color:#86868b;font-size:15px;line-height:1.6;text-align:center;">${t('firstPurchaseBonus.instruction', lang)}</p>
+        
+        <!-- Bonus Details -->
+        <div style="background-color:#f5f5f7;border-radius:20px;padding:24px;margin-bottom:24px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+            <tr>
+              <td width="28">${icon('gift', 'black', 16)}</td>
+              <td style="color:#86868b;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:500;">${t('firstPurchaseBonus.bonusDetails', lang)}</td>
+            </tr>
+          </table>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);color:#86868b;font-size:13px;">${t('firstPurchaseBonus.baseCredits', lang)}</td>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);text-align:right;color:#1d1d1f;font-size:14px;">${baseCredits}</td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);color:#86868b;font-size:13px;">${t('firstPurchaseBonus.bonusCredits', lang)}</td>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);text-align:right;color:#1d1d1f;font-size:14px;font-weight:600;">+${bonusCredits}</td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0;color:#1d1d1f;font-size:14px;font-weight:600;">${t('firstPurchaseBonus.totalCredits', lang)}</td>
+              <td style="padding:12px 0;text-align:right;color:#1d1d1f;font-size:16px;font-weight:700;">${totalCredits}</td>
+            </tr>
+          </table>
+        </div>
+        
+        <!-- New Balance Highlight -->
+        <div style="background-color:#1d1d1f;border-radius:20px;padding:24px;text-align:center;margin-bottom:24px;">
+          <p style="margin:0 0 8px;color:rgba(255,255,255,0.6);font-size:12px;text-transform:uppercase;letter-spacing:1px;">${t('firstPurchaseBonus.newBalance', lang)}</p>
+          <p style="margin:0;color:#ffffff;font-size:36px;font-weight:700;">${newBalance} <span style="font-size:16px;font-weight:400;">credits</span></p>
+        </div>
+        
+        <!-- Special Offer Note -->
+        <div style="background-color:#f5f5f7;border-radius:16px;padding:16px;margin-bottom:24px;">
+          <table role="presentation" cellpadding="0" cellspacing="0">
+            <tr>
+              <td width="32" style="vertical-align:top;padding-top:2px;">${icon('info', 'black', 18)}</td>
+              <td style="color:#1d1d1f;font-size:14px;line-height:1.5;">${t('firstPurchaseBonus.specialOffer', lang)}</td>
+            </tr>
+          </table>
+        </div>
+        
+        <p style="margin:0 0 24px;color:#86868b;font-size:14px;line-height:1.5;text-align:center;">${t('firstPurchaseBonus.enjoyCredits', lang)}</p>
+        
+        <!-- CTA Button -->
+        ${dashboardUrl ? `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center" style="padding:8px 0;">
+              <a href="${dashboardUrl}" style="display:inline-block;padding:16px 40px;background-color:#1d1d1f;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;border-radius:980px;">${t('firstPurchaseBonus.exploreFeatures', lang)}</a>
+            </td>
+          </tr>
+        </table>` : ''}
+      </td>
+    </tr>`;
+
+  return appleBase({ content, footerText: t('firstPurchaseBonus.footerText', lang), lang });
+}
+
+// ============================================================================
+// LOW CREDITS WARNING EMAIL - Apple Style
+// ============================================================================
+
+/**
+ * Low Credits Warning Email Template
+ * Sent when user's credit balance is low
+ */
+function lowCreditsEmail({ 
+  userName, 
+  currentBalance,
+  pricingUrl,
+  lang = DEFAULT_LANG 
+}) {
+  const content = `
+    <!-- Header -->
+    <tr>
+      <td style="padding:48px 40px 32px;text-align:center;">
+        ${headerIcon('alertCircle', 'black', 32)}
+        <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">${t('lowCredits.title', lang)}</h1>
+        <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">${t('lowCredits.subtitle', lang)}</p>
+      </td>
+    </tr>
+    <!-- Content -->
+    <tr>
+      <td style="padding:0 40px 40px;">
+        <p style="margin:0 0 24px;color:#1d1d1f;font-size:17px;line-height:1.5;text-align:center;">${t('lowCredits.greeting', lang)} <strong>${userName}</strong>,</p>
+        <p style="margin:0 0 32px;color:#86868b;font-size:15px;line-height:1.6;text-align:center;">${t('lowCredits.instruction', lang)}</p>
+        
+        <!-- Current Balance -->
+        <div style="background-color:#f5f5f7;border-radius:20px;padding:32px;text-align:center;margin-bottom:24px;">
+          <p style="margin:0 0 8px;color:#86868b;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:500;">${t('lowCredits.currentBalance', lang)}</p>
+          <p style="margin:0;color:#1d1d1f;font-size:48px;font-weight:700;">${currentBalance}</p>
+          <p style="margin:8px 0 0;color:#86868b;font-size:14px;">${t('lowCredits.credits', lang)}</p>
+        </div>
+        
+        <!-- Recommendation -->
+        <div style="background-color:#f5f5f7;border-radius:16px;padding:20px;margin-bottom:24px;">
+          <table role="presentation" cellpadding="0" cellspacing="0">
+            <tr>
+              <td width="32" style="vertical-align:top;padding-top:2px;">${icon('info', 'black', 18)}</td>
+              <td style="color:#1d1d1f;font-size:14px;line-height:1.5;">${t('lowCredits.recommendation', lang)}</td>
+            </tr>
+          </table>
+        </div>
+        
+        <p style="margin:0 0 24px;color:#86868b;font-size:14px;line-height:1.5;text-align:center;">${t('lowCredits.packages', lang)}</p>
+        
+        <!-- CTA Button -->
+        ${pricingUrl ? `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center" style="padding:8px 0;">
+              <a href="${pricingUrl}" style="display:inline-block;padding:16px 40px;background-color:#1d1d1f;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;border-radius:980px;">${t('lowCredits.topUpNow', lang)}</a>
+            </td>
+          </tr>
+        </table>` : ''}
+      </td>
+    </tr>`;
+
+  return appleBase({ content, footerText: t('lowCredits.footerText', lang), lang });
+}
+
+// ============================================================================
+// RE-ENGAGEMENT EMAIL - Apple Style
+// ============================================================================
+
+/**
+ * Re-engagement Email Template
+ * Sent to inactive users to bring them back
+ */
+function reEngagementEmail({ 
+  userName, 
+  currentCredits,
+  dashboardUrl,
+  lang = DEFAULT_LANG 
+}) {
+  const content = `
+    <!-- Header -->
+    <tr>
+      <td style="padding:48px 40px 32px;text-align:center;">
+        ${headerIcon('sparkles', 'black', 32)}
+        <h1 style="margin:0 0 8px;color:#1d1d1f;font-size:28px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;">${t('reEngagement.title', lang)}</h1>
+        <p style="margin:0;color:#86868b;font-size:15px;font-weight:400;">${t('reEngagement.subtitle', lang)}</p>
+      </td>
+    </tr>
+    <!-- Content -->
+    <tr>
+      <td style="padding:0 40px 40px;">
+        <p style="margin:0 0 24px;color:#1d1d1f;font-size:17px;line-height:1.5;text-align:center;">${t('reEngagement.greeting', lang)} <strong>${userName}</strong>,</p>
+        <p style="margin:0 0 32px;color:#86868b;font-size:15px;line-height:1.6;text-align:center;">${t('reEngagement.instruction', lang)}</p>
+        
+        <!-- What's New -->
+        <div style="background-color:#f5f5f7;border-radius:20px;padding:28px;margin-bottom:24px;">
+          <p style="margin:0 0 20px;color:#1d1d1f;font-size:15px;font-weight:600;">${t('reEngagement.whatsNew', lang)}</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);">
+                <table role="presentation" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="32">${icon('zap', 'black', 18)}</td>
+                    <td style="color:#1d1d1f;font-size:14px;">${t('reEngagement.feature1', lang)}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);">
+                <table role="presentation" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="32">${icon('rocket', 'black', 18)}</td>
+                    <td style="color:#1d1d1f;font-size:14px;">${t('reEngagement.feature2', lang)}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0;">
+                <table role="presentation" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="32">${icon('user', 'black', 18)}</td>
+                    <td style="color:#1d1d1f;font-size:14px;">${t('reEngagement.feature3', lang)}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </div>
+        
+        <!-- Credits Reminder -->
+        ${currentCredits > 0 ? `
+        <div style="background-color:#1d1d1f;border-radius:20px;padding:24px;text-align:center;margin-bottom:24px;">
+          <p style="margin:0 0 8px;color:rgba(255,255,255,0.6);font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:500;">${t('reEngagement.yourCredits', lang)}</p>
+          <p style="margin:0 0 8px;color:#ffffff;font-size:36px;font-weight:700;">${currentCredits}</p>
+          <p style="margin:0;color:rgba(255,255,255,0.6);font-size:14px;">${t('reEngagement.creditsWaiting', lang, { credits: currentCredits })}</p>
+        </div>` : ''}
+        
+        <p style="margin:0 0 24px;color:#86868b;font-size:14px;line-height:1.5;text-align:center;">${t('reEngagement.weAreHere', lang)}</p>
+        
+        <!-- CTA Button -->
+        ${dashboardUrl ? `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center" style="padding:8px 0;">
+              <a href="${dashboardUrl}" style="display:inline-block;padding:16px 40px;background-color:#1d1d1f;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;border-radius:980px;">${t('reEngagement.comeBack', lang)}</a>
+            </td>
+          </tr>
+        </table>` : ''}
+      </td>
+    </tr>`;
+
+  return appleBase({ content, footerText: t('reEngagement.footerText', lang), lang });
+}
+
+// ============================================================================
+// EMAIL SUBJECT HELPER
+// ============================================================================
+
+/**
+ * Get localized email subject
+ * @param {string} templateType - Template type (otpVerification, passwordReset, newDeviceLogin, passwordChanged, welcome)
+ * @param {string} lang - Language code
+ * @returns {string} Localized subject with brand name
+ */
+function getEmailSubject(templateType, lang = DEFAULT_LANG) {
+  const title = t(`${templateType}.title`, lang);
+  return `${title} - Graphos AI Studio`;
+}
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 module.exports = {
@@ -1859,10 +3151,16 @@ module.exports = {
   supportReplyEmail,
   newTicketEmail,
   notificationEmail,
+  // New email templates
+  purchaseConfirmationEmail,
+  firstPurchaseBonusEmail,
+  lowCreditsEmail,
+  reEngagementEmail,
   
   // Helpers
   t,
   getLocale,
+  getEmailSubject,
   icon,
   headerIcon,
   logo,

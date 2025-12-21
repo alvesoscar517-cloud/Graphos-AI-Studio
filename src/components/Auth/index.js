@@ -20,7 +20,3 @@ export { default as ForgotPasswordV2 } from './ForgotPasswordV2'
 export { default as AccountSettings } from './AccountSettings'
 export { default as SecuritySettings } from './SecuritySettings'
 export { default as ChangePasswordV2 } from './ChangePasswordV2'
-
-// Google linking
-export { default as LinkGoogleAccount } from './LinkGoogleAccount'
-export { default as LinkGooglePrompt } from './LinkGooglePrompt'

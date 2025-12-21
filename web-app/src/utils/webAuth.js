@@ -1,43 +1,82 @@
 /**
  * Web Authentication Module
  * 
- * Provides Google OAuth 2.0 authentication for web app using direct OAuth.
- * This matches the Chrome Extension behavior (chrome.identity).
+ * Provides Google authentication for web app using Firebase Auth.
+ * Simplified version - no longer uses direct OAuth.
  * 
  * Requirements: 2.1, 2.2, 2.3, 2.4, 8.3
  */
 
 import { logger } from './logger'
-import {
-  signInWithGoogleOAuth,
-  getStoredGoogleToken,
-  getStoredUserInfo,
-  clearGoogleAuth,
-  isSignedInWithGoogle as checkGoogleSignIn,
-  AUTH_ERROR_CODES
-} from './googleOAuth'
-
-// Re-export error codes
-export { AUTH_ERROR_CODES }
+import { 
+  signInWithGoogle as firebaseSignInWithGoogle,
+  signOut as firebaseSignOut,
+  getCurrentUser,
+  onAuthStateChanged
+} from '../services/firebaseAuth'
 
 /**
- * Sign in with Google using OAuth popup (direct OAuth, not Firebase)
- * 
- * @returns {Promise<{success: boolean, userInfo?: object, accessToken?: string, error?: string, code?: string}>}
+ * Error codes for authentication failures
  */
-export async function signInWithGooglePopup() {
-  logger.log('[WebAuth] Starting Google sign-in (direct OAuth)...')
-  return signInWithGoogleOAuth()
+export const AUTH_ERROR_CODES = {
+  POPUP_BLOCKED: 'POPUP_BLOCKED',
+  POPUP_CLOSED: 'POPUP_CLOSED',
+  OAUTH_FAILED: 'OAUTH_FAILED',
+  NETWORK_ERROR: 'NETWORK_ERROR',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR'
 }
 
 /**
- * Sign out from Google OAuth
+ * Sign in with Google using Firebase Auth popup
+ * 
+ * @returns {Promise<{success: boolean, userInfo?: object, token?: string, isNewUser?: boolean, error?: string, code?: string}>}
+ */
+export async function signInWithGooglePopup() {
+  logger.log('[WebAuth] Starting Google sign-in (Firebase Auth)...')
+  
+  try {
+    const result = await firebaseSignInWithGoogle()
+    
+    if (!result.success) {
+      let code = AUTH_ERROR_CODES.OAUTH_FAILED
+      
+      if (result.error === 'User cancelled sign-in') {
+        code = AUTH_ERROR_CODES.POPUP_CLOSED
+      }
+      
+      return {
+        success: false,
+        error: result.error,
+        code
+      }
+    }
+    
+    logger.log('[WebAuth] Sign-in successful:', result.user.email)
+    
+    return {
+      success: true,
+      userInfo: result.user,
+      token: result.token,
+      isNewUser: result.isNewUser
+    }
+  } catch (error) {
+    logger.error('WebAuth', 'Sign-in failed', error)
+    return {
+      success: false,
+      error: error.message,
+      code: AUTH_ERROR_CODES.UNKNOWN_ERROR
+    }
+  }
+}
+
+/**
+ * Sign out from Firebase Auth
  * 
  * @returns {Promise<{success: boolean, error?: string}>}
  */
 export async function signOutWeb() {
   try {
-    clearGoogleAuth()
+    await firebaseSignOut()
     logger.log('[WebAuth] Signed out successfully')
     return { success: true }
   } catch (error) {
@@ -50,41 +89,13 @@ export async function signOutWeb() {
 }
 
 /**
- * Get the current Google access token
- * Useful for Google Drive API calls
- * 
- * @returns {Promise<string|null>} The access token or null if not available
- */
-export async function getGoogleAccessTokenWeb() {
-  try {
-    return getStoredGoogleToken()
-  } catch (error) {
-    logger.error('WebAuth', 'Failed to get access token', error)
-    return null
-  }
-}
-
-/**
  * Subscribe to auth state changes
- * Note: Direct OAuth doesn't have real-time state changes like Firebase
- * This is a simplified version that checks current state
  * 
  * @param {Function} callback - Called with user object or null
  * @returns {Function} Unsubscribe function
  */
 export function onWebAuthStateChanged(callback) {
-  // Check current state immediately
-  const userInfo = getStoredUserInfo()
-  const token = getStoredGoogleToken()
-  
-  if (userInfo && token) {
-    callback(userInfo)
-  } else {
-    callback(null)
-  }
-  
-  // Return no-op unsubscribe since we don't have real-time updates
-  return () => {}
+  return onAuthStateChanged(callback)
 }
 
 /**
@@ -93,7 +104,7 @@ export function onWebAuthStateChanged(callback) {
  * @returns {boolean}
  */
 export function isSignedInWithGoogle() {
-  return checkGoogleSignIn()
+  return !!getCurrentUser()
 }
 
 /**
@@ -102,13 +113,20 @@ export function isSignedInWithGoogle() {
  * @returns {object|null} User info or null
  */
 export function getCurrentWebUser() {
-  return getStoredUserInfo()
+  const user = getCurrentUser()
+  if (!user) return null
+  
+  return {
+    uid: user.uid,
+    email: user.email,
+    name: user.displayName || 'User',
+    picture: user.photoURL || ''
+  }
 }
 
 export default {
   signInWithGooglePopup,
   signOutWeb,
-  getGoogleAccessTokenWeb,
   onWebAuthStateChanged,
   isSignedInWithGoogle,
   getCurrentWebUser,

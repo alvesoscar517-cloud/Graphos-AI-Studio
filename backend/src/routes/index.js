@@ -210,6 +210,10 @@ router.use('/', authRoutes);
 // Email authentication routes
 router.use('/auth/email', emailAuthRoutes);
 
+// Firebase authentication routes (for Firebase Auth Google Sign-In)
+const emailAuthController = require('../controllers/emailAuth.controller');
+router.post('/auth/firebase/google-login', emailAuthController.loginWithFirebaseGoogle);
+
 // ============================================================================
 // PROTECTED ROUTES (Auth Required + Locked Check)
 // ============================================================================

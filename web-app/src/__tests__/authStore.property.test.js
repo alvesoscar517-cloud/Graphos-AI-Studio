@@ -52,8 +52,7 @@ describe('Auth Store - Property Tests', () => {
           fc.record({
             userId: fc.string({ minLength: 1, maxLength: 50 }).filter(s => /^[a-zA-Z0-9_-]+$/.test(s)),
             email: fc.emailAddress(),
-            name: fc.string({ minLength: 1, maxLength: 100 }).filter(s => /^[a-zA-Z0-9 ]+$/.test(s)),
-            hasGoogleLinked: fc.boolean()
+            name: fc.string({ minLength: 1, maxLength: 100 }).filter(s => /^[a-zA-Z0-9 ]+$/.test(s))
           }),
           (userData) => {
             // Store user data

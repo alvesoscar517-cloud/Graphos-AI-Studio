@@ -174,7 +174,7 @@ function Terms() {
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="w-[6px] h-[6px] rounded-full bg-primary mt-[7px] shrink-0"></span>
-                    <span><strong>Google Drive Sync:</strong> Synchronize your notes and conversations across devices</span>
+                    <span><strong>Cloud Sync:</strong> Automatically synchronize your notes and conversations across devices</span>
                   </li>
                 </ul>
                 <p className="text-text-secondary leading-relaxed">

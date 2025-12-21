@@ -263,6 +263,24 @@
     "priority_urgent": "至急"
   },
 
+  "welcome_email": {
+    "subject": "Graphos AI Studio へようこそ",
+    "greeting": "ようこそ",
+    "intro": "Graphos AI Studio にご参加いただきありがとうございます。ライターやクリエイターのコミュニティにご参加いただき嬉しく思います。",
+    "get_started": "始める",
+    "feature1_title": "AI 検出",
+    "feature1_desc": "テキストを分析し、AI が作成したコンテンツを高精度で検出します。",
+    "feature2_title": "ボイスプロファイル",
+    "feature2_desc": "独自のボイスプロファイルを作成し、本物のライティングスタイルを維持します。",
+    "feature3_title": "テキストの人間化",
+    "feature3_desc": "AI が作成したテキストを自然で人間らしいコンテンツに変換します。",
+    "help_title": "お助けが必要ですか？",
+    "help_desc": "サポートチームがいつでもお手伝いします。お気軽にお問い合わせください。",
+    "contact_support": "サポートに連絡",
+    "footer": "このメールは Graphos AI Studio でアカウントを作成したため送信されました。",
+    "copyright": "Graphos AI Studio。すべての権利を留保。"
+  },
+
   "common": {
     "loading": "読み込み中...",
     "processing": "処理中...",

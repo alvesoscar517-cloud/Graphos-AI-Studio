@@ -443,6 +443,12 @@ async function startServer() {
         
         // Check and deploy Firestore indexes (one-time, non-blocking)
         try {
+          const { initializeIndexes } = require('./src/utils/firestoreIndexes');
+          initializeIndexes().catch(err => {
+            console.warn('[STARTUP] [WARNING] Index check failed:', err.message);
+          });
+          
+          // Also try to deploy any missing indexes via API
           const { deployIndexes } = require('./scripts/deploy-indexes');
           deployIndexes().catch(err => {
             console.warn('[STARTUP] [WARNING] Index deployment check failed:', err.message);

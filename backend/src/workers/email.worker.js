@@ -125,6 +125,23 @@ async function processEmailJob(job) {
       case 'notification':
         result = await emailService.sendNotificationEmail(to, subject, data.content, data.lang);
         break;
+      
+      // New email types for purchase, credits, and re-engagement
+      case 'purchase_confirmation':
+        result = await emailService.sendPurchaseConfirmationEmail(to, data, data.lang);
+        break;
+        
+      case 'first_purchase_bonus':
+        result = await emailService.sendFirstPurchaseBonusEmail(to, data, data.lang);
+        break;
+        
+      case 'low_credits':
+        result = await emailService.sendLowCreditsEmail(to, data, data.lang);
+        break;
+        
+      case 're_engagement':
+        result = await emailService.sendReEngagementEmail(to, data, data.lang);
+        break;
         
       default:
         throw new Error(`Unknown email type: ${type}`);

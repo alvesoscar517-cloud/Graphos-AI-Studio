@@ -105,6 +105,82 @@ async function queueDelayedEmail(to, type, data, delayMs) {
   }, delayMs);
 }
 
+/**
+ * Queue a purchase confirmation email
+ * @param {string} to - Recipient email
+ * @param {Object} data - Purchase data (packageName, creditsAdded, newBalance, orderId, amount, currency)
+ * @param {string} lang - Language code
+ * @returns {Promise<Job>} Queued job
+ */
+async function queuePurchaseConfirmationEmail(to, data, lang = 'en') {
+  return addJob(QUEUE_NAMES.EMAIL, 'purchase_confirmation', {
+    type: 'purchase_confirmation',
+    to,
+    subject: 'Purchase Confirmation',
+    data: { ...data, lang }
+  }, {
+    priority: 2, // High priority - important transaction
+    attempts: 3
+  });
+}
+
+/**
+ * Queue a first purchase bonus email
+ * @param {string} to - Recipient email
+ * @param {Object} data - Bonus data (baseCredits, bonusCredits, totalCredits, newBalance)
+ * @param {string} lang - Language code
+ * @returns {Promise<Job>} Queued job
+ */
+async function queueFirstPurchaseBonusEmail(to, data, lang = 'en') {
+  return addJob(QUEUE_NAMES.EMAIL, 'first_purchase_bonus', {
+    type: 'first_purchase_bonus',
+    to,
+    subject: 'Welcome Bonus',
+    data: { ...data, lang }
+  }, {
+    priority: 2, // High priority
+    attempts: 3
+  });
+}
+
+/**
+ * Queue a low credits warning email
+ * @param {string} to - Recipient email
+ * @param {Object} data - Credits data (currentBalance, userName)
+ * @param {string} lang - Language code
+ * @returns {Promise<Job>} Queued job
+ */
+async function queueLowCreditsEmail(to, data, lang = 'en') {
+  return addJob(QUEUE_NAMES.EMAIL, 'low_credits', {
+    type: 'low_credits',
+    to,
+    subject: 'Low Credits Warning',
+    data: { ...data, lang }
+  }, {
+    priority: 5, // Medium priority
+    attempts: 2
+  });
+}
+
+/**
+ * Queue a re-engagement email
+ * @param {string} to - Recipient email
+ * @param {Object} data - User data (currentCredits, userName)
+ * @param {string} lang - Language code
+ * @returns {Promise<Job>} Queued job
+ */
+async function queueReEngagementEmail(to, data, lang = 'en') {
+  return addJob(QUEUE_NAMES.EMAIL, 're_engagement', {
+    type: 're_engagement',
+    to,
+    subject: 'We Miss You',
+    data: { ...data, lang }
+  }, {
+    priority: 10, // Low priority
+    attempts: 2
+  });
+}
+
 // ============================================================================
 // EXPORTS
 // ============================================================================
@@ -114,5 +190,10 @@ module.exports = {
   queueWelcomeEmail,
   queuePasswordResetEmail,
   queueNotificationEmail,
-  queueDelayedEmail
+  queueDelayedEmail,
+  // New queue functions
+  queuePurchaseConfirmationEmail,
+  queueFirstPurchaseBonusEmail,
+  queueLowCreditsEmail,
+  queueReEngagementEmail
 };

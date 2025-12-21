@@ -434,13 +434,11 @@ async function login(email, password, options = {}) {
       picture: userPicture,
       tier: userData.tier,
       authProvider: 'email',
-      hasGoogleLinked: !!userData.googleLinked,
-      // Include Google linked info if available (for Drive sync, avatar, etc.)
+      // Include Google linked info if available (for backward compatibility)
       googleLinked: userData.googleLinked ? {
         googleEmail: userData.googleLinked.googleEmail,
         googleName: userData.googleLinked.googleName,
-        googlePicture: userData.googleLinked.googlePicture,
-        driveEnabled: userData.googleLinked.driveEnabled
+        googlePicture: userData.googleLinked.googlePicture
       } : null
     },
     accessToken: tokens.accessToken,
@@ -1118,7 +1116,7 @@ async function cleanupOldLoginHistory() {
 
 /**
  * Link Google account using OAuth access token (for Chrome extension)
- * This allows email users to link Google for Drive sync
+ * This allows email users to link Google for cloud sync
  * 
  * @param {string} userId - User ID
  * @param {Object} googleData - Google OAuth data
@@ -1204,8 +1202,7 @@ async function linkGoogleWithOAuth(userId, googleData) {
       googleEmail: normalizedGoogleEmail,
       googleName: name || normalizedGoogleEmail.split('@')[0],
       googlePicture: googlePicture,
-      linkedAt: new Date(),
-      driveEnabled: true // Flag to indicate Drive sync is available
+      linkedAt: new Date()
     }
   };
   
@@ -1505,7 +1502,6 @@ async function checkGoogleLinked(googleEmail) {
         picture: userData.picture || userData.googleLinked?.googlePicture,
         tier: userData.tier,
         authProvider: 'email',
-        hasGoogleLinked: true,
         googleLinked: {
           googleEmail: userData.googleLinked.googleEmail
         }
@@ -1622,7 +1618,6 @@ async function loginWithLinkedGoogle(googleEmail, googleAccessToken) {
       picture: userData.picture || userData.googleLinked?.googlePicture || '',
       tier: userData.tier,
       authProvider: 'email',
-      hasGoogleLinked: true,
       googleLinked: {
         googleEmail: userData.googleLinked.googleEmail
       }
@@ -1814,6 +1809,205 @@ async function loginWithGoogleOAuth(googleAccessToken) {
   };
 }
 
+/**
+ * Login or register with Firebase Auth (Google Sign-In via Firebase)
+ * Verifies Firebase ID token and creates/logs in user.
+ * 
+ * @param {Object} params - Login parameters
+ * @param {string} params.firebaseIdToken - Firebase ID token from client
+ * @param {string} params.email - User email from Firebase
+ * @param {string} params.name - User display name from Firebase
+ * @param {string} params.picture - User profile picture URL from Firebase
+ * @returns {Promise<{success: boolean, user: Object, accessToken: string, refreshToken: string, expiresIn: number, isNewUser: boolean}>}
+ */
+async function loginWithFirebaseGoogle({ firebaseIdToken, email, name, picture }) {
+  // Verify Firebase ID token
+  let decodedToken;
+  try {
+    const admin = require('firebase-admin');
+    decodedToken = await admin.auth().verifyIdToken(firebaseIdToken);
+    
+    if (!decodedToken.email) {
+      throw new Error('AUTH_INVALID_TOKEN: No email in Firebase token');
+    }
+  } catch (error) {
+    if (error.message.startsWith('AUTH_')) {
+      throw error;
+    }
+    logger.error('Firebase token verification failed', { error: error.message });
+    throw new Error('AUTH_INVALID_TOKEN: Failed to verify Firebase token');
+  }
+  
+  // Use email from token (more secure) or fallback to provided email
+  const normalizedEmail = normalizeEmail(decodedToken.email || email);
+  const firebaseUid = decodedToken.uid;
+  const googleId = decodedToken.firebase?.identities?.['google.com']?.[0] || firebaseUid;
+  
+  // Check if user exists with this Firebase UID, Google ID, or email
+  let userDoc = null;
+  let userId = null;
+  let isNewUser = false;
+  
+  // First, check by Firebase UID
+  const firebaseUidSnapshot = await db.collection(USERS_COLLECTION)
+    .where('firebaseUid', '==', firebaseUid)
+    .limit(1)
+    .get();
+  
+  if (!firebaseUidSnapshot.empty) {
+    userDoc = firebaseUidSnapshot.docs[0];
+    userId = userDoc.id;
+  } else {
+    // Check by Google ID (for existing Google OAuth users)
+    const googleIdSnapshot = await db.collection(USERS_COLLECTION)
+      .where('googleId', '==', googleId)
+      .limit(1)
+      .get();
+    
+    if (!googleIdSnapshot.empty) {
+      userDoc = googleIdSnapshot.docs[0];
+      userId = userDoc.id;
+    } else {
+      // Check by email (for users who might have registered with same email)
+      const emailSnapshot = await db.collection(USERS_COLLECTION)
+        .where('email', '==', normalizedEmail)
+        .limit(1)
+        .get();
+      
+      if (!emailSnapshot.empty) {
+        const existingUser = emailSnapshot.docs[0].data();
+        
+        // If it's an email user, they should link Google instead
+        if (existingUser.authProvider === 'email') {
+          throw new Error('AUTH_EMAIL_EXISTS: An account with this email already exists. Please sign in with email/password.');
+        }
+        
+        userDoc = emailSnapshot.docs[0];
+        userId = userDoc.id;
+      }
+    }
+  }
+  
+  const now = new Date();
+  const userName = name || decodedToken.name || normalizedEmail.split('@')[0];
+  const userPicture = picture || decodedToken.picture || '';
+  
+  if (!userDoc) {
+    // Create new Firebase Google user
+    isNewUser = true;
+    userId = `firebase_${firebaseUid}`;
+    
+    const newUserData = {
+      userId,
+      email: normalizedEmail,
+      displayName: userName,
+      name: userName,
+      picture: userPicture,
+      firebaseUid,
+      googleId,
+      authProvider: 'google',
+      emailVerified: decodedToken.email_verified || true,
+      tier: 'free',
+      credits: {
+        balance: FREE_CREDITS,
+        purchased: 0,
+        used: 0,
+        bonus: FREE_CREDITS
+      },
+      createdAt: now,
+      lastLoginAt: now,
+      isNewUser: true,
+      usage: {
+        lastActivity: now.toISOString()
+      }
+    };
+    
+    await db.collection(USERS_COLLECTION).doc(userId).set(newUserData);
+    
+    // Log welcome bonus transaction
+    const transactionRef = db.collection('credit_transactions').doc();
+    await transactionRef.set({
+      userId,
+      type: 'addition',
+      amount: FREE_CREDITS,
+      feature: 'welcome_bonus',
+      description: 'Welcome bonus credits',
+      metadata: {
+        source: 'firebase_google_registration',
+        isFirstTransaction: true
+      },
+      timestamp: now.toISOString(),
+      balanceAfter: FREE_CREDITS
+    });
+    
+    logger.info('New Firebase Google user created', { userId, email: normalizedEmail, credits: FREE_CREDITS });
+    
+    // Send welcome notification
+    try {
+      await sendWelcomeNotification(userId, FREE_CREDITS);
+    } catch (notifError) {
+      logger.warn('Failed to send welcome notification', { userId, error: notifError.message });
+    }
+    
+    userDoc = await db.collection(USERS_COLLECTION).doc(userId).get();
+  } else {
+    // Existing user - update last login and Firebase UID
+    const userData = userDoc.data();
+    
+    // Check if account is deleted
+    if (userData.deleted === true) {
+      throw new Error('AUTH_ACCOUNT_DELETED: This account has been deleted.');
+    }
+    
+    // Check if account is locked
+    if (userData.locked === true) {
+      throw new Error(`AUTH_ACCOUNT_SUSPENDED: Your account has been suspended.${userData.lockReason ? ` Reason: ${userData.lockReason}` : ''}`);
+    }
+    
+    await db.collection(USERS_COLLECTION).doc(userId).update({
+      lastLoginAt: now,
+      // Update Firebase UID and Google info
+      firebaseUid: firebaseUid,
+      googleId: googleId,
+      picture: userPicture || userData.picture || '',
+      displayName: userName || userData.displayName
+    });
+  }
+  
+  const userData = userDoc.data();
+  
+  // Generate tokens
+  const tokens = await generateTokens(userId, {
+    rememberMe: true, // Google login always remembers
+    userInfo: {
+      email: normalizedEmail,
+      name: userData.displayName || userData.name || userName,
+      picture: userData.picture || userPicture || '',
+      emailVerified: true
+    }
+  });
+  
+  logger.info('Firebase Google user logged in', { userId, email: normalizedEmail, isNewUser });
+  
+  return {
+    success: true,
+    isNewUser,
+    user: {
+      userId,
+      email: normalizedEmail,
+      displayName: userData.displayName || userData.name || userName,
+      name: userData.displayName || userData.name || userName,
+      picture: userData.picture || userPicture || '',
+      tier: userData.tier || 'free',
+      authProvider: 'google',
+      credits: userData.credits || { balance: FREE_CREDITS }
+    },
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
+    expiresIn: tokens.expiresIn
+  };
+}
+
 module.exports = {
   register,
   verifyEmail,
@@ -1823,12 +2017,8 @@ module.exports = {
   resetPassword,
   changePassword,
   deleteAccount,
-  linkGoogle,
-  linkGoogleWithOAuth,
-  unlinkGoogle,
-  checkGoogleLinked,
-  loginWithLinkedGoogle,
   loginWithGoogleOAuth,
+  loginWithFirebaseGoogle,
   resendVerificationOTP,
   getUserByEmail,
   getActiveSessions,

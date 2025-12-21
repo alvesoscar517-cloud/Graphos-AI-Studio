@@ -208,6 +208,10 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
           10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
           20%, 40%, 60%, 80% { transform: translateX(4px); }
         }
+        @keyframes dotPulse {
+          0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+          40% { transform: scale(1); opacity: 1; }
+        }
       `}</style>
 
       {/* Header */}
@@ -374,10 +378,14 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
             "hover:bg-gray-50 active:scale-[0.98] disabled:opacity-40 transition-all"
           )}>
           {isLoading ? (
-            <>
-              <span className="inline-block w-4 h-4 sm:w-[18px] sm:h-[18px] border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
-              <span>{t('auth.signingIn', 'Signing in...')}</span>
-            </>
+            <div className="flex items-center gap-1.5">
+              <span>{t('auth.signingIn', 'Signing in')}</span>
+              <span className="flex gap-0.5">
+                <span className="w-1 h-1 bg-gray-600 rounded-full" style={{ animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '0s' }} />
+                <span className="w-1 h-1 bg-gray-600 rounded-full" style={{ animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '0.2s' }} />
+                <span className="w-1 h-1 bg-gray-600 rounded-full" style={{ animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '0.4s' }} />
+              </span>
+            </div>
           ) : (
             <>
               <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px]" viewBox="0 0 18 18" fill="none">

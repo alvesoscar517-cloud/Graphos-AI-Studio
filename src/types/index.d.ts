@@ -17,7 +17,6 @@ export interface User {
   displayName?: string;
   picture?: string;
   emailVerified?: boolean;
-  hasGoogleLinked?: boolean;
   authProvider?: 'google' | 'email';
   createdAt?: string;
   updatedAt?: string;
@@ -29,7 +28,6 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   authMethod: 'google' | 'email' | null;
-  hasGoogleLinked: boolean;
   error: string | null;
 }
 
@@ -47,8 +45,6 @@ export interface AuthActions {
   signOut: () => Promise<AuthResult>;
   setUser: (user: User | null) => void;
   updateUser: (updates: Partial<User>) => void;
-  linkGoogleAccount: () => Promise<AuthResult>;
-  unlinkGoogleAccount: () => Promise<AuthResult>;
   getActiveSessions: () => Promise<SessionsResult>;
   revokeSession: (sessionId: string) => Promise<AuthResult>;
   revokeAllOtherSessions: () => Promise<AuthResult>;

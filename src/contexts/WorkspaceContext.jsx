@@ -10,6 +10,7 @@ import {
   deleteConversationFromDB,
   clearConversationsDB
 } from '../services/indexedDB'
+import { queueSync, SyncOperation, isNetworkOnline } from '../services/syncService'
 
 const WorkspaceContext = createContext()
 
@@ -143,49 +144,47 @@ export const WorkspaceProvider = ({ children }) => {
     }
   }, [user])
 
-  // Auto-sync with Google Drive when user signs in with Google or has Google linked
+  // Auto-sync with Firestore when user signs in
   useEffect(() => {
     const handleAuthSignIn = async (event) => {
-      const { hasGoogleLinked, authMethod, isNewUser } = event.detail || {}
-      
-      // Only auto-sync if user has Google access (Google auth or linked Google)
-      if (!hasGoogleLinked && authMethod !== 'google') {
-        return
-      }
+      const { authMethod, isNewUser } = event.detail || {}
       
       // Skip sync for brand new users (nothing to sync yet)
       if (isNewUser) {
-        logger.log('[SYNC] New user, skipping initial Drive sync')
+        logger.log('[SYNC] New user, skipping initial Firestore sync')
         return
       }
       
-      logger.log('[SYNC] User signed in with Google access, starting auto-sync...')
+      logger.log('[SYNC] User signed in, starting auto-sync with Firestore...')
       
       // Small delay to ensure auth is fully set up
       setTimeout(async () => {
         try {
-          const { loadConversationsFromDrive } = await import('../services/drive')
-          const driveConversations = await loadConversationsFromDrive()
+          if (!user || !isNetworkOnline()) return
           
-          if (driveConversations && driveConversations.length > 0) {
+          const userId = user.id || user.uid || user.email
+          const { getConversations } = await import('../services/firestoreDataService')
+          const { conversations: firestoreConversations } = await getConversations(userId, { pageSize: 100 })
+          
+          if (firestoreConversations && firestoreConversations.length > 0) {
             // Merge with local conversations
             setConversations(prev => {
               const localIds = new Set(prev.map(c => c.id))
-              const newFromDrive = driveConversations.filter(c => !localIds.has(c.id))
+              const newFromFirestore = firestoreConversations.filter(c => !localIds.has(c.id))
               
-              // Update existing if Drive version is newer
+              // Update existing if Firestore version is newer
               const merged = prev.map(local => {
-                const driveVersion = driveConversations.find(d => d.id === local.id)
-                if (driveVersion && new Date(driveVersion.updated) > new Date(local.updated)) {
-                  return { ...driveVersion, driveId: driveVersion.driveId }
+                const firestoreVersion = firestoreConversations.find(d => d.id === local.id)
+                if (firestoreVersion && new Date(firestoreVersion.updated) > new Date(local.updated)) {
+                  return { ...firestoreVersion, messages: local.messages } // Keep local messages
                 }
                 return local
               })
               
-              const all = [...merged, ...newFromDrive]
+              const all = [...merged, ...newFromFirestore]
                 .sort((a, b) => new Date(b.updated) - new Date(a.updated))
               
-              logger.log(`[SYNC] Auto-synced: ${driveConversations.length} from Drive, ${newFromDrive.length} new`)
+              logger.log(`[SYNC] Auto-synced: ${firestoreConversations.length} from Firestore, ${newFromFirestore.length} new`)
               return all
             })
           }
@@ -203,11 +202,12 @@ export const WorkspaceProvider = ({ children }) => {
   // Save ref to track last saved state (avoid unnecessary writes)
   const lastSavedRef = useRef(null)
 
-  // Save conversations to IndexedDB (debounced, only when changed)
+  // Save conversations to IndexedDB and queue Firestore sync (debounced, only when changed)
   useEffect(() => {
     if (!user) return
 
     const userKey = user.email || user.id
+    const userId = user.id || user.uid || user.email
     // Only save conversations with actual content (messages)
     const conversationsWithContent = conversations.filter(
       c => c.messages && c.messages.length > 0
@@ -218,12 +218,30 @@ export const WorkspaceProvider = ({ children }) => {
     if (lastSavedRef.current === currentHash) return
     lastSavedRef.current = currentHash
 
-    // Debounce save to IndexedDB
+    // Debounce save to IndexedDB and queue Firestore sync
     const saveTimeout = setTimeout(() => {
-      conversationsWithContent.forEach(conv => {
-        saveConversationToDB(userKey, conv).catch(err => {
-          logger.error('Workspace', 'Failed to save conversation to IndexedDB', err)
-        })
+      conversationsWithContent.forEach(async conv => {
+        try {
+          await saveConversationToDB(userKey, conv)
+          
+          // Queue sync to Firestore (without messages - they're separate)
+          if (userId && isNetworkOnline()) {
+            const convForSync = {
+              ...conv,
+              messages: undefined, // Don't include messages in conversation sync
+              messageCount: conv.messages?.length || 0
+            }
+            await queueSync({
+              entityType: 'conversation',
+              entityId: conv.id,
+              operation: SyncOperation.UPDATE,
+              data: convForSync,
+              userId
+            })
+          }
+        } catch (err) {
+          logger.error('Workspace', 'Failed to save conversation', err)
+        }
       })
     }, 500)
 
@@ -751,6 +769,8 @@ export const WorkspaceProvider = ({ children }) => {
 
   // Delete conversation
   const deleteConversation = useCallback(async (id) => {
+    const userId = user?.id || user?.uid || user?.email
+    
     setConversations(prev => prev.filter(c => c.id !== id))
     if (currentConversation?.id === id) {
       setCurrentConversation(null)
@@ -758,10 +778,21 @@ export const WorkspaceProvider = ({ children }) => {
     // Also delete from IndexedDB
     try {
       await deleteConversationFromDB(id)
+      
+      // Queue Firestore delete
+      if (userId) {
+        await queueSync({
+          entityType: 'conversation',
+          entityId: id,
+          operation: SyncOperation.DELETE,
+          data: null,
+          userId
+        })
+      }
     } catch (err) {
-      logger.error('Workspace', 'Failed to delete conversation from IndexedDB', err)
+      logger.error('Workspace', 'Failed to delete conversation', err)
     }
-  }, [currentConversation])
+  }, [currentConversation, user])
 
   // Update system prompt
   const updateSystemPrompt = useCallback((prompt) => {
@@ -827,62 +858,76 @@ export const WorkspaceProvider = ({ children }) => {
     await sendMessage(lastUserMessage.content, lastUserMessage.attachments || [])
   }, [currentConversation, sendMessage])
 
-  // Sync to Drive
-  const syncConversationsToDrive = useCallback(async () => {
+  // Sync conversations to Firestore
+  const syncConversationsToFirestore = useCallback(async () => {
     if (!user) {
       throw new Error('User not authenticated')
     }
 
+    const userId = user.id || user.uid || user.email
+    
     try {
-      const { syncConversationsToDrive: syncToDrive } = await import('../services/drive')
+      const { getConversations, saveConversation } = await import('../services/firestoreDataService')
       
       // Only sync conversations with content
       const conversationsToSync = conversations.filter(c => 
         c.messages && c.messages.length > 0
       )
       
-      const result = await syncToDrive(conversationsToSync)
-      logger.log(`[UPLOAD] Synced ${result.synced} conversations to Drive`)
-      return result
+      let synced = 0
+      for (const conv of conversationsToSync) {
+        const convForSync = {
+          ...conv,
+          messages: undefined, // Messages are synced separately
+          messageCount: conv.messages?.length || 0
+        }
+        await saveConversation(userId, convForSync)
+        synced++
+      }
+      
+      logger.log(`[UPLOAD] Synced ${synced} conversations to Firestore`)
+      return { synced }
     } catch (error) {
-      logger.error('Workspace', 'Failed to sync conversations to Drive', error)
+      logger.error('Workspace', 'Failed to sync conversations to Firestore', error)
       throw error
     }
   }, [user, conversations])
 
-  // Load from Drive
-  const loadConversationsFromDrive = useCallback(async () => {
+  // Load conversations from Firestore
+  const loadConversationsFromFirestore = useCallback(async () => {
     if (!user) {
       throw new Error('User not authenticated')
     }
 
+    const userId = user.id || user.uid || user.email
+    
     try {
-      const { loadConversationsFromDrive: loadFromDrive } = await import('../services/drive')
-      const driveConversations = await loadFromDrive()
+      const { getConversations } = await import('../services/firestoreDataService')
+      const { conversations: firestoreConversations } = await getConversations(userId, { pageSize: 100 })
       
-      // Merge with local conversations (Drive takes precedence for same ID)
+      // Merge with local conversations (Firestore takes precedence for same ID)
       const localIds = new Set(conversations.map(c => c.id))
-      const newFromDrive = driveConversations.filter(c => !localIds.has(c.id))
+      const newFromFirestore = firestoreConversations.filter(c => !localIds.has(c.id))
       
-      // Update existing conversations if Drive version is newer
+      // Update existing conversations if Firestore version is newer
       const merged = conversations.map(local => {
-        const driveVersion = driveConversations.find(d => d.id === local.id)
-        if (driveVersion && new Date(driveVersion.updated) > new Date(local.updated)) {
-          return { ...driveVersion, driveId: driveVersion.driveId }
+        const firestoreVersion = firestoreConversations.find(d => d.id === local.id)
+        if (firestoreVersion && new Date(firestoreVersion.updated) > new Date(local.updated)) {
+          return { ...firestoreVersion, messages: local.messages } // Keep local messages
         }
         return local
       })
       
-      // Add new conversations from Drive
-      const allConversations = [...merged, ...newFromDrive]
+      // Add new conversations from Firestore
+      const allConversations = [...merged, ...newFromFirestore]
         .sort((a, b) => new Date(b.updated) - new Date(a.updated))
       
       setConversations(allConversations)
-      logger.log(`[DOWNLOAD] Loaded ${driveConversations.length} conversations from Drive, ${newFromDrive.length} new`)
+      logger.log(`[DOWNLOAD] Loaded ${firestoreConversations.length} conversations from Firestore, ${newFromFirestore.length} new`)
       
-      return { loaded: driveConversations.length, new: newFromDrive.length }
+      return { loaded: firestoreConversations.length, new: newFromFirestore.length }
     } catch (error) {
-      logger.error('Workspace', 'Failed to load conversations from Drive', error)
+      logger.error('Workspace', 'Failed to load conversations from Firestore', error)
       throw error
     }
   }, [user, conversations])
@@ -902,8 +947,8 @@ export const WorkspaceProvider = ({ children }) => {
     generateSystemPrompt,
     updateModelSettings,
     updateConversationTitle,
-    syncConversationsToDrive,
-    loadConversationsFromDrive,
+    syncConversationsToFirestore,
+    loadConversationsFromFirestore,
     retryLastMessage
   }
 

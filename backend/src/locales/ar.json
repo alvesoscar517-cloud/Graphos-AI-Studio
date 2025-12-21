@@ -263,6 +263,24 @@
     "priority_urgent": "عاجل"
   },
 
+  "welcome_email": {
+    "subject": "Marhaba bik fi Graphos AI Studio",
+    "greeting": "Marhaba bik",
+    "intro": "Shukran lak ala al-indimam ila Graphos AI Studio. Nahnu mutahammasun li wujudik ka juz min mujtamaina min al-kuttab wal-mubdieen.",
+    "get_started": "Ibda al-aan",
+    "feature1_title": "Kashf al-dhaka al-istinaei",
+    "feature1_desc": "Hallil nassak li kashf al-muhtawa al-munsha bi al-dhaka al-istinaei bi diqqah aliyah.",
+    "feature2_title": "Malaffat al-sawt",
+    "feature2_desc": "Anshi malaffat sawt faridah lil-hifaz ala uslub kitabatak al-asil.",
+    "feature3_title": "Ansanat al-nass",
+    "feature3_desc": "Hawwil al-nass al-munsha bi al-dhaka al-istinaei ila muhtawa tabiei wa bashari.",
+    "help_title": "Hal tahtaj musaadah?",
+    "help_desc": "Fariq al-daam ladayna mawjud li musaadatak. La tataraddad fi al-tawasul maana.",
+    "contact_support": "Tawasul maa al-daam",
+    "footer": "Tamma irsal hadha al-barid al-elektroni li annaka anshaat hisaban fi Graphos AI Studio.",
+    "copyright": "Graphos AI Studio. Jamee al-huquq mahfuzah."
+  },
+
   "common": {
     "loading": "جارٍ التحميل...",
     "processing": "جارٍ المعالجة...",

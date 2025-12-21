@@ -17,7 +17,6 @@ export {
   useUser, 
   useIsAuthenticated, 
   useAuthMethod,
-  useHasGoogleLinked,
   useAuthLoading,
   useAuthError,
   useAuthActions 

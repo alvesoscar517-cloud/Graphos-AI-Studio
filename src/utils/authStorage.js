@@ -509,11 +509,16 @@ export function clearAuthStorage() {
   
   // Clear Zustand persist storage from chrome.storage.local (for Chrome Extension)
   if (typeof chrome !== 'undefined' && chrome.storage?.local) {
-    chrome.storage.local.remove(['auth-storage', 'userInfo', 'accessToken', 'driveFolderId', 'conversationsFolderId']).catch(() => {})
+    chrome.storage.local.remove(['auth-storage', 'userInfo', 'accessToken']).catch(() => {})
   }
   
-  // Clear storage cache
+  // Clear storage cache but preserve rememberedEmail for auto-fill
+  // (giống Google, GitHub - email được giữ lại sau logout)
+  const preservedEmail = storageCache[AUTH_STORAGE_KEYS.REMEMBERED_EMAIL]
   storageCache = {}
+  if (preservedEmail) {
+    storageCache[AUTH_STORAGE_KEYS.REMEMBERED_EMAIL] = preservedEmail
+  }
 
   logger.log('[SECURITY] Auth storage cleared')
 }

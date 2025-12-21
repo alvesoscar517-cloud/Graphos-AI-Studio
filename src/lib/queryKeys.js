@@ -38,11 +38,25 @@ export const queryKeys = {
     detail: (id) => [...queryKeys.notes.all, 'detail', id],
   },
 
-  // Workspace / Conversations
+  // Workspace / Conversations (legacy)
   workspace: {
     all: ['workspace'],
     conversations: () => [...queryKeys.workspace.all, 'conversations'],
     conversation: (id) => [...queryKeys.workspace.all, 'conversation', id],
+  },
+
+  // Conversations (Firestore)
+  conversations: {
+    all: ['conversations'],
+    list: () => [...queryKeys.conversations.all, 'list'],
+    detail: (id) => [...queryKeys.conversations.all, 'detail', id],
+  },
+
+  // Messages (Firestore)
+  messages: {
+    all: ['messages'],
+    list: (conversationId) => [...queryKeys.messages.all, 'list', conversationId],
+    detail: (conversationId, messageId) => [...queryKeys.messages.all, 'detail', conversationId, messageId],
   },
 
   // Notifications

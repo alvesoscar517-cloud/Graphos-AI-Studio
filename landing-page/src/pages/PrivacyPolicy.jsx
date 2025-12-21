@@ -351,18 +351,14 @@ function PrivacyPolicy() {
                 </ul>
               </section>
 
-              <section id="google-drive" className="mb-10">
+              <section id="cloud-storage" className="mb-10">
                 <h2 className="text-lg font-semibold text-text-primary mb-3">
-                  Google Drive Integration
+                  Cloud Storage & Sync
                 </h2>
                 <p className="text-text-secondary leading-relaxed mb-3">
-                  If you choose to sync your data with Google Drive, we request the following permissions:
+                  Your data is securely stored and synchronized using Firebase Firestore. We request the following Google permissions for authentication:
                 </p>
                 <ul className="space-y-2 text-text-secondary mb-4">
-                  <li className="flex items-start gap-3">
-                    <span className="w-[6px] h-[6px] rounded-full bg-primary mt-[7px] shrink-0"></span>
-                    <span><strong>drive.file</strong> - Access to files created by Graphos AI Studio only</span>
-                  </li>
                   <li className="flex items-start gap-3">
                     <span className="w-[6px] h-[6px] rounded-full bg-primary mt-[7px] shrink-0"></span>
                     <span><strong>userinfo.email</strong> - Your email address for account identification</span>
@@ -373,7 +369,7 @@ function PrivacyPolicy() {
                   </li>
                 </ul>
                 <p className="text-text-secondary leading-relaxed mb-3">
-                  Data synced to Google Drive includes:
+                  Data stored in our cloud includes:
                 </p>
                 <ul className="space-y-2 text-text-secondary">
                   <li className="flex items-start gap-3">
@@ -386,12 +382,11 @@ function PrivacyPolicy() {
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="w-[6px] h-[6px] rounded-full bg-primary mt-[7px] shrink-0"></span>
-                    <span>Files are stored in a dedicated "Graphos AI" folder in your Drive</span>
+                    <span>Voice profiles and writing preferences</span>
                   </li>
                 </ul>
                 <p className="text-text-secondary leading-relaxed mt-3">
-                  We do not access any other files in your Google Drive. You can revoke access at any time 
-                  through your Google Account settings.
+                  Your data is encrypted in transit and at rest. You can delete your data at any time through your account settings.
                 </p>
               </section>
 

@@ -263,6 +263,24 @@
     "priority_urgent": "Срочно"
   },
 
+  "welcome_email": {
+    "subject": "Dobro pozhalovat v Graphos AI Studio",
+    "greeting": "Dobro pozhalovat",
+    "intro": "Spasibo za prisoedinenie k Graphos AI Studio. My rady videt vas v nashem soobshchestve pisatelej i sozdatelej.",
+    "get_started": "Nachat",
+    "feature1_title": "Obnaruzhenie II",
+    "feature1_desc": "Analiziruyte tekst dlya obnaruzheniya kontenta, sozdannogo II, s vysokoj tochnostyu.",
+    "feature2_title": "Golosovye Profili",
+    "feature2_desc": "Sozdavajte unikalnye golosovye profili dlya sohraneniya vashego autentichnogo stilya pisma.",
+    "feature3_title": "Gumanizaciya Teksta",
+    "feature3_desc": "Preobrazuyte tekst, sozdannyj II, v estestvennyj, chelovecheskij kontent.",
+    "help_title": "Nuzhna pomoshch?",
+    "help_desc": "Nasha komanda podderzhki vsegda gotova pomoch vam. Svyazhites s nami v lyuboe vremya.",
+    "contact_support": "Svyazatsya s podderzhkoj",
+    "footer": "Eto pismo bylo otpravleno, potomu chto vy sozdali akkaunt v Graphos AI Studio.",
+    "copyright": "Graphos AI Studio. Vse prava zashchishcheny."
+  },
+
   "common": {
     "loading": "Загрузка...",
     "processing": "Обработка...",

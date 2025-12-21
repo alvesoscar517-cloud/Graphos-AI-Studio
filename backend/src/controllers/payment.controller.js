@@ -349,15 +349,35 @@ async function handleOrderCreated(data, customData) {
       credits: newCredits
     });
 
-    // Send auto notification for purchase
+    // Send auto notification for purchase (includes email)
     if (foundPkg && newCredits) {
-      const totalCredits = foundPkg.credits + foundPkg.bonus;
+      const baseCredits = foundPkg.credits + foundPkg.bonus;
+      // First purchase bonus: Double the credits (x2)
+      const firstPurchaseBonus = isFirstPurchase ? baseCredits : 0;
+      const totalCreditsAdded = baseCredits + firstPurchaseBonus;
+      
       await autoNotification.sendPurchaseNotification(
         userId,
         foundPkg.description || orderData.variantName || orderData.productName || packageId,
-        totalCredits,
-        newCredits.balance || newCredits
+        totalCreditsAdded,
+        newCredits.balance || newCredits,
+        {
+          orderId: String(data.id),
+          amount: foundPkg.price,
+          currency: attrs.currency || 'USD'
+        }
       );
+      
+      // If first purchase, also send bonus notification with email
+      if (isFirstPurchase) {
+        await autoNotification.sendFirstPurchaseBonusNotification(
+          userId,
+          foundPkg.description || orderData.variantName || orderData.productName || packageId,
+          baseCredits,
+          firstPurchaseBonus, // Bonus credits (same as base for x2)
+          'en' // Will be overridden by user's language in the function
+        );
+      }
     }
   }
 }

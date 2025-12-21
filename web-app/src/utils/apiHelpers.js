@@ -50,7 +50,7 @@ export async function getAuthHeaders() {
       };
     }
     
-    // Fallback: Try Google OAuth token directly (for Drive API, not backend)
+    // Fallback: Try Google OAuth token directly (for Google API calls)
     // This is only used when user hasn't gone through backend login yet
     if (isChromeExtension()) {
       try {

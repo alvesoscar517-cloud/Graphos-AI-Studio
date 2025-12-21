@@ -20,9 +20,17 @@ rules_version = '2';
  * - orders: Purchase orders (read by owner, filtered by userId)
  * - support_tickets: Support tickets (read by admin panel only)
  * - system_settings: System config (read by admin panel only)
+ * - user_notes: User notes (read/write by owner) - NEW
+ * - user_conversations: User conversations (read/write by owner) - NEW
+ * - user_messages: Conversation messages (read/write by owner) - NEW
  * 
  * NOTE: Write operations are ALWAYS denied for Web SDK.
  * All writes go through authenticated backend API → Admin SDK.
+ * 
+ * EXCEPTION: user_notes, user_conversations, user_messages allow direct writes
+ * from authenticated Firebase Auth users for offline-first sync.
+ * 
+ * Requirements: 9.1, 9.2, 9.3, 9.4, 9.5
  */
 
 service cloud.firestore {
@@ -37,6 +45,45 @@ service cloud.firestore {
       return request.method == 'get' || request.method == 'list';
     }
     
+    // Check if user is authenticated via Firebase Auth
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user owns the document (userId field matches auth uid)
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Validate note data structure
+    function isValidNote() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['userId', 'title', 'content', 'created', 'updated'])
+        && data.userId is string
+        && data.title is string
+        && data.content is string
+        && data.content.size() < 102400; // Max 100KB
+    }
+    
+    // Validate conversation data structure
+    function isValidConversation() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['userId', 'title', 'created', 'updated'])
+        && data.userId is string
+        && data.title is string;
+    }
+    
+    // Validate message data structure
+    function isValidMessage() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['conversationId', 'userId', 'role', 'content', 'timestamp'])
+        && data.conversationId is string
+        && data.userId is string
+        && data.role in ['user', 'assistant']
+        && data.content is string
+        && data.content.size() < 51200; // Max 50KB
+    }
+    
     // =========================================================================
     // USERS COLLECTION
     // Read: Allowed (frontend reads own user doc by userId)
@@ -45,6 +92,60 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isReadOnly();
       allow write: if false;
+    }
+    
+    // =========================================================================
+    // USER NOTES COLLECTION (NEW - Firestore Sync)
+    // Read: Allowed for owner only
+    // Write: Allowed for owner only with validation
+    // Requirements: 9.1, 9.4, 9.5
+    // =========================================================================
+    match /user_notes/{noteId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() 
+        && request.resource.data.userId == request.auth.uid
+        && isValidNote();
+      allow update: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid
+        && isValidNote();
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // =========================================================================
+    // USER CONVERSATIONS COLLECTION (NEW - Firestore Sync)
+    // Read: Allowed for owner only
+    // Write: Allowed for owner only with validation
+    // Requirements: 9.2, 9.4
+    // =========================================================================
+    match /user_conversations/{conversationId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() 
+        && request.resource.data.userId == request.auth.uid
+        && isValidConversation();
+      allow update: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid
+        && isValidConversation();
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // =========================================================================
+    // USER MESSAGES COLLECTION (NEW - Firestore Sync)
+    // Read: Allowed for owner only
+    // Write: Allowed for owner only with validation
+    // Requirements: 9.3, 9.4, 9.5
+    // =========================================================================
+    match /user_messages/{messageId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() 
+        && request.resource.data.userId == request.auth.uid
+        && isValidMessage();
+      allow update: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid
+        && isValidMessage();
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
     
     // =========================================================================

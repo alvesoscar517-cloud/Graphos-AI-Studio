@@ -1,22 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useUser, useAuth } from '../../stores/authStore'
+import { useUser, useAuth, useAuthStore } from '../../stores/authStore'
 import CreditBalance from '../CreditBalance'
 import UpgradePlanModal from '../UpgradePlanModal'
-import AccountSettings from '../Auth/AccountSettings'
 import Icon from '../Common/Icon'
 import Portal from '../Common/Portal'
 import modal from '../../utils/modal'
 import { cn } from '../../lib/utils'
+import { uploadAvatar, validateAvatarFile, AVATAR_CONFIG } from '../../services/avatarService'
 
 const UserProfilePopup = ({ onClose }) => {
   const { t } = useTranslation()
   const popupRef = useRef(null)
-  const user = useUser() // Use Zustand store for user data
-  const { signOut } = useAuth() // Keep signOut from context for now
+  const fileInputRef = useRef(null)
+  const user = useUser()
+  const { signOut } = useAuth()
+  const updateUser = useAuthStore(state => state.updateUser)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
-  const [showAccountSettings, setShowAccountSettings] = useState(false)
   const [creditRefreshKey, setCreditRefreshKey] = useState(0)
+  const [isUploading, setIsUploading] = useState(false)
+
+  // Check if user is email user (not Google)
+  const isEmailUser = user?.provider === 'email' || (!user?.picture?.includes('googleusercontent'))
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -24,7 +29,6 @@ const UserProfilePopup = ({ onClose }) => {
         onClose()
       }
     }
-
     document.addEventListener('click', handleClickOutside)
     return () => document.removeEventListener('click', handleClickOutside)
   }, [onClose])
@@ -35,7 +39,6 @@ const UserProfilePopup = ({ onClose }) => {
       t('auth.confirmSignOutTitle'),
       { confirmText: t('auth.signOut'), danger: true }
     )
-    
     if (confirmed) {
       await signOut()
       onClose()
@@ -48,8 +51,43 @@ const UserProfilePopup = ({ onClose }) => {
   }
 
   const handlePurchaseSuccess = () => {
-    setCreditRefreshKey(prev => prev + 1);
-    setShowUpgradeModal(false);
+    setCreditRefreshKey(prev => prev + 1)
+    setShowUpgradeModal(false)
+  }
+
+  const handleAvatarClick = () => {
+    if (isEmailUser && fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const validation = validateAvatarFile(file)
+    if (!validation.valid) {
+      modal.toast(validation.error, '', 'error')
+      return
+    }
+
+    setIsUploading(true)
+    try {
+      const userId = user?.userId || user?.uid || user?.id
+      const result = await uploadAvatar(file, userId)
+      
+      if (result.success) {
+        updateUser({ picture: result.avatarUrl })
+        modal.toast(t('profile.avatarUpdated', 'Avatar updated'), '', 'success')
+      } else {
+        modal.toast(result.error || t('profile.avatarFailed', 'Failed to update avatar'), '', 'error')
+      }
+    } catch (err) {
+      modal.toast(t('profile.avatarFailed', 'Failed to update avatar'), '', 'error')
+    } finally {
+      setIsUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
   }
 
   return (
@@ -64,18 +102,62 @@ const UserProfilePopup = ({ onClose }) => {
       >
         {/* Profile Header */}
         <div className="py-[27px] px-5 text-center">
-          {user?.picture ? (
-            <img 
-              src={user.picture} 
-              className="w-avatar-3xl h-avatar-3xl rounded-full mx-auto mb-3.5"
-              alt="User Avatar"
+          {/* Avatar with upload hover for email users */}
+          <div className="relative inline-block group">
+            {user?.picture ? (
+              <img 
+                src={user.picture} 
+                className={cn(
+                  "w-avatar-3xl h-avatar-3xl rounded-full mx-auto",
+                  isEmailUser && "cursor-pointer"
+                )}
+                alt="User Avatar"
+                onClick={handleAvatarClick}
+              />
+            ) : (
+              <div 
+                className={cn(
+                  "w-avatar-3xl h-avatar-3xl rounded-full mx-auto bg-gradient-to-br from-gradient-orange-start to-gradient-orange-end p-1.5 flex items-center justify-center",
+                  isEmailUser && "cursor-pointer"
+                )}
+                onClick={handleAvatarClick}
+              >
+                <Icon name="user-circle" size="xl" className="w-12 h-12" themed={false} />
+              </div>
+            )}
+            
+            {/* Upload overlay for email users */}
+            {isEmailUser && (
+              <div 
+                className={cn(
+                  "absolute inset-0 rounded-full flex items-center justify-center cursor-pointer transition-opacity",
+                  "bg-black/50 opacity-0 group-hover:opacity-100",
+                  isUploading && "opacity-100"
+                )}
+                onClick={handleAvatarClick}
+              >
+                {isUploading ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                )}
+              </div>
+            )}
+
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={AVATAR_CONFIG.ALLOWED_TYPES.join(',')}
+              onChange={handleFileChange}
+              className="hidden"
             />
-          ) : (
-            <div className="w-avatar-3xl h-avatar-3xl rounded-full mx-auto mb-3.5 bg-gradient-to-br from-gradient-orange-start to-gradient-orange-end p-1.5 flex items-center justify-center">
-              <Icon name="user-circle" size="xl" className="w-12 h-12" themed={false} />
-            </div>
-          )}
-          <h3 className="text-xl font-normal text-text-primary mb-[7px]">
+          </div>
+
+          <h3 className="text-xl font-normal text-text-primary mb-[7px] mt-3.5">
             {user?.name || t('auth.notSignedIn')}
           </h3>
           <p className="text-xs text-text-secondary mb-0 max-w-[260px] mx-auto overflow-hidden text-ellipsis whitespace-nowrap text-center">
@@ -91,25 +173,7 @@ const UserProfilePopup = ({ onClose }) => {
           />
         </div>
 
-        <div className="px-5 pb-4 space-y-2">
-          <button 
-            onClick={() => setShowAccountSettings(true)}
-            className={cn(
-              "w-full py-2.5 px-4 rounded-lg text-sm font-medium",
-              "bg-transparent border border-border-light",
-              "text-text-secondary cursor-pointer",
-              "hover:bg-bg-hover hover:text-text-primary hover:border-border-hover",
-              "transition-colors flex items-center justify-center gap-2"
-            )}
-          >
-            <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
-              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
-              <path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-            </svg>
-            {t('auth.accountSettings')}
-          </button>
+        <div className="px-5 pb-4">
           <button 
             onClick={handleSignOut}
             className={cn(
@@ -124,6 +188,7 @@ const UserProfilePopup = ({ onClose }) => {
             {t('auth.signOut')}
           </button>
         </div>
+
         <div className="py-2 px-5 text-center text-[10px] text-text-muted">
           <a 
             href="https://graphosai.com/privacy" 
@@ -151,30 +216,6 @@ const UserProfilePopup = ({ onClose }) => {
         onClose={() => setShowUpgradeModal(false)}
         onPurchaseSuccess={handlePurchaseSuccess}
       />
-
-      {/* Account Settings Modal */}
-      {showAccountSettings && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-          <div 
-            className="absolute inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm" 
-            onClick={() => setShowAccountSettings(false)}
-          />
-          <div className="relative bg-bg-primary dark:bg-bg-secondary border border-border dark:border-border-light rounded-2xl shadow-2xl dark:shadow-black/50 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-4">
-              <h2 className="text-lg font-semibold text-text-primary">
-                {t('auth.accountSettings')}
-              </h2>
-              <button 
-                onClick={() => setShowAccountSettings(false)}
-                className="p-1.5 rounded-lg hover:bg-bg-hover dark:hover:bg-bg-primary transition-colors text-text-muted hover:text-text-primary"
-              >
-                <Icon name="x" size="sm" />
-              </button>
-            </div>
-            <AccountSettings />
-          </div>
-        </div>
-      )}
     </Portal>
   )
 }

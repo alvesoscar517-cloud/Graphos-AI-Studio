@@ -1,20 +1,20 @@
 /**
- * Notes Context (Refactored to use TanStack Query)
+ * Notes Context (Refactored to use TanStack Query with Firestore)
  * 
- * This context now uses TanStack Query hooks internally for better caching.
- * New code should import directly from '@/hooks/queries/useNotes'
+ * This context now uses Firestore hooks for offline-first sync.
+ * New code should import directly from '@/hooks/queries/useFirestoreNotes'
  */
 
 import { logger } from '@/utils/logger'
 import { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { 
-  useNotes as useNotesQuery, 
-  useCreateNote, 
-  useUpdateNote, 
-  useDeleteNote,
-  useSyncNotes,
-} from '../hooks/queries/useNotes'
+  useFirestoreNotes as useNotesQuery, 
+  useCreateFirestoreNote as useCreateNote, 
+  useUpdateFirestoreNote as useUpdateNote, 
+  useDeleteFirestoreNote as useDeleteNote,
+  useSyncFirestoreNotes as useSyncNotes,
+} from '../hooks/queries/useFirestoreNotes'
 import { queryKeys } from '../lib/queryKeys'
 import { useAuth } from '../stores/authStore'
 import { useNotesStore } from '../stores/notesStore'
@@ -152,16 +152,13 @@ export const NotesProvider = ({ children }) => {
       .slice(0, MAX_VISIBLE_NOTES)
   }, [notes])
 
-  // Sync notes from Drive
+  // Sync notes from Firestore (force refresh)
   const syncNotes = useCallback(async () => {
     try {
       await syncNotesMutation.mutateAsync()
       return true
     } catch (error) {
       logError(error, { context: 'syncNotes' })
-      if (error.message === 'NEED_REAUTH') {
-        setNeedsReauth(true)
-      }
       throw error
     }
   }, [syncNotesMutation])

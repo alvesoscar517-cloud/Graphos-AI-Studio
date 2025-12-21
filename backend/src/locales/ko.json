@@ -263,6 +263,24 @@
     "priority_urgent": "긴급"
   },
 
+  "welcome_email": {
+    "subject": "Graphos AI Studio에 오신 것을 환영합니다",
+    "greeting": "환영합니다",
+    "intro": "Graphos AI Studio에 참여해 주셔서 감사합니다. 작가와 크리에이터 커뮤니티에 함께하게 되어 기쁩니다.",
+    "get_started": "시작하기",
+    "feature1_title": "AI 탐지",
+    "feature1_desc": "텍스트를 분석하여 AI가 생성한 콘텐츠를 높은 정밀도로 탐지합니다.",
+    "feature2_title": "보이스 프로필",
+    "feature2_desc": "고유한 보이스 프로필을 생성하여 진정한 글쓰기 스타일을 유지합니다.",
+    "feature3_title": "텍스트 인간화",
+    "feature3_desc": "AI가 생성한 텍스트를 자연스러운 인간 같은 콘텐츠로 변환합니다.",
+    "help_title": "도움이 필요하세요?",
+    "help_desc": "지원 팀이 언제든지 도와드릴 준비가 되어 있습니다. 언제든지 연락 주세요.",
+    "contact_support": "지원 연락",
+    "footer": "이 이메일은 Graphos AI Studio에서 계정을 생성하여 발송합니다.",
+    "copyright": "Graphos AI Studio. 모든 권리 보장."
+  },
+
   "common": {
     "loading": "로딩 중...",
     "processing": "처리 중...",

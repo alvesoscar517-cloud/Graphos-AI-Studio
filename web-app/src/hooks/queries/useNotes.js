@@ -1,6 +1,6 @@
 /**
  * Notes Query Hooks
- * TanStack Query hooks for notes management with IndexedDB + Drive sync
+ * TanStack Query hooks for notes management with IndexedDB + Firestore sync
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -13,8 +13,8 @@ import {
   saveNoteToDB, 
   deleteNoteFromDB 
 } from '@/services/indexedDB'
-import { loadNotesFromDrive, saveNoteToDrive, deleteNoteFromDrive } from '@/services/drive'
 import { useNotesStore } from '@/stores/notesStore'
+import { queueSync, SyncOperation, isNetworkOnline } from '@/services/syncService'
 
 const MAX_VISIBLE_NOTES = 5
 
@@ -35,7 +35,7 @@ const truncateTitleToWords = (title, maxWords = 7) => {
 }
 
 /**
- * Fetch all notes from IndexedDB with Drive sync
+ * Fetch all notes from IndexedDB with Firestore sync
  */
 export function useNotes(options = {}) {
   return useQuery({
@@ -44,7 +44,7 @@ export function useNotes(options = {}) {
       // Initialize IndexedDB
       await initDB()
       
-      // Load from IndexedDB first (fast)
+      // Load from IndexedDB first (fast, offline-first)
       let notes = await getNotesFromDB()
       
       // Migration: Remove visible flag from old notes
@@ -52,25 +52,6 @@ export function useNotes(options = {}) {
         const { visible, ...rest } = note
         return rest
       })
-      
-      // Try to sync with Drive in background
-      try {
-        if (typeof chrome !== 'undefined' && chrome.storage?.local) {
-          const result = await chrome.storage.local.get(['accessToken'])
-          if (result.accessToken) {
-            let driveNotes = await loadNotesFromDrive()
-            driveNotes = driveNotes.map(note => {
-              const { visible, ...rest } = note
-              return rest
-            })
-            // Update cache
-            await saveNotesToDB(driveNotes)
-            return driveNotes
-          }
-        }
-      } catch (err) {
-        console.warn('Drive sync failed, using cached notes:', err.message)
-      }
       
       return notes
     },
@@ -109,6 +90,7 @@ export function useCreateNote() {
         updated: new Date(),
         titleGenerated: false,
         userEditedTitle: false,
+        syncStatus: 'pending',
         ...noteData,
       }
       return newNote
@@ -123,14 +105,14 @@ export function useCreateNote() {
 }
 
 /**
- * Update note with optimistic update and auto-save
+ * Update note with optimistic update and auto-save to Firestore
  */
 export function useUpdateNote() {
   const queryClient = useQueryClient()
   let saveTimeout = null
 
   return useMutation({
-    mutationFn: async ({ noteId, data, isUserTitleEdit = false }) => {
+    mutationFn: async ({ noteId, data, isUserTitleEdit = false, userId }) => {
       const notes = queryClient.getQueryData(queryKeys.notes.list()) || []
       const existingNote = notes.find(n => n.id === noteId)
       if (!existingNote) throw new Error('Note not found')
@@ -140,31 +122,29 @@ export function useUpdateNote() {
         ...existingNote, 
         ...data, 
         ...titleUpdates, 
-        updated: new Date() 
+        updated: new Date(),
+        syncStatus: 'pending'
       }
 
       // Save to IndexedDB immediately
       await saveNoteToDB(updatedNote)
 
-      // Auto-save to Drive with debounce (only if has content)
-      if (hasContent(updatedNote)) {
+      // Queue Firestore sync with debounce (only if has content)
+      if (hasContent(updatedNote) && userId) {
         if (saveTimeout) clearTimeout(saveTimeout)
         saveTimeout = setTimeout(async () => {
           try {
-            if (typeof chrome !== 'undefined' && chrome.storage?.local) {
-              const result = await chrome.storage.local.get(['accessToken'])
-              if (result.accessToken) {
-                const driveId = await saveNoteToDrive(updatedNote)
-                if (!updatedNote.driveId && driveId) {
-                  // Update with driveId
-                  queryClient.setQueryData(queryKeys.notes.list(), (old = []) =>
-                    old.map(n => n.id === noteId ? { ...n, driveId } : n)
-                  )
-                }
-              }
+            if (isNetworkOnline()) {
+              await queueSync({
+                entityType: 'note',
+                entityId: noteId,
+                operation: SyncOperation.UPDATE,
+                data: updatedNote,
+                userId
+              })
             }
           } catch (err) {
-            console.error('Auto-save to Drive failed:', err)
+            console.error('Auto-save to Firestore failed:', err)
           }
         }, 2000)
       }
@@ -199,25 +179,28 @@ export function useDeleteNote() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (noteId) => {
-      const notes = queryClient.getQueryData(queryKeys.notes.list()) || []
-      const note = notes.find(n => n.id === noteId)
-
+    mutationFn: async ({ noteId, userId }) => {
       // Delete from IndexedDB
       await deleteNoteFromDB(noteId)
 
-      // Delete from Drive if exists
-      if (note?.driveId) {
+      // Queue Firestore delete
+      if (userId && isNetworkOnline()) {
         try {
-          await deleteNoteFromDrive(note.driveId)
+          await queueSync({
+            entityType: 'note',
+            entityId: noteId,
+            operation: SyncOperation.DELETE,
+            data: null,
+            userId
+          })
         } catch (err) {
-          console.error('Failed to delete from Drive:', err)
+          console.error('Failed to queue Firestore delete:', err)
         }
       }
 
       return noteId
     },
-    onMutate: async (noteId) => {
+    onMutate: async ({ noteId }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.notes.list() })
       const previousNotes = queryClient.getQueryData(queryKeys.notes.list())
 
@@ -227,7 +210,7 @@ export function useDeleteNote() {
 
       return { previousNotes }
     },
-    onError: (_err, _noteId, context) => {
+    onError: (_err, _variables, context) => {
       queryClient.setQueryData(queryKeys.notes.list(), context?.previousNotes)
     },
   })
@@ -308,19 +291,34 @@ export function useGenerateTitle() {
 }
 
 /**
- * Sync notes from Drive
+ * Sync notes from Firestore
  */
 export function useSyncNotes() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: async () => {
-      const driveNotes = await loadNotesFromDrive()
-      await saveNotesToDB(driveNotes)
-      return driveNotes
+    mutationFn: async (userId) => {
+      if (!userId || !isNetworkOnline()) {
+        throw new Error('Cannot sync: offline or no user')
+      }
+      
+      const { getNotes } = await import('@/services/firestoreDataService')
+      const { notes: firestoreNotes } = await getNotes(userId, { pageSize: 100 })
+      
+      // Merge with local notes
+      const localNotes = await getNotesFromDB()
+      const firestoreIds = new Set(firestoreNotes.map(n => n.id))
+      
+      // Keep local notes that aren't in Firestore yet
+      const localOnly = localNotes.filter(n => !firestoreIds.has(n.id))
+      
+      const merged = [...firestoreNotes, ...localOnly]
+      await saveNotesToDB(merged)
+      
+      return merged
     },
-    onSuccess: (driveNotes) => {
-      queryClient.setQueryData(queryKeys.notes.list(), driveNotes)
+    onSuccess: (notes) => {
+      queryClient.setQueryData(queryKeys.notes.list(), notes)
     },
   })
 }

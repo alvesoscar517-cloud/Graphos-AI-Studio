@@ -20,7 +20,6 @@ export {
   useUser,
   useIsAuthenticated,
   useAuthMethod,
-  useHasGoogleLinked,
   useAuthLoading,
   useAuthError,
 } from '../stores/authStore'

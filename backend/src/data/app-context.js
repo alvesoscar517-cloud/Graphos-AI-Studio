@@ -58,7 +58,7 @@ const APP_CONTEXT = {
         description: "Quick sign-in using your Google account",
         features: [
           "One-click authentication",
-          "Automatic Google Drive sync capability",
+          "Automatic cloud sync",
           "No password to remember"
         ]
       }
@@ -116,7 +116,7 @@ const APP_CONTEXT = {
       location: "Click profile icon → Settings → Account",
       options: [
         "View and edit profile information",
-        "Link/unlink Google account (for Drive sync)",
+        "Link/unlink Google account",
         "Manage security settings",
         "Delete account (permanent)"
       ]
@@ -125,7 +125,7 @@ const APP_CONTEXT = {
     googleAccountLinking: {
       description: "Email users can link their Google account for additional features",
       benefits: [
-        "Sync notes and history to Google Drive",
+        "Sync notes and history to cloud",
         "Access your work from any device",
         "Automatic backup of your content"
       ],
@@ -133,14 +133,14 @@ const APP_CONTEXT = {
         "1. Go to Settings → Account",
         "2. Click 'Link Google Account'",
         "3. Sign in with your Google account",
-        "4. Grant Drive permissions when prompted"
+        "4. Your account is now linked"
       ]
     },
     
     faq: [
       {
         question: "Can I use both email and Google to sign in?",
-        answer: "If you created an account with email, you can link your Google account for Drive sync, but you'll still sign in with email/password. If you signed up with Google, you'll always use Google to sign in."
+        answer: "If you created an account with email, you can link your Google account for cloud sync, but you'll still sign in with email/password. If you signed up with Google, you'll always use Google to sign in."
       },
       {
         question: "What happens if I don't verify my email?",
@@ -677,20 +677,19 @@ const APP_CONTEXT = {
         "Auto-save all work",
         "Search and filter history",
         "Filter by type (Text/Chat)",
-        "Filter by source (Local/Drive)",
         "Sort by date or name",
-        "Google Drive sync (optional)",
+        "Cloud sync across devices",
         "Delete individual or bulk items"
       ],
       
-      driveSync: {
-        description: "Optionally sync your notes with Google Drive for backup and cross-device access",
+      cloudSync: {
+        description: "Your notes are automatically synced to the cloud for backup and cross-device access",
         howToEnable: [
-          "1. Go to Settings → Account",
-          "2. Link your Google account",
-          "3. Click 'Sync' in History to sync notes"
+          "1. Sign in to your account",
+          "2. Your data syncs automatically",
+          "3. Access from any device where you're signed in"
         ],
-        note: "Requires Google account linking. Your data stays private."
+        note: "Your data stays private and encrypted."
       }
     },
 
@@ -824,7 +823,7 @@ const APP_CONTEXT = {
       description: "Manage your account and security",
       options: [
         "Profile information",
-        "Google account linking (for Drive sync)",
+        "Google account linking",
         "Password change (for email accounts)",
         "Session management",
         "Account deletion"
@@ -1004,7 +1003,7 @@ const APP_CONTEXT = {
     },
     {
       question: "How do I sync my work across devices?",
-      answer: "Link your Google account: Settings → Account → Link Google Account. Then in History, click 'Sync' to sync notes with Google Drive. Your work will be available on any device where you're signed in.",
+      answer: "Your work is automatically synced to the cloud when you're signed in. Simply sign in on any device to access your notes and conversations.",
       category: "sync"
     },
     {
@@ -1065,12 +1064,12 @@ const APP_CONTEXT = {
     },
     {
       question: "Can I sign in with Google?",
-      answer: "Yes! Click 'Sign in with Google' on the login screen. This is the fastest way to get started. Your Google account will be linked automatically for Drive sync.",
+      answer: "Yes! Click 'Sign in with Google' on the login screen. This is the fastest way to get started. Your data will be automatically synced to the cloud.",
       category: "auth"
     },
     {
-      question: "How do I link my Google account for Drive sync?",
-      answer: "Go to Settings → Account → Click 'Link Google Account' → Sign in with Google → Grant Drive permissions. This enables automatic backup and sync of your notes across devices.",
+      question: "How do I link my Google account?",
+      answer: "Go to Settings → Account → Click 'Link Google Account' → Sign in with Google. This enables automatic backup and sync of your notes across devices.",
       category: "auth"
     },
     {
@@ -1137,7 +1136,7 @@ const APP_CONTEXT = {
     },
     {
       question: "How do I access my chat history?",
-      answer: "Go to History in the main navigation. All your conversations are auto-saved. You can search, filter by type (Text/Chat), and sync with Google Drive for backup.",
+      answer: "Go to History in the main navigation. All your conversations are auto-saved. You can search and filter by type (Text/Chat). Your data is automatically synced to the cloud.",
       category: "features"
     }
   ],
@@ -1175,12 +1174,11 @@ const APP_CONTEXT = {
       ]
     },
     {
-      issue: "Google Drive sync not working",
+      issue: "Cloud sync not working",
       solutions: [
-        "Check if Google account is linked in Settings → Account",
+        "Check if you're signed in to your account",
         "Try signing out and signing in again",
         "Make sure you have internet connection",
-        "Grant Drive permissions when prompted",
         "Contact support if issue persists"
       ]
     },
@@ -1327,7 +1325,7 @@ AUTHENTICATION:
 • Email accounts require verification (6-digit code sent to email)
 • Forgot password? Reset via email with verification code
 • Security: View active sessions, login history, sign out all devices
-• Link Google account for Drive sync (Settings → Account)
+• Your data is automatically synced to the cloud
 `;
   }
 
@@ -1724,7 +1722,7 @@ SIGN IN OPTIONS:
    
 2. Google Sign-In
    - One-click authentication
-   - Automatic Drive sync capability
+   - Automatic cloud sync
 
 ACCOUNT CREATION:
 1. Click 'Create Account'
@@ -1748,7 +1746,7 @@ SECURITY FEATURES (Settings → Security):
 
 GOOGLE ACCOUNT LINKING (for email users):
 - Go to Settings → Account → Link Google Account
-- Enables Google Drive sync for notes backup
+- Enables cloud sync for notes backup
 - Access your work from any device
 
 ACCOUNT DELETION:

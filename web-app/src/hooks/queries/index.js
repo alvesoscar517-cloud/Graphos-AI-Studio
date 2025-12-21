@@ -86,3 +86,38 @@ export {
   useRevokeSession,
   useRevokeAllSessions,
 } from './useUser'
+
+// Firestore hooks (new sync system)
+export {
+  useFirestoreNotes,
+  useFirestoreNote,
+  useCreateFirestoreNote,
+  useUpdateFirestoreNote,
+  useDeleteFirestoreNote,
+  useSearchFirestoreNotes,
+  useVisibleFirestoreNotes,
+  useSyncFirestoreNotes,
+  useGenerateNoteTitle,
+  useCurrentFirestoreNote,
+} from './useFirestoreNotes'
+
+export {
+  useFirestoreConversations,
+  useFirestoreConversation,
+  useCreateFirestoreConversation,
+  useUpdateFirestoreConversation,
+  useDeleteFirestoreConversation,
+  useRecentConversations,
+  useSearchConversations,
+} from './useFirestoreConversations'
+
+export {
+  useFirestoreMessages,
+  useInfiniteFirestoreMessages,
+  useAddFirestoreMessage,
+  useUpdateFirestoreMessage,
+  useDeleteFirestoreMessage,
+  useBatchAddMessages,
+  useMessageCount,
+  useLastMessage,
+} from './useFirestoreMessages'

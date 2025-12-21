@@ -4,12 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { useNotes } from '../../contexts/NotesContext'
 import { useWorkspace } from '../../contexts/WorkspaceContext'
-import { useUser, useAuthMethod, useHasGoogleLinked, useAuth } from '../../stores/authStore'
-import { openDriveFolder } from '../../services/drive'
+import { useUser, useAuthMethod, useAuth } from '../../stores/authStore'
 import { truncateTitleByWords, stripHelpPrefix, hasHelpPrefix } from '../../utils/titleUtils'
 import modal from '../../utils/modal'
 
-import LinkGooglePrompt from '../Auth/LinkGooglePrompt'
 import { SkeletonHistoryRow } from '../ui/skeleton'
 import { cn } from '../../lib/utils'
 import { createPortal } from 'react-dom'
@@ -36,16 +34,14 @@ const HighlightText = ({ text, searchTerm, regex }) => {
 const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const { t } = useTranslation()
   const { notes, loadNote, loading, syncNotes, needsReauth, deleteNote } = useNotes()
-  const { conversations, loadConversation, deleteConversation, syncConversationsToDrive, loadConversationsFromDrive } = useWorkspace()
+  const { conversations, loadConversation, deleteConversation } = useWorkspace()
   // Use Zustand stores for user data
   const user = useUser()
   const authMethod = useAuthMethod()
-  const hasGoogleLinked = useHasGoogleLinked()
-  // Keep signOut and linkGoogleAccount from context
-  const { signOut, linkGoogleAccount } = useAuth()
+  // Keep signOut from context
+  const { signOut } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('all')
-  const [filterSource, setFilterSource] = useState('all')
   const [sortBy, setSortBy] = useState('updated')
   const [sortOrder, setSortOrder] = useState('asc')
   const [isSyncing, setIsSyncing] = useState(false)
@@ -53,13 +49,8 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   const [isSelectionMode, setIsSelectionMode] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [isMobile, setIsMobile] = useState(false)
-  const [isSourceDropdownOpen, setIsSourceDropdownOpen] = useState(false)
-  const [sourceDropdownPosition, setSourceDropdownPosition] = useState({ x: 0, y: 0, width: 0 })
-  const [showLinkGooglePrompt, setShowLinkGooglePrompt] = useState(false)
-  const [linkGoogleAction, setLinkGoogleAction] = useState(null)
   const itemsPerPage = 50
   const searchInputRef = useRef(null)
-  const sourceDropdownRef = useRef(null)
 
   // Detect mobile
   useEffect(() => {
@@ -67,17 +58,6 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (sourceDropdownRef.current && !sourceDropdownRef.current.contains(e.target)) {
-        setIsSourceDropdownOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   // Keyboard shortcuts
@@ -88,8 +68,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         searchInputRef.current?.focus()
       }
       if (e.key === 'Escape') {
-        if (isSourceDropdownOpen) setIsSourceDropdownOpen(false)
-        else if (searchTerm) setSearchTerm('')
+        if (searchTerm) setSearchTerm('')
         else if (isSelectionMode) {
           setIsSelectionMode(false)
           setSelectedItems(new Set())
@@ -102,7 +81,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [searchTerm, isSelectionMode, isSourceDropdownOpen])
+  }, [searchTerm, isSelectionMode])
 
   const formatTimeAgo = useCallback((date) => {
     const now = new Date()
@@ -152,7 +131,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         title: noteTitle,
         type: note.type === 'chat' ? 'chat' : 'text',
         updated: note.updated,
-        source: note.driveId ? 'drive' : 'local',
+        source: 'local', // All items are now local (Firestore synced)
         data: note
       })
     })
@@ -167,7 +146,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         title: convTitle,
         type: 'chat',
         updated: new Date(conv.updated),
-        source: conv.driveId ? 'drive' : 'local',
+        source: 'local', // All items are now local (Firestore synced)
         data: conv
       })
     })
@@ -180,12 +159,9 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       const matchesType = filterType === 'all' || 
                          (filterType === 'text' && item.type === 'text') ||
                          (filterType === 'chat' && item.type === 'chat')
-      const matchesSource = filterSource === 'all' ||
-                           (filterSource === 'drive' && item.source === 'drive') ||
-                           (filterSource === 'local' && item.source === 'local')
-      return matchesSearch && matchesType && matchesSource
+      return matchesSearch && matchesType
     })
-  }, [allItems, searchTerm, filterType, filterSource])
+  }, [allItems, searchTerm, filterType])
 
   const sortedItems = useMemo(() => {
     const sorted = [...filteredItems].sort((a, b) => {
@@ -213,7 +189,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       toggleItemSelection(item)
       return
     }
-    if (item.source === 'drive') {
+    if (item.type === 'text') {
       loadNote(item.id)
       onViewChange('aistudio-editor')
     } else {
@@ -243,7 +219,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       try {
         const itemsToDelete = sortedItems.filter(item => selectedItems.has(`${item.source}-${item.id}`))
         for (const item of itemsToDelete) {
-          if (item.source === 'drive') await deleteNote(item.id)
+          if (item.type === 'text') await deleteNote(item.id)
           else await deleteConversation(item.id)
         }
         setSelectedItems(new Set())
@@ -273,7 +249,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     )
     if (confirmed) {
       try {
-        if (item.source === 'drive') await deleteNote(item.id)
+        if (item.type === 'text') await deleteNote(item.id)
         else await deleteConversation(item.id)
         modal.toast(t('history.deleted'), '', 'success')
       } catch (error) {
@@ -282,103 +258,14 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     }
   }
 
-  const needsGoogleLink = authMethod === 'email' && !hasGoogleLinked
-
-  const handleOpenInDrive = async () => {
-    try {
-      if (!user) { modal.alert(t('auth.pleaseSignIn'), t('auth.notSignedIn')); return }
-      if (needsGoogleLink) { setLinkGoogleAction('open'); setShowLinkGooglePrompt(true); return }
-      await openDriveFolder(notes)
-      modal.toast(t('history.driveFolderOpened'), '', 'success')
-    } catch (error) {
-      if (error.message === 'Not authenticated') modal.alert(t('auth.pleaseSignIn'), t('auth.notSignedIn'))
-      else if (error.message === 'NEED_REAUTH' || error.message === 'NEED_GOOGLE_AUTH') {
-        // New device needs Google authorization
-        const { requestGoogleAuth } = await import('../../services/drive')
-        const confirmed = await modal.confirm(
-          t('auth.googleAuthRequired') || 'Google Authorization Required',
-          t('auth.googleAuthRequiredDesc') || 'This device needs to authorize Google Drive access.',
-          { confirmText: t('common.authorize') || 'Authorize', danger: false }
-        )
-        if (confirmed) {
-          await requestGoogleAuth()
-          // Retry after authorization
-          await handleOpenInDrive()
-        }
-      } else modal.errorWithReport(t('history.unableToOpenDrive') + ': ' + error.message, error, 'Error', 'HistoryView.handleOpenInDrive')
-    }
-  }
-
   const handleSyncNotes = async () => {
-    if (needsGoogleLink) { setLinkGoogleAction('sync'); setShowLinkGooglePrompt(true); return }
     try {
       setIsSyncing(true)
-      // Sync both notes and conversations
-      const [notesResult, convsResult] = await Promise.allSettled([
-        syncNotes(),
-        syncConversationsToDrive()
-      ])
-      
-      // Also load from Drive to get any new items
-      await Promise.allSettled([
-        loadConversationsFromDrive()
-      ])
-      
-      const errors = [notesResult, convsResult].filter(r => r.status === 'rejected')
-      if (errors.length > 0) {
-        // Check if any error is NEED_GOOGLE_AUTH (new device needs authorization)
-        const needsAuth = errors.some(e => e.reason?.message === 'NEED_GOOGLE_AUTH')
-        if (needsAuth) {
-          // Request Google authorization interactively
-          const { requestGoogleAuth } = await import('../../services/drive')
-          const confirmed = await modal.confirm(
-            t('auth.googleAuthRequired') || 'Google Authorization Required',
-            t('auth.googleAuthRequiredDesc') || 'This device needs to authorize Google Drive access. Click OK to sign in with Google.',
-            { confirmText: t('common.authorize') || 'Authorize', danger: false }
-          )
-          if (confirmed) {
-            await requestGoogleAuth()
-            // Retry sync after authorization
-            await handleSyncNotes()
-          }
-          return
-        }
-        console.warn('Some sync operations failed:', errors)
-      }
-      
+      await syncNotes()
       modal.toast(t('history.synced'), t('history.notesSynced'), 'success')
     } catch (error) {
-      // Handle NEED_GOOGLE_AUTH at top level too
-      if (error.message === 'NEED_GOOGLE_AUTH') {
-        const { requestGoogleAuth } = await import('../../services/drive')
-        const confirmed = await modal.confirm(
-          t('auth.googleAuthRequired') || 'Google Authorization Required',
-          t('auth.googleAuthRequiredDesc') || 'This device needs to authorize Google Drive access.',
-          { confirmText: t('common.authorize') || 'Authorize', danger: false }
-        )
-        if (confirmed) {
-          await requestGoogleAuth()
-          await handleSyncNotes()
-        }
-        return
-      }
       modal.errorWithReport(t('history.unableToSync') + ': ' + error.message, error, 'Error', 'HistoryView.handleSyncNotes')
     } finally { setIsSyncing(false) }
-  }
-
-  const handleLinkGoogleAndContinue = async () => {
-    try {
-      await linkGoogleAccount()
-      setShowLinkGooglePrompt(false)
-      modal.toast(t('auth.email.googleLinked') || 'Google account linked!', '', 'success')
-      if (linkGoogleAction === 'sync') await handleSyncNotes()
-      else if (linkGoogleAction === 'open') {
-        await openDriveFolder(notes)
-        modal.toast(t('history.driveFolderOpened'), '', 'success')
-      }
-    } catch (error) {
-      modal.errorWithReport(error.message || t('auth.email.linkFailed'), error, 'Error', 'HistoryView.handleLinkGoogleAndContinue')
-    }
   }
 
   // Render table row
@@ -426,21 +313,6 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
           <>
             <td className="w-28 whitespace-nowrap text-left pl-4 pr-4 py-2.5 border-b border-border-light align-middle text-sm h-11 max-xl:hidden">
               <span className="text-text-secondary text-sm">{item.type === 'chat' ? t('history.chat') : t('history.text')}</span>
-            </td>
-            <td className="w-28 whitespace-nowrap text-left pl-4 pr-4 py-2.5 border-b border-border-light align-middle text-sm h-11 max-lg:hidden">
-              <span className="inline-flex items-center gap-1.5 text-sm text-text-secondary">
-                {item.source === 'drive' ? (
-                  <>
-                    <img src="/icon/google-drive-svgrepo-com.svg" alt={t('history.drive')} className="w-3.5 h-3.5 opacity-60 icon-invert" />
-                    {t('history.drive')}
-                  </>
-                ) : (
-                  <>
-                    <img src="/icon/monitor.svg" alt={t('history.local')} className="w-3.5 h-3.5 opacity-60 icon-invert" />
-                    {t('history.local')}
-                  </>
-                )}
-              </span>
             </td>
           </>
         )}
@@ -514,8 +386,6 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         <div className="flex items-center gap-2 text-sm text-text-secondary flex-wrap">
           <span>{item.type === 'chat' ? t('history.chat') : t('history.text')}</span>
           <span className="text-border">•</span>
-          <span>{item.source === 'drive' ? t('history.drive') : t('history.local')}</span>
-          <span className="text-border">•</span>
           <span>{formatTimeAgo(item.updated)}</span>
         </div>
       </div>
@@ -524,8 +394,6 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
 
   return (
     <>
-      {showLinkGooglePrompt && <LinkGooglePrompt onLink={handleLinkGoogleAndContinue} onClose={() => setShowLinkGooglePrompt(false)} />}
-      
       <div className="flex flex-col flex-1 bg-bg-tertiary h-screen overflow-hidden">
         {/* Top Bar - only toggle button, no label */}
         <div className="flex items-center py-2 px-4 bg-bg-tertiary h-14 shrink-0">
@@ -587,14 +455,6 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
             <div className="flex items-center gap-3 ml-auto flex-1 justify-end flex-wrap max-md:w-full max-md:flex-col max-md:gap-3">
               {!isMobile && (
                 <>
-                  <button 
-                    className="flex items-center gap-2 py-2 px-3 bg-transparent border border-border-hover rounded-lg cursor-pointer text-sm text-text-secondary font-normal transition-all duration-200 hover:text-text-primary hover:border-text-primary hover:bg-bg-tertiary whitespace-nowrap shrink-0"
-                    onClick={handleOpenInDrive}
-                    data-tooltip-collapsed={t('history.openInDrive')}
-                  >
-                    <img src="/icon/google-drive-svgrepo-com.svg" alt={t('history.openInDrive')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
-                    <span className="max-xl:hidden">{t('history.openInDrive')}</span>
-                  </button>
                   <button 
                     className={cn(
                       "flex items-center gap-2 py-2 px-3 bg-transparent border border-border-hover rounded-lg cursor-pointer text-sm text-text-secondary font-normal transition-all duration-200 whitespace-nowrap shrink-0",
@@ -671,41 +531,6 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                         <span className="max-xl:hidden">{sort === 'updated' ? t('history.date') : sort === 'name' ? t('history.name') : t('history.type')}</span> {sortBy === sort && (sortOrder === 'asc' ? '↑' : '↓')}
                       </button>
                     ))}
-                    <div className="w-px h-6 bg-border mx-1 shrink-0 max-lg:hidden" />
-                    <div className="relative inline-block" ref={sourceDropdownRef}>
-                      <button 
-                        className="toolbar-btn min-w-28 max-lg:min-w-0 max-lg:px-2"
-                        onClick={() => setIsSourceDropdownOpen(!isSourceDropdownOpen)}
-                      >
-                        <span className="max-xl:hidden">{filterSource === 'all' ? t('history.allSources') : filterSource === 'drive' ? t('history.driveOnly') : t('history.localOnly')}</span>
-                        <span className="xl:hidden">{filterSource === 'all' ? t('history.all') : filterSource === 'drive' ? t('history.drive') : t('history.local')}</span>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn("shrink-0 opacity-60 transition-transform duration-200 stroke-text-secondary", isSourceDropdownOpen && "rotate-180")}>
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                      </button>
-                      {isSourceDropdownOpen && (
-                        <div 
-                          className="absolute top-full left-0 mt-1 bg-bg-secondary border border-border rounded-xl shadow-lg z-[100] animate-fade-in p-1.5 min-w-full"
-                        >
-                          {['all', 'drive', 'local'].map((source) => (
-                            <button 
-                              key={source}
-                              className={cn(
-                                "block w-full py-2 px-3 bg-transparent border-none text-left text-sm cursor-pointer transition-all duration-100 whitespace-nowrap rounded-lg",
-                                "hover:bg-fill-tertiary",
-                                filterSource === source ? "text-text-primary font-medium" : "text-text-secondary font-normal"
-                              )}
-                              onClick={() => { 
-                                setFilterSource(source); 
-                                setIsSourceDropdownOpen(false) 
-                              }}
-                            >
-                              {source === 'all' ? t('history.allSources') : source === 'drive' ? t('history.driveOnly') : t('history.localOnly')}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
                   </>
                 )}
               </div>
@@ -723,23 +548,6 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                   <SkeletonHistoryRow key={i} />
                 ))}
               </div>
-            ) : needsReauth ? (
-              <div className="flex flex-col items-center justify-center py-10 px-5 text-center min-h-96 flex-1">
-                <img src="/icon/shield-check.svg" alt={t('auth.drivePermissionRequired')} className="w-20 h-20 opacity-20 mb-6 grayscale icon-invert" />
-                <h3 className="text-xl font-medium text-text-primary mb-2">{t('auth.drivePermissionRequired')}</h3>
-                <p className="text-sm text-text-secondary mb-8 leading-relaxed max-w-modal-sm">
-                  {t('history.drivePermissionDesc')}<br/>{t('history.signInAgainDesc')}
-                </p>
-                <button 
-                  className="bg-transparent text-text-secondary border border-border-hover py-2.5 px-6 rounded-pill text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-bg-tertiary hover:text-text-primary hover:border-text-primary hover:-translate-y-px active:translate-y-0"
-                  onClick={async () => {
-                    const confirmed = await modal.confirm(t('history.needSignInAgain'), t('auth.signInAgain'), { confirmText: t('auth.signInAgain'), danger: false })
-                    if (confirmed) { await signOut(); modal.info(t('history.needSignInAgain')) }
-                  }}
-                >
-                  {t('auth.signInAgain')}
-                </button>
-              </div>
             ) : sortedItems.length === 0 ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center py-10 px-5 text-center">
                 <img src="/icon/message-square.svg" alt={t('history.noItems')} className="w-20 h-20 opacity-20 mb-6 grayscale icon-invert" />
@@ -755,7 +563,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                       catch (error) { modal.errorWithReport(t('history.unableToSync') + ': ' + error.message, error, 'Error', 'HistoryView.inlineSync') }
                     }}
                   >
-                    {t('history.syncFromDrive')}
+                    {t('history.syncNow')}
                   </button>
                 )}
               </div>
@@ -770,7 +578,6 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                     {isSelectionMode && <th className="w-10 pl-4"></th>}
                     <th className="text-left py-2.5 pr-3 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10 pl-4 min-w-40">{t('history.name')}</th>
                     <th className="w-28 text-left py-2.5 pl-4 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10 max-xl:hidden">{t('history.type')}</th>
-                    <th className="w-28 text-left py-2.5 pl-4 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10 max-lg:hidden">{t('history.source')}</th>
                     <th className="w-32 text-left py-2.5 pl-4 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10">{t('history.updated')}</th>
                     <th className="w-12 text-right py-2.5 pr-4 font-medium text-text-secondary text-xs tracking-wide bg-transparent h-10"></th>
                   </tr>
