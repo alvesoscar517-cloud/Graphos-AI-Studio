@@ -140,7 +140,7 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
       <div className="mb-5 sm:mb-7">
         <div className="mb-3 sm:mb-4">
           <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 rounded-xl sm:rounded-2xl mx-auto flex items-center justify-center overflow-hidden">
-            <svg className="w-6 h-6 sm:w-7 sm:h-7 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg className="w-6 h-6 sm:w-7 sm:h-7 shrink-0 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/>
             </svg>
           </div>

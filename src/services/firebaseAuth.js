@@ -11,6 +11,7 @@
 import { 
   signInWithPopup, 
   signInWithCredential,
+  signInWithCustomToken as firebaseSignInWithCustomToken,
   GoogleAuthProvider,
   onAuthStateChanged as firebaseOnAuthStateChanged,
   signOut as firebaseSignOut
@@ -188,6 +189,41 @@ export async function checkEmailConflict(email, backendUrl) {
 
 
 /**
+ * Sign in with Firebase Custom Token
+ * Used for email users to get Firebase Auth session
+ * This enables direct Firestore access with security rules
+ * 
+ * @param {string} customToken - Firebase custom token from backend
+ * @returns {Promise<{success: boolean, user?: object, error?: string}>}
+ */
+export async function signInWithCustomToken(customToken) {
+  if (!customToken) {
+    logger.warn('[FirebaseAuth] No custom token provided')
+    return { success: false, error: 'No custom token provided' }
+  }
+  
+  try {
+    const { auth } = getFirebaseAuth()
+    const result = await firebaseSignInWithCustomToken(auth, customToken)
+    
+    logger.log('[FirebaseAuth] Custom token sign-in successful', { uid: result.user.uid })
+    
+    return {
+      success: true,
+      user: {
+        uid: result.user.uid,
+        email: result.user.email,
+        name: result.user.displayName || 'User',
+        picture: result.user.photoURL || ''
+      }
+    }
+  } catch (error) {
+    logger.error('FirebaseAuth', 'Custom token sign-in failed', error)
+    return { success: false, error: error.message }
+  }
+}
+
+/**
  * Get current Firebase user
  */
 export function getCurrentUser() {
@@ -266,6 +302,7 @@ export function initializeAuth() {
 
 export default {
   signInWithGoogle,
+  signInWithCustomToken,
   checkEmailConflict,
   getCurrentUser,
   getIdToken,

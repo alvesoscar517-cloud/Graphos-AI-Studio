@@ -251,6 +251,7 @@ async function verifyEmail(email, otp) {
     authProvider: 'email',
     emailVerified: true,
     passwordHash: pendingData.passwordHash,
+    language: pendingData.locale || 'en', // Store user's preferred language
     createdAt: now,
     lastLoginAt: now
   };
@@ -279,6 +280,24 @@ async function verifyEmail(email, otp) {
     }
   });
 
+  // Generate Firebase Custom Token for client-side Firebase Auth
+  // This allows email users to have Firebase Auth session like Google users
+  let firebaseCustomToken = null;
+  try {
+    firebaseCustomToken = await admin.auth().createCustomToken(userId, {
+      email: normalizedEmail,
+      name: pendingData.displayName,
+      authProvider: 'email'
+    });
+    logger.info('Firebase custom token created for email user', { userId });
+  } catch (customTokenError) {
+    logger.warn('Failed to create Firebase custom token', { 
+      userId, 
+      error: customTokenError.message 
+    });
+    // Continue without custom token - user can still use API but not Firestore direct access
+  }
+
   logger.info('User registered and verified', { userId, email: normalizedEmail });
 
   return {
@@ -293,7 +312,8 @@ async function verifyEmail(email, otp) {
     },
     accessToken: tokens.accessToken,
     refreshToken: tokens.refreshToken,
-    expiresIn: tokens.expiresIn
+    expiresIn: tokens.expiresIn,
+    firebaseCustomToken // For client-side Firebase Auth sign-in
   };
 }
 
@@ -417,6 +437,23 @@ async function login(email, password, options = {}) {
     }
   });
 
+  // Generate Firebase Custom Token for client-side Firebase Auth
+  // This allows email users to have Firebase Auth session like Google users
+  let firebaseCustomToken = null;
+  try {
+    firebaseCustomToken = await admin.auth().createCustomToken(userId, {
+      email: normalizedEmail,
+      name: userData.name,
+      authProvider: 'email'
+    });
+    logger.info('Firebase custom token created for email login', { userId });
+  } catch (customTokenError) {
+    logger.warn('Failed to create Firebase custom token on login', { 
+      userId, 
+      error: customTokenError.message 
+    });
+  }
+
   logger.info('User logged in', { userId, email: normalizedEmail, rememberMe });
 
   // Get best available picture (prefer user's own, fallback to Google linked)
@@ -443,7 +480,8 @@ async function login(email, password, options = {}) {
     },
     accessToken: tokens.accessToken,
     refreshToken: tokens.refreshToken,
-    expiresIn: tokens.expiresIn
+    expiresIn: tokens.expiresIn,
+    firebaseCustomToken // For client-side Firebase Auth sign-in
   };
 }
 

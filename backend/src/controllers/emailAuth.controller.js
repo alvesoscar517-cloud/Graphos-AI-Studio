@@ -262,6 +262,7 @@ exports.verifyEmail = async (req, res) => {
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
       expiresIn: result.expiresIn,
+      firebaseCustomToken: result.firebaseCustomToken, // For client-side Firebase Auth
       message: 'Email verified successfully'
     });
     
@@ -380,6 +381,7 @@ exports.login = async (req, res) => {
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
       expiresIn: result.expiresIn,
+      firebaseCustomToken: result.firebaseCustomToken, // For client-side Firebase Auth
       isNewDevice: result.isNewDevice
     });
     

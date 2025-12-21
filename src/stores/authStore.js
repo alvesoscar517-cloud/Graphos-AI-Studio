@@ -406,10 +406,14 @@ export const useAuthStore = create(
         
         signInWithEmail: async (email, password, rememberMe = false) => {
           try {
+            // Get current language from i18n
+            const { default: i18n } = await import('../i18n')
+            const locale = i18n.language?.split('-')[0] || 'en'
+            
             const response = await fetch(`${API_BASE_URL}/auth/email/login`, {
               method: 'POST', 
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, password, rememberMe })
+              body: JSON.stringify({ email, password, rememberMe, locale })
             })
             
             const data = await response.json()
@@ -418,6 +422,18 @@ export const useAuthStore = create(
               const e = new Error(data.error || 'Login failed')
               e.code = data.code
               throw e 
+            }
+            
+            // Sign in to Firebase Auth with custom token (for Firestore access)
+            if (data.firebaseCustomToken) {
+              try {
+                const { signInWithCustomToken } = await import('../services/firebaseAuth')
+                await signInWithCustomToken(data.firebaseCustomToken)
+                logger.log('[AUTH] Firebase Auth session established for email user')
+              } catch (firebaseError) {
+                logger.warn('Auth', 'Firebase custom token sign-in failed (non-critical)', firebaseError.message)
+                // Continue - user can still use API, just not direct Firestore
+              }
             }
             
             // Store user info securely
@@ -464,10 +480,14 @@ export const useAuthStore = create(
 
         registerWithEmail: async (email, password, displayName) => {
           try {
+            // Get current language from i18n
+            const { default: i18n } = await import('../i18n')
+            const locale = i18n.language?.split('-')[0] || 'en'
+            
             const response = await fetch(`${API_BASE_URL}/auth/email/register`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, password, displayName })
+              body: JSON.stringify({ email, password, displayName, locale })
             })
             
             const data = await response.json()
@@ -505,6 +525,17 @@ export const useAuthStore = create(
               return { needsLogin: true, message: data.message }
             }
 
+            // Sign in to Firebase Auth with custom token (for Firestore access)
+            if (data.firebaseCustomToken) {
+              try {
+                const { signInWithCustomToken } = await import('../services/firebaseAuth')
+                await signInWithCustomToken(data.firebaseCustomToken)
+                logger.log('[AUTH] Firebase Auth session established for new email user')
+              } catch (firebaseError) {
+                logger.warn('Auth', 'Firebase custom token sign-in failed (non-critical)', firebaseError.message)
+              }
+            }
+
             // Store auth data
             setUserData(data.user)
             secureSet(AUTH_STORAGE_KEYS.USER_ID, data.user.userId)
@@ -538,10 +569,14 @@ export const useAuthStore = create(
 
         resendVerificationOTP: async (email) => {
           try {
+            // Get current language from i18n
+            const { default: i18n } = await import('../i18n')
+            const locale = i18n.language?.split('-')[0] || 'en'
+            
             const response = await fetch(`${API_BASE_URL}/auth/email/resend-otp`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email })
+              body: JSON.stringify({ email, locale })
             })
             
             const data = await response.json()
@@ -559,7 +594,11 @@ export const useAuthStore = create(
 
         requestPasswordReset: async (email) => {
           try {
-            const requestBody = JSON.stringify({ email })
+            // Get current language from i18n
+            const { default: i18n } = await import('../i18n')
+            const locale = i18n.language?.split('-')[0] || 'en'
+            
+            const requestBody = JSON.stringify({ email, locale })
             logger.log('[AUTH] requestPasswordReset - email:', email)
             logger.log('[AUTH] requestPasswordReset - body:', requestBody)
             logger.log('[AUTH] requestPasswordReset - URL:', `${API_BASE_URL}/auth/email/forgot-password`)
@@ -615,13 +654,17 @@ export const useAuthStore = create(
           try {
             const authToken = await tokenService.getValidToken()
             
+            // Get current language from i18n
+            const { default: i18n } = await import('../i18n')
+            const locale = i18n.language?.split('-')[0] || 'en'
+            
             const response = await fetch(`${API_BASE_URL}/auth/email/change-password`, {
               method: 'POST',
               headers: { 
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`
               },
-              body: JSON.stringify({ currentPassword, newPassword })
+              body: JSON.stringify({ currentPassword, newPassword, locale })
             })
             
             const data = await response.json()

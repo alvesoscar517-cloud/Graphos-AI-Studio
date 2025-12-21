@@ -815,7 +815,25 @@ async function sendWelcomeNotification(userId, freeCredits = 100) {
     }
 
     const notification = createFromTemplate('WELCOME', { credits: freeCredits });
-    return await sendToUser(userId, notification);
+    const notifResult = await sendToUser(userId, notification);
+
+    // Send welcome email
+    try {
+      const userDoc = await db.collection('users').doc(userId).get();
+      const userData = userDoc.exists ? userDoc.data() : null;
+      
+      if (userData?.email) {
+        const lang = userData.language || userData.preferredLanguage || 'en';
+        const { queueWelcomeEmail } = require('./emailQueue.service');
+        await queueWelcomeEmail(userData.email, userData.name || userData.displayName || userData.email.split('@')[0], lang);
+        logger.info('[AUTO-NOTIF] Welcome email queued', { userId, email: userData.email, lang });
+      }
+    } catch (emailError) {
+      logger.error('[AUTO-NOTIF] Failed to queue welcome email:', emailError);
+      // Don't fail the whole operation if email fails
+    }
+
+    return notifResult;
   } catch (error) {
     logger.error('[AUTO-NOTIF] Send welcome notification error:', error);
     return null;
