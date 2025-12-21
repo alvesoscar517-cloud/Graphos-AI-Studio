@@ -7,10 +7,10 @@
 const express = require('express');
 const router = express.Router();
 const avatarController = require('../controllers/avatar.controller');
-const { requireAuth } = require('../middleware/auth.middleware');
+const { authenticate } = require('../middleware/auth.middleware');
 
 // All routes require authentication
-router.use(requireAuth);
+router.use(authenticate);
 
 // Upload/Update avatar
 router.post('/', avatarController.uploadAvatar);

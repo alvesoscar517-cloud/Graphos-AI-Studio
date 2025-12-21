@@ -85,6 +85,8 @@
     }
     .btn-download.primary { background: #8b5cf6; color: white; }
     .btn-download.primary:hover { background: #7c3aed; }
+    .btn-download.og { background: #f59e0b; color: white; }
+    .btn-download.og:hover { background: #d97706; }
     .btn-download-all {
       margin-bottom: 30px; padding: 14px 28px; border-radius: 12px;
       background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white;
@@ -259,6 +261,7 @@
       border-radius: 12px;
       font-size: 10px;
       font-weight: 500;
+      white-space: nowrap;
     }
     .demo-status-badge.humanized { background: #dcfce7; color: #166534; }
     .demo-status-dot { width: 5px; height: 5px; border-radius: 50%; background: #22c55e; }
@@ -285,6 +288,7 @@
       gap: 5px;
       font-size: 11px;
       color: #22c55e;
+      white-space: nowrap;
     }
     .demo-humanize-btn {
       display: flex;
@@ -298,6 +302,7 @@
       font-weight: 600;
       color: white;
       opacity: 0.5;
+      white-space: nowrap;
     }
 
     /* VOICE PROFILE STYLES */
@@ -418,7 +423,7 @@
       margin-bottom: 8px;
     }
     .demo-traits-tags { display: flex; flex-wrap: wrap; gap: 4px; }
-    .demo-trait-tag { padding: 3px 8px; border-radius: 12px; font-size: 9px; font-weight: 500; }
+    .demo-trait-tag { padding: 3px 8px; border-radius: 12px; font-size: 9px; font-weight: 500; white-space: nowrap; }
     .demo-trait-tag.purple { background: #ede9fe; color: #7c3aed; }
     .demo-trait-tag.gray { background: white; color: #64748b; }
 
@@ -613,6 +618,7 @@
       font-size: 10px;
       font-weight: 500;
       border: none;
+      white-space: nowrap;
     }
     .demo-style-btn.active { background: #10b981; color: white; }
     .demo-style-btn:not(.active) { background: #f1f5f9; color: #64748b; }
@@ -627,6 +633,7 @@
       border-radius: 12px;
       font-size: 10px;
       font-weight: 500;
+      white-space: nowrap;
     }
     .demo-rewrite-textarea {
       flex: 1;
@@ -651,6 +658,7 @@
       gap: 5px;
       font-size: 11px;
       color: #22c55e;
+      white-space: nowrap;
     }
     .demo-rewrite-btn {
       display: flex;
@@ -664,6 +672,7 @@
       font-weight: 600;
       color: white;
       opacity: 0.5;
+      white-space: nowrap;
     }
     .demo-rewrite-sidebar {
       width: 180px;
@@ -781,6 +790,7 @@
       font-weight: 600;
       color: white;
       width: fit-content;
+      white-space: nowrap;
     }
     .pill-blue-solid {
       background: rgba(59, 130, 246, 0.25);
@@ -845,6 +855,7 @@
       font-weight: 500;
       border: none;
       cursor: pointer;
+      white-space: nowrap;
     }
     .demo-sample-btn.active { background: #3b82f6; color: white; }
     .demo-sample-btn:not(.active) { background: #f1f5f9; color: #64748b; }
@@ -879,6 +890,7 @@
       font-weight: 600;
       color: #475569;
       cursor: pointer;
+      white-space: nowrap;
     }
     .demo-results-panel {
       flex: 0.8;
@@ -923,6 +935,7 @@
       border-radius: 16px;
       font-size: 11px;
       font-weight: 600;
+      white-space: nowrap;
     }
     .demo-confidence {
       background: #f8fafc;
@@ -1166,6 +1179,10 @@
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
       <span id="downloadAllText">Download All (7 images)</span>
     </button>
+    <button class="btn-download-all" style="background: linear-gradient(135deg, #f59e0b, #d97706); margin-left: 12px;" onclick="downloadAllOG()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+      <span id="downloadAllOGText">Download All OG (5 images - 1200×630)</span>
+    </button>
   </div>
   
   <div class="og-container">
@@ -1177,7 +1194,11 @@
       <div class="og-actions">
         <button class="btn-download primary" onclick="downloadCard('screenshot-1')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-          Download PNG
+          1280×800
+        </button>
+        <button class="btn-download og" onclick="downloadCardOG('screenshot-1')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          OG 1200×630
         </button>
       </div>
       <div class="screenshot-card screenshot-marketing" id="screenshot-1">
@@ -1368,7 +1389,11 @@
       <div class="og-actions">
         <button class="btn-download primary" onclick="downloadCard('screenshot-2')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-          Download PNG
+          1280×800
+        </button>
+        <button class="btn-download og" onclick="downloadCardOG('screenshot-2')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          OG 1200×630
         </button>
       </div>
       <div class="screenshot-card screenshot-marketing" id="screenshot-2">
@@ -1516,7 +1541,11 @@
       <div class="og-actions">
         <button class="btn-download primary" onclick="downloadCard('screenshot-3')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-          Download PNG
+          1280×800
+        </button>
+        <button class="btn-download og" onclick="downloadCardOG('screenshot-3')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          OG 1200×630
         </button>
       </div>
       <div class="screenshot-card screenshot-marketing" id="screenshot-3">
@@ -1701,7 +1730,11 @@
       <div class="og-actions">
         <button class="btn-download primary" onclick="downloadCard('screenshot-4')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-          Download PNG
+          1280×800
+        </button>
+        <button class="btn-download og" onclick="downloadCardOG('screenshot-4')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          OG 1200×630
         </button>
       </div>
       <div class="screenshot-card screenshot-marketing" id="screenshot-4">
@@ -1917,7 +1950,11 @@
       <div class="og-actions">
         <button class="btn-download primary" onclick="downloadCard('screenshot-5')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-          Download PNG
+          1280×800
+        </button>
+        <button class="btn-download og" onclick="downloadCardOG('screenshot-5')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          OG 1200×630
         </button>
       </div>
       <div class="screenshot-card screenshot-marketing" id="screenshot-5">
@@ -4061,6 +4098,72 @@
       }
     }
     
+    // Download screenshot as OG image (1200x630) - crops center portion
+    async function downloadCardOG(elementId) {
+      const element = document.getElementById(elementId);
+      if (!element) {
+        alert('Element not found: ' + elementId);
+        return;
+      }
+      
+      const originalSize = SIZES[elementId] || { width: 1280, height: 800 };
+      const ogWidth = 1200;
+      const ogHeight = 630;
+      
+      try {
+        // First capture at original size
+        const dataUrl = await htmlToImage.toPng(element, {
+          width: originalSize.width,
+          height: originalSize.height,
+          pixelRatio: 1,
+          skipAutoScale: true,
+          cacheBust: true,
+          includeQueryParams: true
+        });
+        
+        // Create canvas to crop/resize to OG dimensions
+        const canvas = document.createElement('canvas');
+        canvas.width = ogWidth;
+        canvas.height = ogHeight;
+        const ctx = canvas.getContext('2d');
+        
+        const img = new Image();
+        img.onload = function() {
+          // Calculate crop area to maintain aspect ratio and center
+          const sourceAspect = originalSize.width / originalSize.height;
+          const targetAspect = ogWidth / ogHeight;
+          
+          let sx, sy, sw, sh;
+          
+          if (sourceAspect > targetAspect) {
+            // Source is wider - crop sides
+            sh = originalSize.height;
+            sw = sh * targetAspect;
+            sx = (originalSize.width - sw) / 2;
+            sy = 0;
+          } else {
+            // Source is taller - crop top/bottom
+            sw = originalSize.width;
+            sh = sw / targetAspect;
+            sx = 0;
+            sy = (originalSize.height - sh) / 2;
+          }
+          
+          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, ogWidth, ogHeight);
+          
+          const ogDataUrl = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.download = getFilename(elementId).replace('.png', '-og.png');
+          link.href = ogDataUrl;
+          link.click();
+        };
+        img.src = dataUrl;
+      } catch (error) {
+        console.error('Download OG error:', error);
+        alert('Error downloading OG image. Please try again.');
+      }
+    }
+    
     // Download all images
     async function downloadAll() {
       const images = [
@@ -4085,6 +4188,31 @@
       }
       
       btn.innerHTML = '✓ All downloaded!';
+      setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+    }
+    
+    // Download all OG images (5 screenshots at 1200x630)
+    async function downloadAllOG() {
+      const images = [
+        'screenshot-1',
+        'screenshot-2',
+        'screenshot-3',
+        'screenshot-4',
+        'screenshot-5'
+      ];
+      
+      const btn = document.querySelectorAll('.btn-download-all')[1];
+      const originalText = btn.innerHTML;
+      
+      for (let i = 0; i < images.length; i++) {
+        const id = images[i];
+        btn.innerHTML = `⏳ Downloading OG ${i + 1}/${images.length}...`;
+        
+        await downloadCardOG(id);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      btn.innerHTML = '✓ All OG downloaded!';
       setTimeout(() => { btn.innerHTML = originalText; }, 3000);
     }
     
