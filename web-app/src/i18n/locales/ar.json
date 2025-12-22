@@ -384,7 +384,8 @@
     "driveFolderOpened": "تم فتح مجلد Drive",
     "syncFromDrive": "مزامنة من Drive",
     "pleaseSignInToView": "يرجى تسجيل الدخول لعرض السجل",
-    "conversation": "محادثة"
+    "conversation": "محادثة",
+    "syncNow": "مزامنة الآن"
   },
   "workspace": {
     "title": "مساحة عمل الذكاء الاصطناعي",

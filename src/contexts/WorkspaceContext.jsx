@@ -1,25 +1,23 @@
 /**
- * WorkspaceContext with RxDB
+ * WorkspaceContext with Firestore
  * 
- * Simplified workspace management using RxDB for offline-first data
- * with automatic Firestore sync.
+ * Workspace management using Firestore for real-time sync.
  */
 
 import { logger } from '../utils/logger'
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useAuth } from '../stores/authStore'
 import { useProfiles } from './ProfileContext'
 import { handleCreditError, showUpgradeModal } from '../utils/creditHandler'
 import { 
   useConversations, 
-  useMessages, 
   useConversationMutations, 
-  useMessageMutations,
-  useRxDBSync,
   clearLocalData
 } from '../db/hooks'
+import { subscribeToMessages } from '../db/firestore'
+import { getFirebaseAuth } from '../config/firebase'
 
-const WorkspaceContext = createContext()
+const WorkspaceContext = createContext(null)
 
 export const useWorkspace = () => {
   const context = useContext(WorkspaceContext)
@@ -53,16 +51,33 @@ export const WorkspaceProvider = ({ children }) => {
   const { user } = useAuth()
   const { currentProfile } = useSafeProfiles()
   
-  // Get userId for RxDB
-  const userId = user?.userId || user?.uid || user?.id
+  // Get Firebase Auth uid for Firestore operations
+  // Firestore rules require request.auth.uid to match userId in data
+  // Priority: Firebase Auth currentUser > user.uid > user.userId
+  const [firebaseUid, setFirebaseUid] = useState(null)
   
-  // Setup RxDB sync when user logs in
-  useRxDBSync(userId)
+  useEffect(() => {
+    const auth = getFirebaseAuth()
+    if (!auth) return
+    
+    // Listen for Firebase Auth state changes
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+      if (firebaseUser) {
+        setFirebaseUid(firebaseUser.uid)
+        logger.log('[WORKSPACE] Firebase Auth uid:', firebaseUser.uid)
+      } else {
+        setFirebaseUid(null)
+      }
+    })
+    return () => unsubscribe()
+  }, [])
   
-  // Get conversations from RxDB (reactive)
-  const { conversations: rxConversations, loading: conversationsLoading } = useConversations(userId)
-  const { createConversation, updateConversation, deleteConversation: removeConversation } = useConversationMutations()
-  const { addMessage, saveMessage } = useMessageMutations()
+  // Use Firebase Auth uid for Firestore, fallback to user.uid/userId for API calls
+  const userId = firebaseUid || user?.uid || user?.userId || user?.id
+  
+  // Get conversations from Firestore (reactive)
+  const { conversations: firestoreConversations, loading: conversationsLoading } = useConversations(userId)
+  const { createConversation, updateConversation, saveConversationMessages, deleteConversation: removeConversation } = useConversationMutations()
   
   // Local state
   const [currentConversation, setCurrentConversation] = useState(null)
@@ -99,43 +114,47 @@ export const WorkspaceProvider = ({ children }) => {
     prevUserRef.current = userId
   }, [userId])
 
-  // Load messages when current conversation changes
+  // Subscribe to messages when current conversation changes
+  // LOCAL-FIRST: UI shows local state immediately, Firestore syncs in background
   useEffect(() => {
     if (!currentConversation?.id || !userId) {
-      setCurrentMessages([])
       return
     }
 
-    // Find messages for current conversation from RxDB
-    const loadMessages = async () => {
-      try {
-        const { getDatabase } = await import('../db/database')
-        const db = await getDatabase()
-        
-        const subscription = db.messages
-          .find({
-            selector: {
-              conversationId: currentConversation.id,
-              userId
-            }
-          })
-          .sort({ timestamp: 'asc' })
-          .$.subscribe(docs => {
-            setCurrentMessages(docs.map(d => d.toJSON()))
-          })
-
-        return () => subscription.unsubscribe()
-      } catch (err) {
-        logger.error('Workspace', 'Failed to load messages', err)
+    // Subscribe to Firestore for cross-device sync (background only)
+    const unsubscribe = subscribeToMessages(currentConversation.id, userId, (messages) => {
+      // Only merge if we have messages AND no local streaming messages
+      // This prevents Firestore from overwriting optimistic updates
+      if (messages.length > 0) {
+        setCurrentMessages(prev => {
+          // If we have streaming messages, keep local state (don't let Firestore overwrite)
+          const hasStreamingMessages = prev.some(m => m.streaming)
+          if (hasStreamingMessages) {
+            return prev
+          }
+          
+          // If local is empty, use Firestore data (loading existing conversation)
+          if (prev.length === 0) {
+            return messages
+          }
+          
+          // Merge: prefer local messages, add any from Firestore that we don't have
+          const localIds = new Set(prev.map(m => m.id))
+          const newFromFirestore = messages.filter(m => !localIds.has(m.id))
+          
+          if (newFromFirestore.length > 0) {
+            // New messages from another device
+            return [...prev, ...newFromFirestore].sort((a, b) => 
+              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+            )
+          }
+          
+          return prev
+        })
       }
-    }
+    })
 
-    const cleanup = loadMessages()
-    return () => {
-      if (cleanup && typeof cleanup.then === 'function') {
-        cleanup.then(unsub => unsub && unsub())
-      }
-    }
+    return () => unsubscribe()
   }, [currentConversation?.id, userId])
 
   // Generate system prompt based on user profile
@@ -165,42 +184,128 @@ export const WorkspaceProvider = ({ children }) => {
     return prompt
   }, [currentProfile])
 
-  // Create new conversation
+  // Pending save queue - tracks conversations waiting for Firestore ID
+  // Pattern: { tempId: { messages: [], updates: {}, resolve: fn } }
+  const pendingSaveQueueRef = useRef(new Map())
+  
+  // Track temp ID to Firestore ID mapping for quick lookup
+  const tempToFirestoreIdRef = useRef(new Map())
+  
+  // Create new conversation - optimistic update, sync in background
+  // Pattern: Similar to Notion/Linear - create locally first, sync async
   const createNewConversation = useCallback(async (title = 'New Chat') => {
     if (!userId) return null
     
+    const now = new Date().toISOString()
+    const tempId = `temp_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
+    
+    // Create local conversation immediately for instant UX
+    const localConv = {
+      id: tempId,
+      userId,
+      title,
+      messages: [], // Embedded messages
+      systemPrompt: generateSystemPrompt(),
+      type: 'chat',
+      titleGenerated: false,
+      userEditedTitle: false,
+      summary: null,
+      created: now,
+      updated: now,
+      _isTemp: true // Mark as temp for easier tracking
+    }
+    
+    // Update UI immediately
+    setCurrentConversation(localConv)
+    setCurrentMessages([])
+    
+    // Initialize pending queue for this temp conversation
+    pendingSaveQueueRef.current.set(tempId, { messages: [], updates: {} })
+    
+    // Sync to Firestore in background
     try {
-      const newConv = await createConversation(userId, {
+      const firestoreConv = await createConversation(userId, {
         title,
-        systemPrompt: generateSystemPrompt(),
+        systemPrompt: localConv.systemPrompt,
         type: 'chat'
       })
       
-      // Handle case where database is not ready
-      if (!newConv) {
-        logger.warn('Workspace', 'Database not ready, cannot create conversation')
-        return null
+      if (firestoreConv) {
+        logger.log('[WORKSPACE] Created conversation in Firestore:', firestoreConv.id)
+        
+        // Store mapping for future lookups
+        tempToFirestoreIdRef.current.set(tempId, firestoreConv.id)
+        
+        // Flush any pending saves that accumulated while waiting
+        const pending = pendingSaveQueueRef.current.get(tempId)
+        if (pending && pending.messages.length > 0) {
+          logger.log('[WORKSPACE] Flushing pending messages:', pending.messages.length)
+          await saveConversationMessages(firestoreConv.id, pending.messages, pending.updates)
+        }
+        pendingSaveQueueRef.current.delete(tempId)
+        
+        // Update conversation ID atomically
+        setCurrentConversation(prev => {
+          if (prev?.id === tempId) {
+            return { ...prev, id: firestoreConv.id, _isTemp: false }
+          }
+          return prev
+        })
       }
-      
-      const convData = newConv.toJSON ? newConv.toJSON() : newConv
-      setCurrentConversation(convData)
-      setCurrentMessages([])
-      
-      logger.log('[WORKSPACE] Created new conversation:', convData.id)
-      return convData
     } catch (err) {
-      logger.error('Workspace', 'Failed to create conversation', err)
-      return null
+      logger.warn('Workspace', 'Failed to sync conversation to Firestore:', err.message)
+      // Keep local conversation - will work offline
+      // Mark for retry later
+      const existing = pendingSaveQueueRef.current.get(tempId) || { messages: [], updates: {} }
+      pendingSaveQueueRef.current.set(tempId, { 
+        ...existing,
+        _retryNeeded: true 
+      })
     }
-  }, [userId, createConversation, generateSystemPrompt])
+    
+    return localConv
+  }, [userId, createConversation, generateSystemPrompt, saveConversationMessages])
 
-  // Load conversation
+  // Merge current temp conversation into list for immediate display
+  // Moved up so loadConversation can use it
+  const mergedConversations = useMemo(() => {
+    if (!currentConversation) return firestoreConversations
+    
+    // If current conversation is temp and not in Firestore list, add it
+    const isTemp = currentConversation.id?.startsWith('temp_')
+    const existsInFirestore = firestoreConversations.some(c => c.id === currentConversation.id)
+    
+    if (isTemp || !existsInFirestore) {
+      // Add current conversation at the top
+      return [currentConversation, ...firestoreConversations.filter(c => c.id !== currentConversation.id)]
+    }
+    
+    return firestoreConversations
+  }, [currentConversation, firestoreConversations])
+
+  // Load conversation - search in merged list (includes temp conversations)
+  // Pattern: Load embedded messages immediately, subscribe for real-time updates
   const loadConversation = useCallback((id) => {
-    const conversation = rxConversations.find(c => c.id === id)
+    // First check if it's the current conversation
+    if (currentConversation?.id === id) {
+      return // Already loaded
+    }
+    
+    // Search in merged conversations (includes temp and Firestore)
+    const conversation = mergedConversations.find(c => c.id === id)
     if (conversation) {
       setCurrentConversation(conversation)
+      
+      // CRITICAL FIX: Load embedded messages immediately instead of waiting for subscription
+      // This ensures messages are visible when opening an existing conversation
+      if (conversation.messages && conversation.messages.length > 0) {
+        logger.log('[WORKSPACE] Loading embedded messages:', conversation.messages.length)
+        setCurrentMessages(conversation.messages)
+      } else {
+        setCurrentMessages([]) // Clear messages, will be loaded by subscription
+      }
     }
-  }, [rxConversations])
+  }, [mergedConversations, currentConversation])
 
   // Truncate title to max words
   const truncateTitleToWords = useCallback((title, maxWords = 7) => {
@@ -256,9 +361,10 @@ export const WorkspaceProvider = ({ children }) => {
           return new Promise((resolve) => {
             const reader = new FileReader()
             reader.onload = () => {
+              const result = reader.result
               resolve({
                 ...att,
-                base64: reader.result.split(',')[1],
+                base64: typeof result === 'string' ? result.split(',')[1] : '',
                 mimeType: att.type || att.file.type
               })
             }
@@ -278,10 +384,7 @@ export const WorkspaceProvider = ({ children }) => {
       timestamp: new Date().toISOString()
     }
 
-    // Save user message to RxDB
-    await saveMessage(conversation.id, userId, userMessage)
-    
-    // Update local state immediately
+    // Update local state immediately (optimistic update)
     const updatedMessages = [...currentMessages, userMessage]
     setCurrentMessages(updatedMessages)
 
@@ -376,7 +479,7 @@ export const WorkspaceProvider = ({ children }) => {
               ))
             },
             onComplete: (completeInfo) => {
-              if (completeInfo.summary) newSummary = completeInfo.summary
+              if (completeInfo?.summary) newSummary = completeInfo.summary
             }
           }
         )
@@ -399,7 +502,7 @@ export const WorkspaceProvider = ({ children }) => {
           {
             conversationSummary: conversation?.summary,
             onComplete: (completeInfo) => {
-              if (completeInfo.summary) newSummary = completeInfo.summary
+              if (completeInfo?.summary) newSummary = completeInfo.summary
             }
           }
         )
@@ -419,7 +522,7 @@ export const WorkspaceProvider = ({ children }) => {
         check()
       })
 
-      // Save final AI message to RxDB
+      // Final AI message
       const finalAiMessage = {
         id: aiMessageId,
         role: 'assistant',
@@ -428,33 +531,80 @@ export const WorkspaceProvider = ({ children }) => {
         streaming: false
       }
       
-      await saveMessage(conversation.id, userId, finalAiMessage)
+      // Build final messages array
+      const finalMessages = [...updatedMessages, finalAiMessage]
+      
+      // Update local state
+      setCurrentMessages(finalMessages)
 
-      // Update conversation title if first message
+      // Generate title if first message
       const isFirstMessage = currentMessages.length === 0
+      const newTitle = isFirstMessage && !conversation.userEditedTitle 
+        ? generateTitle(content) 
+        : conversation.title
+      
       if (isFirstMessage && !conversation.userEditedTitle) {
-        const newTitle = generateTitle(content)
-        await updateConversation(conversation.id, { 
-          title: newTitle, 
-          titleGenerated: true,
-          summary: newSummary,
-          messageCount: 2
-        })
-        setCurrentConversation(prev => ({ ...prev, title: newTitle, titleGenerated: true }))
-      } else if (newSummary) {
-        await updateConversation(conversation.id, { summary: newSummary })
+        setCurrentConversation(prev => prev ? { ...prev, title: newTitle, titleGenerated: true } : null)
       }
 
-      setCurrentMessages(prev => prev.map(m => 
-        m.id === aiMessageId ? finalAiMessage : m
-      ))
+      // Save everything to Firestore in one atomic operation
+      // Pattern: Similar to Slack/Discord - queue if temp, save immediately if real ID
+      const isTemp = conversation.id.startsWith('temp_')
+      const isLocalOnly = conversation.id.startsWith('local_')
+      
+      // Build updates object
+      const updates = {
+        ...(isFirstMessage && !conversation.userEditedTitle ? { title: newTitle, titleGenerated: true } : {}),
+        ...(newSummary ? { summary: newSummary } : {})
+      }
+      
+      if (!isTemp && !isLocalOnly) {
+        // Real Firestore ID - save immediately
+        logger.log('[WORKSPACE] Saving messages to Firestore:', conversation.id, finalMessages.length)
+        saveConversationMessages(conversation.id, finalMessages, updates).catch(err => {
+          logger.warn('Workspace', 'Failed to save conversation:', err.message)
+        })
+      } else if (isTemp) {
+        // Check if we already have a Firestore ID for this temp conversation
+        const firestoreId = tempToFirestoreIdRef.current.get(conversation.id)
+        
+        if (firestoreId) {
+          // Firestore ID is ready - save directly
+          logger.log('[WORKSPACE] Temp conversation has Firestore ID, saving:', firestoreId)
+          saveConversationMessages(firestoreId, finalMessages, updates).catch(err => {
+            logger.warn('Workspace', 'Failed to save conversation:', err.message)
+          })
+          
+          // Update current conversation ID
+          setCurrentConversation(prev => {
+            if (prev?.id === conversation.id) {
+              return { ...prev, id: firestoreId, _isTemp: false }
+            }
+            return prev
+          })
+        } else {
+          // Queue for later when Firestore ID is ready
+          logger.log('[WORKSPACE] Queueing messages for temp conversation:', conversation.id)
+          const existing = pendingSaveQueueRef.current.get(conversation.id) || { messages: [], updates: {} }
+          pendingSaveQueueRef.current.set(conversation.id, {
+            messages: finalMessages,
+            updates: { ...existing.updates, ...updates }
+          })
+        }
+      }
 
     } catch (err) {
       logger.error('Workspace', 'Send message error', err)
       
       // Handle credit errors
-      if (handleCreditError(err)) {
-        showUpgradeModal()
+      if (typeof handleCreditError === 'function') {
+        try {
+          if (handleCreditError(err, userId)) {
+            showUpgradeModal()
+          }
+        } catch (e) {
+          // Ignore credit handler errors
+        }
       }
       
       setError(formatErrorMessage(err))
@@ -464,11 +614,25 @@ export const WorkspaceProvider = ({ children }) => {
     } finally {
       setIsLoading(false)
     }
-  }, [currentConversation, currentMessages, userId, modelSettings, currentProfile, generateSystemPrompt, generateTitle, saveMessage, updateConversation, createNewConversation, formatErrorMessage])
+  }, [currentConversation, currentMessages, userId, modelSettings, currentProfile, generateSystemPrompt, generateTitle, saveConversationMessages, updateConversation, createNewConversation, formatErrorMessage])
 
   // Delete conversation
   const deleteConversation = useCallback(async (id) => {
     try {
+      // Handle temp conversations - just clear local state
+      if (id.startsWith('temp_')) {
+        logger.log('[WORKSPACE] Deleting temp conversation:', id)
+        pendingSaveQueueRef.current.delete(id)
+        tempToFirestoreIdRef.current.delete(id)
+        
+        if (currentConversation?.id === id) {
+          setCurrentConversation(null)
+          setCurrentMessages([])
+        }
+        return
+      }
+      
+      // Delete from Firestore
       await removeConversation(id)
       
       if (currentConversation?.id === id) {
@@ -491,7 +655,7 @@ export const WorkspaceProvider = ({ children }) => {
       })
       
       if (currentConversation?.id === id) {
-        setCurrentConversation(prev => ({ ...prev, title: newTitle, userEditedTitle: true }))
+        setCurrentConversation(prev => prev ? { ...prev, title: newTitle, userEditedTitle: true } : null)
       }
     } catch (err) {
       logger.error('Workspace', 'Failed to rename conversation', err)
@@ -524,7 +688,7 @@ export const WorkspaceProvider = ({ children }) => {
 
   const value = {
     // Data
-    conversations: rxConversations,
+    conversations: mergedConversations,
     currentConversation,
     messages: currentMessages,
     isLoading: isLoading || conversationsLoading,

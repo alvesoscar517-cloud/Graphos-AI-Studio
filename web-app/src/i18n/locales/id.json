@@ -384,7 +384,8 @@
     "driveFolderOpened": "Folder Drive dibuka",
     "syncFromDrive": "Sinkronkan dari Drive",
     "pleaseSignInToView": "Silakan masuk untuk melihat riwayat",
-    "conversation": "Percakapan"
+    "conversation": "Percakapan",
+    "syncNow": "Sinkronkan sekarang"
   },
   "workspace": {
     "title": "Ruang Kerja AI",

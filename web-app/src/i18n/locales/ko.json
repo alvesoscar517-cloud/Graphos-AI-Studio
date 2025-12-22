@@ -384,7 +384,8 @@
     "driveFolderOpened": "Drive 폴더가 열렸습니다",
     "syncFromDrive": "Drive에서 동기화",
     "pleaseSignInToView": "기록을 보려면 로그인하세요",
-    "conversation": "대화"
+    "conversation": "대화",
+    "syncNow": "지금 동기화"
   },
   "workspace": {
     "title": "AI 워크스페이스",

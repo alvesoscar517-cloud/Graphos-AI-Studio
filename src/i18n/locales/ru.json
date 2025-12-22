@@ -384,7 +384,8 @@
     "driveFolderOpened": "Папка Диска открыта",
     "syncFromDrive": "Синхронизировать с Диска",
     "pleaseSignInToView": "Войдите, чтобы просмотреть историю",
-    "conversation": "Диалог"
+    "conversation": "Диалог",
+    "syncNow": "Синхронизировать сейчас"
   },
   "workspace": {
     "title": "Рабочая среда ИИ",

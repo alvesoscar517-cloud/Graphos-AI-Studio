@@ -384,7 +384,8 @@
     "driveFolderOpened": "เปิดโฟลเดอร์ Drive แล้ว",
     "syncFromDrive": "ซิงค์จาก Drive",
     "pleaseSignInToView": "กรุณาเข้าสู่ระบบเพื่อดูประวัติ",
-    "conversation": "บทสนทนา"
+    "conversation": "บทสนทนา",
+    "syncNow": "ซิงค์ตอนนี้"
   },
   "workspace": {
     "title": "พื้นที่ทำงาน AI",

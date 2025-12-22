@@ -1,19 +1,11 @@
 /**
- * RxDB Module Index
+ * Database Module Index
+ * 
+ * Exports Firestore database utilities and hooks.
  */
 
-// Database
-export { 
-  getDatabase, 
-  setupFirestoreSync, 
-  stopFirestoreSync,
-  getReplicationState,
-  forceSyncAll,
-  clearLocalData
-} from './database'
-
-// Schemas
-export * from './schemas'
+// Firestore utilities
+export { clearLocalData } from './firestore'
 
 // Hooks
 export * from './hooks'

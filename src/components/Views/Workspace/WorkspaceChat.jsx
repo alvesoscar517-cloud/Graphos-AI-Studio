@@ -10,7 +10,7 @@ import threeDotsAnimation from '../../../animation/Three dots loading.json'
 
 const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden, chatInput }) => {
   const { t } = useTranslation()
-  const { currentConversation, isLoading, updateConversationTitle, clearConversation } = useWorkspace()
+  const { currentConversation, messages, isLoading, updateConversationTitle, clearConversation } = useWorkspace()
   const messagesEndRef = useRef(null)
   const messagesContainerRef = useRef(null)
   const [title, setTitle] = useState('')
@@ -80,7 +80,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
   }, [currentConversation?.id])
 
   // Get last message for scroll tracking
-  const lastMessage = currentConversation?.messages?.[currentConversation?.messages?.length - 1]
+  const lastMessage = messages?.[messages?.length - 1]
   const isStreamingMessage = lastMessage?.streaming
   
   // Track if user is near bottom for auto-scroll during streaming
@@ -88,7 +88,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
 
   // Auto-scroll to bottom only for new messages, not when loading from history
   useEffect(() => {
-    if (!currentConversation?.messages?.length) return
+    if (!messages?.length) return
     
     // Skip auto-scroll on initial load from history (conversation has existing messages)
     if (isInitialLoadRef.current) {
@@ -102,7 +102,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
     
     // Auto-scroll for new messages
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [currentConversation?.messages?.length])
+  }, [messages?.length])
 
   // Auto-scroll during streaming if user is near bottom
   useEffect(() => {
@@ -221,7 +221,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
         style={{ paddingBottom: '100px', scrollbarGutter: 'stable' }}
       >
         <div className="max-w-3xl mx-auto px-4 flex flex-col gap-6 workspace-chat-content">
-          {currentConversation?.messages.length === 0 ? (
+          {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <img src="/icon/message-circle.svg" alt="Empty" className="w-12 h-12 opacity-30 mb-4 icon-invert" />
               <h3 className="text-lg font-medium text-text-primary mb-2">{t('workspace.startConversation')}</h3>
@@ -231,17 +231,17 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
             </div>
           ) : (
             <>
-              {currentConversation.messages.map((message, index) => (
+              {messages.map((message, index) => (
                 <ChatMessage 
                   key={message.id} 
                   message={message} 
-                  isLastMessage={index === currentConversation.messages.length - 1}
+                  isLastMessage={index === messages.length - 1}
                 />
               ))}
               
               {/* Show loading only when isLoading AND last message is not streaming with content */}
               {isLoading && (() => {
-                const lastMsg = currentConversation.messages[currentConversation.messages.length - 1]
+                const lastMsg = messages[messages.length - 1]
                 const isStreamingWithContent = lastMsg?.streaming && lastMsg?.content?.length > 0
                 return !isStreamingWithContent
               })() && (

@@ -55,36 +55,34 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
-    // Validate note data structure
+    // Validate note data structure (simplified - RxDB adds extra fields)
     function isValidNote() {
       let data = request.resource.data;
-      return data.keys().hasAll(['userId', 'title', 'content', 'created', 'updated'])
-        && data.userId is string
+      return data.userId is string
+        && data.userId.size() > 0
         && data.title is string
         && data.content is string
         && data.content.size() < 102400; // Max 100KB
-        // Note: serverTimestamp and _deleted are auto-added by RxDB replication
     }
     
-    // Validate conversation data structure
+    // Validate conversation data structure (simplified)
+    // Conversations now embed messages array directly
     function isValidConversation() {
       let data = request.resource.data;
-      return data.keys().hasAll(['userId', 'title', 'created', 'updated'])
-        && data.userId is string
+      return data.userId is string
+        && data.userId.size() > 0
         && data.title is string;
-        // Note: serverTimestamp and _deleted are auto-added by RxDB replication
     }
     
-    // Validate message data structure
+    // Validate message data structure (simplified - RxDB adds extra fields)
     function isValidMessage() {
       let data = request.resource.data;
-      return data.keys().hasAll(['conversationId', 'userId', 'role', 'content', 'timestamp'])
-        && data.conversationId is string
+      return data.conversationId is string
         && data.userId is string
+        && data.userId.size() > 0
         && data.role in ['user', 'assistant', 'system']
         && data.content is string
         && data.content.size() < 51200; // Max 50KB
-        // Note: serverTimestamp and _deleted are auto-added by RxDB replication
     }
     
     // =========================================================================
@@ -136,19 +134,26 @@ service cloud.firestore {
     // =========================================================================
     // USER MESSAGES COLLECTION (NEW - Firestore Sync)
     // Read: Allowed for owner only
-    // Write: Allowed for owner only with validation
+    // Write: Allowed for owner only
     // Requirements: 9.3, 9.4, 9.5
     // =========================================================================
     match /user_messages/{messageId} {
-      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Allow read if authenticated and userId matches
+      allow read: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+      
+      // Allow create if authenticated and userId matches - simplified validation
       allow create: if isAuthenticated() 
-        && request.resource.data.userId == request.auth.uid
-        && isValidMessage();
+        && request.resource.data.userId == request.auth.uid;
+      
+      // Allow update if authenticated and userId matches
       allow update: if isAuthenticated() 
         && resource.data.userId == request.auth.uid
-        && request.resource.data.userId == request.auth.uid
-        && isValidMessage();
-      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+        && request.resource.data.userId == request.auth.uid;
+      
+      // Allow delete if authenticated and userId matches
+      allow delete: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
     }
     
     // =========================================================================

@@ -83,10 +83,9 @@ export {
   useRevokeAllSessions,
 } from './useUser'
 
-// RxDB hooks (new sync system) - re-exported from db/hooks
+// Firestore hooks - re-exported from db/hooks for convenience
 export {
-  useNotes as useRxNotes,
-  useConversations as useRxConversations,
-  useMessages as useRxMessages,
-  useProfiles as useRxProfiles,
+  useNotes as useFirestoreNotes,
+  useConversations as useFirestoreConversations,
+  useMessages as useFirestoreMessages,
 } from '../../db/hooks'

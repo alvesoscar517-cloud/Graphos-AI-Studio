@@ -1,12 +1,12 @@
 /**
  * Workspace Query Hook
  * 
- * Re-exports from RxDB hooks for backward compatibility.
+ * Re-exports from Firestore hooks for backward compatibility.
  * New code should use WorkspaceContext or import directly from db/hooks.
  */
 
 import { 
-  useConversations as useConversationsRx, 
+  useConversations as useConversationsFirestore, 
   useConversationMutations,
   useMessageMutations 
 } from '../../db/hooks'
@@ -18,13 +18,13 @@ import { useAuth } from '../../stores/authStore'
 export function useConversations() {
   const { user } = useAuth()
   const userId = user?.userId || user?.uid || user?.id
-  const { conversations, loading, error } = useConversationsRx(userId)
+  const { conversations, loading, error } = useConversationsFirestore(userId)
   
   return {
     data: conversations,
     isLoading: loading,
     error,
-    refetch: () => {} // RxDB auto-updates
+    refetch: () => {} // Firestore auto-updates
   }
 }
 

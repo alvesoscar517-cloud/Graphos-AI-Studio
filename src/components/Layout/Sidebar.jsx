@@ -94,9 +94,9 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
       source: 'aistudio'
     }))
 
-    // Map conversations to unified format (only those with actual messages)
+    // Map conversations to unified format
+    // Show all conversations (messages are loaded separately)
     const conversationItems = conversations
-      .filter(conv => conv.messages && conv.messages.length > 0)
       .map(conv => ({
         id: conv.id,
         title: conv.title || 'New Chat',

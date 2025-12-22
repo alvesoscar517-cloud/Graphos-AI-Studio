@@ -1,11 +1,11 @@
 /**
  * Notes Query Hooks
  * 
- * Re-exports from RxDB hooks for backward compatibility.
+ * Re-exports from Firestore hooks for backward compatibility.
  * New code should use NotesContext or import directly from db/hooks.
  */
 
-import { useNotes as useNotesRx, useNote as useNoteRx, useNoteMutations } from '../../db/hooks'
+import { useNotes as useNotesFirestore, useNoteMutations } from '../../db/hooks'
 import { useAuth } from '../../stores/authStore'
 import { useMemo } from 'react'
 
@@ -25,13 +25,13 @@ const hasContent = (note) => {
 export function useNotes(options = {}) {
   const { user } = useAuth()
   const userId = user?.userId || user?.uid || user?.id
-  const { notes, loading, error } = useNotesRx(userId)
+  const { notes, loading, error } = useNotesFirestore(userId)
   
   return {
     data: notes,
     isLoading: loading,
     error,
-    refetch: () => {} // RxDB auto-updates
+    refetch: () => {} // Firestore auto-updates
   }
 }
 
@@ -102,7 +102,7 @@ export function useDeleteNote() {
 }
 
 /**
- * Sync notes - no-op with RxDB (auto-syncs)
+ * Sync notes - no-op with Firestore (auto-syncs)
  */
 export function useSyncNotes() {
   return {

@@ -384,7 +384,8 @@
     "driveFolderOpened": "Driveフォルダを開きました",
     "syncFromDrive": "Driveから同期",
     "pleaseSignInToView": "履歴を表示するにはサインインしてください",
-    "conversation": "会話"
+    "conversation": "会話",
+    "syncNow": "今すぐ同期"
   },
   "workspace": {
     "title": "AIワークスペース",

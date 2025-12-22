@@ -1,30 +1,30 @@
 /**
- * RxDB Hooks Index
+ * Database Hooks Index
+ * 
+ * Exports Firestore hooks for Notes and Conversations.
+ * Profile uses API (not included here).
  */
 
-// Core hooks
+// Firestore hooks for Notes
 export { 
-  useDatabase, 
-  useRxDBSync, 
-  useRxCollection, 
-  useRxDocument, 
-  useRxMutations,
-  clearLocalData,
-  setupFirestoreSync,
-  stopFirestoreSync
-} from './useRxDB'
+  useNotes, 
+  useNoteMutations 
+} from './useFirestore'
 
-// Notes hooks
-export { useNotes, useNote, useNoteMutations } from './useNotes'
-
-// Conversations hooks
+// Firestore hooks for Conversations and Messages
 export { 
   useConversations, 
-  useConversation, 
   useConversationMutations,
   useMessages,
   useMessageMutations
-} from './useConversations'
+} from './useFirestore'
 
-// Profiles hooks
-export { useProfiles, useProfile, useDefaultProfile, useProfileMutations } from './useProfiles'
+// Sync hook (no-op for Firestore)
+export { useFirestoreSync as useRxDBSync } from './useFirestore'
+
+// Clear data utility
+export { clearLocalData } from './useFirestore'
+
+// Legacy aliases for backward compatibility
+export { useNotes as useNote } from './useFirestore'
+export { useConversations as useConversation } from './useFirestore'

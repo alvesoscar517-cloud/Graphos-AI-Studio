@@ -384,7 +384,8 @@
     "driveFolderOpened": "Drive फ़ोल्डर खोला गया",
     "syncFromDrive": "Drive से सिंक करें",
     "pleaseSignInToView": "इतिहास देखने के लिए कृपया साइन इन करें",
-    "conversation": "वार्तालाप"
+    "conversation": "वार्तालाप",
+    "syncNow": "अभी सिंक करें"
   },
   "workspace": {
     "title": "AI वर्कस्पेस",

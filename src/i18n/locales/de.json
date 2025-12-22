@@ -384,7 +384,8 @@
     "driveFolderOpened": "Drive-Ordner geöffnet",
     "syncFromDrive": "Von Drive synchronisieren",
     "pleaseSignInToView": "Bitte anmelden, um den Verlauf zu sehen",
-    "conversation": "Unterhaltung"
+    "conversation": "Unterhaltung",
+    "syncNow": "Jetzt synchronisieren"
   },
   "workspace": {
     "title": "KI-Arbeitsbereich",

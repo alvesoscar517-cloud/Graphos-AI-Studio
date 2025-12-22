@@ -113,9 +113,10 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
   }, [t])
 
   // Check if conversation has meaningful content
+  // With Firestore, messages are loaded separately, so just check if conversation exists
   const conversationHasContent = useCallback((conv) => {
     if (!conv) return false
-    return conv.messages && conv.messages.length > 0
+    return true // All conversations are valid, messages loaded on demand
   }, [])
 
   const allItems = useMemo(() => {

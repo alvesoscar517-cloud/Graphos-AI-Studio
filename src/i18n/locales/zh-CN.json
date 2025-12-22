@@ -384,7 +384,8 @@
     "driveFolderOpened": "Drive 文件夹已打开",
     "syncFromDrive": "从 Drive 同步",
     "pleaseSignInToView": "请登录以查看历史记录",
-    "conversation": "对话"
+    "conversation": "对话",
+    "syncNow": "立即同步"
   },
   "workspace": {
     "title": "AI 工作区",

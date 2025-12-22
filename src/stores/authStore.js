@@ -860,15 +860,15 @@ export const useAuthStore = create(
             const { authMethod, user } = get()
             const userId = user?.userId || user?.uid || user?.id
             
-            // Clear RxDB local data for this user BEFORE signing out
+            // Clear local data for this user BEFORE signing out
             // This ensures data isolation between users
             if (userId) {
               try {
-                const { clearLocalData } = await import('../db/database')
+                const { clearLocalData } = await import('../db/firestore')
                 await clearLocalData()
-                logger.log('[AUTH] Cleared RxDB data for user:', userId)
+                logger.log('[AUTH] Cleared local data for user:', userId)
               } catch (e) {
-                logger.warn('Auth', 'Failed to clear RxDB data:', e.message)
+                logger.warn('Auth', 'Failed to clear local data:', e.message)
               }
             }
             

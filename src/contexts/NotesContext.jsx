@@ -1,21 +1,16 @@
 /**
- * Notes Context with RxDB
+ * Notes Context with Firestore
  * 
- * Simplified notes management using RxDB for offline-first data
- * with automatic Firestore sync.
+ * Notes management using Firestore for real-time sync.
  */
 
 import { logger } from '../utils/logger'
 import { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useAuth } from '../stores/authStore'
 import { useNotesStore } from '../stores/notesStore'
-import { 
-  useNotes as useNotesRx, 
-  useNoteMutations,
-  useRxDBSync 
-} from '../db/hooks'
+import { useNotes as useNotesFirestore, useNoteMutations } from '../db/hooks'
 
-const NotesContext = createContext()
+const NotesContext = createContext(null)
 
 export const useNotes = () => {
   const context = useContext(NotesContext)
@@ -38,14 +33,11 @@ export const NotesProvider = ({ children }) => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth()
   const prevUserRef = useRef(null)
   
-  // Get userId for RxDB
-  const userId = user?.userId || user?.uid || user?.id
+  // Get userId - prefer Firebase Auth uid for Firestore compatibility
+  const userId = user?.uid || user?.userId || user?.id
   
-  // Setup RxDB sync
-  useRxDBSync(userId)
-  
-  // Get notes from RxDB (reactive)
-  const { notes: rxNotes, loading: notesLoading } = useNotesRx(userId)
+  // Get notes from Firestore (reactive)
+  const { notes: firestoreNotes, loading: notesLoading } = useNotesFirestore(userId)
   const { createNote, updateNote, saveNote, deleteNote: removeNote, deleteNotes } = useNoteMutations()
   
   // Current note state
@@ -62,8 +54,8 @@ export const NotesProvider = ({ children }) => {
   // Current note derived from notes list
   const currentNote = useMemo(() => {
     if (!currentNoteId) return null
-    return rxNotes.find(n => n.id === currentNoteId) || null
-  }, [currentNoteId, rxNotes])
+    return firestoreNotes.find(n => n.id === currentNoteId) || null
+  }, [currentNoteId, firestoreNotes])
 
   // Clear notes when user changes
   useEffect(() => {
@@ -97,11 +89,14 @@ export const NotesProvider = ({ children }) => {
         isArchived: false
       })
       
-      const noteObj = newNote.toJSON ? newNote.toJSON() : newNote
-      setCurrentNoteId(noteObj.id)
+      if (!newNote) {
+        logger.warn('Notes', 'Failed to create note')
+        return null
+      }
       
-      logger.log('[NOTES] Created new note:', noteObj.id)
-      return noteObj
+      setCurrentNoteId(newNote.id)
+      logger.log('[NOTES] Created new note:', newNote.id)
+      return newNote
     } catch (err) {
       logger.error('Notes', 'Failed to create note', err)
       return null
@@ -126,9 +121,12 @@ export const NotesProvider = ({ children }) => {
     
     try {
       const saved = await saveNote(userId, noteData)
-      const noteObj = saved.toJSON ? saved.toJSON() : saved
-      logger.log('[NOTES] Saved note:', noteObj.id)
-      return noteObj
+      if (!saved) {
+        logger.warn('Notes', 'Failed to save note')
+        return null
+      }
+      logger.log('[NOTES] Saved note:', saved.id)
+      return saved
     } catch (err) {
       logger.error('Notes', 'Failed to save note', err)
       return null
@@ -141,8 +139,7 @@ export const NotesProvider = ({ children }) => {
       await removeNote(noteId)
       
       if (currentNoteId === noteId) {
-        // Select next note or null
-        const remainingNotes = rxNotes.filter(n => n.id !== noteId)
+        const remainingNotes = firestoreNotes.filter(n => n.id !== noteId)
         setCurrentNoteId(remainingNotes.length > 0 ? remainingNotes[0].id : null)
       }
       
@@ -150,7 +147,7 @@ export const NotesProvider = ({ children }) => {
     } catch (err) {
       logger.error('Notes', 'Failed to delete note', err)
     }
-  }, [removeNote, currentNoteId, rxNotes, setCurrentNoteId])
+  }, [removeNote, currentNoteId, firestoreNotes, setCurrentNoteId])
 
   // Delete multiple notes
   const deleteMultipleNotes = useCallback(async (noteIds) => {
@@ -158,7 +155,7 @@ export const NotesProvider = ({ children }) => {
       await deleteNotes(noteIds)
       
       if (noteIds.includes(currentNoteId)) {
-        const remainingNotes = rxNotes.filter(n => !noteIds.includes(n.id))
+        const remainingNotes = firestoreNotes.filter(n => !noteIds.includes(n.id))
         setCurrentNoteId(remainingNotes.length > 0 ? remainingNotes[0].id : null)
       }
       
@@ -166,7 +163,7 @@ export const NotesProvider = ({ children }) => {
     } catch (err) {
       logger.error('Notes', 'Failed to delete notes', err)
     }
-  }, [deleteNotes, currentNoteId, rxNotes, setCurrentNoteId])
+  }, [deleteNotes, currentNoteId, firestoreNotes, setCurrentNoteId])
 
   // Load note
   const loadNote = useCallback((noteId) => {
@@ -175,48 +172,48 @@ export const NotesProvider = ({ children }) => {
 
   // Toggle pin
   const togglePin = useCallback(async (noteId) => {
-    const note = rxNotes.find(n => n.id === noteId)
+    const note = firestoreNotes.find(n => n.id === noteId)
     if (note) {
       await updateNote(noteId, { isPinned: !note.isPinned })
     }
-  }, [rxNotes, updateNote])
+  }, [firestoreNotes, updateNote])
 
   // Toggle archive
   const toggleArchive = useCallback(async (noteId) => {
-    const note = rxNotes.find(n => n.id === noteId)
+    const note = firestoreNotes.find(n => n.id === noteId)
     if (note) {
       await updateNote(noteId, { isArchived: !note.isArchived })
     }
-  }, [rxNotes, updateNote])
+  }, [firestoreNotes, updateNote])
 
   // Get visible notes (most recent with content)
   const getVisibleNotes = useCallback(() => {
     const MAX_VISIBLE = 5
-    return rxNotes
+    return firestoreNotes
       .filter(n => hasContent(n) && !n.isArchived)
       .sort((a, b) => new Date(b.updated) - new Date(a.updated))
       .slice(0, MAX_VISIBLE)
-  }, [rxNotes])
+  }, [firestoreNotes])
 
   // Filter notes
   const pinnedNotes = useMemo(() => 
-    rxNotes.filter(n => n.isPinned && !n.isArchived), 
-    [rxNotes]
+    firestoreNotes.filter(n => n.isPinned && !n.isArchived), 
+    [firestoreNotes]
   )
   
   const archivedNotes = useMemo(() => 
-    rxNotes.filter(n => n.isArchived), 
-    [rxNotes]
+    firestoreNotes.filter(n => n.isArchived), 
+    [firestoreNotes]
   )
   
   const activeNotes = useMemo(() => 
-    rxNotes.filter(n => !n.isArchived), 
-    [rxNotes]
+    firestoreNotes.filter(n => !n.isArchived), 
+    [firestoreNotes]
   )
 
   const value = {
     // Data
-    notes: rxNotes,
+    notes: firestoreNotes,
     activeNotes,
     pinnedNotes,
     archivedNotes,
@@ -236,8 +233,10 @@ export const NotesProvider = ({ children }) => {
     toggleArchive,
     getVisibleNotes,
     
-    // Compatibility
-    refetch: () => {}, // RxDB auto-updates
+    // Compatibility - Firestore auto-syncs, these are no-ops
+    syncNotes: async () => { logger.log('[NOTES] Sync requested - Firestore auto-syncs') },
+    refetch: () => {},
+    needsReauth: false,
     hasContent
   }
 

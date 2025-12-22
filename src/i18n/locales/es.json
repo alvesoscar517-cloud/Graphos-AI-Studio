@@ -384,7 +384,8 @@
     "driveFolderOpened": "Carpeta de Drive abierta",
     "syncFromDrive": "Sincronizar desde Drive",
     "pleaseSignInToView": "Por favor inicie sesión para ver el historial",
-    "conversation": "Conversación"
+    "conversation": "Conversación",
+    "syncNow": "Sincronizar ahora"
   },
   "workspace": {
     "title": "Espacio de trabajo IA",

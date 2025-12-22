@@ -383,7 +383,8 @@
     "driveFolderOpened": "Đã mở thư mục Drive",
     "syncFromDrive": "Đồng bộ từ Drive",
     "pleaseSignInToView": "Vui lòng đăng nhập để xem lịch sử",
-    "conversation": "Cuộc trò chuyện"
+    "conversation": "Cuộc trò chuyện",
+    "syncNow": "Đồng bộ ngay"
   },
   "workspace": {
     "title": "Không gian làm việc AI",

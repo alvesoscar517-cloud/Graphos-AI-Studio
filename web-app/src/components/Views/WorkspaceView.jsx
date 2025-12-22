@@ -12,7 +12,7 @@ const WorkspaceView = ({
   leftSidebarHidden,
   initialHelpMode = false
 }) => {
-  const { currentConversation, sendMessage, isLoading, clearConversation, modelSettings, updateModelSettings } = useWorkspace()
+  const { currentConversation, messages, sendMessage, isLoading, clearConversation, modelSettings, updateModelSettings } = useWorkspace()
   const [isTransitioning, setIsTransitioning] = useState(false)
 
   const handleModelChange = useCallback((modelId) => {
@@ -39,8 +39,8 @@ const WorkspaceView = ({
     }
   }, [currentConversation, sendMessage])
 
-  // Show default view when no conversation OR conversation has no messages
-  const showDefaultView = !currentConversation || currentConversation.messages.length === 0
+  // Show default view when no conversation OR no messages
+  const showDefaultView = !currentConversation || messages.length === 0
 
   return (
     <div className={cn(

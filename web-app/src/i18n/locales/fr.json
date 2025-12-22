@@ -384,7 +384,8 @@
     "driveFolderOpened": "Dossier Drive ouvert",
     "syncFromDrive": "Synchroniser depuis Drive",
     "pleaseSignInToView": "Veuillez vous connecter pour voir l'historique",
-    "conversation": "Conversation"
+    "conversation": "Conversation",
+    "syncNow": "Synchroniser maintenant"
   },
   "workspace": {
     "title": "Espace de travail IA",

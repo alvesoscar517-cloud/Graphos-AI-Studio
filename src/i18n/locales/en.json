@@ -384,7 +384,8 @@
     "driveFolderOpened": "Drive folder opened",
     "syncFromDrive": "Sync from Drive",
     "pleaseSignInToView": "Please sign in to view history",
-    "conversation": "Conversation"
+    "conversation": "Conversation",
+    "syncNow": "Sync Now"
   },
   "workspace": {
     "title": "AI Workspace",
