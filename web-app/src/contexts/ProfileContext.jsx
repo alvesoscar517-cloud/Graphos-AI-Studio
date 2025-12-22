@@ -1,17 +1,18 @@
 /**
- * Profile Context (Refactored to use TanStack Query)
+ * Profile Context with RxDB
  * 
- * This context now uses TanStack Query hooks internally for better caching
- * and real-time updates while maintaining backward compatibility.
- * 
- * New code should import directly from '@/hooks/queries/useProfiles'
+ * Simplified profile management using RxDB for offline-first data
+ * with automatic Firestore sync.
  */
 
-import { logger } from '@/utils/logger'
-import { createContext, useContext, useCallback, useMemo, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import { useProfilesQuery, useCreateProfile, useUpdateProfile, useDeleteProfile } from '../hooks/queries/useProfiles'
-import { queryKeys } from '../lib/queryKeys'
+import { logger } from '../utils/logger'
+import { createContext, useContext, useCallback, useMemo, useState, useEffect } from 'react'
+import { useAuth } from '../stores/authStore'
+import { 
+  useProfiles as useProfilesRx, 
+  useProfileMutations,
+  useRxDBSync 
+} from '../db/hooks'
 import { 
   setActiveProfile as setStorageActiveProfile, 
   getActiveProfile as getStorageActiveProfile,
@@ -29,43 +30,58 @@ export const useProfiles = () => {
 }
 
 export const ProfileProvider = ({ children }) => {
-  const queryClient = useQueryClient()
+  const { user } = useAuth()
   
-  // Track active profile ID in state to trigger re-renders
+  // Get userId for RxDB
+  const userId = user?.userId || user?.uid || user?.id
+  
+  // Setup RxDB sync
+  useRxDBSync(userId)
+  
+  // Get profiles from RxDB (reactive)
+  const { profiles: rxProfiles, loading: profilesLoading } = useProfilesRx(userId)
+  const { createProfile, updateProfile, saveProfile, deleteProfile: removeProfile, setDefaultProfile } = useProfileMutations()
+  
+  // Track active profile ID
   const [activeProfileId, setActiveProfileId] = useState(() => getStorageActiveProfile().id)
-  
-  // Use TanStack Query for profiles
-  const { 
-    data: profiles = [], 
-    isLoading: loading, 
-    refetch 
-  } = useProfilesQuery()
-  
-  // Mutations
-  const createProfileMutation = useCreateProfile()
-  const updateProfileMutation = useUpdateProfile()
-  const deleteProfileMutation = useDeleteProfile()
 
-  // Get current profile from state + profiles array
+  // Convert RxDB profiles to expected format
+  const profiles = useMemo(() => {
+    return rxProfiles.map(p => ({
+      profile_id: p.id,
+      profile_name: p.name,
+      writing_style: p.writing_style,
+      tone: p.tone,
+      expertise: p.expertise,
+      vocabulary_preferences: p.vocabulary_preferences,
+      key_characteristics: p.key_characteristics,
+      sentence_patterns: p.sentence_patterns,
+      rewrite_instructions: p.rewrite_instructions,
+      isDefault: p.isDefault,
+      created: p.created,
+      updated: p.updated,
+      // Keep original for mutations
+      _rxdbDoc: p
+    }))
+  }, [rxProfiles])
+
+  // Get current profile
   const currentProfile = useMemo(() => {
     if (!activeProfileId) return null
     if (profiles.length === 0) {
-      // Profiles not loaded yet, but we have activeProfileId from storage
-      // Return a minimal profile object to prevent UI showing "No Profile"
       const storedProfile = getStorageActiveProfile()
       if (storedProfile.id && storedProfile.name) {
         logger.log('[PROFILE] Using stored profile while loading:', storedProfile.name)
         return {
           profile_id: storedProfile.id,
           profile_name: storedProfile.name,
-          _isPlaceholder: true // Flag to indicate this is temporary
+          _isPlaceholder: true
         }
       }
       return null
     }
     const found = profiles.find(p => p.profile_id === activeProfileId)
     if (!found && activeProfileId) {
-      // Profile was deleted or not found, clear storage
       logger.log('[PROFILE] Stored profile not found in list, clearing')
       clearActiveProfile()
       return null
@@ -73,99 +89,137 @@ export const ProfileProvider = ({ children }) => {
     return found || null
   }, [profiles, activeProfileId])
 
+  // Auto-select default profile
+  useEffect(() => {
+    if (!activeProfileId && profiles.length > 0) {
+      const defaultProfile = profiles.find(p => p.isDefault)
+      if (defaultProfile) {
+        selectProfile(defaultProfile)
+      }
+    }
+  }, [profiles, activeProfileId])
+
   // Select profile
   const selectProfile = useCallback((profile) => {
-    logger.log('[PIN] Selecting profile:', profile?.profile_name || 'None')
+    logger.log('[PROFILE] Selecting profile:', profile?.profile_name || 'None')
     
     if (profile) {
-      setStorageActiveProfile(profile.profile_id, profile.profile_name)
       setActiveProfileId(profile.profile_id)
+      setStorageActiveProfile(profile.profile_id, profile.profile_name)
     } else {
-      clearActiveProfile()
       setActiveProfileId(null)
+      clearActiveProfile()
     }
   }, [])
 
-  // Load profiles (backward compatible - now just refetches)
-  const loadProfiles = useCallback((force = false) => {
-    if (force) {
-      queryClient.invalidateQueries({ queryKey: queryKeys.profiles.all })
-    }
-    return refetch()
-  }, [queryClient, refetch])
-
-  // Invalidate cache
-  const invalidateCache = useCallback(() => {
-    logger.log('[SYNC] Invalidating profile cache...')
-    queryClient.invalidateQueries({ queryKey: queryKeys.profiles.all })
-  }, [queryClient])
-
-  // Add profile (backward compatible)
-  const addProfile = useCallback(async (profileData) => {
+  // Create new profile
+  const createNewProfile = useCallback(async (profileData) => {
+    if (!userId) return null
+    
     try {
-      const result = await createProfileMutation.mutateAsync(profileData)
-      return result
-    } catch (error) {
-      logger.error('Profile', 'Error creating profile', error)
-      throw error
-    }
-  }, [createProfileMutation])
-
-  // Remove profile (backward compatible)
-  const removeProfile = useCallback(async (profileId) => {
-    try {
-      await deleteProfileMutation.mutateAsync(profileId)
+      const newProfile = await createProfile(userId, {
+        name: profileData.profile_name || profileData.name,
+        writing_style: profileData.writing_style,
+        tone: profileData.tone,
+        expertise: profileData.expertise || [],
+        vocabulary_preferences: profileData.vocabulary_preferences,
+        key_characteristics: profileData.key_characteristics || [],
+        sentence_patterns: profileData.sentence_patterns || [],
+        rewrite_instructions: profileData.rewrite_instructions,
+        isDefault: profileData.isDefault || false
+      })
       
-      // Clear selection if deleted profile was active
-      if (activeProfileId === profileId) {
-        clearActiveProfile()
-        setActiveProfileId(null)
+      const profileObj = newProfile.toJSON ? newProfile.toJSON() : newProfile
+      logger.log('[PROFILE] Created new profile:', profileObj.id)
+      
+      return {
+        profile_id: profileObj.id,
+        profile_name: profileObj.name,
+        ...profileObj
       }
-    } catch (error) {
-      logger.error('Profile', 'Error deleting profile', error)
-      throw error
+    } catch (err) {
+      logger.error('Profile', 'Failed to create profile', err)
+      return null
     }
-  }, [deleteProfileMutation, activeProfileId])
+  }, [userId, createProfile])
 
   // Update profile
-  const updateProfile = useCallback(async (profileId, data) => {
+  const updateProfileData = useCallback(async (profileId, updates) => {
     try {
-      const result = await updateProfileMutation.mutateAsync({ profileId, data })
-      return result
-    } catch (error) {
-      logger.error('Profile', 'Error updating profile', error)
-      throw error
+      // Convert from API format to RxDB format
+      const rxdbUpdates = {
+        name: updates.profile_name || updates.name,
+        writing_style: updates.writing_style,
+        tone: updates.tone,
+        expertise: updates.expertise,
+        vocabulary_preferences: updates.vocabulary_preferences,
+        key_characteristics: updates.key_characteristics,
+        sentence_patterns: updates.sentence_patterns,
+        rewrite_instructions: updates.rewrite_instructions,
+        isDefault: updates.isDefault
+      }
+      
+      // Remove undefined values
+      Object.keys(rxdbUpdates).forEach(key => {
+        if (rxdbUpdates[key] === undefined) delete rxdbUpdates[key]
+      })
+      
+      await updateProfile(profileId, rxdbUpdates)
+      logger.log('[PROFILE] Updated profile:', profileId)
+    } catch (err) {
+      logger.error('Profile', 'Failed to update profile', err)
     }
-  }, [updateProfileMutation])
+  }, [updateProfile])
 
-  const value = useMemo(() => ({
+  // Delete profile
+  const deleteProfileById = useCallback(async (profileId) => {
+    try {
+      await removeProfile(profileId)
+      
+      if (activeProfileId === profileId) {
+        const remainingProfiles = profiles.filter(p => p.profile_id !== profileId)
+        if (remainingProfiles.length > 0) {
+          selectProfile(remainingProfiles[0])
+        } else {
+          selectProfile(null)
+        }
+      }
+      
+      logger.log('[PROFILE] Deleted profile:', profileId)
+    } catch (err) {
+      logger.error('Profile', 'Failed to delete profile', err)
+    }
+  }, [removeProfile, activeProfileId, profiles, selectProfile])
+
+  // Set as default
+  const setAsDefault = useCallback(async (profileId) => {
+    try {
+      await setDefaultProfile(userId, profileId, rxProfiles)
+      logger.log('[PROFILE] Set default profile:', profileId)
+    } catch (err) {
+      logger.error('Profile', 'Failed to set default profile', err)
+    }
+  }, [setDefaultProfile, userId, rxProfiles])
+
+  const value = {
+    // Data
     profiles,
     currentProfile,
-    loading,
-    loadProfiles,
+    loading: profilesLoading,
+    
+    // Actions
     selectProfile,
-    invalidateCache,
-    addProfile,
-    removeProfile,
-    updateProfile,
-    // Expose mutation states for UI feedback
-    isCreating: createProfileMutation.isPending,
-    isUpdating: updateProfileMutation.isPending,
-    isDeleting: deleteProfileMutation.isPending,
-  }), [
-    profiles,
-    currentProfile,
-    loading,
-    loadProfiles,
-    selectProfile,
-    invalidateCache,
-    addProfile,
-    removeProfile,
-    updateProfile,
-    createProfileMutation.isPending,
-    updateProfileMutation.isPending,
-    deleteProfileMutation.isPending,
-  ])
+    createProfile: createNewProfile,
+    updateProfile: updateProfileData,
+    deleteProfile: deleteProfileById,
+    setAsDefault,
+    
+    // Compatibility
+    refetch: () => {}, // RxDB auto-updates
+    
+    // Aliases for backward compatibility
+    setCurrentProfile: selectProfile
+  }
 
   return (
     <ProfileContext.Provider value={value}>
@@ -173,3 +227,5 @@ export const ProfileProvider = ({ children }) => {
     </ProfileContext.Provider>
   )
 }
+
+export default ProfileContext

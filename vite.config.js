@@ -20,6 +20,28 @@ export default defineConfig(({ mode }) => ({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    // Deduplicate Firebase to ensure single instance
+    dedupe: [
+      'firebase',
+      '@firebase/app',
+      '@firebase/auth',
+      '@firebase/firestore',
+      '@firebase/util',
+      '@firebase/component',
+      '@firebase/logger'
+    ]
+  },
+  optimizeDeps: {
+    // Force Vite to pre-bundle these together
+    include: [
+      'firebase/app',
+      'firebase/auth', 
+      'firebase/firestore',
+      'rxdb',
+      'rxdb/plugins/replication-firestore'
+    ],
+    // Exclude to prevent duplication
+    exclude: []
   },
   server: {
     port: 5173,

@@ -189,6 +189,25 @@ app.use(requestTimeout(30000));
 // 4. CORS
 app.use(corsMiddleware);
 
+// 4.1. Handle 431 errors (Request Header Fields Too Large)
+// This can happen before Express processes the request, so we need to catch it early
+app.use((err, req, res, next) => {
+  if (err.status === 431 || err.statusCode === 431) {
+    // Ensure CORS headers are set for error responses
+    const origin = req.get('Origin');
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    return res.status(431).json({
+      success: false,
+      error: 'Request headers too large. Please clear your browser cache and try again.',
+      code: 'HEADERS_TOO_LARGE'
+    });
+  }
+  next(err);
+});
+
 // 5. Capture raw body for webhook signature verification (MUST be before express.json)
 app.use('/webhooks/lemonsqueezy', express.raw({ type: 'application/json' }), (req, res, next) => {
   req.rawBody = req.body.toString();

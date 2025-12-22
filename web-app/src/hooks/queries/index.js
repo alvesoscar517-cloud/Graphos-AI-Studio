@@ -67,15 +67,11 @@ export {
 
 export {
   useNotes,
-  useNote,
   useCreateNote,
   useUpdateNote,
   useDeleteNote,
-  useSearchNotes,
   useVisibleNotes,
-  useCurrentNote,
   useSyncNotes,
-  useCurrentNoteWithStore,
 } from './useNotes'
 
 export {
@@ -87,37 +83,10 @@ export {
   useRevokeAllSessions,
 } from './useUser'
 
-// Firestore hooks (new sync system)
+// RxDB hooks (new sync system) - re-exported from db/hooks
 export {
-  useFirestoreNotes,
-  useFirestoreNote,
-  useCreateFirestoreNote,
-  useUpdateFirestoreNote,
-  useDeleteFirestoreNote,
-  useSearchFirestoreNotes,
-  useVisibleFirestoreNotes,
-  useSyncFirestoreNotes,
-  useGenerateNoteTitle,
-  useCurrentFirestoreNote,
-} from './useFirestoreNotes'
-
-export {
-  useFirestoreConversations,
-  useFirestoreConversation,
-  useCreateFirestoreConversation,
-  useUpdateFirestoreConversation,
-  useDeleteFirestoreConversation,
-  useRecentConversations,
-  useSearchConversations,
-} from './useFirestoreConversations'
-
-export {
-  useFirestoreMessages,
-  useInfiniteFirestoreMessages,
-  useAddFirestoreMessage,
-  useUpdateFirestoreMessage,
-  useDeleteFirestoreMessage,
-  useBatchAddMessages,
-  useMessageCount,
-  useLastMessage,
-} from './useFirestoreMessages'
+  useNotes as useRxNotes,
+  useConversations as useRxConversations,
+  useMessages as useRxMessages,
+  useProfiles as useRxProfiles,
+} from '../../db/hooks'

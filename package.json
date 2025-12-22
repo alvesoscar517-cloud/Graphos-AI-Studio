@@ -48,6 +48,7 @@
     "@tiptap/pm": "^3.13.0",
     "@tiptap/react": "^3.13.0",
     "@tiptap/starter-kit": "^3.13.0",
+    "ajv": "^8.17.1",
     "clsx": "^2.1.1",
     "docx": "^9.5.1",
     "file-saver": "^2.0.5",
@@ -72,6 +73,8 @@
     "react-window": "^2.2.3",
     "reconnecting-eventsource": "^1.6.4",
     "regenerator-runtime": "^0.14.1",
+    "rxdb": "^16.21.1",
+    "rxjs": "^7.8.2",
     "simplex-noise": "^4.0.3",
     "swr": "^2.3.7",
     "tailwind-merge": "^3.4.0",
@@ -99,5 +102,10 @@
     "tailwindcss": "^4.1.17",
     "vite": "^5.2.0",
     "vite-plugin-static-copy": "^3.1.4"
+  },
+  "overrides": {
+    "firebase": "^12.6.0",
+    "@firebase/firestore": "^4.9.2",
+    "@firebase/app": "^0.13.0"
   }
 }

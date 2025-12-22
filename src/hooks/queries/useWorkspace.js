@@ -1,157 +1,99 @@
 /**
  * Workspace Query Hook
- * TanStack Query hook for workspace/conversations management
+ * 
+ * Re-exports from RxDB hooks for backward compatibility.
+ * New code should use WorkspaceContext or import directly from db/hooks.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { queryKeys } from '@/lib/queryKeys'
+import { 
+  useConversations as useConversationsRx, 
+  useConversationMutations,
+  useMessageMutations 
+} from '../../db/hooks'
+import { useAuth } from '../../stores/authStore'
 
 /**
- * Get conversations from localStorage (client-side only)
+ * Fetch conversations for current user
  */
-function getConversationsFromStorage(userKey) {
-  try {
-    const saved = localStorage.getItem(`workspace_conversations_${userKey}`)
-    return saved ? JSON.parse(saved) : []
-  } catch {
-    return []
+export function useConversations() {
+  const { user } = useAuth()
+  const userId = user?.userId || user?.uid || user?.id
+  const { conversations, loading, error } = useConversationsRx(userId)
+  
+  return {
+    data: conversations,
+    isLoading: loading,
+    error,
+    refetch: () => {} // RxDB auto-updates
   }
-}
-
-/**
- * Save conversations to localStorage
- */
-function saveConversationsToStorage(userKey, conversations) {
-  try {
-    localStorage.setItem(`workspace_conversations_${userKey}`, JSON.stringify(conversations))
-  } catch {
-    // Ignore storage errors
-  }
-}
-
-/**
- * Fetch conversations (from localStorage)
- */
-export function useConversations(userKey) {
-  return useQuery({
-    queryKey: queryKeys.workspace.conversations(),
-    queryFn: () => getConversationsFromStorage(userKey),
-    enabled: !!userKey,
-    staleTime: Infinity, // Don't refetch automatically since it's local
-  })
 }
 
 /**
  * Create new conversation
  */
-export function useCreateConversation(userKey) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async (conversationData) => {
-      const newConversation = {
-        id: Date.now().toString(),
-        title: 'New Chat',
-        messages: [],
-        created: new Date(),
-        updated: new Date(),
-        ...conversationData,
-      }
-      return newConversation
+export function useCreateConversation() {
+  const { user } = useAuth()
+  const userId = user?.userId || user?.uid || user?.id
+  const { createConversation } = useConversationMutations()
+  
+  return {
+    mutateAsync: async (conversationData = {}) => {
+      return await createConversation(userId, conversationData)
     },
-    onSuccess: (newConversation) => {
-      queryClient.setQueryData(queryKeys.workspace.conversations(), (old = []) => {
-        const updated = [newConversation, ...old]
-        saveConversationsToStorage(userKey, updated)
-        return updated
-      })
-    },
-  })
+    mutate: (conversationData = {}) => {
+      createConversation(userId, conversationData)
+    }
+  }
 }
 
 /**
  * Update conversation
  */
-export function useUpdateConversation(userKey) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async ({ conversationId, updates }) => {
-      return { conversationId, updates }
+export function useUpdateConversation() {
+  const { updateConversation } = useConversationMutations()
+  
+  return {
+    mutateAsync: async ({ conversationId, updates }) => {
+      return await updateConversation(conversationId, updates)
     },
-    onSuccess: ({ conversationId, updates }) => {
-      queryClient.setQueryData(queryKeys.workspace.conversations(), (old = []) => {
-        const updated = old.map((c) =>
-          c.id === conversationId ? { ...c, ...updates, updated: new Date() } : c
-        )
-        saveConversationsToStorage(userKey, updated)
-        return updated
-      })
-    },
-  })
+    mutate: ({ conversationId, updates }) => {
+      updateConversation(conversationId, updates)
+    }
+  }
 }
 
 /**
  * Delete conversation
  */
-export function useDeleteConversation(userKey) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async (conversationId) => {
-      return conversationId
+export function useDeleteConversation() {
+  const { deleteConversation } = useConversationMutations()
+  
+  return {
+    mutateAsync: async (conversationId) => {
+      return await deleteConversation(conversationId)
     },
-    onMutate: async (conversationId) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.workspace.conversations() })
-
-      const previousConversations = queryClient.getQueryData(
-        queryKeys.workspace.conversations()
-      )
-
-      queryClient.setQueryData(queryKeys.workspace.conversations(), (old = []) => {
-        const updated = old.filter((c) => c.id !== conversationId)
-        saveConversationsToStorage(userKey, updated)
-        return updated
-      })
-
-      return { previousConversations }
-    },
-    onError: (err, conversationId, context) => {
-      queryClient.setQueryData(
-        queryKeys.workspace.conversations(),
-        context.previousConversations
-      )
-    },
-  })
+    mutate: (conversationId) => {
+      deleteConversation(conversationId)
+    }
+  }
 }
 
 /**
  * Add message to conversation
  */
-export function useAddMessage(userKey) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async ({ conversationId, message }) => {
-      return { conversationId, message }
+export function useAddMessage() {
+  const { user } = useAuth()
+  const userId = user?.userId || user?.uid || user?.id
+  const { addMessage } = useMessageMutations()
+  
+  return {
+    mutateAsync: async ({ conversationId, message }) => {
+      return await addMessage(conversationId, userId, message)
     },
-    onSuccess: ({ conversationId, message }) => {
-      queryClient.setQueryData(queryKeys.workspace.conversations(), (old = []) => {
-        const updated = old.map((c) => {
-          if (c.id === conversationId) {
-            return {
-              ...c,
-              messages: [...(c.messages || []), message],
-              updated: new Date(),
-            }
-          }
-          return c
-        })
-        saveConversationsToStorage(userKey, updated)
-        return updated
-      })
-    },
-  })
+    mutate: ({ conversationId, message }) => {
+      addMessage(conversationId, userId, message)
+    }
+  }
 }
 
 export default useConversations

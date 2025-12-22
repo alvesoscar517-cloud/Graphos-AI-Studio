@@ -34,8 +34,8 @@ export {
   simulateNotification
 } from './notificationService';
 
-// IndexedDB Service
-export { default as indexedDBService } from './indexedDB';
+// RxDB Database (replaces IndexedDB)
+export { getDatabase, setupFirestoreSync, clearLocalData } from '../db/database';
 
 // Analysis Cache
 export { default as analysisCache } from './analysisCache';

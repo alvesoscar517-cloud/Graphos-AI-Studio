@@ -1,24 +1,19 @@
 /**
- * Notes Context (Refactored to use TanStack Query with Firestore)
+ * Notes Context with RxDB
  * 
- * This context now uses Firestore hooks for offline-first sync.
- * New code should import directly from '@/hooks/queries/useFirestoreNotes'
+ * Simplified notes management using RxDB for offline-first data
+ * with automatic Firestore sync.
  */
 
-import { logger } from '@/utils/logger'
+import { logger } from '../utils/logger'
 import { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import { 
-  useFirestoreNotes as useNotesQuery, 
-  useCreateFirestoreNote as useCreateNote, 
-  useUpdateFirestoreNote as useUpdateNote, 
-  useDeleteFirestoreNote as useDeleteNote,
-  useSyncFirestoreNotes as useSyncNotes,
-} from '../hooks/queries/useFirestoreNotes'
-import { queryKeys } from '../lib/queryKeys'
 import { useAuth } from '../stores/authStore'
 import { useNotesStore } from '../stores/notesStore'
-import { logError } from '../utils/errors'
+import { 
+  useNotes as useNotesRx, 
+  useNoteMutations,
+  useRxDBSync 
+} from '../db/hooks'
 
 const NotesContext = createContext()
 
@@ -30,13 +25,10 @@ export const useNotes = () => {
   return context
 }
 
-const MAX_VISIBLE_NOTES = 5
-
 // Check if note has meaningful content
 const hasContent = (note) => {
   if (!note) return false
   let content = note.content?.trim() || ''
-  // Strip HTML tags to check for actual text content
   const plainText = content.replace(/<[^>]*>/g, '').trim()
   const title = note.title?.trim() || ''
   return plainText.length > 0 || (title.length > 0 && title !== 'Untitled')
@@ -44,159 +36,216 @@ const hasContent = (note) => {
 
 export const NotesProvider = ({ children }) => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth()
-  const queryClient = useQueryClient()
   const prevUserRef = useRef(null)
   
-  // Current note state - sync with Zustand store
-  const [currentNoteId, setCurrentNoteIdLocal] = useState(null)
-  const [needsReauth, setNeedsReauth] = useState(false)
+  // Get userId for RxDB
+  const userId = user?.userId || user?.uid || user?.id
   
-  // Get store action once - stable reference
+  // Setup RxDB sync
+  useRxDBSync(userId)
+  
+  // Get notes from RxDB (reactive)
+  const { notes: rxNotes, loading: notesLoading } = useNotesRx(userId)
+  const { createNote, updateNote, saveNote, deleteNote: removeNote, deleteNotes } = useNoteMutations()
+  
+  // Current note state
+  const [currentNoteId, setCurrentNoteIdLocal] = useState(null)
+  
+  // Sync with Zustand store
   const setStoreNoteId = useNotesStore.getState().setCurrentNoteId
   
-  // Wrapper to sync both local state and Zustand store
   const setCurrentNoteId = useCallback((id) => {
     setCurrentNoteIdLocal(id)
     setStoreNoteId(id)
   }, [setStoreNoteId])
-  
-  // TanStack Query hooks
-  const { data: notes = [], isLoading: loading, refetch } = useNotesQuery({
-    enabled: !authLoading && isAuthenticated,
-  })
-  
-  const createNoteMutation = useCreateNote()
-  const updateNoteMutation = useUpdateNote()
-  const deleteNoteMutation = useDeleteNote()
-  const syncNotesMutation = useSyncNotes()
 
   // Current note derived from notes list
   const currentNote = useMemo(() => {
     if (!currentNoteId) return null
-    return notes.find(n => n.id === currentNoteId) || null
-  }, [currentNoteId, notes])
+    return rxNotes.find(n => n.id === currentNoteId) || null
+  }, [currentNoteId, rxNotes])
 
-  // Clear notes when user changes or logs out
+  // Clear notes when user changes
   useEffect(() => {
     if (authLoading) return
 
-    const prevUser = prevUserRef.current
-    const currentUserId = user?.email || user?.id
-    const prevUserId = prevUser?.email || prevUser?.id
-
-    // Detect user change
-    if (prevUserId && prevUserId !== currentUserId) {
+    const prevUserId = prevUserRef.current
+    
+    if (prevUserId && prevUserId !== userId) {
       logger.log('[SECURITY] User changed, clearing notes data...')
       setCurrentNoteId(null)
-      setNeedsReauth(false)
-      queryClient.removeQueries({ queryKey: queryKeys.notes.all })
     }
 
-    // User logged out
-    if (!isAuthenticated && prevUser) {
+    if (!isAuthenticated && prevUserRef.current) {
       setCurrentNoteId(null)
-      setNeedsReauth(false)
-      queryClient.removeQueries({ queryKey: queryKeys.notes.all })
     }
 
-    prevUserRef.current = user
-  }, [user, isAuthenticated, authLoading, queryClient])
+    prevUserRef.current = userId
+  }, [userId, isAuthenticated, authLoading, setCurrentNoteId])
 
-  // Create note - title will be set by component using i18n
-  const createNote = useCallback(() => {
-    const newNote = {
-      id: Date.now().toString(),
-      title: '', // Empty title, component will display translated "Untitled"
-      content: '',
-      type: 'Chat prompt',
-      updated: new Date(),
-      titleGenerated: false,
-      userEditedTitle: false,
+  // Create new note
+  const createNewNote = useCallback(async (noteData = {}) => {
+    if (!userId) return null
+    
+    try {
+      const newNote = await createNote(userId, {
+        title: noteData.title || 'Untitled',
+        content: noteData.content || '',
+        tags: noteData.tags || [],
+        folder: noteData.folder || null,
+        isPinned: false,
+        isArchived: false
+      })
+      
+      const noteObj = newNote.toJSON ? newNote.toJSON() : newNote
+      setCurrentNoteId(noteObj.id)
+      
+      logger.log('[NOTES] Created new note:', noteObj.id)
+      return noteObj
+    } catch (err) {
+      logger.error('Notes', 'Failed to create note', err)
+      return null
     }
-    
-    // Optimistically add to cache
-    queryClient.setQueryData(queryKeys.notes.list(), (old = []) => [...old, newNote])
-    setCurrentNoteId(newNote.id)
-    
-    return newNote
-  }, [queryClient])
+  }, [userId, createNote, setCurrentNoteId])
 
   // Update note
-  const updateNote = useCallback((id, updates, isUserTitleEdit = false) => {
-    updateNoteMutation.mutate({ noteId: id, data: updates, isUserTitleEdit })
-  }, [updateNoteMutation])
+  const updateNoteContent = useCallback(async (noteId, updates) => {
+    if (!noteId) return
+    
+    try {
+      await updateNote(noteId, updates)
+      logger.log('[NOTES] Updated note:', noteId)
+    } catch (err) {
+      logger.error('Notes', 'Failed to update note', err)
+    }
+  }, [updateNote])
+
+  // Save note (upsert)
+  const saveNoteData = useCallback(async (noteData) => {
+    if (!userId) return null
+    
+    try {
+      const saved = await saveNote(userId, noteData)
+      const noteObj = saved.toJSON ? saved.toJSON() : saved
+      logger.log('[NOTES] Saved note:', noteObj.id)
+      return noteObj
+    } catch (err) {
+      logger.error('Notes', 'Failed to save note', err)
+      return null
+    }
+  }, [userId, saveNote])
 
   // Delete note
-  const deleteNote = useCallback(async (id) => {
-    await deleteNoteMutation.mutateAsync(id)
-    
-    if (currentNoteId === id) {
-      const remaining = notes.filter(n => n.id !== id && hasContent(n))
-      setCurrentNoteId(remaining.length > 0 ? remaining[0].id : null)
+  const deleteNoteById = useCallback(async (noteId) => {
+    try {
+      await removeNote(noteId)
+      
+      if (currentNoteId === noteId) {
+        // Select next note or null
+        const remainingNotes = rxNotes.filter(n => n.id !== noteId)
+        setCurrentNoteId(remainingNotes.length > 0 ? remainingNotes[0].id : null)
+      }
+      
+      logger.log('[NOTES] Deleted note:', noteId)
+    } catch (err) {
+      logger.error('Notes', 'Failed to delete note', err)
     }
-  }, [deleteNoteMutation, currentNoteId, notes])
+  }, [removeNote, currentNoteId, rxNotes, setCurrentNoteId])
+
+  // Delete multiple notes
+  const deleteMultipleNotes = useCallback(async (noteIds) => {
+    try {
+      await deleteNotes(noteIds)
+      
+      if (noteIds.includes(currentNoteId)) {
+        const remainingNotes = rxNotes.filter(n => !noteIds.includes(n.id))
+        setCurrentNoteId(remainingNotes.length > 0 ? remainingNotes[0].id : null)
+      }
+      
+      logger.log('[NOTES] Deleted multiple notes:', noteIds.length)
+    } catch (err) {
+      logger.error('Notes', 'Failed to delete notes', err)
+    }
+  }, [deleteNotes, currentNoteId, rxNotes, setCurrentNoteId])
 
   // Load note
-  const loadNote = useCallback((id) => {
-    const note = notes.find(n => n.id === id)
+  const loadNote = useCallback((noteId) => {
+    setCurrentNoteId(noteId)
+  }, [setCurrentNoteId])
+
+  // Toggle pin
+  const togglePin = useCallback(async (noteId) => {
+    const note = rxNotes.find(n => n.id === noteId)
     if (note) {
-      setCurrentNoteId(id)
+      await updateNote(noteId, { isPinned: !note.isPinned })
     }
-  }, [notes])
+  }, [rxNotes, updateNote])
 
-  // Get visible notes
+  // Toggle archive
+  const toggleArchive = useCallback(async (noteId) => {
+    const note = rxNotes.find(n => n.id === noteId)
+    if (note) {
+      await updateNote(noteId, { isArchived: !note.isArchived })
+    }
+  }, [rxNotes, updateNote])
+
+  // Get visible notes (most recent with content)
   const getVisibleNotes = useCallback(() => {
-    return notes
-      .filter(n => hasContent(n))
+    const MAX_VISIBLE = 5
+    return rxNotes
+      .filter(n => hasContent(n) && !n.isArchived)
       .sort((a, b) => new Date(b.updated) - new Date(a.updated))
-      .slice(0, MAX_VISIBLE_NOTES)
-  }, [notes])
+      .slice(0, MAX_VISIBLE)
+  }, [rxNotes])
 
-  // Sync notes from Firestore (force refresh)
-  const syncNotes = useCallback(async () => {
-    try {
-      await syncNotesMutation.mutateAsync()
-      return true
-    } catch (error) {
-      logError(error, { context: 'syncNotes' })
-      throw error
-    }
-  }, [syncNotesMutation])
+  // Filter notes
+  const pinnedNotes = useMemo(() => 
+    rxNotes.filter(n => n.isPinned && !n.isArchived), 
+    [rxNotes]
+  )
+  
+  const archivedNotes = useMemo(() => 
+    rxNotes.filter(n => n.isArchived), 
+    [rxNotes]
+  )
+  
+  const activeNotes = useMemo(() => 
+    rxNotes.filter(n => !n.isArchived), 
+    [rxNotes]
+  )
 
-
-
-  const value = useMemo(() => ({
-    notes,
+  const value = {
+    // Data
+    notes: rxNotes,
+    activeNotes,
+    pinnedNotes,
+    archivedNotes,
     currentNote,
-    loading,
-    needsReauth,
-    createNote,
-    updateNote,
-    deleteNote,
+    currentNoteId,
+    loading: notesLoading || authLoading,
+    
+    // Actions
+    createNote: createNewNote,
+    updateNote: updateNoteContent,
+    saveNote: saveNoteData,
+    deleteNote: deleteNoteById,
+    deleteNotes: deleteMultipleNotes,
     loadNote,
+    setCurrentNoteId,
+    togglePin,
+    toggleArchive,
     getVisibleNotes,
-    syncNotes,
-    // Expose mutation states
-    isCreating: createNoteMutation.isPending,
-    isUpdating: updateNoteMutation.isPending,
-    isDeleting: deleteNoteMutation.isPending,
-    isSyncing: syncNotesMutation.isPending,
-  }), [
-    notes,
-    currentNote,
-    loading,
-    needsReauth,
-    createNote,
-    updateNote,
-    deleteNote,
-    loadNote,
-    getVisibleNotes,
-    syncNotes,
-    createNoteMutation.isPending,
-    updateNoteMutation.isPending,
-    deleteNoteMutation.isPending,
-    syncNotesMutation.isPending,
-  ])
+    
+    // Compatibility
+    refetch: () => {}, // RxDB auto-updates
+    hasContent
+  }
 
-  return <NotesContext.Provider value={value}>{children}</NotesContext.Provider>
+  return (
+    <NotesContext.Provider value={value}>
+      {children}
+    </NotesContext.Provider>
+  )
 }
+
+export default NotesContext

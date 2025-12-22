@@ -63,6 +63,7 @@ service cloud.firestore {
         && data.title is string
         && data.content is string
         && data.content.size() < 102400; // Max 100KB
+        // Note: serverTimestamp and _deleted are auto-added by RxDB replication
     }
     
     // Validate conversation data structure
@@ -71,6 +72,7 @@ service cloud.firestore {
       return data.keys().hasAll(['userId', 'title', 'created', 'updated'])
         && data.userId is string
         && data.title is string;
+        // Note: serverTimestamp and _deleted are auto-added by RxDB replication
     }
     
     // Validate message data structure
@@ -79,9 +81,10 @@ service cloud.firestore {
       return data.keys().hasAll(['conversationId', 'userId', 'role', 'content', 'timestamp'])
         && data.conversationId is string
         && data.userId is string
-        && data.role in ['user', 'assistant']
+        && data.role in ['user', 'assistant', 'system']
         && data.content is string
         && data.content.size() < 51200; // Max 50KB
+        // Note: serverTimestamp and _deleted are auto-added by RxDB replication
     }
     
     // =========================================================================
@@ -145,6 +148,20 @@ service cloud.firestore {
         && resource.data.userId == request.auth.uid
         && request.resource.data.userId == request.auth.uid
         && isValidMessage();
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // =========================================================================
+    // USER PROFILES COLLECTION (NEW - Firestore Sync)
+    // Read: Allowed for owner only
+    // Write: Allowed for owner only
+    // =========================================================================
+    match /user_profiles/{profileId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid;
       allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
     

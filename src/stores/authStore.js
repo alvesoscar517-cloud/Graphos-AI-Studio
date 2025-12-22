@@ -860,15 +860,15 @@ export const useAuthStore = create(
             const { authMethod, user } = get()
             const userId = user?.userId || user?.uid || user?.id
             
-            // Clear IndexedDB data for this user BEFORE signing out
+            // Clear RxDB local data for this user BEFORE signing out
             // This ensures data isolation between users
             if (userId) {
               try {
-                const { clearAllUserData } = await import('../services/indexedDB')
-                await clearAllUserData(userId)
-                logger.log('[AUTH] Cleared IndexedDB data for user:', userId)
+                const { clearLocalData } = await import('../db/database')
+                await clearLocalData()
+                logger.log('[AUTH] Cleared RxDB data for user:', userId)
               } catch (e) {
-                logger.warn('Auth', 'Failed to clear IndexedDB data:', e.message)
+                logger.warn('Auth', 'Failed to clear RxDB data:', e.message)
               }
             }
             

@@ -33,12 +33,30 @@ const REQUIRED_INDEXES = [
       .limit(1)
   },
   {
+    name: 'user_notes_by_serverTimestamp',
+    collection: 'user_notes',
+    fields: ['userId', 'serverTimestamp'],
+    testQuery: (collection) => collection
+      .where('userId', '==', '__test__')
+      .orderBy('serverTimestamp', 'asc')
+      .limit(1)
+  },
+  {
     name: 'user_conversations_by_updated',
     collection: 'user_conversations',
     fields: ['userId', 'updated'],
     testQuery: (collection) => collection
       .where('userId', '==', '__test__')
       .orderBy('updated', 'desc')
+      .limit(1)
+  },
+  {
+    name: 'user_conversations_by_serverTimestamp',
+    collection: 'user_conversations',
+    fields: ['userId', 'serverTimestamp'],
+    testQuery: (collection) => collection
+      .where('userId', '==', '__test__')
+      .orderBy('serverTimestamp', 'asc')
       .limit(1)
   },
   {
@@ -49,6 +67,24 @@ const REQUIRED_INDEXES = [
       .where('conversationId', '==', '__test__')
       .where('userId', '==', '__test__')
       .orderBy('timestamp', 'asc')
+      .limit(1)
+  },
+  {
+    name: 'user_messages_by_serverTimestamp',
+    collection: 'user_messages',
+    fields: ['userId', 'serverTimestamp'],
+    testQuery: (collection) => collection
+      .where('userId', '==', '__test__')
+      .orderBy('serverTimestamp', 'asc')
+      .limit(1)
+  },
+  {
+    name: 'user_profiles_by_serverTimestamp',
+    collection: 'user_profiles',
+    fields: ['userId', 'serverTimestamp'],
+    testQuery: (collection) => collection
+      .where('userId', '==', '__test__')
+      .orderBy('serverTimestamp', 'asc')
       .limit(1)
   }
 ];

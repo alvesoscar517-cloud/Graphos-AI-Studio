@@ -1,25 +1,25 @@
 /**
  * Sync Status Indicator
- * Shows offline status and sync errors
+ * Shows offline status and sync state using RxDB
  */
 
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
-import { isNetworkOnline, getSyncQueueLength, triggerSync } from '../../services/syncService'
+import { forceSyncAll, getReplicationState } from '../../db/database'
 
 const SyncStatusIndicator = () => {
   const { t } = useTranslation()
-  const [isOnline, setIsOnline] = useState(isNetworkOnline())
-  const [pendingCount, setPendingCount] = useState(0)
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
   const [isSyncing, setIsSyncing] = useState(false)
   const [showBanner, setShowBanner] = useState(false)
+  const [hasError, setHasError] = useState(false)
 
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true)
-      // Auto-sync when back online
-      handleSync()
+      setShowBanner(false)
+      // RxDB auto-syncs when back online
     }
     const handleOffline = () => {
       setIsOnline(false)
@@ -29,42 +29,50 @@ const SyncStatusIndicator = () => {
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
 
-    // Check pending sync items periodically
-    const checkPending = async () => {
-      try {
-        const count = await getSyncQueueLength()
-        setPendingCount(count)
-        if (count > 0 && !isOnline) {
-          setShowBanner(true)
+    // Subscribe to replication states
+    const subscriptions = []
+    const checkReplicationStates = () => {
+      const collections = ['notes', 'conversations', 'messages', 'profiles']
+      collections.forEach(name => {
+        const state = getReplicationState(name)
+        if (state) {
+          subscriptions.push(
+            state.active$.subscribe(active => {
+              setIsSyncing(active)
+            }),
+            state.error$.subscribe(err => {
+              if (err) {
+                setHasError(true)
+                setShowBanner(true)
+              }
+            })
+          )
         }
-      } catch (e) {
-        // Ignore errors
-      }
+      })
     }
 
-    checkPending()
-    const interval = setInterval(checkPending, 30000) // Check every 30s
+    // Delay to allow RxDB to initialize
+    const timeout = setTimeout(checkReplicationStates, 2000)
 
     return () => {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
-      clearInterval(interval)
+      clearTimeout(timeout)
+      subscriptions.forEach(sub => sub.unsubscribe())
     }
-  }, [isOnline])
+  }, [])
 
   const handleSync = async () => {
     if (!isOnline || isSyncing) return
     
     setIsSyncing(true)
+    setHasError(false)
     try {
-      await triggerSync()
-      const count = await getSyncQueueLength()
-      setPendingCount(count)
-      if (count === 0) {
-        setShowBanner(false)
-      }
+      await forceSyncAll()
+      setShowBanner(false)
     } catch (e) {
       console.error('Sync failed:', e)
+      setHasError(true)
     } finally {
       setIsSyncing(false)
     }
@@ -74,8 +82,8 @@ const SyncStatusIndicator = () => {
     setShowBanner(false)
   }
 
-  // Don't show anything if online and no pending items
-  if (isOnline && pendingCount === 0 && !showBanner) {
+  // Don't show anything if online and no issues
+  if (isOnline && !showBanner && !hasError) {
     return null
   }
 
@@ -88,16 +96,20 @@ const SyncStatusIndicator = () => {
         "transition-all duration-300 ease-out",
         !showBanner && "translate-y-20 opacity-0 pointer-events-none",
         isOnline 
-          ? "bg-amber-50/95 dark:bg-amber-900/90 border-amber-200 dark:border-amber-700"
-          : "bg-red-50/95 dark:bg-red-900/90 border-red-200 dark:border-red-700"
+          ? hasError
+            ? "bg-red-50/95 dark:bg-red-900/90 border-red-200 dark:border-red-700"
+            : "bg-green-50/95 dark:bg-green-900/90 border-green-200 dark:border-green-700"
+          : "bg-amber-50/95 dark:bg-amber-900/90 border-amber-200 dark:border-amber-700"
       )}
     >
       {/* Status Icon */}
       <div className={cn(
         "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
         isOnline 
-          ? "bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-300"
-          : "bg-red-100 dark:bg-red-800 text-red-600 dark:text-red-300"
+          ? hasError
+            ? "bg-red-100 dark:bg-red-800 text-red-600 dark:text-red-300"
+            : "bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-300"
+          : "bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-300"
       )}>
         {!isOnline ? (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -113,9 +125,15 @@ const SyncStatusIndicator = () => {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin">
             <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
           </svg>
+        ) : hasError ? (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
         ) : (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+            <polyline points="20 6 9 17 4 12"/>
           </svg>
         )}
       </div>
@@ -125,18 +143,22 @@ const SyncStatusIndicator = () => {
         <span className={cn(
           "text-sm font-medium",
           isOnline 
-            ? "text-amber-800 dark:text-amber-200"
-            : "text-red-800 dark:text-red-200"
+            ? hasError
+              ? "text-red-800 dark:text-red-200"
+              : "text-green-800 dark:text-green-200"
+            : "text-amber-800 dark:text-amber-200"
         )}>
           {!isOnline 
             ? t('sync.offline', 'You\'re offline')
-            : pendingCount > 0 
-              ? t('sync.pendingChanges', { count: pendingCount }) || `${pendingCount} changes pending`
-              : t('sync.synced', 'All synced')
+            : hasError
+              ? t('sync.error', 'Sync error')
+              : isSyncing
+                ? t('sync.syncing', 'Syncing...')
+                : t('sync.synced', 'All synced')
           }
         </span>
         {!isOnline && (
-          <span className="text-xs text-red-600 dark:text-red-400">
+          <span className="text-xs text-amber-600 dark:text-amber-400">
             {t('sync.offlineDesc', 'Changes will sync when you\'re back online')}
           </span>
         )}
@@ -144,19 +166,19 @@ const SyncStatusIndicator = () => {
 
       {/* Actions */}
       <div className="flex items-center gap-2 ml-2">
-        {isOnline && pendingCount > 0 && (
+        {isOnline && hasError && (
           <button
             onClick={handleSync}
             disabled={isSyncing}
             className={cn(
               "px-3 py-1 text-xs font-medium rounded-full",
-              "bg-amber-200 dark:bg-amber-700 text-amber-800 dark:text-amber-100",
-              "hover:bg-amber-300 dark:hover:bg-amber-600",
+              "bg-red-200 dark:bg-red-700 text-red-800 dark:text-red-100",
+              "hover:bg-red-300 dark:hover:bg-red-600",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               "transition-colors"
             )}
           >
-            {isSyncing ? t('sync.syncing', 'Syncing...') : t('sync.syncNow', 'Sync now')}
+            {isSyncing ? t('sync.syncing', 'Syncing...') : t('sync.retry', 'Retry')}
           </button>
         )}
         <button
