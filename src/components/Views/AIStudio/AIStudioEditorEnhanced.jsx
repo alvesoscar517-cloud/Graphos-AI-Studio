@@ -373,7 +373,7 @@ const AIStudioEditorEnhanced = ({
               <div 
                 className={cn(
                   "text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default",
-                  "max-w-[200px] shrink",
+                  "max-w-[300px] shrink",
                   isTypingTitle && "animate-pulse"
                 )}
               >

@@ -169,7 +169,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
               />
             )}
             <div 
-              className={`text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-[200px] shrink ${isTypingTitle ? 'animate-pulse' : ''}`}
+              className={`text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-[300px] shrink ${isTypingTitle ? 'animate-pulse' : ''}`}
             >
               {stripHelpPrefix(displayTitle)}
             </div>

@@ -19,6 +19,8 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // Fix Firebase nested modules resolution
+      '@firebase/auth': path.resolve(__dirname, 'node_modules/firebase/node_modules/@firebase/auth'),
     },
     // Deduplicate Firebase to ensure single instance
     dedupe: [
@@ -36,9 +38,7 @@ export default defineConfig(({ mode }) => ({
     include: [
       'firebase/app',
       'firebase/auth', 
-      'firebase/firestore',
-      'rxdb',
-      'rxdb/plugins/replication-firestore'
+      'firebase/firestore'
     ],
     // Exclude to prevent duplication
     exclude: []
@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     outDir: 'dist',
-    emptyOutDir: false, // Don't delete admin when building main
+    emptyOutDir: true, // Clean dist folder before build
     // Production optimizations
     minify: mode === 'production' ? 'esbuild' : false,
     sourcemap: mode === 'production' ? false : true,
