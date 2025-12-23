@@ -86,9 +86,7 @@ const MainLayout = () => {
     : (rightSidebarHidden || !shouldShowRightSidebar)
 
   return (
-    <div className={cn(
-      "flex h-screen w-full overflow-hidden bg-bg-secondary",
-      "p-1.5 gap-1.5" // Floating panels effect (6px)
+    <div className={cn("flex h-screen w-full overflow-hidden bg-bg-secondary","p-1.5 gap-1.5" // Floating panels effect (6px)
     )}>
       <Sidebar 
         hidden={leftSidebarHidden}

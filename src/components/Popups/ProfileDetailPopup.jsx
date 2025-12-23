@@ -3,6 +3,16 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 
+import { AlignLeft, AlertCircle, Award, BarChart, BookOpen, Check, CheckCircle, FileText, Info, List, Mic, Play, Star, ThumbsUp } from 'lucide-react'
+
+// Quality rating icon mapping
+const QUALITY_ICONS = {
+  star: Star,
+  'thumbs-up': ThumbsUp,
+  check: Check,
+  'alert-circle': AlertCircle,
+}
+
 const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
   const { t } = useTranslation()
   const popupRef = useRef(null)
@@ -64,76 +74,41 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
     poor: { border: 'border-error', text: 'text-error' }
   }
 
-  const sectionClass = cn(
-    "mb-6 p-5 bg-bg-secondary border border-border-light rounded-xl",
-    "transition-all duration-200",
-    "max-lg:mb-5 max-lg:p-4",
-    "max-md:mb-4 max-md:p-3.5",
-    "max-sm:mb-3 max-sm:p-3"
+  const sectionClass = cn("mb-6 p-5 bg-bg-secondary border border-border-light rounded-xl","transition-all duration-200","max-lg:mb-5 max-lg:p-4","max-md:mb-4 max-md:p-3.5","max-sm:mb-3 max-sm:p-3"
   )
 
-  const sectionTitleClass = cn(
-    "flex items-center gap-2 m-0 mb-4 text-sm font-semibold",
-    "text-text-primary uppercase tracking-wider opacity-90",
-    "max-lg:mb-3 max-lg:text-xs",
-    "max-sm:mb-2.5 max-sm:text-[11px]"
+  const sectionTitleClass = cn("flex items-center gap-2 m-0 mb-4 text-sm font-semibold","text-text-primary uppercase tracking-wider opacity-90","max-lg:mb-3 max-lg:text-xs","max-sm:mb-2.5 max-sm:text-[11px]"
   )
 
-  const gridItemClass = cn(
-    "bg-bg-primary border border-border-light p-3 rounded-lg",
-    "flex flex-col gap-1 transition-all duration-200",
-    "max-lg:p-2.5",
-    "max-sm:p-2"
+  const gridItemClass = cn("bg-bg-primary border border-border-light p-3 rounded-lg","flex flex-col gap-1 transition-all duration-200","max-lg:p-2.5","max-sm:p-2"
   )
 
   return createPortal(
-    <div className={cn(
-      "fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-overlay-high p-5 animate-fade-in",
-      "transition-all duration-300",
-      "max-lg:p-4 max-md:p-3 max-md:items-end max-sm:p-2"
+    <div className={cn("fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-overlay-high p-5 animate-fade-in","transition-all duration-300","max-lg:p-4 max-md:p-3 max-md:items-end max-sm:p-2"
     )}>
       <div 
         ref={popupRef}
-        className={cn(
-          "bg-bg-primary border border-border-light rounded-3xl",
-          "w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden",
-          "shadow-modal animate-slide-up transition-all duration-300",
-          "max-lg:max-w-3xl max-lg:rounded-2xl",
-          "max-md:max-w-full max-md:max-h-[85vh] max-md:rounded-t-2xl max-md:rounded-b-none",
-          "max-sm:max-h-[90vh]"
+        className={cn("bg-bg-primary border border-border rounded-3xl","w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden","shadow-modal animate-slide-up transition-all duration-300","max-lg:max-w-3xl max-lg:rounded-2xl","max-md:max-w-full max-md:max-h-[85vh] max-md:rounded-t-2xl max-md:rounded-b-none","max-sm:max-h-[90vh]"
         )}
       >
         {/* Header */}
-        <div className={cn(
-          "flex items-center justify-between py-5 px-6 border-b border-border-light",
-          "bg-bg-primary shrink-0",
-          "max-lg:py-4 max-lg:px-5",
-          "max-md:py-3.5 max-md:px-4",
-          "max-sm:py-3 max-sm:px-3"
+        <div className={cn("flex items-center justify-between py-5 px-6","bg-bg-primary shrink-0","max-lg:py-4 max-lg:px-5","max-md:py-3.5 max-md:px-4","max-sm:py-3 max-sm:px-3"
         )}>
           <div className="flex items-center gap-3 flex-1 min-w-0 max-sm:gap-2">
-            <h2 className={cn(
-              "m-0 text-xl font-bold text-text-primary tracking-tight truncate",
-              "max-lg:text-lg max-sm:text-base"
+            <h2 className={cn("m-0 text-xl font-bold text-text-primary tracking-tight truncate","max-lg:text-lg max-sm:text-base"
             )}>
               {profile.profile_name}
             </h2>
-            <span className={cn(
-              "py-1 px-3 rounded-lg text-xs font-medium border border-transparent shrink-0",
-              "max-sm:py-0.5 max-sm:px-2 max-sm:text-[10px]",
-              profile.status === 'ready' && "bg-success/[0.12] text-success border-success/20",
-              profile.status !== 'ready' && "bg-warning/[0.12] text-warning border-warning/20"
+            <span className={cn("py-1 px-3 rounded-lg text-xs font-medium border border-transparent shrink-0","max-sm:py-0.5 max-sm:px-2 max-sm:text-[10px]",
+              profile.status === 'ready' &&"bg-success/[0.12] text-success border-success/20",
+              profile.status !== 'ready' &&"bg-warning/[0.12] text-warning border-warning/20"
             )}>
               {profile.status === 'ready' ? t('profile.ready') : t('profile.processing')}
             </span>
           </div>
           <button 
             onClick={onClose}
-            className={cn(
-              "w-9 h-9 rounded-lg border border-border-light bg-bg-secondary shrink-0",
-              "cursor-pointer flex items-center justify-center transition-all duration-200",
-              "hover:bg-error/10 hover:border-error/30",
-              "max-sm:w-8 max-sm:h-8"
+            className={cn("w-9 h-9 rounded-lg border border-border-light bg-bg-secondary shrink-0","cursor-pointer flex items-center justify-center transition-all duration-200","hover:bg-error/10 hover:border-error/30","max-sm:w-8 max-sm:h-8"
             )}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-secondary hover:text-error max-sm:w-4 max-sm:h-4">
@@ -144,28 +119,20 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
         </div>
 
         {/* Content */}
-        <div className={cn(
-          "flex-1 overflow-y-auto p-6 bg-bg-primary scrollbar-none",
-          "max-lg:p-5 max-md:p-4 max-sm:p-3"
+        <div className={cn("flex-1 overflow-y-auto p-6 bg-bg-primary scrollbar-none","max-lg:p-5 max-md:p-4 max-sm:p-3"
         )}>
           {/* Quality Score Section */}
           {(profile.quality_score || profile.qualityScore) && (
             <section className={sectionClass}>
               <h3 className={sectionTitleClass}>
-                <img src="/icon/award.svg" alt="" className="w-4 h-4 opacity-60 icon-invert max-sm:w-3.5 max-sm:h-3.5" />
+                <Award size={14} className="opacity-60 max-sm:max-sm:" />
                 {t('profile.profileQuality')}
               </h3>
               <div className="flex items-center gap-5 max-lg:gap-4 max-md:flex-col max-md:items-start max-md:gap-3">
-                <div className={cn(
-                  "flex items-baseline gap-1 py-4 px-5 bg-bg-primary border-3 rounded-2xl",
-                  "min-w-28 justify-center shadow-md",
-                  "max-lg:py-3 max-lg:px-4 max-lg:min-w-24",
-                  "max-sm:py-2.5 max-sm:px-3 max-sm:min-w-20 max-sm:rounded-xl",
+                <div className={cn("flex items-baseline gap-1 py-4 px-5 bg-bg-primary border-3 rounded-2xl","min-w-28 justify-center shadow-md","max-lg:py-3 max-lg:px-4 max-lg:min-w-24","max-sm:py-2.5 max-sm:px-3 max-sm:min-w-20 max-sm:rounded-xl",
                   qualityColors[qualityRating]?.border
                 )}>
-                  <span className={cn(
-                    "text-4xl font-extrabold leading-none tracking-tight",
-                    "max-lg:text-3xl max-sm:text-2xl",
+                  <span className={cn("text-4xl font-extrabold leading-none tracking-tight","max-lg:text-3xl max-sm:text-2xl",
                     qualityColors[qualityRating]?.text
                   )}>
                     {profile.quality_score || profile.qualityScore}
@@ -173,13 +140,12 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
                   <span className="text-sm font-medium text-text-muted max-sm:text-xs">/100</span>
                 </div>
                 <div className="flex-1 flex flex-col gap-2 max-sm:gap-1.5">
-                  <div className={cn(
-                    "inline-flex items-center gap-2 py-2 px-4 bg-bg-primary",
-                    "border border-border-light rounded-lg text-sm font-semibold w-fit",
-                    "shadow-sm",
-                    "max-sm:py-1.5 max-sm:px-3 max-sm:text-xs max-sm:gap-1.5"
+                  <div className={cn("inline-flex items-center gap-2 py-2 px-4 bg-bg-primary","border border-border-light rounded-lg text-sm font-semibold w-fit","shadow-sm","max-sm:py-1.5 max-sm:px-3 max-sm:text-xs max-sm:gap-1.5"
                   )}>
-                    <img src={`/icon/${getQualityRating().icon}.svg`} alt="" className="w-4 h-4 opacity-70 icon-invert max-sm:w-3.5 max-sm:h-3.5" />
+                    {(() => {
+                      const QualityIcon = QUALITY_ICONS[getQualityRating().icon] || AlertCircle
+                      return <QualityIcon size={16} className="opacity-70 max-sm:w-3.5 max-sm:h-3.5" />
+                    })()}
                     <span className="text-text-primary font-bold">{getQualityRating().label}</span>
                   </div>
                   <p className="m-0 text-sm text-text-muted leading-relaxed max-sm:text-xs">{getQualityDescription()}</p>
@@ -191,7 +157,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {/* Overview Section */}
           <section className={sectionClass}>
             <h3 className={sectionTitleClass}>
-              <img src="/icon/info.svg" alt="" className="w-4 h-4 opacity-60 icon-invert max-sm:w-3.5 max-sm:h-3.5" />
+              <Info size={14} className="opacity-60 max-sm:max-sm:" />
               {t('profile.overview')}
             </h3>
             <div className="grid grid-cols-4 gap-3 max-lg:grid-cols-2 max-lg:gap-2.5 max-sm:gap-2">
@@ -217,7 +183,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {/* Statistical Features */}
           <section className={sectionClass}>
             <h3 className={sectionTitleClass}>
-              <img src="/icon/bar-chart.svg" alt="" className="w-4 h-4 opacity-60 icon-invert max-sm:w-3.5 max-sm:h-3.5" />
+              <BarChart size={14} className="opacity-60 max-sm:max-sm:" />
               {t('profile.statisticalFeatures')}
             </h3>
             <div className="grid grid-cols-5 gap-3 max-lg:grid-cols-3 max-md:grid-cols-2 max-lg:gap-2.5 max-sm:gap-2">
@@ -248,7 +214,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {voiceProfile.tone && (
             <section className={sectionClass}>
               <h3 className={sectionTitleClass}>
-                <img src="/icon/mic.svg" alt="" className="w-4 h-4 opacity-60 icon-invert max-sm:w-3.5 max-sm:h-3.5" />
+                <Mic size={14} className="opacity-60 max-sm:max-sm:" />
                 {t('profile.writingStyle')}
               </h3>
               <div className="grid grid-cols-4 gap-3 max-lg:grid-cols-2 max-lg:gap-2.5 max-sm:gap-2">
@@ -276,16 +242,14 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {voiceProfile.key_characteristics?.length > 0 && (
             <section className={sectionClass}>
               <h3 className={sectionTitleClass}>
-                <img src="/icon/list.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
+                <List className="opacity-60" />
                 {t('profile.keyCharacteristics')}
               </h3>
               <ul className="list-none p-0 m-0 flex flex-col gap-2">
                 {voiceProfile.key_characteristics.map((char, index) => (
-                  <li key={index} className={cn(
-                    "flex items-start gap-2.5 py-3 px-3.5 bg-bg-primary border border-border-light",
-                    "rounded-lg text-sm text-text-primary leading-relaxed transition-all duration-200"
+                  <li key={index} className={cn("flex items-start gap-2.5 py-3 px-3.5 bg-bg-primary border border-border-light","rounded-lg text-sm text-text-primary leading-relaxed transition-all duration-200"
                   )}>
-                    <img src="/icon/check-circle.svg" alt="" className="w-4 h-4 opacity-60 shrink-0 mt-0.5 icon-invert" />
+                    <CheckCircle className="opacity-60 shrink-0 mt-0.5" />
                     <span>{char}</span>
                   </li>
                 ))}
@@ -297,7 +261,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {(vocabPrefs.common_phrases?.length > 0 || vocabPrefs.preferred_connectors?.length > 0) && (
             <section className={sectionClass}>
               <h3 className={sectionTitleClass}>
-                <img src="/icon/book-open.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
+                <BookOpen className="opacity-60" />
                 {t('profile.preferredVocabulary')}
               </h3>
               
@@ -306,9 +270,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
                   <h4 className="m-0 mb-2.5 text-xs font-semibold text-text-muted uppercase tracking-wider opacity-90">{t('profile.commonPhrases')}</h4>
                   <div className="flex flex-wrap gap-2">
                     {vocabPrefs.common_phrases.map((phrase, index) => (
-                      <span key={index} className={cn(
-                        "py-1.5 px-3 bg-bg-primary border border-border-light",
-                        "rounded-lg text-sm text-text-primary font-medium transition-all duration-200"
+                      <span key={index} className={cn("py-1.5 px-3 bg-bg-primary border border-border-light","rounded-lg text-sm text-text-primary font-medium transition-all duration-200"
                       )}>{phrase}</span>
                     ))}
                   </div>
@@ -320,9 +282,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
                   <h4 className="m-0 mb-2.5 text-xs font-semibold text-text-muted uppercase tracking-wider opacity-90">{t('profile.preferredConnectors')}</h4>
                   <div className="flex flex-wrap gap-2">
                     {vocabPrefs.preferred_connectors.map((connector, index) => (
-                      <span key={index} className={cn(
-                        "py-1.5 px-3 bg-bg-primary border border-border-light",
-                        "rounded-lg text-sm text-text-primary font-medium transition-all duration-200"
+                      <span key={index} className={cn("py-1.5 px-3 bg-bg-primary border border-border-light","rounded-lg text-sm text-text-primary font-medium transition-all duration-200"
                       )}>{connector}</span>
                     ))}
                   </div>
@@ -334,9 +294,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
                   <h4 className="m-0 mb-2.5 text-xs font-semibold text-text-muted uppercase tracking-wider opacity-90">{t('profile.wordsToAvoid')}</h4>
                   <div className="flex flex-wrap gap-2">
                     {vocabPrefs.avoid_words.map((word, index) => (
-                      <span key={index} className={cn(
-                        "py-1.5 px-3 bg-error/[0.12] border border-error/25 rounded-lg",
-                        "text-sm text-error font-medium transition-all duration-200"
+                      <span key={index} className={cn("py-1.5 px-3 bg-error/[0.12] border border-error/25 rounded-lg","text-sm text-error font-medium transition-all duration-200"
                       )}>{word}</span>
                     ))}
                   </div>
@@ -349,7 +307,7 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {voiceProfile.rewrite_instructions && (
             <section className={sectionClass}>
               <h3 className={sectionTitleClass}>
-                <img src="/icon/file-text.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
+                <FileText className="opacity-60" />
                 {t('profile.rewritingGuidelines')}
               </h3>
               <div className="bg-bg-primary border border-border p-4 rounded-lg">
@@ -360,9 +318,9 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
 
           {/* Opening Style */}
           {sentencePatterns.opening_style && (
-            <section className={cn(sectionClass, "!mb-0")}>
+            <section className={cn(sectionClass,"!mb-0")}>
               <h3 className={sectionTitleClass}>
-                <img src="/icon/align-left.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
+                <AlignLeft className="opacity-60" />
                 {t('profile.openingStyle')}
               </h3>
               <div className="bg-bg-primary border border-border p-4 rounded-lg">
@@ -373,20 +331,11 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
         </div>
 
         {/* Footer */}
-        <div className={cn(
-          "py-4 px-6 border-t border-border-light bg-bg-primary",
-          "flex justify-end gap-3 shrink-0",
-          "max-lg:py-3.5 max-lg:px-5",
-          "max-md:px-4 max-md:flex-col-reverse max-md:gap-2",
-          "max-sm:py-3 max-sm:px-3"
+        <div className={cn("py-4 px-6 bg-bg-primary","flex justify-end gap-3 shrink-0","max-lg:py-3.5 max-lg:px-5","max-md:px-4 max-md:flex-col-reverse max-md:gap-2","max-sm:py-3 max-sm:px-3"
         )}>
           <button 
             onClick={onClose}
-            className={cn(
-              "py-2.5 px-6 rounded-lg border border-border-light bg-bg-secondary",
-              "text-text-primary text-sm font-semibold cursor-pointer transition-all duration-200",
-              "hover:bg-bg-hover hover:border-border-hover",
-              "max-sm:py-2 max-sm:px-4 max-sm:text-xs"
+            className={cn("py-2.5 px-6 rounded-lg border border-border-light bg-bg-secondary","text-text-primary text-sm font-semibold cursor-pointer transition-all duration-200","hover:bg-bg-hover hover:border-border-hover","max-sm:py-2 max-sm:px-4 max-sm:text-xs"
             )}
           >
             {t('common.close')}
@@ -394,14 +343,10 @@ const ProfileDetailPopup = ({ profile, onClose, onUse }) => {
           {onUse && profile.status === 'ready' && (
             <button 
               onClick={onUse}
-              className={cn(
-                "py-2.5 px-6 rounded-lg border border-border-light bg-bg-primary",
-                "text-text-primary text-sm font-semibold cursor-pointer transition-all duration-200",
-                "flex items-center justify-center gap-2 hover:bg-bg-hover hover:border-border-hover",
-                "max-sm:py-2 max-sm:px-4 max-sm:text-xs max-sm:gap-1.5"
+              className={cn("py-2.5 px-6 rounded-lg border border-border-light bg-bg-primary","text-text-primary text-sm font-semibold cursor-pointer transition-all duration-200","flex items-center justify-center gap-2 hover:bg-bg-hover hover:border-border-hover","max-sm:py-2 max-sm:px-4 max-sm:text-xs max-sm:gap-1.5"
               )}
             >
-              <img src="/icon/play.svg" alt="" className="w-4 h-4 opacity-60 transition-all duration-200 icon-invert max-sm:w-3.5 max-sm:h-3.5" />
+              <Play size={14} className="opacity-60 transition-all duration-200 max-sm:max-sm:" />
               {t('profile.useThisProfile')}
             </button>
           )}

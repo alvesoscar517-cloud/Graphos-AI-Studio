@@ -5,7 +5,7 @@
  * 
  * Features:
  * - Auto-shows when credits < 10
- * - Dismissible with "Don't show again today" option
+ * - Dismissible with"Don't show again today" option
  * - Smooth slide-in animation
  * - Buy credits button
  * - System colors only (white, black, gray based on theme)
@@ -13,10 +13,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import Icon from './Common/Icon'
 import { useCredits } from '@/hooks/queries'
 import { useIsAuthenticated } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
 
+import { Bell, ShoppingCart, X } from 'lucide-react'
 const LOW_CREDITS_THRESHOLD = 10
 const DISMISS_STORAGE_KEY = 'lowCreditsToast_dismissedAt'
 const DISMISS_DURATION = 24 * 60 * 60 * 1000 // 24 hours
@@ -83,16 +85,10 @@ const LowCreditsToast = ({ onBuyCredits }) => {
 
   return createPortal(
     <div
-      className={cn(
-        "fixed bottom-5 right-5 z-toast",
-        "w-[340px] max-w-[calc(100vw-40px)]",
-        "bg-bg-primary border border-border rounded-xl",
-        "shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)]",
-        "overflow-hidden",
-        "transition-all duration-300 ease-out",
+      className={cn("fixed bottom-5 right-5 z-toast","w-[340px] max-w-[calc(100vw-40px)]","bg-bg-primary border border-border rounded-xl","shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)]","overflow-hidden","transition-all duration-300 ease-out",
         isAnimatingOut 
-          ? "opacity-0 translate-x-full" 
-          : "opacity-100 translate-x-0 animate-slide-in-right"
+          ?"opacity-0 translate-x-full" 
+          :"opacity-100 translate-x-0 animate-slide-in-right"
       )}
       role="alert"
       aria-live="polite"
@@ -100,11 +96,7 @@ const LowCreditsToast = ({ onBuyCredits }) => {
       {/* Header with icon */}
       <div className="flex items-start gap-3 p-4 pb-3">
         <div className="w-10 h-10 rounded-full bg-fill-secondary flex items-center justify-center shrink-0">
-          <img 
-            src="/icon/bell.svg" 
-            alt="" 
-            className="w-5 h-5 icon-invert opacity-70"
-          />
+          <Bell size={20} className="opacity-70" />
         </div>
         
         <div className="flex-1 min-w-0">
@@ -119,22 +111,18 @@ const LowCreditsToast = ({ onBuyCredits }) => {
         {/* Close button */}
         <button
           onClick={() => handleDismiss(false)}
-          className={cn(
-            "w-6 h-6 rounded-md flex items-center justify-center shrink-0",
-            "bg-transparent border-none cursor-pointer",
-            "opacity-50 hover:opacity-100 hover:bg-fill-tertiary",
-            "transition-all duration-150"
+          className={cn("w-6 h-6 rounded-md flex items-center justify-center shrink-0","bg-transparent border-none cursor-pointer","opacity-50 hover:opacity-100 hover:bg-fill-tertiary","transition-all duration-150"
           )}
           aria-label={t('common.close')}
         >
-          <img src="/icon/x.svg" alt="" className="w-3.5 h-3.5 icon-invert" />
+          <X size={14} />
         </button>
       </div>
 
       {/* Credits display */}
       <div className="px-4 pb-3">
         <div className="flex items-center gap-2 py-2 px-3 bg-fill-tertiary rounded-lg border border-border-light">
-          <img src="/icon/coins.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
+          <Icon name="coins" className="w-4 h-4 opacity-60" />
           <span className="text-sm font-semibold text-text-primary">
             {balance} {t('credits.credits')}
           </span>
@@ -148,29 +136,16 @@ const LowCreditsToast = ({ onBuyCredits }) => {
       <div className="flex items-center gap-2 px-4 pb-4">
         <button
           onClick={handleBuyCredits}
-          className={cn(
-            "flex-1 py-2.5 px-4 rounded-lg",
-            "bg-text-primary text-bg-primary border-none",
-            "text-sm font-medium cursor-pointer",
-            "flex items-center justify-center gap-2",
-            "hover:opacity-80 transition-opacity"
+          className={cn("flex-1 py-2.5 px-4 rounded-lg","bg-text-primary text-bg-primary border-none","text-sm font-medium cursor-pointer","flex items-center justify-center gap-2","hover:opacity-80 transition-opacity"
           )}
         >
-          <img 
-            src="/icon/shopping-cart.svg" 
-            alt="" 
-            className="w-4 h-4 icon-invert-reverse" 
-          />
+          <ShoppingCart size={16} />
           {t('lowCredits.buyNow')}
         </button>
         
         <button
           onClick={() => handleDismiss(true)}
-          className={cn(
-            "py-2.5 px-3 rounded-lg",
-            "bg-fill-tertiary text-text-secondary border border-border-light",
-            "text-xs cursor-pointer",
-            "hover:bg-fill-secondary transition-colors"
+          className={cn("py-2.5 px-3 rounded-lg","bg-fill-tertiary text-text-secondary border border-border-light","text-xs cursor-pointer","hover:bg-fill-secondary transition-colors"
           )}
         >
           {t('lowCredits.remindLater')}

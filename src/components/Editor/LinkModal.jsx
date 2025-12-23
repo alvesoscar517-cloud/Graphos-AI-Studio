@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 
+import { Link } from 'lucide-react'
 /**
  * LinkModal - Modal for inserting/editing links
  */
@@ -61,18 +62,11 @@ const LinkModal = ({ isOpen, currentUrl = '', onSave, onRemove, onClose }) => {
       className="fixed inset-0 flex items-center justify-center z-menu"
       onClick={handleOverlayClick}
     >
-      <div className={cn(
-        "bg-bg-primary border border-border-light rounded-2xl shadow-popup",
-        "w-full max-w-md m-4 overflow-hidden p-5",
-        "animate-slide-up-fast"
+      <div className={cn("bg-bg-primary border border-border rounded-2xl shadow-popup","w-full max-w-md m-4 overflow-hidden p-5","animate-slide-up-fast"
       )}>
         {/* Header */}
         <div className="flex items-center gap-2.5 text-md font-medium text-text-primary mb-4">
-          <img 
-            src="/icon/link.svg" 
-            alt={t('editor.link')} 
-            className="w-icon-md h-icon-md opacity-70 icon-invert" 
-          />
+          <Link size={18} className="opacity-70" />
           <span>{currentUrl ? t('editor.editLink') : t('editor.insertLink')}</span>
         </div>
 
@@ -81,12 +75,7 @@ const LinkModal = ({ isOpen, currentUrl = '', onSave, onRemove, onClose }) => {
           <input
             ref={inputRef}
             type="url"
-            className={cn(
-              "w-full py-3 px-3.5 text-sm rounded-xl outline-none box-border",
-              "border border-border-light",
-              "bg-bg-secondary",
-              "text-text-primary",
-              "placeholder:text-text-muted"
+            className={cn("w-full py-3 px-3.5 text-sm rounded-xl outline-none box-border","border border-border-light","bg-bg-secondary","text-text-primary","placeholder:text-text-muted"
             )}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
@@ -100,11 +89,7 @@ const LinkModal = ({ isOpen, currentUrl = '', onSave, onRemove, onClose }) => {
           <div>
             {currentUrl && (
               <button 
-                className={cn(
-                  "py-2 px-4 text-sm font-medium rounded-pill cursor-pointer border-none",
-                  "bg-transparent text-system-red",
-                  "transition-colors duration-150",
-                  "hover:bg-system-red/10"
+                className={cn("py-2 px-4 text-sm font-medium rounded-pill cursor-pointer border-none","bg-transparent text-system-red","transition-colors duration-150","hover:bg-system-red/10"
                 )}
                 onClick={handleRemove}
               >
@@ -114,25 +99,14 @@ const LinkModal = ({ isOpen, currentUrl = '', onSave, onRemove, onClose }) => {
           </div>
           <div className="flex gap-2">
             <button 
-              className={cn(
-                "py-2 px-5 text-sm font-medium rounded-pill cursor-pointer border-none",
-                "bg-transparent text-text-secondary",
-                "transition-colors duration-150",
-                "hover:bg-bg-tertiary hover:text-text-primary"
+              className={cn("py-2 px-5 text-sm font-medium rounded-pill cursor-pointer border-none","bg-transparent text-text-secondary","transition-colors duration-150","hover:bg-bg-tertiary hover:text-text-primary"
               )}
               onClick={onClose}
             >
               {t('common.cancel')}
             </button>
             <button 
-              className={cn(
-                "py-2 px-5 text-sm font-medium rounded-pill cursor-pointer border-none",
-                "bg-accent text-white",
-                "transition-colors duration-150",
-                "hover:bg-accent-hover",
-                "disabled:bg-border-hover",
-                "disabled:text-text-muted",
-                "disabled:cursor-not-allowed"
+              className={cn("py-2 px-5 text-sm font-medium rounded-pill cursor-pointer border-none","bg-accent text-white","transition-colors duration-150","hover:bg-accent-hover","disabled:bg-border-hover","disabled:text-text-muted","disabled:cursor-not-allowed"
               )}
               onClick={handleSave}
               disabled={!url.trim()}

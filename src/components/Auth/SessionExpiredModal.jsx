@@ -76,7 +76,7 @@ export function SessionExpiredModal() {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm mx-4"
+            className="bg-white border border-gray-200 rounded-2xl shadow-2xl p-6 max-w-sm mx-4"
           >
             {/* Icon */}
             <div className="flex justify-center mb-4">

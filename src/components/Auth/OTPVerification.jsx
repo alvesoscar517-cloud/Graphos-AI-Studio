@@ -155,12 +155,8 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
           <input key={index} ref={el => inputRefs.current[index] = el} type="text" inputMode="numeric" maxLength={1}
             value={digit} onChange={(e) => handleChange(index, e.target.value)} onKeyDown={(e) => handleKeyDown(index, e)} onPaste={handlePaste}
             disabled={isLoading || countdown <= 0} placeholder="•"
-            className={cn("w-10 h-12 sm:w-otp sm:h-otp text-center text-xl sm:text-2xl font-bold border-2 rounded-lg sm:rounded-xl transition-all duration-200",
-              "bg-white text-gray-900 border-gray-200",
-              "focus:outline-none focus:border-system-blue focus:ring-2 focus:ring-system-blue/20",
-              "disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed",
-              "placeholder:text-gray-300",
-              error && "border-system-red bg-red-50 animate-shake")} />
+            className={cn("w-10 h-12 sm:w-otp sm:h-otp text-center text-xl sm:text-2xl font-bold border-2 rounded-lg sm:rounded-xl transition-all duration-200","bg-white text-gray-900 border-gray-200","focus:outline-none focus:border-system-blue focus:ring-2 focus:ring-system-blue/20","disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed","placeholder:text-gray-300",
+              error &&"border-system-red bg-red-50 animate-shake")} />
         ))}
       </div>
 
@@ -195,9 +191,7 @@ const OTPVerification = ({ email, onVerify, onResend, onCancel, isLoading }) => 
 
       <div className="flex flex-col gap-2.5 sm:gap-3">
         <button type="button" onClick={() => handleSubmit(otp.join(''))} disabled={isLoading || otp.join('').length !== 6 || countdown <= 0}
-          className={cn("w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200",
-            "bg-system-blue text-white hover:brightness-110 active:scale-[0.98] active:brightness-95",
-            "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100")}>
+          className={cn("w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200","bg-system-blue text-white hover:brightness-110 active:scale-[0.98] active:brightness-95","disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100")}>
           {isLoading ? <><span className="inline-block w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-transparent border-t-current rounded-full animate-spin mr-2 align-middle"/>{t('auth.email.verifying')}</> : t('auth.email.verifyBtn')}
         </button>
         <button type="button" onClick={handleResend} disabled={isLoading || resendCooldown > 0}

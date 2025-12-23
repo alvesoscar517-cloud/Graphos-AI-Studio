@@ -18,11 +18,7 @@ const MainContent = ({
 }) => {
   return (
     <main 
-      className={cn(
-        "flex-1 flex flex-col h-full overflow-hidden bg-bg-tertiary",
-        "min-w-0", // Important: allows flex item to shrink below content size
-        "relative z-base", // Lower z-index to allow sidebar popups to appear above
-        "rounded-md" // Floating panel effect
+      className={cn("flex-1 flex flex-col h-full overflow-hidden bg-bg-tertiary","min-w-0", // Important: allows flex item to shrink below content size"relative z-base", // Lower z-index to allow sidebar popups to appear above"rounded-md" // Floating panel effect
       )}
     >
       {currentView === 'home' && (

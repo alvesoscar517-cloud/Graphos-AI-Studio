@@ -2,6 +2,19 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
 
+import { Briefcase, DollarSign, Gauge, Info, Layers, Star, TrendingUp, Zap } from 'lucide-react'
+
+// Icon mapping for model details
+const MODEL_DETAIL_ICONS = {
+  'gauge': Gauge,
+  'zap': Zap,
+  'dollar-sign': DollarSign,
+  'layers': Layers,
+  'star': Star,
+  'briefcase': Briefcase,
+  'trending-up': TrendingUp,
+}
+
 const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
   const { t } = useTranslation()
 
@@ -9,33 +22,33 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
     {
       id: 'gemini-2.5-flash-lite',
       name: 'Graphos Velocity',
-      speed: { icon: '/icon/gauge.svg', text: t('model.ultraFast') },
+      speed: { icon: 'gauge', text: t('model.ultraFast') },
       description: t('model.velocityDesc'),
       details: [
-        { icon: '/icon/zap.svg', text: t('model.shortText') },
-        { icon: '/icon/dollar-sign.svg', text: t('model.lowCost') }
+        { icon: 'zap', text: t('model.shortText') },
+        { icon: 'dollar-sign', text: t('model.lowCost') }
       ],
       iconName: 'audio-lines'
     },
     {
       id: 'gemini-2.5-flash',
       name: 'Graphos Hyper',
-      speed: { icon: '/icon/gauge.svg', text: t('model.fast') },
+      speed: { icon: 'gauge', text: t('model.fast') },
       description: t('model.hyperDesc'),
       details: [
-        { icon: '/icon/layers.svg', text: t('model.versatile') },
-        { icon: '/icon/star.svg', text: t('model.recommended') }
+        { icon: 'layers', text: t('model.versatile') },
+        { icon: 'star', text: t('model.recommended') }
       ],
       iconName: 'audio-lines'
     },
     {
       id: 'gemini-2.5-pro',
       name: 'Graphos Zenith',
-      speed: { icon: '/icon/gauge.svg', text: t('model.slower') },
+      speed: { icon: 'gauge', text: t('model.slower') },
       description: t('model.zenithDesc'),
       details: [
-        { icon: '/icon/briefcase.svg', text: t('model.importantText') },
-        { icon: '/icon/trending-up.svg', text: t('model.highQuality') }
+        { icon: 'briefcase', text: t('model.importantText') },
+        { icon: 'trending-up', text: t('model.highQuality') }
       ],
       iconName: 'audio-lines'
     }
@@ -47,12 +60,8 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
         {REWRITE_MODELS.map((model) => (
           <div
             key={model.id}
-            className={cn(
-              "flex flex-col gap-3 p-4",
-              "bg-bg-tertiary border border-border-light rounded-lg",
-              "cursor-pointer transition-all duration-200 relative",
-              "hover:border-border-hover hover:shadow-sm",
-              selectedModel === model.id && "border-border-hover shadow-sm"
+            className={cn("flex flex-col gap-3 p-4","bg-bg-tertiary border border-border-light rounded-lg","cursor-pointer transition-all duration-200 relative","hover:border-border-hover hover:shadow-sm",
+              selectedModel === model.id &&"border-border-hover shadow-sm"
             )}
             onClick={() => onModelSelect(model.id)}
           >
@@ -70,7 +79,10 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
               <div className="flex-1 min-w-0">
                 <h4 className="text-sm font-medium text-text-primary m-0 mb-1">{model.name}</h4>
                 <div className="flex items-center gap-1.5 text-2xs text-text-muted">
-                  <img src={model.speed.icon} alt="speed" className="w-3.5 h-3.5 opacity-50 icon-invert" />
+                  {(() => {
+                    const SpeedIcon = MODEL_DETAIL_ICONS[model.speed.icon] || Gauge
+                    return <SpeedIcon size={14} className="opacity-50" />
+                  })()}
                   <span>{model.speed.text}</span>
                 </div>
               </div>
@@ -78,18 +90,20 @@ const RewriteModelSelector = ({ selectedModel, onModelSelect }) => {
 
             {/* Description */}
             <div className="flex items-start gap-2 text-2xs text-text-muted leading-relaxed py-2 px-3 bg-bg-secondary rounded-md">
-              <img src="/icon/info.svg" alt="info" className="w-3.5 h-3.5 opacity-50 flex-shrink-0 mt-0.5 icon-invert" />
+              <Info size={14} className="opacity-50 flex-shrink-0 mt-0.5" />
               <span className="line-clamp-2 flex-1">{model.description}</span>
             </div>
 
             {/* Details */}
             <div className="flex gap-3">
-              {model.details.map((detail, idx) => (
+              {model.details.map((detail, idx) => {
+                const DetailIcon = MODEL_DETAIL_ICONS[detail.icon] || Info
+                return (
                 <div key={idx} className="flex items-center gap-1.5 text-2xs text-text-muted flex-1 whitespace-nowrap overflow-hidden">
-                  <img src={detail.icon} alt="" className="w-3.5 h-3.5 opacity-50 flex-shrink-0 icon-invert" />
+                  <DetailIcon size={14} className="opacity-50 flex-shrink-0" />
                   <span className="leading-relaxed overflow-hidden text-ellipsis">{detail.text}</span>
                 </div>
-              ))}
+              )})}
             </div>
           </div>
         ))}

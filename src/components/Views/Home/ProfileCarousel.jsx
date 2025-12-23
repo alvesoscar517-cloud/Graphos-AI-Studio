@@ -6,6 +6,7 @@ import EmptyProfileCard from './EmptyProfileCard'
 import { SkeletonProfileCard } from '../../ui/skeleton'
 import { cn } from '../../../lib/utils'
 
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 // Breakpoints for responsive carousel
 const BREAKPOINT_SM = 640
 const BREAKPOINT_MD = 768
@@ -125,40 +126,24 @@ const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile, loading }) =
         {!loading && profiles.length > visibleCards && (
           <div className="flex gap-2">
             <button 
-              className={cn(
-                "w-10 h-10 rounded-full border border-border-light",
-                "bg-bg-secondary cursor-pointer",
-                "flex items-center justify-center transition-all duration-200",
-                "shadow-sm",
-                "hover:bg-bg-tertiary hover:border-border-hover hover:scale-105 hover:shadow-md",
-                "active:scale-95",
-                "disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none",
-                "max-md:w-9 max-md:h-9"
+              className={cn("w-10 h-10 rounded-full border border-border-light","bg-bg-secondary cursor-pointer","flex items-center justify-center transition-all duration-200","shadow-sm","hover:bg-bg-tertiary hover:border-border-hover hover:scale-105 hover:shadow-md","active:scale-95","disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none","max-md:w-9 max-md:h-9"
               )}
               onClick={handlePrev}
               disabled={!canGoPrev}
               data-tooltip={t('common.previous')}
               data-tooltip-position="bottom"
             >
-              <img src="/icon/chevron-left.svg" alt={t('common.previous')} className="w-5 h-5 opacity-70 icon-invert max-md:w-4 max-md:h-4" />
+              <ChevronLeft className="opacity-70 max-md:max-md:" />
             </button>
             <button 
-              className={cn(
-                "w-10 h-10 rounded-full border border-border-light",
-                "bg-bg-secondary cursor-pointer",
-                "flex items-center justify-center transition-all duration-200",
-                "shadow-sm",
-                "hover:bg-bg-tertiary hover:border-border-hover hover:scale-105 hover:shadow-md",
-                "active:scale-95",
-                "disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none",
-                "max-md:w-9 max-md:h-9"
+              className={cn("w-10 h-10 rounded-full border border-border-light","bg-bg-secondary cursor-pointer","flex items-center justify-center transition-all duration-200","shadow-sm","hover:bg-bg-tertiary hover:border-border-hover hover:scale-105 hover:shadow-md","active:scale-95","disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none","max-md:w-9 max-md:h-9"
               )}
               onClick={handleNext}
               disabled={!canGoNext}
               data-tooltip={t('common.next')}
               data-tooltip-position="bottom"
             >
-              <img src="/icon/chevron-right.svg" alt={t('common.next')} className="w-5 h-5 opacity-70 icon-invert max-md:w-4 max-md:h-4" />
+              <ChevronRight className="opacity-70 max-md:max-md:" />
             </button>
           </div>
         )}
@@ -185,10 +170,8 @@ const ProfileCarousel = ({ profiles, onSelectProfile, onUseProfile, loading }) =
       ) : (
         <div className="relative overflow-hidden">
           <div 
-            className={cn(
-              "flex gap-5 will-change-transform pb-2",
-              "max-lg:gap-4 max-md:gap-3",
-              isResizing ? "transition-none" : "transition-transform duration-400 ease-smooth"
+            className={cn("flex gap-5 will-change-transform pb-2","max-lg:gap-4 max-md:gap-3",
+              isResizing ?"transition-none" :"transition-transform duration-400 ease-smooth"
             )}
             style={{ 
               transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,

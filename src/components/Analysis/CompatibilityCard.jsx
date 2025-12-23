@@ -182,10 +182,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onAnalysisStart, on
   return (
     <>
       {/* Main Card */}
-      <div className={cn(
-        "p-3 border border-border-light rounded-xl",
-        "bg-bg-secondary transition-all duration-200",
-        "hover:shadow-md"
+      <div className={cn("p-3 border border-border-light rounded-xl","bg-bg-secondary transition-all duration-200","hover:shadow-md"
       )}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-2 relative">
@@ -202,10 +199,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onAnalysisStart, on
           </div>
           {score !== null && (
             <button 
-              className={cn(
-                "bg-transparent border-none p-1.5 cursor-pointer rounded-md",
-                "flex items-center justify-center transition-colors duration-200",
-                "hover:bg-bg-tertiary ml-auto"
+              className={cn("bg-transparent border-none p-1.5 cursor-pointer rounded-md","flex items-center justify-center transition-colors duration-200","hover:bg-bg-tertiary ml-auto"
               )}
               onClick={() => setShowResult(!showResult)}
             >
@@ -213,7 +207,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onAnalysisStart, on
                 name="chevron-down" 
                 size="md" 
                 color="muted"
-                className={cn("transition-transform duration-300", showResult && "rotate-180")}
+                className={cn("transition-transform duration-300", showResult &&"rotate-180")}
               />
             </button>
           )}
@@ -221,14 +215,8 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onAnalysisStart, on
 
         {/* Action Button */}
         <button 
-          className={cn(
-            "w-full flex items-center justify-between py-2.5 px-3.5",
-            "bg-bg-secondary border border-border-light rounded-xl",
-            "text-sm font-medium text-text-primary cursor-pointer",
-            "transition-all duration-200 relative overflow-hidden",
-            "hover:border-border-hover hover:shadow-md",
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
-            isLoading && "pointer-events-none opacity-70"
+          className={cn("w-full flex items-center justify-between py-2.5 px-3.5","bg-bg-secondary border border-border-light rounded-xl","text-sm font-medium text-text-primary cursor-pointer","transition-all duration-200 relative overflow-hidden","hover:border-border-hover hover:shadow-md","disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+            isLoading &&"pointer-events-none opacity-70"
           )}
           onClick={calculateScore}
           disabled={disabled || isLoading || (!textChanged && score !== null)}
@@ -351,11 +339,10 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onAnalysisStart, on
                     </div>
                     <div className="w-full h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
                       <div 
-                        className={cn(
-                          "h-full rounded-sm transition-all duration-500",
-                          confidence < 60 && "bg-gradient-to-r from-orange-500 to-red-400",
-                          confidence >= 60 && confidence < 80 && "bg-gradient-to-r from-blue-500 to-cyan-400",
-                          confidence >= 80 && "bg-gradient-to-r from-green-500 to-emerald-400"
+                        className={cn("h-full rounded-sm transition-all duration-500",
+                          confidence < 60 &&"bg-gradient-to-r from-orange-500 to-red-400",
+                          confidence >= 60 && confidence < 80 &&"bg-gradient-to-r from-blue-500 to-cyan-400",
+                          confidence >= 80 &&"bg-gradient-to-r from-green-500 to-emerald-400"
                         )}
                         style={{ width: `${safeScore(confidence)}%` }}
                       />
@@ -398,12 +385,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onAnalysisStart, on
 
               {/* View Details Button */}
               <button 
-                className={cn(
-                  "w-full py-2 px-3 mt-0",
-                  "bg-bg-secondary border-none rounded-lg",
-                  "flex items-center justify-between cursor-pointer",
-                  "transition-all duration-200 text-xs font-medium text-text-primary",
-                  "hover:bg-bg-tertiary"
+                className={cn("w-full py-2 px-3 mt-0","bg-bg-secondary border-none rounded-lg","flex items-center justify-between cursor-pointer","transition-all duration-200 text-xs font-medium text-text-primary","hover:bg-bg-tertiary"
                 )}
                 onClick={() => setShowModal(true)}
               >
@@ -420,7 +402,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onAnalysisStart, on
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className="flex items-center justify-between py-5 px-6 border-b border-border-light">
+            <div className="flex items-center justify-between py-5 px-6">
               <h3 className="text-lg font-medium text-text-primary m-0">{t('analysis.detailedAnalysis')}</h3>
               <button 
                 className="bg-transparent border-none p-2 cursor-pointer rounded-full flex items-center justify-center hover:bg-bg-tertiary"
@@ -616,11 +598,10 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onAnalysisStart, on
                   <div className="flex flex-col gap-3 p-4 bg-fill-tertiary border border-border-light rounded-xl">
                     {analysisDetails.deviant_sentences.slice(0, 5).map((item, index) => (
                       <div key={index} className="flex items-start gap-2 text-xs">
-                        <span className={cn(
-                          "flex-shrink-0 p-1 rounded-md",
-                          item.severity === 'severe' && "bg-error/15",
-                          item.severity === 'moderate' && "bg-warning/15",
-                          item.severity === 'mild' && "bg-primary/15"
+                        <span className={cn("flex-shrink-0 p-1 rounded-md",
+                          item.severity === 'severe' &&"bg-error/15",
+                          item.severity === 'moderate' &&"bg-warning/15",
+                          item.severity === 'mild' &&"bg-primary/15"
                         )}>
                           <Icon 
                             name="alert-circle" 
@@ -648,7 +629,7 @@ const CompatibilityCard = ({ disabled, currentProfile, text, onAnalysisStart, on
                   <span className="ml-auto text-text-primary font-medium">{analysisDetails.processing_time_ms || 0}ms</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
-                  <Icon name={analysisDetails.cache_hit ? "zap" : "database"} size="xs" color="muted" />
+                  <Icon name={analysisDetails.cache_hit ?"zap" :"database"} size="xs" color="muted" />
                   <span className="text-text-secondary">{t('analysis.cacheStatus')}</span>
                   <span className="ml-auto text-text-primary font-medium">{analysisDetails.cache_hit ? t('common.cached') : t('common.fresh')}</span>
                 </div>

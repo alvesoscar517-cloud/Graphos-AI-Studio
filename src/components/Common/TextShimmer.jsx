@@ -2,14 +2,13 @@ import { cn } from '../../lib/utils'
 
 /**
  * TextShimmer - Hiệu ứng ánh sáng quét qua text (kiểu Facebook/LinkedIn/YouTube)
- * Sử dụng linear-gradient với animation để tạo hiệu ứng "sweep" từ trái sang phải
+ * Sử dụng linear-gradient với animation để tạo hiệu ứng"sweep" từ trái sang phải
  */
 const TextShimmer = ({ children, className = '', duration = 2, block = false }) => {
   return (
     <span 
       className={cn(
-        block ? "block" : "inline",
-        "relative whitespace-pre-wrap",
+        block ?"block" :"inline","relative whitespace-pre-wrap",
         className
       )}
       style={{

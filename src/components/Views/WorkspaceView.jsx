@@ -43,9 +43,7 @@ const WorkspaceView = ({
   const showDefaultView = !currentConversation || messages.length === 0
 
   return (
-    <div className={cn(
-      "flex flex-col flex-1 bg-bg-tertiary",
-      "h-screen overflow-hidden relative"
+    <div className={cn("flex flex-col flex-1 bg-bg-tertiary","h-screen overflow-hidden relative"
     )}>
       {showDefaultView ? (
         <>

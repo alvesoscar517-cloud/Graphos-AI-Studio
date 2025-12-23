@@ -37,13 +37,11 @@ const TextStatsBar = ({
 
   if (compact) {
     return (
-      <div className={cn(
-        "flex flex-row items-center py-1 px-2 gap-3 text-xs",
-        "text-text-muted bg-bg-secondary rounded-md",
-        statusColor === 'warning' && "border-l-2 border-amber-400 bg-amber-500/5",
-        statusColor === 'error' && "border-l-2 border-red-400 bg-error/5",
-        statusColor === 'muted' && "opacity-60",
-        statusColor === 'normal' && "border-l-2 border-green-400",
+      <div className={cn("flex flex-row items-center py-1 px-2 gap-3 text-xs","text-text-muted bg-bg-secondary rounded-md",
+        statusColor === 'warning' &&"border-l-2 border-amber-400 bg-amber-500/5",
+        statusColor === 'error' &&"border-l-2 border-red-400 bg-error/5",
+        statusColor === 'muted' &&"opacity-60",
+        statusColor === 'normal' &&"border-l-2 border-green-400",
         className
       )}>
         <span>{stats.chars.toLocaleString()} {t('tokens.characters')}</span>
@@ -60,14 +58,11 @@ const TextStatsBar = ({
   }
 
   return (
-    <div className={cn(
-      "flex flex-col gap-1 py-1.5 px-3 text-xs",
-      "text-text-muted bg-bg-secondary rounded-md",
-      "transition-all duration-200",
-      statusColor === 'warning' && "border-l-2 border-amber-400 bg-amber-500/5",
-      statusColor === 'error' && "border-l-2 border-red-400 bg-error/5",
-      statusColor === 'muted' && "opacity-60",
-      statusColor === 'normal' && "border-l-2 border-green-400",
+    <div className={cn("flex flex-col gap-1 py-1.5 px-3 text-xs","text-text-muted bg-bg-secondary rounded-md","transition-all duration-200",
+      statusColor === 'warning' &&"border-l-2 border-amber-400 bg-amber-500/5",
+      statusColor === 'error' &&"border-l-2 border-red-400 bg-error/5",
+      statusColor === 'muted' &&"opacity-60",
+      statusColor === 'normal' &&"border-l-2 border-green-400",
       className
     )}>
       <div className="flex items-center gap-4 flex-wrap">

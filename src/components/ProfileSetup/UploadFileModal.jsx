@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
-import { Icon } from '../Common'
+import Icon from '../Common/Icon'
 
 const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [] }) => {
   const { t } = useTranslation()
@@ -149,7 +149,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [] }) => {
 
   return (
     <div className={cn("fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-modal p-5 animate-fade-in")} onClick={onClose}>
-      <div className={cn("bg-white rounded-3xl w-full max-w-[580px] max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up-bounce max-md:max-w-[95%]")} onClick={(e) => e.stopPropagation()}>
+      <div className={cn("bg-white border border-gray-200 rounded-3xl w-full max-w-[580px] max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up-bounce max-md:max-w-[95%]")} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-start gap-3 px-6 pt-6 pb-4 shrink-0">
           <div className="card-icon !w-10 !h-10">
@@ -164,9 +164,9 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [] }) => {
         {/* Content */}
         <div className="flex-1 px-6 pb-6 pt-3 bg-white overflow-y-auto scrollbar-none">
           {/* Upload Zone */}
-          <div className={cn("rounded-2xl py-6 px-6 text-center transition-all duration-300 bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 border-dashed relative overflow-hidden", isDragging && "border-accent bg-gradient-to-br from-blue-50 to-blue-100 scale-[1.01] shadow-lg")} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+          <div className={cn("rounded-2xl py-6 px-6 text-center transition-all duration-300 bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 border-dashed relative overflow-hidden", isDragging &&"border-accent bg-gradient-to-br from-blue-50 to-blue-100 scale-[1.01] shadow-lg")} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
             <div className="flex items-center justify-center mb-4">
-              <img src="/icon for background/monster-chibi.svg" alt="Upload" className={cn("w-28 h-28 object-contain opacity-50", isDragging && "opacity-80")} />
+              <img src="/icon for background/monster-chibi.svg" alt="Upload" className={cn("w-28 h-28 object-contain opacity-50", isDragging &&"opacity-80")} />
             </div>
             <div className="flex flex-col items-center gap-3">
               <p className="text-sm text-slate-500 m-0 font-medium">{t('profileSetup.supportedFormats')}</p>
@@ -188,7 +188,7 @@ const UploadFileModal = ({ isOpen, onClose, onSave, initialFiles = [] }) => {
                 </div>
               )}
               {fileAnalysis.map((item, index) => (
-                <div key={index} className={cn("flex items-center gap-4 p-4 bg-bg-secondary rounded-xl transition-all duration-200 animate-slide-in hover:bg-bg-hover", item.error && "bg-red-50 border border-red-200", !item.isValid && !item.error && "bg-amber-50 border border-amber-200")}>
+                <div key={index} className={cn("flex items-center gap-4 p-4 bg-bg-secondary rounded-xl transition-all duration-200 animate-slide-in hover:bg-bg-hover", item.error &&"bg-red-50 border border-red-200", !item.isValid && !item.error &&"bg-amber-50 border border-amber-200")}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary shrink-0"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold text-gray-900 mb-1 overflow-hidden text-ellipsis whitespace-nowrap">{item.file.name}</div>

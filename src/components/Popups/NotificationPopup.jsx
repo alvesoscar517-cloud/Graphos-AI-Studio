@@ -3,6 +3,16 @@ import { useTranslation } from 'react-i18next'
 import Portal from '../Common/Portal'
 import { useNotifications, useNotificationActions } from '../../stores/notificationStore'
 
+import { ArrowRight, Inbox, X, Info, CheckCircle, AlertTriangle, XCircle, Megaphone } from 'lucide-react'
+
+// Notification type to lucide-react icon mapping
+const NOTIFICATION_ICONS = {
+  info: Info,
+  success: CheckCircle,
+  warning: AlertTriangle,
+  error: XCircle,
+  announcement: Megaphone,
+}
 export default function NotificationPopup({ onClose, onViewChange, autoShowNotification = null }) {
   const { t, i18n } = useTranslation()
   const { notifications, unreadCount, loading } = useNotifications()
@@ -115,17 +125,6 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
     });
   };
 
-  const getNotificationIcon = (type) => {
-    const icons = {
-      info: 'info.svg',
-      success: 'check-circle.svg',
-      warning: 'alert-triangle.svg',
-      error: 'x-circle.svg',
-      announcement: 'megaphone.svg'
-    };
-    return icons[type] || 'info.svg';
-  };
-
   const formatTime = (timestamp) => {
     const now = new Date();
     const notifTime = new Date(timestamp);
@@ -227,7 +226,7 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
             </div>
           ) : notifications.length === 0 ? (
             <div className="notif-empty">
-              <img src="/icon/inbox.svg" alt="Empty" />
+              <Inbox />
               <p>{t('notifications.noNotifications')}</p>
             </div>
           ) : (
@@ -245,7 +244,10 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                   }}
                 >
                   <div className={`notif-item-icon ${!notif.read ? 'unread' : ''}`}>
-                    <img src={`/icon/${getNotificationIcon(notif.type)}`} alt={notif.type} />
+                    {(() => {
+                      const NotifIcon = NOTIFICATION_ICONS[notif.type] || NOTIFICATION_ICONS.info
+                      return <NotifIcon size={18} className="opacity-70" />
+                    })()}
                   </div>
                   <div className="notif-item-content">
                     <div className="notif-item-title">
@@ -259,7 +261,7 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                     onClick={(e) => handleDelete(e, notif.id)}
                     data-tooltip={t('common.delete')}
                   >
-                    <img src="/icon/x.svg" alt={t('common.delete')} />
+                    <X />
                   </button>
                 </div>
               );
@@ -362,11 +364,7 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                   data-tooltip={t('common.close')}
                   data-tooltip-position="bottom"
                 >
-                  <img src="/icon/x.svg" alt={t('common.close')} className="icon-invert" style={{ 
-                    width: '14px', 
-                    height: '14px',
-                    opacity: 0.6
-                  }} />
+                  <X />
                 </button>
               </div>
 
@@ -404,7 +402,6 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                     left: 0,
                     right: 0,
                     padding: '16px',
-                    background: 'linear-gradient(to top, var(--color-bg-primary) 70%, transparent)',
                     paddingTop: '32px',
                     pointerEvents: 'none'
                   }}>
@@ -438,11 +435,7 @@ export default function NotificationPopup({ onClose, onViewChange, autoShowNotif
                     }}
                   >
                     {selectedNotif.translations[userLang].cta}
-                    <img 
-                      src="/icon/arrow-right.svg" 
-                      alt="" 
-                      className="w-3.5 h-3.5 icon-invert"
-                    />
+                    <ArrowRight size={14} />
                   </button>
                 </div>
               )}

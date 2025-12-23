@@ -15,9 +15,7 @@ export default function Spinner({ size = 'medium', color = 'primary' }) {
 
   return (
     <div className="inline-flex items-center justify-center">
-      <div className={cn(
-        "rounded-full border-solid",
-        "animate-spin",
+      <div className={cn("rounded-full border-solid","animate-spin",
         sizeClasses[size],
         colorClasses[color]
       )} 

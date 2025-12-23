@@ -25,7 +25,7 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
     // Get error code - prefer err.code, fallback to parsing from message
     let errorCode = err.code
     if (!errorCode && message.includes(':')) {
-      // Parse from message format: "ERROR_CODE: message" or just the code
+      // Parse from message format:"ERROR_CODE: message" or just the code
       const possibleCode = message.split(':')[0]?.trim()
       if (possibleCode && possibleCode.startsWith('AUTH_')) {
         errorCode = possibleCode
@@ -186,18 +186,13 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
 
   const isLoading = externalLoading || formLoading
 
-  const inputClass = cn(
-    "w-full pl-11 pr-3.5 py-3 text-sm border border-gray-200 rounded-xl",
-    "bg-white text-gray-900 transition-all duration-200",
-    "focus:outline-none focus:border-system-blue focus:ring-2 focus:ring-system-blue/20",
-    "disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed",
-    "placeholder:text-gray-400"
+  const inputClass = cn("w-full pl-11 pr-3.5 py-3 text-sm border border-gray-200 rounded-xl","bg-white text-gray-900 transition-all duration-200","focus:outline-none focus:border-system-blue focus:ring-2 focus:ring-system-blue/20","disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed","placeholder:text-gray-400"
   )
 
-  const inputErrorClass = "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+  const inputErrorClass ="border-red-300 focus:border-red-500 focus:ring-red-500/20"
   
   // iOS-style shake animation class
-  const shakeClass = "animate-[shake_0.5s_ease-in-out]"
+  const shakeClass ="animate-[shake_0.5s_ease-in-out]"
 
   return (
     <form className="w-full" onSubmit={handleSubmit}>
@@ -241,7 +236,7 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
             placeholder={t('auth.email.emailPlaceholder')}
             disabled={isLoading}
             autoComplete="email"
-            className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.email && inputErrorClass)}
+            className={cn(inputClass,"pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.email && inputErrorClass)}
           />
         </div>
         {/* Only show email error if email has error (priority) */}
@@ -268,7 +263,7 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
             placeholder={t('auth.email.passwordPlaceholder')}
             disabled={isLoading}
             autoComplete="current-password"
-            className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm pr-10 sm:pr-12", !errors.email && errors.password && inputErrorClass)}
+            className={cn(inputClass,"pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm pr-10 sm:pr-12", !errors.email && errors.password && inputErrorClass)}
           />
           <button
             type="button"
@@ -305,10 +300,9 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
         />
         <label 
           htmlFor="rememberMe" 
-          className={cn(
-            "w-5 h-5 rounded-full border-2 shrink-0 relative cursor-pointer transition-colors",
-            watch('rememberMe') ? "border-system-blue" : "border-gray-300",
-            isLoading && "cursor-not-allowed opacity-50"
+          className={cn("w-5 h-5 rounded-full border-2 shrink-0 relative cursor-pointer transition-colors",
+            watch('rememberMe') ?"border-system-blue" :"border-gray-300",
+            isLoading &&"cursor-not-allowed opacity-50"
           )}
         >
           {watch('rememberMe') && (
@@ -317,9 +311,8 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
         </label>
         <label 
           htmlFor="rememberMe" 
-          className={cn(
-            "text-xs sm:text-sm text-gray-600 cursor-pointer select-none",
-            isLoading && "cursor-not-allowed opacity-50"
+          className={cn("text-xs sm:text-sm text-gray-600 cursor-pointer select-none",
+            isLoading &&"cursor-not-allowed opacity-50"
           )}
         >
           {t('auth.email.rememberMe', 'Remember me')}
@@ -340,10 +333,7 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
       <button
         type="submit"
         disabled={isLoading}
-        className={cn(
-          "w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200",
-          "bg-system-blue text-white hover:brightness-110 active:scale-[0.98]",
-          "disabled:opacity-40 disabled:cursor-not-allowed"
+        className={cn("w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200","bg-system-blue text-white hover:brightness-110 active:scale-[0.98]","disabled:opacity-40 disabled:cursor-not-allowed"
         )}
       >
         {isLoading ? (
@@ -372,10 +362,7 @@ const EmailLoginForm = ({ onLogin, onSwitchToRegister, onForgotPassword, onGoogl
       {/* Google Sign In */}
       {onGoogleSignIn && (
         <button type="button" onClick={onGoogleSignIn} disabled={isLoading}
-          className={cn(
-            "flex items-center justify-center gap-2 sm:gap-2.5 w-full py-2.5 sm:py-3 px-4",
-            "bg-white border border-gray-200 rounded-xl text-xs sm:text-sm font-medium text-gray-800",
-            "hover:bg-gray-50 active:scale-[0.98] disabled:opacity-40 transition-all"
+          className={cn("flex items-center justify-center gap-2 sm:gap-2.5 w-full py-2.5 sm:py-3 px-4","bg-white border border-gray-200 rounded-xl text-xs sm:text-sm font-medium text-gray-800","hover:bg-gray-50 active:scale-[0.98] disabled:opacity-40 transition-all"
           )}>
           {isLoading ? (
             <div className="flex items-center gap-1.5">

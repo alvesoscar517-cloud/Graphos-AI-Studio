@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import Icon from '../Common/Icon'
 import { useTranslation } from 'react-i18next'
 import { debounce } from '../../utils/debounce'
 import { cn } from '../../lib/utils'
-import { Icon } from '../Common'
 
 const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
   const { t } = useTranslation()
@@ -119,7 +119,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
     }
     
     if (repetitiveWords.length > 0 && wordCount > 300) {
-      smartHints.push(`Repeated words: "${repetitiveWords.slice(0, 2).join('", "')}"`)
+      smartHints.push(`Repeated words:"${repetitiveWords.slice(0, 2).join('","')}"`)
     }
     
     const shortSentences = sentences.filter(s => s.trim().split(/\s+/).length < 10).length
@@ -220,10 +220,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
       onClick={onClose}
     >
       <div 
-        className={cn(
-          "bg-white rounded-2xl w-full max-w-[820px] max-h-[88vh]",
-          "flex flex-col shadow-xl",
-          "animate-slide-up overflow-hidden"
+        className={cn("bg-white border border-gray-200 rounded-2xl w-full max-w-[820px] max-h-[88vh]","flex flex-col shadow-xl","animate-slide-up overflow-hidden"
         )}
         onClick={(e) => e.stopPropagation()}
       >
@@ -245,10 +242,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
         {/* Content */}
         <div className="flex-1 flex flex-col py-3 px-7 pb-5 gap-3.5 overflow-y-auto min-h-0">
           <textarea
-            className={cn(
-              "w-full min-h-[420px] flex-1 p-4 text-sm font-sans leading-relaxed",
-              "text-gray-900 bg-gray-50 border border-gray-300 rounded-xl",
-              "resize-none outline-none placeholder:text-gray-500"
+            className={cn("w-full min-h-[420px] flex-1 p-4 text-sm font-sans leading-relaxed","text-gray-900 bg-gray-50 border border-gray-300 rounded-xl","resize-none outline-none placeholder:text-gray-500"
             )}
             placeholder={t('profileSetup.pasteTextPlaceholder')}
             value={text}
@@ -263,8 +257,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
                 <span className="text-sm text-gray-400 font-normal">/</span>
                 <span className="text-sm font-medium text-gray-500">5,000 {t('common.words')}</span>
               </div>
-              <div className={cn(
-                "py-1.5 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300",
+              <div className={cn("py-1.5 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300",
                 statusColors[status].bg,
                 statusColors[status].text
               )}>
@@ -274,9 +267,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
             <div className="flex flex-col gap-2">
               <div className="w-full h-1.5 bg-gray-200 rounded-xl relative overflow-hidden">
                 <div 
-                  className={cn(
-                    "h-full rounded-xl transition-all duration-400 ease-out",
-                    "bg-gradient-to-r",
+                  className={cn("h-full rounded-xl transition-all duration-400 ease-out","bg-gradient-to-r",
                     statusColors[status].fill
                   )}
                   style={{ width: `${progress}%` }}
@@ -286,9 +277,8 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
                 {[500, 1000, 2000, 3000, 5000].map((milestone, i) => (
                   <span 
                     key={milestone}
-                    className={cn(
-                      "text-xs font-semibold tracking-wide transition-all duration-300",
-                      wordCount >= milestone ? "text-emerald-500" : "text-gray-500"
+                    className={cn("text-xs font-semibold tracking-wide transition-all duration-300",
+                      wordCount >= milestone ?"text-emerald-500" :"text-gray-500"
                     )}
                   >
                     {i === 1 ? '1K' : i === 2 ? '2K' : i === 3 ? '3K' : i === 4 ? '5K' : milestone}
@@ -302,7 +292,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
         {/* Footer */}
         <div className="flex items-center justify-between py-4 px-7 shrink-0">
           <div className="flex items-center gap-2 py-2.5 px-3.5 bg-bg-secondary rounded-lg">
-            <img src="/icon/lightbulb.svg" alt="" width="16" height="16" className="shrink-0 opacity-60" />
+            <Icon name="lightbulb" className="shrink-0 opacity-60" />
             <span className="text-sm text-gray-600 leading-snug">{getPrimaryHint()}</span>
           </div>
           <div className="flex gap-2.5">
@@ -313,11 +303,7 @@ const PasteTextModal = ({ isOpen, onClose, onSave, initialText = '' }) => {
               {t('common.cancel')}
             </button>
             <button 
-              className={cn(
-                "py-2.5 px-6 text-sm font-medium border-none rounded-lg cursor-pointer transition-all duration-200",
-                "bg-primary text-white",
-                "hover:enabled:bg-primary-hover hover:enabled:-translate-y-px hover:enabled:shadow-md",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+              className={cn("py-2.5 px-6 text-sm font-medium border-none rounded-lg cursor-pointer transition-all duration-200","bg-primary text-white","hover:enabled:bg-primary-hover hover:enabled:-translate-y-px hover:enabled:shadow-md","disabled:opacity-50 disabled:cursor-not-allowed"
               )}
               onClick={handleSave}
               disabled={!canSave}

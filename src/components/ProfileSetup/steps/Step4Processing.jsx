@@ -11,25 +11,25 @@ import faceIdAnimation from '../../../animation/face-id.json'
 import error404Animation from '../../../animation/404 blue.json'
 
 const ProcessingView = ({ animationKey, processingStep, processingMessage, totalSamples, t }) => (
-  <div className="block animate-fade-in-slow h-[calc(100%-100px)] relative max-lg:h-auto" role="status" aria-live="polite" aria-busy="true">
-    <div className="grid grid-cols-2 h-full gap-0 relative min-h-0 overflow-hidden max-lg:grid-cols-1 max-lg:overflow-visible">
+  <div className="block animate-fade-in-slow h-[calc(100%-100px)] relative max-md:h-auto" role="status" aria-live="polite" aria-busy="true">
+    <div className="grid grid-cols-2 h-full gap-0 relative min-h-0 overflow-hidden max-md:grid-cols-1 max-md:overflow-visible">
       {/* Animation Container - Hidden on tablet portrait */}
-      <div className="flex items-center justify-center w-full h-full p-10 box-border bg-transparent max-lg:hidden">
-        <div className="!w-lottie-md !h-lottie-md max-w-full max-h-full max-lg:!w-lottie-sm max-lg:!h-lottie-sm">
+      <div className="flex items-center justify-center w-full h-full p-10 box-border bg-transparent max-md:hidden">
+        <div className="!w-lottie-md !h-lottie-md max-w-full max-h-full max-md:!w-lottie-sm max-md:!h-lottie-sm">
           <LottieWrapper key={`step4-${animationKey}`} animationData={loadingBlueAnimation} loop={true} />
         </div>
       </div>
       
       {/* Compact Animation for tablet/mobile */}
-      <div className="hidden max-lg:flex items-center justify-center py-6 bg-transparent">
+      <div className="hidden max-md:flex items-center justify-center py-6 bg-transparent">
         <div className="!w-lottie-xs !h-lottie-xs">
           <LottieWrapper key={`step4-mobile-${animationKey}`} animationData={loadingBlueAnimation} loop={true} />
         </div>
       </div>
       
       {/* Content Container - Right Column */}
-      <div className="py-2.5 pl-0 pr-10 flex flex-col justify-center bg-transparent overflow-y-auto h-full relative scrollbar-hidden max-lg:h-auto max-lg:overflow-visible max-lg:px-6 max-md:px-5">
-        <div className="w-[95%] max-lg:w-full">
+      <div className="py-2.5 pl-0 pr-10 flex flex-col justify-center bg-transparent overflow-y-auto h-full relative scrollbar-hidden max-md:h-auto max-md:overflow-visible max-md:px-6 max-sm:px-5">
+        <div className="w-[95%] max-md:w-full">
           <h1 className="text-2xl font-semibold text-gray-800 mb-3 leading-tight">
             {t('profileSetup.finalizingProfile')}
           </h1>
@@ -45,24 +45,22 @@ const ProcessingView = ({ animationKey, processingStep, processingMessage, total
               { step: 3, label: t('profileSetup.generatingVoice') || 'Generating voice profile' },
               { step: 4, label: t('profileSetup.savingProfile') || 'Saving profile' }
             ].map(({ step, label }) => (
-              <div key={step} className={cn(
-                "flex items-center gap-3 py-2.5 px-4 rounded-xl transition-all duration-300",
+              <div key={step} className={cn("flex items-center gap-3 py-2.5 px-4 rounded-xl transition-all duration-300",
                 processingStep >= step 
                   ? processingStep === step 
-                    ? "bg-text-link/10 border border-text-link/30" 
-                    : "bg-green-50 border border-green-200"
-                  : "bg-bg-secondary border border-border"
+                    ?"bg-text-link/10 border border-text-link/30" 
+                    :"bg-green-50 border border-green-200"
+                  :"bg-bg-secondary border border-border"
               )}>
                 {processingStep === step ? (
                   <div className="w-5 h-5 border-2 border-text-link border-t-transparent rounded-full animate-spin flex-shrink-0" />
                 ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={cn("flex-shrink-0", processingStep > step ? "stroke-success" : "stroke-gray-400")} strokeWidth="2">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={cn("flex-shrink-0", processingStep > step ?"stroke-success" :"stroke-gray-400")} strokeWidth="2">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 )}
-                <span className={cn(
-                  "text-sm font-medium",
-                  processingStep === step ? "text-text-link" : processingStep > step ? "text-green-600" : "text-text-muted"
+                <span className={cn("text-sm font-medium",
+                  processingStep === step ?"text-text-link" : processingStep > step ?"text-green-600" :"text-text-muted"
                 )}>
                   {label}
                 </span>
@@ -119,9 +117,9 @@ const CompletionView = ({ animationKey, qualityScore, onComplete, t }) => (
       {qualityScore ? (
         <div className="mb-8 animate-slide-up">
           <div className={cn("text-4xl font-bold mb-2",
-            qualityScore.rating === 'excellent' ? "text-success" :
-            qualityScore.rating === 'good' ? "text-text-link" :
-            qualityScore.rating === 'fair' ? "text-amber-500" : "text-text-muted"
+            qualityScore.rating === 'excellent' ?"text-success" :
+            qualityScore.rating === 'good' ?"text-text-link" :
+            qualityScore.rating === 'fair' ?"text-amber-500" :"text-text-muted"
           )}>{qualityScore.score}/100</div>
           <p className="text-sm text-input-placeholder">{qualityScore.recommendation}</p>
         </div>

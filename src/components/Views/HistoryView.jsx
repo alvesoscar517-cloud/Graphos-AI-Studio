@@ -12,6 +12,7 @@ import { SkeletonHistoryRow } from '../ui/skeleton'
 import { cn } from '../../lib/utils'
 import { createPortal } from 'react-dom'
 
+import { MessageSquare, PanelLeft, RefreshCw, Search, Trash2, HelpCircle, MessageCircle, FileText } from 'lucide-react'
 // Helper function to highlight search text
 const HighlightText = ({ text, searchTerm, regex }) => {
   if (!searchTerm || !text || !regex) return <>{text}</>
@@ -123,7 +124,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     const items = []
     // Filter notes with actual content
     notes.filter(noteHasContent).forEach(note => {
-      // Fallback title for notes: use first content or "Untitled"
+      // Fallback title for notes: use first content or"Untitled"
       const noteTitle = note.title?.trim() || 
         (note.content?.trim()?.split(/[.!?\n]/)[0]?.slice(0, 50)) || 
         t('common.untitled', 'Untitled')
@@ -138,7 +139,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     })
     // Filter conversations with actual messages
     conversations.filter(conversationHasContent).forEach(conv => {
-      // Fallback title for conversations: use first message or "New Chat"
+      // Fallback title for conversations: use first message or"New Chat"
       const convTitle = conv.title?.trim() || 
         (conv.messages?.[0]?.content?.trim()?.split(/[.!?\n]/)[0]?.slice(0, 50)) || 
         t('workspace.newChat', 'New Chat')
@@ -278,13 +279,9 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
       <tr 
         key={itemKey} 
         onClick={(e) => handleItemClick(item, e)}
-        className={cn(
-          "cursor-pointer transition-all duration-200",
-          isSelected && "!bg-primary/10",
-          isSelectionMode && "cursor-pointer",
-          "hover:bg-transparent [&:hover_td]:bg-bg-hover",
-          "[&:hover_td]:border-b-bg-hover",
-          "[&:hover_td:first-child]:rounded-l-lg [&:hover_td:last-child]:rounded-r-lg"
+        className={cn("cursor-pointer transition-all duration-200",
+          isSelected &&"!bg-primary/10",
+          isSelectionMode &&"cursor-pointer","hover:bg-transparent [&:hover_td]:bg-bg-hover","[&:hover_td]:border-b-bg-hover","[&:hover_td:first-child]:rounded-l-lg [&:hover_td:last-child]:rounded-r-lg"
         )}
       >
         {isSelectionMode && (
@@ -300,11 +297,13 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         )}
         <td className="py-2.5 pr-3 border-b border-border-light text-text-primary align-middle text-sm h-11 pl-4 min-w-40">
           <div className="flex items-center gap-3 font-normal text-text-primary overflow-hidden">
-            <img 
-              src={hasHelpPrefix(item.title) ? "/icon/help-circle.svg" : (item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg")} 
-              alt={hasHelpPrefix(item.title) ? "Help" : (item.type === 'chat' ? "Chat" : "Text")} 
-              className="w-5 h-5 opacity-55 shrink-0 icon-invert"
-            />
+            {hasHelpPrefix(item.title) ? (
+              <HelpCircle size={20} className="opacity-55 shrink-0" />
+            ) : item.type === 'chat' ? (
+              <MessageCircle size={20} className="opacity-55 shrink-0" />
+            ) : (
+              <FileText size={20} className="opacity-55 shrink-0" />
+            )}
             <span className="overflow-hidden text-ellipsis whitespace-nowrap">
               <HighlightText text={truncateTitleByWords(stripHelpPrefix(item.title), 7)} searchTerm={searchTerm} regex={searchRegex} />
             </span>
@@ -322,17 +321,13 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
         </td>
         <td className="w-12 text-right pr-4 py-2.5 border-b border-border-light align-middle text-sm h-11">
           <button 
-            className={cn(
-              "p-1 bg-transparent border-none cursor-pointer rounded",
-              "opacity-40 transition-all duration-200 flex items-center justify-center",
-              "w-7 h-7 shrink-0",
-              "hover:opacity-100 hover:bg-fill-tertiary"
+            className={cn("p-1 bg-transparent border-none cursor-pointer rounded","opacity-40 transition-all duration-200 flex items-center justify-center","w-7 h-7 shrink-0","hover:opacity-100 hover:bg-fill-tertiary"
             )}
             onClick={(e) => { e.stopPropagation(); handleDeleteItem(item) }}
             data-tooltip={t('common.delete')}
             data-tooltip-position="left"
           >
-            <img src="/icon/trash-2.svg" alt={t('common.delete')} className="w-4 h-4 icon-invert" />
+            <Trash2 size={16} />
           </button>
         </td>
       </tr>
@@ -347,11 +342,8 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
     return (
       <div 
         key={itemKey}
-        className={cn(
-          "bg-bg-secondary border border-border rounded-lg p-4",
-          "cursor-pointer transition-all duration-200 relative",
-          "hover:bg-bg-tertiary hover:border-border-hover",
-          isSelected && "bg-primary/10 border-primary"
+        className={cn("bg-bg-secondary border border-border rounded-lg p-4","cursor-pointer transition-all duration-200 relative","hover:bg-bg-tertiary hover:border-border-hover",
+          isSelected &&"bg-primary/10 border-primary"
         )}
         onClick={(e) => handleItemClick(item, e)}
       >
@@ -364,13 +356,15 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
             className="absolute top-4 left-4 w-5 h-5 cursor-pointer accent-primary"
           />
         )}
-        <div className={cn("flex items-center justify-between mb-2", isSelectionMode && isSelected && "ml-8")}>
+        <div className={cn("flex items-center justify-between mb-2", isSelectionMode && isSelected &&"ml-8")}>
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <img 
-              src={hasHelpPrefix(item.title) ? "/icon/help-circle.svg" : (item.type === 'chat' ? "/icon/message-circle.svg" : "/icon/file-text.svg")} 
-              alt={hasHelpPrefix(item.title) ? "Help" : (item.type === 'chat' ? t('history.chat') : t('history.text'))} 
-              className="w-5 h-5 opacity-55 shrink-0 icon-invert"
-            />
+            {hasHelpPrefix(item.title) ? (
+              <HelpCircle size={20} className="opacity-55 shrink-0" />
+            ) : item.type === 'chat' ? (
+              <MessageCircle size={20} className="opacity-55 shrink-0" />
+            ) : (
+              <FileText size={20} className="opacity-55 shrink-0" />
+            )}
             <span className="text-md font-medium text-text-primary overflow-hidden text-ellipsis whitespace-nowrap">
               <HighlightText text={truncateTitleByWords(stripHelpPrefix(item.title), 7)} searchTerm={searchTerm} regex={searchRegex} />
             </span>
@@ -381,7 +375,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
             data-tooltip={t('common.delete')}
             data-tooltip-position="left"
           >
-            <img src="/icon/trash-2.svg" alt={t('common.delete')} className="w-4 h-4 icon-invert" />
+            <Trash2 size={16} />
           </button>
         </div>
         <div className="flex items-center gap-2 text-sm text-text-secondary flex-wrap">
@@ -404,7 +398,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
             data-tooltip={t('common.menu')} 
             data-tooltip-position="right"
           >
-            <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+            <PanelLeft size={20} className="opacity-60" />
           </button>
         </div>
 
@@ -417,11 +411,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
               <div className="relative grid grid-cols-3 p-1 rounded-full bg-bg-secondary border border-border-light max-md:w-full">
                 {/* Sliding Pill Indicator */}
                 <motion.div
-                  className={cn(
-                    "absolute top-1 bottom-1 rounded-full",
-                    "bg-bg-primary border border-border-light",
-                    "shadow-sm",
-                    "col-span-1"
+                  className={cn("absolute top-1 bottom-1 rounded-full","bg-bg-primary border border-border-light","shadow-sm","col-span-1"
                   )}
                   initial={false}
                   animate={{
@@ -431,7 +421,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                   }}
                   style={{ width: 'calc(33.33% - 3px)' }}
                   transition={{
-                    type: "spring",
+                    type:"spring",
                     stiffness: 400,
                     damping: 30
                   }}
@@ -439,12 +429,10 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                 {['all', 'text', 'chat'].map(type => (
                   <button 
                     key={type}
-                    className={cn(
-                      "bg-transparent border-none py-1.5 px-5 rounded-full z-10 text-sm font-medium cursor-pointer transition-colors duration-200 text-center whitespace-nowrap",
-                      "max-lg:px-3 max-lg:text-xs",
+                    className={cn("bg-transparent border-none py-1.5 px-5 rounded-full z-10 text-sm font-medium cursor-pointer transition-colors duration-200 text-center whitespace-nowrap","max-lg:px-3 max-lg:text-xs",
                       filterType === type 
-                        ? "text-text-primary" 
-                        : "text-text-muted hover:text-text-secondary"
+                        ?"text-text-primary" 
+                        :"text-text-muted hover:text-text-secondary"
                     )}
                     onClick={() => setFilterType(type)}
                   >
@@ -457,22 +445,20 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
               {!isMobile && (
                 <>
                   <button 
-                    className={cn(
-                      "flex items-center gap-2 py-2 px-3 bg-transparent border border-border-hover rounded-lg cursor-pointer text-sm text-text-secondary font-normal transition-all duration-200 whitespace-nowrap shrink-0",
-                      "hover:text-text-primary hover:border-text-primary hover:bg-bg-tertiary",
-                      isSyncing && "[&_img]:animate-spin"
+                    className={cn("flex items-center gap-2 py-2 px-3 bg-transparent border border-border-hover rounded-lg cursor-pointer text-sm text-text-secondary font-normal transition-all duration-200 whitespace-nowrap shrink-0","hover:text-text-primary hover:border-text-primary hover:bg-bg-tertiary",
+                      isSyncing &&"[&_img]:animate-spin"
                     )}
                     onClick={handleSyncNotes}
                     disabled={isSyncing}
                     data-tooltip-collapsed={t('history.sync')}
                   >
-                    <img src="/icon/refresh-cw.svg" alt={t('history.sync')} className="w-icon-lg h-icon-lg opacity-60 transition-transform duration-600 icon-invert" />
+                    <RefreshCw size={20} className="opacity-60 transition-transform duration-600" />
                     <span className="max-xl:hidden">{t('history.sync')}</span>
                   </button>
                 </>
               )}
               <div className="flex items-center gap-2 py-2 px-3 bg-transparent border border-border-hover rounded-lg min-w-40 max-w-xs flex-1 max-md:w-full max-md:min-w-0 max-md:max-w-none">
-                <img src="/icon/search.svg" alt={t('common.search')} className="w-icon-lg h-icon-lg opacity-60 shrink-0 icon-invert" />
+                <Search size={20} className="opacity-60 shrink-0" />
                 <input 
                   ref={searchInputRef}
                   type="text" 
@@ -520,11 +506,11 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
                     {['updated', 'name', 'type'].map(sort => (
                       <button 
                         key={sort}
-                        className={cn("toolbar-btn max-lg:px-2", sortBy === sort && "active")}
+                        className={cn("toolbar-btn max-lg:px-2", sortBy === sort &&"active")}
                         onClick={() => toggleSortOrder(sort)}
                         data-tooltip-collapsed={sort === 'updated' ? t('history.date') : sort === 'name' ? t('history.name') : t('history.type')}
                       >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn("shrink-0", sortBy === sort ? "stroke-primary" : "stroke-text-secondary")}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn("shrink-0", sortBy === sort ?"stroke-primary" :"stroke-text-secondary")}>
                           {sort === 'updated' && <><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></>}
                           {sort === 'name' && <path d="M4 7h16M4 12h16M4 17h10"></path>}
                           {sort === 'type' && <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></>}
@@ -551,7 +537,7 @@ const HistoryView = ({ onToggleLeftSidebar, onViewChange }) => {
               </div>
             ) : sortedItems.length === 0 ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center py-10 px-5 text-center">
-                <img src="/icon/message-square.svg" alt={t('history.noItems')} className="w-20 h-20 opacity-20 mb-6 grayscale icon-invert" />
+                <MessageSquare size={48} className="opacity-20 mb-6 grayscale" />
                 <h3 className="text-xl font-medium text-text-primary mb-2">{t('history.noItems')}</h3>
                 <p className="text-sm text-text-secondary mb-8 leading-relaxed max-w-modal-sm">
                   {user ? t('history.noItemsDesc') : t('history.pleaseSignInToView')}

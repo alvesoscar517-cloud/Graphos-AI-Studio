@@ -44,10 +44,7 @@ const SparklesLoader = memo(function SparklesLoader(props) {
   }
 
   return (
-    <div className={cn(
-      "absolute inset-0 flex items-center justify-center z-10",
-      "bg-bg-secondary/30 backdrop-blur-[1px]",
-      "rounded-xl transition-all duration-200",
+    <div className={cn("absolute inset-0 flex items-center justify-center z-10","bg-bg-secondary/30 backdrop-blur-[1px]","rounded-xl transition-all duration-200",
       overlayClassName,
       className
     )}>

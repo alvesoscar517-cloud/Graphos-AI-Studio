@@ -87,11 +87,7 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
       {/* Main Badge */}
       <div 
         ref={badgeRef}
-        className={cn(
-          "inline-flex items-center py-1 px-2.5 text-xs font-medium",
-          "text-text-muted bg-bg-secondary rounded-xl",
-          "cursor-default transition-colors duration-150 select-none",
-          "hover:bg-bg-tertiary"
+        className={cn("inline-flex items-center py-1 px-2.5 text-xs font-medium","text-text-muted bg-bg-secondary rounded-xl","cursor-default transition-colors duration-150 select-none","hover:bg-bg-tertiary"
         )}
         onMouseEnter={handleBadgeEnter}
         onMouseLeave={handleBadgeLeave}
@@ -103,10 +99,7 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
       {warningLevel !== 'normal' && (
         <div
           ref={warningRef}
-          className={cn(
-            "inline-flex items-center justify-center w-6 h-6 ml-1",
-            "cursor-default rounded-md transition-colors duration-150",
-            "hover:bg-bg-tertiary"
+          className={cn("inline-flex items-center justify-center w-6 h-6 ml-1","cursor-default rounded-md transition-colors duration-150","hover:bg-bg-tertiary"
           )}
           onMouseEnter={handleWarningEnter}
           onMouseLeave={handleWarningLeave}
@@ -129,9 +122,7 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
           onMouseEnter={handleBadgeEnter}
           onMouseLeave={handleBadgeLeave}
         >
-          <div className={cn(
-            "bg-bg-primary border border-border-light rounded-lg",
-            "py-2 px-2.5 min-w-[170px] shadow-lg"
+          <div className={cn("bg-bg-primary border border-border rounded-lg","py-2 px-2.5 min-w-[170px] shadow-lg"
           )} style={{ fontSize: '11px' }}>
             <div className="flex justify-between items-center mb-1">
               <span className="font-semibold text-text-muted uppercase tracking-wide" style={{ fontSize: '10px' }}>
@@ -205,7 +196,7 @@ const TokenBadge = ({ text, task = 'rewrite' }) => {
           onMouseEnter={handleWarningEnter}
           onMouseLeave={handleWarningLeave}
         >
-          <div className="bg-bg-primary border border-warning rounded-lg py-2 px-2.5 min-w-[170px] shadow-lg" style={{ fontSize: '11px' }}>
+          <div className="bg-bg-primary border border-border rounded-lg py-2 px-2.5 min-w-[170px] shadow-lg" style={{ fontSize: '11px' }}>
             <div className="flex items-center gap-1.5 font-medium text-text-primary" style={{ fontSize: '12px' }}>
               <Icon name="alert-triangle" alt={t('common.warning')} size="sm" color="warning" themed={false} />
               <span>{warningLevel === 'danger' ? t('tokens.textVeryLong') : t('tokens.textQuiteLong')}</span>

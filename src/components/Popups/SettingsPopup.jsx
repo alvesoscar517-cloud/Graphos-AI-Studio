@@ -112,9 +112,7 @@ const SettingsPopup = ({ onClose, onViewChange }) => {
         {showThemeSubmenu && (
           <div 
             ref={themeSubmenuRef}
-            className={cn(
-              "popup fixed w-auto min-w-[140px] py-2 pr-2 z-popup-submenu",
-              "animate-fade-in"
+            className={cn("popup fixed w-auto min-w-[140px] py-2 pr-2 z-popup-submenu","animate-fade-in"
             )}
             style={{
               bottom: 'auto',
@@ -129,11 +127,10 @@ const SettingsPopup = ({ onClose, onViewChange }) => {
                 className="dropdown-item gap-3 pr-4"
                 onClick={() => handleThemeSelect(option.value)}
               >
-                <div className={cn(
-                  "w-5 h-5 rounded-full border-2 shrink-0 relative",
+                <div className={cn("w-5 h-5 rounded-full border-2 shrink-0 relative",
                   themeMode === option.value 
-                    ? "border-text-primary" 
-                    : "border-text-muted"
+                    ?"border-text-primary" 
+                    :"border-text-muted"
                 )}>
                   {themeMode === option.value && (
                     <div className="w-2.5 h-2.5 rounded-full bg-text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
@@ -168,9 +165,7 @@ const SettingsPopup = ({ onClose, onViewChange }) => {
         {showLanguageSubmenu && (
           <div 
             ref={languageSubmenuRef}
-            className={cn(
-              "popup fixed w-[200px] z-popup-submenu max-h-[320px] overflow-hidden",
-              "animate-fade-in"
+            className={cn("popup fixed w-[200px] z-popup-submenu max-h-[320px] overflow-hidden","animate-fade-in"
             )}
             style={{
               bottom: 'auto',
@@ -186,11 +181,10 @@ const SettingsPopup = ({ onClose, onViewChange }) => {
                   className="dropdown-item gap-2.5 pr-3"
                   onClick={() => handleLanguageSelect(lang.code)}
                 >
-                  <div className={cn(
-                    "w-4 h-4 rounded-full border-2 shrink-0 relative",
+                  <div className={cn("w-4 h-4 rounded-full border-2 shrink-0 relative",
                     currentLangCode === lang.code 
-                      ? "border-text-primary" 
-                      : "border-text-muted"
+                      ?"border-text-primary" 
+                      :"border-text-muted"
                   )}>
                     {currentLangCode === lang.code && (
                       <div className="w-2 h-2 rounded-full bg-text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />

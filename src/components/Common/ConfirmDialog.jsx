@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/utils';
+import { AlertTriangle, AlertOctagon, Info } from 'lucide-react';
 
 export default function ConfirmDialog({ 
   title, 
@@ -13,11 +14,17 @@ export default function ConfirmDialog({
 }) {
   const { t } = useTranslation();
   
-  const icons = {
-    warning: '/icon/alert-triangle.svg',
-    danger: '/icon/alert-octagon.svg',
-    info: '/icon/info.svg'
-  };
+  const IconComponent = {
+    warning: AlertTriangle,
+    danger: AlertOctagon,
+    info: Info
+  }[type] || AlertTriangle;
+
+  const iconColorClass = {
+    warning: 'text-warning',
+    danger: 'text-error',
+    info: 'text-primary'
+  }[type] || 'text-warning';
 
   return createPortal(
     <div 
@@ -41,16 +48,7 @@ export default function ConfirmDialog({
           type === 'danger' && "bg-system-red/15",
           type === 'info' && "bg-system-blue/15"
         )}>
-          <img 
-            src={icons[type]} 
-            alt={type} 
-            className={cn(
-              "w-7 h-7",
-              type === 'warning' && "filter-icon-warning",
-              type === 'danger' && "filter-icon-error",
-              type === 'info' && "filter-icon-primary"
-            )} 
-          />
+          <IconComponent size={28} className={iconColorClass} />
         </div>
 
         {/* Title */}

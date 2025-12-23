@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
 
+import { AlignLeft, BookOpen, FileText, List, RefreshCw, Shield } from 'lucide-react'
 const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, onSliderInteraction }) => {
   const { t } = useTranslation()
   const [localPreferences, setLocalPreferences] = useState(preferences || {
@@ -40,25 +41,25 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
   const preferenceItems = [
     {
       key: 'useVocabularyPreferences',
-      icon: '/icon/book-open.svg',
+      icon: 'book-open',
       title: t('writingPreferences.preferredVocabulary'),
       description: t('writingPreferences.preferredVocabularyDesc')
     },
     {
       key: 'useKeyCharacteristics',
-      icon: '/icon/list.svg',
+      icon: 'list',
       title: t('writingPreferences.keyFeatures'),
       description: t('writingPreferences.keyFeaturesDesc')
     },
     {
       key: 'useSentencePatterns',
-      icon: '/icon/align-left.svg',
+      icon: 'align-left',
       title: t('writingPreferences.sentenceStructure'),
       description: t('writingPreferences.sentenceStructureDesc')
     },
     {
       key: 'useRewriteInstructions',
-      icon: '/icon/file-text.svg',
+      icon: 'file-text',
       title: t('writingPreferences.rewriteInstructions'),
       description: t('writingPreferences.rewriteInstructionsDesc')
     }
@@ -67,7 +68,7 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
   // Anti-AI Detection - works without profile (applies anti-AI rules to rewrite)
   const antiAIDetectionItem = {
     key: 'useAntiAIDetection',
-    icon: '/icon/shield.svg',
+    icon: 'shield',
     title: t('writingPreferences.antiAIDetection'),
     description: t('writingPreferences.antiAIDetectionDesc'),
     badge: t('writingPreferences.new')
@@ -76,7 +77,7 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
   // Iterative Refinement - works without profile (switches between Rewrite and Humanize)
   const iterativeRefinementItem = {
     key: 'useIterativeRefinement',
-    icon: '/icon/refresh-cw.svg',
+    icon: 'refresh-cw',
     title: t('writingPreferences.iterativeRefinement'),
     description: t('writingPreferences.iterativeRefinementDesc'),
     badge: t('writingPreferences.beta')
@@ -99,10 +100,8 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
 
       <div className="flex flex-col gap-1">
         {preferenceItems.map((item) => (
-          <div key={item.key} className={cn(
-            "flex items-center justify-between gap-2 py-2 px-2.5",
-            "bg-bg-secondary border border-border-light rounded-xl",
-            isProfileDisabled && "opacity-50 pointer-events-none"
+          <div key={item.key} className={cn("flex items-center justify-between gap-2 py-2 px-2.5","bg-bg-secondary border border-border-light rounded-xl",
+            isProfileDisabled &&"opacity-50 pointer-events-none"
           )}>
             <div className="flex items-center gap-2 flex-1 min-w-0">
               <Icon name={item.icon.replace('/icon/', '').replace('.svg', '')} alt={item.title} size="md" color="muted" themed className="shrink-0" />
@@ -134,9 +133,7 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
 
       <div className="flex flex-col gap-1">
         {/* Anti-AI Detection - works without profile */}
-        <div className={cn(
-          "flex items-center justify-between gap-2 py-2 px-2.5",
-          "bg-bg-secondary border border-border-light rounded-xl"
+        <div className={cn("flex items-center justify-between gap-2 py-2 px-2.5","bg-bg-secondary border border-border-light rounded-xl"
         )}>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <Icon name="shield" alt={antiAIDetectionItem.title} size="md" color="muted" themed className="shrink-0" />
@@ -161,9 +158,7 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
         </div>
 
         {/* Iterative Refinement - works without profile, switches between Rewrite and Humanize */}
-        <div className={cn(
-          "flex items-center justify-between gap-2 py-2 px-2.5",
-          "bg-bg-secondary border border-border-light rounded-xl"
+        <div className={cn("flex items-center justify-between gap-2 py-2 px-2.5","bg-bg-secondary border border-border-light rounded-xl"
         )}>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <Icon name="refresh-cw" alt={iterativeRefinementItem.title} size="md" color="muted" themed className="shrink-0" />
@@ -189,9 +184,7 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
 
         {/* Target AI Probability Slider */}
         {localPreferences.useIterativeRefinement && (
-          <div className={cn(
-            "flex flex-col gap-1.5 py-2 px-2.5",
-            "bg-bg-secondary border border-border-light rounded-xl"
+          <div className={cn("flex flex-col gap-1.5 py-2 px-2.5","bg-bg-secondary border border-border-light rounded-xl"
           )}>
             <div className="flex justify-between items-center text-[11px]">
               <span className="text-text-primary font-medium">{t('writingPreferences.targetAIProbability')}</span>
@@ -219,13 +212,7 @@ const WritingPreferences = ({ currentProfile, preferences, onPreferencesChange, 
                 onSliderInteraction?.(true)
               }}
               onMouseUp={() => onSliderInteraction?.(false)}
-              className={cn(
-                "w-full h-1 rounded appearance-none cursor-pointer touch-none",
-                "bg-bg-tertiary",
-                "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4",
-                "[&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-full",
-                "[&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform",
-                "[&::-webkit-slider-thumb]:hover:scale-110"
+              className={cn("w-full h-1 rounded appearance-none cursor-pointer touch-none","bg-bg-tertiary","[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4","[&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-full","[&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform","[&::-webkit-slider-thumb]:hover:scale-110"
               )}
             />
             <div className="flex justify-between text-xs text-text-muted">

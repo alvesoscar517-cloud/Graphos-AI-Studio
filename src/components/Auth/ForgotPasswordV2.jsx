@@ -99,12 +99,7 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
     await onResetPassword.request(email)
   }
 
-  const inputClass = cn(
-    "w-full pl-11 pr-3.5 py-3 text-sm border border-gray-200 rounded-xl",
-    "bg-white text-gray-900 transition-all duration-200",
-    "focus:outline-none focus:border-system-blue focus:ring-2 focus:ring-system-blue/20",
-    "disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed",
-    "placeholder:text-gray-400"
+  const inputClass = cn("w-full pl-11 pr-3.5 py-3 text-sm border border-gray-200 rounded-xl","bg-white text-gray-900 transition-all duration-200","focus:outline-none focus:border-system-blue focus:ring-2 focus:ring-system-blue/20","disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed","placeholder:text-gray-400"
   )
 
   // Success Step
@@ -125,9 +120,7 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
         <button
           type="button"
           onClick={onCancel}
-          className={cn(
-            "w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200",
-            "bg-system-blue text-white hover:brightness-110 active:scale-[0.98]"
+          className={cn("w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200","bg-system-blue text-white hover:brightness-110 active:scale-[0.98]"
           )}
         >
           {t('auth.email.backToLogin', 'Back to login')}
@@ -191,7 +184,7 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
               placeholder={t('auth.email.newPasswordPlaceholder')} 
               disabled={loading} 
               autoComplete="new-password" 
-              className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm pr-10 sm:pr-12", errors.newPassword && "border-red-300")} 
+              className={cn(inputClass,"pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm pr-10 sm:pr-12", errors.newPassword &&"border-red-300")} 
             />
             <button 
               type="button" 
@@ -236,7 +229,7 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
               placeholder={t('auth.email.confirmPasswordPlaceholder')} 
               disabled={loading} 
               autoComplete="new-password" 
-              className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.confirmPassword && "border-red-300")} 
+              className={cn(inputClass,"pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.confirmPassword &&"border-red-300")} 
             />
           </div>
           {errors.confirmPassword && (
@@ -258,10 +251,7 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
         <button 
           type="submit" 
           disabled={loading}
-          className={cn(
-            "w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200",
-            "bg-system-blue text-white hover:brightness-110 active:scale-[0.98] active:brightness-95",
-            "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100"
+          className={cn("w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200","bg-system-blue text-white hover:brightness-110 active:scale-[0.98] active:brightness-95","disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100"
           )}
         >
           {loading ? (
@@ -326,7 +316,7 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
             placeholder={t('auth.email.emailPlaceholder')} 
             disabled={loading} 
             autoComplete="email" 
-            className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.email && "border-red-300")} 
+            className={cn(inputClass,"pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.email &&"border-red-300")} 
           />
         </div>
         {errors.email && (
@@ -358,10 +348,7 @@ const ForgotPasswordV2 = ({ onResetPassword, onCancel, isLoading: externalLoadin
       <button 
         type="submit" 
         disabled={loading || emailSentSuccess}
-        className={cn(
-          "w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200",
-          "bg-system-blue text-white hover:brightness-110 active:scale-[0.98] active:brightness-95",
-          "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100"
+        className={cn("w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200","bg-system-blue text-white hover:brightness-110 active:scale-[0.98] active:brightness-95","disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100"
         )}
       >
         {loading ? (

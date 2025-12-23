@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/utils'
 import Icon from '../../Common/Icon'
 
+import { FileText, Paperclip, Send, X } from 'lucide-react'
 // Supported file types
 const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
 const SUPPORTED_DOC_TYPES = ['application/pdf', 'text/plain', 'text/csv', 'application/json']
@@ -149,19 +150,12 @@ const ChatInput = ({ onSendMessage, disabled }) => {
   }
 
   return (
-    <div className={cn(
-      "fixed bottom-0 left-sidebar right-sidebar-right z-10",
-      "py-4 px-6 pb-6",
-      "bg-gradient-to-t from-bg-primary from-80% to-transparent",
-      "max-lg:left-0 max-lg:right-0"
+    <div className={cn("fixed bottom-0 left-sidebar right-sidebar-right z-10","py-4 px-6 pb-6","bg-gradient-to-t from-bg-primary from-80% to-transparent","max-lg:left-0 max-lg:right-0"
     )}>
       <div className="max-w-2xl mx-auto flex flex-col gap-2 w-full">
         {/* Upload Error */}
         {uploadError && (
-          <div className={cn(
-            "flex items-center gap-2 py-2 px-3",
-            "bg-error/10 border border-error/20 rounded-lg",
-            "text-sm text-error"
+          <div className={cn("flex items-center gap-2 py-2 px-3","bg-error/10 border border-error/20 rounded-lg","text-sm text-error"
           )}>
             <Icon name="alert-circle" size="sm" color="error" />
             <span>{uploadError}</span>
@@ -170,18 +164,12 @@ const ChatInput = ({ onSendMessage, disabled }) => {
 
         {/* Attachments Preview */}
         {attachments.length > 0 && (
-          <div className={cn(
-            "flex flex-wrap gap-2 p-2",
-            "bg-bg-secondary rounded-t-xl",
-            "border border-border-light border-b-0"
+          <div className={cn("flex flex-wrap gap-2 p-2","bg-bg-secondary rounded-t-xl","border border-border-light border-b-0"
           )}>
             {attachments.map((attachment, index) => (
               <div 
                 key={index} 
-                className={cn(
-                  "flex items-center gap-2 py-1.5 px-2",
-                  "bg-bg-primary border border-border-light rounded-lg",
-                  "max-w-attachment"
+                className={cn("flex items-center gap-2 py-1.5 px-2","bg-bg-primary border border-border-light rounded-lg","max-w-attachment"
                 )}
               >
                 {attachment.isImage ? (
@@ -192,7 +180,7 @@ const ChatInput = ({ onSendMessage, disabled }) => {
                   />
                 ) : (
                   <div className="w-10 h-10 flex items-center justify-center rounded bg-bg-hover">
-                    <img src="/icon/file-text.svg" alt={t('chat.file')} className="w-5 h-5 opacity-60 icon-invert" />
+                    <FileText size={20} className="opacity-60" />
                   </div>
                 )}
                 <div className="flex flex-col gap-0.5 min-w-0 flex-1">
@@ -208,16 +196,13 @@ const ChatInput = ({ onSendMessage, disabled }) => {
                   </span>
                 </div>
                 <button 
-                  className={cn(
-                    "p-1 bg-transparent border-none cursor-pointer rounded",
-                    "opacity-50 flex items-center justify-center",
-                    "hover:opacity-100 hover:bg-bg-hover"
+                  className={cn("p-1 bg-transparent border-none cursor-pointer rounded","opacity-50 flex items-center justify-center","hover:opacity-100 hover:bg-bg-hover"
                   )}
                   onClick={() => handleRemoveAttachment(index)}
                   data-tooltip={t('common.remove')}
                   data-tooltip-position="top"
                 >
-                  <img src="/icon/x.svg" alt={t('common.remove')} className="w-3.5 h-3.5 icon-invert" />
+                  <X size={14} />
                 </button>
               </div>
             ))}
@@ -225,36 +210,23 @@ const ChatInput = ({ onSendMessage, disabled }) => {
         )}
 
         {/* Input Box */}
-        <div className={cn(
-          "flex items-end gap-2 py-3 px-4",
-          "bg-bg-secondary border border-border-hover rounded-3xl",
-          "transition-all duration-200",
-          attachments.length > 0 && "rounded-t-none border-t-0"
+        <div className={cn("flex items-end gap-2 py-3 px-4","bg-bg-secondary border border-border-hover rounded-3xl","transition-all duration-200",
+          attachments.length > 0 &&"rounded-t-none border-t-0"
         )}>
           <button 
-            className={cn(
-              "p-2 bg-transparent border-none cursor-pointer rounded-full",
-              "opacity-60 flex items-center justify-center",
-              "transition-all duration-200",
-              "hover:opacity-100 hover:bg-bg-hover",
-              "disabled:opacity-30 disabled:cursor-not-allowed"
+            className={cn("p-2 bg-transparent border-none cursor-pointer rounded-full","opacity-60 flex items-center justify-center","transition-all duration-200","hover:opacity-100 hover:bg-bg-hover","disabled:opacity-30 disabled:cursor-not-allowed"
             )}
             onClick={() => fileInputRef.current?.click()}
             disabled={disabled}
             data-tooltip={t('common.attach')}
             data-tooltip-position="top"
           >
-            <img src="/icon/paperclip.svg" alt={t('common.attach')} className="w-5 h-5 icon-invert" />
+            <Paperclip size={20} />
           </button>
 
           <textarea
             ref={textareaRef}
-            className={cn(
-              "flex-1 border-none bg-transparent resize-none",
-              "text-sm leading-relaxed text-text-primary",
-              "max-h-40 overflow-y-auto",
-              "placeholder:text-text-muted",
-              "focus:outline-none"
+            className={cn("flex-1 border-none bg-transparent resize-none","text-sm leading-relaxed text-text-primary","max-h-40 overflow-y-auto","placeholder:text-text-muted","focus:outline-none"
             )}
             placeholder={t('workspace.typeMessage')}
             value={message}
@@ -267,19 +239,14 @@ const ChatInput = ({ onSendMessage, disabled }) => {
 
           {(message.trim() || attachments.length > 0) && (
             <button 
-              className={cn(
-                "p-2 rounded-full cursor-pointer border-none",
-                "bg-primary flex items-center justify-center",
-                "transition-all duration-200",
-                "hover:bg-primary-hover",
-                "disabled:opacity-30 disabled:cursor-not-allowed"
+              className={cn("p-2 rounded-full cursor-pointer border-none","bg-primary flex items-center justify-center","transition-all duration-200","hover:bg-primary-hover","disabled:opacity-30 disabled:cursor-not-allowed"
               )}
               onClick={handleSend}
               disabled={disabled}
               data-tooltip={t('common.send')}
               data-tooltip-position="top"
             >
-              <img src="/icon/send.svg" alt={t('common.send')} className="w-5 h-5 invert" />
+              <Send size={20} />
             </button>
           )}
 
@@ -294,10 +261,7 @@ const ChatInput = ({ onSendMessage, disabled }) => {
         </div>
 
         {/* Supported formats hint */}
-        <div className={cn(
-          "text-xs text-text-muted text-center",
-          "opacity-0 transition-opacity duration-200",
-          "group-focus-within:opacity-100"
+        <div className={cn("text-xs text-text-muted text-center","opacity-0 transition-opacity duration-200","group-focus-within:opacity-100"
         )}>
           {t('editor.supportsFormats')}
         </div>

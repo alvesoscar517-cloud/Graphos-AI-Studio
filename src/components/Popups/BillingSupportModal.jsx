@@ -13,6 +13,15 @@ import { useSendBillingSupport } from '@/hooks/queries'
 import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
 
+import { Clock, ShieldCheck, Users } from 'lucide-react'
+
+// Icon mapping for info cards
+const INFO_CARD_ICONS = {
+  'clock': Clock,
+  'users': Users,
+  'shield-check': ShieldCheck,
+}
+
 // Validation schema
 const billingSupportSchema = z.object({
   category: z.string().min(1, 'Please select a category'),
@@ -115,9 +124,7 @@ const BillingSupportModal = ({ onClose }) => {
 
   return createPortal(
     <div 
-      className={cn(
-        "fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-toast animate-fade-in",
-        "p-4 max-md:p-3 max-md:items-end"
+      className={cn("fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-toast animate-fade-in","p-4 max-md:p-3 max-md:items-end"
       )}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
@@ -125,11 +132,7 @@ const BillingSupportModal = ({ onClose }) => {
     >
       <div 
         ref={modalRef} 
-        className={cn(
-          "bg-bg-primary rounded-2xl w-full max-w-[600px] max-h-[90vh]",
-          "flex flex-col overflow-hidden shadow-modal",
-          "animate-slide-up",
-          "max-md:max-w-full max-md:max-h-[85vh] max-md:rounded-t-2xl max-md:rounded-b-none"
+        className={cn("bg-bg-primary border border-border rounded-2xl w-full max-w-[600px] max-h-[90vh]","flex flex-col overflow-hidden shadow-modal","animate-slide-up","max-md:max-w-full max-md:max-h-[85vh] max-md:rounded-t-2xl max-md:rounded-b-none"
         )}
         onClick={(e) => e.stopPropagation()}
       >
@@ -152,16 +155,19 @@ const BillingSupportModal = ({ onClose }) => {
           {/* Info Cards */}
           <div className="grid grid-cols-3 gap-2 mb-6 max-sm:grid-cols-1">
             {[
-              { icon: '/icon/clock.svg', title: t('billing.responseTime'), value: '< 24h' },
-              { icon: '/icon/users.svg', title: t('billing.supportTeam'), value: t('billing.available') },
-              { icon: '/icon/shield-check.svg', title: t('billing.secure'), value: t('billing.encrypted') }
-            ].map((card, idx) => (
+              { icon: 'clock', title: t('billing.responseTime'), value: '< 24h' },
+              { icon: 'users', title: t('billing.supportTeam'), value: t('billing.available') },
+              { icon: 'shield-check', title: t('billing.secure'), value: t('billing.encrypted') }
+            ].map((card, idx) => {
+              const CardIcon = INFO_CARD_ICONS[card.icon] || Clock
+              return (
               <div key={idx} className="p-3 bg-bg-secondary rounded-xl text-center">
-                <img src={card.icon} alt={card.title} className="w-5 h-5 mx-auto mb-1.5 opacity-60 icon-invert" />
+                <CardIcon size={20} className="mx-auto mb-1.5 opacity-60" />
                 <p className="m-0 text-xs text-text-muted">{card.title}</p>
                 <p className="m-0 text-sm font-semibold text-text-primary">{card.value}</p>
               </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* Support Categories */}
@@ -171,11 +177,8 @@ const BillingSupportModal = ({ onClose }) => {
               {categories.map((cat) => (
                 <div
                   key={cat.key}
-                  className={cn(
-                    "py-2 px-4 bg-bg-secondary border border-border rounded-pill",
-                    "text-sm text-text-primary cursor-pointer transition-all duration-200 select-none",
-                    "hover:border-accent hover:bg-bg-hover",
-                    category === cat.key && "bg-primary text-white border-accent"
+                  className={cn("py-2 px-4 bg-bg-secondary border border-border rounded-pill","text-sm text-text-primary cursor-pointer transition-all duration-200 select-none","hover:border-accent hover:bg-bg-hover",
+                    category === cat.key &&"bg-primary text-white border-accent"
                   )}
                   onClick={() => setValue('category', cat.key, { shouldValidate: true })}
                 >
@@ -199,11 +202,8 @@ const BillingSupportModal = ({ onClose }) => {
                 {...register('subject')}
                 placeholder={t('billing.briefDescription')}
                 maxLength={100}
-                className={cn(
-                  "w-full box-border py-3 px-4 border rounded-xl",
-                  "bg-bg-primary text-text-primary text-sm font-sans",
-                  "placeholder:text-text-muted focus:outline-none focus:border-primary",
-                  errors.subject ? "border-error" : "border-border"
+                className={cn("w-full box-border py-3 px-4 border rounded-xl","bg-bg-primary text-text-primary text-sm font-sans","placeholder:text-text-muted focus:outline-none focus:border-primary",
+                  errors.subject ?"border-error" :"border-border"
                 )}
               />
               {errors.subject && (
@@ -220,13 +220,8 @@ const BillingSupportModal = ({ onClose }) => {
                 placeholder={t('billing.descriptionPlaceholder')}
                 rows={6}
                 maxLength={2000}
-                className={cn(
-                  "w-full box-border py-3 px-4 border rounded-xl",
-                  "bg-bg-primary text-text-primary text-sm font-sans leading-relaxed",
-                  "placeholder:text-text-muted focus:outline-none focus:border-primary",
-                  "resize-none h-[140px] min-h-[140px] max-h-[140px] overflow-y-auto scrollbar-none",
-                  "whitespace-pre-wrap break-words",
-                  errors.description ? "border-error" : "border-border"
+                className={cn("w-full box-border py-3 px-4 border rounded-xl","bg-bg-primary text-text-primary text-sm font-sans leading-relaxed","placeholder:text-text-muted focus:outline-none focus:border-primary","resize-none h-[140px] min-h-[140px] max-h-[140px] overflow-y-auto scrollbar-none","whitespace-pre-wrap break-words",
+                  errors.description ?"border-error" :"border-border"
                 )}
               />
               <div className="flex justify-between mt-1.5">
@@ -254,12 +249,7 @@ const BillingSupportModal = ({ onClose }) => {
                 />
                 <button
                   type="button"
-                  className={cn(
-                    "inline-flex items-center gap-2 py-2.5 px-4",
-                    "bg-bg-secondary border-2 border-dashed border-border rounded-xl",
-                    "text-text-primary text-sm font-medium cursor-pointer transition-all duration-200",
-                    "hover:not-disabled:bg-bg-hover hover:not-disabled:border-accent hover:not-disabled:-translate-y-px hover:not-disabled:shadow-popup",
-                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={cn("inline-flex items-center gap-2 py-2.5 px-4","bg-bg-secondary border-2 border-dashed border-border rounded-xl","text-text-primary text-sm font-medium cursor-pointer transition-all duration-200","hover:not-disabled:bg-bg-hover hover:not-disabled:border-accent hover:not-disabled:-translate-y-px hover:not-disabled:shadow-popup","disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                   onClick={() => fileInputRef.current?.click()}
                   disabled={attachments.length >= 3}
@@ -304,11 +294,7 @@ const BillingSupportModal = ({ onClose }) => {
               </button>
               <button 
                 type="submit" 
-                className={cn(
-                  "py-3 px-6 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200",
-                  "border border-primary bg-primary text-white",
-                  "hover:not-disabled:bg-primary-hover hover:not-disabled:-translate-y-px",
-                  "disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                className={cn("py-3 px-6 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200","border border-primary bg-primary text-white","hover:not-disabled:bg-primary-hover hover:not-disabled:-translate-y-px","disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
                 )}
                 disabled={isSubmitting}
               >

@@ -191,7 +191,7 @@ export function WelcomeBanner() {
                   onClick={handleClose}
                   className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 w-7 h-7 sm:w-8 sm:h-8 
                              flex items-center justify-center rounded-full
-                             bg-black/50 hover:bg-black/70 transition-colors"
+                            bg-black/50 hover:bg-black/70 transition-colors"
                 >
                   <XIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                 </button>
@@ -220,7 +220,7 @@ export function WelcomeBanner() {
                         className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 
                                    w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full
                                    bg-white/20 hover:bg-white/40 backdrop-blur-sm
-                                   transition-all duration-200 hover:scale-110"
+                                  transition-all duration-200 hover:scale-110"
                       >
                         <ChevronLeftIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow-lg" />
                       </button>
@@ -229,7 +229,7 @@ export function WelcomeBanner() {
                         className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 
                                    w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full
                                    bg-white/20 hover:bg-white/40 backdrop-blur-sm
-                                   transition-all duration-200 hover:scale-110"
+                                  transition-all duration-200 hover:scale-110"
                       >
                         <ChevronRightIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow-lg" />
                       </button>
@@ -239,7 +239,7 @@ export function WelcomeBanner() {
                   {/* Progress dots */}
                   {BANNER_IMAGES.length > 1 && (
                     <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 
-                                    flex gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-sm">
+                                   flex gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-sm">
                       {BANNER_IMAGES.map((_, index) => (
                         <button
                           key={index}

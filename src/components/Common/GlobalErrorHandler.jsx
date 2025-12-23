@@ -8,6 +8,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@/stores/appStore'
 
+import { AlertCircle, AlertTriangle, Bug, ClockAlert, CloudAlert, CloudOff, Construction, Home, RefreshCw, ShieldOff, WifiOff } from 'lucide-react'
+
 // Error types for categorization
 const ERROR_TYPES = {
   OFFLINE: 'offline',
@@ -20,16 +22,16 @@ const ERROR_TYPES = {
   UNKNOWN: 'unknown'
 }
 
-// Icon mapping for each error type
-const ERROR_ICONS = {
-  [ERROR_TYPES.OFFLINE]: '/icon/wifi-off.svg',
-  [ERROR_TYPES.NETWORK]: '/icon/wifi-off.svg',
-  [ERROR_TYPES.SERVER]: '/icon/cloud-alert.svg',
-  [ERROR_TYPES.TIMEOUT]: '/icon/clock-alert.svg',
-  [ERROR_TYPES.MAINTENANCE]: '/icon/construction.svg',
-  [ERROR_TYPES.FORBIDDEN]: '/icon/shield-off.svg',
-  [ERROR_TYPES.QUOTA]: '/icon/alert-circle.svg',
-  [ERROR_TYPES.UNKNOWN]: '/icon/alert-triangle.svg'
+// Icon component mapping for each error type
+const ERROR_ICON_COMPONENTS = {
+  [ERROR_TYPES.OFFLINE]: WifiOff,
+  [ERROR_TYPES.NETWORK]: WifiOff,
+  [ERROR_TYPES.SERVER]: CloudAlert,
+  [ERROR_TYPES.TIMEOUT]: ClockAlert,
+  [ERROR_TYPES.MAINTENANCE]: Construction,
+  [ERROR_TYPES.FORBIDDEN]: ShieldOff,
+  [ERROR_TYPES.QUOTA]: AlertCircle,
+  [ERROR_TYPES.UNKNOWN]: AlertTriangle
 }
 
 /**
@@ -267,25 +269,15 @@ export function GlobalErrorHandler({ children }) {
   // Show error page if there's a global error
   if (globalError) {
     const { title, message } = getErrorContent()
-    const icon = ERROR_ICONS[errorType] || ERROR_ICONS[ERROR_TYPES.UNKNOWN]
+    const IconComponent = ERROR_ICON_COMPONENTS[errorType] || ERROR_ICON_COMPONENTS[ERROR_TYPES.UNKNOWN]
 
     return (
       <div className="flex items-center justify-center min-h-screen w-full p-4 bg-bg-primary box-border">
         <div className="flex flex-col items-center text-center max-w-[520px] w-full">
           {/* Error Icon - same style as ErrorPage */}
-          <div className="w-36 h-36 mb-6">
-            <img src={icon} alt="Error" className="w-full h-full object-contain error-icon-style" />
+          <div className="w-36 h-36 mb-6 flex items-center justify-center">
+            <IconComponent size={96} className="text-text-muted opacity-60" />
           </div>
-          <style>{`
-            .error-icon-style {
-              opacity: 0.6;
-            }
-            .dark .error-icon-style,
-            [data-theme="dark"] .error-icon-style {
-              filter: invert(1) brightness(2);
-              opacity: 0.7;
-            }
-          `}</style>
 
           {/* Error Title */}
           <h1 className="text-xl font-semibold text-text-primary m-0 mb-2">{title}</h1>
@@ -301,7 +293,7 @@ export function GlobalErrorHandler({ children }) {
               className="inline-flex items-center justify-center gap-2 py-2.5 px-5 text-sm font-medium rounded-lg border-none cursor-pointer transition-all bg-accent text-white hover:bg-accent-hover active:scale-[0.98]"
               onClick={handleRetry}
             >
-              <img src="/icon/refresh-cw.svg" alt="" className="w-4 h-4 brightness-0 invert" />
+              <RefreshCw />
               {t('errorPage.tryAgain', 'Try Again')}
             </button>
 
@@ -310,7 +302,7 @@ export function GlobalErrorHandler({ children }) {
                 className="inline-flex items-center justify-center gap-2 py-2.5 px-5 text-sm font-medium rounded-lg cursor-pointer transition-all bg-bg-secondary text-text-primary border border-border-light hover:bg-bg-hover active:scale-[0.98]"
                 onClick={() => (window.location.href = '/')}
               >
-                <img src="/icon/home.svg" alt="" className="w-4 h-4 opacity-70 icon-invert" />
+                <Home size={18} className="opacity-70" />
                 {t('errorPage.backToHome', 'Back to Home')}
               </button>
             )}
@@ -408,49 +400,49 @@ export function GlobalErrorTestButton() {
             onClick={() => triggerError('offline')}
             className="w-full text-left px-3 py-2 text-sm hover:bg-bg-hover rounded flex items-center gap-2"
           >
-            <img src="/icon/wifi-off.svg" alt="" className="w-4 h-4 icon-invert" />
+            <WifiOff />
             Offline
           </button>
           <button
             onClick={() => triggerError('network')}
             className="w-full text-left px-3 py-2 text-sm hover:bg-bg-hover rounded flex items-center gap-2"
           >
-            <img src="/icon/cloud-off.svg" alt="" className="w-4 h-4 icon-invert" />
+            <CloudOff />
             Network Error
           </button>
           <button
             onClick={() => triggerError('server')}
             className="w-full text-left px-3 py-2 text-sm hover:bg-bg-hover rounded flex items-center gap-2"
           >
-            <img src="/icon/cloud-alert.svg" alt="" className="w-4 h-4 icon-invert" />
+            <CloudAlert />
             Server Error
           </button>
           <button
             onClick={() => triggerError('timeout')}
             className="w-full text-left px-3 py-2 text-sm hover:bg-bg-hover rounded flex items-center gap-2"
           >
-            <img src="/icon/clock-alert.svg" alt="" className="w-4 h-4 icon-invert" />
+            <ClockAlert />
             Timeout
           </button>
           <button
             onClick={() => triggerError('maintenance')}
             className="w-full text-left px-3 py-2 text-sm hover:bg-bg-hover rounded flex items-center gap-2"
           >
-            <img src="/icon/construction.svg" alt="" className="w-4 h-4 icon-invert" />
+            <Construction />
             Maintenance
           </button>
           <button
             onClick={() => triggerError('forbidden')}
             className="w-full text-left px-3 py-2 text-sm hover:bg-bg-hover rounded flex items-center gap-2"
           >
-            <img src="/icon/shield-off.svg" alt="" className="w-4 h-4 icon-invert" />
+            <ShieldOff />
             Forbidden
           </button>
           <button
             onClick={() => triggerError('quota')}
             className="w-full text-left px-3 py-2 text-sm hover:bg-bg-hover rounded flex items-center gap-2"
           >
-            <img src="/icon/alert-circle.svg" alt="" className="w-4 h-4 icon-invert" />
+            <AlertCircle />
             Quota Exceeded
           </button>
         </div>
@@ -460,7 +452,7 @@ export function GlobalErrorTestButton() {
         className="w-10 h-10 rounded-full bg-system-red text-white flex items-center justify-center shadow-lg hover:bg-system-red/90 transition-colors"
         title="Test Global Errors"
       >
-        <img src="/icon/bug.svg" alt="" className="w-5 h-5 brightness-0 invert" />
+        <Bug size={20} />
       </button>
     </div>
   )

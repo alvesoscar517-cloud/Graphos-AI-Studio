@@ -100,9 +100,7 @@ const FeedbackModal = ({ onClose }) => {
 
   return createPortal(
     <div 
-      className={cn(
-        "fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-toast animate-fade-in",
-        "p-4 max-md:p-3 max-md:items-end"
+      className={cn("fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-toast animate-fade-in","p-4 max-md:p-3 max-md:items-end"
       )}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
@@ -110,11 +108,7 @@ const FeedbackModal = ({ onClose }) => {
     >
       <div 
         ref={modalRef} 
-        className={cn(
-          "bg-bg-primary rounded-2xl w-full max-w-[550px] max-h-[90vh]",
-          "flex flex-col overflow-hidden shadow-modal",
-          "animate-slide-up",
-          "max-md:max-w-full max-md:max-h-[85vh] max-md:rounded-t-2xl max-md:rounded-b-none"
+        className={cn("bg-bg-primary border border-border rounded-2xl w-full max-w-[550px] max-h-[90vh]","flex flex-col overflow-hidden shadow-modal","animate-slide-up","max-md:max-w-full max-md:max-h-[85vh] max-md:rounded-t-2xl max-md:rounded-b-none"
         )}
         onClick={(e) => e.stopPropagation()}
       >
@@ -147,11 +141,8 @@ const FeedbackModal = ({ onClose }) => {
               {...register('title')}
               placeholder={t('feedback.titlePlaceholder')}
               maxLength={100}
-              className={cn(
-                "w-full box-border py-3 px-4 border rounded-xl",
-                "bg-bg-primary text-text-primary text-sm font-sans",
-                "placeholder:text-text-muted focus:outline-none focus:border-primary",
-                errors.title ? "border-error" : "border-border"
+              className={cn("w-full box-border py-3 px-4 border rounded-xl","bg-bg-primary text-text-primary text-sm font-sans","placeholder:text-text-muted focus:outline-none focus:border-primary",
+                errors.title ?"border-error" :"border-border"
               )}
             />
             {errors.title && (
@@ -168,13 +159,8 @@ const FeedbackModal = ({ onClose }) => {
               placeholder={t('feedback.contentPlaceholder')}
               rows={6}
               maxLength={2000}
-              className={cn(
-                "w-full box-border py-3 px-4 border rounded-xl",
-                "bg-bg-primary text-text-primary text-sm font-sans leading-relaxed",
-                "placeholder:text-text-muted focus:outline-none focus:border-primary",
-                "resize-none h-40 min-h-40 max-h-40 overflow-y-auto scrollbar-none",
-                "whitespace-pre-wrap break-words",
-                errors.content ? "border-error" : "border-border"
+              className={cn("w-full box-border py-3 px-4 border rounded-xl","bg-bg-primary text-text-primary text-sm font-sans leading-relaxed","placeholder:text-text-muted focus:outline-none focus:border-primary","resize-none h-40 min-h-40 max-h-40 overflow-y-auto scrollbar-none","whitespace-pre-wrap break-words",
+                errors.content ?"border-error" :"border-border"
               )}
             />
             <div className="flex justify-between mt-1.5">
@@ -202,12 +188,7 @@ const FeedbackModal = ({ onClose }) => {
               />
               <button
                 type="button"
-                className={cn(
-                  "inline-flex items-center gap-2 py-2.5 px-4",
-                  "bg-bg-secondary border-2 border-dashed border-border rounded-xl",
-                  "text-text-primary text-sm font-medium cursor-pointer transition-all duration-200",
-                  "hover:not-disabled:bg-bg-hover hover:not-disabled:border-accent hover:not-disabled:-translate-y-px hover:not-disabled:shadow-popup",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                className={cn("inline-flex items-center gap-2 py-2.5 px-4","bg-bg-secondary border-2 border-dashed border-border rounded-xl","text-text-primary text-sm font-medium cursor-pointer transition-all duration-200","hover:not-disabled:bg-bg-hover hover:not-disabled:border-accent hover:not-disabled:-translate-y-px hover:not-disabled:shadow-popup","disabled:opacity-50 disabled:cursor-not-allowed"
                 )}
                 onClick={() => fileInputRef.current?.click()}
                 disabled={images.length >= 3}
@@ -244,10 +225,7 @@ const FeedbackModal = ({ onClose }) => {
           <div className="flex gap-3 justify-end mt-6 flex-col sm:flex-row">
             <button 
               type="button" 
-              className={cn(
-                "py-3 px-6 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200",
-                "border border-border bg-bg-secondary text-text-primary",
-                "hover:bg-bg-hover hover:border-accent hover:-translate-y-px"
+              className={cn("py-3 px-6 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200","border border-border bg-bg-secondary text-text-primary","hover:bg-bg-hover hover:border-accent hover:-translate-y-px"
               )}
               onClick={onClose}
             >
@@ -255,11 +233,7 @@ const FeedbackModal = ({ onClose }) => {
             </button>
             <button 
               type="submit" 
-              className={cn(
-                "py-3 px-6 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200",
-                "border border-primary bg-primary text-white",
-                "hover:not-disabled:bg-primary-hover hover:not-disabled:-translate-y-px",
-                "disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+              className={cn("py-3 px-6 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200","border border-primary bg-primary text-white","hover:not-disabled:bg-primary-hover hover:not-disabled:-translate-y-px","disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
               )}
               disabled={isSubmitting}
             >

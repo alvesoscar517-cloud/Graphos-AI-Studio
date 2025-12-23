@@ -275,9 +275,7 @@ function TiptapEditorComponent({
   return (
     <div 
       ref={editorContainerRef}
-      className={cn(
-        "tiptap-editor-container",
-        "relative w-full h-full bg-bg-tertiary overflow-hidden box-border flex flex-col",
+      className={cn("tiptap-editor-container","relative w-full h-full bg-bg-tertiary overflow-hidden box-border flex flex-col",
         className
       )}
     >
@@ -298,9 +296,8 @@ function TiptapEditorComponent({
           {/* Editor content */}
           <EditorContent 
             editor={editor} 
-            className={cn(
-              "tiptap-editor",
-              isProcessing && "tiptap-processing"
+            className={cn("tiptap-editor",
+              isProcessing &&"tiptap-processing"
             )}
           />
         </div>

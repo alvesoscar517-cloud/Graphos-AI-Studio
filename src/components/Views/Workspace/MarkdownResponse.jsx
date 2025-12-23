@@ -76,13 +76,7 @@ const CodeBlock = ({ code, language }) => {
       {/* Copy button */}
       <button
         onClick={handleCopy}
-        className={cn(
-          "absolute top-2 right-2 p-1.5 rounded-md",
-          "bg-bg-hover/80 hover:bg-bg-hover",
-          "text-text-muted hover:text-text-primary",
-          "opacity-0 group-hover:opacity-100",
-          "transition-all duration-200",
-          "flex items-center justify-center"
+        className={cn("absolute top-2 right-2 p-1.5 rounded-md","bg-bg-hover/80 hover:bg-bg-hover","text-text-muted hover:text-text-primary","opacity-0 group-hover:opacity-100","transition-all duration-200","flex items-center justify-center"
         )}
         data-tooltip={copied ? t('common.copied') : t('common.copy')}
         data-tooltip-position="left"
@@ -100,11 +94,8 @@ const CodeBlock = ({ code, language }) => {
       </button>
 
       {/* Code content */}
-      <pre className={cn(
-        "bg-bg-secondary rounded-lg overflow-x-auto",
-        language ? "pt-10 pb-4 px-4" : "py-4 px-4",
-        "text-sm font-mono leading-relaxed",
-        "border border-border-light"
+      <pre className={cn("bg-bg-secondary rounded-lg overflow-x-auto",
+        language ?"pt-10 pb-4 px-4" :"py-4 px-4","text-sm font-mono leading-relaxed","border border-border-light"
       )}>
         <code
           className="text-text-primary whitespace-pre"
@@ -184,10 +175,7 @@ const MarkdownResponse = ({
       // Inline code
       return (
         <code
-          className={cn(
-            "bg-bg-secondary/80 py-0.5 px-1.5 rounded",
-            "font-mono text-[0.9em]",
-            "text-text-primary"
+          className={cn("bg-bg-secondary/80 py-0.5 px-1.5 rounded","font-mono text-[0.9em]","text-text-primary"
           )}
           {...props}
         >
@@ -226,9 +214,7 @@ const MarkdownResponse = ({
     // Blockquote
     blockquote({ children }) {
       return (
-        <blockquote className={cn(
-          "border-l-3 border-primary pl-4 my-4",
-          "text-text-secondary italic"
+        <blockquote className={cn("border-l-3 border-primary pl-4 my-4","text-text-secondary italic"
         )}>
           {children}
         </blockquote>
@@ -294,9 +280,7 @@ const MarkdownResponse = ({
   }), [])
 
   return (
-    <div className={cn(
-      "text-base leading-relaxed text-text-primary",
-      "max-w-none",
+    <div className={cn("text-base leading-relaxed text-text-primary","max-w-none",
       className
     )}>
       <ReactMarkdown components={components}>

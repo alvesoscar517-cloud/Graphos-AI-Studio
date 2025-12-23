@@ -7,6 +7,7 @@ import ImportToWorkspacePopup from '../../Popups/ImportToWorkspacePopup'
 import { cn } from '../../../lib/utils'
 import { useSpeech } from '../../../hooks'
 
+import { File } from 'lucide-react'
 // Help prefix for app context detection
 const HELP_PREFIX = '[APP_HELP] '
 
@@ -102,18 +103,14 @@ const ChatMessage = ({ message, isLastMessage = false }) => {
   }
 
   return (
-    <div className={cn(
-      "flex w-full animate-message-in",
-      isUser ? "justify-end" : "justify-start"
+    <div className={cn("flex w-full animate-message-in",
+      isUser ?"justify-end" :"justify-start"
     )}>
-      <div className={cn(
-        "flex flex-col",
-        isUser ? "items-end max-w-7/10" : "items-start w-full"
+      <div className={cn("flex flex-col",
+        isUser ?"items-end max-w-7/10" :"items-start w-full"
       )}>
         {isUser ? (
-          <div className={cn(
-            "py-3 px-4 rounded-2xl break-words",
-            "bg-bg-secondary border border-border-light"
+          <div className={cn("py-3 px-4 rounded-2xl break-words","bg-bg-secondary border border-border-light"
           )}>
             <p className="m-0 leading-[1.6] text-base whitespace-pre-wrap text-text-primary">
               {displayContent}
@@ -132,7 +129,7 @@ const ChatMessage = ({ message, isLastMessage = false }) => {
                       />
                     ) : (
                       <div className="flex items-center gap-2 py-2 px-3 rounded-lg text-sm bg-bg-hover">
-                        <img src="/icon/file.svg" alt={t('chat.file')} className="w-5 h-5 opacity-60 icon-invert" />
+                        <File size={20} className="opacity-60" />
                         <span className="text-text-primary">{attachment.name}</span>
                       </div>
                     )}
@@ -142,14 +139,11 @@ const ChatMessage = ({ message, isLastMessage = false }) => {
             )}
           </div>
         ) : (
-          <div className={cn(
-            "w-full relative",
-            isError && "text-error"
+          <div className={cn("w-full relative",
+            isError &&"text-error"
           )}>
             {isError ? (
-              <div className={cn(
-                "bg-error/10 border border-error/20",
-                "rounded-xl p-4"
+              <div className={cn("bg-error/10 border border-error/20","rounded-xl p-4"
               )}>
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2.5">
@@ -159,13 +153,7 @@ const ChatMessage = ({ message, isLastMessage = false }) => {
                     </span>
                   </div>
                   <button 
-                    className={cn(
-                      "inline-flex items-center gap-1.5 py-2 px-4 w-fit",
-                      "bg-error/10 border border-error/30 rounded-lg",
-                      "text-error text-sm font-medium",
-                      "cursor-pointer transition-all duration-200",
-                      "hover:bg-error/15 hover:border-error/40",
-                      "disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={cn("inline-flex items-center gap-1.5 py-2 px-4 w-fit","bg-error/10 border border-error/30 rounded-lg","text-error text-sm font-medium","cursor-pointer transition-all duration-200","hover:bg-error/15 hover:border-error/40","disabled:opacity-50 disabled:cursor-not-allowed"
                     )}
                     onClick={handleRetry}
                     disabled={isLoading}
@@ -189,12 +177,7 @@ const ChatMessage = ({ message, isLastMessage = false }) => {
                   <div className="relative flex items-center gap-1 mt-3">
                     {/* Copy button */}
                     <button 
-                      className={cn(
-                        "bg-transparent border-none p-1.5 cursor-pointer rounded-md",
-                        "inline-flex items-center justify-center",
-                        "text-text-muted",
-                        "hover:bg-bg-hover hover:text-text-primary",
-                        "transition-all duration-200"
+                      className={cn("bg-transparent border-none p-1.5 cursor-pointer rounded-md","inline-flex items-center justify-center","text-text-muted","hover:bg-bg-hover hover:text-text-primary","transition-all duration-200"
                       )}
                       onClick={handleCopy}
                       data-tooltip={copied ? t('common.copied') : t('common.copy')}
@@ -214,13 +197,7 @@ const ChatMessage = ({ message, isLastMessage = false }) => {
 
                     {/* Regenerate button */}
                     <button 
-                      className={cn(
-                        "bg-transparent border-none p-1.5 cursor-pointer rounded-md",
-                        "inline-flex items-center justify-center",
-                        "text-text-muted",
-                        "hover:bg-bg-hover hover:text-text-primary",
-                        "transition-all duration-200",
-                        "disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={cn("bg-transparent border-none p-1.5 cursor-pointer rounded-md","inline-flex items-center justify-center","text-text-muted","hover:bg-bg-hover hover:text-text-primary","transition-all duration-200","disabled:opacity-50 disabled:cursor-not-allowed"
                       )}
                       onClick={handleRegenerate}
                       disabled={isLoading}
@@ -238,13 +215,8 @@ const ChatMessage = ({ message, isLastMessage = false }) => {
                     {/* Listen button - only show if TTS is supported */}
                     {isSupported && (
                       <button 
-                        className={cn(
-                          "bg-transparent border-none p-1.5 cursor-pointer rounded-md",
-                          "inline-flex items-center justify-center",
-                          "text-text-muted",
-                          "hover:bg-bg-hover hover:text-text-primary",
-                          "transition-all duration-200",
-                          isSpeaking && "text-primary"
+                        className={cn("bg-transparent border-none p-1.5 cursor-pointer rounded-md","inline-flex items-center justify-center","text-text-muted","hover:bg-bg-hover hover:text-text-primary","transition-all duration-200",
+                          isSpeaking &&"text-primary"
                         )}
                         onClick={handleListen}
                         data-tooltip={isSpeaking ? t('workspace.stopListening') : t('workspace.listen')}
@@ -268,12 +240,7 @@ const ChatMessage = ({ message, isLastMessage = false }) => {
                     {/* Import button */}
                     <div className="relative">
                       <button 
-                        className={cn(
-                          "bg-transparent border-none p-1.5 cursor-pointer rounded-md",
-                          "inline-flex items-center justify-center",
-                          "text-text-muted",
-                          "hover:bg-bg-hover hover:text-text-primary",
-                          "transition-all duration-200"
+                        className={cn("bg-transparent border-none p-1.5 cursor-pointer rounded-md","inline-flex items-center justify-center","text-text-muted","hover:bg-bg-hover hover:text-text-primary","transition-all duration-200"
                         )}
                         onClick={() => setShowImportPopup(!showImportPopup)}
                         data-tooltip={t('workspace.import', 'Import')}

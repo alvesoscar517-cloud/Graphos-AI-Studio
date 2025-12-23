@@ -8,6 +8,7 @@ import EditTitleModal from '../../Common/EditTitleModal'
 import LazyLottie from '../../Common/LazyLottie'
 import threeDotsAnimation from '../../../animation/Three dots loading.json'
 
+import { ArrowDown, HelpCircle, MessageCircle, PanelLeft, PanelRight, Pencil, Plus } from 'lucide-react'
 const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebarHidden, chatInput }) => {
   const { t } = useTranslation()
   const { currentConversation, messages, isLoading, updateConversationTitle, clearConversation } = useWorkspace()
@@ -157,16 +158,12 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
             data-tooltip={t('common.menu')} 
             data-tooltip-position="right"
           >
-            <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+            <PanelLeft size={20} className="opacity-60" />
           </button>
 
           <div className="flex items-center gap-2 min-w-0 flex-1">
             {hasHelpPrefix(title) && (
-              <img 
-                src="/icon/help-circle.svg" 
-                alt="Help" 
-                className="w-4 h-4 opacity-60 icon-invert shrink-0" 
-              />
+              <HelpCircle size={18} className="opacity-60 shrink-0" />
             )}
             <div 
               className={`text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default max-w-[300px] shrink ${isTypingTitle ? 'animate-pulse' : ''}`}
@@ -180,26 +177,19 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
               data-tooltip-position="bottom"
               disabled={isTypingTitle}
             >
-              <img src="/icon/pencil.svg" alt={t('common.edit')} className="w-3.5 h-3.5 icon-invert" />
+              <Pencil size={14} />
             </button>
           </div>
 
           <div className="flex items-center gap-1">
             <button 
-              className={cn(
-                "flex items-center justify-center p-2",
-                "bg-transparent text-text-primary",
-                "border border-border-light",
-                "rounded-full cursor-pointer",
-                "transition-all duration-200",
-                "hover:bg-bg-hover",
-                "hover:border-border-hover"
+              className={cn("flex items-center justify-center p-2","bg-transparent text-text-primary","border border-border-light","rounded-full cursor-pointer","transition-all duration-200","hover:bg-bg-hover","hover:border-border-hover"
               )}
               onClick={clearConversation}
               data-tooltip={t('common.new')} 
               data-tooltip-position="left"
             >
-              <img src="/icon/plus.svg" alt={t('workspace.newChat')} className="w-4 h-4 opacity-70 icon-invert" />
+              <Plus size={18} className="opacity-70" />
             </button>
             {rightSidebarHidden && (
               <button 
@@ -208,7 +198,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
                 data-tooltip={t('nav.sidebar')} 
                 data-tooltip-position="left"
               >
-                <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+                <PanelRight size={20} className="opacity-60" />
               </button>
             )}
           </div>
@@ -223,7 +213,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
         <div className="max-w-3xl mx-auto px-4 flex flex-col gap-6 workspace-chat-content">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <img src="/icon/message-circle.svg" alt="Empty" className="w-12 h-12 opacity-30 mb-4 icon-invert" />
+              <MessageCircle size={48} className="opacity-30 mb-4" />
               <h3 className="text-lg font-medium text-text-primary mb-2">{t('workspace.startConversation')}</h3>
               <p className="text-sm text-text-secondary">
                 {t('workspace.askAnythingAI')}
@@ -267,7 +257,7 @@ const WorkspaceChat = ({ onToggleLeftSidebar, onToggleRightSidebar, rightSidebar
           data-tooltip={t('workspace.scrollDown')}
           data-tooltip-position="top"
         >
-          <img src="/icon/arrow-down.svg" alt={t('workspace.scrollDown')} className="w-4 h-4 opacity-60 icon-invert" />
+          <ArrowDown size={16} className="opacity-60" />
         </button>
       )}
 

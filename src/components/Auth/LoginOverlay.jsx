@@ -353,10 +353,7 @@ const LoginOverlay = () => {
         background: 'linear-gradient(135deg, #0071E3 0%, #5856D6 100%)'
       }}
     >
-      <div className={cn(
-        "relative z-10 w-full max-w-[360px] text-center my-auto",
-        "py-5 px-4 sm:py-6 sm:px-6 pb-4 sm:pb-5 bg-white rounded-2xl",
-        "border border-black/[0.04] shadow-modal animate-slide-up-slow"
+      <div className={cn("relative z-10 w-full max-w-[360px] text-center my-auto","py-5 px-4 sm:py-6 sm:px-6 pb-4 sm:pb-5 bg-white rounded-2xl","border border-black/[0.04] shadow-modal animate-slide-up-slow"
       )}>
         {authMode === 'select' && (
           <div className="w-thumbnail-md h-thumbnail-md mx-auto mb-8 flex items-center justify-center" ref={animationContainer}>
@@ -371,12 +368,7 @@ const LoginOverlay = () => {
         
         {(authMode === 'email-register' || authMode === 'forgot-password') && (
           <button 
-            className={cn(
-              "absolute top-5 left-5 sm:top-8 sm:left-9 bg-transparent border-none",
-              "text-xs sm:text-sm text-gray-400 cursor-pointer p-0 rounded-lg",
-              "transition-all duration-150 font-medium flex items-center gap-1",
-              "hover:not-disabled:text-gray-900",
-              "disabled:opacity-50 disabled:cursor-not-allowed"
+            className={cn("absolute top-5 left-5 sm:top-8 sm:left-9 bg-transparent border-none","text-xs sm:text-sm text-gray-400 cursor-pointer p-0 rounded-lg","transition-all duration-150 font-medium flex items-center gap-1","hover:not-disabled:text-gray-900","disabled:opacity-50 disabled:cursor-not-allowed"
             )}
             onClick={() => setAuthMode('email-login')}
             disabled={isLoading}

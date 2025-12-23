@@ -434,8 +434,8 @@ const ProfileSetup = () => {
       "before:content-[''] before:absolute before:inset-0 before:bg-white/25 before:z-0",
       // Desktop: no scroll on outer container
       "overflow-hidden",
-      // Tablet portrait & mobile: allow outer scroll
-      "max-lg:overflow-y-auto max-lg:items-start max-lg:py-8"
+      // Tablet portrait & mobile: allow outer scroll (use max-md instead of max-lg for extension)
+      "max-md:overflow-y-auto max-md:items-start max-md:py-8"
     )}>
       <div className={cn(
         "w-10/12 max-w-modal-2xl bg-white/75 backdrop-blur-2xl",
@@ -443,8 +443,8 @@ const ProfileSetup = () => {
         "overflow-hidden animate-slide-in relative z-base",
         // Desktop: fixed height with internal scroll
         "h-[85vh]",
-        // Tablet portrait & mobile: auto height, let outer container scroll
-        "max-lg:h-auto max-lg:max-h-[95vh] max-lg:overflow-y-auto max-lg:scrollbar-hidden"
+        // Tablet portrait & mobile: auto height (use max-md instead of max-lg for extension)
+        "max-md:h-auto max-md:max-h-[95vh] max-md:overflow-y-auto max-md:scrollbar-hidden"
       )}>
         {/* Progress Bar */}
         <div className="py-[30px] px-10 pb-5 bg-transparent" role="progressbar" aria-valuenow={currentStep} aria-valuemin={1} aria-valuemax={4} aria-label={`Progress: Step ${currentStep} of 4`}>
@@ -588,11 +588,7 @@ const ProfileSetup = () => {
 
       {/* Draft Restore Toast */}
       {hasDraft && draftInfo && currentStep === 1 && (
-        <div className={cn(
-          "fixed bottom-6 left-1/2 -translate-x-1/2 z-toast",
-          "flex items-center gap-4 py-4 px-5 pr-12",
-          "bg-white rounded-xl shadow-lg",
-          "border border-gray-200 animate-slide-up"
+        <div className={cn("fixed bottom-6 left-1/2 -translate-x-1/2 z-toast","flex items-center gap-4 py-4 px-5 pr-12","bg-white rounded-xl shadow-lg","border border-gray-200 animate-slide-up"
         )}>
           <div className="w-10 h-10 rounded-lg bg-text-link/10 flex items-center justify-center text-text-link">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -635,8 +631,8 @@ const ProfileSetup = () => {
             'text-xs text-gray-600',
             // Desktop: bottom right
             'bottom-6 right-6',
-            // Tablet/mobile: top right to avoid being hidden by modal
-            'max-lg:bottom-auto max-lg:top-4 max-lg:right-4'
+            // Tablet/mobile: top right to avoid being hidden by modal (use max-md for extension)
+            'max-md:bottom-auto max-md:top-4 max-md:right-4'
           )}
           data-tooltip={t('profileSetup.autoSavingDraft')}
         >

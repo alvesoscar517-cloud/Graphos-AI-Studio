@@ -23,10 +23,7 @@ const IconContainer = ({ children, size = 'md', className }) => {
   
   return (
     <div 
-      className={cn(
-        "flex items-center justify-center shrink-0",
-        "transition-all duration-200",
-        "group-hover:scale-105",
+      className={cn("flex items-center justify-center shrink-0","transition-all duration-200","group-hover:scale-105",
         sizeClasses[size],
         radiusClasses[size],
         className

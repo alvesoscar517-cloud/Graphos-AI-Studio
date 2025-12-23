@@ -17,9 +17,7 @@ const AIStudioView = ({
   }
 
   return (
-    <div className={cn(
-      "flex flex-col flex-1 bg-bg-tertiary",
-      "h-screen w-full overflow-hidden box-border"
+    <div className={cn("flex flex-col flex-1 bg-bg-tertiary","h-screen w-full overflow-hidden box-border"
     )}>
       <AIStudioEditorEnhanced 
         onToggleLeftSidebar={onToggleLeftSidebar}

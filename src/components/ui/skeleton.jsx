@@ -163,9 +163,7 @@ function SkeletonProfileCard({ className = '' }) {
     )}>
       {/* Header with Icon */}
       <div className="flex items-start justify-between mb-4 max-lg:mb-3">
-        <Skeleton className={cn(
-          "w-14 h-14 rounded-xl",
-          "max-lg:w-10 max-lg:h-10 max-sm:w-9 max-sm:h-9"
+        <Skeleton className={cn("w-14 h-14 rounded-xl","max-lg:w-10 max-lg:h-10 max-sm:w-9 max-sm:h-9"
         )} />
       </div>
       
@@ -173,10 +171,7 @@ function SkeletonProfileCard({ className = '' }) {
       <Skeleton className="h-[18px] w-3/4 rounded-md mb-2 max-lg:h-4 max-sm:h-[13px]" />
       
       {/* Meta */}
-      <div className={cn(
-        "flex items-center gap-3 mb-4",
-        "max-lg:gap-2 max-lg:mb-3",
-        "max-sm:gap-1.5"
+      <div className={cn("flex items-center gap-3 mb-4","max-lg:gap-2 max-lg:mb-3","max-sm:gap-1.5"
       )}>
         <Skeleton className="h-3 w-16 rounded-md max-lg:w-14 max-sm:w-12" />
         <Skeleton className="h-3 w-20 rounded-md max-lg:w-16 max-sm:w-14" />
@@ -184,16 +179,12 @@ function SkeletonProfileCard({ className = '' }) {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3 mb-4 max-lg:gap-2 max-lg:mb-3 max-sm:gap-1.5">
-        <div className={cn(
-          "flex flex-col gap-1.5 p-3 rounded-lg border border-border-light bg-fill-tertiary",
-          "max-lg:p-2 max-sm:p-1.5"
+        <div className={cn("flex flex-col gap-1.5 p-3 rounded-lg border border-border-light bg-fill-tertiary","max-lg:p-2 max-sm:p-1.5"
         )}>
           <Skeleton className="h-2.5 w-12 rounded max-sm:w-10" />
           <Skeleton className="h-5 w-10 rounded-md max-lg:h-4 max-sm:h-3.5" />
         </div>
-        <div className={cn(
-          "flex flex-col gap-1.5 p-3 rounded-lg border border-border-light bg-fill-tertiary",
-          "max-lg:p-2 max-sm:p-1.5"
+        <div className={cn("flex flex-col gap-1.5 p-3 rounded-lg border border-border-light bg-fill-tertiary","max-lg:p-2 max-sm:p-1.5"
         )}>
           <Skeleton className="h-2.5 w-14 rounded max-sm:w-12" />
           <Skeleton className="h-5 w-8 rounded-md max-lg:h-4 max-sm:h-3.5" />
@@ -228,11 +219,7 @@ function SkeletonActionCard({ className = '' }) {
       'max-sm:py-2.5 max-sm:px-3 max-sm:gap-2.5 max-sm:rounded-lg',
       className
     )}>
-      <Skeleton className={cn(
-        "w-12 h-12 rounded-lg shrink-0",
-        "max-xl:w-10 max-xl:h-10",
-        "max-lg:w-11 max-lg:h-11",
-        "max-sm:w-9 max-sm:h-9"
+      <Skeleton className={cn("w-12 h-12 rounded-lg shrink-0","max-xl:w-10 max-xl:h-10","max-lg:w-11 max-lg:h-11","max-sm:w-9 max-sm:h-9"
       )} />
       <Skeleton className="h-[14px] w-28 rounded-md max-lg:w-20 max-sm:w-16 max-sm:h-3" />
     </div>
@@ -251,10 +238,7 @@ function SkeletonFeatureCard({ className = '' }) {
       'max-sm:py-2.5 max-sm:px-3 max-sm:gap-2.5 max-sm:rounded-lg',
       className
     )}>
-      <Skeleton className={cn(
-        "w-12 h-12 rounded-lg shrink-0",
-        "max-xl:w-10 max-xl:h-10",
-        "max-sm:w-9 max-sm:h-9"
+      <Skeleton className={cn("w-12 h-12 rounded-lg shrink-0","max-xl:w-10 max-xl:h-10","max-sm:w-9 max-sm:h-9"
       )} />
       <div className="flex-1 space-y-2 min-w-0 max-xl:space-y-1.5 max-sm:space-y-1">
         <Skeleton className="h-[14px] w-1/3 rounded-md max-xl:h-3 max-sm:h-2.5" />

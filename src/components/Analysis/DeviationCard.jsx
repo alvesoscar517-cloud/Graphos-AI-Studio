@@ -11,6 +11,7 @@ import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
 import LazyLottie from '../Common/LazyLottie'
 
+import { ChevronDown } from 'lucide-react'
 const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete, onAnalysisStart, onAnalysisEnd }) => {
   const { t } = useTranslation()
   const [deviations, setDeviations] = useState([])
@@ -133,9 +134,7 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete, onA
   }
 
   return (
-    <div className={cn(
-      "p-3 border border-border-light rounded-xl",
-      "bg-bg-secondary transition-all duration-200 hover:shadow-md"
+    <div className={cn("p-3 border border-border-light rounded-xl","bg-bg-secondary transition-all duration-200 hover:shadow-md"
     )}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-2 relative">
@@ -148,30 +147,19 @@ const DeviationCard = ({ disabled, currentProfile, text, onAnalysisComplete, onA
         </div>
         {analysisData && (
           <button 
-            className={cn(
-              "bg-transparent border-none p-1.5 cursor-pointer rounded-md",
-              "flex items-center justify-center transition-colors duration-200",
-              "hover:bg-bg-tertiary ml-auto"
+            className={cn("bg-transparent border-none p-1.5 cursor-pointer rounded-md","flex items-center justify-center transition-colors duration-200","hover:bg-bg-tertiary ml-auto"
             )}
             onClick={() => setShowResult(!showResult)}
           >
-            <img 
-              src="/icon/chevron-down.svg" alt={t('common.toggle')}
-              className={cn("w-icon-md h-icon-md opacity-60 transition-all duration-300 hover:opacity-100 icon-invert", showResult ? "rotate-180" : "rotate-0")}
-            />
+            <ChevronDown />
           </button>
         )}
       </div>
 
       {/* Action Button */}
       <button 
-        className={cn(
-          "w-full flex items-center justify-between py-2.5 px-3.5",
-          "bg-bg-secondary border border-border-light rounded-xl",
-          "text-sm font-medium text-text-primary cursor-pointer",
-          "transition-all duration-200 hover:border-border-hover hover:shadow-md",
-          "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
-          isLoading && "pointer-events-none opacity-70"
+        className={cn("w-full flex items-center justify-between py-2.5 px-3.5","bg-bg-secondary border border-border-light rounded-xl","text-sm font-medium text-text-primary cursor-pointer","transition-all duration-200 hover:border-border-hover hover:shadow-md","disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+          isLoading &&"pointer-events-none opacity-70"
         )}
         onClick={findDeviations}
         disabled={disabled || isLoading || (!textChanged && analysisData !== null)}

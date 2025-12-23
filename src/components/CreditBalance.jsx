@@ -3,6 +3,7 @@
  * Uses TanStack Query with real-time updates via useCredits hook
  */
 import { useEffect, useCallback } from 'react'
+import Icon from './Common/Icon'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCredits } from '@/hooks/queries'
@@ -56,26 +57,21 @@ const CreditBalance = ({ userId, onUpgradeClick }) => {
         {isLoading ? (
           <Skeleton className="h-4 w-20 rounded mx-auto" />
         ) : (
-          <span className={cn(
-            "inline-flex items-center gap-1.5 text-sm tracking-wide text-text-secondary",
-            isLowCredit && !isOutOfCredit && "text-warning font-medium",
-            isOutOfCredit && "text-error font-semibold"
+          <span className={cn("inline-flex items-center gap-1.5 text-sm tracking-wide text-text-secondary",
+            isLowCredit && !isOutOfCredit &&"text-warning font-medium",
+            isOutOfCredit &&"text-error font-semibold"
           )}>
-            <img src="/icon/coins.svg" alt="" className="w-3.5 h-3.5 icon-invert opacity-70" />
+            <Icon name="coins" size="xs" className="opacity-70" />
             {balance} {t('credits.credits')}
           </span>
         )}
       </div>
       <button 
-        className={cn(
-          "w-full py-2.5 px-4 rounded-3xl text-xs font-medium cursor-pointer",
-          "transition-colors duration-200 flex items-center justify-center gap-1.5",
-          "bg-bg-primary border border-border-light text-text-primary",
-          "hover:bg-bg-hover hover:border-border-hover"
+        className={cn("w-full py-2.5 px-4 rounded-3xl text-xs font-medium cursor-pointer","transition-colors duration-200 flex items-center justify-center gap-1.5","bg-bg-primary border border-border-light text-text-primary","hover:bg-bg-hover hover:border-border-hover"
         )}
         onClick={onUpgradeClick}
       >
-        <img src="/icon/crown-power.svg" alt="" className="w-4 h-4" />
+        <Icon name="crown-power" className="w-4 h-4" />
         {t('credits.upgradePlan')}
       </button>
     </div>

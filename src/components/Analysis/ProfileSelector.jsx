@@ -9,6 +9,24 @@ import { invalidateProfileDetailCache } from '../../utils/profileDetailCache'
 import modal from '../../utils/modal'
 import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
+import { 
+  Briefcase, User, GraduationCap, Palette, 
+  TrendingUp, MessageCircle, Code, MoreHorizontal, UserRound 
+} from 'lucide-react'
+
+// Theme icon mapping
+const THEME_ICONS = {
+  'work': Briefcase,
+  'personal': User,
+  'academic': GraduationCap,
+  'creative': Palette,
+  'business': TrendingUp,
+  'social': MessageCircle,
+  'technical': Code,
+  'other': MoreHorizontal
+}
+
+const getThemeIconComponent = (theme) => THEME_ICONS[theme] || UserRound
 
 const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
   const { t } = useTranslation()
@@ -53,20 +71,6 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
     p.profile_id.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const getThemeIcon = (theme) => {
-    const themeIcons = {
-      'work': 'briefcase',
-      'personal': 'user',
-      'academic': 'graduation-cap',
-      'creative': 'palette',
-      'business': 'trending-up',
-      'social': 'message-circle',
-      'technical': 'code',
-      'other': 'more-horizontal'
-    }
-    return themeIcons[theme] || 'user-round'
-  }
-
   const getThemeColor = (theme) => {
     const colors = {
       'work': 'text-primary',
@@ -85,21 +89,16 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
     <>
       {/* Selector Card */}
       <div 
-        className={cn(
-          "bg-bg-secondary border border-border-light rounded-xl",
-          "py-3 px-3 pb-2 cursor-pointer transition-all duration-200",
-          "flex flex-col items-center text-center gap-1",
-          "hover:border-border-hover hover:shadow-md"
+        className={cn("bg-bg-secondary border border-border-light rounded-xl","py-3 px-3 pb-2 cursor-pointer transition-all duration-200","flex flex-col items-center text-center gap-1","hover:border-border-hover hover:shadow-md"
         )}
         onClick={handleClick}
       >
         <div className="flex flex-col items-center gap-1.5 w-full">
           <div className="card-icon !w-12 !h-12">
-            <img 
-              src={`/icon/${getThemeIcon(currentProfile?.theme)}.svg`} 
-              alt={t('nav.profile')} 
-              className="w-6 h-6 filter-icon-primary"
-            />
+            {(() => {
+              const ThemeIcon = getThemeIconComponent(currentProfile?.theme)
+              return <ThemeIcon className="w-6 h-6 text-primary" />
+            })()}
           </div>
           <div className="flex flex-col gap-0.5 w-full">
             <h3 className="text-xs font-medium text-text-primary m-0 leading-tight">
@@ -124,10 +123,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
           onClick={() => setShowModal(false)}
         >
           <div 
-            className={cn(
-              "bg-bg-primary rounded-3xl w-full max-w-md h-[520px]",
-              "flex flex-col shadow-modal animate-slide-up",
-              "max-md:max-w-[calc(100%-32px)] max-md:h-[80vh] max-md:max-h-[520px] max-md:rounded-2xl"
+            className={cn("bg-bg-primary border border-border rounded-3xl w-full max-w-md h-[520px]","flex flex-col shadow-modal animate-slide-up","max-md:max-w-[calc(100%-32px)] max-md:h-[80vh] max-md:max-h-[520px] max-md:rounded-2xl"
             )}
             onClick={(e) => e.stopPropagation()}
           >
@@ -156,12 +152,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                 />
                 <input 
                   type="text" 
-                  className={cn(
-                    "w-full py-2.5 pl-10 pr-10 text-sm",
-                    "bg-bg-secondary border border-border-light rounded-lg",
-                    "text-text-primary placeholder:text-text-muted",
-                    "outline-none transition-all duration-200",
-                    "focus:border-accent focus:ring-2 focus:ring-primary/20"
+                  className={cn("w-full py-2.5 pl-10 pr-10 text-sm","bg-bg-secondary border border-border-light rounded-lg","text-text-primary placeholder:text-text-muted","outline-none transition-all duration-200","focus:border-accent focus:ring-2 focus:ring-primary/20"
                   )}
                   placeholder={t('profile.searchProfiles')}
                   value={searchTerm}
@@ -190,18 +181,14 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                   <img 
                     src="/icon for background/monster-chibi.svg" 
                     alt={t('common.noProfiles')} 
-                    className="w-32 h-32 mb-4 opacity-60 icon-invert"
+                    className="w-32 h-32 mb-4 opacity-60 icon-auto-theme"
                   />
                   <p className="text-sm text-text-secondary mb-4">
                     {searchTerm ? t('profile.noProfilesFound') : t('profile.noProfilesYet')}
                   </p>
                   {!searchTerm && (
                     <button 
-                      className={cn(
-                        "inline-flex items-center gap-2 py-2.5 px-4",
-                        "bg-primary text-white text-sm font-medium rounded-xl",
-                        "border-none cursor-pointer transition-all duration-200",
-                        "hover:bg-primary-hover"
+                      className={cn("inline-flex items-center gap-2 py-2.5 px-4","bg-primary text-white text-sm font-medium rounded-xl","border-none cursor-pointer transition-all duration-200","hover:bg-primary-hover"
                       )}
                       onClick={() => navigate('/profile-setup')}
                     >
@@ -215,11 +202,7 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                   {/* Clear selection option - only show when a profile is selected */}
                   {currentProfile && !searchTerm && (
                     <div 
-                      className={cn(
-                        "bg-bg-secondary border border-border-light rounded-xl",
-                        "p-4 cursor-pointer transition-all duration-200",
-                        "hover:border-border-hover hover:shadow-sm",
-                        "flex items-center gap-3"
+                      className={cn("bg-bg-secondary border border-border-light rounded-xl","p-4 cursor-pointer transition-all duration-200","hover:border-border-hover hover:shadow-sm","flex items-center gap-3"
                       )}
                       onClick={() => handleSelectProfile(null)}
                     >
@@ -239,21 +222,17 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                   {filteredProfiles.map(profile => (
                     <div 
                       key={profile.profile_id}
-                      className={cn(
-                        "bg-bg-secondary border border-border-light rounded-xl",
-                        "p-4 cursor-pointer transition-all duration-200",
-                        "hover:border-border-hover hover:shadow-sm"
+                      className={cn("bg-bg-secondary border border-border-light rounded-xl","p-4 cursor-pointer transition-all duration-200","hover:border-border-hover hover:shadow-sm"
                       )}
                       onClick={() => handleSelectProfile(profile)}
                     >
                       {/* Card Header */}
                       <div className="flex items-center gap-3">
                         <div className="card-icon !w-10 !h-10 shrink-0">
-                          <img 
-                            src={`/icon/${getThemeIcon(profile.theme)}.svg`} 
-                            alt={profile.profile_name} 
-                            className="w-5 h-5 filter-icon-primary"
-                          />
+                          {(() => {
+                            const ThemeIcon = getThemeIconComponent(profile.theme)
+                            return <ThemeIcon className="w-5 h-5 text-primary" />
+                          })()}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -275,22 +254,18 @@ const ProfileSelector = ({ currentProfile, onProfileSelect }) => {
                             )}
                           </div>
                           {(profile.quality_score || profile.qualityScore) && (
-                            <span className={cn(
-                              "text-sm font-semibold",
-                              (profile.quality_rating || profile.qualityRating) === 'excellent' && "text-success",
-                              (profile.quality_rating || profile.qualityRating) === 'good' && "text-primary",
-                              (profile.quality_rating || profile.qualityRating) === 'ok' && "text-warning",
-                              !(profile.quality_rating || profile.qualityRating) && "text-text-secondary"
+                            <span className={cn("text-sm font-semibold",
+                              (profile.quality_rating || profile.qualityRating) === 'excellent' &&"text-success",
+                              (profile.quality_rating || profile.qualityRating) === 'good' &&"text-primary",
+                              (profile.quality_rating || profile.qualityRating) === 'ok' &&"text-warning",
+                              !(profile.quality_rating || profile.qualityRating) &&"text-text-secondary"
                             )}>
                               {profile.quality_score || profile.qualityScore}/100
                             </span>
                           )}
                         </div>
                         <button 
-                          className={cn(
-                            "p-2 bg-transparent border-none rounded-lg cursor-pointer shrink-0",
-                            "opacity-40 transition-all duration-200",
-                            "hover:opacity-100 hover:bg-error/10"
+                          className={cn("p-2 bg-transparent border-none rounded-lg cursor-pointer shrink-0","opacity-40 transition-all duration-200","hover:opacity-100 hover:bg-error/10"
                           )}
                           onClick={(e) => handleDeleteProfile(e, profile.profile_id)}
                           data-tooltip={t('common.delete')}

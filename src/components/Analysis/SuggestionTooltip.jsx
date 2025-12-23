@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
 
+import { Check } from 'lucide-react'
 /**
  * SuggestionTooltip - Compact tooltip matching system design
  */
@@ -95,20 +96,15 @@ const SuggestionTooltip = ({
       <div className="fixed inset-0 z-modal-backdrop bg-transparent" onClick={onClose} />
       <div 
         ref={tooltipRef}
-        className={cn(
-          "fixed w-[420px] max-h-[450px] overflow-y-auto overflow-x-hidden",
-          "bg-bg-primary border border-border-light rounded-xl shadow-lg",
-          "p-4 z-modal opacity-0 scale-95 transition-all duration-150",
-          "scrollbar-none [-ms-overflow-style:none]"
+        className={cn("fixed w-[420px] max-h-[450px] overflow-y-auto overflow-x-hidden","bg-bg-primary border border-border rounded-xl shadow-lg","p-4 z-modal opacity-0 scale-95 transition-all duration-150","scrollbar-none [-ms-overflow-style:none]"
         )}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
-          <div className={cn(
-            "text-2xs font-medium py-1 px-2 rounded-md flex items-center gap-1.5",
-            color === 'error' && "bg-error/10 text-error",
-            color === 'warning' && "bg-warning/10 text-warning",
-            color === 'primary' && "bg-primary/10 text-primary"
+          <div className={cn("text-2xs font-medium py-1 px-2 rounded-md flex items-center gap-1.5",
+            color === 'error' &&"bg-error/10 text-error",
+            color === 'warning' &&"bg-warning/10 text-warning",
+            color === 'primary' &&"bg-primary/10 text-primary"
           )}>
             <Icon name="lightbulb" size="xs" color={color} />
             <span>{t('tooltip.suggestion')}</span>
@@ -131,11 +127,10 @@ const SuggestionTooltip = ({
                 <div className="flex items-center gap-1.5 mb-1">
                   <Icon name={getIssueIcon(issue.type)} size="xs" color="muted" />
                   <span className="text-2xs font-medium text-text-secondary capitalize">{issue.type}</span>
-                  <span className={cn(
-                    "text-2xs py-0.5 px-1.5 rounded-md font-medium ml-auto",
-                    issue.severity === 'high' && "bg-error/15 text-error",
-                    issue.severity === 'medium' && "bg-warning/15 text-warning",
-                    issue.severity === 'low' && "bg-primary/15 text-primary"
+                  <span className={cn("text-2xs py-0.5 px-1.5 rounded-md font-medium ml-auto",
+                    issue.severity === 'high' &&"bg-error/15 text-error",
+                    issue.severity === 'medium' &&"bg-warning/15 text-warning",
+                    issue.severity === 'low' &&"bg-primary/15 text-primary"
                   )}>
                     {getSeverityLabel(issue.severity)}
                   </span>
@@ -200,7 +195,7 @@ const SuggestionTooltip = ({
               className="flex items-center gap-1.5 py-2 px-4 bg-primary text-white border-none rounded-lg text-sm font-medium cursor-pointer hover:bg-primary-hover transition-all ml-auto"
               onClick={() => onApply(suggestions.rewritten)}
             >
-              <img src="/icon/check.svg" alt="check" className="w-4 h-4 brightness-0 invert" />
+              <Check />
               <span>{t('tooltip.apply')}</span>
             </button>
           )}

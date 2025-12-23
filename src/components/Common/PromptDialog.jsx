@@ -27,26 +27,17 @@ export default function PromptDialog({
 
   return createPortal(
     <div 
-      className={cn(
-        "fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-modal-nested p-5",
-        "animate-fade-in",
-        "max-md:p-3 max-md:items-end"
+      className={cn("fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-modal-nested p-5","animate-fade-in","max-md:p-3 max-md:items-end"
       )}
       onClick={onCancel}
     >
       <div 
-        className={cn(
-          "bg-bg-secondary rounded-2xl p-8 max-w-modal-sm w-full",
-          "shadow-modal text-center",
-          "animate-slide-up",
-          "max-md:max-w-full max-md:rounded-t-2xl max-md:rounded-b-none max-md:p-5"
+        className={cn("bg-bg-secondary border border-border rounded-2xl p-8 max-w-modal-sm w-full","shadow-modal text-center","animate-slide-up","max-md:max-w-full max-md:rounded-t-2xl max-md:rounded-b-none max-md:p-5"
         )}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Icon */}
-        <div className={cn(
-          "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5",
-          "bg-gradient-to-br from-blue-100 to-blue-200"
+        <div className={cn("w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5","bg-gradient-to-br from-blue-100 to-blue-200"
         )}>
           <Icon name="edit" size="lg" color="primary" />
         </div>
@@ -66,13 +57,7 @@ export default function PromptDialog({
         {/* Input */}
         <input
           type="text"
-          className={cn(
-            "w-full mb-6 py-3 px-4 text-sm rounded-lg outline-none box-border",
-            "border border-border-hover",
-            "bg-bg-secondary",
-            "text-text-primary",
-            "placeholder:text-text-muted",
-            "focus:border-accent focus:ring-2 focus:ring-blue-500/20"
+          className={cn("w-full mb-6 py-3 px-4 text-sm rounded-lg outline-none box-border","border border-border-hover","bg-bg-secondary","text-text-primary","placeholder:text-text-muted","focus:border-accent focus:ring-2 focus:ring-blue-500/20"
           )}
           placeholder={placeholder}
           value={value}
@@ -84,22 +69,14 @@ export default function PromptDialog({
         {/* Actions */}
         <div className="flex gap-3 max-md:flex-col-reverse">
           <button 
-            className={cn(
-              "flex-1 py-2.5 px-4 rounded-lg text-sm font-medium cursor-pointer",
-              "bg-bg-tertiary text-text-secondary",
-              "border-none transition-colors duration-200",
-              "hover:bg-bg-hover"
+            className={cn("flex-1 py-2.5 px-4 rounded-lg text-sm font-medium cursor-pointer","bg-bg-tertiary text-text-secondary","border-none transition-colors duration-200","hover:bg-bg-hover"
             )}
             onClick={onCancel}
           >
             {cancelText}
           </button>
           <button 
-            className={cn(
-              "flex-1 py-2.5 px-4 rounded-lg text-sm font-medium cursor-pointer",
-              "bg-primary text-white border-none",
-              "transition-colors duration-200",
-              "hover:bg-primary-hover"
+            className={cn("flex-1 py-2.5 px-4 rounded-lg text-sm font-medium cursor-pointer","bg-primary text-white border-none","transition-colors duration-200","hover:bg-primary-hover"
             )}
             onClick={handleConfirm}
           >

@@ -14,7 +14,8 @@ import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
 import LazyLottie from '../Common/LazyLottie'
 
-// Helper function to format evidence text - convert [TAG] to "Tag:"
+import { ChevronDown } from 'lucide-react'
+// Helper function to format evidence text - convert [TAG] to"Tag:"
 const formatEvidenceText = (text) => {
   const match = text.match(/^\[([A-Z]+)\]\s*(.*)$/)
   if (match) {
@@ -222,10 +223,7 @@ const AIDetectionCard = ({ disabled, text, onAnalysisStart, onAnalysisEnd }) => 
   return (
     <>
       {/* Main Card */}
-      <div className={cn(
-        "p-3 border border-border-light rounded-xl",
-        "bg-bg-secondary transition-all duration-200",
-        "hover:shadow-md"
+      <div className={cn("p-3 border border-border-light rounded-xl","bg-bg-secondary transition-all duration-200","hover:shadow-md"
       )}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-2 relative">
@@ -242,36 +240,19 @@ const AIDetectionCard = ({ disabled, text, onAnalysisStart, onAnalysisEnd }) => 
           </div>
           {result !== null && (
             <button 
-              className={cn(
-                "bg-transparent border-none p-1.5 cursor-pointer rounded-md",
-                "flex items-center justify-center transition-colors duration-200",
-                "hover:bg-bg-tertiary ml-auto"
+              className={cn("bg-transparent border-none p-1.5 cursor-pointer rounded-md","flex items-center justify-center transition-colors duration-200","hover:bg-bg-tertiary ml-auto"
               )}
               onClick={() => setShowResult(!showResult)}
             >
-              <img 
-                src="/icon/chevron-down.svg"
-                alt={t('common.toggle')}
-                className={cn(
-                  "w-icon-md h-icon-md opacity-60 transition-all duration-300",
-                  "hover:opacity-100 icon-invert",
-                  showResult ? "rotate-180" : "rotate-0"
-                )}
-              />
+              <ChevronDown />
             </button>
           )}
         </div>
 
         {/* Action Button */}
         <button 
-          className={cn(
-            "w-full flex items-center justify-between py-2.5 px-3.5",
-            "bg-bg-secondary border border-border-light rounded-xl",
-            "text-sm font-medium text-text-primary cursor-pointer",
-            "transition-all duration-200 relative overflow-hidden",
-            "hover:border-border-hover hover:shadow-md",
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
-            isLoading && "pointer-events-none opacity-70"
+          className={cn("w-full flex items-center justify-between py-2.5 px-3.5","bg-bg-secondary border border-border-light rounded-xl","text-sm font-medium text-text-primary cursor-pointer","transition-all duration-200 relative overflow-hidden","hover:border-border-hover hover:shadow-md","disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+            isLoading &&"pointer-events-none opacity-70"
           )}
           onClick={detectAI}
           disabled={disabled || isLoading || (!textChanged && result !== null)}
@@ -347,7 +328,7 @@ const AIDetectionCard = ({ disabled, text, onAnalysisStart, onAnalysisEnd }) => 
               <div className="w-full flex justify-center">
                 <div className="inline-flex items-center gap-2 py-2 px-3 bg-bg-secondary border border-border-light rounded-lg text-xs font-medium text-text-primary">
                   <Icon 
-                    name={result < 30 ? "shield-check" : result < 50 ? "check-circle" : result < 70 ? "alert-circle" : "alert-triangle"} 
+                    name={result < 30 ?"shield-check" : result < 50 ?"check-circle" : result < 70 ?"alert-circle" :"alert-triangle"} 
                     size="sm" color="primary" className="flex-shrink-0 -mt-px"
                   />
                   <span className="whitespace-nowrap leading-none">{verdict}</span>
@@ -364,11 +345,10 @@ const AIDetectionCard = ({ disabled, text, onAnalysisStart, onAnalysisEnd }) => 
                     </div>
                     <div className="w-full h-1.5 bg-bg-tertiary rounded-sm overflow-hidden">
                       <div 
-                        className={cn(
-                          "h-full rounded-sm transition-all duration-500",
-                          confidence < 60 && "bg-gradient-to-r from-orange-500 to-red-400",
-                          confidence >= 60 && confidence < 80 && "bg-gradient-to-r from-blue-500 to-cyan-400",
-                          confidence >= 80 && "bg-gradient-to-r from-green-500 to-emerald-400"
+                        className={cn("h-full rounded-sm transition-all duration-500",
+                          confidence < 60 &&"bg-gradient-to-r from-orange-500 to-red-400",
+                          confidence >= 60 && confidence < 80 &&"bg-gradient-to-r from-blue-500 to-cyan-400",
+                          confidence >= 80 &&"bg-gradient-to-r from-green-500 to-emerald-400"
                         )}
                         style={{ width: `${confidence}%` }}
                       />
@@ -387,12 +367,7 @@ const AIDetectionCard = ({ disabled, text, onAnalysisStart, onAnalysisEnd }) => 
               
               {/* View Details Button */}
               <button 
-                className={cn(
-                  "w-full py-2 px-3 mt-0",
-                  "bg-bg-secondary border-none rounded-lg",
-                  "flex items-center justify-between cursor-pointer",
-                  "transition-all duration-200 text-xs font-medium text-text-primary",
-                  "hover:bg-bg-tertiary"
+                className={cn("w-full py-2 px-3 mt-0","bg-bg-secondary border-none rounded-lg","flex items-center justify-between cursor-pointer","transition-all duration-200 text-xs font-medium text-text-primary","hover:bg-bg-tertiary"
                 )}
                 onClick={() => setShowModal(true)}
               >
@@ -410,7 +385,7 @@ const AIDetectionCard = ({ disabled, text, onAnalysisStart, onAnalysisEnd }) => 
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className="flex items-center justify-between py-5 px-6 border-b border-border-light">
+            <div className="flex items-center justify-between py-5 px-6">
               <h3 className="text-lg font-medium text-text-primary m-0">{t('analysis.detailedAnalysis')}</h3>
               <button 
                 className="bg-transparent border-none p-2 cursor-pointer rounded-full flex items-center justify-center hover:bg-bg-tertiary"

@@ -8,6 +8,21 @@ import ModelSelector from '../../Analysis/ModelSelector'
 import { cn } from '../../../lib/utils'
 import Icon from '../../Common/Icon'
 
+import { AlignLeft, BookOpen, Info, List, Mic, Settings, Shield, Sliders, User, UserCheck, X, AlertCircle } from 'lucide-react'
+
+// Icon mapping for voice profile options
+const VOICE_PROFILE_ICONS = {
+  'user': User,
+  'book-open': BookOpen,
+  'list': List,
+  'align-left': AlignLeft,
+}
+
+// Icon mapping for humanization options
+const HUMANIZATION_ICONS = {
+  'shield': Shield,
+  'user-check': UserCheck,
+}
 // Breakpoints for responsive behavior
 const BREAKPOINT_MOBILE = 768
 const BREAKPOINT_TABLET = 1024
@@ -96,15 +111,15 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
   }, [])
 
   const voiceProfileOptions = [
-    { key: 'useVoiceProfile', icon: '/icon/user.svg', title: t('workspace.useVoiceProfile'), description: t('workspace.useVoiceProfileDesc') },
-    { key: 'useVocabularyPreferences', icon: '/icon/book-open.svg', title: t('workspace.vocabularyPreferences'), description: t('workspace.vocabularyPreferencesDesc') },
-    { key: 'useKeyCharacteristics', icon: '/icon/list.svg', title: t('workspace.keyCharacteristics'), description: t('workspace.keyCharacteristicsDesc') },
-    { key: 'useSentencePatterns', icon: '/icon/align-left.svg', title: t('workspace.sentencePatterns'), description: t('workspace.sentencePatternsDesc') }
+    { key: 'useVoiceProfile', icon: 'user', title: t('workspace.useVoiceProfile'), description: t('workspace.useVoiceProfileDesc') },
+    { key: 'useVocabularyPreferences', icon: 'book-open', title: t('workspace.vocabularyPreferences'), description: t('workspace.vocabularyPreferencesDesc') },
+    { key: 'useKeyCharacteristics', icon: 'list', title: t('workspace.keyCharacteristics'), description: t('workspace.keyCharacteristicsDesc') },
+    { key: 'useSentencePatterns', icon: 'align-left', title: t('workspace.sentencePatterns'), description: t('workspace.sentencePatternsDesc') }
   ]
 
   const humanizationOptions = [
-    { key: 'useAntiAIDetection', icon: '/icon/shield.svg', title: t('workspace.antiAIDetection'), description: t('workspace.antiAIDetectionDesc'), badge: 'NEW' },
-    { key: 'humanizeResponse', icon: '/icon/user-check.svg', title: t('workspace.humanizeOutput'), description: t('workspace.humanizeOutputDesc'), badge: 'BETA' }
+    { key: 'useAntiAIDetection', icon: 'shield', title: t('workspace.antiAIDetection'), description: t('workspace.antiAIDetectionDesc'), badge: 'NEW' },
+    { key: 'humanizeResponse', icon: 'user-check', title: t('workspace.humanizeOutput'), description: t('workspace.humanizeOutputDesc'), badge: 'BETA' }
   ]
 
   const responseStyles = [
@@ -138,15 +153,10 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
       </AnimatePresence>
 
       <motion.aside 
-        className={cn(
-          "bg-bg-tertiary",
-          "overflow-y-auto overflow-x-hidden flex flex-col",
-          "h-full shrink-0",
-          "touch-pan-y overscroll-contain scrollbar-none",
-          "rounded-md", // Floating panel effect
-          isDragging ? "z-[100] shadow-xl" : "z-sidebar",
+        className={cn("bg-bg-tertiary","overflow-y-auto overflow-x-hidden flex flex-col","h-full shrink-0","touch-pan-y overscroll-contain scrollbar-none","rounded-md", // Floating panel effect
+          isDragging ?"z-[100] shadow-xl" :"z-sidebar",
           // Mobile: full width overlay from right
-          isMobile && "fixed inset-y-0 right-0 rounded-none shadow-2xl z-[100] max-w-[85vw]"
+          isMobile &&"fixed inset-y-0 right-0 rounded-none shadow-2xl z-[100] max-w-[85vw]"
         )}
         initial={false}
         animate={{
@@ -155,12 +165,12 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
           x: isMobile && hidden ? '100%' : 0
         }}
         transition={{
-          type: "spring",
+          type:"spring",
           stiffness: 300,
           damping: 30,
           mass: 0.8
         }}
-        drag={hidden || isInteractingWithSlider || isMobile ? false : "x"}
+        drag={hidden || isInteractingWithSlider || isMobile ? false :"x"}
         dragConstraints={{ left: 0, right: 300 }}
         dragElastic={0.15}
         dragMomentum={false}
@@ -186,21 +196,17 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
       {/* Header */}
       <div className="flex items-center justify-between gap-2 py-3 px-4 h-14 shrink-0">
         <div className="flex items-center gap-2 py-1.5 px-3 border border-border-light rounded-lg text-sm font-semibold text-text-primary">
-          <img src="/icon/settings.svg" alt={t('nav.settings')} className="w-icon-lg h-icon-lg opacity-70 icon-invert" />
+          <Settings size={20} className="opacity-70" />
           <span>{t('workspace.aiSettings')}</span>
         </div>
         <button 
-          className={cn(
-            "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
-            "flex items-center justify-center transition-all duration-200",
-            "w-8 h-8 shrink-0",
-            "hover:bg-bg-hover"
+          className={cn("p-1.5 bg-transparent border-none cursor-pointer rounded-full","flex items-center justify-center transition-all duration-200","w-8 h-8 shrink-0","hover:bg-bg-hover"
           )}
           onClick={onClose}
           data-tooltip={t('common.close')}
           data-tooltip-position="left"
         >
-          <img src="/icon/x.svg" alt={t('common.close')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+          <X size={20} className="opacity-60" />
         </button>
       </div>
 
@@ -211,7 +217,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
         {/* Voice Profile Section */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-1.5 px-1 mb-0.5">
-            <img src="/icon/mic.svg" alt={t('workspace.voiceProfile')} className="w-3 h-3 opacity-60 icon-invert" />
+            <Mic size={12} className="opacity-60" />
             <span className="text-[10px] font-medium text-text-muted uppercase tracking-wide">{t('workspace.voiceProfile')}</span>
           </div>
 
@@ -225,14 +231,15 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
               return (
                 <div 
                   key={option.key} 
-                  className={cn(
-                    "flex items-center justify-between py-2 px-2.5 gap-2 rounded-xl",
-                    "bg-bg-secondary border border-border-light",
-                    isDisabled && "opacity-50 pointer-events-none"
+                  className={cn("flex items-center justify-between py-2 px-2.5 gap-2 rounded-xl","bg-bg-secondary border border-border-light",
+                    isDisabled &&"opacity-50 pointer-events-none"
                   )}
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <img src={option.icon} alt="" className="w-icon-md h-icon-md opacity-60 shrink-0 icon-invert" />
+                    {(() => {
+                      const OptionIcon = VOICE_PROFILE_ICONS[option.icon] || User
+                      return <OptionIcon size={16} className="opacity-60 shrink-0" />
+                    })()}
                     <div className="flex flex-col gap-0.5 min-w-0 flex-1">
                       <span className="text-xs font-medium text-text-primary flex items-center gap-1.5">{option.title}</span>
                       <span className="text-[11px] text-text-secondary whitespace-nowrap overflow-hidden text-ellipsis">{option.description}</span>
@@ -250,9 +257,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
           </div>
 
           {!currentProfile && (
-            <div className={cn(
-              "flex items-start gap-2 py-2 px-2.5 mt-1 rounded-xl text-[11px]",
-              "bg-bg-secondary border border-border-light text-text-secondary"
+            <div className={cn("flex items-start gap-2 py-2 px-2.5 mt-1 rounded-xl text-[11px]","bg-bg-secondary border border-border-light text-text-secondary"
             )}>
               <Icon name="alert-circle" size="sm" color="muted" className="shrink-0 mt-0.5" />
               <span>{t('workspace.selectProfileNotice')}</span>
@@ -263,7 +268,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
         {/* Humanization Section */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-1.5 px-1 mb-0.5">
-            <img src="/icon/user-check.svg" alt={t('workspace.humanization')} className="w-3 h-3 opacity-60 icon-invert" />
+            <UserCheck size={12} className="opacity-60" />
             <span className="text-[10px] font-medium text-text-muted uppercase tracking-wide">{t('workspace.humanization')}</span>
           </div>
 
@@ -271,7 +276,10 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
             {humanizationOptions.map((option) => (
               <div key={option.key} className="flex items-center justify-between py-2 px-2.5 gap-2 rounded-xl bg-bg-secondary border border-border-light">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <img src={option.icon} alt="" className="w-icon-md h-icon-md opacity-60 shrink-0 icon-invert" />
+                  {(() => {
+                    const OptionIcon = HUMANIZATION_ICONS[option.icon] || Shield
+                    return <OptionIcon size={16} className="opacity-60 shrink-0" />
+                  })()}
                   <div className="flex flex-col gap-0.5 min-w-0 flex-1">
                     <span className="text-xs font-medium text-text-primary flex items-center gap-1">
                       {option.title}
@@ -315,13 +323,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
                   setIsInteractingWithSlider(true)
                 }}
                 onMouseUp={() => setIsInteractingWithSlider(false)}
-                className={cn(
-                  "w-full h-1 rounded appearance-none cursor-pointer touch-none",
-                  "bg-bg-tertiary",
-                  "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4",
-                  "[&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-full",
-                  "[&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform",
-                  "[&::-webkit-slider-thumb]:hover:scale-110"
+                className={cn("w-full h-1 rounded appearance-none cursor-pointer touch-none","bg-bg-tertiary","[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4","[&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-full","[&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform","[&::-webkit-slider-thumb]:hover:scale-110"
                 )}
               />
               <div className="flex justify-between text-xs text-text-muted">
@@ -333,9 +335,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
 
           {/* Notice when humanization enabled without profile */}
           {(chatSettings.humanizeResponse || chatSettings.useAntiAIDetection) && !currentProfile && (
-            <div className={cn(
-              "flex items-start gap-2 py-2 px-2.5 rounded-xl text-[11px]",
-              "bg-bg-secondary border border-border-light text-text-secondary"
+            <div className={cn("flex items-start gap-2 py-2 px-2.5 rounded-xl text-[11px]","bg-bg-secondary border border-border-light text-text-secondary"
             )}>
               <Icon name="info" size="sm" color="muted" className="shrink-0 mt-0.5" />
               <span>{t('workspace.genericHumanizationNotice')}</span>
@@ -346,7 +346,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
         {/* Response Style Section */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-1.5 px-1 mb-0.5">
-            <img src="/icon/sliders.svg" alt={t('workspace.responseStyle')} className="w-3 h-3 opacity-60 icon-invert" />
+            <Sliders size={12} className="opacity-60" />
             <span className="text-[10px] font-medium text-text-muted uppercase tracking-wide">{t('workspace.responseStyle')}</span>
           </div>
           
@@ -356,10 +356,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
             <div className="relative flex p-1 rounded-xl bg-bg-secondary border border-border-light">
               {/* Sliding Glass Indicator */}
               <motion.div
-                className={cn(
-                  "absolute top-1 bottom-1 rounded-lg",
-                  "bg-fill-tertiary border border-border-light",
-                  "shadow-sm backdrop-blur-sm"
+                className={cn("absolute top-1 bottom-1 rounded-lg","bg-fill-tertiary border border-border-light","shadow-sm backdrop-blur-sm"
                 )}
                 initial={false}
                 animate={{
@@ -369,7 +366,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
                   width: 'calc(33.33% - 4px)'
                 }}
                 transition={{
-                  type: "spring",
+                  type:"spring",
                   stiffness: 400,
                   damping: 30
                 }}
@@ -377,13 +374,10 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
               {responseStyles.map((style) => (
                 <button
                   key={style.value}
-                  className={cn(
-                    "flex-1 py-2 px-2 bg-transparent border-none rounded-lg z-10",
-                    "text-xs font-medium cursor-pointer whitespace-nowrap",
-                    "transition-colors duration-200",
+                  className={cn("flex-1 py-2 px-2 bg-transparent border-none rounded-lg z-10","text-xs font-medium cursor-pointer whitespace-nowrap","transition-colors duration-200",
                     (chatSettings.responseStyle || 'balanced') === style.value 
-                      ? "text-text-primary" 
-                      : "text-text-muted hover:text-text-secondary"
+                      ?"text-text-primary" 
+                      :"text-text-muted hover:text-text-secondary"
                   )}
                   onClick={() => handleSettingChange('responseStyle', style.value)}
                 >
@@ -399,10 +393,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
             <div className="relative flex p-1 rounded-xl bg-bg-secondary border border-border-light">
               {/* Sliding Glass Indicator */}
               <motion.div
-                className={cn(
-                  "absolute top-1 bottom-1 rounded-lg",
-                  "bg-fill-tertiary border border-border-light",
-                  "shadow-sm backdrop-blur-sm"
+                className={cn("absolute top-1 bottom-1 rounded-lg","bg-fill-tertiary border border-border-light","shadow-sm backdrop-blur-sm"
                 )}
                 initial={false}
                 animate={{
@@ -412,7 +403,7 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
                   width: 'calc(33.33% - 4px)'
                 }}
                 transition={{
-                  type: "spring",
+                  type:"spring",
                   stiffness: 400,
                   damping: 30
                 }}
@@ -420,13 +411,10 @@ const WorkspaceSidebar = ({ hidden, onClose }) => {
               {creativityLevels.map((level) => (
                 <button
                   key={level.value}
-                  className={cn(
-                    "flex-1 py-2 px-2 bg-transparent border-none rounded-lg z-10",
-                    "text-xs font-medium cursor-pointer whitespace-nowrap",
-                    "transition-colors duration-200",
+                  className={cn("flex-1 py-2 px-2 bg-transparent border-none rounded-lg z-10","text-xs font-medium cursor-pointer whitespace-nowrap","transition-colors duration-200",
                     (chatSettings.creativityLevel || 'medium') === level.value 
-                      ? "text-text-primary" 
-                      : "text-text-muted hover:text-text-secondary"
+                      ?"text-text-primary" 
+                      :"text-text-muted hover:text-text-secondary"
                   )}
                   onClick={() => {
                     handleSettingChange('creativityLevel', level.value)

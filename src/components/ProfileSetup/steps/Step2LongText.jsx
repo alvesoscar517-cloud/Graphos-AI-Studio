@@ -7,6 +7,7 @@ import { cn } from '../../../lib/utils'
 import LottieWrapper from '../LottieWrapper'
 import biometricAnimation from '../../../animation/biometric-authentication.json'
 
+import { CheckCircle, Edit2, FileText, Info } from 'lucide-react'
 const Step2LongText = ({
   animationKey,
   hasPastedText,
@@ -22,25 +23,25 @@ const Step2LongText = ({
   const { t } = useTranslation()
 
   return (
-    <div className="block animate-fade-in-slow h-[calc(100%-100px)] relative max-lg:h-auto">
-      <div className="grid grid-cols-2 h-full gap-0 relative min-h-0 overflow-hidden max-lg:grid-cols-1 max-lg:overflow-visible">
+    <div className="block animate-fade-in-slow h-[calc(100%-100px)] relative max-md:h-auto">
+      <div className="grid grid-cols-2 h-full gap-0 relative min-h-0 overflow-hidden max-md:grid-cols-1 max-md:overflow-visible">
         {/* Animation Container - Hidden on tablet portrait */}
-        <div className="flex items-center justify-center w-full h-full p-10 box-border bg-transparent max-lg:hidden">
-          <div className="!w-lottie-md !h-lottie-md max-w-full max-h-full max-lg:!w-lottie-sm max-lg:!h-lottie-sm filter-yellow-to-blue">
+        <div className="flex items-center justify-center w-full h-full p-10 box-border bg-transparent max-md:hidden">
+          <div className="!w-lottie-md !h-lottie-md max-w-full max-h-full max-md:!w-lottie-sm max-md:!h-lottie-sm filter-yellow-to-blue">
             <LottieWrapper key={`step2-${animationKey}`} animationData={biometricAnimation} loop={true} />
           </div>
         </div>
         
         {/* Compact Animation for tablet/mobile */}
-        <div className="hidden max-lg:flex items-center justify-center py-6 bg-transparent">
+        <div className="hidden max-md:flex items-center justify-center py-6 bg-transparent">
           <div className="!w-lottie-xs !h-lottie-xs filter-yellow-to-blue">
             <LottieWrapper key={`step2-mobile-${animationKey}`} animationData={biometricAnimation} loop={true} />
           </div>
         </div>
         
         {/* Form Container */}
-        <div className="py-2.5 pl-0 pr-10 flex flex-col justify-between bg-transparent overflow-y-auto h-full relative scrollbar-hidden max-lg:h-auto max-lg:overflow-visible max-lg:px-6 max-md:px-5">
-          <div className="w-[95%] max-lg:w-full">
+        <div className="py-2.5 pl-0 pr-10 flex flex-col justify-between bg-transparent overflow-y-auto h-full relative scrollbar-hidden max-md:h-auto max-md:overflow-visible max-md:px-6 max-sm:px-5">
+          <div className="w-[95%] max-md:w-full">
             <h1 className="text-2xl font-semibold text-gray-800 mb-3 leading-tight">
               {t('profileSetup.provideLongText')}
             </h1>
@@ -52,11 +53,8 @@ const Step2LongText = ({
             <div className="grid grid-cols-2 gap-5 mb-10 max-w-form max-md:grid-cols-1">
               {/* Paste Text Card */}
               <div 
-                className={cn(
-                  "bg-white/60 border border-gray-200 rounded-2xl py-8 px-6",
-                  "cursor-pointer transition-all duration-200 relative overflow-hidden",
-                  "hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-sm",
-                  hasPastedText && "border-text-link bg-white/75"
+                className={cn("bg-white/60 border border-gray-200 rounded-2xl py-8 px-6","cursor-pointer transition-all duration-200 relative overflow-hidden","hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-sm",
+                  hasPastedText &&"border-text-link bg-white/75"
                 )}
                 onClick={onOpenPasteModal}
               >
@@ -81,11 +79,8 @@ const Step2LongText = ({
 
               {/* Upload Files Card */}
               <div 
-                className={cn(
-                  "bg-white/60 border border-gray-200 rounded-2xl py-8 px-6",
-                  "cursor-pointer transition-all duration-200 relative overflow-hidden",
-                  "hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-sm",
-                  hasUploadedFiles && "border-text-link bg-white/75"
+                className={cn("bg-white/60 border border-gray-200 rounded-2xl py-8 px-6","cursor-pointer transition-all duration-200 relative overflow-hidden","hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-sm",
+                  hasUploadedFiles &&"border-text-link bg-white/75"
                 )}
                 onClick={onOpenUploadModal}
               >
@@ -112,14 +107,11 @@ const Step2LongText = ({
 
             {/* Status Badge */}
             {totalChunks > 0 ? (
-              <div className={cn(
-                "flex items-center justify-between gap-4 py-3.5 px-4 pr-4",
-                "bg-bg-secondary rounded-xl border border-gray-200",
-                "mt-5 max-w-form animate-slide-in"
+              <div className={cn("flex items-center justify-between gap-4 py-3.5 px-4 pr-4","bg-bg-secondary rounded-xl border border-gray-200","mt-5 max-w-form animate-slide-in"
               )}>
                 <div className="flex items-center gap-3 flex-1">
                   <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center shrink-0 border border-gray-200">
-                    <img src="/icon/check-circle.svg" alt="" width="18" height="18" className="opacity-65" />
+                    <CheckCircle className="opacity-65" />
                   </div>
                   <div className="flex items-baseline gap-1.5 flex-wrap">
                     <span className="text-sm font-medium text-gray-600">{t('profileSetup.saved')}:</span>
@@ -131,46 +123,33 @@ const Step2LongText = ({
                 <div className="flex gap-2 shrink-0">
                   {hasPastedText && (
                     <button 
-                      className={cn(
-                        "inline-flex items-center gap-1.5 py-2 px-3.5",
-                        "bg-white border border-gray-300 rounded-lg",
-                        "text-sm font-medium text-gray-600",
-                        "cursor-pointer transition-all duration-200",
-                        "hover:bg-gray-50 hover:border-gray-400 hover:text-gray-700"
+                      className={cn("inline-flex items-center gap-1.5 py-2 px-3.5","bg-white border border-gray-300 rounded-lg","text-sm font-medium text-gray-600","cursor-pointer transition-all duration-200","hover:bg-gray-50 hover:border-gray-400 hover:text-gray-700"
                       )}
                       onClick={onOpenPasteModal}
                       data-tooltip={t('profileSetup.viewEditPastedText')}
                     >
-                      <img src="/icon/edit-2.svg" alt="" width="16" height="16" />
+                      <Edit2 />
                       <span>{t('profileSetup.editText')}</span>
                     </button>
                   )}
                   {hasUploadedFiles && (
                     <button 
-                      className={cn(
-                        "inline-flex items-center gap-1.5 py-2 px-3.5",
-                        "bg-white border border-gray-300 rounded-lg",
-                        "text-sm font-medium text-gray-600",
-                        "cursor-pointer transition-all duration-200",
-                        "hover:bg-gray-50 hover:border-gray-400 hover:text-gray-700"
+                      className={cn("inline-flex items-center gap-1.5 py-2 px-3.5","bg-white border border-gray-300 rounded-lg","text-sm font-medium text-gray-600","cursor-pointer transition-all duration-200","hover:bg-gray-50 hover:border-gray-400 hover:text-gray-700"
                       )}
                       onClick={onOpenUploadModal}
                       data-tooltip={t('profileSetup.viewManageFiles')}
                     >
-                      <img src="/icon/file-text.svg" alt="" width="16" height="16" />
+                      <FileText />
                       <span>{t('profileSetup.manageFiles')}</span>
                     </button>
                   )}
                 </div>
               </div>
             ) : (
-              <div className={cn(
-                "flex items-center gap-3 py-3.5 px-4",
-                "bg-bg-secondary rounded-xl border border-gray-200",
-                "mt-5 max-w-form"
+              <div className={cn("flex items-center gap-3 py-3.5 px-4","bg-bg-secondary rounded-xl border border-gray-200","mt-5 max-w-form"
               )}>
                 <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center shrink-0 border border-gray-200">
-                  <img src="/icon/info.svg" alt="" width="18" height="18" className="opacity-65" />
+                  <Info className="opacity-65" />
                 </div>
                 <span className="text-sm text-gray-600">{t('profileSetup.provide1000to5000')}</span>
               </div>
@@ -179,28 +158,16 @@ const Step2LongText = ({
           </div>
           
           {/* Button Group - Fixed at bottom */}
-          <div className="flex gap-3 justify-end pt-6 pb-4 w-[95%] max-lg:w-full max-sm:flex-col-reverse shrink-0">
+          <div className="flex gap-3 justify-end pt-6 pb-4 w-[95%] max-md:w-full max-sm:flex-col-reverse shrink-0">
               <button 
-                className={cn(
-                  "py-3 px-7 text-md font-semibold border border-transparent rounded-lg",
-                  "cursor-pointer transition-all duration-200 inline-flex items-center gap-2",
-                  "bg-gray-100 text-gray-700 border-gray-200",
-                  "hover:bg-gray-200 hover:border-gray-400",
-                  "max-sm:w-full max-sm:justify-center"
+                className={cn("py-3 px-7 text-md font-semibold border border-transparent rounded-lg","cursor-pointer transition-all duration-200 inline-flex items-center gap-2","bg-gray-100 text-gray-700 border-gray-200","hover:bg-gray-200 hover:border-gray-400","max-sm:w-full max-sm:justify-center"
                 )}
                 onClick={onBack}
               >
                 {t('common.back')}
               </button>
               <button 
-                className={cn(
-                  "py-3 px-7 text-md font-semibold border border-transparent rounded-lg",
-                  "cursor-pointer transition-all duration-200 inline-flex items-center gap-2",
-                  "bg-text-link text-white border-text-link",
-                  "hover:enabled:bg-primary hover:enabled:border-primary",
-                  "hover:enabled:-translate-y-px hover:enabled:shadow-md",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                  "max-sm:w-full max-sm:justify-center"
+                className={cn("py-3 px-7 text-md font-semibold border border-transparent rounded-lg","cursor-pointer transition-all duration-200 inline-flex items-center gap-2","bg-text-link text-white border-text-link","hover:enabled:bg-primary hover:enabled:border-primary","hover:enabled:-translate-y-px hover:enabled:shadow-md","disabled:opacity-50 disabled:cursor-not-allowed","max-sm:w-full max-sm:justify-center"
                 )}
                 disabled={!hasLongText}
                 onClick={onNext}

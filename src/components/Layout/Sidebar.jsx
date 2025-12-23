@@ -149,13 +149,9 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
 
   return (
     <motion.aside 
-      className={cn(
-        "bg-bg-tertiary",
-        "flex flex-col overflow-y-auto overflow-x-hidden scrollbar-thin",
-        "h-full touch-pan-y shrink-0 relative",
-        "rounded-md", // Floating panel effect
-        isDragging ? "z-[100] shadow-xl" : "z-[50]",
-        isCollapsed && !hidden && "items-center"
+      className={cn("bg-bg-tertiary","flex flex-col overflow-y-auto overflow-x-hidden scrollbar-thin","h-full touch-pan-y shrink-0 relative","rounded-md", // Floating panel effect
+        isDragging ?"z-[100] shadow-xl" :"z-[50]",
+        isCollapsed && !hidden &&"items-center"
       )}
       initial={false}
       animate={{ 
@@ -163,8 +159,8 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
         opacity: hidden ? 0 : 1,
         x: 0
       }}
-      transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.8 }}
-      drag={hidden ? false : "x"}
+      transition={{ type:"spring", stiffness: 300, damping: 30, mass: 0.8 }}
+      drag={hidden ? false :"x"}
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.2}
       dragMomentum={false}
@@ -179,7 +175,7 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
         minWidth: isDragging ? (isCollapsed ? 64 : 220) : undefined
       }}
     >
-      <div className={cn("py-4", isCollapsed && "px-2")}>
+      <div className={cn("py-4", isCollapsed &&"px-2")}>
         {isCollapsed ? (
           <a 
             href="https://graphosai.com/" 
@@ -203,14 +199,10 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
         )}
       </div>
 
-      <nav className={cn("py-3 flex-1", isCollapsed ? "px-1" : "px-2")}>
-        <div className={cn(
-          "flex items-center gap-3 py-2.5 px-3 rounded-2xl",
-          "text-text-primary text-body cursor-pointer relative my-0.5",
-          "transition-all duration-200",
-          "focus:outline-none hover:bg-fill-tertiary", 
-          currentView === 'home' && "bg-fill-secondary",
-          isCollapsed && "justify-center px-2"
+      <nav className={cn("py-3 flex-1", isCollapsed ?"px-1" :"px-2")}>
+        <div className={cn("flex items-center gap-3 py-2.5 px-3 rounded-2xl","text-text-primary text-body cursor-pointer relative my-0.5","transition-all duration-200","focus:outline-none hover:bg-fill-tertiary", 
+          currentView === 'home' &&"bg-fill-secondary",
+          isCollapsed &&"justify-center px-2"
         )} onClick={() => onViewChange('home')} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onViewChange('home')} data-tooltip-collapsed={t('nav.home')}>
           <Icon name="home" alt={t('nav.home')} size="lg" />
           {!isCollapsed && <span>{t('nav.home')}</span>}
@@ -219,13 +211,9 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
         {(() => {
           const isAIStudioActive = currentView === 'aistudio-editor' && (!currentNote || !recentItems.some(item => item.source === 'aistudio' && item.id === currentNote?.id));
           return (
-            <div className={cn(
-              "flex items-center gap-3 py-2.5 px-3 rounded-2xl",
-              "text-text-primary text-body cursor-pointer relative my-0.5",
-              "transition-all duration-200",
-              "focus:outline-none hover:bg-fill-tertiary",
-              isAIStudioActive && "bg-fill-secondary",
-              isCollapsed && "justify-center px-2"
+            <div className={cn("flex items-center gap-3 py-2.5 px-3 rounded-2xl","text-text-primary text-body cursor-pointer relative my-0.5","transition-all duration-200","focus:outline-none hover:bg-fill-tertiary",
+              isAIStudioActive &&"bg-fill-secondary",
+              isCollapsed &&"justify-center px-2"
             )} onClick={() => onViewChange('aistudio-editor', { createNew: true })} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onViewChange('aistudio-editor', { createNew: true })} data-tooltip-collapsed={t('nav.aiStudio')}>
               <Icon name="play" alt={t('nav.aiStudio')} size="lg" />
               {!isCollapsed && <span>{t('nav.aiStudio')}</span>}
@@ -238,13 +226,9 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
           const isWorkspaceActive = currentView === 'workspace' && 
             (!currentConversation || !recentItems.some(item => item.source === 'workspace' && item.id === currentConversation?.id));
           return (
-            <div className={cn(
-              "flex items-center gap-3 py-2.5 px-3 rounded-2xl",
-              "text-text-primary text-body cursor-pointer relative my-0.5",
-              "transition-all duration-200",
-              "focus:outline-none hover:bg-fill-tertiary", 
-              isWorkspaceActive && "bg-fill-secondary",
-              isCollapsed && "justify-center px-2"
+            <div className={cn("flex items-center gap-3 py-2.5 px-3 rounded-2xl","text-text-primary text-body cursor-pointer relative my-0.5","transition-all duration-200","focus:outline-none hover:bg-fill-tertiary", 
+              isWorkspaceActive &&"bg-fill-secondary",
+              isCollapsed &&"justify-center px-2"
             )} onClick={() => onViewChange('workspace', { createNew: true })} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onViewChange('workspace', { createNew: true })} data-tooltip-collapsed={t('nav.aiWorkspace')}>
               <Icon name="message-square" alt={t('nav.aiWorkspace')} size="lg" />
               {!isCollapsed && <span>{t('nav.aiWorkspace')}</span>}
@@ -266,11 +250,8 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
                   : (currentConversation?.id === item.id && currentView === 'workspace')
                 
                 return (
-                  <div key={`${item.source}-${item.id}`} className={cn(
-                    "cursor-pointer relative flex items-center justify-between gap-2",
-                    "py-2.5 px-3 my-0.5 rounded-2xl bg-transparent transition-all duration-200",
-                    "text-body leading-snug group hover:bg-fill-tertiary",
-                    isActive && "bg-fill-tertiary"
+                  <div key={`${item.source}-${item.id}`} className={cn("cursor-pointer relative flex items-center justify-between gap-2","py-2.5 px-3 my-0.5 rounded-2xl bg-transparent transition-all duration-200","text-body leading-snug group hover:bg-fill-tertiary",
+                    isActive &&"bg-fill-tertiary"
                   )} onClick={() => handleItemClick(item)}>
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       {hasHelpPrefix(item.title) ? (
@@ -294,10 +275,7 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
                         {truncateTitle(stripHelpPrefix(item.title))}
                       </span>
                     </div>
-                    <button className={cn(
-                      "bg-transparent border-none p-1 cursor-pointer rounded-sm",
-                      "opacity-0 invisible shrink-0 transition-all duration-150",
-                      "group-hover:opacity-60 group-hover:visible hover:!opacity-100 hover:bg-fill-secondary"
+                    <button className={cn("bg-transparent border-none p-1 cursor-pointer rounded-sm","opacity-0 invisible shrink-0 transition-all duration-150","group-hover:opacity-60 group-hover:visible hover:!opacity-100 hover:bg-fill-secondary"
                     )} onClick={(e) => handleDeleteItem(e, item)}>
                       <Icon name="trash" alt={t('common.delete')} size="sm" />
                     </button>
@@ -306,10 +284,8 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
               })}
             </div>
 
-            <div className={cn(
-              "block py-2.5 px-3 text-system-blue text-body rounded-2xl m-0 font-medium cursor-pointer",
-              "hover:bg-fill-tertiary focus:outline-none transition-all duration-200",
-              currentView === 'history' && "bg-fill-tertiary"
+            <div className={cn("block py-2.5 px-3 text-system-blue text-body rounded-2xl m-0 font-medium cursor-pointer","hover:bg-fill-tertiary focus:outline-none transition-all duration-200",
+              currentView === 'history' &&"bg-fill-tertiary"
             )} onClick={() => onViewChange('history')} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onViewChange('history')}>
               {t('nav.viewAllHistory')} →
             </div>
@@ -317,25 +293,18 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
         )}
 
         {isCollapsed && (
-          <div className={cn(
-            "flex items-center justify-center py-2.5 px-2 rounded-2xl my-0.5",
-            "text-text-secondary text-body cursor-pointer",
-            "transition-all duration-200",
-            "focus:outline-none hover:bg-fill-tertiary", 
-            currentView === 'history' && "bg-fill-tertiary"
+          <div className={cn("flex items-center justify-center py-2.5 px-2 rounded-2xl my-0.5","text-text-secondary text-body cursor-pointer","transition-all duration-200","focus:outline-none hover:bg-fill-tertiary", 
+            currentView === 'history' &&"bg-fill-tertiary"
           )} onClick={() => onViewChange('history')} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onViewChange('history')} data-tooltip-collapsed={t('nav.viewAllHistory')}>
             <Icon name="clock" alt={t('nav.viewAllHistory')} size="lg" color="muted" />
           </div>
         )}
       </nav>
 
-      <div className={cn("p-2 overflow-visible", isCollapsed && "px-1")}>
+      <div className={cn("p-2 overflow-visible", isCollapsed &&"px-1")}>
         <div className="p-0 relative overflow-visible">
-          <button className={cn(
-            "flex items-center gap-3 py-2.5 px-3 text-text-primary",
-            "text-body rounded-2xl relative my-0.5 border-none bg-transparent w-full cursor-pointer",
-            "hover:bg-fill-tertiary focus:outline-none transition-all duration-200",
-            isCollapsed && "justify-center px-2"
+          <button className={cn("flex items-center gap-3 py-2.5 px-3 text-text-primary","text-body rounded-2xl relative my-0.5 border-none bg-transparent w-full cursor-pointer","hover:bg-fill-tertiary focus:outline-none transition-all duration-200",
+            isCollapsed &&"justify-center px-2"
           )} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowSettings(false); setShowUserProfile(false); setShowNotifications(!showNotifications); }} data-tooltip-collapsed={t('nav.notification')}>
             <div className="relative flex items-center justify-center">
               <Icon name="bell" alt={t('nav.notification')} size="lg" />
@@ -344,21 +313,15 @@ const Sidebar = ({ hidden, currentView, onViewChange, onToggle }) => {
             {!isCollapsed && t('nav.notification')}
           </button>
 
-          <button className={cn(
-            "flex items-center gap-3 py-2.5 px-3 text-text-primary",
-            "text-body rounded-2xl relative my-0.5 border-none bg-transparent w-full cursor-pointer",
-            "hover:bg-fill-tertiary focus:outline-none transition-all duration-200",
-            isCollapsed && "justify-center px-2"
+          <button className={cn("flex items-center gap-3 py-2.5 px-3 text-text-primary","text-body rounded-2xl relative my-0.5 border-none bg-transparent w-full cursor-pointer","hover:bg-fill-tertiary focus:outline-none transition-all duration-200",
+            isCollapsed &&"justify-center px-2"
           )} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowNotifications(false); setShowUserProfile(false); setShowSettings(!showSettings); }} data-tooltip-collapsed={t('nav.settings')}>
             <Icon name="settings" alt={t('nav.settings')} size="lg" />
             {!isCollapsed && t('nav.settings')}
           </button>
 
-          <button className={cn(
-            "flex items-center gap-3 py-2.5 px-3 text-text-primary",
-            "text-body rounded-2xl relative my-0.5 border-none bg-transparent w-full cursor-pointer",
-            "hover:bg-fill-tertiary focus:outline-none transition-all duration-200",
-            isCollapsed && "justify-center px-2"
+          <button className={cn("flex items-center gap-3 py-2.5 px-3 text-text-primary","text-body rounded-2xl relative my-0.5 border-none bg-transparent w-full cursor-pointer","hover:bg-fill-tertiary focus:outline-none transition-all duration-200",
+            isCollapsed &&"justify-center px-2"
           )} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowNotifications(false); setShowSettings(false); setShowUserProfile(!showUserProfile); }} data-tooltip-collapsed={user?.email || t('common.notLoggedIn')}>
             {user?.picture ? (
               <img src={user.picture} alt="User" className="w-6 h-6 shrink-0 rounded-full" />

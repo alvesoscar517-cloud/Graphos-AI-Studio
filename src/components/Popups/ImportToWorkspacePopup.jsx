@@ -136,7 +136,7 @@ const ImportToWorkspacePopup = ({ content, htmlContent, onClose, onImport }) => 
   return (
     <div 
       ref={popupRef}
-      className="absolute z-dropdown bg-bg-primary dark:bg-bg-secondary rounded-xl shadow-elevated animate-fade-in overflow-hidden"
+      className="absolute z-dropdown bg-bg-primary dark:bg-bg-secondary border border-border rounded-xl shadow-elevated animate-fade-in overflow-hidden"
       style={{
         bottom: '100%',
         left: '0px',

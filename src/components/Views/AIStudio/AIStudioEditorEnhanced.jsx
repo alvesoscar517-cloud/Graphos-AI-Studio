@@ -12,6 +12,7 @@ import TokenBadge from '../../Common/TokenBadge'
 import { cn } from '../../../lib/utils'
 import { exportToDocx, exportToPdf, exportToHtml } from '../../Editor/utils/exportDocument'
 
+import { Code, Download, EyeOff, File, FileText, PanelLeft, PanelRight, Pencil, Plus, Upload } from 'lucide-react'
 const AIStudioEditorEnhanced = ({ 
   onToggleLeftSidebar, 
   onToggleRightSidebar, 
@@ -341,57 +342,41 @@ const AIStudioEditorEnhanced = ({
   }, [currentNote?.content, analysis])
 
   return (
-    <div className={cn(
-      "flex flex-col flex-1 overflow-hidden p-0 m-0",
-      "bg-bg-tertiary",
-      "h-full w-full box-border"
+    <div className={cn("flex flex-col flex-1 overflow-hidden p-0 m-0","bg-bg-tertiary","h-full w-full box-border"
     )}>
       {/* Header block - floating panel with rounded corners like sidebar */}
       <div className="shrink-0 p-2 pb-0">
-        <header className={cn(
-          "flex flex-col",
-          "bg-bg-tertiary rounded-lg",
-          "border border-border-light"
+        <header className={cn("flex flex-col","bg-bg-tertiary rounded-lg","border border-border-light"
         )}>
           {/* Top row - title and actions */}
           <div className="flex items-center gap-2 py-2 px-4 h-12 max-md:px-3 max-md:gap-1 @container">
             <button 
-              className={cn(
-                "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
-                "w-8 h-8 shrink-0 flex items-center justify-center",
-                "transition-colors duration-200",
-                "hover:bg-bg-hover"
+              className={cn("p-1.5 bg-transparent border-none cursor-pointer rounded-full","w-8 h-8 shrink-0 flex items-center justify-center","transition-colors duration-200","hover:bg-bg-hover"
               )}
               onClick={onToggleLeftSidebar}
               data-tooltip={t('common.menu')} 
               data-tooltip-position="right"
             >
-              <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+              <PanelLeft size={20} className="opacity-60" />
             </button>
             
             <div className="flex items-center gap-2 min-w-0 flex-1 max-md:gap-1 overflow-hidden">
               <div 
-                className={cn(
-                  "text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default",
-                  "max-w-[300px] shrink",
-                  isTypingTitle && "animate-pulse"
+                className={cn("text-sm font-medium text-text-primary py-1 px-2 whitespace-nowrap overflow-hidden text-ellipsis cursor-default","max-w-[300px] shrink",
+                  isTypingTitle &&"animate-pulse"
                 )}
               >
                 {displayTitle || t('editor.untitled')}
               </div>
               <button 
-              className={cn(
-                "bg-transparent border-none p-1.5 cursor-pointer rounded-md shrink-0",
-                "flex items-center justify-center opacity-50 transition-all duration-200",
-                "hover:opacity-100 hover:bg-bg-hover hover:scale-110",
-                "disabled:opacity-30 disabled:cursor-not-allowed"
+              className={cn("bg-transparent border-none p-1.5 cursor-pointer rounded-md shrink-0","flex items-center justify-center opacity-50 transition-all duration-200","hover:opacity-100 hover:bg-bg-hover hover:scale-110","disabled:opacity-30 disabled:cursor-not-allowed"
               )}
               onClick={handleEditClick}
               data-tooltip={t('common.edit')}
               data-tooltip-position="bottom"
               disabled={isTypingTitle}
             >
-              <img src="/icon/pencil.svg" alt={t('common.edit')} className="w-3.5 h-3.5 icon-invert" />
+              <Pencil size={14} />
             </button>
             
             <div className="hidden @[800px]:block">
@@ -402,118 +387,73 @@ const AIStudioEditorEnhanced = ({
           <div className="flex items-center gap-1 shrink-0">
             {hasHighlights && showHighlights && (
               <button 
-                className={cn(
-                  "flex items-center gap-1.5 py-1.5 px-3.5",
-                  "bg-transparent text-text-primary",
-                  "border border-border-light",
-                  "rounded-pill text-sm font-medium cursor-pointer",
-                  "transition-all duration-200",
-                  "hover:bg-bg-hover",
-                  "hover:border-border-hover",
-                  "max-lg:py-1 max-lg:px-2.5",
-                  "max-md:px-2"
+                className={cn("flex items-center gap-1.5 py-1.5 px-3.5","bg-transparent text-text-primary","border border-border-light","rounded-pill text-sm font-medium cursor-pointer","transition-all duration-200","hover:bg-bg-hover","hover:border-border-hover","max-lg:py-1 max-lg:px-2.5","max-md:px-2"
                 )}
                 onClick={() => setShowHighlights(false)}
                 data-tooltip={t('common.hide')}
                 data-tooltip-collapsed={t('common.done')}
               >
-                <img src="/icon/eye-off.svg" alt={t('common.hide')} className="w-4 h-4 opacity-70 icon-invert max-md:w-3.5 max-md:h-3.5" />
+                <EyeOff size={14} className="opacity-70 max-md:max-md:" />
                 <span className="max-md:hidden">{t('common.done')}</span>
               </button>
             )}
 
             <button 
-              className={cn(
-                "flex items-center justify-center p-2",
-                "bg-transparent text-text-primary",
-                "border border-border-light",
-                "rounded-full text-sm font-medium cursor-pointer",
-                "transition-all duration-200",
-                "hover:bg-bg-hover",
-                "hover:border-border-hover"
+              className={cn("flex items-center justify-center p-2","bg-transparent text-text-primary","border border-border-light","rounded-full text-sm font-medium cursor-pointer","transition-all duration-200","hover:bg-bg-hover","hover:border-border-hover"
               )}
               onClick={onCreateNote}
               data-tooltip={t('common.new')}
             >
-              <img src="/icon/plus.svg" alt={t('common.new')} className="w-4 h-4 opacity-70 icon-invert" />
+              <Plus size={18} className="opacity-70" />
             </button>
             <button 
-              className={cn(
-                "flex items-center justify-center p-2",
-                "bg-transparent text-text-primary",
-                "border border-border-light",
-                "rounded-full text-sm font-medium cursor-pointer",
-                "transition-all duration-200",
-                "hover:bg-bg-hover",
-                "hover:border-border-hover"
+              className={cn("flex items-center justify-center p-2","bg-transparent text-text-primary","border border-border-light","rounded-full text-sm font-medium cursor-pointer","transition-all duration-200","hover:bg-bg-hover","hover:border-border-hover"
               )}
               onClick={() => fileInputRef.current?.click()}
               data-tooltip={t('common.upload')}
             >
-              <img src="/icon/upload.svg" alt={t('common.upload')} className="w-4 h-4 opacity-70 icon-invert" />
+              <Upload size={18} className="opacity-70" />
             </button>
 
             {/* Export Dropdown */}
             <div ref={exportMenuRef} className="relative">
               <button 
-                className={cn(
-                  "flex items-center justify-center p-2",
-                  "bg-transparent text-text-primary",
-                  "border border-border-light",
-                  "rounded-full text-sm font-medium cursor-pointer",
-                  "transition-all duration-200",
-                  "hover:bg-bg-hover",
-                  "hover:border-border-hover",
-                  isExporting && "opacity-50 cursor-wait"
+                className={cn("flex items-center justify-center p-2","bg-transparent text-text-primary","border border-border-light","rounded-full text-sm font-medium cursor-pointer","transition-all duration-200","hover:bg-bg-hover","hover:border-border-hover",
+                  isExporting &&"opacity-50 cursor-wait"
                 )}
                 onClick={() => setShowExportMenu(!showExportMenu)}
                 disabled={isExporting || !tiptapEditor}
                 data-tooltip={t('common.download') || 'Download'}
               >
-                <img src="/icon/download.svg" alt={t('common.download') || 'Download'} className="w-4 h-4 opacity-70 icon-invert" />
+                <Download size={18} className="opacity-70" />
               </button>
 
               {/* Export Menu Dropdown */}
               {showExportMenu && (
-                <div className={cn(
-                  "absolute right-0 top-full mt-1 z-50",
-                  "bg-bg-primary border border-border-light rounded-xl shadow-popup",
-                  "p-1.5 min-w-[160px]"
+                <div className={cn("absolute right-0 top-full mt-1 z-50","bg-bg-primary border border-border-light rounded-xl shadow-popup","p-1.5 min-w-[160px]"
                 )}>
                   <button
                     onClick={handleExportDocx}
-                    className={cn(
-                      "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg",
-                      "text-sm text-text-primary text-left",
-                      "hover:bg-fill-tertiary transition-colors",
-                      "border-none bg-transparent cursor-pointer"
+                    className={cn("w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg","text-sm text-text-primary text-left","hover:bg-fill-tertiary transition-colors","border-none bg-transparent cursor-pointer"
                     )}
                   >
-                    <img src="/icon/file-text.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
+                    <FileText size={16} className="opacity-60" />
                     Word (.docx)
                   </button>
                   <button
                     onClick={handleExportPdf}
-                    className={cn(
-                      "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg",
-                      "text-sm text-text-primary text-left",
-                      "hover:bg-fill-tertiary transition-colors",
-                      "border-none bg-transparent cursor-pointer"
+                    className={cn("w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg","text-sm text-text-primary text-left","hover:bg-fill-tertiary transition-colors","border-none bg-transparent cursor-pointer"
                     )}
                   >
-                    <img src="/icon/file.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
+                    <File size={16} className="opacity-60" />
                     PDF
                   </button>
                   <button
                     onClick={handleExportHtml}
-                    className={cn(
-                      "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg",
-                      "text-sm text-text-primary text-left",
-                      "hover:bg-fill-tertiary transition-colors",
-                      "border-none bg-transparent cursor-pointer"
+                    className={cn("w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg","text-sm text-text-primary text-left","hover:bg-fill-tertiary transition-colors","border-none bg-transparent cursor-pointer"
                     )}
                   >
-                    <img src="/icon/code.svg" alt="" className="w-4 h-4 opacity-60 icon-invert" />
+                    <Code size={16} className="opacity-60" />
                     HTML
                   </button>
                 </div>
@@ -522,16 +462,12 @@ const AIStudioEditorEnhanced = ({
 
             {rightSidebarHidden && (
               <button 
-                className={cn(
-                  "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
-                  "w-8 h-8 flex items-center justify-center",
-                  "transition-colors duration-200",
-                  "hover:bg-bg-hover"
+                className={cn("p-1.5 bg-transparent border-none cursor-pointer rounded-full","w-8 h-8 flex items-center justify-center","transition-colors duration-200","hover:bg-bg-hover"
                 )}
                 onClick={onToggleRightSidebar}
                 data-tooltip={t('nav.sidebar')}
               >
-                <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+                <PanelRight size={20} className="opacity-60" />
               </button>
             )}
             
@@ -558,10 +494,7 @@ const AIStudioEditorEnhanced = ({
         </header>
       </div>
 
-      <div className={cn(
-        "relative flex-1 p-0 m-0 border-none",
-        "bg-bg-tertiary",
-        "overflow-hidden h-full w-full box-border"
+      <div className={cn("relative flex-1 p-0 m-0 border-none","bg-bg-tertiary","overflow-hidden h-full w-full box-border"
       )}>
         <TiptapEditor
           value={currentNote?.content || ''}

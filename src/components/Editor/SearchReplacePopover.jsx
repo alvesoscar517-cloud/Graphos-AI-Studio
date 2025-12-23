@@ -241,9 +241,7 @@ const SearchReplacePopover = ({
   return (
     <div
       ref={popoverRef}
-      className={cn(
-        "fixed bg-bg-primary border border-border-light rounded-xl shadow-popup",
-        "p-3 w-80"
+      className={cn("fixed bg-bg-primary border border-border rounded-xl shadow-popup","p-3 w-80"
       )}
       style={popoverStyle}
       onClick={handlePopoverClick}
@@ -267,11 +265,7 @@ const SearchReplacePopover = ({
             onFocus={handleInputFocus}
             onMouseDown={(e) => e.stopPropagation()}
             placeholder={t('editor.searchPlaceholder') || 'Search...'}
-            className={cn(
-              "w-full h-8 pl-8 pr-3 text-sm",
-              "bg-bg-secondary border border-border-light rounded-full",
-              "text-text-primary placeholder:text-text-muted",
-              "focus:outline-none"
+            className={cn("w-full h-8 pl-8 pr-3 text-sm","bg-bg-secondary border border-border-light rounded-full","text-text-primary placeholder:text-text-muted","focus:outline-none"
             )}
           />
         </div>
@@ -286,10 +280,7 @@ const SearchReplacePopover = ({
           type="button"
           onClick={goToPrev}
           disabled={matchCount === 0}
-          className={cn(
-            "w-6 h-6 flex items-center justify-center rounded",
-            "bg-transparent border-none cursor-pointer",
-            "hover:bg-bg-hover disabled:opacity-40 disabled:cursor-not-allowed"
+          className={cn("w-6 h-6 flex items-center justify-center rounded","bg-transparent border-none cursor-pointer","hover:bg-bg-hover disabled:opacity-40 disabled:cursor-not-allowed"
           )}
           data-tooltip={t('editor.previousMatch') || 'Previous'}
         >
@@ -299,10 +290,7 @@ const SearchReplacePopover = ({
           type="button"
           onClick={goToNext}
           disabled={matchCount === 0}
-          className={cn(
-            "w-6 h-6 flex items-center justify-center rounded",
-            "bg-transparent border-none cursor-pointer",
-            "hover:bg-bg-hover disabled:opacity-40 disabled:cursor-not-allowed"
+          className={cn("w-6 h-6 flex items-center justify-center rounded","bg-transparent border-none cursor-pointer","hover:bg-bg-hover disabled:opacity-40 disabled:cursor-not-allowed"
           )}
           data-tooltip={t('editor.nextMatch') || 'Next'}
         >
@@ -313,11 +301,8 @@ const SearchReplacePopover = ({
         <button
           type="button"
           onClick={() => setShowReplace(!showReplace)}
-          className={cn(
-            "w-6 h-6 flex items-center justify-center rounded",
-            "bg-transparent border-none cursor-pointer",
-            "hover:bg-bg-hover",
-            showReplace && "bg-primary/15"
+          className={cn("w-6 h-6 flex items-center justify-center rounded","bg-transparent border-none cursor-pointer","hover:bg-bg-hover",
+            showReplace &&"bg-primary/15"
           )}
           data-tooltip={t('editor.toggleReplace') || 'Replace'}
         >
@@ -328,10 +313,7 @@ const SearchReplacePopover = ({
         <button
           type="button"
           onClick={onClose}
-          className={cn(
-            "w-6 h-6 flex items-center justify-center rounded",
-            "bg-transparent border-none cursor-pointer",
-            "hover:bg-bg-hover"
+          className={cn("w-6 h-6 flex items-center justify-center rounded","bg-transparent border-none cursor-pointer","hover:bg-bg-hover"
           )}
         >
           <Icon name="x" size="sm" color="muted" />
@@ -355,11 +337,7 @@ const SearchReplacePopover = ({
               onFocus={handleInputFocus}
               onMouseDown={(e) => e.stopPropagation()}
               placeholder={t('editor.replacePlaceholder') || 'Replace with...'}
-              className={cn(
-                "w-full h-8 pl-8 pr-3 text-sm",
-                "bg-bg-secondary border border-border-light rounded-full",
-                "text-text-primary placeholder:text-text-muted",
-                "focus:outline-none"
+              className={cn("w-full h-8 pl-8 pr-3 text-sm","bg-bg-secondary border border-border-light rounded-full","text-text-primary placeholder:text-text-muted","focus:outline-none"
               )}
             />
           </div>
@@ -368,11 +346,7 @@ const SearchReplacePopover = ({
             type="button"
             onClick={replaceCurrent}
             disabled={matchCount === 0}
-            className={cn(
-              "h-7 px-3 text-xs font-medium rounded-full",
-              "bg-transparent border border-border-light",
-              "text-text-primary cursor-pointer",
-              "hover:bg-bg-hover disabled:opacity-40 disabled:cursor-not-allowed"
+            className={cn("h-7 px-3 text-xs font-medium rounded-full","bg-transparent border border-border-light","text-text-primary cursor-pointer","hover:bg-bg-hover disabled:opacity-40 disabled:cursor-not-allowed"
             )}
           >
             {t('editor.replace') || 'Replace'}
@@ -381,10 +355,7 @@ const SearchReplacePopover = ({
             type="button"
             onClick={replaceAll}
             disabled={matchCount === 0}
-            className={cn(
-              "h-7 px-3 text-xs font-medium rounded-full",
-              "bg-primary text-white border-none cursor-pointer",
-              "hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed"
+            className={cn("h-7 px-3 text-xs font-medium rounded-full","bg-primary text-white border-none cursor-pointer","hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed"
             )}
           >
             {t('editor.replaceAll') || 'All'}

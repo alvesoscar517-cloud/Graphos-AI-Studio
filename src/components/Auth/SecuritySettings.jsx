@@ -77,10 +77,9 @@ const SecuritySettings = () => {
     return 'Unknown browser'
   }
 
-  const tabClass = (tab, danger = false) => cn(
-    "px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-all",
-    activeTab === tab ? (danger ? "text-red-600 border-red-600" : "text-text-primary border-primary") : "text-text-muted border-transparent hover:text-text-primary",
-    danger && "text-red-600"
+  const tabClass = (tab, danger = false) => cn("px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-all",
+    activeTab === tab ? (danger ?"text-red-600 border-red-600" :"text-text-primary border-primary") :"text-text-muted border-transparent hover:text-text-primary",
+    danger &&"text-red-600"
   )
 
   return (
@@ -135,7 +134,7 @@ const SecuritySettings = () => {
               : loginHistory.length === 0 ? <p className="text-center py-10 text-sm text-text-muted">{t('auth.email.noHistory')}</p>
               : <div className="flex flex-col gap-3">
                 {loginHistory.map((entry, index) => (
-                  <div key={index} className={cn("flex justify-between items-center p-4 rounded-lg border", entry.isNewDevice ? "bg-amber-50 border-amber-300" : "bg-bg-secondary border-border-light")}>
+                  <div key={index} className={cn("flex justify-between items-center p-4 rounded-lg border", entry.isNewDevice ?"bg-amber-50 border-amber-300" :"bg-bg-secondary border-border-light")}>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <span>{entry.isNewDevice ? '[NEW]' : '[COMPUTER]'}</span>

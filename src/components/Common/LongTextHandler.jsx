@@ -98,10 +98,7 @@ const LongTextHandler = ({
     if (!isTooLong || stats.chars === 0) return null
 
     return (
-      <div className={cn(
-        "flex items-start gap-3 py-3 px-4",
-        "bg-amber-500/10 border border-amber-500/30 rounded-lg",
-        "animate-slide-up-fast"
+      <div className={cn("flex items-start gap-3 py-3 px-4","bg-amber-500/10 border border-amber-500/30 rounded-lg","animate-slide-up-fast"
       )}>
         <div className="text-xl shrink-0">[{t('common.warning').toUpperCase()}]</div>
         <div className="flex-1 min-w-0">
@@ -116,10 +113,7 @@ const LongTextHandler = ({
         
         {modelRecommendation.model !== model && onChangeModel && (
           <button 
-            className={cn(
-              "py-1.5 px-3 text-xs bg-amber-400 text-black border-none rounded-md",
-              "cursor-pointer whitespace-nowrap transition-all duration-200",
-              "hover:bg-amber-500 hover:-translate-y-0.5"
+            className={cn("py-1.5 px-3 text-xs bg-amber-400 text-black border-none rounded-md","cursor-pointer whitespace-nowrap transition-all duration-200","hover:bg-amber-500 hover:-translate-y-0.5"
             )}
             onClick={() => onChangeModel(modelRecommendation.model)}
           >

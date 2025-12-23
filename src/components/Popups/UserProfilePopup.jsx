@@ -94,10 +94,7 @@ const UserProfilePopup = ({ onClose }) => {
     <Portal>
       <div 
         ref={popupRef}
-        className={cn(
-          "popup fixed bottom-[56px] left-3 w-popup-md",
-          "z-popup overflow-hidden",
-          "sm:w-popup-lg"
+        className={cn("popup fixed bottom-[56px] left-3 w-popup-md","z-popup overflow-hidden","sm:w-popup-lg"
         )}
       >
         {/* Profile Header */}
@@ -107,18 +104,16 @@ const UserProfilePopup = ({ onClose }) => {
             {user?.picture ? (
               <img 
                 src={user.picture} 
-                className={cn(
-                  "w-avatar-3xl h-avatar-3xl rounded-full mx-auto",
-                  isEmailUser && "cursor-pointer"
+                className={cn("w-avatar-3xl h-avatar-3xl rounded-full mx-auto",
+                  isEmailUser &&"cursor-pointer"
                 )}
                 alt="User Avatar"
                 onClick={handleAvatarClick}
               />
             ) : (
               <div 
-                className={cn(
-                  "w-avatar-3xl h-avatar-3xl rounded-full mx-auto bg-gradient-to-br from-gradient-orange-start to-gradient-orange-end p-1.5 flex items-center justify-center",
-                  isEmailUser && "cursor-pointer"
+                className={cn("w-avatar-3xl h-avatar-3xl rounded-full mx-auto bg-gradient-to-br from-gradient-orange-start to-gradient-orange-end p-1.5 flex items-center justify-center",
+                  isEmailUser &&"cursor-pointer"
                 )}
                 onClick={handleAvatarClick}
               >
@@ -129,10 +124,8 @@ const UserProfilePopup = ({ onClose }) => {
             {/* Upload overlay for email users */}
             {isEmailUser && (
               <div 
-                className={cn(
-                  "absolute inset-0 rounded-full flex items-center justify-center cursor-pointer transition-opacity",
-                  "bg-black/50 opacity-0 group-hover:opacity-100",
-                  isUploading && "opacity-100"
+                className={cn("absolute inset-0 rounded-full flex items-center justify-center cursor-pointer transition-opacity","bg-black/50 opacity-0 group-hover:opacity-100",
+                  isUploading &&"opacity-100"
                 )}
                 onClick={handleAvatarClick}
               >
@@ -176,12 +169,7 @@ const UserProfilePopup = ({ onClose }) => {
         <div className="px-5 pb-4">
           <button 
             onClick={handleSignOut}
-            className={cn(
-              "w-full py-2.5 px-4 rounded-lg text-sm font-medium",
-              "bg-transparent border border-border-light",
-              "text-text-secondary cursor-pointer",
-              "hover:bg-bg-hover hover:text-text-primary hover:border-border-hover",
-              "transition-colors flex items-center justify-center gap-2"
+            className={cn("w-full py-2.5 px-4 rounded-lg text-sm font-medium","bg-transparent border border-border-light","text-text-secondary cursor-pointer","hover:bg-bg-hover hover:text-text-primary hover:border-border-hover","transition-colors flex items-center justify-center gap-2"
             )}
           >
             <Icon name="log-out" size="sm" />

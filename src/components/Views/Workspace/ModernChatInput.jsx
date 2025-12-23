@@ -266,13 +266,10 @@ const ModernChatInput = ({
   const hasContent = message.trim() || attachments.length > 0
 
   return (
-    <div className={cn("w-full", isCentered && "max-w-2xl mx-auto")}>
+    <div className={cn("w-full", isCentered &&"max-w-2xl mx-auto")}>
       {/* Upload Error */}
       {uploadError && (
-        <div className={cn(
-          "flex items-center gap-2 py-2 px-3 mb-2",
-          "bg-error/10 border border-error/20 rounded-lg",
-          "text-sm text-error"
+        <div className={cn("flex items-center gap-2 py-2 px-3 mb-2","bg-error/10 border border-error/20 rounded-lg","text-sm text-error"
         )}>
           <Icon name="alert-circle" size="sm" color="error" />
           <span>{uploadError}</span>
@@ -280,10 +277,7 @@ const ModernChatInput = ({
       )}
 
       {/* Main Input Container - shadcn-io/ai style */}
-      <div className={cn(
-        "relative flex flex-col",
-        "bg-bg-primary border border-border-light rounded-2xl",
-        "shadow-sm"
+      <div className={cn("relative flex flex-col","bg-bg-primary border border-border-light rounded-2xl","shadow-sm"
       )}>
         {/* Attachments Preview - inside input container */}
         {attachments.length > 0 && (
@@ -291,10 +285,7 @@ const ModernChatInput = ({
             {attachments.map((attachment, index) => (
               <div 
                 key={index} 
-                className={cn(
-                  "flex items-center gap-2 py-1.5 px-2",
-                  "bg-bg-secondary/50 border border-border-light/50 rounded-lg",
-                  "max-w-[200px]"
+                className={cn("flex items-center gap-2 py-1.5 px-2","bg-bg-secondary/50 border border-border-light/50 rounded-lg","max-w-[200px]"
                 )}
               >
                 {attachment.isImage ? (
@@ -317,10 +308,7 @@ const ModernChatInput = ({
                   </span>
                 </div>
                 <button 
-                  className={cn(
-                    "p-1 bg-transparent border-none cursor-pointer rounded",
-                    "opacity-50 flex items-center justify-center",
-                    "hover:opacity-100 hover:bg-bg-hover"
+                  className={cn("p-1 bg-transparent border-none cursor-pointer rounded","opacity-50 flex items-center justify-center","hover:opacity-100 hover:bg-bg-hover"
                   )}
                   onClick={() => handleRemoveAttachment(index)}
                 >
@@ -334,13 +322,7 @@ const ModernChatInput = ({
         {/* Textarea */}
         <textarea
           ref={textareaRef}
-          className={cn(
-            "w-full border-none bg-transparent resize-none",
-            "text-text-primary text-sm",
-            "px-4 pt-3 pb-2",
-            "outline-none min-h-[44px] max-h-[200px]",
-            "overflow-y-auto",
-            "placeholder:text-text-muted/60"
+          className={cn("w-full border-none bg-transparent resize-none","text-text-primary text-sm","px-4 pt-3 pb-2","outline-none min-h-[44px] max-h-[200px]","overflow-y-auto","placeholder:text-text-muted/60"
           )}
           placeholder={isHelpMode ? t('workspace.helpPlaceholder') : defaultPlaceholder}
           value={message}
@@ -361,13 +343,7 @@ const ModernChatInput = ({
               <button
                 ref={plusButtonRef}
                 type="button"
-                className={cn(
-                  "inline-flex items-center justify-center gap-2",
-                  "h-8 w-8 rounded-lg",
-                  "text-text-muted hover:text-text-primary",
-                  "hover:bg-bg-hover/80",
-                  "transition-colors",
-                  "disabled:opacity-50 disabled:pointer-events-none"
+                className={cn("inline-flex items-center justify-center gap-2","h-8 w-8 rounded-lg","text-text-muted hover:text-text-primary","hover:bg-bg-hover/80","transition-colors","disabled:opacity-50 disabled:pointer-events-none"
                 )}
                 onClick={() => setShowPlusMenu(!showPlusMenu)}
                 disabled={disabled}
@@ -386,10 +362,7 @@ const ModernChatInput = ({
                 >
                   <div 
                     ref={plusMenuRef}
-                    className={cn(
-                      "absolute bg-bg-primary border border-border-light rounded-xl",
-                      "shadow-lg p-1.5 min-w-[180px]",
-                      "animate-fade-in"
+                    className={cn("absolute bg-bg-primary border border-border rounded-xl","shadow-lg p-1.5 min-w-[180px]","animate-fade-in"
                     )}
                     style={(() => {
                       const buttonRect = plusButtonRef.current?.getBoundingClientRect()
@@ -415,12 +388,7 @@ const ModernChatInput = ({
                   >
                     {/* Images Option */}
                     <button
-                      className={cn(
-                        "w-full px-3 py-2 text-left rounded-lg",
-                        "flex items-center gap-3",
-                        "text-sm text-text-primary",
-                        "hover:bg-fill-tertiary",
-                        "transition-colors"
+                      className={cn("w-full px-3 py-2 text-left rounded-lg","flex items-center gap-3","text-sm text-text-primary","hover:bg-fill-tertiary","transition-colors"
                       )}
                       onClick={() => {
                         imageInputRef.current?.click()
@@ -436,12 +404,7 @@ const ModernChatInput = ({
 
                     {/* Files Option */}
                     <button
-                      className={cn(
-                        "w-full px-3 py-2 text-left rounded-lg",
-                        "flex items-center gap-3",
-                        "text-sm text-text-primary",
-                        "hover:bg-fill-tertiary",
-                        "transition-colors"
+                      className={cn("w-full px-3 py-2 text-left rounded-lg","flex items-center gap-3","text-sm text-text-primary","hover:bg-fill-tertiary","transition-colors"
                       )}
                       onClick={() => {
                         fileInputRef.current?.click()
@@ -456,12 +419,7 @@ const ModernChatInput = ({
 
                     {/* Help Option - Info icon */}
                     <button
-                      className={cn(
-                        "w-full px-3 py-2 text-left rounded-lg",
-                        "flex items-center gap-3",
-                        "text-sm text-text-primary",
-                        "hover:bg-fill-tertiary",
-                        "transition-colors"
+                      className={cn("w-full px-3 py-2 text-left rounded-lg","flex items-center gap-3","text-sm text-text-primary","hover:bg-fill-tertiary","transition-colors"
                       )}
                       onClick={handleHelpClick}
                     >
@@ -482,14 +440,8 @@ const ModernChatInput = ({
             {browserSupportsSpeechRecognition && (
               <button
                 type="button"
-                className={cn(
-                  "inline-flex items-center justify-center gap-2",
-                  "h-8 px-3 rounded-lg",
-                  "text-text-muted hover:text-text-primary",
-                  "hover:bg-bg-hover/80",
-                  "transition-colors",
-                  listening && "text-error bg-error/10",
-                  "disabled:opacity-50 disabled:pointer-events-none"
+                className={cn("inline-flex items-center justify-center gap-2","h-8 px-3 rounded-lg","text-text-muted hover:text-text-primary","hover:bg-bg-hover/80","transition-colors",
+                  listening &&"text-error bg-error/10","disabled:opacity-50 disabled:pointer-events-none"
                 )}
                 onClick={toggleVoiceRecording}
                 disabled={disabled}
@@ -508,13 +460,7 @@ const ModernChatInput = ({
               <button
                 type="button"
                 onClick={() => setIsHelpMode(false)}
-                className={cn(
-                  "inline-flex items-center gap-1.5",
-                  "h-8 px-3 rounded-lg",
-                  "bg-bg-hover text-text-primary",
-                  "hover:bg-bg-secondary",
-                  "transition-colors cursor-pointer",
-                  "group"
+                className={cn("inline-flex items-center gap-1.5","h-8 px-3 rounded-lg","bg-bg-hover text-text-primary","hover:bg-bg-secondary","transition-colors cursor-pointer","group"
                 )}
               >
                 <svg 
@@ -555,18 +501,12 @@ const ModernChatInput = ({
                 <button
                   ref={modelButtonRef}
                   type="button"
-                  className={cn(
-                    "inline-flex items-center justify-between gap-1",
-                    "h-8 px-3 rounded-lg",
-                    "text-xs text-text-muted",
-                    "hover:bg-bg-hover/80",
-                    "transition-colors",
-                    "min-w-[120px]"
+                  className={cn("inline-flex items-center justify-between gap-1","h-8 px-3 rounded-lg","text-xs text-text-muted","hover:bg-bg-hover/80","transition-colors","min-w-[120px]"
                   )}
                   onClick={() => setShowModelDropdown(!showModelDropdown)}
                 >
                   <span>{currentModel.name}</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("transition-transform", showModelDropdown && "rotate-180")}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("transition-transform", showModelDropdown &&"rotate-180")}>
                     <path d="m6 9 6 6 6-6" />
                   </svg>
                 </button>
@@ -579,10 +519,7 @@ const ModernChatInput = ({
                   >
                     <div 
                       ref={modelDropdownRef}
-                      className={cn(
-                        "absolute bg-bg-primary border border-border-light rounded-xl",
-                        "shadow-lg p-1.5 min-w-[180px]",
-                        "animate-fade-in"
+                      className={cn("absolute bg-bg-primary border border-border rounded-xl","shadow-lg p-1.5 min-w-[180px]","animate-fade-in"
                       )}
                       style={(() => {
                         const buttonRect = modelButtonRef.current?.getBoundingClientRect()
@@ -613,12 +550,7 @@ const ModernChatInput = ({
                       {MODELS.map((model) => (
                         <button
                           key={model.id}
-                          className={cn(
-                            "w-full px-3 py-2 text-left rounded-lg",
-                            "flex items-center justify-between",
-                            "text-sm text-text-primary",
-                            "hover:bg-fill-tertiary",
-                            "transition-colors"
+                          className={cn("w-full px-3 py-2 text-left rounded-lg","flex items-center justify-between","text-sm text-text-primary","hover:bg-fill-tertiary","transition-colors"
                           )}
                           onClick={() => {
                             onModelChange?.(model.id)
@@ -644,14 +576,10 @@ const ModernChatInput = ({
           {/* Send Button - shadcn-io/ai style (paper plane icon) */}
           <button
             type="button"
-            className={cn(
-              "inline-flex items-center justify-center",
-              "h-8 w-8 rounded-lg",
-              "transition-colors",
+            className={cn("inline-flex items-center justify-center","h-8 w-8 rounded-lg","transition-colors",
               hasContent && status === 'ready'
-                ? "bg-text-primary text-bg-primary hover:bg-text-primary/90" 
-                : "bg-bg-hover text-text-muted cursor-not-allowed",
-              "disabled:opacity-50"
+                ?"bg-text-primary text-bg-primary hover:bg-text-primary/90" 
+                :"bg-bg-hover text-text-muted cursor-not-allowed","disabled:opacity-50"
             )}
             onClick={handleSend}
             disabled={disabled || !hasContent || status !== 'ready'}

@@ -45,16 +45,11 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
   }
 
   return (
-    <div className={cn(
-      "p-4 border border-border-light rounded-xl",
-      "bg-bg-tertiary transition-all duration-200 hover:shadow-md"
+    <div className={cn("p-4 border border-border-light rounded-xl","bg-bg-tertiary transition-all duration-200 hover:shadow-md"
     )}>
       {/* Header */}
       <div className="flex items-center gap-4 mb-3 relative">
-        <div className={cn(
-          "w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0",
-          "bg-bg-tertiary transition-all duration-200",
-          "hover:bg-bg-secondary hover:scale-[1.02]"
+        <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0","bg-bg-tertiary transition-all duration-200","hover:bg-bg-secondary hover:scale-[1.02]"
         )}>
           <Icon name="pen" alt={t('rewrite.rewrite')} size="xl" color="primary" className="w-7 h-7" />
         </div>
@@ -66,13 +61,8 @@ const RewriteCard = ({ disabled, currentProfile, text }) => {
 
       {/* Action Button */}
       <button 
-        className={cn(
-          "w-full flex items-center justify-between py-2.5 px-3.5",
-          "bg-bg-secondary border border-border-light rounded-xl",
-          "text-sm font-medium text-text-primary cursor-pointer",
-          "transition-all duration-200 hover:border-border-hover hover:shadow-md",
-          "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
-          isLoading && "pointer-events-none opacity-70"
+        className={cn("w-full flex items-center justify-between py-2.5 px-3.5","bg-bg-secondary border border-border-light rounded-xl","text-sm font-medium text-text-primary cursor-pointer","transition-all duration-200 hover:border-border-hover hover:shadow-md","disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+          isLoading &&"pointer-events-none opacity-70"
         )}
         onClick={rewriteText}
         disabled={disabled || isLoading}

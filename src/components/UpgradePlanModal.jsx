@@ -7,6 +7,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import Icon from './Common/Icon'
 import { useQueryClient } from '@tanstack/react-query';
 import { usePayment } from '../contexts/PaymentContext';
 import { usePackages, useCreateCheckout } from '@/hooks/queries';
@@ -14,6 +15,16 @@ import { useToasts } from '@/stores/uiStore';
 import { useUser } from '@/stores/authStore';
 import { queryKeys } from '@/lib/queryKeys';
 import { cn } from '../lib/utils';
+
+import { CreditCard, Gift, Info, ShoppingCart, Tags, X } from 'lucide-react'
+
+// Package icon mapping - maps package id to custom crown SVG icons
+const PACKAGE_ICON_MAP = {
+  'basic': 'crown-basic',
+  'pro': 'crown-pro', 
+  'pro_plus': 'crown-pro-plus',
+  'power': 'crown-power',
+}
 
 // Currency mapping by language code with exchange rates (approximate, updated periodically)
 const CURRENCY_CONFIG = {
@@ -180,27 +191,19 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
 
   return createPortal(
     <div 
-      className={cn(
-        "fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-toast p-5",
-        "animate-overlay-fade",
-        "max-md:p-3 max-md:items-end"
+      className={cn("fixed inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center z-toast p-5","animate-overlay-fade","max-md:p-3 max-md:items-end"
       )}
       onClick={onClose}
     >
       <div 
-        className={cn(
-          "bg-bg-primary",
-          "border border-border rounded-2xl max-w-[820px] w-full max-h-[85vh]",
-          "overflow-hidden flex flex-col shadow-modal",
-          "animate-modal-slide",
-          "max-md:max-w-full max-md:max-h-[90vh] max-md:rounded-t-2xl max-md:rounded-b-none"
+        className={cn("bg-bg-primary","border border-border rounded-2xl max-w-[820px] w-full max-h-[85vh]","overflow-hidden flex flex-col shadow-modal","animate-modal-slide","max-md:max-w-full max-md:max-h-[90vh] max-md:rounded-t-2xl max-md:rounded-b-none"
         )}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-5">
           <div className="flex items-center gap-2.5">
-            <img src="/icon/coins.svg" alt="" className="w-icon-2xl h-icon-2xl opacity-80 icon-invert" />
+            <Icon name="coins" size="2xl" className="opacity-80" />
             <h2 className="m-0 text-lg font-semibold text-text-primary">{t('billing.buyCredits')}</h2>
           </div>
           <button 
@@ -210,7 +213,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
             data-tooltip={t('common.close')}
             data-tooltip-position="bottom"
           >
-            <img src="/icon/x.svg" alt="" className="w-icon-lg h-icon-lg icon-invert" />
+            <X size={20} />
           </button>
         </div>
 
@@ -241,12 +244,12 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
         {isFirstPurchaseEligible && (
           <div className="mx-6 mb-2 p-3 bg-bg-secondary rounded-xl">
             <div className="flex items-center justify-center gap-2.5">
-              <img src="/icon/gift-banner.svg" alt="" className="w-5 h-5 shrink-0" />
+              <Icon name="gift-banner" size="lg" className="w-5 h-5 shrink-0" />
               <div className="text-center">
                 <span className="text-sm font-bold text-amber-500">{t('billing.firstPurchaseTitle', 'WELCOME OFFER')}</span>
                 <span className="text-sm font-medium text-amber-500 ml-2">{t('billing.firstPurchaseDesc', 'Double credits on your first purchase!')}</span>
               </div>
-              <img src="/icon/gift-banner.svg" alt="" className="w-5 h-5 shrink-0" />
+              <Icon name="gift-banner" size="lg" className="w-5 h-5 shrink-0" />
             </div>
           </div>
         )}
@@ -265,41 +268,30 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                 return (
                   <div
                     key={pkg.id}
-                    className={cn(
-                      "bg-bg-secondary border border-border-light rounded-2xl py-5 px-4 flex flex-col items-center relative",
-                      "transition-colors hover:border-border-hover",
-                      "max-sm:flex-row max-sm:flex-wrap max-sm:p-3.5 max-sm:gap-2.5"
+                    className={cn("bg-bg-secondary border border-border-light rounded-2xl py-5 px-4 flex flex-col items-center relative","transition-colors hover:border-border-hover","max-sm:flex-row max-sm:flex-wrap max-sm:p-3.5 max-sm:gap-2.5"
                     )}
                   >
                     {/* First Purchase x2 Badge */}
                     {isFirstPurchaseEligible && (
-                      <img 
-                        src="/icon/x2-credits.svg" 
-                        alt="x2" 
-                        className={cn(
-                          "absolute -top-3 right-0 w-10 h-10 drop-shadow-md",
-                          "max-sm:static max-sm:order-[-1] max-sm:w-9 max-sm:h-9"
-                        )}
-                      />
+                      <Icon name="x2-credits" alt="x2" />
                     )}
                     
                     {pkg.popular && !isFirstPurchaseEligible && (
-                      <div className={cn(
-                        "absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-white border-none",
-                        "py-1 px-2.5 rounded-lg text-xs font-semibold flex items-center gap-1 uppercase tracking-wide",
-                        "max-sm:static max-sm:translate-x-0 max-sm:w-full max-sm:justify-center max-sm:order-[-1] max-sm:mb-1"
+                      <div className={cn("absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-white border-none","py-1 px-2.5 rounded-lg text-xs font-semibold flex items-center gap-1 uppercase tracking-wide","max-sm:static max-sm:translate-x-0 max-sm:w-full max-sm:justify-center max-sm:order-[-1] max-sm:mb-1"
                       )}>
-                        <img src="/icon/tags.svg" alt="" className="w-3 h-3 brightness-0 invert" />
+                        <Tags size={12} />
                         <span>{t('billing.popular')}</span>
                       </div>
                     )}
                     
-                    <div className={cn(
-                      "flex flex-col items-center gap-2.5 mb-3.5 pt-3",
-                      "max-sm:flex-row max-sm:mb-0 max-sm:!pt-0 max-sm:flex-1"
+                    <div className={cn("flex flex-col items-center gap-2.5 mb-3.5 pt-3","max-sm:flex-row max-sm:mb-0 max-sm:!pt-0 max-sm:flex-1"
                     )}>
                       <div className="w-10 h-10 flex items-center justify-center max-sm:w-9 max-sm:h-9">
-                        <img src={`/icon/${pkg.icon || 'zap'}.svg`} alt="" className="w-8 h-8" />
+                        <img 
+                          src={`/icon/${PACKAGE_ICON_MAP[pkg.id] || 'crown-basic'}.svg`}
+                          alt={pkg.description}
+                          className="w-8 h-8 max-sm:w-7 max-sm:h-7"
+                        />
                       </div>
                       <h3 className="m-0 text-sm font-semibold text-text-primary">{pkg.description}</h3>
                     </div>
@@ -314,7 +306,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
 
                     <div className="flex flex-col items-center gap-1.5 mb-2.5 max-sm:flex-row max-sm:w-full max-sm:justify-between max-sm:mb-1.5">
                       <div className="flex items-center gap-1.5 text-text-primary">
-                        <img src="/icon/coins.svg" alt="" className="w-3.5 h-3.5 opacity-60 icon-invert" />
+                        <Icon name="coins" size="xs" className="opacity-60" />
                         {isFirstPurchaseEligible ? (
                           <>
                             <span className="text-xs text-text-muted line-through">{pkg.totalCredits.toLocaleString()}</span>
@@ -331,7 +323,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                         </div>
                       ) : bonusPercent ? (
                         <div className="inline-flex items-center gap-1 py-0.5 px-2 bg-success/10 rounded-lg text-xs font-semibold text-success">
-                          <img src="/icon/gift.svg" alt="" className="w-icon-2xs h-icon-2xs" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(70%) saturate(459%) hue-rotate(93deg) brightness(95%) contrast(92%)' }} />
+                          <Gift size={10} />
                           <span>+{bonusPercent}% {t('billing.bonus')}</span>
                         </div>
                       ) : null}
@@ -348,13 +340,10 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                     </div>
 
                     <button
-                      className={cn(
-                        "w-full py-2.5 px-3.5 border-none rounded-xl text-sm font-semibold cursor-pointer",
-                        "transition-colors flex items-center justify-center gap-1.5 mt-auto",
+                      className={cn("w-full py-2.5 px-3.5 border-none rounded-xl text-sm font-semibold cursor-pointer","transition-colors flex items-center justify-center gap-1.5 mt-auto",
                         pkg.popular 
-                          ? "bg-primary text-white hover:opacity-90" 
-                          : "bg-fill-tertiary text-text-primary hover:bg-fill-secondary",
-                        "disabled:opacity-50 disabled:cursor-not-allowed"
+                          ?"bg-primary text-white hover:opacity-90" 
+                          :"bg-fill-tertiary text-text-primary hover:bg-fill-secondary","disabled:opacity-50 disabled:cursor-not-allowed"
                       )}
                       onClick={(e) => { e.stopPropagation(); handlePurchasePackage(pkg); }}
                       disabled={createCheckout.isPending}
@@ -366,7 +355,7 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
                         </>
                       ) : (
                         <>
-                          <img src="/icon/shopping-cart.svg" alt="" className={cn("w-3.5 h-3.5 opacity-70", pkg.popular ? "brightness-0 invert" : "icon-invert")} />
+                          <ShoppingCart size={16} />
                           <span>{t('billing.buyNow')}</span>
                         </>
                       )}
@@ -382,16 +371,17 @@ const UpgradePlanModal = ({ isOpen, onClose, onPurchaseSuccess }) => {
         <div className="py-3.5 px-6 flex flex-col items-center gap-1.5 max-sm:p-3.5">
           {showLocalCurrency && (
             <div className="flex items-center gap-1 text-[10px] text-text-muted opacity-70 italic">
-              <img src="/icon/info.svg" alt="" className="w-3 h-3 opacity-50 icon-invert" />
+              <Info size={12} className="opacity-50" />
               <span>{t('billing.localCurrencyDisclaimer', 'Prices shown are estimates and may vary based on current exchange rates')}</span>
             </div>
           )}
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-text-secondary">{t('billing.securePayment')}</span>
-            <img src="/icon/lemonsqueezy-with-name.svg" alt="Lemon Squeezy" className="h-4 w-auto opacity-90 icon-invert" />
+            <img src="/icon/lemonsqueezy-light-mode.svg" alt="Lemon Squeezy" className="h-4 w-auto opacity-90 lemonsqueezy-light" />
+            <img src="/icon/lemonsqueezy-darkmode.svg" alt="Lemon Squeezy" className="h-4 w-auto opacity-90 lemonsqueezy-dark" />
           </div>
           <div className="flex items-center gap-1.5 text-text-muted text-xs">
-            <img src="/icon/credit-card.svg" alt="Card" data-tooltip={t('billing.creditDebitCard')} className="w-3.5 h-3.5 opacity-50 icon-invert" />
+            <CreditCard size={14} className="opacity-50" />
             <span className="opacity-70">{t('billing.paymentMethods')}</span>
           </div>
         </div>

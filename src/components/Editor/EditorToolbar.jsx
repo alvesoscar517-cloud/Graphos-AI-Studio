@@ -22,15 +22,8 @@ const ToolbarButton = ({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={cn(
-        "flex items-center justify-center shrink-0",
-        "w-7 h-7 rounded-md",
-        "bg-transparent border-none cursor-pointer",
-        "transition-all duration-150",
-        "hover:bg-bg-hover",
-        "disabled:opacity-40 disabled:cursor-not-allowed",
-        isActive && "bg-primary/15 text-primary",
-        "max-md:w-6 max-md:h-6",
+      className={cn("flex items-center justify-center shrink-0","w-7 h-7 rounded-md","bg-transparent border-none cursor-pointer","transition-all duration-150","hover:bg-bg-hover","disabled:opacity-40 disabled:cursor-not-allowed",
+        isActive &&"bg-primary/15 text-primary","max-md:w-6 max-md:h-6",
         className
       )}
       data-tooltip={tooltip || label}
@@ -81,13 +74,7 @@ const ColorPicker = ({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         disabled={disabled}
-        className={cn(
-          "flex items-center justify-center",
-          "w-7 h-7 rounded-md",
-          "bg-transparent border-none cursor-pointer",
-          "transition-all duration-150",
-          "hover:bg-bg-hover",
-          "disabled:opacity-40 disabled:cursor-not-allowed"
+        className={cn("flex items-center justify-center","w-7 h-7 rounded-md","bg-transparent border-none cursor-pointer","transition-all duration-150","hover:bg-bg-hover","disabled:opacity-40 disabled:cursor-not-allowed"
         )}
         data-tooltip={tooltip}
         data-tooltip-position="bottom"
@@ -103,9 +90,7 @@ const ColorPicker = ({
       
       {isOpen && (
         <div 
-          className={cn(
-            "fixed p-2",
-            "bg-bg-primary border border-border-light rounded-lg shadow-popup"
+          className={cn("fixed p-2","bg-bg-primary border border-border-light rounded-lg shadow-popup"
           )}
           style={{
             zIndex: 9999,
@@ -122,10 +107,8 @@ const ColorPicker = ({
                   onChange(colorOption.value)
                   setIsOpen(false)
                 }}
-                className={cn(
-                  "w-6 h-6 rounded-md border-2 cursor-pointer",
-                  "transition-transform hover:scale-110",
-                  currentColor === colorOption.value ? "border-primary" : "border-transparent"
+                className={cn("w-6 h-6 rounded-md border-2 cursor-pointer","transition-transform hover:scale-110",
+                  currentColor === colorOption.value ?"border-primary" :"border-transparent"
                 )}
                 style={{ 
                   backgroundColor: colorOption.value === 'default' 
@@ -177,15 +160,7 @@ const ToolbarDropdown = ({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         disabled={disabled}
-        className={cn(
-          "flex items-center justify-center gap-1",
-          "h-7 px-2 rounded-md",
-          "bg-transparent border-none cursor-pointer",
-          "transition-all duration-150",
-          "hover:bg-bg-hover",
-          "disabled:opacity-40 disabled:cursor-not-allowed",
-          "text-xs font-medium text-text-secondary",
-          "max-md:h-6 max-md:px-1.5 max-md:text-[11px]"
+        className={cn("flex items-center justify-center gap-1","h-7 px-2 rounded-md","bg-transparent border-none cursor-pointer","transition-all duration-150","hover:bg-bg-hover","disabled:opacity-40 disabled:cursor-not-allowed","text-xs font-medium text-text-secondary","max-md:h-6 max-md:px-1.5 max-md:text-[11px]"
         )}
         data-tooltip={tooltip || label}
         data-tooltip-position="bottom"
@@ -216,11 +191,9 @@ const ToolbarDropdown = ({
                   onChange(option.value)
                   setIsOpen(false)
                 }}
-                className={cn(
-                  "block w-full px-3 py-1.5 text-left whitespace-nowrap text-sm rounded-lg",
-                  "border-none bg-transparent cursor-pointer transition-colors",
-                  !isActive && "hover:bg-fill-tertiary",
-                  isActive ? "text-primary font-medium" : "text-text-primary"
+                className={cn("block w-full px-3 py-1.5 text-left whitespace-nowrap text-sm rounded-lg","border-none bg-transparent cursor-pointer transition-colors",
+                  !isActive &&"hover:bg-fill-tertiary",
+                  isActive ?"text-primary font-medium" :"text-text-primary"
                 )}
                 style={option.style}
               >
@@ -426,13 +399,8 @@ const EditorToolbar = ({
 
   return (
     <div
-      className={cn(
-        "flex items-center justify-start gap-0.5 px-3 py-1.5",
-        "bg-fill-tertiary rounded-2xl",
-        "overflow-x-auto scrollbar-hidden",
-        "max-md:px-2 max-md:py-1 max-md:rounded-xl max-md:gap-0",
-        "transition-opacity duration-200",
-        disabled && "opacity-50 pointer-events-none",
+      className={cn("flex items-center justify-start gap-0.5 px-3 py-1.5","bg-fill-tertiary rounded-2xl","overflow-x-auto scrollbar-hidden","max-md:px-2 max-md:py-1 max-md:rounded-xl max-md:gap-0","transition-opacity duration-200",
+        disabled &&"opacity-50 pointer-events-none",
         className
       )}
     >

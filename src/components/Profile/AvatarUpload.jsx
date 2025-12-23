@@ -100,10 +100,7 @@ const AvatarUpload = ({
     <div className="flex flex-col items-center gap-3">
       {/* Avatar Display */}
       <div className="relative group">
-        <div className={cn(
-          "rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary-dark",
-          "flex items-center justify-center text-white font-semibold",
-          "ring-2 ring-border ring-offset-2 ring-offset-bg-primary",
+        <div className={cn("rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary-dark","flex items-center justify-center text-white font-semibold","ring-2 ring-border ring-offset-2 ring-offset-bg-primary",
           sizeClasses[size]
         )}>
           {currentAvatar ? (
@@ -122,13 +119,8 @@ const AvatarUpload = ({
           <button
             onClick={triggerFileSelect}
             disabled={isUploading}
-            className={cn(
-              "absolute inset-0 rounded-full",
-              "bg-black/50 opacity-0 group-hover:opacity-100",
-              "flex items-center justify-center",
-              "transition-opacity duration-200",
-              "cursor-pointer",
-              isUploading && "opacity-100"
+            className={cn("absolute inset-0 rounded-full","bg-black/50 opacity-0 group-hover:opacity-100","flex items-center justify-center","transition-opacity duration-200","cursor-pointer",
+              isUploading &&"opacity-100"
             )}
           >
             {isUploading ? (
@@ -172,12 +164,7 @@ const AvatarUpload = ({
           <button
             onClick={triggerFileSelect}
             disabled={isUploading}
-            className={cn(
-              "px-3 py-1.5 text-xs font-medium rounded-lg",
-              "bg-primary/10 text-primary",
-              "hover:bg-primary/20",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "transition-colors"
+            className={cn("px-3 py-1.5 text-xs font-medium rounded-lg","bg-primary/10 text-primary","hover:bg-primary/20","disabled:opacity-50 disabled:cursor-not-allowed","transition-colors"
             )}
           >
             {t('profile.changePhoto', 'Change photo')}
@@ -187,12 +174,7 @@ const AvatarUpload = ({
             <button
               onClick={handleRemove}
               disabled={isUploading}
-              className={cn(
-                "px-3 py-1.5 text-xs font-medium rounded-lg",
-                "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400",
-                "hover:bg-red-200 dark:hover:bg-red-900/50",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
-                "transition-colors"
+              className={cn("px-3 py-1.5 text-xs font-medium rounded-lg","bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400","hover:bg-red-200 dark:hover:bg-red-900/50","disabled:opacity-50 disabled:cursor-not-allowed","transition-colors"
               )}
             >
               {t('profile.removePhoto', 'Remove')}

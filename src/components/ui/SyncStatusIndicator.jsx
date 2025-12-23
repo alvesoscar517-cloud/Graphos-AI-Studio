@@ -44,23 +44,18 @@ const SyncStatusIndicator = () => {
 
   return (
     <div
-      className={cn(
-        "fixed bottom-4 left-1/2 -translate-x-1/2 z-50",
-        "flex items-center gap-3 px-4 py-2.5 rounded-full",
-        "shadow-lg border backdrop-blur-sm",
-        "transition-all duration-300 ease-out",
-        !showBanner && "translate-y-20 opacity-0 pointer-events-none",
+      className={cn("fixed bottom-4 left-1/2 -translate-x-1/2 z-50","flex items-center gap-3 px-4 py-2.5 rounded-full","shadow-lg border backdrop-blur-sm","transition-all duration-300 ease-out",
+        !showBanner &&"translate-y-20 opacity-0 pointer-events-none",
         isOnline 
-          ? "bg-green-50/95 dark:bg-green-900/90 border-green-200 dark:border-green-700"
-          : "bg-amber-50/95 dark:bg-amber-900/90 border-amber-200 dark:border-amber-700"
+          ?"bg-green-50/95 dark:bg-green-900/90 border-green-200 dark:border-green-700"
+          :"bg-amber-50/95 dark:bg-amber-900/90 border-amber-200 dark:border-amber-700"
       )}
     >
       {/* Status Icon */}
-      <div className={cn(
-        "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
+      <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0",
         isOnline 
-          ? "bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-300"
-          : "bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-300"
+          ?"bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-300"
+          :"bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-300"
       )}>
         {!isOnline ? (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -81,11 +76,10 @@ const SyncStatusIndicator = () => {
 
       {/* Message */}
       <div className="flex flex-col">
-        <span className={cn(
-          "text-sm font-medium",
+        <span className={cn("text-sm font-medium",
           isOnline 
-            ? "text-green-800 dark:text-green-200"
-            : "text-amber-800 dark:text-amber-200"
+            ?"text-green-800 dark:text-green-200"
+            :"text-amber-800 dark:text-amber-200"
         )}>
           {!isOnline 
             ? t('sync.offline', 'You\'re offline')
@@ -102,10 +96,7 @@ const SyncStatusIndicator = () => {
       {/* Dismiss button */}
       <button
         onClick={handleDismiss}
-        className={cn(
-          "p-1 rounded-full ml-2",
-          "hover:bg-black/10 dark:hover:bg-white/10",
-          "transition-colors"
+        className={cn("p-1 rounded-full ml-2","hover:bg-black/10 dark:hover:bg-white/10","transition-colors"
         )}
         aria-label={t('common.dismiss', 'Dismiss')}
       >

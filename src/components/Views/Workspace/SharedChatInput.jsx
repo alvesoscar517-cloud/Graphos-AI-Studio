@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/utils'
 
+import { Paperclip } from 'lucide-react'
 const SharedChatInput = ({ 
   onSendMessage, 
   disabled, 
@@ -70,46 +71,26 @@ const SharedChatInput = ({
   }
 
   return (
-    <div className={cn("w-full", isCentered && "max-w-2xl mx-auto")}>
-      <div className={cn(
-          "flex items-center gap-2 rounded-2xl py-2 px-3 min-h-11",
-          "bg-bg-primary border border-border-light",
-          "shadow-sm",
-          !isCentered && [
-            "bg-bg-primary/95",
-            "backdrop-blur-md"
-          ],
-          "transition-all duration-200",
-          "hover:border-border-hover focus-within:border-border-hover"
+    <div className={cn("w-full", isCentered &&"max-w-2xl mx-auto")}>
+      <div className={cn("flex items-center gap-2 rounded-2xl py-2 px-3 min-h-11","bg-bg-primary border border-border-light","shadow-sm",
+          !isCentered && ["bg-bg-primary/95","backdrop-blur-md"
+          ],"transition-all duration-200","hover:border-border-hover focus-within:border-border-hover"
         )}>
           <button 
             type="button"
-            className={cn(
-              "p-1 bg-transparent border-none cursor-pointer rounded-full",
-              "flex items-center justify-center shrink-0",
-              "opacity-60 transition-opacity duration-200",
-              "hover:opacity-100",
-              "disabled:opacity-30 disabled:cursor-not-allowed"
+            className={cn("p-1 bg-transparent border-none cursor-pointer rounded-full","flex items-center justify-center shrink-0","opacity-60 transition-opacity duration-200","hover:opacity-100","disabled:opacity-30 disabled:cursor-not-allowed"
             )}
             onClick={() => fileInputRef.current?.click()}
             disabled={disabled}
             data-tooltip={t('common.attach')}
             data-tooltip-position="top"
           >
-            <img src="/icon/paperclip.svg" alt={t('common.attach')} className="w-4.5 h-4.5 opacity-70 icon-invert" />
+            <Paperclip className="opacity-70" />
           </button>
 
           <textarea
             ref={textareaRef}
-            className={cn(
-              "flex-1 border-none bg-transparent resize-none",
-              "text-text-primary text-sm",
-              "py-1 px-1 outline-none",
-              "min-h-5 max-h-16",
-              "overflow-y-auto scrollbar-none",
-              "font-[Google_Sans,Roboto,sans-serif]",
-              "placeholder:text-text-muted placeholder:opacity-60",
-              "leading-normal"
+            className={cn("flex-1 border-none bg-transparent resize-none","text-text-primary text-sm","py-1 px-1 outline-none","min-h-5 max-h-16","overflow-y-auto scrollbar-none","font-[Google_Sans,Roboto,sans-serif]","placeholder:text-text-muted placeholder:opacity-60","leading-normal"
             )}
             placeholder={defaultPlaceholder}
             value={message}
@@ -123,13 +104,7 @@ const SharedChatInput = ({
           {showSendBtn && (
             <button 
               type="button"
-              className={cn(
-                "w-7 h-7 rounded-full border-none cursor-pointer shrink-0",
-                "flex items-center justify-center relative p-0",
-                "bg-primary text-white",
-                "transition-colors duration-200",
-                "hover:bg-primary-hover",
-                "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-border-light"
+              className={cn("w-7 h-7 rounded-full border-none cursor-pointer shrink-0","flex items-center justify-center relative p-0","bg-primary text-white","transition-colors duration-200","hover:bg-primary-hover","disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-border-light"
               )}
               onClick={handleSend}
               disabled={disabled}

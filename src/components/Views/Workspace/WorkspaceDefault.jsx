@@ -3,6 +3,7 @@ import { useUser } from '../../../stores/authStore'
 import { cn } from '../../../lib/utils'
 import QuickActions from './QuickActions'
 
+import { PanelLeft, PanelRight } from 'lucide-react'
 const WorkspaceDefault = ({ 
   onToggleLeftSidebar, 
   onToggleRightSidebar, 
@@ -18,17 +19,13 @@ const WorkspaceDefault = ({
       {/* Header */}
       <div className="flex items-center gap-2 py-2 px-4 border-b border-border-light h-14 shrink-0">
         <button 
-          className={cn(
-            "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
-            "w-8 h-8 shrink-0 flex items-center justify-center",
-            "transition-colors duration-200",
-            "hover:bg-bg-hover"
+          className={cn("p-1.5 bg-transparent border-none cursor-pointer rounded-full","w-8 h-8 shrink-0 flex items-center justify-center","transition-colors duration-200","hover:bg-bg-hover"
           )}
           onClick={onToggleLeftSidebar}
           data-tooltip={t('common.menu')} 
           data-tooltip-position="right"
         >
-          <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+          <PanelLeft size={20} className="opacity-60" />
         </button>
         
         <span className="text-sm font-medium text-text-primary">
@@ -38,17 +35,13 @@ const WorkspaceDefault = ({
         {rightSidebarHidden && (
           <div className="ml-auto">
             <button 
-              className={cn(
-                "p-1.5 bg-transparent border-none cursor-pointer rounded-full",
-                "w-8 h-8 flex items-center justify-center",
-                "transition-colors duration-200",
-                "hover:bg-bg-hover"
+              className={cn("p-1.5 bg-transparent border-none cursor-pointer rounded-full","w-8 h-8 flex items-center justify-center","transition-colors duration-200","hover:bg-bg-hover"
               )}
               onClick={onToggleRightSidebar}
               data-tooltip={t('nav.sidebar')} 
               data-tooltip-position="left"
             >
-              <img src="/icon/panel-right.svg" alt={t('nav.sidebar')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+              <PanelRight size={20} className="opacity-60" />
             </button>
           </div>
         )}

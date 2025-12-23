@@ -78,15 +78,10 @@ const ChangePasswordV2 = ({ onChangePassword, onCancel, isLoading: externalLoadi
     setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }))
   }
 
-  const inputClass = cn(
-    "w-full pl-11 pr-12 py-3 text-sm border rounded-xl",
-    "bg-white text-gray-900 transition-all duration-200",
-    "focus:outline-none focus:border-system-blue focus:ring-2 focus:ring-system-blue/20",
-    "disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed",
-    "placeholder:text-gray-400"
+  const inputClass = cn("w-full pl-11 pr-12 py-3 text-sm border rounded-xl","bg-white text-gray-900 transition-all duration-200","focus:outline-none focus:border-system-blue focus:ring-2 focus:ring-system-blue/20","disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed","placeholder:text-gray-400"
   )
 
-  const inputErrorClass = "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+  const inputErrorClass ="border-red-300 focus:border-red-500 focus:ring-red-500/20"
 
   const PasswordIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -129,9 +124,7 @@ const ChangePasswordV2 = ({ onChangePassword, onCancel, isLoading: externalLoadi
             setShowSuccess(false)
             onCancel?.()
           }}
-          className={cn(
-            "px-6 py-3 text-sm font-semibold rounded-xl transition-all duration-200",
-            "bg-system-blue text-white hover:brightness-110 active:scale-[0.98]"
+          className={cn("px-6 py-3 text-sm font-semibold rounded-xl transition-all duration-200","bg-system-blue text-white hover:brightness-110 active:scale-[0.98]"
           )}
         >
           {t('auth.email.done', 'Done')}
@@ -257,10 +250,7 @@ const ChangePasswordV2 = ({ onChangePassword, onCancel, isLoading: externalLoadi
         <button
           type="submit"
           disabled={isLoading}
-          className={cn(
-            "flex-1 py-3 px-4 text-sm font-semibold rounded-xl transition-all duration-200",
-            "bg-system-blue text-white hover:brightness-110 active:scale-[0.98]",
-            "disabled:opacity-40 disabled:cursor-not-allowed"
+          className={cn("flex-1 py-3 px-4 text-sm font-semibold rounded-xl transition-all duration-200","bg-system-blue text-white hover:brightness-110 active:scale-[0.98]","disabled:opacity-40 disabled:cursor-not-allowed"
           )}
         >
           {isLoading ? (
@@ -277,10 +267,7 @@ const ChangePasswordV2 = ({ onChangePassword, onCancel, isLoading: externalLoadi
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className={cn(
-              "px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200",
-              "bg-gray-100 text-gray-700 hover:bg-gray-200",
-              "disabled:opacity-40 disabled:cursor-not-allowed"
+            className={cn("px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200","bg-gray-100 text-gray-700 hover:bg-gray-200","disabled:opacity-40 disabled:cursor-not-allowed"
             )}
           >
             {t('common.cancel')}

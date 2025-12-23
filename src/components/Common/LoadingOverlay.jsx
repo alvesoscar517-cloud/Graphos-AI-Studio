@@ -35,18 +35,11 @@ const LoadingOverlay = ({ show }) => {
   if (!show) return null
 
   return (
-    <div className={cn(
-      "fixed inset-0 bg-black/5",
-      "backdrop-blur-[1px]",
-      "flex items-center justify-center z-modal-backdrop",
-      "animate-fade-in"
+    <div className={cn("fixed inset-0 bg-black/5","backdrop-blur-[1px]","flex items-center justify-center z-modal-backdrop","animate-fade-in"
     )}
     style={{ WebkitBackdropFilter: 'blur(1px)' }}
     >
-      <div className={cn(
-        "flex flex-col items-center gap-3 p-6 rounded-lg",
-        "bg-bg-primary/80 shadow-elevated",
-        "animate-scale-in-bounce"
+      <div className={cn("flex flex-col items-center gap-3 p-6 rounded-lg","bg-bg-primary/80 shadow-elevated","animate-scale-in-bounce"
       )}>
         <Suspense fallback={<SpinnerFallback />}>
           <LottieLoader />

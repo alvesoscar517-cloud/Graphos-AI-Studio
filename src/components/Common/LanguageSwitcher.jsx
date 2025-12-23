@@ -32,12 +32,7 @@ const LanguageSwitcher = ({ compact = false }) => {
     return (
       <div className="inline-flex items-center relative" ref={dropdownRef}>
         <button 
-          className={cn(
-            "flex items-center gap-1.5 py-1.5 px-2.5 rounded-md",
-            "bg-bg-secondary border border-border-light",
-            "text-text-primary text-sm cursor-pointer",
-            "transition-all duration-200",
-            "hover:border-accent"
+          className={cn("flex items-center gap-1.5 py-1.5 px-2.5 rounded-md","bg-bg-secondary border border-border-light","text-text-primary text-sm cursor-pointer","transition-all duration-200","hover:border-accent"
           )}
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -46,26 +41,18 @@ const LanguageSwitcher = ({ compact = false }) => {
             name="chevron-down" 
             size="sm"
             color="muted"
-            className={cn("transition-transform duration-200", isOpen && "rotate-180")}
+            className={cn("transition-transform duration-200", isOpen &&"rotate-180")}
           />
         </button>
         
         {isOpen && (
-          <div className={cn(
-            "absolute top-full right-0 mt-1 min-w-[160px]",
-            "bg-bg-primary border border-border-light rounded-lg",
-            "shadow-lg overflow-hidden z-50",
-            "animate-fade-in-fast"
+          <div className={cn("absolute top-full right-0 mt-1 min-w-[160px]","bg-bg-primary border border-border-light rounded-lg","shadow-lg overflow-hidden z-50","animate-fade-in-fast"
           )}>
             {supportedLanguages.map((lang) => (
               <button
                 key={lang.code}
-                className={cn(
-                  "w-full flex items-center gap-2 py-2 px-3",
-                  "text-sm text-left bg-transparent border-none cursor-pointer",
-                  "text-text-primary transition-colors duration-150",
-                  "hover:bg-bg-hover",
-                  currentLanguage === lang.code && "bg-bg-secondary"
+                className={cn("w-full flex items-center gap-2 py-2 px-3","text-sm text-left bg-transparent border-none cursor-pointer","text-text-primary transition-colors duration-150","hover:bg-bg-hover",
+                  currentLanguage === lang.code &&"bg-bg-secondary"
                 )}
                 onClick={() => handleLanguageChange(lang.code)}
               >
@@ -85,12 +72,7 @@ const LanguageSwitcher = ({ compact = false }) => {
   return (
     <div className="inline-flex items-center relative" ref={dropdownRef}>
       <button 
-        className={cn(
-          "flex items-center gap-2 py-1.5 px-3 rounded-md",
-          "bg-bg-secondary border border-border-light",
-          "text-text-primary text-sm cursor-pointer",
-          "transition-all duration-200",
-          "hover:border-accent focus:outline-none focus:border-accent focus:ring-2 focus:ring-primary/20"
+        className={cn("flex items-center gap-2 py-1.5 px-3 rounded-md","bg-bg-secondary border border-border-light","text-text-primary text-sm cursor-pointer","transition-all duration-200","hover:border-accent focus:outline-none focus:border-accent focus:ring-2 focus:ring-primary/20"
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -100,26 +82,18 @@ const LanguageSwitcher = ({ compact = false }) => {
           name="chevron-down"
           size="sm"
           color="muted"
-          className={cn("transition-transform duration-200", isOpen && "rotate-180")}
+          className={cn("transition-transform duration-200", isOpen &&"rotate-180")}
         />
       </button>
       
       {isOpen && (
-        <div className={cn(
-          "absolute top-full left-0 mt-1 min-w-[200px]",
-          "bg-bg-primary border border-border-light rounded-lg",
-          "shadow-lg overflow-hidden z-50",
-          "animate-fade-in-fast"
+        <div className={cn("absolute top-full left-0 mt-1 min-w-[200px]","bg-bg-primary border border-border-light rounded-lg","shadow-lg overflow-hidden z-50","animate-fade-in-fast"
         )}>
           {supportedLanguages.map((lang) => (
             <button
               key={lang.code}
-              className={cn(
-                "w-full flex items-center gap-2 py-2.5 px-3",
-                "text-sm text-left bg-transparent border-none cursor-pointer",
-                "text-text-primary transition-colors duration-150",
-                "hover:bg-bg-hover",
-                currentLanguage === lang.code && "bg-bg-secondary"
+              className={cn("w-full flex items-center gap-2 py-2.5 px-3","text-sm text-left bg-transparent border-none cursor-pointer","text-text-primary transition-colors duration-150","hover:bg-bg-hover",
+                currentLanguage === lang.code &&"bg-bg-secondary"
               )}
               onClick={() => handleLanguageChange(lang.code)}
             >

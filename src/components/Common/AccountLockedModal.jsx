@@ -34,15 +34,9 @@ export default function AccountLockedModal() {
   if (!isVisible || !lockInfo) return null;
 
   return (
-    <div className={cn(
-      "fixed inset-0 bg-black/5 flex items-center justify-center z-toast p-5",
-      "backdrop-blur-[1px]"
+    <div className={cn("fixed inset-0 bg-black/5 flex items-center justify-center z-toast p-5","backdrop-blur-[1px]"
     )}>
-      <div className={cn(
-        "bg-bg-primary rounded-2xl p-10 max-w-modal-md w-full",
-        "shadow-2xl text-center",
-        "animate-slide-up",
-        "max-sm:p-6"
+      <div className={cn("bg-bg-primary border border-border rounded-2xl p-10 max-w-modal-md w-full","shadow-2xl text-center","animate-slide-up","max-sm:p-6"
       )}>
         {/* Icon */}
         <div className="mx-auto mb-6 w-16 h-16">
@@ -65,9 +59,7 @@ export default function AccountLockedModal() {
         
         {/* Reason */}
         {lockInfo.reason && (
-          <div className={cn(
-            "bg-error/10 border border-error/30",
-            "rounded-lg p-4 mb-6 text-left"
+          <div className={cn("bg-error/10 border border-error/30","rounded-lg p-4 mb-6 text-left"
           )}>
             <strong className="block text-error text-sm mb-2">
               {t('accountLocked.reason', 'Reason')}:
@@ -81,21 +73,14 @@ export default function AccountLockedModal() {
         {/* Actions */}
         <div className="flex gap-3 mb-5 max-sm:flex-col">
           <button 
-            className={cn(
-              "flex-1 py-3 px-6 rounded-lg font-semibold text-sm cursor-pointer border-none",
-              "bg-error text-white transition-all duration-200",
-              "hover:bg-red-600 hover:-translate-y-0.5 hover:shadow-glow-error"
+            className={cn("flex-1 py-3 px-6 rounded-lg font-semibold text-sm cursor-pointer border-none","bg-error text-white transition-all duration-200","hover:bg-red-600 hover:-translate-y-0.5 hover:shadow-glow-error"
             )}
             onClick={handleContactSupport}
           >
             {t('accountLocked.contactSupport', 'Contact Support')}
           </button>
           <button 
-            className={cn(
-              "flex-1 py-3 px-6 rounded-lg font-semibold text-sm cursor-pointer border-none",
-              "bg-bg-secondary text-text-secondary",
-              "transition-colors duration-200",
-              "hover:bg-bg-tertiary"
+            className={cn("flex-1 py-3 px-6 rounded-lg font-semibold text-sm cursor-pointer border-none","bg-bg-secondary text-text-secondary","transition-colors duration-200","hover:bg-bg-tertiary"
             )}
             onClick={handleClose}
           >

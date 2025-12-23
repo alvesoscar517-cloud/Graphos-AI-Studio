@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import ghostIcon from '../../../icon for background/ghost-with-raised-arms.svg'
 
+import { CheckCircle, Flag, Home, RefreshCw } from 'lucide-react'
 // Direct API call for error reporting (no QueryClient dependency)
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://graphosai-472729326429.us-central1.run.app'
 
@@ -150,15 +151,15 @@ const ErrorPage = ({
           <img 
             src={ghostIcon} 
             alt="Error" 
-            className="w-full h-full object-contain ghost-icon-invert"
+            className="w-full h-full object-contain ghost-"
           />
         </div>
         <style>{`
-          .ghost-icon-invert {
+          .ghost- {
             opacity: 0.6;
           }
-          .dark .ghost-icon-invert,
-          [data-theme="dark"] .ghost-icon-invert {
+          .dark .ghost-,
+          [data-theme="dark"] .ghost- {
             filter: invert(1) brightness(2);
             opacity: 0.7;
           }
@@ -193,7 +194,7 @@ const ErrorPage = ({
               className="inline-flex items-center justify-center gap-2 py-2.5 px-5 text-sm font-medium rounded-lg border-none cursor-pointer transition-all bg-accent text-white hover:bg-accent-hover active:scale-[0.98]"
               onClick={onRetry}
             >
-              <img src="/icon/refresh-cw.svg" alt="" className="w-4 h-4 brightness-0 invert" />
+              <RefreshCw />
               {t('errorPage.tryAgain', 'Try Again')}
             </button>
           )}
@@ -203,7 +204,7 @@ const ErrorPage = ({
               className="inline-flex items-center justify-center gap-2 py-2.5 px-5 text-sm font-medium rounded-lg border-none cursor-pointer transition-all bg-accent text-white hover:bg-accent-hover active:scale-[0.98]"
               onClick={handleReload}
             >
-              <img src="/icon/refresh-cw.svg" alt="" className="w-4 h-4 brightness-0 invert" />
+              <RefreshCw />
               {t('errorPage.tryAgain', 'Try Again')}
             </button>
           )}
@@ -220,21 +221,11 @@ const ErrorPage = ({
               onClick={handleReportError}
               disabled={reportStatus === 'sending' || reportStatus === 'sent' || reportStatus === 'already_reported'}
             >
-              <img 
-                src={reportStatus === 'sent' || reportStatus === 'already_reported' ? '/icon/check-circle.svg' : '/icon/flag.svg'} 
-                alt="" 
-                className={`w-4 h-4 ${
-                  reportStatus === 'sent' || reportStatus === 'already_reported' 
-                    ? '' 
-                    : 'opacity-70 icon-invert'
-                }`}
-                style={reportStatus === 'sent' || reportStatus === 'already_reported' 
-                  ? { filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' } 
-                  : reportStatus === 'error'
-                  ? { filter: 'invert(31%) sepia(98%) saturate(7483%) hue-rotate(359deg) brightness(103%) contrast(107%)' }
-                  : {}
-                }
-              />
+              {reportStatus === 'sent' || reportStatus === 'already_reported' ? (
+                <CheckCircle size={16} className="text-success" />
+              ) : (
+                <Flag size={16} className={reportStatus === 'error' ? 'text-error' : 'opacity-70'} />
+              )}
               {getReportButtonText()}
             </button>
           )}
@@ -244,7 +235,7 @@ const ErrorPage = ({
               className="inline-flex items-center justify-center gap-2 py-2.5 px-5 text-sm font-medium rounded-lg cursor-pointer transition-all bg-bg-secondary text-text-primary border border-border-light hover:bg-bg-hover active:scale-[0.98]"
               onClick={handleGoHome}
             >
-              <img src="/icon/home.svg" alt="" className="w-4 h-4 opacity-70 icon-invert" />
+              <Home size={18} className="opacity-70" />
               {t('errorPage.backToHome', 'Back to Home')}
             </button>
           )}

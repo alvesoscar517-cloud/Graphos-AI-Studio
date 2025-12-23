@@ -4,6 +4,7 @@
  */
 import { useEffect, useCallback } from 'react'
 import { cn } from '../../lib/utils'
+import { AlertTriangle, HelpCircle, Info } from 'lucide-react'
 
 const ConfirmModal = ({
   isOpen,
@@ -32,13 +33,11 @@ const ConfirmModal = ({
 
   if (!isOpen) return null
 
-  const iconMap = {
-    warning: 'alert-triangle',
-    question: 'help-circle',
-    info: 'info'
-  }
-
-  const icon = iconMap[type] || 'alert-triangle'
+  const IconComponent = {
+    warning: AlertTriangle,
+    question: HelpCircle,
+    info: Info
+  }[type] || AlertTriangle
 
   const iconBgColors = {
     warning: 'bg-icon-warning',
@@ -46,10 +45,10 @@ const ConfirmModal = ({
     info: 'bg-icon-info'
   }
 
-  const iconFilterClasses = {
-    warning: 'filter-icon-warning',
-    question: 'filter-icon-primary',
-    info: 'filter-icon-primary'
+  const iconColorClasses = {
+    warning: 'text-warning',
+    question: 'text-primary',
+    info: 'text-primary'
   }
 
   return (
@@ -63,7 +62,7 @@ const ConfirmModal = ({
     >
       <div 
         className={cn(
-          "bg-white rounded-2xl max-w-md w-[90%] py-5 px-6",
+          "bg-white border border-gray-200 rounded-2xl max-w-md w-[90%] py-5 px-6",
           "shadow-xl",
           "animate-scale-in"
         )}
@@ -74,11 +73,7 @@ const ConfirmModal = ({
             "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
             iconBgColors[type]
           )}>
-            <img 
-              src={`/icon/${icon}.svg`} 
-              alt={type} 
-              className={cn("w-5 h-5", iconFilterClasses[type])}
-            />
+            <IconComponent size={20} className={iconColorClasses[type]} />
           </div>
           <div className="flex-1 min-w-0 pt-1">
             <h3 className="text-base font-semibold text-text-primary m-0 mb-1 leading-tight">

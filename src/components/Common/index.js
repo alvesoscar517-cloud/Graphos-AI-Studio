@@ -1,5 +1,6 @@
 // Common components exports
 export { default as Icon } from './Icon'
+export { default as DynamicIcon } from './DynamicIcon'
 export { default as ConfirmDialog } from './ConfirmDialog'
 export { default as Toast } from './Toast'
 export { default as Spinner } from './Spinner'

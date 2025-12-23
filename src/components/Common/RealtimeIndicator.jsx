@@ -16,15 +16,13 @@ export default function RealtimeIndicator({ isConnected, lastUpdate, className }
   }
 
   return (
-    <div className={cn(
-      "flex items-center gap-3 px-3.5 py-2 bg-fill-tertiary rounded-full text-xs text-text-muted",
+    <div className={cn("flex items-center gap-3 px-3.5 py-2 bg-fill-tertiary rounded-full text-xs text-text-muted",
       className
     )}>
       <div className="flex items-center gap-2">
         <span 
-          className={cn(
-            "w-2 h-2 rounded-full",
-            isConnected ? "bg-success" : "bg-warning"
+          className={cn("w-2 h-2 rounded-full",
+            isConnected ?"bg-success" :"bg-warning"
           )}
           style={isConnected ? { animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' } : {}} 
         />

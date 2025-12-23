@@ -85,7 +85,7 @@ export function NoteList() {
       {/* Editor Modal */}
       {isEditorOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg mx-4">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 w-full max-w-lg mx-4">
             <h3 className="text-lg font-semibold mb-4">
               {editingNote ? t('notes.editNote') : t('notes.newNote')}
             </h3>

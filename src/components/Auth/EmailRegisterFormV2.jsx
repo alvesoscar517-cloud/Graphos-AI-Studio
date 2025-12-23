@@ -99,12 +99,7 @@ const EmailRegisterFormV2 = ({ onRegister, onSwitchToLogin, isLoading: externalL
     good: 'text-emerald-500', strong: 'text-emerald-600'
   }
 
-  const inputClass = cn(
-    "w-full pl-11 pr-3.5 py-3 text-sm border border-gray-200 rounded-xl",
-    "bg-white text-gray-900 transition-all duration-200",
-    "focus:outline-none focus:border-system-blue focus:ring-2 focus:ring-system-blue/20",
-    "disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed",
-    "placeholder:text-gray-400"
+  const inputClass = cn("w-full pl-11 pr-3.5 py-3 text-sm border border-gray-200 rounded-xl","bg-white text-gray-900 transition-all duration-200","focus:outline-none focus:border-system-blue focus:ring-2 focus:ring-system-blue/20","disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed","placeholder:text-gray-400"
   )
 
   return (
@@ -141,7 +136,7 @@ const EmailRegisterFormV2 = ({ onRegister, onSwitchToLogin, isLoading: externalL
             disabled={loading} 
             autoComplete="name" 
             maxLength={50} 
-            className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.displayName && "border-red-300")} 
+            className={cn(inputClass,"pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.displayName &&"border-red-300")} 
           />
         </div>
         {errors.displayName && (
@@ -168,7 +163,7 @@ const EmailRegisterFormV2 = ({ onRegister, onSwitchToLogin, isLoading: externalL
             placeholder={t('auth.email.emailPlaceholder')} 
             disabled={loading} 
             autoComplete="email" 
-            className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.email && "border-red-300")} 
+            className={cn(inputClass,"pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.email &&"border-red-300")} 
           />
         </div>
         {errors.email && (
@@ -195,7 +190,7 @@ const EmailRegisterFormV2 = ({ onRegister, onSwitchToLogin, isLoading: externalL
             placeholder={t('auth.email.passwordPlaceholder')}
             disabled={loading} 
             autoComplete="new-password" 
-            className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm pr-10 sm:pr-12", errors.password && "border-red-300")} 
+            className={cn(inputClass,"pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm pr-10 sm:pr-12", errors.password &&"border-red-300")} 
           />
           <button 
             type="button" 
@@ -255,7 +250,7 @@ const EmailRegisterFormV2 = ({ onRegister, onSwitchToLogin, isLoading: externalL
             placeholder={t('auth.email.confirmPasswordPlaceholder')}
             disabled={loading} 
             autoComplete="new-password" 
-            className={cn(inputClass, "pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.confirmPassword && "border-red-300")} 
+            className={cn(inputClass,"pl-9 sm:pl-11 py-2.5 sm:py-3 text-xs sm:text-sm", errors.confirmPassword &&"border-red-300")} 
           />
         </div>
         <div className="min-h-[20px] sm:min-h-[24px] mt-1 sm:mt-1.5">
@@ -263,7 +258,7 @@ const EmailRegisterFormV2 = ({ onRegister, onSwitchToLogin, isLoading: externalL
             <span className="text-[10px] sm:text-xs text-red-500">{errors.confirmPassword.message}</span>
           ) : (
             <span className={cn("text-xs sm:text-sm text-error font-medium transition-opacity duration-150",
-              confirmPassword && password !== confirmPassword ? "opacity-100" : "opacity-0")}>
+              confirmPassword && password !== confirmPassword ?"opacity-100" :"opacity-0")}>
               {t('auth.email.passwordMismatch')}
             </span>
           )}
@@ -284,10 +279,7 @@ const EmailRegisterFormV2 = ({ onRegister, onSwitchToLogin, isLoading: externalL
       <button 
         type="submit" 
         disabled={loading || passwordStrength.score < 50}
-        className={cn(
-          "w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200",
-          "bg-system-blue text-white hover:brightness-110 active:scale-[0.98] active:brightness-95",
-          "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100"
+        className={cn("w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200","bg-system-blue text-white hover:brightness-110 active:scale-[0.98] active:brightness-95","disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100"
         )}
       >
         {loading ? (
@@ -310,11 +302,7 @@ const EmailRegisterFormV2 = ({ onRegister, onSwitchToLogin, isLoading: externalL
         type="button" 
         onClick={onSwitchToLogin} 
         disabled={loading}
-        className={cn(
-          "w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-medium rounded-xl transition-all duration-200",
-          "bg-white text-gray-800 border border-gray-200",
-          "hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100 active:scale-[0.98]",
-          "disabled:opacity-40 disabled:cursor-not-allowed"
+        className={cn("w-full py-2.5 sm:py-3 px-4 text-xs sm:text-sm font-medium rounded-xl transition-all duration-200","bg-white text-gray-800 border border-gray-200","hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100 active:scale-[0.98]","disabled:opacity-40 disabled:cursor-not-allowed"
         )}
       >
         {t('auth.email.alreadyHaveAccount')}

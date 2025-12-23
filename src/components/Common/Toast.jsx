@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom';
 import { useEffect } from 'react';
 import { cn } from '../../lib/utils';
+import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react'
 
 export default function Toast({ message, type = 'info', onClose, duration = 3000 }) {
   useEffect(() => {
@@ -12,17 +13,24 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
     }
   }, [duration, onClose]);
 
-  const icons = {
-    success: '/icon/check-circle.svg',
-    error: '/icon/x-circle.svg',
-    warning: '/icon/alert-triangle.svg',
-    info: '/icon/info.svg'
-  };
+  const IconComponent = {
+    success: CheckCircle,
+    error: XCircle,
+    warning: AlertTriangle,
+    info: Info
+  }[type] || Info;
+
+  const iconColorClass = {
+    success: 'text-success',
+    error: 'text-error',
+    warning: 'text-warning',
+    info: 'text-primary'
+  }[type] || 'text-primary';
 
   return createPortal(
     <div className={cn(
       "fixed top-6 right-6 min-w-toast max-w-toast-max py-4 px-5",
-      "bg-bg-secondary rounded-md shadow-elevated",
+      "bg-bg-secondary border border-border rounded-md shadow-elevated",
       "flex items-center gap-3 z-toast",
       "animate-slide-in backdrop-blur-xl",
       "dark:bg-gray-900",
@@ -35,17 +43,7 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
         type === 'warning' && "bg-system-orange/15",
         type === 'info' && "bg-system-blue/15"
       )}>
-        <img 
-          src={icons[type]} 
-          alt={type} 
-          className={cn(
-            "w-5 h-5",
-            type === 'success' && "filter-icon-success",
-            type === 'error' && "filter-icon-error",
-            type === 'warning' && "filter-icon-warning",
-            type === 'info' && "filter-icon-primary"
-          )} 
-        />
+        <IconComponent size={20} className={iconColorClass} />
       </div>
       <span className="flex-1 text-text-primary font-medium text-body leading-relaxed">
         {message}
@@ -60,7 +58,7 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
         data-tooltip="Close"
         data-tooltip-position="left"
       >
-        <img src="/icon/x.svg" alt="Close" className="w-4 h-4 block icon-invert" />
+        <X size={16} className="text-current" />
       </button>
     </div>,
     document.body

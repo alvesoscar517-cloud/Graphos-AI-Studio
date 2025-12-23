@@ -12,6 +12,7 @@ import threeDotsAnimation from '../../animation/Three dots loading.json'
 import { cn } from '../../lib/utils'
 import LazyLottie from '../Common/LazyLottie'
 
+import { Pen, Upload, UserCheck } from 'lucide-react'
 const transition = {
   type: 'spring',
   bounce: 0,
@@ -23,16 +24,9 @@ const transition = {
 const Button = ({ children, onClick, disabled, ariaLabel, active = false, variant = '' }) => {
   return (
     <button
-      className={cn(
-        "rewrite-toolbar-btn",
-        "relative flex items-center justify-center gap-2 h-10 px-5",
-        "border-none rounded-xl",
-        "text-sm font-medium cursor-pointer",
-        "transition-all duration-150 select-none whitespace-nowrap shrink-0",
-        "disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none",
-        "focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:outline-offset-2 focus-visible:rounded-xl",
-        active && "active",
-        variant === 'primary' && "variant-primary"
+      className={cn("rewrite-toolbar-btn","relative flex items-center justify-center gap-2 h-10 px-5","border-none rounded-xl","text-sm font-medium cursor-pointer","transition-all duration-150 select-none whitespace-nowrap shrink-0","disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none","focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:outline-offset-2 focus-visible:rounded-xl",
+        active &&"active",
+        variant === 'primary' &&"variant-primary"
       )}
       type="button"
       onClick={onClick}
@@ -412,10 +406,7 @@ const RewriteToolbar = ({
   return (
     <MotionConfig transition={transition}>
       <motion.div 
-        className={cn(
-          "absolute bottom-6 left-0 right-0 z-sidebar",
-          "pointer-events-none flex justify-center items-center",
-          "md:bottom-4"
+        className={cn("absolute bottom-6 left-0 right-0 z-sidebar","pointer-events-none flex justify-center items-center","md:bottom-4"
         )}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -433,21 +424,21 @@ const RewriteToolbar = ({
                 active={isLoading}
                 variant={writingPreferences?.useIterativeRefinement ? 'primary' : ''}
               >
-                <img 
-                  src={writingPreferences?.useIterativeRefinement ? '/icon/user-check.svg' : '/icon/pen.svg'} 
-                  alt={t('rewrite.rewrite')} 
-                  className={cn(
-                    "w-icon-md h-icon-md shrink-0 opacity-55 transition-opacity duration-150",
-                    "group-hover:not-disabled:opacity-85 icon-invert",
-                    isLoading && "invisible",
-                    writingPreferences?.useIterativeRefinement && "invert opacity-90"
-                  )}
-                />
-                <span className={cn(
-                  "text-sm leading-tight font-medium opacity-85 tracking-tight transition-opacity duration-150",
-                  "group-hover:not-disabled:opacity-100",
-                  isLoading && "invisible",
-                  writingPreferences?.useIterativeRefinement && "opacity-100"
+                {writingPreferences?.useIterativeRefinement ? (
+                  <UserCheck size={16} className={cn(
+                    "shrink-0 opacity-90 transition-opacity duration-150",
+                    isLoading && "invisible"
+                  )} />
+                ) : (
+                  <Pen size={16} className={cn(
+                    "shrink-0 opacity-55 transition-opacity duration-150",
+                    "group-hover:not-disabled:opacity-85",
+                    isLoading && "invisible"
+                  )} />
+                )}
+                <span className={cn("text-sm leading-tight font-medium opacity-85 tracking-tight transition-opacity duration-150","group-hover:not-disabled:opacity-100",
+                  isLoading &&"invisible",
+                  writingPreferences?.useIterativeRefinement &&"opacity-100"
                 )}>{rewriteLabel}</span>
                 {isLoading && (
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
@@ -466,17 +457,8 @@ const RewriteToolbar = ({
                 disabled={disabled || isLoading}
                 ariaLabel={t('rewrite.uploadFile')}
               >
-                <img 
-                  src="/icon/upload.svg" 
-                  alt={t('common.upload')} 
-                  className={cn(
-                    "w-icon-md h-icon-md shrink-0 opacity-55 transition-opacity duration-150",
-                    "group-hover:not-disabled:opacity-85 icon-invert"
-                  )}
-                />
-                <span className={cn(
-                  "text-sm leading-tight font-medium opacity-85 tracking-tight transition-opacity duration-150",
-                  "group-hover:not-disabled:opacity-100"
+                <Upload />
+                <span className={cn("text-sm leading-tight font-medium opacity-85 tracking-tight transition-opacity duration-150","group-hover:not-disabled:opacity-100"
                 )}>{t('common.upload')}</span>
               </Button>
             </div>

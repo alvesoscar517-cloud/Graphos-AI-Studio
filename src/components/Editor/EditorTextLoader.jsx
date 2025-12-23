@@ -41,10 +41,8 @@ const ShimmerLine = memo(function ShimmerLine({
       }}
     >
       <div
-        className={cn(
-          "relative overflow-hidden rounded-md",
-          height,
-          "bg-fill-secondary"
+        className={cn("relative overflow-hidden rounded-md",
+          height,"bg-fill-secondary"
         )}
         style={{ width }}
       >
@@ -213,11 +211,7 @@ const EditorTextLoader = memo(function EditorTextLoader({
       {visible && (
         <motion.div
           ref={containerRef}
-          className={cn(
-            "absolute inset-0 z-20",
-            "bg-bg-tertiary",
-            "flex flex-col",
-            "overflow-hidden",
+          className={cn("absolute inset-0 z-20","bg-bg-tertiary","flex flex-col","overflow-hidden",
             className
           )}
           initial={{ opacity: 0 }}
@@ -226,18 +220,15 @@ const EditorTextLoader = memo(function EditorTextLoader({
           transition={{ duration: 0.25 }}
         >
           {/* Content area matching editor padding */}
-          <div className={cn(
-            "flex-1 overflow-hidden",
-            "p-6 max-md:p-4",
+          <div className={cn("flex-1 overflow-hidden","p-6 max-md:p-4",
             // Center content vertically for compact layouts
-            layout.layout === 'compact' && "flex items-center"
+            layout.layout === 'compact' &&"flex items-center"
           )}>
             {/* Shimmer paragraphs */}
-            <div className={cn(
-              "flex flex-col gap-6",
+            <div className={cn("flex flex-col gap-6",
               // Adjust max-width based on layout
-              layout.layout === 'large' ? "max-w-4xl" : "max-w-3xl",
-              layout.layout === 'compact' && "gap-4 w-full"
+              layout.layout === 'large' ?"max-w-4xl" :"max-w-3xl",
+              layout.layout === 'compact' &&"gap-4 w-full"
             )}>
               {Array.from({ length: layout.paragraphs }).map((_, pIndex) => (
                 <ShimmerParagraph

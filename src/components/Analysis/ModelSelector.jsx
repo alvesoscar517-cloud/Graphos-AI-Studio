@@ -4,6 +4,17 @@ import { createPortal } from 'react-dom'
 import { cn } from '../../lib/utils'
 import Icon from '../Common/Icon'
 
+import { Zap, Layers, Star, Briefcase, Award } from 'lucide-react'
+
+// Tag icon mapping
+const TAG_ICONS = {
+  'zap': Zap,
+  'layers': Layers,
+  'star': Star,
+  'briefcase': Briefcase,
+  'award': Award,
+}
+
 const ModelSelector = ({ selectedModel, onModelSelect }) => {
   const { t } = useTranslation()
   const [showModal, setShowModal] = useState(false)
@@ -16,7 +27,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
       description: t('model.velocityDesc'),
       tags: [
         { label: t('model.shortText'), icon: 'zap' },
-        { label: t('model.lowCost'), icon: 'coins' }
+        { label: t('model.lowCost'), icon: 'zap' }
       ],
       iconName: 'audio-lines'
     },
@@ -55,11 +66,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
     <>
       {/* Selector Card */}
       <div 
-        className={cn(
-          "bg-bg-secondary border border-border-light rounded-xl",
-          "py-3 px-3 pb-2 cursor-pointer transition-all duration-200",
-          "flex flex-col items-center text-center gap-1",
-          "hover:border-border-hover hover:shadow-md"
+        className={cn("bg-bg-secondary border border-border-light rounded-xl","py-3 px-3 pb-2 cursor-pointer transition-all duration-200","flex flex-col items-center text-center gap-1","hover:border-border-hover hover:shadow-md"
         )}
         onClick={() => setShowModal(true)}
       >
@@ -85,11 +92,11 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
           onClick={() => setShowModal(false)}
         >
           <div 
-            className="bg-bg-primary rounded-3xl w-full max-w-lg h-[600px] flex flex-col shadow-modal animate-slide-up overflow-hidden max-md:max-w-[calc(100%-32px)] max-md:h-[80vh] max-md:rounded-2xl"
+            className="bg-bg-primary border border-border rounded-3xl w-full max-w-lg flex flex-col shadow-modal animate-slide-up overflow-hidden max-md:max-w-[calc(100%-32px)] max-md:rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between py-5 px-6 max-md:py-4 max-md:px-4">
+            <div className="flex items-center justify-between py-5 px-6 max-md:py-4 max-md:px-4 shrink-0">
               <h2 className="text-lg font-medium text-text-primary m-0">{t('model.selectAIModel')}</h2>
               <button 
                 className="bg-transparent border-none p-2 cursor-pointer rounded-full flex items-center justify-center hover:bg-bg-tertiary"
@@ -99,16 +106,12 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
               </button>
             </div>
 
-            {/* Models List */}
-            <div className="flex-1 overflow-y-auto flex flex-col gap-3 px-4 pb-4 max-md:gap-2 max-md:px-3 max-md:pb-3">
+            {/* Models List - No scroll, fit all 3 models */}
+            <div className="flex flex-col gap-3 px-4 pb-4 max-md:gap-2 max-md:px-3 max-md:pb-3">
               {MODELS.map(model => (
                 <div
                   key={model.id}
-                  className={cn(
-                    "bg-bg-primary border border-border-light rounded-xl",
-                    "p-4 cursor-pointer transition-all duration-200 relative flex flex-col gap-2.5",
-                    "hover:border-border-hover hover:shadow-sm",
-                    "max-md:p-3 max-md:gap-2"
+                  className={cn("bg-bg-primary border border-border-light rounded-xl","p-4 cursor-pointer transition-all duration-200 relative flex flex-col gap-2.5","hover:border-border-hover hover:shadow-sm","max-md:p-3 max-md:gap-2"
                   )}
                   onClick={() => handleSelectModel(model)}
                 >
@@ -141,15 +144,17 @@ const ModelSelector = ({ selectedModel, onModelSelect }) => {
 
                   {/* Tags */}
                   <div className="flex flex-wrap gap-1.5">
-                    {model.tags.map((tag, idx) => (
+                    {model.tags.map((tag, idx) => {
+                      const TagIcon = TAG_ICONS[tag.icon] || Zap
+                      return (
                       <span 
                         key={idx} 
                         className="flex items-center gap-1 py-0.5 px-1.5 bg-bg-secondary border border-border-light rounded-md text-[10px] text-text-muted"
                       >
-                        <Icon name={tag.icon} alt={tag.label} size="xs" color="muted" />
+                        <TagIcon size={12} className="opacity-70" />
                         {tag.label}
                       </span>
-                    ))}
+                    )})}
                   </div>
                 </div>
               ))}

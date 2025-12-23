@@ -11,28 +11,47 @@ import { useCredits } from '@/hooks/queries'
 import { SkeletonCreditRow, Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
+import { BarChart, Calendar, ChevronDown, Clock, CreditCard, Gift, MessageCircle, PanelLeft, Pencil, RefreshCw, RotateCcw, ScanSearch, Sparkles, WandSparkles, PlusCircle, MinusCircle, Circle } from 'lucide-react'
+
+// Icon component mapping
+const ICON_COMPONENTS = {
+  'message-circle': MessageCircle,
+  'wand-sparkles': WandSparkles,
+  'scan-search': ScanSearch,
+  'pencil': Pencil,
+  'bar-chart': BarChart,
+  'credit-card': CreditCard,
+  'gift': Gift,
+  'sparkles': Sparkles,
+  'rotate-ccw': RotateCcw,
+  'refresh-cw': RefreshCw,
+  'plus-circle': PlusCircle,
+  'minus-circle': MinusCircle,
+  'circle': Circle,
+}
+
 // Feature name to display text and icon mapping
 const FEATURE_CONFIG = {
   // Usage features (deduction)
-  chat_message: { icon: '/icon/message-circle.svg', labelKey: 'credits.feature.chatMessage' },
-  chat_message_output: { icon: '/icon/message-circle.svg', labelKey: 'credits.feature.chatMessage', mergeWith: 'chat_message' },
-  chat_humanized: { icon: '/icon/message-circle.svg', labelKey: 'credits.feature.chatHumanized' },
-  chat_humanized_output: { icon: '/icon/message-circle.svg', labelKey: 'credits.feature.chatHumanized', mergeWith: 'chat_humanized' },
-  humanize: { icon: '/icon/wand-sparkles.svg', labelKey: 'credits.feature.humanize' },
-  iterative_humanize: { icon: '/icon/wand-sparkles.svg', labelKey: 'credits.feature.humanize' },
-  detect: { icon: '/icon/scan-search.svg', labelKey: 'credits.feature.detect' },
-  rewrite: { icon: '/icon/pencil.svg', labelKey: 'credits.feature.rewrite' },
-  text_rewrite: { icon: '/icon/pencil.svg', labelKey: 'credits.feature.rewrite' },
-  analyze: { icon: '/icon/bar-chart.svg', labelKey: 'credits.feature.analyze' },
-  text_analysis: { icon: '/icon/bar-chart.svg', labelKey: 'credits.feature.analyze' },
-  ai_detection: { icon: '/icon/scan-search.svg', labelKey: 'credits.feature.detect' },
+  chat_message: { icon: 'message-circle', labelKey: 'credits.feature.chatMessage' },
+  chat_message_output: { icon: 'message-circle', labelKey: 'credits.feature.chatMessage', mergeWith: 'chat_message' },
+  chat_humanized: { icon: 'message-circle', labelKey: 'credits.feature.chatHumanized' },
+  chat_humanized_output: { icon: 'message-circle', labelKey: 'credits.feature.chatHumanized', mergeWith: 'chat_humanized' },
+  humanize: { icon: 'wand-sparkles', labelKey: 'credits.feature.humanize' },
+  iterative_humanize: { icon: 'wand-sparkles', labelKey: 'credits.feature.humanize' },
+  detect: { icon: 'scan-search', labelKey: 'credits.feature.detect' },
+  rewrite: { icon: 'pencil', labelKey: 'credits.feature.rewrite' },
+  text_rewrite: { icon: 'pencil', labelKey: 'credits.feature.rewrite' },
+  analyze: { icon: 'bar-chart', labelKey: 'credits.feature.analyze' },
+  text_analysis: { icon: 'bar-chart', labelKey: 'credits.feature.analyze' },
+  ai_detection: { icon: 'scan-search', labelKey: 'credits.feature.detect' },
   // Addition features
-  purchase: { icon: '/icon/credit-card.svg', labelKey: 'credits.feature.purchase' },
-  first_purchase: { icon: '/icon/gift.svg', labelKey: 'credits.feature.firstPurchase' },
-  bonus: { icon: '/icon/gift.svg', labelKey: 'credits.feature.bonus' },
-  welcome_bonus: { icon: '/icon/sparkles.svg', labelKey: 'credits.feature.welcomeBonus' },
-  refund: { icon: '/icon/rotate-ccw.svg', labelKey: 'credits.feature.refund' },
-  subscription_renewal: { icon: '/icon/refresh-cw.svg', labelKey: 'credits.feature.subscriptionRenewal' },
+  purchase: { icon: 'credit-card', labelKey: 'credits.feature.purchase' },
+  first_purchase: { icon: 'gift', labelKey: 'credits.feature.firstPurchase' },
+  bonus: { icon: 'gift', labelKey: 'credits.feature.bonus' },
+  welcome_bonus: { icon: 'sparkles', labelKey: 'credits.feature.welcomeBonus' },
+  refund: { icon: 'rotate-ccw', labelKey: 'credits.feature.refund' },
+  subscription_renewal: { icon: 'refresh-cw', labelKey: 'credits.feature.subscriptionRenewal' },
 }
 
 // Features that should be merged (output transactions merged into input)
@@ -56,15 +75,16 @@ const getTransactionIcon = (tx) => {
     return FEATURE_CONFIG[baseFeature].icon
   }
   // Fallback to type
-  if (type === 'addition') return '/icon/plus-circle.svg'
-  if (type === 'deduction') return '/icon/minus-circle.svg'
-  return '/icon/circle.svg'
+  if (type === 'addition') return 'plus-circle'
+  if (type === 'deduction') return 'minus-circle'
+  return 'circle'
 }
 
 // Transaction icon component
 const TransactionIcon = ({ tx }) => {
-  const iconSrc = getTransactionIcon(tx)
-  return <img src={iconSrc} alt="" className="w-5 h-5 opacity-55 icon-invert shrink-0" />
+  const iconName = getTransactionIcon(tx)
+  const IconComponent = ICON_COMPONENTS[iconName] || Circle
+  return <IconComponent size={20} className="opacity-55 shrink-0" />
 }
 
 const CreditHistoryView = ({ onToggleLeftSidebar }) => {
@@ -326,7 +346,7 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
           data-tooltip={t('common.menu')}
           data-tooltip-position="right"
         >
-          <img src="/icon/panel-left.svg" alt={t('common.menu')} className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+          <PanelLeft size={20} className="opacity-60" />
         </button>
       </div>
 
@@ -379,18 +399,14 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
                 )}
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
               >
-                <img src="/icon/calendar.svg" alt="Calendar" className="w-icon-lg h-icon-lg opacity-60 icon-invert" />
+                <Calendar size={20} className="opacity-60" />
                 <span>
                   {filterDays === 7 && t('credits.last7Days', 'Last 7 days')}
                   {filterDays === 30 && t('credits.last30Days', 'Last 30 days')}
                   {filterDays === 90 && t('credits.last90Days', 'Last 90 days')}
                   {filterDays === 365 && t('credits.lastYear', 'Last year')}
                 </span>
-                <img
-                  src="/icon/chevron-down.svg"
-                  alt="Expand"
-                  className={cn('w-4 h-4 opacity-60 transition-transform icon-invert', isFilterOpen && 'rotate-180')}
-                />
+                <ChevronDown size={16} />
               </button>
 
               <AnimatePresence>
@@ -484,7 +500,7 @@ const CreditHistoryView = ({ onToggleLeftSidebar }) => {
           ) : transactions.length === 0 ? (
             // Empty state
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <img src="/icon/clock.svg" alt="No transactions" className="w-16 h-16 opacity-20 mb-4 icon-invert" />
+              <Clock size={64} className="opacity-20 mb-4" />
               <p className="text-text-secondary text-sm">{t('credits.noTransactions', 'No transactions yet')}</p>
             </div>
           ) : isMobile ? (

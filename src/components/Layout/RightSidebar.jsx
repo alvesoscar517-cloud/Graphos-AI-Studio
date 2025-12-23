@@ -389,15 +389,10 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       </AnimatePresence>
 
       <motion.aside 
-        className={cn(
-          "bg-bg-tertiary",
-          "overflow-y-auto overflow-x-hidden flex flex-col",
-          "h-full shrink-0",
-          "touch-pan-y overscroll-contain scrollbar-none",
-          "rounded-md", // Floating panel effect
-          isDragging ? "z-[100] shadow-xl" : "z-sidebar",
+        className={cn("bg-bg-tertiary","overflow-y-auto overflow-x-hidden flex flex-col","h-full shrink-0","touch-pan-y overscroll-contain scrollbar-none","rounded-md", // Floating panel effect
+          isDragging ?"z-[100] shadow-xl" :"z-sidebar",
           // Mobile: full width overlay from right
-          isMobile && "fixed inset-y-0 right-0 rounded-none shadow-2xl z-[100] max-w-[85vw]"
+          isMobile &&"fixed inset-y-0 right-0 rounded-none shadow-2xl z-[100] max-w-[85vw]"
         )}
         initial={false}
         animate={{
@@ -406,12 +401,12 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
           x: isMobile && hidden ? '100%' : 0
         }}
         transition={{
-          type: "spring",
+          type:"spring",
           stiffness: 300,
           damping: 30,
           mass: 0.8
         }}
-        drag={hidden || isInteractingWithSlider || isMobile ? false : "x"}
+        drag={hidden || isInteractingWithSlider || isMobile ? false :"x"}
         dragConstraints={{ left: 0, right: 300 }}
         dragElastic={0.15}
         dragMomentum={false}
@@ -430,18 +425,14 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
         }}
       >
       {/* Header */}
-      <div className={cn(
-        "flex items-center gap-2 py-3 px-4 h-14 justify-start shrink-0",
-        isMobile && "px-3"
+      <div className={cn("flex items-center gap-2 py-3 px-4 h-14 justify-start shrink-0",
+        isMobile &&"px-3"
       )}>
         {/* Mode Toggle - Pill Slider */}
         <div className="relative flex p-1 rounded-full flex-1 bg-bg-secondary border border-border-light">
           {/* Sliding Pill Indicator */}
           <motion.div
-            className={cn(
-              "absolute top-1 bottom-1 rounded-full",
-              "bg-bg-primary border border-border-light",
-              "shadow-sm"
+            className={cn("absolute top-1 bottom-1 rounded-full","bg-bg-primary border border-border-light","shadow-sm"
             )}
             initial={false}
             animate={{
@@ -449,19 +440,16 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
               width: 'calc(50% - 4px)'
             }}
             transition={{
-              type: "spring",
+              type:"spring",
               stiffness: 400,
               damping: 30
             }}
           />
           
           <button 
-            className={cn(
-              "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 z-10",
-              "bg-transparent border-none rounded-full cursor-pointer",
-              "text-xs font-medium transition-colors duration-200",
-              mode === 'analysis' ? "text-text-primary" : "text-text-muted hover:text-text-secondary",
-              isMobile && "py-2"
+            className={cn("flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 z-10","bg-transparent border-none rounded-full cursor-pointer","text-xs font-medium transition-colors duration-200",
+              mode === 'analysis' ?"text-text-primary" :"text-text-muted hover:text-text-secondary",
+              isMobile &&"py-2"
             )}
             onClick={() => handleModeChange('analysis')}
           >
@@ -475,12 +463,9 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
             <span>{t('rightSidebar.analysis')}</span>
           </button>
           <button 
-            className={cn(
-              "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 z-10",
-              "bg-transparent border-none rounded-full cursor-pointer",
-              "text-xs font-medium transition-colors duration-200",
-              mode === 'rewrite' ? "text-text-primary" : "text-text-muted hover:text-text-secondary",
-              isMobile && "py-2"
+            className={cn("flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 z-10","bg-transparent border-none rounded-full cursor-pointer","text-xs font-medium transition-colors duration-200",
+              mode === 'rewrite' ?"text-text-primary" :"text-text-muted hover:text-text-secondary",
+              isMobile &&"py-2"
             )}
             onClick={() => handleModeChange('rewrite')}
           >
@@ -497,12 +482,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
 
         {/* Close Button */}
         <button 
-          className={cn(
-            "shrink-0 p-1.5",
-            "bg-transparent border-none rounded-full cursor-pointer",
-            "flex items-center justify-center",
-            "w-8 h-8 transition-colors duration-200",
-            "hover:bg-bg-hover"
+          className={cn("shrink-0 p-1.5","bg-transparent border-none rounded-full cursor-pointer","flex items-center justify-center","w-8 h-8 transition-colors duration-200","hover:bg-bg-hover"
           )}
           onClick={onClose}
           data-tooltip={t('common.close')} 
@@ -515,9 +495,8 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
       {/* Settings Panel */}
       <div 
         ref={scrollContainerRef}
-        className={cn(
-          "flex flex-col gap-4 p-4 flex-1 overflow-y-auto overflow-x-hidden",
-          isMobile && "gap-3 p-3"
+        className={cn("flex flex-col gap-4 p-4 flex-1 overflow-y-auto overflow-x-hidden",
+          isMobile &&"gap-3 p-3"
         )}
       >
         <ProfileSelector 
@@ -575,14 +554,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
             {/* Rewrite Button */}
             <div className="flex flex-col gap-2">
               <button
-                className={cn(
-                  "w-full flex items-center justify-center gap-2 py-3 px-4",
-                  "rounded-xl font-semibold text-sm cursor-pointer",
-                  "transition-all duration-200",
-                  "bg-bg-secondary text-accent",
-                  "border border-border-light",
-                  "hover:bg-bg-hover hover:border-border-hover",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                className={cn("w-full flex items-center justify-center gap-2 py-3 px-4","rounded-xl font-semibold text-sm cursor-pointer","transition-all duration-200","bg-bg-secondary text-accent","border border-border-light","hover:bg-bg-hover hover:border-border-hover","disabled:opacity-50 disabled:cursor-not-allowed"
                 )}
                 onClick={handleRewrite}
                 disabled={!hasText || !hasAnyFeatureEnabled() || isRewriting || isProcessing}
@@ -597,7 +569,7 @@ const RightSidebar = ({ hidden, onClose, onAnalysisComplete, onModeChange }) => 
                 ) : (
                   <>
                     <Icon 
-                      name={writingPreferences?.useIterativeRefinement ? "user-check" : "pen"}
+                      name={writingPreferences?.useIterativeRefinement ?"user-check" :"pen"}
                       alt={rewriteLabel}
                       size="md"
                       color="primary"
